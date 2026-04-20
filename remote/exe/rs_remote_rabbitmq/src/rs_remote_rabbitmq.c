@@ -312,7 +312,7 @@ int rmq_connect(int msg_order)
 
 unsigned int rmq_receive()
 {
-  pwr_tStatus sts;
+  pwr_tStatus sts = 1;
   int search_remtrans = 0;
   remtrans_item* remtrans;
   amqp_rpc_reply_t ret;
@@ -513,10 +513,10 @@ unsigned int rmq_receive()
 
 unsigned int rmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans, char* buf, int buf_size)
 {
-  int sts;
+  int sts = 0;
   amqp_basic_properties_t prop;
   amqp_bytes_t msg;
-  char* tmpbuf;
+  char* tmpbuf = NULL;
   unsigned int tmpbuf_size;
 
   if (rn_rmq->DisableHeader)

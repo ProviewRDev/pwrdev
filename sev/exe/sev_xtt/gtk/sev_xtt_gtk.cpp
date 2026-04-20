@@ -65,8 +65,10 @@ int main(int argc, char* argv[])
   char servername[40] = "";
 
   // Get options
-  for (int i = 1; i < argc; i++) {
-    if (streq(argv[i], "-s") && i + 1 < argc) {
+  for (int i = 1; i < argc; i++)
+  {
+    if (streq(argv[i], "-s") && i + 1 < argc)
+    {
       strncpy(servername, argv[i + 1], sizeof(servername));
       i++;
     }
@@ -77,7 +79,8 @@ int main(int argc, char* argv[])
     throw co_error(sts);
 
   sevcli_init(&sts, &sevcli);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("Sev client init error %u\n", sts);
     exit(0);
   }
@@ -86,7 +89,8 @@ int main(int argc, char* argv[])
     sevcli_set_servernode(&sts, sevcli, servername);
 
   sevcli_get_itemlist(&sts, sevcli, &items, &itemcnt);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("Sev client get itemlist error %u\n", sts);
     exit(0);
   }

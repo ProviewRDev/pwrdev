@@ -50,7 +50,8 @@
 
 class GrowCtx;
 
-class GlowCustomColors {
+class GlowCustomColors
+{
 public:
   //! Constructor
   GlowCustomColors() : colortheme_lightness(0), is_default_colortheme(0)
@@ -60,21 +61,15 @@ public:
       colors[i][0] = colors[i][1] = colors[i][2] = 1;
   }
 
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(std::istream& fp);
   int get_color(glow_eDrawType dtype, double* r, double* g, double* b);
   int set_color(glow_eDrawType dtype, double r, double g, double b);
   void reset_colors();
   int write_colorfile(char* name);
   int read_colorfile(GrowCtx* ctx, char* name);
-  void set_colortheme_lightness(int lightness)
-  {
-    colortheme_lightness = lightness;
-  }
-  void set_colortheme_is_default(int isdefault)
-  {
-    is_default_colortheme = isdefault;
-  }
+  void set_colortheme_lightness(int lightness) { colortheme_lightness = lightness; }
+  void set_colortheme_is_default(int isdefault) { is_default_colortheme = isdefault; }
   int is_empty();
   static int get_colortheme_colors(char* file, double** colorvect, int* size);
 

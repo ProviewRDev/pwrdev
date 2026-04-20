@@ -39,11 +39,8 @@
 
 #include "xtt_xnav_brow.h"
 
-int xnav_crr_signal(
-    XNavBrow* brow, char* filename, char* signalname, brow_tNode parent_node);
-int xnav_crr_object(
-    XNavBrow* brow, char* filename, char* objectname, brow_tNode parent_node);
-int xnav_crr_code(XNavBrow* brow, char* filename, char* str, int brief,
-    int func, int case_sensitive);
+int xnav_crr_signal(XNavBrow* brow, char* filename, char* signalname, brow_tNode parent_node);
+int xnav_crr_object(XNavBrow* brow, char* filename, char* objectname, brow_tNode parent_node);
+int xnav_crr_code(XNavBrow* brow, char* filename, char* str, int brief, int func, int case_sensitive);
 
 #endif

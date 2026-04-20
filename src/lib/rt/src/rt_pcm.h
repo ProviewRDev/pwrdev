@@ -63,7 +63,8 @@
 
 #define pcm_cNewsVersion 1
 
-typedef enum {
+typedef enum
+{
   pcm_eNews__ = 0,
   pcm_eNews_HotSwitchInit = pcm_cNews_HotSwitchInit,
   pcm_eNews_HotSwitchDone = pcm_cNews_HotSwitchDone,
@@ -72,8 +73,9 @@ typedef enum {
 
 typedef struct pcm_s_News pcm_sNews;
 
-struct pcm_s_News {
-  pwr_tVersion Version; /* version of this message */
+struct pcm_s_News
+{
+  pwr_tVersion Version;     /* version of this message */
   pwr_tNodeIndex NodeIndex; /* index of source node */
   pwr_tTime Time;
   pcm_eNews News;

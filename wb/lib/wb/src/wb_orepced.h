@@ -39,7 +39,8 @@
 
 #include "wb_vrepced.h"
 
-class wb_orepced : public wb_orep {
+class wb_orepced : public wb_orep
+{
   wb_vrepced* m_vrep;
   unsigned int m_refCount;
   wb_orep* m_orep;
@@ -76,32 +77,21 @@ public:
 
   wb_orep* ancestor(pwr_tStatus* sts); ///< get object at top of hierarchy
   wb_orep* parent(pwr_tStatus* sts);
-  wb_orep* after(pwr_tStatus* sts); ///< get next sibling
-  wb_orep* before(pwr_tStatus* sts); ///< get previous sibling
-  wb_orep* first(pwr_tStatus* sts); ///< get first child
+  wb_orep* after(pwr_tStatus* sts);                ///< get next sibling
+  wb_orep* before(pwr_tStatus* sts);               ///< get previous sibling
+  wb_orep* first(pwr_tStatus* sts);                ///< get first child
   wb_orep* child(pwr_tStatus* sts, wb_name& name); ///< get named child
-  wb_orep* last(pwr_tStatus* sts); ///< get last child
-  wb_orep* next(pwr_tStatus*
-          sts); ///< get next in list of objects of same class in one volume
-  wb_orep* previous(pwr_tStatus*
-          sts); ///< get previous in list of objects of same class in one volume
+  wb_orep* last(pwr_tStatus* sts);                 ///< get last child
+  wb_orep* next(pwr_tStatus* sts);     ///< get next in list of objects of same class in one volume
+  wb_orep* previous(pwr_tStatus* sts); ///< get previous in list of objects of same class in one volume
 
   virtual wb_adrep* attribute(pwr_tStatus*, const char* name);
 
   virtual wb_adrep* attribute(pwr_tStatus*);
 
-  wb_erep* erep() const
-  {
-    return m_vrep->erep();
-  }
-  wb_vrep* vrep() const
-  {
-    return m_vrep;
-  }
-  virtual ldh_eVolRep vtype() const
-  {
-    return ldh_eVolRep_Ced;
-  }
+  wb_erep* erep() const { return m_vrep->erep(); }
+  wb_vrep* vrep() const { return m_vrep; }
+  virtual ldh_eVolRep vtype() const { return ldh_eVolRep_Ced; }
 
   virtual bool docBlock(char** block, int* size) const;
   virtual bool docBlock(char* block);

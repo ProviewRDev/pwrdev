@@ -41,13 +41,12 @@
 
 #include "xtt_ev.h"
 
-class EvGtk : public Ev {
+class EvGtk : public Ev
+{
 public:
-  EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
-      char* ala_name, char* blk_name, pwr_tObjid ev_user, int display_ala,
-      int display_eve, int display_blk, int display_return, int display_ack,
-      int ev_beep, pwr_tMask ev_pop_mask, int ev_eventname_seg,
-      pwr_tStatus* status);
+  EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name, char* ala_name, char* blk_name,
+        pwr_tObjid ev_user, int display_ala, int display_eve, int display_blk, int display_return,
+        int display_ack, int ev_beep, pwr_tMask ev_pop_mask, int ev_eventname_seg, pwr_tStatus* status);
   ~EvGtk();
 
   GtkWidget* parent_wid;
@@ -75,19 +74,14 @@ public:
   void set_transient_ala(void* basewidget);
   void set_transient_blk(void* basewidget);
   void set_title_ala(char* title);
-  EvAla* open_alarmlist_satellite(const char* title, pwr_tStatus* sts,
-      int width, int height, int x, int y, pwr_tObjid view,
-      unsigned int options = 0, void* widget = 0);
-  EvEve* open_eventlist_satellite(const char* title, pwr_tStatus* sts,
-      int width, int height, int x, int y, pwr_tObjid view,
-      unsigned int options = 0, void* widget = 0);
+  EvAla* open_alarmlist_satellite(const char* title, pwr_tStatus* sts, int width, int height, int x, int y,
+                                  pwr_tObjid view, unsigned int options = 0, void* widget = 0);
+  EvEve* open_eventlist_satellite(const char* title, pwr_tStatus* sts, int width, int height, int x, int y,
+                                  pwr_tObjid view, unsigned int options = 0, void* widget = 0);
 
-  static gboolean eve_action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
-  static gboolean ala_action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
-  static gboolean blk_action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean eve_action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean ala_action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean blk_action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void eve_activate_exit(GtkWidget* w, gpointer data);
   static void ala_activate_exit(GtkWidget* w, gpointer data);
   static void blk_activate_exit(GtkWidget* w, gpointer data);

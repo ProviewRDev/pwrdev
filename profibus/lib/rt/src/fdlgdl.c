@@ -70,13 +70,12 @@ LOCAL_DATA
 #pragma check_stack(off)
 #endif
 
-FUNCTION PUBLIC INT16 fdlgdl_get_data_len(
-    IN INT16 result,         /* Service-Result */
-    IN USIGN8 service,       /* Service */
-    IN USIGN8 primitive,     /* Service-Primitive */
-    IN USIGN8 FAR* data_ptr, /* pointer to data */
-    OUT INT16* data_len_ptr  /* length of data */
-    )
+FUNCTION PUBLIC INT16 fdlgdl_get_data_len(IN INT16 result,         /* Service-Result */
+                                          IN USIGN8 service,       /* Service */
+                                          IN USIGN8 primitive,     /* Service-Primitive */
+                                          IN USIGN8 FAR* data_ptr, /* pointer to data */
+                                          OUT INT16* data_len_ptr  /* length of data */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION

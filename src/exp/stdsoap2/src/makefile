@@ -61,6 +61,11 @@ copy : $(export_h) | silent
 
 lib : $(export_obj) | silent
 
+# stdsoap2 is third-party (gSOAP) — suppress warnings we cannot fix
+$(obj_dir)/stdsoap2.o : stdsoap2.cpp
+	@ $(log_c_obj)
+	@ $(cxx) $(cxxflags) -w $(csetos) $(cinc) $(cobj) $(source)
+
 exe :
 
 clean :

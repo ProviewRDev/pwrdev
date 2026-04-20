@@ -40,7 +40,8 @@
 
 static int dark_theme = -1;
 
-GtkToolItem* wutl_tools_item(GtkToolbar *tools, const char *img, GCallback cb, const char* tooltip, void *ctx, int disable_focus, int translate)
+GtkToolItem* wutl_tools_item(GtkToolbar* tools, const char* img, GCallback cb, const char* tooltip, void* ctx,
+                             int disable_focus, int translate)
 {
   pwr_tFileName fname;
   GtkToolItem* item;
@@ -51,9 +52,10 @@ GtkToolItem* wutl_tools_item(GtkToolbar *tools, const char *img, GCallback cb, c
     g_signal_connect(item, "clicked", cb, ctx);
   if (disable_focus)
     gtk_widget_set_can_focus(GTK_WIDGET(item), FALSE);
-    //g_object_set(item, "can-focus", FALSE, NULL);
+  // g_object_set(item, "can-focus", FALSE, NULL);
   gtk_toolbar_insert(tools, item, -1);
-  if (tooltip) {
+  if (tooltip)
+  {
     if (translate)
       gtk_tool_item_set_tooltip_text(item, CoWowGtk::translate_utf8(tooltip));
     else
@@ -62,7 +64,8 @@ GtkToolItem* wutl_tools_item(GtkToolbar *tools, const char *img, GCallback cb, c
   return item;
 }
 
-GtkToolItem* wutl_tools_toggle_button(GtkToolbar *tools, const char *img, GCallback cb, const char* tooltip, void *ctx, int disable_focus, int translate)
+GtkToolItem* wutl_tools_toggle_button(GtkToolbar* tools, const char* img, GCallback cb, const char* tooltip,
+                                      void* ctx, int disable_focus, int translate)
 {
   pwr_tFileName fname;
   GtkToolItem* item;
@@ -74,7 +77,7 @@ GtkToolItem* wutl_tools_toggle_button(GtkToolbar *tools, const char *img, GCallb
   g_signal_connect(item, "clicked", cb, ctx);
   if (disable_focus)
     gtk_widget_set_can_focus(GTK_WIDGET(item), FALSE);
-    //g_object_set(item, "can-focus", FALSE, NULL);
+  // g_object_set(item, "can-focus", FALSE, NULL);
   gtk_toolbar_insert(tools, item, -1);
   if (translate)
     gtk_tool_item_set_tooltip_text(item, CoWowGtk::translate_utf8(tooltip));
@@ -84,14 +87,15 @@ GtkToolItem* wutl_tools_toggle_button(GtkToolbar *tools, const char *img, GCallb
   return item;
 }
 
-void wutl_widget_name_suffix_add(GtkWidget *w, const char *suffix)
+void wutl_widget_name_suffix_add(GtkWidget* w, const char* suffix)
 {
   char name[80];
-  char *s;
+  char* s;
 
   strncpy(name, gtk_widget_get_name(w), sizeof(name));
-  if ((s = strchr(name, '_'))) {
-    if (strcmp(s+1, suffix) == 0)
+  if ((s = strchr(name, '_')))
+  {
+    if (strcmp(s + 1, suffix) == 0)
       return;
     *s = 0;
   }
@@ -100,10 +104,10 @@ void wutl_widget_name_suffix_add(GtkWidget *w, const char *suffix)
   gtk_widget_set_name(w, name);
 }
 
-void wutl_widget_name_suffix_sub(GtkWidget *w)
+void wutl_widget_name_suffix_sub(GtkWidget* w)
 {
   char name[80];
-  char *s;
+  char* s;
 
   strncpy(name, gtk_widget_get_name(w), sizeof(name));
   if (!(s = strchr(name, '_')))
@@ -112,13 +116,14 @@ void wutl_widget_name_suffix_sub(GtkWidget *w)
   gtk_widget_set_name(w, name);
 }
 
-int wutl_get_dark_theme(GtkWidget *toplevel)
+int wutl_get_dark_theme(GtkWidget* toplevel)
 {
-  if (dark_theme == -1) {
+  if (dark_theme == -1)
+  {
     GdkRGBA color;
     GtkStyleContext* style_context = gtk_widget_get_style_context(toplevel);
     gtk_style_context_get_color(style_context, GTK_STATE_FLAG_NORMAL, &color);
-    if ( (color.red + color.blue + color.green)/3 > 0.5)
+    if ((color.red + color.blue + color.green) / 3 > 0.5)
       dark_theme = 1;
     else
       dark_theme = 0;

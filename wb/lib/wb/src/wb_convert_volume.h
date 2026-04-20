@@ -39,7 +39,8 @@
 
 #include "pwr.h"
 
-class wb_convert_volume {
+class wb_convert_volume
+{
 public:
   pwr_tCid m_cidChecked;
   int m_classCount;

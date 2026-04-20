@@ -53,89 +53,67 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer msgw)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-MsgWindowGtk::MsgWindowGtk(void* msg_parent_ctx, GtkWidget* msg_parent_wid,
-    const char* msg_name, pwr_tStatus* status)
+MsgWindowGtk::MsgWindowGtk(void* msg_parent_ctx, GtkWidget* msg_parent_wid, const char* msg_name,
+                           pwr_tStatus* status)
     : MsgWindow(msg_parent_ctx, msg_name, status), parent_wid(msg_parent_wid)
 {
   const int window_width = 800;
   const int window_height = 600;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      window_height, "default-width", window_width, "title",
-      CoWowGtk::translate_utf8(msg_name), NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height, "default-width",
+                                      window_width, "title", CoWowGtk::translate_utf8(msg_name), NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(toplevel, "focus-in-event",
-      G_CALLBACK(MsgWindowGtk::action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(MsgWindowGtk::action_inputfocus), this);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File Entry
-  GtkWidget* file_clear
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("C_lear"));
-  g_signal_connect(
-      file_clear, "activate", G_CALLBACK(MsgWindowGtk::activate_clear), this);
+  GtkWidget* file_clear = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("C_lear"));
+  g_signal_connect(file_clear, "activate", G_CALLBACK(MsgWindowGtk::activate_clear), this);
 
-  GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Print"));
-  g_signal_connect(
-      file_print, "activate", G_CALLBACK(MsgWindowGtk::activate_print), this);
+  GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Print"));
+  g_signal_connect(file_print, "activate", G_CALLBACK(MsgWindowGtk::activate_print), this);
 
-  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Close"));
-  g_signal_connect(
-      file_close, "activate", G_CALLBACK(MsgWindowGtk::activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Close"));
+  g_signal_connect(file_close, "activate", G_CALLBACK(MsgWindowGtk::activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_clear);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_print);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
 
-  GtkWidget* file
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
+  GtkWidget* file = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // View menu
-  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Zoom _In"));
-  g_signal_connect(view_zoom_in, "activate",
-      G_CALLBACK(MsgWindowGtk::activate_zoom_in), this);
-  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _In"));
+  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(MsgWindowGtk::activate_zoom_in), this);
+  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Zoom _Out"));
-  g_signal_connect(view_zoom_out, "activate",
-      G_CALLBACK(MsgWindowGtk::activate_zoom_out), this);
-  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Out"));
+  g_signal_connect(view_zoom_out, "activate", G_CALLBACK(MsgWindowGtk::activate_zoom_out), this);
+  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Zoom _Reset"));
-  g_signal_connect(view_zoom_reset, "activate",
-      G_CALLBACK(MsgWindowGtk::activate_zoom_reset), this);
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Reset"));
+  g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(MsgWindowGtk::activate_zoom_reset), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_out);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_reset);
 
-  GtkWidget* view
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
+  GtkWidget* view = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), view);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
@@ -171,19 +149,24 @@ MsgWindowGtk::~MsgWindowGtk()
 
 void MsgWindowGtk::map()
 {
-  if (nodraw) {
+  if (nodraw)
+  {
     deferred_map = 1;
     return;
-  } else
+  }
+  else
     deferred_map = 0;
 
   if (maptimer.disabled())
     return;
 
-  if (!displayed) {
+  if (!displayed)
+  {
     g_object_set(toplevel, "visible", TRUE, NULL);
     displayed = 1;
-  } else {
+  }
+  else
+  {
     gtk_window_present(GTK_WINDOW(toplevel));
   }
   maptimer.disable(400);
@@ -191,7 +174,8 @@ void MsgWindowGtk::map()
 
 void MsgWindowGtk::unmap()
 {
-  if (displayed) {
+  if (displayed)
+  {
     g_object_set(toplevel, "visible", FALSE, NULL);
     displayed = 0;
   }
@@ -204,16 +188,16 @@ void MsgWindowGtk::print()
 
   strncpy(title, CoWowGtk::translate_utf8(name), sizeof(title));
 
-  CoWowGtk::CreateBrowPrintDialogGtk(title, msgnav->brow->ctx,
-      flow_eOrientation_Landscape, 1.4, (void*)toplevel, &sts);
+  CoWowGtk::CreateBrowPrintDialogGtk(title, msgnav->brow->ctx, flow_eOrientation_Landscape, 1.4,
+                                     (void*)toplevel, &sts);
 }
 
-gboolean MsgWindowGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean MsgWindowGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   MsgWindowGtk* msgw = (MsgWindowGtk*)data;
 
-  if (msgw && msgw->displayed) {
+  if (msgw && msgw->displayed)
+  {
     if (msgw->focustimer.disabled())
       return FALSE;
 
@@ -269,8 +253,7 @@ void MsgWindowGtk::activate_zoom_reset(GtkWidget* w, gpointer data)
 
 void MsgWindowGtk::activate_help(GtkWidget* w, gpointer data)
 {
-  CoXHelp::dhelp("messagewindow_refman", 0, navh_eHelpFile_Other,
-      "$pwr_lang/man_dg.dat", true);
+  CoXHelp::dhelp("messagewindow_refman", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
 }
 
 void MsgWindowGtk::activate_help_message(GtkWidget* w, gpointer data)

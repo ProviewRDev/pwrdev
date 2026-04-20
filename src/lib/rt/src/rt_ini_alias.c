@@ -50,7 +50,7 @@
 #include "rt_ini_alias.h"
 
 static FILE* ini_datafile = 0;
-static ini_sAlias *ini_aliaslist = 0;
+static ini_sAlias* ini_aliaslist = 0;
 
 static int ini_datafile_init(char* filename);
 
@@ -58,10 +58,10 @@ static int ini_datafile_close();
 
 static int ini_datafile_get_next(char* parameter, char** data, int* elements);
 
-static int ini_datafile_get_next_alias(char* node, char *alias, char* addr);
+static int ini_datafile_get_next_alias(char* node, char* alias, char* addr);
 
-static int ini_parse(char* instring, char* parse_char, char* inc_parse_char,
-    char* outstr, int max_rows, int max_cols);
+static int ini_parse(char* instring, char* parse_char, char* inc_parse_char, char* outstr, int max_rows,
+                     int max_cols);
 
 static int ini_read_line(char* line, int maxsize, FILE* file);
 
@@ -80,8 +80,9 @@ pwr_tStatus ini_LoadAlias(char* filename)
   if (EVEN(sts))
     return sts;
 
-  while (ODD(ini_datafile_get_next_alias(a.nodename, a.alias, a.addr))) {
-    ap = (ini_sAlias *)calloc(1, sizeof(*ap));
+  while (ODD(ini_datafile_get_next_alias(a.nodename, a.alias, a.addr)))
+  {
+    ap = (ini_sAlias*)calloc(1, sizeof(*ap));
     memcpy(ap, &a, sizeof(*ap));
 
     ap->next = ini_aliaslist;
@@ -91,26 +92,29 @@ pwr_tStatus ini_LoadAlias(char* filename)
   return INI__SUCCESS;
 }
 
-void ini_FreeAlias(void) 
+void ini_FreeAlias(void)
 {
   ini_sAlias *ap, *nextap;
 
-  for (ap = ini_aliaslist; ap; ap = nextap) {
+  for (ap = ini_aliaslist; ap; ap = nextap)
+  {
     nextap = ap->next;
     free(ap);
   }
   ini_aliaslist = 0;
 }
 
-pwr_tStatus ini_GetAlias(char* nodename, char* alias, char *addr)
+pwr_tStatus ini_GetAlias(char* nodename, char* alias, char* addr)
 {
-  ini_sAlias *ap;
+  ini_sAlias* ap;
 
-  for (ap = ini_aliaslist; ap; ap = ap->next) {
-    if (strcmp(nodename, ap->nodename) == 0) {
+  for (ap = ini_aliaslist; ap; ap = ap->next)
+  {
+    if (strcmp(nodename, ap->nodename) == 0)
+    {
       strcpy(alias, ap->alias);
       if (addr)
-	strcpy(addr, ap->addr);
+        strcpy(addr, ap->addr);
       return INI__SUCCESS;
     }
   }
@@ -133,12 +137,14 @@ pwr_tStatus ini_SetAttributeAfterPlc(char* filename, char* nodename, int output)
   if (EVEN(sts))
     return sts;
 
-  while (1) {
+  while (1)
+  {
     sts = ini_datafile_get_next(codeword, (char**)&data_ptr, &elements);
     if (EVEN(sts))
       break;
 
-    if (elements != 2) {
+    if (elements != 2)
+    {
       if (elements > 2)
         if (output)
           printf("Syntax error in alias file %s\n", (char*)data_ptr);
@@ -160,14 +166,11 @@ pwr_tStatus ini_SetAttributeAfterPlc(char* filename, char* nodename, int output)
       if (output)
         printf("Unable to modify attribute '%s'\n", (char*)attribute_ptr);
       else
-        errh_Error(
-            "unable to modify attribute '%s'\n%m", (char*)attribute_ptr, sts);
+        errh_Error("unable to modify attribute '%s'\n%m", (char*)attribute_ptr, sts);
     else if (output)
-      printf(
-          "Attribute '%s' set to '%s'", (char*)attribute_ptr, (char*)value_ptr);
+      printf("Attribute '%s' set to '%s'", (char*)attribute_ptr, (char*)value_ptr);
     else
-      errh_Info(
-          "attribute '%s' set to '%s'", (char*)attribute_ptr, (char*)value_ptr);
+      errh_Info("attribute '%s' set to '%s'", (char*)attribute_ptr, (char*)value_ptr);
 
     free(data_ptr);
   }
@@ -193,14 +196,16 @@ pwr_tStatus ini_SetAttribute(char* filename, char* nodename, int output)
   if (EVEN(sts))
     return sts;
 
-  while (1) {
+  while (1)
+  {
     sts = ini_datafile_get_next(codeword, (char**)&data_ptr, &elements);
     if (EVEN(sts))
       break;
 
     if (elements == 3 && streq(data_ptr[2], ""))
       elements = 2;
-    if (elements != 2) {
+    if (elements != 2)
+    {
       if (elements > 2)
         if (output)
           printf("Syntax error in alias file '%s'\n", (char*)data_ptr);
@@ -217,23 +222,22 @@ pwr_tStatus ini_SetAttribute(char* filename, char* nodename, int output)
     value_ptr = data_ptr;
     value_ptr++;
 
-    if (str_NoCaseStrcmp((char*)attribute_ptr, "PLCSCAN") == 0) {
+    if (str_NoCaseStrcmp((char*)attribute_ptr, "PLCSCAN") == 0)
+    {
       sts = ini_set_plcscan((char*)value_ptr);
       if (EVEN(sts))
         if (output)
           printf("Unable to modify attribute %s\n", (char*)attribute_ptr);
         else
-          errh_Error(
-              "unable to modify attribute %s\n%m", (char*)attribute_ptr, sts);
+          errh_Error("unable to modify attribute %s\n%m", (char*)attribute_ptr, sts);
       else if (output)
-        printf("Attribute '%s' set to '%s'\n", (char*)attribute_ptr,
-            (char*)value_ptr);
+        printf("Attribute '%s' set to '%s'\n", (char*)attribute_ptr, (char*)value_ptr);
       else
-        errh_Info("attribute '%s' set to '%s'", (char*)attribute_ptr,
-            (char*)value_ptr);
-    } else if (str_NoCaseStrcmp((char*)attribute_ptr, "PLCSIM") == 0
-        || str_NoCaseStrcmp((char*)attribute_ptr, "ERRLOGFILE") == 0
-        || str_NoCaseStrcmp((char*)attribute_ptr, "ERRLOGTERM") == 0)
+        errh_Info("attribute '%s' set to '%s'", (char*)attribute_ptr, (char*)value_ptr);
+    }
+    else if (str_NoCaseStrcmp((char*)attribute_ptr, "PLCSIM") == 0 ||
+             str_NoCaseStrcmp((char*)attribute_ptr, "ERRLOGFILE") == 0 ||
+             str_NoCaseStrcmp((char*)attribute_ptr, "ERRLOGTERM") == 0)
 
     {
       sts = ini_set_nodeattribute((char*)attribute_ptr, (char*)value_ptr);
@@ -241,28 +245,24 @@ pwr_tStatus ini_SetAttribute(char* filename, char* nodename, int output)
         if (output)
           printf("Unable to modify attribute %s\n", (char*)attribute_ptr);
         else
-          errh_Error(
-              "unable to modify attribute %s\n%m", (char*)attribute_ptr, sts);
+          errh_Error("unable to modify attribute %s\n%m", (char*)attribute_ptr, sts);
       else if (output)
-        printf("Attribute '%s' set to '%s'\n", (char*)attribute_ptr,
-            (char*)value_ptr);
+        printf("Attribute '%s' set to '%s'\n", (char*)attribute_ptr, (char*)value_ptr);
       else
-        errh_Info("attribute '%s' set to '%s'", (char*)attribute_ptr,
-            (char*)value_ptr);
-    } else {
+        errh_Info("attribute '%s' set to '%s'", (char*)attribute_ptr, (char*)value_ptr);
+    }
+    else
+    {
       sts = ini_set_attribute((char*)attribute_ptr, (char*)value_ptr);
       if (EVEN(sts))
         if (output)
           printf("Unable to modify attribute %s\n", (char*)attribute_ptr);
         else
-          errh_Error(
-              "unable to modify attribute %s\n%m", (char*)attribute_ptr, sts);
+          errh_Error("unable to modify attribute %s\n%m", (char*)attribute_ptr, sts);
       else if (output)
-        printf("Attribute '%s' set to '%s'\n", (char*)attribute_ptr,
-            (char*)value_ptr);
+        printf("Attribute '%s' set to '%s'\n", (char*)attribute_ptr, (char*)value_ptr);
       else
-        errh_Info("attribute '%s' set to '%s'", (char*)attribute_ptr,
-            (char*)value_ptr);
+        errh_Info("attribute '%s' set to '%s'", (char*)attribute_ptr, (char*)value_ptr);
     }
     free(data_ptr);
   }
@@ -273,15 +273,15 @@ pwr_tStatus ini_SetAttribute(char* filename, char* nodename, int output)
 }
 
 /****************************************************************************
-* Name:		ini_datafile_init()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ * Name:		ini_datafile_init()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 static int ini_datafile_init(char* filename)
 {
   /* Open file */
@@ -293,15 +293,15 @@ static int ini_datafile_init(char* filename)
 }
 
 /****************************************************************************
-* Name:		ini_datafile_close()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ * Name:		ini_datafile_close()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 static int ini_datafile_close()
 {
   /* Close file */
@@ -312,15 +312,15 @@ static int ini_datafile_close()
 }
 
 /****************************************************************************
-* Name:		ini_datafile_get_next()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ * Name:		ini_datafile_get_next()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 static int ini_datafile_get_next(char* parameter, char** data, int* elements)
 {
   char line[256];
@@ -333,7 +333,8 @@ static int ini_datafile_get_next(char* parameter, char** data, int* elements)
 
   str_ToUpper(param, parameter);
   found = 0;
-  while (1) {
+  while (1)
+  {
     /* Read one line */
     sts = ini_read_line(line, sizeof(line), ini_datafile);
     if (EVEN(sts))
@@ -343,12 +344,13 @@ static int ini_datafile_get_next(char* parameter, char** data, int* elements)
 
     /* Parse the line */
 
-    nr = ini_parse(line, "=, 	", "", (char*)data_array,
-        sizeof(data_array) / sizeof(data_array[0]), sizeof(data_array[0]));
+    nr = ini_parse(line, "=, 	", "", (char*)data_array, sizeof(data_array) / sizeof(data_array[0]),
+                   sizeof(data_array[0]));
     if (nr == 0)
       continue;
 
-    if (str_NoCaseStrcmp(data_array[0], param) == 0) {
+    if (str_NoCaseStrcmp(data_array[0], param) == 0)
+    {
       found = 1;
       break;
     }
@@ -364,16 +366,16 @@ static int ini_datafile_get_next(char* parameter, char** data, int* elements)
 }
 
 /****************************************************************************
-* Name:		ini_datafile_get_next_alias()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
-static int ini_datafile_get_next_alias(char* node, char *alias, char* addr)
+ * Name:		ini_datafile_get_next_alias()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
+static int ini_datafile_get_next_alias(char* node, char* alias, char* addr)
 {
   char line[256];
   char data_array[4][80];
@@ -383,7 +385,8 @@ static int ini_datafile_get_next_alias(char* node, char *alias, char* addr)
     return 0;
 
   found = 0;
-  while (1) {
+  while (1)
+  {
     /* Read one line */
     sts = ini_read_line(line, sizeof(line), ini_datafile);
     if (EVEN(sts))
@@ -393,12 +396,13 @@ static int ini_datafile_get_next_alias(char* node, char *alias, char* addr)
 
     /* Parse the line */
 
-    nr = ini_parse(line, "=, 	", "", (char*)data_array,
-        sizeof(data_array) / sizeof(data_array[0]), sizeof(data_array[0]));
+    nr = ini_parse(line, "=, 	", "", (char*)data_array, sizeof(data_array) / sizeof(data_array[0]),
+                   sizeof(data_array[0]));
     if (nr == 0)
       continue;
 
-    if (str_NoCaseStrcmp(data_array[0], "alias") == 0 && nr > 2) {
+    if (str_NoCaseStrcmp(data_array[0], "alias") == 0 && nr > 2)
+    {
       found = 1;
       break;
     }
@@ -417,28 +421,28 @@ static int ini_datafile_get_next_alias(char* node, char *alias, char* addr)
 }
 
 /*************************************************************************
-*
-* Name:		ini_parse()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*string		I	string to be parsed.
-* char		*parse_char	I	parse charachter(s).
-* char		*inc_parse_char	I	parse charachter(s) that will be
-*					included in the parsed string.
-* char		*outstr		O	parsed strings.
-* int		max_rows	I	maximum number of chars in a parsed
-*					string.
-* int 		max_cols	I	maximum number of parsed elements.
-*
-* Description:
-*	Parses a string.
-*
-**************************************************************************/
+ *
+ * Name:		ini_parse()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*string		I	string to be parsed.
+ * char		*parse_char	I	parse charachter(s).
+ * char		*inc_parse_char	I	parse charachter(s) that will be
+ *					included in the parsed string.
+ * char		*outstr		O	parsed strings.
+ * int		max_rows	I	maximum number of chars in a parsed
+ *					string.
+ * int 		max_cols	I	maximum number of parsed elements.
+ *
+ * Description:
+ *	Parses a string.
+ *
+ **************************************************************************/
 
-static int ini_parse(char* instring, char* parse_char, char* inc_parse_char,
-    char* outstr, int max_rows, int max_cols)
+static int ini_parse(char* instring, char* parse_char, char* inc_parse_char, char* outstr, int max_rows,
+                     int max_cols)
 {
   char* string;
   int row;
@@ -456,26 +460,33 @@ static int ini_parse(char* instring, char* parse_char, char* inc_parse_char,
   col = 0;
   char_found = 0;
   next_token = 0;
-  while (*string != '\0') {
+  while (*string != '\0')
+  {
     char_ptr = parse_char;
     inc_char_ptr = inc_parse_char;
     parsechar_found = 0;
     inc_parsechar_found = 0;
-    if (*string == '"') {
+    if (*string == '"')
+    {
       one_token = !one_token;
       string++;
       continue;
     }
-    if (!one_token) {
-      while (*char_ptr != '\0') {
+    if (!one_token)
+    {
+      while (*char_ptr != '\0')
+      {
         /* Check if this is a parse charachter */
-        if (*string == *char_ptr) {
+        if (*string == *char_ptr)
+        {
           parsechar_found = 1;
           /* Next token */
-          if (col > 0) {
+          if (col > 0)
+          {
             *(outstr + row * max_cols + col) = '\0';
             row++;
-            if (row >= max_rows) {
+            if (row >= max_rows)
+            {
               str_ToUpper(outstr, outstr);
               return row;
             }
@@ -486,16 +497,20 @@ static int ini_parse(char* instring, char* parse_char, char* inc_parse_char,
         }
         char_ptr++;
       }
-      while (*inc_char_ptr != '\0') {
+      while (*inc_char_ptr != '\0')
+      {
         /* Check if this is a parse charachter */
-        if (*string == *inc_char_ptr) {
+        if (*string == *inc_char_ptr)
+        {
           parsechar_found = 1;
           inc_parsechar_found = 1;
           /* Next token */
-          if (col > 0) {
+          if (col > 0)
+          {
             *(outstr + row * max_cols + col) = '\0';
             row++;
-            if (row >= max_rows) {
+            if (row >= max_rows)
+            {
               str_ToUpper(outstr, outstr);
               return row;
             }
@@ -507,12 +522,14 @@ static int ini_parse(char* instring, char* parse_char, char* inc_parse_char,
         inc_char_ptr++;
       }
     }
-    if (!parsechar_found && !next_token) {
+    if (!parsechar_found && !next_token)
+    {
       char_found++;
       *(outstr + row * max_cols + col) = *string;
       col++;
     }
-    if (inc_parsechar_found) {
+    if (inc_parsechar_found)
+    {
       *(outstr + row * max_cols + col) = *inc_char_ptr;
       col++;
     }
@@ -531,17 +548,17 @@ static int ini_parse(char* instring, char* parse_char, char* inc_parse_char,
 }
 
 /*************************************************************************
-*
-* Name:		ini_read_line()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Read a line for a file.
-*
-**************************************************************************/
+ *
+ * Name:		ini_read_line()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Read a line for a file.
+ *
+ **************************************************************************/
 
 static int ini_read_line(char* line, int maxsize, FILE* file)
 {
@@ -557,17 +574,17 @@ static int ini_read_line(char* line, int maxsize, FILE* file)
 }
 
 /*************************************************************************
-*
-* Name:		ini_set_attribute()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Set value of a parameter in rtdb.
-*
-**************************************************************************/
+ *
+ * Name:		ini_set_attribute()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Set value of a parameter in rtdb.
+ *
+ **************************************************************************/
 
 static int ini_set_attribute(char* name_str, char* value_str)
 {
@@ -588,8 +605,10 @@ static int ini_set_attribute(char* name_str, char* value_str)
   if (EVEN(sts))
     return sts;
 
-  switch (atid) {
-  case pwr_eType_Objid: {
+  switch (atid)
+  {
+  case pwr_eType_Objid:
+  {
     pwr_tOid oid;
 
     sts = gdh_NameToObjid((char*)value_str, &oid);
@@ -599,7 +618,8 @@ static int ini_set_attribute(char* name_str, char* value_str)
     memcpy(buffer, &oid, sizeof(oid));
     break;
   }
-  case pwr_eType_AttrRef: {
+  case pwr_eType_AttrRef:
+  {
     pwr_tAttrRef aref;
 
     sts = gdh_NameToAttrref(pwr_cNOid, value_str, &aref);
@@ -625,17 +645,17 @@ static int ini_set_attribute(char* name_str, char* value_str)
 }
 
 /*************************************************************************
-*
-* Name:		ini_set_plcsim()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Set value of a parameter in rtdb.
-*
-**************************************************************************/
+ *
+ * Name:		ini_set_plcsim()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Set value of a parameter in rtdb.
+ *
+ **************************************************************************/
 
 static int ini_set_nodeattribute(char* attribute_str, char* value_str)
 {
@@ -649,7 +669,8 @@ static int ini_set_nodeattribute(char* attribute_str, char* value_str)
 
   /* Get pointer to node object */
   sts = gdh_GetNodeObject(0, &nodeobjid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_CErrLog(sts);
     return sts;
   }
@@ -661,7 +682,8 @@ static int ini_set_nodeattribute(char* attribute_str, char* value_str)
   if (EVEN(sts))
     return sts;
 
-  if (str_NoCaseStrcmp(attribute_str, "PLCSIM") == 0) {
+  if (str_NoCaseStrcmp(attribute_str, "PLCSIM") == 0)
+  {
     /* Moved to IOHandler object */
     sts = gdh_GetClassList(pwr_cClass_IOHandler, &objid);
     if (EVEN(sts))
@@ -670,7 +692,8 @@ static int ini_set_nodeattribute(char* attribute_str, char* value_str)
     if (EVEN(sts))
       return sts;
 
-    if (str_NoCaseStrcmp(value_str, "YES") == 0) {
+    if (str_NoCaseStrcmp(value_str, "YES") == 0)
+    {
       strcpy(attributename, nodename);
       strcat(attributename, ".IOReadWriteFlag");
       value = 0;
@@ -683,7 +706,9 @@ static int ini_set_nodeattribute(char* attribute_str, char* value_str)
       sts = gdh_SetObjectInfo(attributename, &value, sizeof(value));
       if (EVEN(sts))
         return sts;
-    } else if (str_NoCaseStrcmp(value_str, "NO") == 0) {
+    }
+    else if (str_NoCaseStrcmp(value_str, "NO") == 0)
+    {
       strcpy(attributename, nodename);
       strcat(attributename, ".IOReadWriteFlag");
       value = 1;
@@ -696,45 +721,48 @@ static int ini_set_nodeattribute(char* attribute_str, char* value_str)
       sts = gdh_SetObjectInfo(attributename, &value, sizeof(value));
       if (EVEN(sts))
         return sts;
-    } else
+    }
+    else
       return 0;
-  } else if (str_NoCaseStrcmp(attribute_str, "ERRLOGFILE") == 0) {
+  }
+  else if (str_NoCaseStrcmp(attribute_str, "ERRLOGFILE") == 0)
+  {
     strcpy(attributename, nodename);
     strcat(attributename, ".ErrLogFile");
-    sts = gdh_SetObjectInfo(
-        attributename, value_str, sizeof(nodeobjp->ErrLogFile));
+    sts = gdh_SetObjectInfo(attributename, value_str, sizeof(nodeobjp->ErrLogFile));
     if (EVEN(sts))
       return sts;
-  } else if (str_NoCaseStrcmp(attribute_str, "ERRLOGTERM") == 0) {
+  }
+  else if (str_NoCaseStrcmp(attribute_str, "ERRLOGTERM") == 0)
+  {
     strcpy(attributename, nodename);
     strcat(attributename, ".ErrLogTerm");
-    sts = gdh_SetObjectInfo(
-        attributename, value_str, sizeof(nodeobjp->ErrLogTerm));
+    sts = gdh_SetObjectInfo(attributename, value_str, sizeof(nodeobjp->ErrLogTerm));
     if (EVEN(sts))
       return sts;
-  } else
+  }
+  else
     return 0;
 
   return INI__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		ini_set_plcscan()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Set value of a parameter in rtdb.
-*
-**************************************************************************/
+ *
+ * Name:		ini_set_plcscan()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Set value of a parameter in rtdb.
+ *
+ **************************************************************************/
 
 static int ini_set_plcscan(char* value_str)
 {
-  pwr_tString40 classname[]
-      = { "WindowPlc", "WindowCond", "WindowOrderact", "WindowSubstep", "" };
+  pwr_tString40 classname[] = {"WindowPlc", "WindowCond", "WindowOrderact", "WindowSubstep", ""};
   pwr_tString40* classname_p;
   pwr_tString256 objectname;
   pwr_tClassId class;
@@ -747,14 +775,16 @@ static int ini_set_plcscan(char* value_str)
 
   /* Get all window classes */
   classname_p = (pwr_tString40*)&classname;
-  while (!streq((char*)classname_p, "")) {
+  while (!streq((char*)classname_p, ""))
+  {
     sts = gdh_ClassNameToNumber((char*)classname_p, &class);
     if (EVEN(sts))
       return sts;
 
     /* Get every object of each class */
     sts = gdh_GetClassList(class, &objid);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       /* Set attribute ScanOff to true */
       sts = gdh_ObjidToName(objid, objectname, sizeof(objectname), cdh_mNName);
       if (EVEN(sts))

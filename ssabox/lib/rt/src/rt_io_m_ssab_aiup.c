@@ -63,7 +63,8 @@
 
 #define IO_MAXCHAN 32
 
-typedef struct {
+typedef struct
+{
   unsigned int Address;
   int Qbus_fp;
   int ScanCount[IO_MAXCHAN];
@@ -81,7 +82,8 @@ static pwr_tStatus AiRangeToCoef(io_sChannel* chanp)
 
   cop = chanp->cop;
 
-  if (cop) {
+  if (cop)
+  {
     cop->CalculateNewCoef = 0;
 
     /* Coef for RawValue to SignalValue conversion */
@@ -89,17 +91,19 @@ static pwr_tStatus AiRangeToCoef(io_sChannel* chanp)
     cop->SigValPolyCoef1 = cop->ChannelSigValRangeHigh / 30000;
 
     /* Coef for SignalValue to ActualValue conversion */
-    if (chanp->ChanClass != pwr_cClass_ChanAit && cop->SensorPolyType == 1) {
-      if (!feqf(cop->SensorSigValRangeHigh, cop->SensorSigValRangeLow)) {
-        PolyCoef1 = (cop->ActValRangeHigh - cop->ActValRangeLow)
-            / (cop->SensorSigValRangeHigh - cop->SensorSigValRangeLow);
-        PolyCoef0
-            = cop->ActValRangeHigh - cop->SensorSigValRangeHigh * PolyCoef1;
+    if (chanp->ChanClass != pwr_cClass_ChanAit && cop->SensorPolyType == 1)
+    {
+      if (!feqf(cop->SensorSigValRangeHigh, cop->SensorSigValRangeLow))
+      {
+        PolyCoef1 = (cop->ActValRangeHigh - cop->ActValRangeLow) /
+                    (cop->SensorSigValRangeHigh - cop->SensorSigValRangeLow);
+        PolyCoef0 = cop->ActValRangeHigh - cop->SensorSigValRangeHigh * PolyCoef1;
         cop->SensorPolyCoef1 = cop->SigValPolyCoef1 * PolyCoef1;
         cop->SensorPolyCoef0 = PolyCoef0 + PolyCoef1 * cop->SigValPolyCoef0;
-      } else {
-        sts = gdh_AttrrefToName(
-            &chanp->ChanAref, buf, sizeof(buf), cdh_mName_volumeStrict);
+      }
+      else
+      {
+        sts = gdh_AttrrefToName(&chanp->ChanAref, buf, sizeof(buf), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
         errh_Error("Invalid SigValueRange in Ai channel %s", buf);
@@ -110,8 +114,7 @@ static pwr_tStatus AiRangeToCoef(io_sChannel* chanp)
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   pwr_sClass_Ssab_BaseACard* op;
   io_sLocal* local;
@@ -128,7 +131,8 @@ static pwr_tStatus IoCardInit(
 
   /* Caluclate polycoeff */
   chanp = cp->chanlist;
-  for (i = 0; i < cp->ChanListSize; i++) {
+  for (i = 0; i < cp->ChanListSize; i++)
+  {
     if (chanp->sop)
       AiRangeToCoef(chanp);
     chanp++;
@@ -144,8 +148,7 @@ static pwr_tStatus IoCardInit(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local;
 
@@ -160,8 +163,7 @@ static pwr_tStatus IoCardClose(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local;
   io_sRackLocal* r_local = (io_sRackLocal*)(rp->Local);
@@ -181,8 +183,10 @@ static pwr_tStatus IoCardRead(
   op = (pwr_sClass_Ssab_BaseACard*)cp->op;
 
   chanp = &cp->chanlist[0];
-  for (i = 0; i < cp->ChanListSize; i++) {
-    if (!chanp->cop || !chanp->sop) {
+  for (i = 0; i < cp->ChanListSize; i++)
+  {
+    if (!chanp->cop || !chanp->sop)
+    {
       chanp++;
       continue;
     }
@@ -192,56 +196,65 @@ static pwr_tStatus IoCardRead(
     if (cop->CalculateNewCoef)
       AiRangeToCoef(chanp);
 
-    if (cop->ConversionOn) {
-      if (local->ScanCount[i] <= 1) {
-        if (r_local->Qbus_fp != 0 && r_local->s == 0) {
+    if (cop->ConversionOn)
+    {
+      if (local->ScanCount[i] <= 1)
+      {
+        if (r_local->Qbus_fp != 0 && r_local->s == 0)
+        {
           rb.Address = local->Address + 2 * i;
           sts = read(local->Qbus_fp, &rb, sizeof(rb));
           data = (unsigned short)rb.Data;
-        } else {
+        }
+        else
+        {
           /* Ethernet I/O, Get data from current address */
-          data = bfbeth_get_data(
-              r_local, (pwr_tUInt16)(local->Address + 2 * i), &sts);
+          data = bfbeth_get_data(r_local, (pwr_tUInt16)(local->Address + 2 * i), &sts);
           /* Yes, we want to read this address the next time aswell */
           bfbeth_set_read_req(r_local, (pwr_tUInt16)(local->Address + 2 * i));
 
-          if (sts == -1) {
+          if (sts == -1)
+          {
             /* Error handling for ethernet Qbus-I/O */
             rrp = (pwr_sClass_Ssab_RemoteRack*)rp->op;
-            if (bfb_error == 0) {
+            if (bfb_error == 0)
+            {
               op->ErrorCount++;
               bfb_error = 1;
-              if (op->ErrorCount == op->ErrorSoftLimit) {
-                errh_Error(
-                    "IO Error soft limit reached on card '%s'", cp->Name);
+              if (op->ErrorCount == op->ErrorSoftLimit)
+              {
+                errh_Error("IO Error soft limit reached on card '%s'", cp->Name);
                 ctx->IOHandler->CardErrorSoftLimit = 1;
-                ctx->IOHandler->ErrorSoftLimitObject
-                    = cdh_ObjidToAref(cp->Objid);
+                ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
               }
-              if (op->ErrorCount == op->ErrorHardLimit) {
-                errh_Error(
-                    "IO Error hard limit reached on card '%s', stall action %d",
-                    cp->Name, rrp->StallAction);
+              if (op->ErrorCount == op->ErrorHardLimit)
+              {
+                errh_Error("IO Error hard limit reached on card '%s', stall action %d", cp->Name,
+                           rrp->StallAction);
                 ctx->IOHandler->CardErrorHardLimit = 1;
-                ctx->IOHandler->ErrorHardLimitObject
-                    = cdh_ObjidToAref(cp->Objid);
+                ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
               }
-              if (op->ErrorCount >= op->ErrorHardLimit
-                  && rrp->StallAction == pwr_eSsabStallAction_ResetInputs) {
+              if (op->ErrorCount >= op->ErrorHardLimit &&
+                  rrp->StallAction == pwr_eSsabStallAction_ResetInputs)
+              {
                 data = 0;
                 sts = 1;
               }
-              if (op->ErrorCount >= op->ErrorHardLimit
-                  && rrp->StallAction == pwr_eSsabStallAction_EmergencyBreak) {
+              if (op->ErrorCount >= op->ErrorHardLimit &&
+                  rrp->StallAction == pwr_eSsabStallAction_EmergencyBreak)
+              {
                 ctx->Node->EmergBreakTrue = 1;
                 return IO__ERRDEVICE;
               }
             }
-            if (sts == -1) {
+            if (sts == -1)
+            {
               chanp++;
               continue;
             }
-          } else {
+          }
+          else
+          {
             op->ErrorCount = 0;
           }
         }
@@ -252,14 +265,15 @@ static pwr_tStatus IoCardRead(
           /* Increase error count and check error limits */
           op->ErrorCount++;
 
-          if (op->ErrorCount == op->ErrorSoftLimit) {
+          if (op->ErrorCount == op->ErrorSoftLimit)
+          {
             errh_Error("IO Error soft limit reached on card '%s'", cp->Name);
             ctx->IOHandler->CardErrorSoftLimit = 1;
             ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
           }
-          if (op->ErrorCount >= op->ErrorHardLimit) {
-            errh_Error("IO Error hard limit reached on card '%s', IO stopped",
-                cp->Name);
+          if (op->ErrorCount >= op->ErrorHardLimit)
+          {
+            errh_Error("IO Error hard limit reached on card '%s', IO stopped", cp->Name);
             ctx->Node->EmergBreakTrue = 1;
             ctx->IOHandler->CardErrorHardLimit = 1;
             ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
@@ -272,7 +286,8 @@ static pwr_tStatus IoCardRead(
         /* Convert rawvalue to sigvalue and actualvalue */
         sop->RawValue = data;
         sop->SigValue = data * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
-        switch (chanp->ChanClass) {
+        switch (chanp->ChanClass)
+        {
         case pwr_cClass_ChanAi:
           io_ConvertAi(cop, data, &actvalue);
           break;
@@ -282,11 +297,10 @@ static pwr_tStatus IoCardRead(
         }
 
         /* Filter */
-        if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0
-            && sop->FilterAttribute[0] > ctx->ScanTime) {
-          actvalue = *(pwr_tFloat32*)chanp->vbp
-              + ctx->ScanTime / sop->FilterAttribute[0]
-                  * (actvalue - *(pwr_tFloat32*)chanp->vbp);
+        if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0 && sop->FilterAttribute[0] > ctx->ScanTime)
+        {
+          actvalue = *(pwr_tFloat32*)chanp->vbp +
+                     ctx->ScanTime / sop->FilterAttribute[0] * (actvalue - *(pwr_tFloat32*)chanp->vbp);
         }
 
         *(pwr_tFloat32*)chanp->vbp = actvalue;
@@ -299,7 +313,8 @@ static pwr_tStatus IoCardRead(
 
   /* Fix for qbus errors */
   local->ErrScanCnt++;
-  if (local->ErrScanCnt >= local->ErrReset) {
+  if (local->ErrScanCnt >= local->ErrReset)
+  {
     local->ErrScanCnt = 0;
     if (op->ErrorCount > op->ErrorSoftLimit)
       op->ErrorCount--;
@@ -312,5 +327,5 @@ static pwr_tStatus IoCardRead(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Ssab_AiuP) = { pwr_BindIoMethod(IoCardInit),
-  pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Ssab_AiuP) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                            pwr_BindIoMethod(IoCardRead), pwr_NullMethod};

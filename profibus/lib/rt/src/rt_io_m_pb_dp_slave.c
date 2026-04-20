@@ -73,7 +73,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   pwr_sClass_Pb_Ii* iip;
   pwr_sClass_Pb_Io* iop;
   pwr_sClass_Pb_Module* mp;
-  char name[196];  
+  char name[196];
   pwr_tCid cid;
 
   io_sChannel* chanp;
@@ -126,10 +126,10 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
     switch (cid)
     {
-    /* Old style configuring with Pb_xx objects. Still here for combatibility
-       reasons.
-       New systems (from v4.1.3) should be build with Pb_Module objects or
-       subclasses */
+      /* Old style configuring with Pb_xx objects. Still here for combatibility
+         reasons.
+         New systems (from v4.1.3) should be build with Pb_Module objects or
+         subclasses */
 
     case pwr_cClass_Pb_Di:
       dip = (pwr_sClass_Pb_Di*)cardp->op;
@@ -179,9 +179,9 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
       iop->Status = PB_MODULE_STATE_OPERATE;
       break;
 
-    /* New style configuring (from v4.1.3) with Pb_Module objects or subclass.
-      Loop all channels
-      in the module and set channel size and offset. */
+      /* New style configuring (from v4.1.3) with Pb_Module objects or subclass.
+        Loop all channels
+        in the module and set channel size and offset. */
 
     case pwr_cClass_Pb_Module:
       mp = (pwr_sClass_Pb_Module*)cardp->op;
@@ -198,8 +198,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
           {
           case pwr_cClass_ChanIi:
             chanp->offset = ((pwr_sClass_ChanIi*)chanp->cop)->Number;
-            chanp->size =
-                GetChanSize(((pwr_sClass_ChanIi*)chanp->cop)->Representation);
+            chanp->size = GetChanSize(((pwr_sClass_ChanIi*)chanp->cop)->Representation);
             break;
           default:
             errh_Error("PROFIBUS: Diagnostic channel class, card %s", cardp->Name);
@@ -371,19 +370,17 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     }
     if (sp->ErrorCount == sp->ErrorHardLimit)
     {
-      errh_Error("PROFIBUS: IO Error hard limit reached on device '%s', stall action %d",
-                 rp->Name, sp->StallAction);
+      errh_Error("PROFIBUS: IO Error hard limit reached on device '%s', stall action %d", rp->Name,
+                 sp->StallAction);
       ctx->IOHandler->CardErrorHardLimit = 1;
       ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(rp->Objid);
     }
-    if (sp->ErrorCount > sp->ErrorHardLimit &&
-        sp->StallAction == pwr_ePbStallAction_ResetInputs)
+    if (sp->ErrorCount > sp->ErrorHardLimit && sp->StallAction == pwr_ePbStallAction_ResetInputs)
     {
       memset(&sp->Inputs, 0, sp->BytesOfInput);
     }
 
-    if (sp->ErrorCount > sp->ErrorHardLimit &&
-        sp->StallAction == pwr_ePbStallAction_EmergencyBreak)
+    if (sp->ErrorCount > sp->ErrorHardLimit && sp->StallAction == pwr_ePbStallAction_EmergencyBreak)
     {
       ctx->Node->EmergBreakTrue = 1;
     }
@@ -420,16 +417,12 @@ static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Pb_DP_Slave) = {
-    pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackRead),
-    pwr_BindIoMethod(IoRackWrite), pwr_BindIoMethod(IoRackClose),
-    pwr_NullMethod};
+pwr_dExport pwr_BindIoMethods(Pb_DP_Slave) = {pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackRead),
+                                              pwr_BindIoMethod(IoRackWrite), pwr_BindIoMethod(IoRackClose),
+                                              pwr_NullMethod};

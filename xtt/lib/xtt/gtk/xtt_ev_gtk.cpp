@@ -60,9 +60,7 @@ static gint eve_delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
   return TRUE;
 }
 
-static void eve_destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void eve_destroy_event(GtkWidget* w, gpointer data) {}
 
 static gint ala_delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
@@ -70,9 +68,7 @@ static gint ala_delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
   return TRUE;
 }
 
-static void ala_destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void ala_destroy_event(GtkWidget* w, gpointer data) {}
 
 static gint blk_delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
@@ -80,20 +76,14 @@ static gint blk_delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
   return TRUE;
 }
 
-static void blk_destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void blk_destroy_event(GtkWidget* w, gpointer data) {}
 
-EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
-    char* ala_name, char* blk_name, pwr_tObjid ev_user, int display_ala,
-    int display_eve, int display_blk, int display_return, int display_ack,
-    int ev_beep, pwr_tMask ev_pop_mask, int ev_eventname_seg,
-    pwr_tStatus* status)
-    : Ev(ev_parent_ctx, eve_name, ala_name, blk_name, ev_user, display_ala,
-          display_eve, display_blk, display_return, display_ack, ev_beep,
-          ev_pop_mask, ev_eventname_seg, status),
-      parent_wid(ev_parent_wid), parent_wid_eve(0), parent_wid_ala(0),
-      parent_wid_blk(0)
+EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name, char* ala_name, char* blk_name,
+             pwr_tObjid ev_user, int display_ala, int display_eve, int display_blk, int display_return,
+             int display_ack, int ev_beep, pwr_tMask ev_pop_mask, int ev_eventname_seg, pwr_tStatus* status)
+    : Ev(ev_parent_ctx, eve_name, ala_name, blk_name, ev_user, display_ala, display_eve, display_blk,
+         display_return, display_ack, ev_beep, ev_pop_mask, ev_eventname_seg, status),
+      parent_wid(ev_parent_wid), parent_wid_eve(0), parent_wid_ala(0), parent_wid_blk(0)
 {
   pwr_tStatus sts;
   pwr_sClass_OpPlace* opp;
@@ -108,13 +98,15 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
   *status = 1;
 
   // Check user object
-  if (cdh_ObjidIsNull(user)) {
+  if (cdh_ObjidIsNull(user))
+  {
     *status = XNAV__NOUSER;
     return;
   }
 
   sts = gdh_ObjidToPointer(user, (pwr_tAddress*)&opp);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *status = XNAV__NOUSER;
     return;
   }
@@ -126,16 +118,12 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
   // Gtk
   // Eve Window
   {
-    parent_wid_eve = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-        eve_height, "default-width", eve_width, "title",
-        CoWowGtk::translate_utf8(eve_name), NULL);
+    parent_wid_eve = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", eve_height, "default-width",
+                                              eve_width, "title", CoWowGtk::translate_utf8(eve_name), NULL);
 
-    g_signal_connect(
-        parent_wid_eve, "delete_event", G_CALLBACK(eve_delete_event), this);
-    g_signal_connect(
-        parent_wid_eve, "destroy", G_CALLBACK(eve_destroy_event), this);
-    g_signal_connect(parent_wid_eve, "focus-in-event",
-        G_CALLBACK(eve_action_inputfocus), this);
+    g_signal_connect(parent_wid_eve, "delete_event", G_CALLBACK(eve_delete_event), this);
+    g_signal_connect(parent_wid_eve, "destroy", G_CALLBACK(eve_destroy_event), this);
+    g_signal_connect(parent_wid_eve, "focus-in-event", G_CALLBACK(eve_action_inputfocus), this);
 
     CoWowGtk::SetWindowIcon(parent_wid_eve);
     dark_theme = CoWowGtk::GetDarkTheme(parent_wid_eve);
@@ -144,34 +132,25 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
 
     // Menu
     // Accelerators
-    GtkAccelGroup* accel_g
-        = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+    GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
     gtk_window_add_accel_group(GTK_WINDOW(parent_wid_eve), accel_g);
 
     GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
     // File entry
-    GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Print"));
-    g_signal_connect(
-        file_print, "activate", G_CALLBACK(eve_activate_print), this);
+    GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Print"));
+    g_signal_connect(file_print, "activate", G_CALLBACK(eve_activate_print), this);
 
-    GtkWidget* file_export = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Export"));
-    g_signal_connect(
-        file_export, "activate", G_CALLBACK(eve_activate_export), this);
+    GtkWidget* file_export = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Export"));
+    g_signal_connect(file_export, "activate", G_CALLBACK(eve_activate_export), this);
 
-    GtkWidget* file_analyse = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Open _Analyser"));
-    g_signal_connect(
-        file_analyse, "activate", G_CALLBACK(eve_activate_analyse), this);
+    GtkWidget* file_analyse = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Open _Analyser"));
+    g_signal_connect(file_analyse, "activate", G_CALLBACK(eve_activate_analyse), this);
 
-    GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Close"));
-    g_signal_connect(
-        file_close, "activate", G_CALLBACK(eve_activate_exit), this);
-    gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Close"));
+    g_signal_connect(file_close, "activate", G_CALLBACK(eve_activate_exit), this);
+    gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
     GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_print);
@@ -179,79 +158,64 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_analyse);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
 
-    GtkWidget* file
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
+    GtkWidget* file = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
     // Functions entry
-    GtkWidget* functions_ack_last = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Acknowledge"));
-    g_signal_connect(functions_ack_last, "activate",
-        G_CALLBACK(eve_activate_ack_last), this);
+    GtkWidget* functions_ack_last = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Acknowledge"));
+    g_signal_connect(functions_ack_last, "activate", G_CALLBACK(eve_activate_ack_last), this);
     gtk_widget_add_accelerator(functions_ack_last, "activate", accel_g, 'k',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                               GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-    GtkWidget* functions_open_plc = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Open _Program"));
-    g_signal_connect(functions_open_plc, "activate",
-        G_CALLBACK(eve_activate_open_plc), this);
+    GtkWidget* functions_open_plc =
+        gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Open _Program"));
+    g_signal_connect(functions_open_plc, "activate", G_CALLBACK(eve_activate_open_plc), this);
     gtk_widget_add_accelerator(functions_open_plc, "activate", accel_g, 'l',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                               GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-    GtkWidget* functions_display_object = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Display object in Navigator"));
-    g_signal_connect(functions_display_object, "activate",
-        G_CALLBACK(eve_activate_display_in_xnav), this);
-    gtk_widget_add_accelerator(functions_display_object, "activate", accel_g,
-        'd', GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* functions_display_object =
+        gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Display object in Navigator"));
+    g_signal_connect(functions_display_object, "activate", G_CALLBACK(eve_activate_display_in_xnav), this);
+    gtk_widget_add_accelerator(functions_display_object, "activate", accel_g, 'd',
+                               GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
     GtkMenu* func_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     // gtk_menu_shell_append(GTK_MENU_SHELL(func_menu), functions_ack_last);
     gtk_menu_shell_append(GTK_MENU_SHELL(func_menu), functions_open_plc);
     gtk_menu_shell_append(GTK_MENU_SHELL(func_menu), functions_display_object);
 
-    GtkWidget* functions = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Functions"));
+    GtkWidget* functions = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Functions"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), functions);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(func_menu));
 
     // View entry
-    GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Zoom _In"));
-    g_signal_connect(
-        view_zoom_in, "activate", G_CALLBACK(eve_activate_zoom_in), this);
-    gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _In"));
+    g_signal_connect(view_zoom_in, "activate", G_CALLBACK(eve_activate_zoom_in), this);
+    gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Zoom _Out"));
-    g_signal_connect(
-        view_zoom_out, "activate", G_CALLBACK(eve_activate_zoom_out), this);
-    gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Out"));
+    g_signal_connect(view_zoom_out, "activate", G_CALLBACK(eve_activate_zoom_out), this);
+    gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Zoom _Reset"));
-    g_signal_connect(
-        view_zoom_reset, "activate", G_CALLBACK(eve_activate_zoom_reset), this);
-    gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Reset"));
+    g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(eve_activate_zoom_reset), this);
+    gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_disp_hundredth = gtk_check_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Display hundredth"));
-    g_signal_connect(view_disp_hundredth, "activate",
-        G_CALLBACK(eve_activate_disp_hundredth), this);
+    GtkWidget* view_disp_hundredth =
+        gtk_check_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Display hundredth"));
+    g_signal_connect(view_disp_hundredth, "activate", G_CALLBACK(eve_activate_disp_hundredth), this);
 
-    GtkWidget* view_hide_object = gtk_check_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Hide Event Name"));
-    g_signal_connect(view_hide_object, "activate",
-        G_CALLBACK(eve_activate_hide_object), this);
+    GtkWidget* view_hide_object =
+        gtk_check_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Hide Event Name"));
+    g_signal_connect(view_hide_object, "activate", G_CALLBACK(eve_activate_hide_object), this);
 
-    GtkWidget* view_hide_text = gtk_check_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Hide _Event Text"));
-    g_signal_connect(
-        view_hide_text, "activate", G_CALLBACK(eve_activate_hide_text), this);
+    GtkWidget* view_hide_text =
+        gtk_check_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Hide _Event Text"));
+    g_signal_connect(view_hide_text, "activate", G_CALLBACK(eve_activate_hide_text), this);
 
     GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
@@ -261,36 +225,29 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_hide_object);
     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_hide_text);
 
-    GtkWidget* view
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
+    GtkWidget* view = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), view);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
     // Help entry
-    GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Help"));
-    g_signal_connect(
-        help_help, "activate", G_CALLBACK(eve_activate_help), this);
-    gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
-        GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+    g_signal_connect(help_help, "activate", G_CALLBACK(eve_activate_help), this);
+    gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-    GtkWidget* help_helpevent = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Help Selected Event"));
-    g_signal_connect(
-        help_helpevent, "activate", G_CALLBACK(eve_activate_helpevent), this);
+    GtkWidget* help_helpevent =
+        gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Help Selected Event"));
+    g_signal_connect(help_helpevent, "activate", G_CALLBACK(eve_activate_helpevent), this);
 
     GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
     gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_helpevent);
 
-    GtkWidget* help
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+    GtkWidget* help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
     // Create eve evlist
-    eve = new EvListGtk(this, eve_vbox, ev_eType_EventList, eve_size,
-        eventname_seg, &eve_widget);
+    eve = new EvListGtk(this, eve_vbox, ev_eType_EventList, eve_size, eventname_seg, &eve_widget);
     eve->start_trace_cb = &eve_start_trace_cb;
     eve->display_in_xnav_cb = &eve_display_in_xnav_cb;
     eve->name_to_alias_cb = &ev_name_to_alias_cb;
@@ -301,52 +258,38 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     // Toolbar
     GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-    wutl_tools_item(tools, 
-        dark_theme ? "$pwr_exe/ico_zoomin_d_20.png" : "$pwr_exe/ico_zoomin_l_20.png", 
-        G_CALLBACK(eve_activate_zoom_in), "Zoom in", this, 0, 1);
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_20.png" : "$pwr_exe/ico_zoomin_l_20.png",
+                    G_CALLBACK(eve_activate_zoom_in), "Zoom in", this, 0, 1);
 
-    wutl_tools_item(tools, 
-        dark_theme ? "$pwr_exe/ico_zoomout_d_20.png" : "$pwr_exe/ico_zoomout_l_20.png", 
-        G_CALLBACK(eve_activate_zoom_out), "Zoom out", this, 0, 1);
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_20.png" : "$pwr_exe/ico_zoomout_l_20.png",
+                    G_CALLBACK(eve_activate_zoom_out), "Zoom out", this, 0, 1);
 
-    wutl_tools_item(tools, 
-        dark_theme ? "$pwr_exe/ico_zoomreset_d_20.png" : "$pwr_exe/ico_zoomreset_l_20.png", 
-        G_CALLBACK(eve_activate_zoom_reset), "Zoom reset", this, 0, 1);
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_20.png" : "$pwr_exe/ico_zoomreset_l_20.png",
+                    G_CALLBACK(eve_activate_zoom_reset), "Zoom reset", this, 0, 1);
 
-
-    eve_methodtoolbar = new XttMethodToolbarGtk(
-        0, 0, ~pwr_mXttOpMethodsMask_ParentObjectGraph, ~0, "");
-    GtkToolbar* tools_meth
-        = (GtkToolbar*)((XttMethodToolbarGtk*)eve_methodtoolbar)->build();
+    eve_methodtoolbar = new XttMethodToolbarGtk(0, 0, ~pwr_mXttOpMethodsMask_ParentObjectGraph, ~0, "");
+    GtkToolbar* tools_meth = (GtkToolbar*)((XttMethodToolbarGtk*)eve_methodtoolbar)->build();
     eve_methodtoolbar->m_xnav = (XNav*)parent_ctx;
     eve_methodtoolbar->m_parent_ctx = eve;
     eve_methodtoolbar->get_select_cb = eve->get_select;
 
-    eve_sup_methodtoolbar = new XttMethodToolbarGtk(0, 0, 0,
-        pwr_mXttMntMethodsMask_OpenTrace | pwr_mXttMntMethodsMask_RtNavigator,
+    eve_sup_methodtoolbar = new XttMethodToolbarGtk(
+        0, 0, 0, pwr_mXttMntMethodsMask_OpenTrace | pwr_mXttMntMethodsMask_RtNavigator,
         " for supervisory object");
-    GtkToolbar* tools_sup
-        = (GtkToolbar*)((XttMethodToolbarGtk*)eve_sup_methodtoolbar)->build();
+    GtkToolbar* tools_sup = (GtkToolbar*)((XttMethodToolbarGtk*)eve_sup_methodtoolbar)->build();
     eve_sup_methodtoolbar->m_xnav = (XNav*)parent_ctx;
     eve_sup_methodtoolbar->m_parent_ctx = eve;
     eve_sup_methodtoolbar->get_select_cb = eve->get_select_supobject;
 
     GtkWidget* eve_toolsbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_box_pack_start(
-        GTK_BOX(eve_toolsbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(eve_toolsbox),
-        GTK_WIDGET(gtk_separator_tool_item_new()), FALSE, FALSE, 4);
-    gtk_box_pack_start(
-        GTK_BOX(eve_toolsbox), GTK_WIDGET(tools_sup), FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(eve_toolsbox),
-        GTK_WIDGET(gtk_separator_tool_item_new()), FALSE, FALSE, 4);
-    gtk_box_pack_start(
-        GTK_BOX(eve_toolsbox), GTK_WIDGET(tools_meth), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(eve_toolsbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(eve_toolsbox), GTK_WIDGET(gtk_separator_tool_item_new()), FALSE, FALSE, 4);
+    gtk_box_pack_start(GTK_BOX(eve_toolsbox), GTK_WIDGET(tools_sup), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(eve_toolsbox), GTK_WIDGET(gtk_separator_tool_item_new()), FALSE, FALSE, 4);
+    gtk_box_pack_start(GTK_BOX(eve_toolsbox), GTK_WIDGET(tools_meth), FALSE, FALSE, 0);
 
-    gtk_box_pack_start(
-        GTK_BOX(eve_vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
-    gtk_box_pack_start(
-        GTK_BOX(eve_vbox), GTK_WIDGET(eve_toolsbox), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(eve_vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(eve_vbox), GTK_WIDGET(eve_toolsbox), FALSE, FALSE, 0);
     gtk_box_pack_end(GTK_BOX(eve_vbox), GTK_WIDGET(eve_widget), TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(parent_wid_eve), eve_vbox);
@@ -358,15 +301,11 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
 
   // Ala Window
   {
-    parent_wid_ala = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-        ala_height, "default-width", ala_width, "title",
-        CoWowGtk::translate_utf8(ala_name), NULL);
-    g_signal_connect(
-        parent_wid_ala, "delete_event", G_CALLBACK(ala_delete_event), this);
-    g_signal_connect(
-        parent_wid_ala, "destroy", G_CALLBACK(ala_destroy_event), this);
-    g_signal_connect(parent_wid_ala, "focus-in-event",
-        G_CALLBACK(ala_action_inputfocus), this);
+    parent_wid_ala = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", ala_height, "default-width",
+                                              ala_width, "title", CoWowGtk::translate_utf8(ala_name), NULL);
+    g_signal_connect(parent_wid_ala, "delete_event", G_CALLBACK(ala_delete_event), this);
+    g_signal_connect(parent_wid_ala, "destroy", G_CALLBACK(ala_destroy_event), this);
+    g_signal_connect(parent_wid_ala, "focus-in-event", G_CALLBACK(ala_action_inputfocus), this);
 
     CoWowGtk::SetWindowIcon(parent_wid_ala);
     dark_theme = CoWowGtk::GetDarkTheme(parent_wid_ala);
@@ -375,60 +314,49 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
 
     // Menu
     // Accelerators
-    GtkAccelGroup* accel_g
-        = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+    GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
     gtk_window_add_accel_group(GTK_WINDOW(parent_wid_ala), accel_g);
 
     GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
     // File entry
-    GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Print"));
-    g_signal_connect(
-        file_print, "activate", G_CALLBACK(ala_activate_print), this);
+    GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Print"));
+    g_signal_connect(file_print, "activate", G_CALLBACK(ala_activate_print), this);
 
-    GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Close"));
-    g_signal_connect(
-        file_close, "activate", G_CALLBACK(ala_activate_exit), this);
-    gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Close"));
+    g_signal_connect(file_close, "activate", G_CALLBACK(ala_activate_exit), this);
+    gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
     GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_print);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
 
-    GtkWidget* file
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
+    GtkWidget* file = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
     // Functions entry
-    GtkWidget* functions_ack_last = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Acknowledge"));
-    g_signal_connect(functions_ack_last, "activate",
-        G_CALLBACK(ala_activate_ack_last), this);
+    GtkWidget* functions_ack_last = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Acknowledge"));
+    g_signal_connect(functions_ack_last, "activate", G_CALLBACK(ala_activate_ack_last), this);
     gtk_widget_add_accelerator(functions_ack_last, "activate", accel_g, 'k',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                               GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-    GtkWidget* functions_ack_all = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("A_cknowledge All"));
-    g_signal_connect(
-        functions_ack_all, "activate", G_CALLBACK(ala_activate_ack_all), this);
+    GtkWidget* functions_ack_all =
+        gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("A_cknowledge All"));
+    g_signal_connect(functions_ack_all, "activate", G_CALLBACK(ala_activate_ack_all), this);
 
-    GtkWidget* functions_open_plc = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Open _Program"));
-    g_signal_connect(functions_open_plc, "activate",
-        G_CALLBACK(ala_activate_open_plc), this);
+    GtkWidget* functions_open_plc =
+        gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Open _Program"));
+    g_signal_connect(functions_open_plc, "activate", G_CALLBACK(ala_activate_open_plc), this);
     gtk_widget_add_accelerator(functions_open_plc, "activate", accel_g, 'l',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                               GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-    GtkWidget* functions_display_object = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Display object in Navigator"));
-    g_signal_connect(functions_display_object, "activate",
-        G_CALLBACK(ala_activate_display_in_xnav), this);
-    gtk_widget_add_accelerator(functions_display_object, "activate", accel_g,
-        'd', GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* functions_display_object =
+        gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Display object in Navigator"));
+    g_signal_connect(functions_display_object, "activate", G_CALLBACK(ala_activate_display_in_xnav), this);
+    gtk_widget_add_accelerator(functions_display_object, "activate", accel_g, 'd',
+                               GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
     GtkMenu* func_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(func_menu), functions_ack_last);
@@ -436,185 +364,146 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     gtk_menu_shell_append(GTK_MENU_SHELL(func_menu), functions_open_plc);
     gtk_menu_shell_append(GTK_MENU_SHELL(func_menu), functions_display_object);
 
-    GtkWidget* functions = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Functions"));
+    GtkWidget* functions = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Functions"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), functions);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(func_menu));
 
     // View entry
-    GtkWidget* view_shift_view = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("S_hift View"));
-    g_signal_connect(
-        view_shift_view, "activate", G_CALLBACK(ala_activate_shift_view), this);
-    gtk_widget_add_accelerator(view_shift_view, "activate", accel_g, 'n',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* view_shift_view = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("S_hift View"));
+    g_signal_connect(view_shift_view, "activate", G_CALLBACK(ala_activate_shift_view), this);
+    gtk_widget_add_accelerator(view_shift_view, "activate", accel_g, 'n', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Zoom _In"));
-    g_signal_connect(
-        view_zoom_in, "activate", G_CALLBACK(ala_activate_zoom_in), this);
-    gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _In"));
+    g_signal_connect(view_zoom_in, "activate", G_CALLBACK(ala_activate_zoom_in), this);
+    gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Zoom _Out"));
-    g_signal_connect(
-        view_zoom_out, "activate", G_CALLBACK(ala_activate_zoom_out), this);
-    gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Out"));
+    g_signal_connect(view_zoom_out, "activate", G_CALLBACK(ala_activate_zoom_out), this);
+    gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Zoom _Reset"));
-    g_signal_connect(
-        view_zoom_reset, "activate", G_CALLBACK(ala_activate_zoom_reset), this);
-    gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Reset"));
+    g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(ala_activate_zoom_reset), this);
+    gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_disp_hundredth = gtk_check_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Display hundredth"));
-    g_signal_connect(view_disp_hundredth, "activate",
-        G_CALLBACK(ala_activate_disp_hundredth), this);
+    GtkWidget* view_disp_hundredth =
+        gtk_check_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Display hundredth"));
+    g_signal_connect(view_disp_hundredth, "activate", G_CALLBACK(ala_activate_disp_hundredth), this);
 
-    GtkWidget* view_hide_object = gtk_check_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Hide Event Name"));
-    g_signal_connect(view_hide_object, "activate",
-        G_CALLBACK(ala_activate_hide_object), this);
+    GtkWidget* view_hide_object =
+        gtk_check_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Hide Event Name"));
+    g_signal_connect(view_hide_object, "activate", G_CALLBACK(ala_activate_hide_object), this);
 
-    GtkWidget* view_hide_text = gtk_check_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Hide _Event Text"));
-    g_signal_connect(
-        view_hide_text, "activate", G_CALLBACK(ala_activate_hide_text), this);
+    GtkWidget* view_hide_text =
+        gtk_check_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Hide _Event Text"));
+    g_signal_connect(view_hide_text, "activate", G_CALLBACK(ala_activate_hide_text), this);
 
     // Submenu Select View
     GtkWidget* view_select_flat = gtk_menu_item_new_with_mnemonic("_Flat");
-    g_signal_connect(view_select_flat, "activate",
-        G_CALLBACK(ala_activate_select_flat), this);
+    g_signal_connect(view_select_flat, "activate", G_CALLBACK(ala_activate_select_flat), this);
 
     GtkWidget* view_select = gtk_menu_item_new_with_mnemonic("_Select View");
     GtkMenu* view_select_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(view_select_menu), view_select_flat);
 
-    for (unsigned int i = 0;
-         i < sizeof(opp->AlarmViews) / sizeof(opp->AlarmViews[0]); i++) {
+    for (unsigned int i = 0; i < sizeof(opp->AlarmViews) / sizeof(opp->AlarmViews[0]); i++)
+    {
       pwr_sClass_AlarmView* viewp;
 
       if (cdh_ObjidIsNull(opp->AlarmViews[i]))
         break;
 
       sts = gdh_ObjidToPointer(opp->AlarmViews[i], (void**)&viewp);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         alarm_views[i] = opp->AlarmViews[i];
-        GtkWidget* view_select_view = gtk_menu_item_new_with_mnemonic(
-            CoWowGtk::translate_utf8(viewp->Name));
-        switch (i) {
+        GtkWidget* view_select_view = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8(viewp->Name));
+        switch (i)
+        {
         case 0:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view1), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view1), this);
           break;
         case 1:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view2), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view2), this);
           break;
         case 2:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view3), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view3), this);
           break;
         case 3:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view4), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view4), this);
           break;
         case 4:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view5), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view5), this);
           break;
         case 5:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view6), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view6), this);
           break;
         case 6:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view7), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view7), this);
           break;
         case 7:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view8), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view8), this);
           break;
         case 8:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view9), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view9), this);
           break;
         case 9:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view10), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view10), this);
           break;
         case 10:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view11), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view11), this);
           break;
         case 11:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view12), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view12), this);
           break;
         case 12:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view13), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view13), this);
           break;
         case 13:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view14), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view14), this);
           break;
         case 14:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view15), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view15), this);
           break;
         case 15:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view16), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view16), this);
           break;
         case 16:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view17), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view17), this);
           break;
         case 17:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view18), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view18), this);
           break;
         case 18:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view19), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view19), this);
           break;
         case 19:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view20), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view20), this);
           break;
         case 20:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view21), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view21), this);
           break;
         case 21:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view22), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view22), this);
           break;
         case 22:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view23), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view23), this);
           break;
         case 23:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view24), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view24), this);
           break;
         case 24:
-          g_signal_connect(view_select_view, "activate",
-              G_CALLBACK(ala_activate_select_view25), this);
+          g_signal_connect(view_select_view, "activate", G_CALLBACK(ala_activate_select_view25), this);
           break;
         }
-        gtk_menu_shell_append(
-            GTK_MENU_SHELL(view_select_menu), view_select_view);
+        gtk_menu_shell_append(GTK_MENU_SHELL(view_select_menu), view_select_view);
       }
     }
 
-    gtk_menu_item_set_submenu(
-        GTK_MENU_ITEM(view_select), GTK_WIDGET(view_select_menu));
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(view_select), GTK_WIDGET(view_select_menu));
 
     GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_shift_view);
@@ -626,36 +515,29 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_hide_object);
     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_hide_text);
 
-    GtkWidget* view
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
+    GtkWidget* view = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), view);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
     // Help entry
-    GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Help"));
-    g_signal_connect(
-        help_help, "activate", G_CALLBACK(ala_activate_help), this);
-    gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
-        GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+    g_signal_connect(help_help, "activate", G_CALLBACK(ala_activate_help), this);
+    gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-    GtkWidget* help_helpevent = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Help Selected Event"));
-    g_signal_connect(
-        help_helpevent, "activate", G_CALLBACK(ala_activate_helpevent), this);
+    GtkWidget* help_helpevent =
+        gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Help Selected Event"));
+    g_signal_connect(help_helpevent, "activate", G_CALLBACK(ala_activate_helpevent), this);
 
     GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
     gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_helpevent);
 
-    GtkWidget* help
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+    GtkWidget* help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
     // Create ala evlist
-    ala = new EvListGtk(this, ala_vbox, ev_eType_AlarmList, ala_size,
-        eventname_seg, &ala_widget);
+    ala = new EvListGtk(this, ala_vbox, ev_eType_AlarmList, ala_size, eventname_seg, &ala_widget);
     ala->start_trace_cb = &ala_start_trace_cb;
     ala->display_in_xnav_cb = &ala_display_in_xnav_cb;
     ala->name_to_alias_cb = &ev_name_to_alias_cb;
@@ -668,55 +550,42 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
     wutl_tools_item(tools,
-        dark_theme ? "$pwr_exe/ico_acknowledge_d_20.png" : "$pwr_exe/ico_acknowledge_l_20.png", 
-        G_CALLBACK(ala_activate_ack_last), "Acknowledge", this);
+                    dark_theme ? "$pwr_exe/ico_acknowledge_d_20.png" : "$pwr_exe/ico_acknowledge_l_20.png",
+                    G_CALLBACK(ala_activate_ack_last), "Acknowledge", this);
 
-    wutl_tools_item(tools, 
-        dark_theme ? "$pwr_exe/ico_zoomin_d_20.png" : "$pwr_exe/ico_zoomin_l_20.png", 
-        G_CALLBACK(ala_activate_zoom_in), "Zoom in", this, 0, 1);
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_20.png" : "$pwr_exe/ico_zoomin_l_20.png",
+                    G_CALLBACK(ala_activate_zoom_in), "Zoom in", this, 0, 1);
 
-    wutl_tools_item(tools, 
-        dark_theme ? "$pwr_exe/ico_zoomout_d_20.png" : "$pwr_exe/ico_zoomout_l_20.png", 
-        G_CALLBACK(ala_activate_zoom_out), "Zoom out", this, 0, 1);
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_20.png" : "$pwr_exe/ico_zoomout_l_20.png",
+                    G_CALLBACK(ala_activate_zoom_out), "Zoom out", this, 0, 1);
 
-    wutl_tools_item(tools, 
-        dark_theme ? "$pwr_exe/ico_zoomreset_d_20.png" : "$pwr_exe/ico_zoomreset_l_20.png", 
-        G_CALLBACK(ala_activate_zoom_reset), "Zoom reset", this, 0, 1);
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_20.png" : "$pwr_exe/ico_zoomreset_l_20.png",
+                    G_CALLBACK(ala_activate_zoom_reset), "Zoom reset", this, 0, 1);
 
-    ala_methodtoolbar = new XttMethodToolbarGtk(
-        0, 0, ~pwr_mXttOpMethodsMask_ParentObjectGraph, ~0, "");
-    GtkToolbar* tools_meth
-        = (GtkToolbar*)((XttMethodToolbarGtk*)ala_methodtoolbar)->build();
+    ala_methodtoolbar = new XttMethodToolbarGtk(0, 0, ~pwr_mXttOpMethodsMask_ParentObjectGraph, ~0, "");
+    GtkToolbar* tools_meth = (GtkToolbar*)((XttMethodToolbarGtk*)ala_methodtoolbar)->build();
 
     ala_methodtoolbar->m_xnav = (XNav*)parent_ctx;
     ala_methodtoolbar->m_parent_ctx = ala;
     ala_methodtoolbar->get_select_cb = ala->get_select;
 
-    ala_sup_methodtoolbar = new XttMethodToolbarGtk(0, 0, 0,
-        pwr_mXttMntMethodsMask_OpenTrace | pwr_mXttMntMethodsMask_RtNavigator,
+    ala_sup_methodtoolbar = new XttMethodToolbarGtk(
+        0, 0, 0, pwr_mXttMntMethodsMask_OpenTrace | pwr_mXttMntMethodsMask_RtNavigator,
         " for supervisory object");
-    GtkToolbar* tools_sup
-        = (GtkToolbar*)((XttMethodToolbarGtk*)ala_sup_methodtoolbar)->build();
+    GtkToolbar* tools_sup = (GtkToolbar*)((XttMethodToolbarGtk*)ala_sup_methodtoolbar)->build();
     ala_sup_methodtoolbar->m_xnav = (XNav*)parent_ctx;
     ala_sup_methodtoolbar->m_parent_ctx = ala;
     ala_sup_methodtoolbar->get_select_cb = ala->get_select_supobject;
 
     GtkWidget* ala_toolsbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_box_pack_start(
-        GTK_BOX(ala_toolsbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(ala_toolsbox),
-        GTK_WIDGET(gtk_separator_tool_item_new()), FALSE, FALSE, 4);
-    gtk_box_pack_start(
-        GTK_BOX(ala_toolsbox), GTK_WIDGET(tools_sup), FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(ala_toolsbox),
-        GTK_WIDGET(gtk_separator_tool_item_new()), FALSE, FALSE, 4);
-    gtk_box_pack_start(
-        GTK_BOX(ala_toolsbox), GTK_WIDGET(tools_meth), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(ala_toolsbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(ala_toolsbox), GTK_WIDGET(gtk_separator_tool_item_new()), FALSE, FALSE, 4);
+    gtk_box_pack_start(GTK_BOX(ala_toolsbox), GTK_WIDGET(tools_sup), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(ala_toolsbox), GTK_WIDGET(gtk_separator_tool_item_new()), FALSE, FALSE, 4);
+    gtk_box_pack_start(GTK_BOX(ala_toolsbox), GTK_WIDGET(tools_meth), FALSE, FALSE, 0);
 
-    gtk_box_pack_start(
-        GTK_BOX(ala_vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
-    gtk_box_pack_start(
-        GTK_BOX(ala_vbox), GTK_WIDGET(ala_toolsbox), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(ala_vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(ala_vbox), GTK_WIDGET(ala_toolsbox), FALSE, FALSE, 0);
     gtk_box_pack_end(GTK_BOX(ala_vbox), GTK_WIDGET(ala_widget), TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(parent_wid_ala), ala_vbox);
@@ -729,16 +598,12 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
 
   // Blk Window
   {
-    parent_wid_blk = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-        blk_height, "default-width", blk_width, "title",
-        CoWowGtk::translate_utf8(blk_name), NULL);
+    parent_wid_blk = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", blk_height, "default-width",
+                                              blk_width, "title", CoWowGtk::translate_utf8(blk_name), NULL);
 
-    g_signal_connect(
-        parent_wid_blk, "delete_event", G_CALLBACK(blk_delete_event), this);
-    g_signal_connect(
-        parent_wid_blk, "destroy", G_CALLBACK(blk_destroy_event), this);
-    g_signal_connect(parent_wid_blk, "focus-in-event",
-        G_CALLBACK(blk_action_inputfocus), this);
+    g_signal_connect(parent_wid_blk, "delete_event", G_CALLBACK(blk_delete_event), this);
+    g_signal_connect(parent_wid_blk, "destroy", G_CALLBACK(blk_destroy_event), this);
+    g_signal_connect(parent_wid_blk, "focus-in-event", G_CALLBACK(blk_action_inputfocus), this);
 
     CoWowGtk::SetWindowIcon(parent_wid_blk);
 
@@ -746,122 +611,99 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
 
     // Menu
     // Accelerators
-    GtkAccelGroup* accel_g
-        = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+    GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
     gtk_window_add_accel_group(GTK_WINDOW(parent_wid_blk), accel_g);
 
     GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
     // File entry
-    GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Print"));
-    g_signal_connect(
-        file_print, "activate", G_CALLBACK(blk_activate_print), this);
+    GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Print"));
+    g_signal_connect(file_print, "activate", G_CALLBACK(blk_activate_print), this);
 
-    GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Close"));
-    g_signal_connect(
-        file_close, "activate", G_CALLBACK(blk_activate_exit), this);
-    gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Close"));
+    g_signal_connect(file_close, "activate", G_CALLBACK(blk_activate_exit), this);
+    gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
     GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_print);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
 
-    GtkWidget* file
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
+    GtkWidget* file = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
     // Functions entry
-    GtkWidget* functions_block_remove = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Remove Blocking"));
-    g_signal_connect(functions_block_remove, "activate",
-        G_CALLBACK(blk_activate_block_remove), this);
+    GtkWidget* functions_block_remove =
+        gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Remove Blocking"));
+    g_signal_connect(functions_block_remove, "activate", G_CALLBACK(blk_activate_block_remove), this);
 
-    GtkWidget* functions_open_plc = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Open _Program"));
-    g_signal_connect(functions_open_plc, "activate",
-        G_CALLBACK(blk_activate_open_plc), this);
+    GtkWidget* functions_open_plc =
+        gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Open _Program"));
+    g_signal_connect(functions_open_plc, "activate", G_CALLBACK(blk_activate_open_plc), this);
     gtk_widget_add_accelerator(functions_open_plc, "activate", accel_g, 'l',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                               GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-    GtkWidget* functions_display_object = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Display object in Navigator"));
-    g_signal_connect(functions_display_object, "activate",
-        G_CALLBACK(blk_activate_display_in_xnav), this);
-    gtk_widget_add_accelerator(functions_display_object, "activate", accel_g,
-        'd', GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* functions_display_object =
+        gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Display object in Navigator"));
+    g_signal_connect(functions_display_object, "activate", G_CALLBACK(blk_activate_display_in_xnav), this);
+    gtk_widget_add_accelerator(functions_display_object, "activate", accel_g, 'd',
+                               GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
     GtkMenu* func_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(func_menu), functions_block_remove);
     gtk_menu_shell_append(GTK_MENU_SHELL(func_menu), functions_open_plc);
     gtk_menu_shell_append(GTK_MENU_SHELL(func_menu), functions_display_object);
 
-    GtkWidget* functions = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Functions"));
+    GtkWidget* functions = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Functions"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), functions);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(func_menu));
 
     // View entry
-    GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Zoom _In"));
-    g_signal_connect(
-        view_zoom_in, "activate", G_CALLBACK(blk_activate_zoom_in), this);
-    gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _In"));
+    g_signal_connect(view_zoom_in, "activate", G_CALLBACK(blk_activate_zoom_in), this);
+    gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Zoom _Out"));
-    g_signal_connect(
-        view_zoom_out, "activate", G_CALLBACK(blk_activate_zoom_out), this);
-    gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Out"));
+    g_signal_connect(view_zoom_out, "activate", G_CALLBACK(blk_activate_zoom_out), this);
+    gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("Zoom _Reset"));
-    g_signal_connect(
-        view_zoom_reset, "activate", G_CALLBACK(blk_activate_zoom_reset), this);
-    gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
-        GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+    GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Reset"));
+    g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(blk_activate_zoom_reset), this);
+    gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b', GdkModifierType(GDK_CONTROL_MASK),
+                               GTK_ACCEL_VISIBLE);
 
     GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_out);
     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_reset);
 
-    GtkWidget* view
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
+    GtkWidget* view = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), view);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
     // Help entry
-    GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
-        CoWowGtk::translate_utf8("_Help"));
-    g_signal_connect(
-        help_help, "activate", G_CALLBACK(blk_activate_help), this);
-    gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
-        GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+    g_signal_connect(help_help, "activate", G_CALLBACK(blk_activate_help), this);
+    gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
     GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
 
-    GtkWidget* help
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+    GtkWidget* help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
     // Create blk evlist
-    blk = new EvListGtk(this, blk_vbox, ev_eType_BlockList, blk_size,
-        eventname_seg, &blk_widget);
+    blk = new EvListGtk(this, blk_vbox, ev_eType_BlockList, blk_size, eventname_seg, &blk_widget);
     blk->start_trace_cb = &blk_start_trace_cb;
     blk->display_in_xnav_cb = &blk_display_in_xnav_cb;
     blk->name_to_alias_cb = &ev_name_to_alias_cb;
     blk->popup_menu_cb = &ev_popup_menu_cb;
 
-    gtk_box_pack_start(
-        GTK_BOX(blk_vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(blk_vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
     gtk_box_pack_end(GTK_BOX(blk_vbox), GTK_WIDGET(blk_widget), TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(parent_wid_blk), blk_vbox);
@@ -871,26 +713,35 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
   // Store this for the mh callbacks
   ev = this;
 
-  if (display_eve) {
+  if (display_eve)
+  {
     gtk_widget_show_all(parent_wid_eve);
     eve_displayed = 1;
-  } else {
+  }
+  else
+  {
     gtk_widget_show_all(parent_wid_eve);
     g_object_set(parent_wid_eve, "visible", FALSE, NULL);
   }
 
-  if (display_ala) {
+  if (display_ala)
+  {
     gtk_widget_show_all(parent_wid_ala);
     ala_displayed = 1;
-  } else {
+  }
+  else
+  {
     gtk_widget_show_all(parent_wid_ala);
     g_object_set(parent_wid_ala, "visible", FALSE, NULL);
   }
 
-  if (display_blk) {
+  if (display_blk)
+  {
     gtk_widget_show_all(parent_wid_blk);
     blk_displayed = 1;
-  } else {
+  }
+  else
+  {
     gtk_widget_show_all(parent_wid_blk);
     g_object_set(parent_wid_blk, "visible", FALSE, NULL);
   }
@@ -902,15 +753,14 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     *status = sts;
 }
 
-EvAla* EvGtk::open_alarmlist_satellite(const char* title, pwr_tStatus* sts,
-    int width, int height, int x, int y, pwr_tObjid view, unsigned int options,
-    void* widget)
+EvAla* EvGtk::open_alarmlist_satellite(const char* title, pwr_tStatus* sts, int width, int height, int x,
+                                       int y, pwr_tObjid view, unsigned int options, void* widget)
 {
   if (sala_cnt >= (int)(sizeof(sala) / sizeof(sala[0])))
     return 0;
 
-  sala[sala_cnt++] = new EvAlaGtk(this, parent_wid, (char*)title, user,
-      eventname_seg, width, height, x, y, view, options, widget, sts);
+  sala[sala_cnt++] = new EvAlaGtk(this, parent_wid, (char*)title, user, eventname_seg, width, height, x, y,
+                                  view, options, widget, sts);
   if (EVEN(*sts))
     return 0;
 
@@ -929,15 +779,14 @@ EvAla* EvGtk::open_alarmlist_satellite(const char* title, pwr_tStatus* sts,
   return sala[sala_cnt - 1];
 }
 
-EvEve* EvGtk::open_eventlist_satellite(const char* title, pwr_tStatus* sts,
-    int width, int height, int x, int y, pwr_tObjid view, unsigned int options,
-    void* widget)
+EvEve* EvGtk::open_eventlist_satellite(const char* title, pwr_tStatus* sts, int width, int height, int x,
+                                       int y, pwr_tObjid view, unsigned int options, void* widget)
 {
   if (seve_cnt >= (int)(sizeof(seve) / sizeof(seve[0])))
     return 0;
 
-  seve[seve_cnt++] = new EvEveGtk(this, parent_wid, (char*)title, user,
-      eventname_seg, width, height, x, y, view, options, widget, sts);
+  seve[seve_cnt++] = new EvEveGtk(this, parent_wid, (char*)title, user, eventname_seg, width, height, x, y,
+                                  view, options, widget, sts);
   if (EVEN(*sts))
     return 0;
 
@@ -963,11 +812,13 @@ EvGtk::~EvGtk()
 {
   if (connected)
     mh_OutunitDisconnect();
-  for (int i = 0; i < seve_cnt; i++) {
+  for (int i = 0; i < seve_cnt; i++)
+  {
     if (seve[i])
       delete seve[i];
   }
-  for (int i = 0; i < sala_cnt; i++) {
+  for (int i = 0; i < sala_cnt; i++)
+  {
     if (sala[i])
       delete sala[i];
   }
@@ -1030,7 +881,8 @@ void EvGtk::map_blk(unsigned int options)
 
 void EvGtk::unmap_eve()
 {
-  if (eve_displayed) {
+  if (eve_displayed)
+  {
     g_object_set(parent_wid_eve, "visible", FALSE, NULL);
     eve_displayed = 0;
   }
@@ -1038,7 +890,8 @@ void EvGtk::unmap_eve()
 
 void EvGtk::unmap_ala()
 {
-  if (ala_displayed) {
+  if (ala_displayed)
+  {
     g_object_set(parent_wid_ala, "visible", FALSE, NULL);
     ala_displayed = 0;
   }
@@ -1046,7 +899,8 @@ void EvGtk::unmap_ala()
 
 void EvGtk::unmap_blk()
 {
-  if (blk_displayed) {
+  if (blk_displayed)
+  {
     g_object_set(parent_wid_blk, "visible", FALSE, NULL);
     blk_displayed = 0;
   }
@@ -1054,29 +908,22 @@ void EvGtk::unmap_blk()
 
 void EvGtk::set_transient_eve(void* basewidget)
 {
-  gtk_window_set_transient_for(
-      GTK_WINDOW(parent_wid_eve), GTK_WINDOW(basewidget));
+  gtk_window_set_transient_for(GTK_WINDOW(parent_wid_eve), GTK_WINDOW(basewidget));
 }
 
 void EvGtk::set_transient_ala(void* basewidget)
 {
-  gtk_window_set_transient_for(
-      GTK_WINDOW(parent_wid_ala), GTK_WINDOW(basewidget));
+  gtk_window_set_transient_for(GTK_WINDOW(parent_wid_ala), GTK_WINDOW(basewidget));
 }
 
 void EvGtk::set_transient_blk(void* basewidget)
 {
-  gtk_window_set_transient_for(
-      GTK_WINDOW(parent_wid_blk), GTK_WINDOW(basewidget));
+  gtk_window_set_transient_for(GTK_WINDOW(parent_wid_blk), GTK_WINDOW(basewidget));
 }
 
-void EvGtk::set_title_ala(char* title)
-{
-  g_object_set(parent_wid_ala, "title", title, NULL);
-}
+void EvGtk::set_title_ala(char* title) { g_object_set(parent_wid_ala, "title", title, NULL); }
 
-gboolean EvGtk::eve_action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean EvGtk::eve_action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   Ev* ev = (Ev*)data;
 
@@ -1086,8 +933,7 @@ gboolean EvGtk::eve_action_inputfocus(
   return FALSE;
 }
 
-gboolean EvGtk::ala_action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean EvGtk::ala_action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   Ev* ev = (Ev*)data;
 
@@ -1097,8 +943,7 @@ gboolean EvGtk::ala_action_inputfocus(
   return FALSE;
 }
 
-gboolean EvGtk::blk_action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean EvGtk::blk_action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   Ev* ev = (Ev*)data;
 
@@ -1153,15 +998,9 @@ void EvGtk::blk_activate_print(GtkWidget* w, gpointer data)
   ev->blk_activate_print();
 }
 
-void EvGtk::eve_activate_export(GtkWidget* w, gpointer ev)
-{
-  ((Ev*)ev)->eve_activate_export();
-}
+void EvGtk::eve_activate_export(GtkWidget* w, gpointer ev) { ((Ev*)ev)->eve_activate_export(); }
 
-void EvGtk::eve_activate_analyse(GtkWidget* w, gpointer ev)
-{
-  ((Ev*)ev)->eve_activate_analyse();
-}
+void EvGtk::eve_activate_analyse(GtkWidget* w, gpointer ev) { ((Ev*)ev)->eve_activate_analyse(); }
 
 void EvGtk::eve_activate_ack_last(GtkWidget* w, gpointer data)
 {

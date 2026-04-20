@@ -55,7 +55,8 @@ static int grow_init_proc(QWidget* w, GlowCtx* fctx, void* client_data)
   QtScrollWidgetGlow* grow = ((QtScrollWidgetGlow*)w);
   GrowCtx* ctx = (GrowCtx*)grow->parent_ctx;
 
-  if (grow->scroll_h) {
+  if (grow->scroll_h)
+  {
     widget_sScroll* scroll_data = new widget_sScroll();
     scroll_data->parent = w;
     scroll_data->scroll_h = grow->scroll_h;
@@ -68,22 +69,19 @@ static int grow_init_proc(QWidget* w, GlowCtx* fctx, void* client_data)
   return (grow->init_proc)(ctx, client_data);
 }
 
-QWidget* growwidgetqt_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data)
+QWidget* growwidgetqt_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data)
 {
   QtScrollWidgetGlow* w = new QtScrollWidgetGlow();
   w->init(glow_eCtxType_Grow, init_proc, client_data, grow_init_proc);
   return (QWidget*)w;
 }
 
-QWidget* scrolledgrowwidgetqt_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
-    QWidget** growwidget)
+QWidget* scrolledgrowwidgetqt_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
+                                  QWidget** growwidget)
 {
   QtScrollWidgetGlow* w = new QtScrollWidgetGlow();
   *growwidget = w;
-  return (QWidget*)w->initScroll(
-      glow_eCtxType_Grow, init_proc, client_data, grow_init_proc);
+  return (QWidget*)w->initScroll(glow_eCtxType_Grow, init_proc, client_data, grow_init_proc);
   ;
 }
 

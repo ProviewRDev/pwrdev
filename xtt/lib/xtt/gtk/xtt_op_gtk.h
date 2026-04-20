@@ -43,21 +43,19 @@
 
 #include "cow_wow_gtk.h"
 
-class OpCmd {
+class OpCmd
+{
 public:
   GtkWidget* w;
   pwr_tCmd cmd;
 
-  OpCmd(GtkWidget* widget, const char* command) : w(widget)
-  {
-    strncpy(cmd, command, sizeof(cmd));
-  }
+  OpCmd(GtkWidget* widget, const char* command) : w(widget) { strncpy(cmd, command, sizeof(cmd)); }
 };
 
-class OpGtk : public Op {
+class OpGtk : public Op
+{
 public:
-  OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace,
-      pwr_tStatus* status);
+  OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_tStatus* status);
   ~OpGtk();
 
   GtkWidget* parent_wid;
@@ -108,8 +106,7 @@ public:
   void update_alarm_info();
   void add_close_button();
   int get_cmd(GtkWidget* w, char* cmd);
-  int create_menu_item(
-      const char* name, int pixmap, int append, const char* cmd);
+  int create_menu_item(const char* name, int pixmap, int append, const char* cmd);
   int delete_menu_item(const char* name);
   void change_sup_color(void* imagew, op_eSupColor color);
   void set_title(char* user);

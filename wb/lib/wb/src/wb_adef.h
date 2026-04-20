@@ -46,7 +46,8 @@ class wb_bdef;
 class wb_cdef;
 class wb_name;
 
-class wb_adef : public wb_status {
+class wb_adef : public wb_status
+{
   wb_adrep* m_adrep;
 
 public:
@@ -58,14 +59,8 @@ public:
 
   ~wb_adef();
 
-  operator bool() const
-  {
-    return (m_adrep != 0);
-  }
-  operator wb_adrep*() const
-  {
-    return m_adrep;
-  }
+  operator bool() const { return (m_adrep != 0); }
+  operator wb_adrep*() const { return m_adrep; }
   bool operator==(wb_adef&);
 
   wb_bdef bdef();

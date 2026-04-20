@@ -38,8 +38,8 @@
 
 #include "co_string.h"
 
-#include "wb_nrep.h"
 #include "wb_ldh_msg.h"
+#include "wb_nrep.h"
 
 char wb_nrep::normname_tab[] = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                                "!!!!$!!!!!!!!-.!0123456789:!!!!!"
@@ -84,17 +84,16 @@ char wb_nrep::unatname_tab[] = "================================"
 
 #define nameDiff(s1, s2) ((long)(s1) - (long)(s2))
 
-wb_nrep::wb_nrep() : m_nRef(0), num_seg(0), num_attr(0), vol_len(0), seg(0),
-                     attr(0), m_hasSuper(false), m_shadowed(false)
-{
+wb_nrep::wb_nrep()
+    : m_nRef(0), num_seg(0), num_attr(0), vol_len(0), seg(0), attr(0),
+      m_hasSuper(false), m_shadowed(false) {
   strcpy(oname, "");
 }
 
-wb_nrep::wb_nrep(const char* n)
+wb_nrep::wb_nrep(const char *n)
     : m_nRef(0), num_seg(0), num_attr(0), vol_len(0), vol_offs(0), b_size(0),
-      b_offset(0), seg(0), attr(0), m_hasSuper(false), m_shadowed(false)
-{
-  const char* s;
+      b_offset(0), seg(0), attr(0), m_hasSuper(false), m_shadowed(false) {
+  const char *s;
   int seg_cnt = 1;
   int attr_cnt = 0;
   int name_len = 0;
@@ -142,9 +141,9 @@ wb_nrep::wb_nrep(const char* n)
     }
   }
   if (seg_cnt)
-    seg = (wb_namesegments*)calloc(seg_cnt, sizeof(wb_namesegments));
+    seg = (wb_namesegments *)calloc(seg_cnt, sizeof(wb_namesegments));
   if (attr_cnt) {
-    attr = (wb_nameattributes*)calloc(attr_cnt, sizeof(wb_nameattributes));
+    attr = (wb_nameattributes *)calloc(attr_cnt, sizeof(wb_nameattributes));
     for (int i = 0; i < attr_cnt; i++)
       attr[i].index = -1;
   }
@@ -152,39 +151,34 @@ wb_nrep::wb_nrep(const char* n)
   parse();
 }
 
-wb_nrep::wb_nrep(const wb_nrep& n)
-{
+wb_nrep::wb_nrep(const wb_nrep &n) {
   memcpy(this, &n, sizeof(*this));
   if (num_seg) {
-    seg = (wb_namesegments*)calloc(num_seg, sizeof(wb_namesegments));
+    seg = (wb_namesegments *)calloc(num_seg, sizeof(wb_namesegments));
     memcpy(seg, n.seg, num_seg * sizeof(wb_namesegments));
   }
   if (num_attr) {
-    attr = (wb_nameattributes*)calloc(num_attr, sizeof(wb_nameattributes));
+    attr = (wb_nameattributes *)calloc(num_attr, sizeof(wb_nameattributes));
     memcpy(attr, n.attr, num_attr * sizeof(wb_nameattributes));
   }
 }
 
-wb_nrep::~wb_nrep()
-{
+wb_nrep::~wb_nrep() {
   free(seg);
   free(attr);
 }
 
-void wb_nrep::unref()
-{
+void wb_nrep::unref() {
   if (--m_nRef == 0)
     delete this;
 }
 
-wb_nrep* wb_nrep::ref()
-{
+wb_nrep *wb_nrep::ref() {
   m_nRef++;
   return this;
 }
 
-void wb_nrep::parse()
-{
+void wb_nrep::parse() {
   int state = 0;
   char *s, *snn;
 
@@ -193,14 +187,14 @@ void wb_nrep::parse()
   if (oname[0] == '_') {
     // This is an identity name.
     for (s = oname; *s; s++, snn++) {
-      switch (idname_tab[*(unsigned char*)s]) {
+      switch (idname_tab[*(unsigned char *)s]) {
       case '!':
         throw wb_error(LDH__BADNAME);
       case '^':
         *snn = *s - 32;
         break;
       default:
-        *snn = idname_tab[*(unsigned char*)s];
+        *snn = idname_tab[*(unsigned char *)s];
       }
       if (s == oname)
         continue;
@@ -318,6 +312,7 @@ void wb_nrep::parse()
         case ']':
           num_attr++;
           state = 6;
+        break;
         case '0':
         case '1':
         case '2':
@@ -434,14 +429,14 @@ void wb_nrep::parse()
     *snn = 0;
   } else {
     for (s = oname; *s; s++, snn++) {
-      switch (normname_tab[*(unsigned char*)s]) {
+      switch (normname_tab[*(unsigned char *)s]) {
       case '!':
         throw wb_error(LDH__BADNAME);
       case '^':
         *snn = *s - 32;
         break;
       default:
-        *snn = normname_tab[*(unsigned char*)s];
+        *snn = normname_tab[*(unsigned char *)s];
       }
 
       /* States
@@ -511,11 +506,10 @@ void wb_nrep::parse()
           if (nameDiff(s, oname) == attr[num_attr].offs)
             throw wb_error(LDH__BADNAME);
           attr[num_attr + 1].offs = nameDiff(s + 1, oname);
-          attr[num_attr].len
-              = attr[num_attr + 1].offs - attr[num_attr].offs - 1;
-          if (attr[num_attr].len == 5
-              && str_NoCaseStrncmp(oname + attr[num_attr].offs, "Super", 5)
-                  == 0) {
+          attr[num_attr].len =
+              attr[num_attr + 1].offs - attr[num_attr].offs - 1;
+          if (attr[num_attr].len == 5 &&
+              str_NoCaseStrncmp(oname + attr[num_attr].offs, "Super", 5) == 0) {
             attr[num_attr].isSuper = true;
             m_hasSuper = true;
           }
@@ -604,67 +598,44 @@ void wb_nrep::parse()
   }
 }
 
-char* wb_nrep::object(char* res)
-{
-  return objectName(oname, res);
-}
+char *wb_nrep::object(char *res) { return objectName(oname, res); }
 
-char* wb_nrep::normObject(char* res)
-{
-  return objectName(norm_name, res);
-}
+char *wb_nrep::normObject(char *res) { return objectName(norm_name, res); }
 
-char* wb_nrep::segment(int idx, char* res)
-{
+char *wb_nrep::segment(int idx, char *res) {
   return segmentName(oname, idx, res);
 }
 
-char* wb_nrep::normSegment(int idx, char* res)
-{
+char *wb_nrep::normSegment(int idx, char *res) {
   return segmentName(norm_name, idx, res);
 }
 
-char* wb_nrep::path(char* res)
-{
-  return pathName(oname, res);
-}
+char *wb_nrep::path(char *res) { return pathName(oname, res); }
 
-char* wb_nrep::normPath(char* res)
-{
-  return pathName(norm_name, res);
-}
+char *wb_nrep::normPath(char *res) { return pathName(norm_name, res); }
 
-char* wb_nrep::volume(char* res)
-{
-  return volumeName(oname, res);
-}
+char *wb_nrep::volume(char *res) { return volumeName(oname, res); }
 
-char* wb_nrep::normVolume(char* res)
-{
-  return volumeName(norm_name, res);
-}
+char *wb_nrep::normVolume(char *res) { return volumeName(norm_name, res); }
 
-char* wb_nrep::attribute(int idx, char* res)
-{
+char *wb_nrep::attribute(int idx, char *res) {
   return attributeName(oname, idx, res);
 }
 
-char* wb_nrep::normAttribute(int idx, char* res)
-{
+char *wb_nrep::normAttribute(int idx, char *res) {
   return attributeName(norm_name, idx, res);
 }
 
-bool wb_nrep::objectIsEqual(const char* n)
-{
-  const char* s1 = norm_name + seg[num_seg - 1].offs;
-  const char* s2 = n;
+bool wb_nrep::objectIsEqual(const char *n) {
+  const char *s1 = norm_name + seg[num_seg - 1].offs;
+  const char *s2 = n;
   char c;
 
   for (int i = 0; i < seg[num_seg - 1].len; i++) {
-    if (normname_tab[*(unsigned char*)s2] == '^')
+    if (normname_tab[*(unsigned char *)s2] == '^')
       c = *s2 - 32;
     else
-      c = normname_tab[*(unsigned char*)s2];
+      c = normname_tab[*(unsigned char *)s2];
     if (*s1 != c)
       return false;
     s1++;
@@ -675,17 +646,16 @@ bool wb_nrep::objectIsEqual(const char* n)
   return true;
 }
 
-bool wb_nrep::volumeIsEqual(const char* n)
-{
-  const char* s1 = norm_name;
-  const char* s2 = n;
+bool wb_nrep::volumeIsEqual(const char *n) {
+  const char *s1 = norm_name;
+  const char *s2 = n;
   char c;
 
   for (int i = 0; i < vol_len; i++) {
-    if (normname_tab[*(unsigned char*)s2] == '^')
+    if (normname_tab[*(unsigned char *)s2] == '^')
       c = *s2 - 32;
     else
-      c = normname_tab[*(unsigned char*)s2];
+      c = normname_tab[*(unsigned char *)s2];
     if (*s1 != c)
       return false;
     s1++;
@@ -696,20 +666,19 @@ bool wb_nrep::volumeIsEqual(const char* n)
   return true;
 }
 
-bool wb_nrep::segmentIsEqual(const char* n, int idx)
-{
-  const char* s1 = norm_name + seg[idx].offs;
-  const char* s2 = n;
+bool wb_nrep::segmentIsEqual(const char *n, int idx) {
+  const char *s1 = norm_name + seg[idx].offs;
+  const char *s2 = n;
   char c;
 
   if (idx < 0 || idx >= num_seg)
     return false;
 
   for (int i = 0; i < seg[idx].len; i++) {
-    if (normname_tab[*(unsigned char*)s2] == '^')
+    if (normname_tab[*(unsigned char *)s2] == '^')
       c = *s2 - 32;
     else
-      c = normname_tab[*(unsigned char*)s2];
+      c = normname_tab[*(unsigned char *)s2];
     if (*s1 != c)
       return false;
     s1++;
@@ -720,20 +689,19 @@ bool wb_nrep::segmentIsEqual(const char* n, int idx)
   return true;
 }
 
-bool wb_nrep::attributeIsEqual(const char* n, int idx)
-{
-  const char* s1 = norm_name + attr[idx].offs;
-  const char* s2 = n;
+bool wb_nrep::attributeIsEqual(const char *n, int idx) {
+  const char *s1 = norm_name + attr[idx].offs;
+  const char *s2 = n;
   char c;
 
   if (idx < 0 || idx >= num_attr)
     return false;
 
   for (int i = 0; i < attr[idx].len; i++) {
-    if (normname_tab[*(unsigned char*)s2] == '^')
+    if (normname_tab[*(unsigned char *)s2] == '^')
       c = *s2 - 32;
     else
-      c = normname_tab[*(unsigned char*)s2];
+      c = normname_tab[*(unsigned char *)s2];
     if (*s1 != c)
       return false;
     s1++;
@@ -744,8 +712,7 @@ bool wb_nrep::attributeIsEqual(const char* n, int idx)
   return true;
 }
 
-char* wb_nrep::objectName(const char* n, char* res)
-{
+char *wb_nrep::objectName(const char *n, char *res) {
   static char result[80];
 
   if (!num_seg) {
@@ -769,8 +736,7 @@ char* wb_nrep::objectName(const char* n, char* res)
   }
 }
 
-char* wb_nrep::pathName(const char* n, char* res)
-{
+char *wb_nrep::pathName(const char *n, char *res) {
   static pwr_tOName result;
 
   if (num_seg <= 1) {
@@ -784,20 +750,19 @@ char* wb_nrep::pathName(const char* n, char* res)
   } else {
     if (res) {
       strncpy(res, n + seg[0].offs,
-          seg[num_seg - 2].offs - seg[0].offs + seg[num_seg - 2].len);
+              seg[num_seg - 2].offs - seg[0].offs + seg[num_seg - 2].len);
       res[seg[num_seg - 2].offs - seg[0].offs + seg[num_seg - 2].len] = 0;
       return res;
     } else {
       strncpy(result, n + seg[0].offs,
-          seg[num_seg - 2].offs - seg[0].offs + seg[num_seg - 2].len);
+              seg[num_seg - 2].offs - seg[0].offs + seg[num_seg - 2].len);
       result[seg[num_seg - 2].offs - seg[0].offs + seg[num_seg - 2].len] = 0;
       return result;
     }
   }
 }
 
-char* wb_nrep::segmentName(const char* n, int idx, char* res)
-{
+char *wb_nrep::segmentName(const char *n, int idx, char *res) {
   static char result[80];
 
   if (idx >= num_seg || idx < 0) {
@@ -821,8 +786,7 @@ char* wb_nrep::segmentName(const char* n, int idx, char* res)
   }
 }
 
-char* wb_nrep::attributeName(const char* n, int idx, char* res)
-{
+char *wb_nrep::attributeName(const char *n, int idx, char *res) {
   static pwr_tOName result;
 
   if (idx >= num_attr || idx < 0) {
@@ -846,8 +810,7 @@ char* wb_nrep::attributeName(const char* n, int idx, char* res)
   }
 }
 
-char* wb_nrep::volumeName(const char* n, char* res)
-{
+char *wb_nrep::volumeName(const char *n, char *res) {
   static char result[80];
   if (vol_len == 0) {
     if (res) {
@@ -870,18 +833,15 @@ char* wb_nrep::volumeName(const char* n, char* res)
   }
 }
 
-char* wb_nrep::name(int ntype, char* res)
-{
+char *wb_nrep::name(int ntype, char *res) {
   return nameName(oname, ntype, res);
 }
 
-char* wb_nrep::normName(int ntype, char* res)
-{
+char *wb_nrep::normName(int ntype, char *res) {
   return nameName(norm_name, ntype, res);
 }
 
-char* wb_nrep::nameName(const char* n, int ntype, char* res)
-{
+char *wb_nrep::nameName(const char *n, int ntype, char *res) {
   static char result[512];
   int colon_added = 0;
 
@@ -920,8 +880,8 @@ char* wb_nrep::nameName(const char* n, int ntype, char* res)
   if (ntype & cdh_mName_object) {
     if (ntype & cdh_mName_path && hasPath())
       strcat(res, "-");
-    else if (ntype & cdh_mName_volume && !hasPath() && hasVolume()
-        && !colon_added)
+    else if (ntype & cdh_mName_volume && !hasPath() && hasVolume() &&
+             !colon_added)
       strcat(res, ":");
     objectName(n, res + strlen(res));
   }
@@ -946,26 +906,24 @@ char* wb_nrep::nameName(const char* n, int ntype, char* res)
   return res;
 }
 
-char* wb_nrep::unatName(const char* name)
-{
+char *wb_nrep::unatName(const char *name) {
   static char result[256];
-  const char* s;
-  char* su;
+  const char *s;
+  char *su;
 
   su = result;
 
   for (s = name; *s; s++, su++) {
-    if (unatname_tab[*(unsigned char*)s] == '=')
+    if (unatname_tab[*(unsigned char *)s] == '=')
       *su = *s;
     else
-      *su = unatname_tab[*(unsigned char*)s];
+      *su = unatname_tab[*(unsigned char *)s];
   }
   *su = 0;
   return result;
 }
 
-char* wb_nrep::segmentsAll(int idx, char* res)
-{
+char *wb_nrep::segmentsAll(int idx, char *res) {
   static char result[256];
 
   if (idx >= num_seg || idx < 0) {
@@ -979,20 +937,19 @@ char* wb_nrep::segmentsAll(int idx, char* res)
   } else {
     if (res) {
       strncpy(res, oname + seg[0].offs,
-          seg[num_seg - 1].offs - seg[0].offs + seg[num_seg - 1].len);
+              seg[num_seg - 1].offs - seg[0].offs + seg[num_seg - 1].len);
       res[seg[num_seg - 1].offs - seg[0].offs + seg[num_seg - 1].len] = 0;
       return res;
     } else {
       strncpy(result, oname + seg[0].offs,
-          seg[num_seg - 1].offs - seg[0].offs + seg[num_seg - 1].len);
+              seg[num_seg - 1].offs - seg[0].offs + seg[num_seg - 1].len);
       result[seg[num_seg - 1].offs - seg[0].offs + seg[num_seg - 1].len] = 0;
       return result;
     }
   }
 }
 
-char* wb_nrep::attributesAll(int idx, char* res, bool true_db)
-{
+char *wb_nrep::attributesAll(int idx, char *res, bool true_db) {
   static char result[256];
 
   if (idx >= num_attr || idx < 0) {
@@ -1035,12 +992,11 @@ char* wb_nrep::attributesAll(int idx, char* res, bool true_db)
   }
 }
 
-bool wb_nrep::checkObjectName(const char* name)
-{
-  const char* s;
+bool wb_nrep::checkObjectName(const char *name) {
+  const char *s;
 
   for (s = name; *s; s++) {
-    if (objname_tab[*(unsigned char*)s] == '!')
+    if (objname_tab[*(unsigned char *)s] == '!')
       return false;
   }
   return true;

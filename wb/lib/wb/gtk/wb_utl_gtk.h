@@ -39,26 +39,21 @@
 #ifndef wb_utl_gtk_h
 #define wb_utl_gtk_h
 
-class wb_utl_gtk : public wb_utl {
+class wb_utl_gtk : public wb_utl
+{
 public:
   GtkWidget* widget;
 
-  wb_utl_gtk(GtkWidget* w) : widget(w)
-  {
-  }
-  ~wb_utl_gtk()
-  {
-  }
+  wb_utl_gtk(GtkWidget* w) : widget(w) {}
+  ~wb_utl_gtk() {}
   int create_mainwindow(int argc, char** argv);
   int destroy_mainwindow();
-  int utl_foe_new(const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx,
-      ldh_tSesContext ldhsesctx, WFoe** foectx, int map_window,
-      ldh_eAccess access);
-  int utl_foe_new_local(WFoe* foectx, const char* name, pwr_tOid plcpgm,
-      ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
-      vldh_t_node nodeobject, unsigned long windowindex,
-      unsigned long new_window, WFoe** return_foectx, int map_window,
-      ldh_eAccess access, foe_eFuncAccess function_access);
+  int utl_foe_new(const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
+                  WFoe** foectx, int map_window, ldh_eAccess access);
+  int utl_foe_new_local(WFoe* foectx, const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx,
+                        ldh_tSesContext ldhsesctx, vldh_t_node nodeobject, unsigned long windowindex,
+                        unsigned long new_window, WFoe** return_foectx, int map_window, ldh_eAccess access,
+                        foe_eFuncAccess function_access);
 };
 
 #endif

@@ -48,13 +48,19 @@
 #define RTT_BUFFER_DEFSIZE 100
 #define RTT_LOGG_LINE_DEFSIZE 512
 
-typedef enum { xtt_eLoggType_Cont = 1, xtt_eLoggType_Mod = 2 } xtt_eLoggType;
-typedef enum { 
-  xtt_eLoggFormat_Std, 
+typedef enum
+{
+  xtt_eLoggType_Cont = 1,
+  xtt_eLoggType_Mod = 2
+} xtt_eLoggType;
+typedef enum
+{
+  xtt_eLoggFormat_Std,
   xtt_eLoggFormat_Py
 } xtt_eLoggFormat;
 
-class XttLogging {
+class XttLogging
+{
 public:
   XttLogging();
   ~XttLogging();
@@ -92,9 +98,9 @@ public:
   ccm_tSingleLineCtx cond_ccm_ctx;
 
   void init(int logg_index, void* logg_xnav);
-  int logging_set(float logg_time, char* filename, char* parameterstr,
-      char* conditionstr, int logg_type, int logg_format, int insert, int buffer_size, int stop,
-      int priority, int create, int line_size, int shortname);
+  int logging_set(float logg_time, char* filename, char* parameterstr, char* conditionstr, int logg_type,
+                  int logg_format, int insert, int buffer_size, int stop, int priority, int create,
+                  int line_size, int shortname);
   int show();
   int show_entry(char* buff, int* buff_cnt);
   int analyse();
@@ -106,14 +112,8 @@ public:
   int log_print(const char* format, ...);
   int print_buffer();
   int close_files();
-  int set_prio(int prio)
-  {
-    return 1;
-  }
-  int set_default_prio()
-  {
-    return 1;
-  }
+  int set_prio(int prio) { return 1; }
+  int set_default_prio() { return 1; }
   void message(char severity, const char* msg);
 };
 

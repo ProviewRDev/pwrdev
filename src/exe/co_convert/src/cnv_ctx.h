@@ -48,11 +48,12 @@ class CnvWblTo;
 class CnvReadWbl;
 class CnvReadXtthelp;
 
-class CnvCtx {
-  private:
+class CnvCtx
+{
+private:
   std::vector<std::string> depend;
 
-  public:
+public:
   CnvCtx();
   pwr_tFileName dir;
   int generate_html;

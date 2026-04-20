@@ -61,10 +61,11 @@ void WGe::graph_init_cb(void* client_data)
 
   ((Graph*)ge->graph)->init_trace();
 
-  if (ge->width == 0 || ge->height == 0) {
-    sts = ((Graph*)ge->graph)
-              ->get_default_size(&default_width, &default_height);
-    if (ODD(sts)) {
+  if (ge->width == 0 || ge->height == 0)
+  {
+    sts = ((Graph*)ge->graph)->get_default_size(&default_width, &default_height);
+    if (ODD(sts))
+    {
       ge->set_size(default_width, default_height);
     }
   }
@@ -82,22 +83,20 @@ int WGe::graph_close_cb(void* client_data)
   return 1;
 }
 
-int WGe::wge_command_cb(void* ge_ctx, char* command, char* script, char *scriptargs)
+int WGe::wge_command_cb(void* ge_ctx, char* command, char* script, char* scriptargs)
 {
   WGe* ge = (WGe*)ge_ctx;
   int sts;
 
-  if (ge->command_cb) {
+  if (ge->command_cb)
+  {
     sts = (ge->command_cb)(ge, command);
     return sts;
   }
   return 0;
 }
 
-int WGe::wge_is_authorized_cb(void* ge_ctx, unsigned int access)
-{
-  return 1;
-}
+int WGe::wge_is_authorized_cb(void* ge_ctx, unsigned int access) { return 1; }
 
 void WGe::message(void* ctx, char severity, const char* message)
 {
@@ -105,29 +104,18 @@ void WGe::message(void* ctx, char severity, const char* message)
     printf("** WGe: %s\n", message);
 }
 
-int WGe::set_object_focus(char* name, int empty)
-{
-  return graph->set_object_focus(name, empty);
-}
+int WGe::set_object_focus(char* name, int empty) { return graph->set_object_focus(name, empty); }
 
-int WGe::set_folder_index(char* name, int idx)
-{
-  return graph->set_folder_index(name, idx);
-}
+int WGe::set_folder_index(char* name, int idx) { return graph->set_folder_index(name, idx); }
 
 int WGe::set_subwindow_source(char* name, char* source, int modal)
 {
   return graph->set_subwindow_source(name, source, 0);
 }
 
-void WGe::set_subwindow_release()
-{
-  subwindow_release = 1;
-}
+void WGe::set_subwindow_release() { subwindow_release = 1; }
 
-WGe::~WGe()
-{
-}
+WGe::~WGe() {}
 
 void WGe::print()
 {
@@ -141,15 +129,12 @@ void WGe::print()
   system(cmd);
 }
 
-WGe::WGe(void* wge_parent_ctx, char* wge_name, char* wge_filename,
-    int wge_scrollbar, int wge_menu, int wge_navigator, int wge_width,
-    int wge_height, int x, int y, char* object_name, int wge_modal = 0)
-    : parent_ctx(wge_parent_ctx), graph(0), scrollbar(wge_scrollbar),
-      navigator(wge_navigator), menu(wge_menu), current_value_object(0),
-      current_confirm_object(0), value_input_open(0), confirm_open(0),
-      command_cb(0), close_cb(0), help_cb(0), is_authorized_cb(0),
-      width(wge_width), height(wge_height), modal(wge_modal), terminated(0),
-      subwindow_release(0)
+WGe::WGe(void* wge_parent_ctx, char* wge_name, char* wge_filename, int wge_scrollbar, int wge_menu,
+         int wge_navigator, int wge_width, int wge_height, int x, int y, char* object_name, int wge_modal = 0)
+    : parent_ctx(wge_parent_ctx), graph(0), scrollbar(wge_scrollbar), navigator(wge_navigator),
+      menu(wge_menu), current_value_object(0), current_confirm_object(0), value_input_open(0),
+      confirm_open(0), command_cb(0), close_cb(0), help_cb(0), is_authorized_cb(0), width(wge_width),
+      height(wge_height), modal(wge_modal), terminated(0), subwindow_release(0)
 {
   strcpy(filename, wge_filename);
   strcpy(name, wge_name);

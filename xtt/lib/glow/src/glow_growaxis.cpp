@@ -51,7 +51,8 @@
 #define nearbyint rint
 #endif
 
-typedef struct {
+typedef struct
+{
   int lines;
   int longq;
   int vvalq;
@@ -59,14 +60,13 @@ typedef struct {
   char format[10];
 } sRange;
 
-GrowAxis::GrowAxis(GrowCtx* glow_ctx, const char* name, double x1, double y1,
-    double x2, double y2, glow_eDrawType border_d_type, int line_w, int t_size,
-    glow_eDrawType t_drawtype, int nodraw)
-    : GrowRect(glow_ctx, name, x1, y1, x2 - x1, y2 - y1, border_d_type, line_w,
-          0, glow_mDisplayLevel_1, 0, 1, 0, glow_eDrawType_Line, 1),
-      text_size(t_size), text_drawtype(t_drawtype),
-      text_color_drawtype(glow_eDrawType_Line), max_value(100), min_value(0),
-      lines(11), longquotient(1), valuequotient(1), increment(0)
+GrowAxis::GrowAxis(GrowCtx* glow_ctx, const char* name, double x1, double y1, double x2, double y2,
+                   glow_eDrawType border_d_type, int line_w, int t_size, glow_eDrawType t_drawtype,
+                   int nodraw)
+    : GrowRect(glow_ctx, name, x1, y1, x2 - x1, y2 - y1, border_d_type, line_w, 0, glow_mDisplayLevel_1, 0, 1,
+               0, glow_eDrawType_Line, 1),
+      text_size(t_size), text_drawtype(t_drawtype), text_color_drawtype(glow_eDrawType_Line), max_value(100),
+      min_value(0), lines(11), longquotient(1), valuequotient(1), increment(0)
 {
   strcpy(format, "%3.0f");
 
@@ -75,9 +75,7 @@ GrowAxis::GrowAxis(GrowCtx* glow_ctx, const char* name, double x1, double y1,
     draw();
 }
 
-GrowAxis::~GrowAxis()
-{
-}
+GrowAxis::~GrowAxis() {}
 
 void GrowAxis::configure()
 {
@@ -90,7 +88,7 @@ void GrowAxis::configure()
   increment = (max_value - min_value) / (lines - 1);
 }
 
-void GrowAxis::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowAxis::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowAxis) << '\n';
   fp << int(glow_eSave_GrowAxis_max_value) << FSPACE << max_value << '\n';
@@ -99,37 +97,38 @@ void GrowAxis::save(std::ofstream& fp, glow_eSaveMode mode)
   GrowRect::save(fp, mode);
   fp << int(glow_eSave_GrowAxis_lines) << FSPACE << lines << '\n';
   fp << int(glow_eSave_GrowAxis_longquotient) << FSPACE << longquotient << '\n';
-  fp << int(glow_eSave_GrowAxis_valuequotient) << FSPACE << valuequotient
-     << '\n';
+  fp << int(glow_eSave_GrowAxis_valuequotient) << FSPACE << valuequotient << '\n';
   fp << int(glow_eSave_GrowAxis_format) << FSPACE << format << '\n';
   fp << int(glow_eSave_GrowAxis_text_size) << FSPACE << text_size << '\n';
-  fp << int(glow_eSave_GrowAxis_text_drawtype) << FSPACE << int(text_drawtype)
-     << '\n';
-  fp << int(glow_eSave_GrowAxis_text_color_drawtype) << FSPACE
-     << int(text_color_drawtype) << '\n';
-  if (user_data && ctx->userdata_save_callback) {
+  fp << int(glow_eSave_GrowAxis_text_drawtype) << FSPACE << int(text_drawtype) << '\n';
+  fp << int(glow_eSave_GrowAxis_text_color_drawtype) << FSPACE << int(text_color_drawtype) << '\n';
+  if (user_data && ctx->userdata_save_callback)
+  {
     fp << int(glow_eSave_GrowAxis_userdata_cb) << '\n';
     (ctx->userdata_save_callback)(&fp, this, glow_eUserdataCbType_Node);
   }
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowAxis::open(std::ifstream& fp)
+void GrowAxis::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowAxis: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowAxis:
       break;
     case glow_eSave_GrowAxis_max_value:
@@ -186,23 +185,24 @@ void GrowAxis::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
 {
   int tmp;
 
-  if (ll_x > ur_x) {
+  if (ll_x > ur_x)
+  {
     /* Shift */
     tmp = ll_x;
     ll_x = ur_x;
     ur_x = tmp;
   }
-  if (ll_y > ur_y) {
+  if (ll_y > ur_y)
+  {
     /* Shift */
     tmp = ll_y;
     ll_y = ur_y;
     ur_y = tmp;
   }
 
-  if (x_right * w->zoom_factor_x - w->offset_x >= ll_x
-      && x_left * w->zoom_factor_x - w->offset_x <= ur_x
-      && y_high * w->zoom_factor_y - w->offset_y >= ll_y
-      && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
+  if (x_right * w->zoom_factor_x - w->offset_x >= ll_x && x_left * w->zoom_factor_x - w->offset_x <= ur_x &&
+      y_high * w->zoom_factor_y - w->offset_y >= ll_y && y_low * w->zoom_factor_y - w->offset_y <= ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
   }
 }
@@ -215,21 +215,23 @@ void GrowAxis::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
   int obj_ur_y = int(y_high * w->zoom_factor_y) - w->offset_y;
   int obj_ll_y = int(y_low * w->zoom_factor_y) - w->offset_y;
 
-  if (*ll_x > *ur_x) {
+  if (*ll_x > *ur_x)
+  {
     /* Shift */
     tmp = *ll_x;
     *ll_x = *ur_x;
     *ur_x = tmp;
   }
-  if (*ll_y > *ur_y) {
+  if (*ll_y > *ur_y)
+  {
     /* Shift */
     tmp = *ll_y;
     *ll_y = *ur_y;
     *ur_y = tmp;
   }
 
-  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
-      && obj_ll_y <= *ur_y) {
+  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y && obj_ll_y <= *ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
 
     // Increase the redraw area
@@ -250,12 +252,13 @@ void GrowAxis::set_highlight(int on)
   draw();
 }
 
-void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode, void *transpnode)
+void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+                    void* transpnode)
 {
   if (ctx->nodraw)
     return;
-  if (w == &ctx->navw) {
+  if (w == &ctx->navw)
+  {
     if (ctx->no_nav)
       return;
     hot = 0;
@@ -271,22 +274,23 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   int max_z_width = 0;
   double rotation;
   glow_eDrawType drawtype;
-  int text_idx
-      = int(w->zoom_factor_y / w->base_zoom_factor * (text_size + 4) - 4);
+  int text_idx = int(w->zoom_factor_y / w->base_zoom_factor * (text_size + 4) - 4);
   double tsize = w->zoom_factor_y / w->base_zoom_factor * (8 + 2 * text_size);
   text_idx = MIN(text_idx, DRAW_TYPE_SIZE - 1);
 
-  if (fix_line_width) {
+  if (fix_line_width)
+  {
     idx = line_width;
     idx += hot;
-    if (idx < 0) {
+    if (idx < 0)
+    {
       return;
     }
-  } else {
+  }
+  else
+  {
     if (node && ((GrowNode*)node)->line_width)
-      idx = int(
-          w->zoom_factor_y / w->base_zoom_factor * ((GrowNode*)node)->line_width
-          - 1);
+      idx = int(w->zoom_factor_y / w->base_zoom_factor * ((GrowNode*)node)->line_width - 1);
     else
       idx = int(w->zoom_factor_y / w->base_zoom_factor * line_width - 1);
     idx += hot;
@@ -294,7 +298,7 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   if ((node && ((GrowNode*)node)->invisible) || invisible)
     return;
 
-  double transp = transparency;  
+  double transp = transparency;
   if (colornode && ((GrowNode*)colornode)->transparency > transparency)
     transp = ((GrowNode*)colornode)->transparency;
   if (transpnode && ((GrowNode*)transpnode)->transparency > transp)
@@ -304,13 +308,16 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
 
-  if (!t) {
+  if (!t)
+  {
     x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
     x2 = int(trf.x(ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
     y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
     rotation = (trf.rot() / 360 - floor(trf.rot() / 360)) * 360;
-  } else {
+  }
+  else
+  {
     x1 = int(trf.x(t, ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = int(trf.y(t, ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
     x2 = int(trf.x(t, ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
@@ -322,22 +329,24 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   ur_x = MAX(x1, x2);
   ll_y = MIN(y1, y2);
   ur_y = MAX(y1, y2);
-  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
-      highlight, (GrowNode*)colornode, 0);
+  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight, (GrowNode*)colornode, 0);
 
-  if (45 >= rotation || rotation > 315) {
+  if (45 >= rotation || rotation > 315)
+  {
     // Vertical line to the right and values to the left
 
     ctx->gdraw->line(w, ur_x, ll_y, ur_x, ur_y, drawtype, idx, 0, transp);
 
     // Calculate max value text width
-    if (draw_text) {
-      for (i = 0; i < lines; i++) {
-        if (i % valuequotient == 0) {
+    if (draw_text)
+    {
+      for (i = 0; i < lines; i++)
+      {
+        if (i % valuequotient == 0)
+        {
           format_text(text, format, max_value - i * increment);
-          ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype,
-              MAX(0, text_idx), glow_eFont_Helvetica, &z_width, &z_height,
-              &z_descent, tsize, 0);
+          ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype, MAX(0, text_idx),
+                                      glow_eFont_Helvetica, &z_width, &z_height, &z_descent, tsize, 0);
           if (max_z_width < z_width)
             max_z_width = z_width;
         }
@@ -346,92 +355,104 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       line_length = ur_x - ll_x - max_z_width;
       if (line_length < 3)
         line_length = 3;
-    } else {
+    }
+    else
+    {
       x_text = ll_x;
       line_length = ur_x - ll_x;
     }
 
-    for (i = 0; i < lines; i++) {
+    for (i = 0; i < lines; i++)
+    {
       y = int(ll_y + double(ur_y - ll_y) / (lines - 1) * i);
       if (i % longquotient == 0)
         ctx->gdraw->line(w, ur_x - line_length, y, ur_x, y, drawtype, idx, 0, transp);
       else
-        ctx->gdraw->line(
-            w, ur_x - int(2.0 / 3 * line_length), y, ur_x, y, drawtype, idx, 0, transp);
-      if (draw_text) {
+        ctx->gdraw->line(w, ur_x - int(2.0 / 3 * line_length), y, ur_x, y, drawtype, idx, 0, transp);
+      if (draw_text)
+      {
         format_text(text, format, max_value - i * increment);
 
-        if (text_idx >= 0 && max_z_width < ur_x - ll_x
-            && i % valuequotient == 0) {
+        if (text_idx >= 0 && max_z_width < ur_x - ll_x && i % valuequotient == 0)
+        {
           if (i == lines - 1)
             y_text = y;
           else if (i == 0)
             y_text = y + z_height - z_descent;
           else
             y_text = y + (z_height - z_descent) / 2;
-          ctx->gdraw->text(w, ll_x, y_text, text, strlen(text), text_drawtype,
-              text_color_drawtype, text_idx, highlight, 0, glow_eFont_Helvetica,
-              tsize, 0, transp);
+          ctx->gdraw->text(w, ll_x, y_text, text, strlen(text), text_drawtype, text_color_drawtype, text_idx,
+                           highlight, 0, glow_eFont_Helvetica, tsize, 0, transp);
         }
       }
     }
-  } else if (45 < rotation && rotation <= 135) {
+  }
+  else if (45 < rotation && rotation <= 135)
+  {
     // Horizontal line at bottom and values to the top
 
     ctx->gdraw->line(w, ll_x, ur_y, ur_x, ur_y, drawtype, idx, 0, transp);
 
     // Calculate max value text height
-    if (draw_text) {
-      ctx->gdraw->get_text_extent("0", 1, text_drawtype, MAX(0, text_idx),
-          glow_eFont_Helvetica, &z_width, &z_height, &z_descent, tsize, 0);
+    if (draw_text)
+    {
+      ctx->gdraw->get_text_extent("0", 1, text_drawtype, MAX(0, text_idx), glow_eFont_Helvetica, &z_width,
+                                  &z_height, &z_descent, tsize, 0);
 
       line_length = ur_y - ll_y - z_height;
       if (line_length < 3)
         line_length = 3;
-    } else {
+    }
+    else
+    {
       line_length = ur_y - ll_y;
     }
 
-    for (i = 0; i < lines; i++) {
+    for (i = 0; i < lines; i++)
+    {
       x = int(ll_x + double(ur_x - ll_x) / (lines - 1) * (lines - 1 - i));
       if (i % longquotient == 0)
         ctx->gdraw->line(w, x, ur_y - line_length, x, ur_y, drawtype, idx, 0, transp);
       else
-        ctx->gdraw->line(
-            w, x, ur_y - int(2.0 / 3 * line_length), x, ur_y, drawtype, idx, 0, transp);
+        ctx->gdraw->line(w, x, ur_y - int(2.0 / 3 * line_length), x, ur_y, drawtype, idx, 0, transp);
 
-      if (draw_text && i % valuequotient == 0) {
+      if (draw_text && i % valuequotient == 0)
+      {
         format_text(text, format, max_value - i * increment);
-        ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype,
-            MAX(0, text_idx), glow_eFont_Helvetica, &z_width, &z_height,
-            &z_descent, tsize, 0);
+        ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype, MAX(0, text_idx), glow_eFont_Helvetica,
+                                    &z_width, &z_height, &z_descent, tsize, 0);
 
-        if (text_idx >= 0 && z_height < ur_y - ll_y) {
+        if (text_idx >= 0 && z_height < ur_y - ll_y)
+        {
           if (i == lines - 1)
             x_text = x;
           else if (i == 0)
             x_text = x - z_width;
           else
             x_text = x - (z_width) / 2;
-          ctx->gdraw->text(w, x_text, ll_y + z_height - z_descent, text,
-              strlen(text), text_drawtype, text_color_drawtype, text_idx,
-              highlight, 0, glow_eFont_Helvetica, tsize, 0, transp);
+          ctx->gdraw->text(w, x_text, ll_y + z_height - z_descent, text, strlen(text), text_drawtype,
+                           text_color_drawtype, text_idx, highlight, 0, glow_eFont_Helvetica, tsize, 0,
+                           transp);
         }
       }
     }
-  } else if (135 < rotation && rotation <= 225) {
+  }
+  else if (135 < rotation && rotation <= 225)
+  {
     // Vertical line to the left and values to the right
 
     ctx->gdraw->line(w, ll_x, ll_y, ll_x, ur_y, drawtype, idx, 0, transp);
 
     // Calculate max value text width
-    if (draw_text) {
-      for (i = 0; i < lines; i++) {
-        if (i % valuequotient == 0) {
+    if (draw_text)
+    {
+      for (i = 0; i < lines; i++)
+      {
+        if (i % valuequotient == 0)
+        {
           format_text(text, format, max_value - i * increment);
-          ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype,
-              MAX(0, text_idx), glow_eFont_Helvetica, &z_width, &z_height,
-              &z_descent, tsize, 0);
+          ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype, MAX(0, text_idx),
+                                      glow_eFont_Helvetica, &z_width, &z_height, &z_descent, tsize, 0);
           if (max_z_width < z_width)
             max_z_width = z_width;
         }
@@ -440,73 +461,79 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       line_length = ur_x - ll_x - max_z_width;
       if (line_length < 3)
         line_length = 3;
-    } else {
+    }
+    else
+    {
       x_text = ur_x;
       line_length = ur_x - ll_x;
     }
 
-    for (i = 0; i < lines; i++) {
+    for (i = 0; i < lines; i++)
+    {
       y = int(ll_y + double(ur_y - ll_y) / (lines - 1) * (lines - 1 - i));
       if (i % longquotient == 0)
         ctx->gdraw->line(w, ll_x, y, ll_x + line_length, y, drawtype, idx, 0, transp);
       else
-        ctx->gdraw->line(
-            w, ll_x, y, ll_x + int(2.0 / 3 * line_length), y, drawtype, idx, 0, transp);
+        ctx->gdraw->line(w, ll_x, y, ll_x + int(2.0 / 3 * line_length), y, drawtype, idx, 0, transp);
       format_text(text, format, max_value - i * increment);
 
-      if (draw_text && text_idx >= 0 && max_z_width < ur_x - ll_x
-          && i % valuequotient == 0) {
+      if (draw_text && text_idx >= 0 && max_z_width < ur_x - ll_x && i % valuequotient == 0)
+      {
         if (i == lines - 1)
           y_text = y + z_height - z_descent;
         else if (i == 0)
           y_text = y;
         else
           y_text = y + (z_height - z_descent) / 2;
-        ctx->gdraw->text(w, x_text, y_text, text, strlen(text), text_drawtype,
-            text_color_drawtype, text_idx, highlight, 0, glow_eFont_Helvetica,
-            tsize, 0, transp);
+        ctx->gdraw->text(w, x_text, y_text, text, strlen(text), text_drawtype, text_color_drawtype, text_idx,
+                         highlight, 0, glow_eFont_Helvetica, tsize, 0, transp);
       }
     }
-  } else { // if ( 225 < rotation && rotation <= 315)
+  }
+  else
+  { // if ( 225 < rotation && rotation <= 315)
     // Horizontal line at top and values at the bottom
 
     ctx->gdraw->line(w, ll_x, ll_y, ur_x, ll_y, drawtype, idx, 0, transp);
 
     // Calculate max value text height
-    if (draw_text) {
-      ctx->gdraw->get_text_extent("0", 1, text_drawtype, MAX(0, text_idx),
-          glow_eFont_Helvetica, &z_width, &z_height, &z_descent, tsize, 0);
+    if (draw_text)
+    {
+      ctx->gdraw->get_text_extent("0", 1, text_drawtype, MAX(0, text_idx), glow_eFont_Helvetica, &z_width,
+                                  &z_height, &z_descent, tsize, 0);
 
       line_length = ur_y - ll_y - (z_height - z_descent);
       if (line_length < 3)
         line_length = 3;
-    } else {
+    }
+    else
+    {
       line_length = ur_y - ll_y;
     }
 
-    for (i = 0; i < lines; i++) {
+    for (i = 0; i < lines; i++)
+    {
       x = int(ll_x + double(ur_x - ll_x) / (lines - 1) * i);
       if (i % longquotient == 0)
         ctx->gdraw->line(w, x, ll_y, x, ll_y + line_length, drawtype, idx, 0, transp);
       else
-        ctx->gdraw->line(
-            w, x, ll_y, x, ll_y + int(2.0 / 3 * line_length), drawtype, idx, 0, transp);
-      if (draw_text && i % valuequotient == 0) {
+        ctx->gdraw->line(w, x, ll_y, x, ll_y + int(2.0 / 3 * line_length), drawtype, idx, 0, transp);
+      if (draw_text && i % valuequotient == 0)
+      {
         format_text(text, format, max_value - i * increment);
-        ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype,
-            MAX(0, text_idx), glow_eFont_Helvetica, &z_width, &z_height,
-            &z_descent, tsize, 0);
+        ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype, MAX(0, text_idx), glow_eFont_Helvetica,
+                                    &z_width, &z_height, &z_descent, tsize, 0);
 
-        if (text_idx >= 0 && z_height - z_descent < ur_y - ll_y) {
+        if (text_idx >= 0 && z_height - z_descent < ur_y - ll_y)
+        {
           if (i == lines - 1)
             x_text = x - z_width;
           else if (i == 0)
             x_text = x;
           else
             x_text = x - (z_width) / 2;
-          ctx->gdraw->text(w, x_text, ur_y, text, strlen(text), text_drawtype,
-              text_color_drawtype, text_idx, highlight, 0, glow_eFont_Helvetica,
-              tsize, 0, transp);
+          ctx->gdraw->text(w, x_text, ur_y, text, strlen(text), text_drawtype, text_color_drawtype, text_idx,
+                           highlight, 0, glow_eFont_Helvetica, tsize, 0, transp);
         }
       }
     }
@@ -550,25 +577,24 @@ void GrowAxis::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
 
 void GrowAxis::draw()
 {
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
 void GrowAxis::align(double x, double y, glow_eAlignDirection direction)
 {
-  double dx, dy;
+  double dx = 0, dy = 0;
 
   ctx->set_defered_redraw();
   draw();
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eAlignDirection_CenterVert:
     dx = x - (x_right + x_left) / 2;
     dy = 0;
@@ -617,8 +643,8 @@ void GrowAxis::set_textsize(int size)
 
 void GrowAxis::set_textbold(int bold)
 {
-  if ((bold && text_drawtype == glow_eDrawType_TextHelveticaBold)
-      || (!bold && text_drawtype == glow_eDrawType_TextHelvetica))
+  if ((bold && text_drawtype == glow_eDrawType_TextHelveticaBold) ||
+      (!bold && text_drawtype == glow_eDrawType_TextHelvetica))
     return;
 
   if (bold)
@@ -631,56 +657,56 @@ void GrowAxis::set_textbold(int bold)
 
 void GrowAxis::set_range(double minval, double maxval, int keep_settings)
 {
-  static sRange rdata[2][25] = { { { 26, 5, 5, 10, "%3.1f" }, // 1
-                                     { 21, 5, 5, 10, "%3.1f" }, // 2
-                                     { 31, 5, 10, 10, "%3.1f" }, // 3
-                                     { 41, 5, 10, 20, "%3.1f" }, // 4
-                                     { 26, 5, 5, 10, "%1.0f" }, // 5
-                                     { 31, 5, 10, 10, "%1.0f" }, // 6
-                                     { 36, 5, 10, 10, "%1.0f" }, // 7
-                                     { 17, 2, 4, 4, "%1.0f" }, // 8
-                                     { 19, 2, 4, 4, "%1.0f" }, // 9
-                                     { 21, 2, 4, 8, "%2.0f" }, // 10
-                                     { 23, 2, 4, 8, "%2.0f" }, // 11
-                                     { 13, 4, 4, 4, "%2.0f" }, // 12
-                                     { 14, 4, 4, 4, "%2.0f" }, // 13
-                                     { 15, 4, 4, 4, "%2.0f" }, // 14
-                                     { 16, 5, 5, 5, "%2.0f" }, // 15
-                                     { 17, 5, 5, 5, "%2.0f" }, // 16
-                                     { 18, 5, 5, 5, "%2.0f" }, // 17
-                                     { 19, 5, 5, 5, "%2.0f" }, // 18
-                                     { 20, 5, 5, 5, "%2.0f" }, // 19
-                                     { 21, 5, 5, 5, "%2.0f" }, // 20
-                                     { 22, 5, 5, 5, "%2.0f" }, // 21
-                                     { 23, 5, 5, 5, "%2.0f" }, // 22
-                                     { 24, 5, 5, 5, "%2.0f" }, // 23
-                                     { 25, 5, 5, 5, "%2.0f" }, // 24
-                                     { 26, 5, 5, 10, "%2.0f" } }, // 25
-    { { 101, 5, 10, 20, "%3.1f" }, // 1
-        { 101, 5, 10, 20, "%3.1f" }, // 2
-        { 61, 10, 10, 20, "%3.1f" }, // 3
-        { 81, 10, 10, 20, "%3.1f" }, // 4
-        { 101, 10, 20, 20, "%1.0f" }, // 5
-        { 61, 5, 10, 20, "%1.0f" }, // 6
-        { 71, 5, 10, 20, "%1.0f" }, // 7
-        { 81, 5, 10, 20, "%1.0f" }, // 8
-        { 91, 5, 10, 20, "%1.0f" }, // 9
-        { 101, 5, 10, 20, "%2.0f" }, // 10
-        { 56, 5, 5, 5, "%2.0f" }, // 11
-        { 61, 5, 10, 10, "%2.0f" }, // 12
-        { 66, 5, 10, 20, "%2.0f" }, // 13
-        { 71, 5, 10, 20, "%2.0f" }, // 14
-        { 76, 5, 10, 20, "%2.0f" }, // 15
-        { 81, 5, 10, 20, "%2.0f" }, // 16
-        { 86, 5, 10, 20, "%2.0f" }, // 17
-        { 91, 5, 10, 20, "%2.0f" }, // 18
-        { 96, 5, 10, 20, "%2.0f" }, // 19
-        { 101, 5, 10, 25, "%2.0f" }, // 20
-        { 43, 2, 6, 6, "%2.0f" }, // 21
-        { 45, 2, 4, 8, "%2.0f" }, // 22
-        { 47, 2, 4, 8, "%2.0f" }, // 23
-        { 49, 2, 4, 8, "%2.0f" }, // 24
-        { 26, 5, 5, 5, "%2.0f" } } }; // 25
+  static sRange rdata[2][25] = {{{26, 5, 5, 10, "%3.1f"},    // 1
+                                 {21, 5, 5, 10, "%3.1f"},    // 2
+                                 {31, 5, 10, 10, "%3.1f"},   // 3
+                                 {41, 5, 10, 20, "%3.1f"},   // 4
+                                 {26, 5, 5, 10, "%1.0f"},    // 5
+                                 {31, 5, 10, 10, "%1.0f"},   // 6
+                                 {36, 5, 10, 10, "%1.0f"},   // 7
+                                 {17, 2, 4, 4, "%1.0f"},     // 8
+                                 {19, 2, 4, 4, "%1.0f"},     // 9
+                                 {21, 2, 4, 8, "%2.0f"},     // 10
+                                 {23, 2, 4, 8, "%2.0f"},     // 11
+                                 {13, 4, 4, 4, "%2.0f"},     // 12
+                                 {14, 4, 4, 4, "%2.0f"},     // 13
+                                 {15, 4, 4, 4, "%2.0f"},     // 14
+                                 {16, 5, 5, 5, "%2.0f"},     // 15
+                                 {17, 5, 5, 5, "%2.0f"},     // 16
+                                 {18, 5, 5, 5, "%2.0f"},     // 17
+                                 {19, 5, 5, 5, "%2.0f"},     // 18
+                                 {20, 5, 5, 5, "%2.0f"},     // 19
+                                 {21, 5, 5, 5, "%2.0f"},     // 20
+                                 {22, 5, 5, 5, "%2.0f"},     // 21
+                                 {23, 5, 5, 5, "%2.0f"},     // 22
+                                 {24, 5, 5, 5, "%2.0f"},     // 23
+                                 {25, 5, 5, 5, "%2.0f"},     // 24
+                                 {26, 5, 5, 10, "%2.0f"}},   // 25
+                                {{101, 5, 10, 20, "%3.1f"},  // 1
+                                 {101, 5, 10, 20, "%3.1f"},  // 2
+                                 {61, 10, 10, 20, "%3.1f"},  // 3
+                                 {81, 10, 10, 20, "%3.1f"},  // 4
+                                 {101, 10, 20, 20, "%1.0f"}, // 5
+                                 {61, 5, 10, 20, "%1.0f"},   // 6
+                                 {71, 5, 10, 20, "%1.0f"},   // 7
+                                 {81, 5, 10, 20, "%1.0f"},   // 8
+                                 {91, 5, 10, 20, "%1.0f"},   // 9
+                                 {101, 5, 10, 20, "%2.0f"},  // 10
+                                 {56, 5, 5, 5, "%2.0f"},     // 11
+                                 {61, 5, 10, 10, "%2.0f"},   // 12
+                                 {66, 5, 10, 20, "%2.0f"},   // 13
+                                 {71, 5, 10, 20, "%2.0f"},   // 14
+                                 {76, 5, 10, 20, "%2.0f"},   // 15
+                                 {81, 5, 10, 20, "%2.0f"},   // 16
+                                 {86, 5, 10, 20, "%2.0f"},   // 17
+                                 {91, 5, 10, 20, "%2.0f"},   // 18
+                                 {96, 5, 10, 20, "%2.0f"},   // 19
+                                 {101, 5, 10, 25, "%2.0f"},  // 20
+                                 {43, 2, 6, 6, "%2.0f"},     // 21
+                                 {45, 2, 4, 8, "%2.0f"},     // 22
+                                 {47, 2, 4, 8, "%2.0f"},     // 23
+                                 {49, 2, 4, 8, "%2.0f"},     // 24
+                                 {26, 5, 5, 5, "%2.0f"}}};   // 25
 
   max_value = maxval;
   min_value = minval;
@@ -693,14 +719,12 @@ void GrowAxis::set_range(double minval, double maxval, int keep_settings)
   int y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
   double rotation = (trf.rot() / 360 - floor(trf.rot() / 360)) * 360;
 
-  if (!keep_settings) {
+  if (!keep_settings)
+  {
     int len;
     int lix;
     int di;
-    int horizontal = (rotation < 45 || (rotation > 135 && rotation < 225)
-                         || rotation > 315)
-        ? 0
-        : 1;
+    int horizontal = (rotation < 45 || (rotation > 135 && rotation < 225) || rotation > 315) ? 0 : 1;
     if (horizontal)
       len = ABS(x2 - x1);
     else
@@ -719,7 +743,8 @@ void GrowAxis::set_range(double minval, double maxval, int keep_settings)
     while (di >= 25)
       di /= 10;
 
-    if (di > 0 && di <= 25) {
+    if (di > 0 && di <= 25)
+    {
       lines = rdata[lix][di - 1].lines;
       longquotient = rdata[lix][di - 1].longq;
       if (horizontal)
@@ -755,9 +780,8 @@ void GrowAxis::set_range(double minval, double maxval, int keep_settings)
   draw();
 }
 
-void GrowAxis::export_javabean(GlowTransform* t, void* node,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, int in_nc,
-    std::ofstream& fp)
+void GrowAxis::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
+                               int node_cnt, int in_nc, std::ostream& fp)
 {
   int i;
   int draw_text = (fabs(increment) > DBL_EPSILON);
@@ -768,20 +792,21 @@ void GrowAxis::export_javabean(GlowTransform* t, void* node,
   int line_length;
   int z_height, z_width, z_descent;
   int max_z_width = 0;
-  int idx = int(
-      ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (text_size + 4) - 4);
-  double tsize
-      = ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (8 + 2 * text_size);
+  int idx = int(ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (text_size + 4) - 4);
+  double tsize = ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (8 + 2 * text_size);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
 
   bold = (text_drawtype == glow_eDrawType_TextHelveticaBold);
 
-  if (!t) {
+  if (!t)
+  {
     x1 = trf.x(ll.x, ll.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = trf.y(ll.x, ll.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = trf.x(ur.x, ur.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y2 = trf.y(ur.x, ur.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
-  } else {
+  }
+  else
+  {
     x1 = trf.x(t, ll.x, ll.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = trf.y(t, ll.x, ll.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = trf.x(t, ur.x, ur.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
@@ -799,62 +824,77 @@ void GrowAxis::export_javabean(GlowTransform* t, void* node,
     rotation = (trf.rot() / 360 - floor(trf.rot() / 360)) * 360;
 
   // Calculate max value line width
-  if (45 >= rotation || rotation > 315) {
-    if (draw_text) {
-      for (i = 0; i < lines; i++) {
-        if (i % valuequotient == 0) {
-          format_text(text, format, max_value - i * increment);
-          ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype,
-              MAX(0, idx), glow_eFont_Helvetica, &z_width, &z_height,
-              &z_descent, tsize, 0);
-          if (max_z_width < z_width)
-            max_z_width = z_width;
-        }
-      }
-      line_length = int(ur_x - ll_x) - max_z_width;
-    } else
-      line_length = int(ur_x - ll_x);
-  } else if (45 < rotation && rotation <= 135) {
-    if (draw_text) {
-      ctx->gdraw->get_text_extent("0", 1, text_drawtype, MAX(0, idx),
-          glow_eFont_Helvetica, &z_width, &z_height, &z_descent, tsize, 0);
-
-      line_length = int(ur_y - ll_y) - (z_height - z_descent);
-    } else
-      line_length = int(ur_y - ll_y);
-  } else if (135 < rotation && rotation <= 225) {
-    if (draw_text) {
-      for (i = 0; i < lines; i++) {
-        if (i % valuequotient == 0) {
-          format_text(text, format, max_value - i * increment);
-          ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype,
-              MAX(0, idx), glow_eFont_Helvetica, &z_width, &z_height,
-              &z_descent, tsize, 0);
-          if (max_z_width < z_width)
-            max_z_width = z_width;
-        }
-      }
-      line_length = int(ur_x - ll_x) - max_z_width;
-    } else
-      line_length = int(ur_x - ll_x);
-  } else // if ( 225 < rotation && rotation <= 315)
+  if (45 >= rotation || rotation > 315)
   {
-    if (draw_text) {
-      ctx->gdraw->get_text_extent("0", 1, text_drawtype, MAX(0, idx),
-          glow_eFont_Helvetica, &z_width, &z_height, &z_descent, tsize, 0);
+    if (draw_text)
+    {
+      for (i = 0; i < lines; i++)
+      {
+        if (i % valuequotient == 0)
+        {
+          format_text(text, format, max_value - i * increment);
+          ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype, MAX(0, idx), glow_eFont_Helvetica,
+                                      &z_width, &z_height, &z_descent, tsize, 0);
+          if (max_z_width < z_width)
+            max_z_width = z_width;
+        }
+      }
+      line_length = int(ur_x - ll_x) - max_z_width;
+    }
+    else
+      line_length = int(ur_x - ll_x);
+  }
+  else if (45 < rotation && rotation <= 135)
+  {
+    if (draw_text)
+    {
+      ctx->gdraw->get_text_extent("0", 1, text_drawtype, MAX(0, idx), glow_eFont_Helvetica, &z_width,
+                                  &z_height, &z_descent, tsize, 0);
 
       line_length = int(ur_y - ll_y) - (z_height - z_descent);
-    } else
+    }
+    else
+      line_length = int(ur_y - ll_y);
+  }
+  else if (135 < rotation && rotation <= 225)
+  {
+    if (draw_text)
+    {
+      for (i = 0; i < lines; i++)
+      {
+        if (i % valuequotient == 0)
+        {
+          format_text(text, format, max_value - i * increment);
+          ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype, MAX(0, idx), glow_eFont_Helvetica,
+                                      &z_width, &z_height, &z_descent, tsize, 0);
+          if (max_z_width < z_width)
+            max_z_width = z_width;
+        }
+      }
+      line_length = int(ur_x - ll_x) - max_z_width;
+    }
+    else
+      line_length = int(ur_x - ll_x);
+  }
+  else // if ( 225 < rotation && rotation <= 315)
+  {
+    if (draw_text)
+    {
+      ctx->gdraw->get_text_extent("0", 1, text_drawtype, MAX(0, idx), glow_eFont_Helvetica, &z_width,
+                                  &z_height, &z_descent, tsize, 0);
+
+      line_length = int(ur_y - ll_y) - (z_height - z_descent);
+    }
+    else
       line_length = int(ur_y - ll_y);
   }
   if (line_length < 3)
     line_length = 3;
 
   ((GrowCtx*)ctx)
-      ->export_jbean->axis(ll_x, ll_y, ur_x, ur_y, draw_type,
-          text_color_drawtype, min_value, max_value, lines, longquotient,
-          valuequotient, line_length, line_width, rotation, bold, idx, format,
-          pass, shape_cnt, node_cnt, fp);
+      ->export_jbean->axis(ll_x, ll_y, ur_x, ur_y, draw_type, text_color_drawtype, min_value, max_value,
+                           lines, longquotient, valuequotient, line_length, line_width, rotation, bold, idx,
+                           format, pass, shape_cnt, node_cnt, fp);
 }
 
 int GrowAxis::trace_scan()
@@ -881,8 +921,8 @@ void GrowAxis::trace_close()
     ctx->trace_disconnect_func((void*)this);
 }
 
-void GrowAxis::set_conf(double max_val, double min_val, int no_of_lines,
-    int long_quot, int value_quot, double rot, const char* value_format)
+void GrowAxis::set_conf(double max_val, double min_val, int no_of_lines, int long_quot, int value_quot,
+                        double rot, const char* value_format)
 {
   max_value = max_val;
   min_value = min_val;
@@ -897,15 +937,9 @@ void GrowAxis::set_conf(double max_val, double min_val, int no_of_lines,
   draw();
 }
 
-void GrowAxis::set_format(const char* f)
-{
-  strncpy(format, f, sizeof(format));
-}
+void GrowAxis::set_format(const char* f) { strncpy(format, f, sizeof(format)); }
 
-void GrowAxis::get_format(char* f)
-{
-  strcpy(f, format);
-}
+void GrowAxis::get_format(char* f) { strcpy(f, format); }
 
 void GrowAxis::set_axis_info(glow_sAxisInfo* info)
 {
@@ -933,27 +967,34 @@ void GrowAxis::get_axis_info(glow_sAxisInfo* info)
 
 void GrowAxis::format_text(char* text, char* fmt, double value)
 {
-  if (streq(fmt, "%1t")) {
+  if (streq(fmt, "%1t"))
+  {
     // Hours, minutes and seconds, value in seconds
     int val = (int)nearbyint(value);
     int hours = val / 3600;
     int minutes = (val - hours * 3600) / 60;
     int seconds = (val - hours * 3600 - minutes * 60);
     sprintf(text, "%d:%02d:%02d", hours, minutes, seconds);
-  } else if (streq(fmt, "%2t")) {
+  }
+  else if (streq(fmt, "%2t"))
+  {
     // Hours and minutes, value in seconds
     int val = (int)nearbyint(value);
     int hours = val / 3600;
     int minutes = (val - hours * 3600) / 60;
     sprintf(text, "%d:%02d", hours, minutes);
-  } else if (streq(fmt, "%3t")) {
+  }
+  else if (streq(fmt, "%3t"))
+  {
     // Days, hours and minues, value in seconds
     int val = (int)nearbyint(value);
     int days = val / (24 * 3600);
     int hours = (val - days * 24 * 3600) / 3600;
     int minutes = (val - days * 24 * 3600 - hours * 3600) / 60;
     sprintf(text, "%d %02d:%02d", days, hours, minutes);
-  } else if (streq(fmt, "%10t")) {
+  }
+  else if (streq(fmt, "%10t"))
+  {
     // Date
     char timstr[40];
     pwr_tTime t;
@@ -963,7 +1004,9 @@ void GrowAxis::format_text(char* text, char* fmt, double value)
     time_AtoAscii(&t, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
     timstr[19] = 0;
     strcpy(text, timstr);
-  } else if (streq(fmt, "%11t")) {
+  }
+  else if (streq(fmt, "%11t"))
+  {
     // Date, no seconds
     char timstr[40];
     pwr_tTime t;
@@ -973,7 +1016,9 @@ void GrowAxis::format_text(char* text, char* fmt, double value)
     time_AtoAscii(&t, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
     timstr[16] = 0;
     strcpy(text, timstr);
-  } else {
+  }
+  else
+  {
     if (fabs(value) < FLT_EPSILON)
       value = 0;
     sprintf(text, fmt, value);
@@ -982,8 +1027,10 @@ void GrowAxis::format_text(char* text, char* fmt, double value)
 
 void GrowAxis::convert(glow_eConvert version)
 {
-  switch (version) {
-  case glow_eConvert_V34: {
+  switch (version)
+  {
+  case glow_eConvert_V34:
+  {
     // Conversion of colors
     GrowRect::convert(version);
     text_drawtype = GlowColor::convert(version, text_drawtype);
@@ -1002,7 +1049,8 @@ glow_eVis GrowAxis::get_visibility()
 
 void GrowAxis::set_visibility(glow_eVis visibility)
 {
-  switch (visibility) {
+  switch (visibility)
+  {
   case glow_eVis_Visible:
     if (invisible == 0)
       return;
@@ -1019,7 +1067,4 @@ void GrowAxis::set_visibility(glow_eVis visibility)
   draw();
 }
 
-int GrowAxis::export_script(GlowExportScript* es, void* o, void* m)
-{
-  return es->axis(this, o, m);
-}
+int GrowAxis::export_script(GlowExportScript* es, void* o, void* m) { return es->axis(this, o, m); }

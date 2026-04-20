@@ -46,24 +46,21 @@
 #include <QTimer>
 #include <QToolButton>
 
-QString fl(const char* text)
-{
-  return QString::fromLocal8Bit(text);
-}
+QString fl(const char* text) { return QString::fromLocal8Bit(text); }
 
 QString convert_utf8(const char* str)
 {
-  if (Lng::translatefile_coding() == lng_eCoding_UTF_8) {
+  if (Lng::translatefile_coding() == lng_eCoding_UTF_8)
+  {
     return QString::fromUtf8(str);
-  } else {
+  }
+  else
+  {
     return QString::fromLatin1(str);
   }
 }
 
-QString translate_utf8(const char* str)
-{
-  return convert_utf8(Lng::translate(str));
-}
+QString translate_utf8(const char* str) { return convert_utf8(Lng::translate(str)); }
 
 void pop(QWidget* w)
 {
@@ -74,48 +71,57 @@ void pop(QWidget* w)
 
 QIcon get_icon(const char* iconName)
 {
-  if (strcmp(iconName, "")) {
+  if (strcmp(iconName, ""))
+  {
     // iconName is not equal to ""
     QIcon icon;
 
     // First check if this is a standard gnome icon, e.g. "zoom-in"
     QIcon::setThemeName("gnome");
-    if (QIcon::hasThemeIcon(fl(iconName))) {
+    if (QIcon::hasThemeIcon(fl(iconName)))
+    {
       icon = QIcon::fromTheme(fl(iconName));
-      if (icon.isNull() || icon.pixmap(16).isNull()) {
+      if (icon.isNull() || icon.pixmap(16).isNull())
+      {
         printf("Warning! Could not find theme icon: %s\n", iconName);
       }
       return icon;
     }
 
-    if (strchr(iconName, '$')) {
+    if (strchr(iconName, '$'))
+    {
       // iconName is a relative path to a local icon, e.g. "xtt_close"
       pwr_tFileName fname;
       dcli_translate_filename(fname, iconName);
       icon = QIcon(fl(fname));
-      if (icon.isNull() || icon.pixmap(16).isNull()) {
-        printf("Warning! Could not find proview icon: %s, path: %s\n", iconName,
-            fname);
+      if (icon.isNull() || icon.pixmap(16).isNull())
+      {
+        printf("Warning! Could not find proview icon: %s, path: %s\n", iconName, fname);
       }
-    } else {
+    }
+    else
+    {
       // iconName is an absolute path to a local icon
       icon = QIcon(fl(iconName));
-      if (icon.isNull() || icon.pixmap(16).isNull()) {
+      if (icon.isNull() || icon.pixmap(16).isNull())
+      {
         printf("Warning! Could not find icon: %s\n", iconName);
       }
     }
     return icon;
-  } else {
+  }
+  else
+  {
     return QIcon();
   }
 }
 
-QAction* addMenuItem(QObject* parent, QMenu* menu, const char* text,
-    const char* callback, const char* shortcut, const char* iconName)
+QAction* addMenuItem(QObject* parent, QMenu* menu, const char* text, const char* callback,
+                     const char* shortcut, const char* iconName)
 {
-  QAction* action
-      = new QAction(get_icon(iconName), translate_utf8(text), parent);
-  if (strcmp(shortcut, "")) {
+  QAction* action = new QAction(get_icon(iconName), translate_utf8(text), parent);
+  if (strcmp(shortcut, ""))
+  {
     action->setShortcut(fl(shortcut));
   }
   QObject::connect(action, SIGNAL(triggered()), parent, callback);
@@ -124,12 +130,12 @@ QAction* addMenuItem(QObject* parent, QMenu* menu, const char* text,
   return action;
 }
 
-QAction* addCheckableMenuItem(QObject* parent, QMenu* menu, const char* text,
-    const char* callback, const char* shortcut, const char* iconName)
+QAction* addCheckableMenuItem(QObject* parent, QMenu* menu, const char* text, const char* callback,
+                              const char* shortcut, const char* iconName)
 {
-  QAction* action
-      = new QAction(get_icon(iconName), translate_utf8(text), parent);
-  if (strcmp(shortcut, "")) {
+  QAction* action = new QAction(get_icon(iconName), translate_utf8(text), parent);
+  if (strcmp(shortcut, ""))
+  {
     action->setShortcut(fl(shortcut));
   }
   action->setCheckable(true);
@@ -139,11 +145,12 @@ QAction* addCheckableMenuItem(QObject* parent, QMenu* menu, const char* text,
   return action;
 }
 
-QAction* addMenuRadioItem(QObject* parent, QMenu* menu, const char* text,
-    const char* callback, QActionGroup* group, const char* shortcut)
+QAction* addMenuRadioItem(QObject* parent, QMenu* menu, const char* text, const char* callback,
+                          QActionGroup* group, const char* shortcut)
 {
   QAction* action = new QAction(translate_utf8(text), parent);
-  if (strcmp(shortcut, "")) {
+  if (strcmp(shortcut, ""))
+  {
     action->setShortcut(fl(shortcut));
   }
   QObject::connect(action, SIGNAL(triggered()), parent, callback);
@@ -153,22 +160,20 @@ QAction* addMenuRadioItem(QObject* parent, QMenu* menu, const char* text,
   return action;
 }
 
-QAction* addToolItem(QObject* parent, QToolBar* tools, const char* text,
-    const char* callback, const char* iconName)
+QAction* addToolItem(QObject* parent, QToolBar* tools, const char* text, const char* callback,
+                     const char* iconName)
 {
-  QAction* action
-      = new QAction(get_icon(iconName), translate_utf8(text), parent);
+  QAction* action = new QAction(get_icon(iconName), translate_utf8(text), parent);
   QObject::connect(action, SIGNAL(triggered()), parent, callback);
 
   tools->addAction(action);
   return action;
 }
 
-QAction* addCheckableToolItem(QObject* parent, QToolBar* tools,
-    const char* text, const char* callback, const char* iconName)
+QAction* addCheckableToolItem(QObject* parent, QToolBar* tools, const char* text, const char* callback,
+                              const char* iconName)
 {
-  QAction* action
-      = new QAction(get_icon(iconName), translate_utf8(text), parent);
+  QAction* action = new QAction(get_icon(iconName), translate_utf8(text), parent);
   action->setCheckable(true);
   QObject::connect(action, SIGNAL(triggered(bool)), parent, callback);
 
@@ -195,15 +200,21 @@ void set_pane_position(QSplitter* pane, int right)
 {
   QList<int> sizes;
   int total;
-  if (pane->orientation() == Qt::Horizontal) {
+  if (pane->orientation() == Qt::Horizontal)
+  {
     total = pane->window()->size().width();
-  } else {
+  }
+  else
+  {
     total = pane->window()->size().height();
   }
 
-  if (right > 0) {
+  if (right > 0)
+  {
     sizes << right << total - right;
-  } else {
+  }
+  else
+  {
     right = -right;
     sizes << total - right << right;
   }
@@ -256,17 +267,14 @@ void add_expanding(QLayout* layout, QWidget* widget)
   layout->addWidget(widget);
 }
 
-void add_expanding(QLayout* layout, QLayout* widget)
-{
-  add_expanding(layout, layout_to_widget(widget));
-}
+void add_expanding(QLayout* layout, QLayout* widget) { add_expanding(layout, layout_to_widget(widget)); }
 
 QFrame* wrapInFrame(QFrame* widget)
 {
   widget->setFrameStyle(QFrame::NoFrame);
-  QFrame *frame = new QFrame();
+  QFrame* frame = new QFrame();
   frame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-  QVBoxLayout *layout = new QVBoxLayout();
+  QVBoxLayout* layout = new QVBoxLayout();
   layout->setContentsMargins(3, 3, 3, 3);
   layout->addWidget(widget);
   frame->setLayout(layout);

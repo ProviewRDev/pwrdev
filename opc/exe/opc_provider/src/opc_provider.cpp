@@ -67,7 +67,8 @@ static char opc_endpoint[256];
 // Wb only
 void opc_provider::object(co_procom* pcom)
 {
-  if (m_list.size() <= 1 || m_list[0]->po.fchoix == 0) {
+  if (m_list.size() <= 1 || m_list[0]->po.fchoix == 0)
+  {
     pcom->provideObject(LDH__NOSUCHOBJ, 0, 0, 0, 0, 0, 0, 0, "", "");
     return;
   }
@@ -92,9 +93,8 @@ void opc_provider::fault()
   soap_print_fault(&soap, stderr);
 }
 
-void opc_provider::insert_object(pwr_tOix fth, pwr_tOix bws,
-    s0__BrowseElement* element, int first, int last, int load_children,
-    std::string* path)
+void opc_provider::insert_object(pwr_tOix fth, pwr_tOix bws, s0__BrowseElement* element, int first, int last,
+                                 int load_children, std::string* path)
 {
   opcprv_obj* o = new opcprv_obj();
   xsd__anyType* valp;
@@ -103,62 +103,66 @@ void opc_provider::insert_object(pwr_tOix fth, pwr_tOix bws,
   strcpy(o->po.name, name_to_objectname((char*)element->Name->c_str()));
   if (element->ItemPath)
     path = element->ItemPath;
-  if (path) {
+  if (path)
+  {
     strcpy(o->item_name, path->c_str());
     strcat(o->item_name, element->ItemName->c_str());
-  } else
+  }
+  else
     strcpy(o->item_name, element->ItemName->c_str());
 
   o->po.oix = next_oix++;
   o->po.fthoix = fth;
-  if (!element->IsItem) {
+  if (!element->IsItem)
+  {
     o->po.cid = pwr_cClass_Opc_Hier;
     o->po.body_size = sizeof(pwr_sClass_Opc_Hier);
     o->po.body = calloc(1, o->po.body_size);
     if (opc_get_property(element->Properties, opc_mProperty_Description, &valp))
-      strncpy(((pwr_sClass_Opc_Hier*)o->po.body)->Description,
-          ((xsd__string*)valp)->__item.c_str(),
-          sizeof(((pwr_sClass_Opc_Hier*)o->po.body)->Description));
-  } else {
+      strncpy(((pwr_sClass_Opc_Hier*)o->po.body)->Description, ((xsd__string*)valp)->__item.c_str(),
+              sizeof(((pwr_sClass_Opc_Hier*)o->po.body)->Description));
+  }
+  else
+  {
     bool foundType = false;
 
-    if (opc_get_property(element->Properties, opc_mProperty_DataType, &valp)) {
-      if (!opc_string_to_opctype(
-              ((xsd__string*)valp)->__item.c_str(), &opctype)) {
+    if (opc_get_property(element->Properties, opc_mProperty_DataType, &valp))
+    {
+      if (!opc_string_to_opctype(((xsd__string*)valp)->__item.c_str(), &opctype))
+      {
         foundType = false;
         opctype = opc_eDataType_;
-      } else
+      }
+      else
         foundType = true;
     }
 
-    if (!foundType) {
+    if (!foundType)
+    {
       // Call opc server to Get Properties of this element for DataType
       _s0__GetPropertiesResponse properties_response_datatype;
       _s0__GetProperties get_properties_dataType;
       s0__ItemIdentifier itemid;
 
-      get_properties_dataType.ReturnPropertyValues
-          = (bool*)malloc(sizeof(bool));
+      get_properties_dataType.ReturnPropertyValues = (bool*)malloc(sizeof(bool));
       *get_properties_dataType.ReturnPropertyValues = true;
       itemid.ItemName = new std::string(o->item_name);
 
       get_properties_dataType.ItemIDs.push_back(&itemid);
 
-      opc_mask_to_propertynames(
-          get_properties_dataType.PropertyNames, opc_mProperty_DataType);
+      opc_mask_to_propertynames(get_properties_dataType.PropertyNames, opc_mProperty_DataType);
 
-      if (soap_call___s0__GetProperties(&soap, opc_endpoint, NULL,
-              &get_properties_dataType, &properties_response_datatype)
-          == SOAP_OK) {
+      if (soap_call___s0__GetProperties(&soap, opc_endpoint, NULL, &get_properties_dataType,
+                                        &properties_response_datatype) == SOAP_OK)
+      {
         server_state->RequestCnt++;
-        if (properties_response_datatype.PropertyLists.size() > 0
-            && properties_response_datatype.PropertyLists[0]->Properties.size()
-                > 0) {
-          if (opc_get_property(
-                  properties_response_datatype.PropertyLists[0]->Properties,
-                  opc_mProperty_DataType, &valp)) {
-            if (!opc_string_to_opctype(
-                    ((xsd__string*)valp)->__item.c_str(), &opctype))
+        if (properties_response_datatype.PropertyLists.size() > 0 &&
+            properties_response_datatype.PropertyLists[0]->Properties.size() > 0)
+        {
+          if (opc_get_property(properties_response_datatype.PropertyLists[0]->Properties,
+                               opc_mProperty_DataType, &valp))
+          {
+            if (!opc_string_to_opctype(((xsd__string*)valp)->__item.c_str(), &opctype))
               opctype = opc_eDataType_;
             else
               foundType = true;
@@ -169,7 +173,8 @@ void opc_provider::insert_object(pwr_tOix fth, pwr_tOix bws,
       free((char*)get_properties_dataType.ReturnPropertyValues);
     }
 
-    switch (opctype) {
+    switch (opctype)
+    {
     case opc_eDataType_string:
       o->po.cid = pwr_cClass_Opc_String;
       o->po.body_size = sizeof(pwr_sClass_Opc_String);
@@ -313,78 +318,85 @@ void opc_provider::insert_object(pwr_tOix fth, pwr_tOix bws,
       o->po.body = calloc(1, o->po.body_size);
       o->type = pwr_eType_String;
       o->size = sizeof(pwr_tString80);
+      break;
     default:
       o->po.cid = pwr_cClass_Opc_Hier;
       o->po.body_size = sizeof(pwr_sClass_Opc_Hier);
       o->po.body = calloc(1, o->po.body_size);
     }
 
-    if (opc_get_property(
-            element->Properties, opc_mProperty_Description, &valp)) {
+    if (opc_get_property(element->Properties, opc_mProperty_Description, &valp))
+    {
       pwr_tString80 desc;
       strncpy(desc, ((xsd__string*)valp)->__item.c_str(), sizeof(desc));
 
-      switch (o->po.cid) {
+      switch (o->po.cid)
+      {
       case pwr_cClass_Opc_Float:
         strncpy(((pwr_sClass_Opc_Float*)o->po.body)->Description, desc,
-            sizeof(((pwr_sClass_Opc_Float*)o->po.body)->Description));
+                sizeof(((pwr_sClass_Opc_Float*)o->po.body)->Description));
         break;
       case pwr_cClass_Opc_Double:
         strncpy(((pwr_sClass_Opc_Float*)o->po.body)->Description, desc,
-            sizeof(((pwr_sClass_Opc_Double*)o->po.body)->Description));
+                sizeof(((pwr_sClass_Opc_Double*)o->po.body)->Description));
         break;
       case pwr_cClass_Opc_Int:
         strncpy(((pwr_sClass_Opc_Int*)o->po.body)->Description, desc,
-            sizeof(((pwr_sClass_Opc_Int*)o->po.body)->Description));
+                sizeof(((pwr_sClass_Opc_Int*)o->po.body)->Description));
         break;
       case pwr_cClass_Opc_Short:
         strncpy(((pwr_sClass_Opc_Short*)o->po.body)->Description, desc,
-            sizeof(((pwr_sClass_Opc_Short*)o->po.body)->Description));
+                sizeof(((pwr_sClass_Opc_Short*)o->po.body)->Description));
         break;
       case pwr_cClass_Opc_Byte:
         strncpy(((pwr_sClass_Opc_Byte*)o->po.body)->Description, desc,
-            sizeof(((pwr_sClass_Opc_Byte*)o->po.body)->Description));
+                sizeof(((pwr_sClass_Opc_Byte*)o->po.body)->Description));
         break;
       case pwr_cClass_Opc_UnsignedInt:
         strncpy(((pwr_sClass_Opc_UnsignedInt*)o->po.body)->Description, desc,
-            sizeof(((pwr_sClass_Opc_UnsignedInt*)o->po.body)->Description));
+                sizeof(((pwr_sClass_Opc_UnsignedInt*)o->po.body)->Description));
         break;
       case pwr_cClass_Opc_UnsignedShort:
         strncpy(((pwr_sClass_Opc_UnsignedShort*)o->po.body)->Description, desc,
-            sizeof(((pwr_sClass_Opc_UnsignedShort*)o->po.body)->Description));
+                sizeof(((pwr_sClass_Opc_UnsignedShort*)o->po.body)->Description));
         break;
       case pwr_cClass_Opc_UnsignedByte:
         strncpy(((pwr_sClass_Opc_UnsignedByte*)o->po.body)->Description, desc,
-            sizeof(((pwr_sClass_Opc_UnsignedByte*)o->po.body)->Description));
+                sizeof(((pwr_sClass_Opc_UnsignedByte*)o->po.body)->Description));
         break;
       }
     }
 
     // No dataType could be found, set as OpcHier object
-    if (!foundType) {
+    if (!foundType)
+    {
       o->po.cid = pwr_cClass_Opc_Hier;
       o->po.body_size = sizeof(pwr_sClass_Opc_Hier);
       o->po.body = calloc(1, o->po.body_size);
-      if (opc_get_property(
-              element->Properties, opc_mProperty_Description, &valp)) {
-        strncpy(((pwr_sClass_Opc_Hier*)o->po.body)->Description,
-            ((xsd__string*)valp)->__item.c_str(),
-            sizeof(((pwr_sClass_Opc_Hier*)o->po.body)->Description));
+      if (opc_get_property(element->Properties, opc_mProperty_Description, &valp))
+      {
+        strncpy(((pwr_sClass_Opc_Hier*)o->po.body)->Description, ((xsd__string*)valp)->__item.c_str(),
+                sizeof(((pwr_sClass_Opc_Hier*)o->po.body)->Description));
       }
     }
   }
   if (first)
     m_list[fth]->po.fchoix = o->po.oix;
-  else {
+  else
+  {
     o->po.bwsoix = bws;
     m_list[bws]->po.fwsoix = o->po.oix;
   }
-  if (last) {
+  if (last)
+  {
     m_list[fth]->po.lchoix = o->po.oix;
-    if (!first) {
+    if (!first)
+    {
       o->po.fwsoix = m_list[fth]->po.fchoix;
       m_list[o->po.fwsoix]->po.bwsoix = o->po.oix;
-    } else {
+    }
+    else
+    {
       // Single child
       o->po.fwsoix = o->po.oix;
       o->po.bwsoix = o->po.oix;
@@ -397,14 +409,14 @@ void opc_provider::insert_object(pwr_tOix fth, pwr_tOix bws,
 
   m_list.push_back(o);
 
-  if (opc_get_property(element->Properties, opc_mProperty_EuType, &valp)) {
-    if ((((xsd__string*)valp)->__item == "analog"
-            || ((xsd__string*)valp)->__item == "")
-        || ((((xsd__string*)valp)->__item != "noEnum")
-               && ((xsd__string*)valp)->__item != "enumerated"))
+  if (opc_get_property(element->Properties, opc_mProperty_EuType, &valp))
+  {
+    if ((((xsd__string*)valp)->__item == "analog" || ((xsd__string*)valp)->__item == "") ||
+        ((((xsd__string*)valp)->__item != "noEnum") && ((xsd__string*)valp)->__item != "enumerated"))
       m_list[o->po.oix]->po.flags |= procom_obj_mFlags_Analog;
   }
-  if (m_list[o->po.oix]->po.flags & procom_obj_mFlags_Analog) {
+  if (m_list[o->po.oix]->po.flags & procom_obj_mFlags_Analog)
+  {
     // Get analog properties
     _s0__GetProperties get_properties;
     _s0__GetPropertiesResponse properties_response;
@@ -419,101 +431,94 @@ void opc_provider::insert_object(pwr_tOix fth, pwr_tOix bws,
 
     get_properties.ItemIDs.push_back(&id);
 
-    opc_mask_to_propertynames(get_properties.PropertyNames, opc_mProperty_HighEU
-            | opc_mProperty_LowEU | opc_mProperty_EngineeringUnits);
+    opc_mask_to_propertynames(get_properties.PropertyNames,
+                              opc_mProperty_HighEU | opc_mProperty_LowEU | opc_mProperty_EngineeringUnits);
 
-    if (soap_call___s0__GetProperties(
-            &soap, opc_endpoint, NULL, &get_properties, &properties_response)
-        == SOAP_OK) {
+    if (soap_call___s0__GetProperties(&soap, opc_endpoint, NULL, &get_properties, &properties_response) ==
+        SOAP_OK)
+    {
       server_state->RequestCnt++;
-      if (properties_response.PropertyLists.size() > 0
-          && properties_response.PropertyLists[0]->Properties.size() > 0) {
-        if (opc_get_property(properties_response.PropertyLists[0]->Properties,
-                opc_mProperty_HighEU, &valp)) {
+      if (properties_response.PropertyLists.size() > 0 &&
+          properties_response.PropertyLists[0]->Properties.size() > 0)
+      {
+        if (opc_get_property(properties_response.PropertyLists[0]->Properties, opc_mProperty_HighEU, &valp))
+        {
           high_eu = ((xsd__double*)valp)->__item;
         }
-        if (opc_get_property(properties_response.PropertyLists[0]->Properties,
-                opc_mProperty_LowEU, &valp)) {
+        if (opc_get_property(properties_response.PropertyLists[0]->Properties, opc_mProperty_LowEU, &valp))
+        {
           low_eu = ((xsd__double*)valp)->__item;
         }
-        if (opc_get_property(properties_response.PropertyLists[0]->Properties,
-                opc_mProperty_EngineeringUnits, &valp)) {
-          strncpy(engineering_units, ((xsd__string*)valp)->__item.c_str(),
-              sizeof(engineering_units));
+        if (opc_get_property(properties_response.PropertyLists[0]->Properties, opc_mProperty_EngineeringUnits,
+                             &valp))
+        {
+          strncpy(engineering_units, ((xsd__string*)valp)->__item.c_str(), sizeof(engineering_units));
         }
 
         void* body = m_list[o->po.oix]->po.body;
-        switch (o->po.cid) {
+        switch (o->po.cid)
+        {
         case pwr_cClass_Opc_Float:
           ((pwr_sClass_Opc_Float*)body)->HighEU = high_eu;
           ((pwr_sClass_Opc_Float*)body)->LowEU = low_eu;
-          strcpy(((pwr_sClass_Opc_Float*)body)->EngineeringUnits,
-              engineering_units);
+          strcpy(((pwr_sClass_Opc_Float*)body)->EngineeringUnits, engineering_units);
           break;
         case pwr_cClass_Opc_Double:
           ((pwr_sClass_Opc_Double*)body)->HighEU = high_eu;
           ((pwr_sClass_Opc_Double*)body)->LowEU = low_eu;
-          strcpy(((pwr_sClass_Opc_Double*)body)->EngineeringUnits,
-              engineering_units);
+          strcpy(((pwr_sClass_Opc_Double*)body)->EngineeringUnits, engineering_units);
           break;
         case pwr_cClass_Opc_Decimal:
           ((pwr_sClass_Opc_Decimal*)body)->HighEU = high_eu;
           ((pwr_sClass_Opc_Decimal*)body)->LowEU = low_eu;
-          strcpy(((pwr_sClass_Opc_Decimal*)body)->EngineeringUnits,
-              engineering_units);
+          strcpy(((pwr_sClass_Opc_Decimal*)body)->EngineeringUnits, engineering_units);
           break;
         case pwr_cClass_Opc_Long:
           ((pwr_sClass_Opc_Long*)body)->HighEU = high_eu;
           ((pwr_sClass_Opc_Long*)body)->LowEU = low_eu;
-          strcpy(((pwr_sClass_Opc_Long*)body)->EngineeringUnits,
-              engineering_units);
+          strcpy(((pwr_sClass_Opc_Long*)body)->EngineeringUnits, engineering_units);
           break;
         case pwr_cClass_Opc_Int:
           ((pwr_sClass_Opc_Int*)body)->HighEU = high_eu;
           ((pwr_sClass_Opc_Int*)body)->LowEU = low_eu;
-          strcpy(
-              ((pwr_sClass_Opc_Int*)body)->EngineeringUnits, engineering_units);
+          strcpy(((pwr_sClass_Opc_Int*)body)->EngineeringUnits, engineering_units);
           break;
         case pwr_cClass_Opc_Short:
           ((pwr_sClass_Opc_Short*)body)->HighEU = high_eu;
           ((pwr_sClass_Opc_Short*)body)->LowEU = low_eu;
-          strcpy(((pwr_sClass_Opc_Short*)body)->EngineeringUnits,
-              engineering_units);
+          strcpy(((pwr_sClass_Opc_Short*)body)->EngineeringUnits, engineering_units);
           break;
         case pwr_cClass_Opc_Byte:
           ((pwr_sClass_Opc_Byte*)body)->HighEU = high_eu;
           ((pwr_sClass_Opc_Byte*)body)->LowEU = low_eu;
-          strcpy(((pwr_sClass_Opc_Byte*)body)->EngineeringUnits,
-              engineering_units);
+          strcpy(((pwr_sClass_Opc_Byte*)body)->EngineeringUnits, engineering_units);
           break;
         case pwr_cClass_Opc_UnsignedLong:
           ((pwr_sClass_Opc_UnsignedLong*)body)->HighEU = high_eu;
           ((pwr_sClass_Opc_UnsignedLong*)body)->LowEU = low_eu;
-          strcpy(((pwr_sClass_Opc_UnsignedLong*)body)->EngineeringUnits,
-              engineering_units);
+          strcpy(((pwr_sClass_Opc_UnsignedLong*)body)->EngineeringUnits, engineering_units);
           break;
         case pwr_cClass_Opc_UnsignedInt:
           ((pwr_sClass_Opc_UnsignedInt*)body)->HighEU = high_eu;
           ((pwr_sClass_Opc_UnsignedInt*)body)->LowEU = low_eu;
-          strcpy(((pwr_sClass_Opc_UnsignedInt*)body)->EngineeringUnits,
-              engineering_units);
+          strcpy(((pwr_sClass_Opc_UnsignedInt*)body)->EngineeringUnits, engineering_units);
           break;
         case pwr_cClass_Opc_UnsignedShort:
           ((pwr_sClass_Opc_UnsignedShort*)body)->HighEU = high_eu;
           ((pwr_sClass_Opc_UnsignedShort*)body)->LowEU = low_eu;
-          strcpy(((pwr_sClass_Opc_UnsignedShort*)body)->EngineeringUnits,
-              engineering_units);
+          strcpy(((pwr_sClass_Opc_UnsignedShort*)body)->EngineeringUnits, engineering_units);
           break;
         case pwr_cClass_Opc_UnsignedByte:
           ((pwr_sClass_Opc_UnsignedByte*)body)->HighEU = high_eu;
           ((pwr_sClass_Opc_UnsignedByte*)body)->LowEU = low_eu;
-          strcpy(((pwr_sClass_Opc_UnsignedByte*)body)->EngineeringUnits,
-              engineering_units);
+          strcpy(((pwr_sClass_Opc_UnsignedByte*)body)->EngineeringUnits, engineering_units);
           break;
         default:;
         }
       }
-    } else {
+    }
+    else
+    {
       // Error returned from soap
       server_state->RequestCnt++;
       fault();
@@ -523,29 +528,31 @@ void opc_provider::insert_object(pwr_tOix fth, pwr_tOix bws,
     delete id.ItemName;
   }
 
-  if (load_children) {
+  if (load_children)
+  {
     _s0__Browse browse;
     _s0__BrowseResponse browse_response;
 
-    browse.ItemName = new std::string(
-        cnv_iso8859_to_utf8(o->item_name, strlen(o->item_name) + 1));
-    opc_mask_to_propertynames(browse.PropertyNames, opc_mProperty_DataType
-            | opc_mProperty_Description | opc_mProperty_EuType);
+    browse.ItemName = new std::string(cnv_iso8859_to_utf8(o->item_name, strlen(o->item_name) + 1));
+    opc_mask_to_propertynames(browse.PropertyNames,
+                              opc_mProperty_DataType | opc_mProperty_Description | opc_mProperty_EuType);
 
-    if (soap_call___s0__Browse(
-            &soap, opc_endpoint, NULL, &browse, &browse_response)
-        == SOAP_OK) {
+    if (soap_call___s0__Browse(&soap, opc_endpoint, NULL, &browse, &browse_response) == SOAP_OK)
+    {
       pwr_tOix next_bws;
       pwr_tOix bws = 0;
 
       server_state->RequestCnt++;
-      for (int i = 0; i < (int)browse_response.Elements.size(); i++) {
+      for (int i = 0; i < (int)browse_response.Elements.size(); i++)
+      {
         next_bws = next_oix;
         insert_object(o->po.oix, bws, browse_response.Elements[i], i == 0,
-            i == (int)browse_response.Elements.size() - 1, 0, 0);
+                      i == (int)browse_response.Elements.size() - 1, 0, 0);
         bws = next_bws;
       }
-    } else {
+    }
+    else
+    {
       // Error returned from soap
       server_state->RequestCnt++;
       fault();
@@ -586,58 +593,67 @@ void opc_provider::init()
 
 void opc_provider::objectOid(co_procom* pcom, pwr_tOix oix)
 {
-  if (m_list.size() == 2) {
+  if (m_list.size() == 2)
+  {
     // Load Rootlist
     _s0__Browse browse;
     _s0__BrowseResponse browse_response;
 
-    opc_mask_to_propertynames(browse.PropertyNames, opc_mProperty_DataType
-            | opc_mProperty_Description | opc_mProperty_EuType);
-    if (soap_call___s0__Browse(
-            &soap, opc_endpoint, NULL, &browse, &browse_response)
-        == SOAP_OK) {
+    opc_mask_to_propertynames(browse.PropertyNames,
+                              opc_mProperty_DataType | opc_mProperty_Description | opc_mProperty_EuType);
+    if (soap_call___s0__Browse(&soap, opc_endpoint, NULL, &browse, &browse_response) == SOAP_OK)
+    {
       server_state->RequestCnt++;
       pwr_tOix bws = m_list[1]->po.oix;
       pwr_tOix next_bws;
-      for (int i = 0; i < (int)browse_response.Elements.size(); i++) {
+      for (int i = 0; i < (int)browse_response.Elements.size(); i++)
+      {
         next_bws = next_oix;
-        insert_object(oix, bws, browse_response.Elements[i], 0,
-            i == (int)browse_response.Elements.size() - 1, 1, 0);
+        insert_object(oix, bws, browse_response.Elements[i], 0, i == (int)browse_response.Elements.size() - 1,
+                      1, 0);
         bws = next_bws;
       }
-    } else {
+    }
+    else
+    {
       // Error returned from soap
       server_state->RequestCnt++;
       fault();
     }
-  } else if (oix < m_list.size()) {
-    if (!(m_list[oix]->po.flags & procom_obj_mFlags_Loaded)) {
+  }
+  else if (oix < m_list.size())
+  {
+    if (!(m_list[oix]->po.flags & procom_obj_mFlags_Loaded))
+    {
       _s0__Browse browse;
       _s0__BrowseResponse browse_response;
 
-      browse.ItemName = new std::string(cnv_iso8859_to_utf8(
-          m_list[oix]->item_name, strlen(m_list[oix]->item_name) + 1));
-      opc_mask_to_propertynames(browse.PropertyNames, opc_mProperty_DataType
-              | opc_mProperty_Description | opc_mProperty_EuType);
+      browse.ItemName =
+          new std::string(cnv_iso8859_to_utf8(m_list[oix]->item_name, strlen(m_list[oix]->item_name) + 1));
+      opc_mask_to_propertynames(browse.PropertyNames,
+                                opc_mProperty_DataType | opc_mProperty_Description | opc_mProperty_EuType);
 
-      if (soap_call___s0__Browse(
-              &soap, opc_endpoint, NULL, &browse, &browse_response)
-          == SOAP_OK) {
+      if (soap_call___s0__Browse(&soap, opc_endpoint, NULL, &browse, &browse_response) == SOAP_OK)
+      {
         pwr_tOix next_bws;
         pwr_tOix bws = 0;
 
         server_state->RequestCnt++;
-        if (browse_response.Errors.size() > 0) {
+        if (browse_response.Errors.size() > 0)
+        {
           errlog(browse.ItemName, browse_response.Errors);
         }
-        for (int i = 0; i < (int)browse_response.Elements.size(); i++) {
+        for (int i = 0; i < (int)browse_response.Elements.size(); i++)
+        {
           next_bws = next_oix;
           insert_object(oix, bws, browse_response.Elements[i], i == 0,
-              i == (int)browse_response.Elements.size() - 1, 0, 0);
+                        i == (int)browse_response.Elements.size() - 1, 0, 0);
           bws = next_bws;
         }
         m_list[oix]->po.flags |= procom_obj_mFlags_Loaded;
-      } else {
+      }
+      else
+      {
         // Error returned from soap
         server_state->RequestCnt++;
         fault();
@@ -646,7 +662,8 @@ void opc_provider::objectOid(co_procom* pcom, pwr_tOix oix)
     }
   }
 
-  if (oix >= m_list.size()) {
+  if (oix >= m_list.size())
+  {
     pcom->provideStatus(GDH__NOSUCHOBJ);
     return;
   }
@@ -655,13 +672,15 @@ void opc_provider::objectOid(co_procom* pcom, pwr_tOix oix)
 
   if (oix == 0)
     olist.push_back(m_list[0]->po);
-  else {
+  else
+  {
     int plist_cnt = 0;
     pwr_tOix p, c;
     pwr_tOix plist[100];
 
     // Get parents
-    for (p = m_list[oix]->po.fthoix;; p = m_list[p]->po.fthoix) {
+    for (p = m_list[oix]->po.fthoix;; p = m_list[p]->po.fthoix)
+    {
       plist[plist_cnt++] = p;
       if (m_list[p]->po.fthoix == 0)
         break;
@@ -672,7 +691,8 @@ void opc_provider::objectOid(co_procom* pcom, pwr_tOix oix)
       olist.push_back(m_list[plist[i]]->po);
 
     // Add siblings
-    for (c = m_list[plist[0]]->po.fchoix;; c = m_list[c]->po.fwsoix) {
+    for (c = m_list[plist[0]]->po.fchoix;; c = m_list[c]->po.fwsoix)
+    {
       if (m_list[c]->po.flags & procom_obj_mFlags_Loaded)
         olist.push_back(m_list[c]->po);
 
@@ -681,10 +701,10 @@ void opc_provider::objectOid(co_procom* pcom, pwr_tOix oix)
     }
   }
   printf("*********************************************\n");
-  for (int i = 0; i < (int)olist.size(); i++) {
-    printf("oix %2d bws %2d fws %2d fth %2d fch %2d lch %2d flags %lu %s\n",
-        olist[i].oix, olist[i].bwsoix, olist[i].fwsoix, olist[i].fthoix,
-        olist[i].fchoix, olist[i].lchoix, olist[i].flags, olist[i].name);
+  for (int i = 0; i < (int)olist.size(); i++)
+  {
+    printf("oix %2d bws %2d fws %2d fth %2d fch %2d lch %2d flags %lu %s\n", olist[i].oix, olist[i].bwsoix,
+           olist[i].fwsoix, olist[i].fthoix, olist[i].fchoix, olist[i].lchoix, olist[i].flags, olist[i].name);
   }
   pcom->provideObjects(GDH__SUCCESS, olist);
 }
@@ -695,8 +715,10 @@ void opc_provider::objectName(co_procom* pcom, char* name, pwr_tOix poix)
   cdh_sParseName pn;
   pwr_tOix oix, coix;
 
-  if (poix) {
-    if (poix >= m_list.size()) {
+  if (poix)
+  {
+    if (poix >= m_list.size())
+    {
       pcom->provideStatus(GDH__NOSUCHOBJ);
       return;
     }
@@ -708,36 +730,41 @@ void opc_provider::objectName(co_procom* pcom, char* name, pwr_tOix poix)
   else
     oix = 0;
 
-  for (int i = 0; i < (int)pn.nObject; i++) {
+  for (int i = 0; i < (int)pn.nObject; i++)
+  {
     bool found = false;
 
-    if (!(m_list[oix]->po.flags & procom_obj_mFlags_Loaded)) {
+    if (!(m_list[oix]->po.flags & procom_obj_mFlags_Loaded))
+    {
       _s0__Browse browse;
       _s0__BrowseResponse browse_response;
 
-      browse.ItemName = new std::string(cnv_iso8859_to_utf8(
-          m_list[oix]->item_name, strlen(m_list[oix]->item_name) + 1));
-      opc_mask_to_propertynames(browse.PropertyNames, opc_mProperty_DataType
-              | opc_mProperty_Description | opc_mProperty_EuType);
+      browse.ItemName =
+          new std::string(cnv_iso8859_to_utf8(m_list[oix]->item_name, strlen(m_list[oix]->item_name) + 1));
+      opc_mask_to_propertynames(browse.PropertyNames,
+                                opc_mProperty_DataType | opc_mProperty_Description | opc_mProperty_EuType);
 
-      if (soap_call___s0__Browse(
-              &soap, opc_endpoint, NULL, &browse, &browse_response)
-          == SOAP_OK) {
+      if (soap_call___s0__Browse(&soap, opc_endpoint, NULL, &browse, &browse_response) == SOAP_OK)
+      {
         pwr_tOix next_bws;
         pwr_tOix bws = 0;
 
         server_state->RequestCnt++;
-        if (browse_response.Errors.size() > 0) {
+        if (browse_response.Errors.size() > 0)
+        {
           errlog(browse.ItemName, browse_response.Errors);
         }
-        for (int i = 0; i < (int)browse_response.Elements.size(); i++) {
+        for (int i = 0; i < (int)browse_response.Elements.size(); i++)
+        {
           next_bws = next_oix;
           insert_object(oix, bws, browse_response.Elements[i], i == 0,
-              i == (int)browse_response.Elements.size() - 1, 0, 0);
+                        i == (int)browse_response.Elements.size() - 1, 0, 0);
           bws = next_bws;
         }
         m_list[oix]->po.flags |= procom_obj_mFlags_Loaded;
-      } else {
+      }
+      else
+      {
         // Error returned from soap
         server_state->RequestCnt++;
         fault();
@@ -747,9 +774,10 @@ void opc_provider::objectName(co_procom* pcom, char* name, pwr_tOix poix)
       delete browse.ItemName;
     }
 
-    for (coix = m_list[oix]->po.fchoix;; coix = m_list[coix]->po.fwsoix) {
-      if (str_NoCaseStrcmp(m_list[coix]->po.name, pn.object[i].name.norm)
-          == 0) {
+    for (coix = m_list[oix]->po.fchoix;; coix = m_list[coix]->po.fwsoix)
+    {
+      if (str_NoCaseStrcmp(m_list[coix]->po.name, pn.object[i].name.norm) == 0)
+      {
         oix = coix;
         found = true;
         break;
@@ -762,9 +790,12 @@ void opc_provider::objectName(co_procom* pcom, char* name, pwr_tOix poix)
       sts = GDH__NOSUCHOBJ;
   }
 
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     objectOid(pcom, oix);
-  } else {
+  }
+  else
+  {
     if (m_env == pvd_eEnv_Wb)
       pcom->provideObject(0, 0, 0, 0, 0, 0, 0, 0, "", "");
     else
@@ -773,60 +804,45 @@ void opc_provider::objectName(co_procom* pcom, char* name, pwr_tOix poix)
 }
 
 // Wb only
-void opc_provider::objectBody(co_procom* pcom, pwr_tOix oix)
-{
-}
+void opc_provider::objectBody(co_procom* pcom, pwr_tOix oix) {}
 
 // Wb only
-void opc_provider::createObject(
-    co_procom* pcom, pwr_tOix destoix, int desttype, pwr_tCid cid, char* name)
-{
-}
+void opc_provider::createObject(co_procom* pcom, pwr_tOix destoix, int desttype, pwr_tCid cid, char* name) {}
 
 // Wb only
-void opc_provider::moveObject(
-    co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, int desttype)
-{
-}
+void opc_provider::moveObject(co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, int desttype) {}
 
 // Wb only
-void opc_provider::deleteObject(co_procom* pcom, pwr_tOix oix)
-{
-}
+void opc_provider::deleteObject(co_procom* pcom, pwr_tOix oix) {}
 
 // Wb only
-void opc_provider::copyObject(
-    co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, int desttype, char* name)
-{
-}
+void opc_provider::copyObject(co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, int desttype, char* name) {}
 
 // Wb only
-void opc_provider::deleteFamily(co_procom* pcom, pwr_tOix oix)
-{
-}
+void opc_provider::deleteFamily(co_procom* pcom, pwr_tOix oix) {}
 
 // Wb only
-void opc_provider::renameObject(co_procom* pcom, pwr_tOix oix, char* name)
-{
-}
+void opc_provider::renameObject(co_procom* pcom, pwr_tOix oix, char* name) {}
 
-void opc_provider::writeAttribute(co_procom* pcom, pwr_tOix oix,
-    unsigned int offset, unsigned int size, char* buffer)
+void opc_provider::writeAttribute(co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size,
+                                  char* buffer)
 {
-  if (oix >= m_list.size() || oix <= 0) {
+  if (oix >= m_list.size() || oix <= 0)
+  {
     pcom->provideStatus(LDH__NOSUCHOBJ);
     return;
   }
 
-  if (offset + size > m_list[oix]->po.body_size) {
+  if (offset + size > m_list[oix]->po.body_size)
+  {
     pcom->provideStatus(LDH__NOSUCHATTR);
     return;
   }
 
-  memcpy((void*)((unsigned long)m_list[oix]->po.body + (unsigned long)offset),
-      buffer, size);
+  memcpy((void*)((unsigned long)m_list[oix]->po.body + (unsigned long)offset), buffer, size);
 
-  switch (m_list[oix]->po.cid) {
+  switch (m_list[oix]->po.cid)
+  {
   case pwr_cClass_Opc_String:
   case pwr_cClass_Opc_Boolean:
   case pwr_cClass_Opc_Float:
@@ -845,34 +861,33 @@ void opc_provider::writeAttribute(co_procom* pcom, pwr_tOix oix,
   case pwr_cClass_Opc_Date:
   case pwr_cClass_Opc_DateTime:
   case pwr_cClass_Opc_Duration:
-  case pwr_cClass_Opc_QName: {
+  case pwr_cClass_Opc_QName:
+  {
     // Value has the same offset for all opctype classes
-    if (offset
-        == (unsigned int)((char*)&((pwr_sClass_Opc_String*)m_list[oix]->po.body)
-                              ->Value
-               - (char*)m_list[oix]->po.body)) {
+    if (offset == (unsigned int)((char*)&((pwr_sClass_Opc_String*)m_list[oix]->po.body)->Value -
+                                 (char*)m_list[oix]->po.body))
+    {
       _s0__Write write;
       _s0__WriteResponse write_response;
       char opc_buffer[2000];
       int opc_type;
 
       s0__ItemValue* item = new s0__ItemValue();
-      item->ItemName = new std::string(cnv_iso8859_to_utf8(
-          m_list[oix]->item_name, strlen(m_list[oix]->item_name) + 1));
+      item->ItemName =
+          new std::string(cnv_iso8859_to_utf8(m_list[oix]->item_name, strlen(m_list[oix]->item_name) + 1));
       opc_pwrtype_to_opctype(m_list[oix]->type, &opc_type);
-      opc_convert_pwrtype_to_opctype(
-          buffer, opc_buffer, sizeof(opc_buffer), opc_type, m_list[oix]->type);
-      item->Value = opc_opctype_to_value(
-          &soap, opc_buffer, sizeof(opc_buffer), opc_type);
+      opc_convert_pwrtype_to_opctype(buffer, opc_buffer, sizeof(opc_buffer), opc_type, m_list[oix]->type);
+      item->Value = opc_opctype_to_value(&soap, opc_buffer, sizeof(opc_buffer), opc_type);
       write.ItemList = new s0__WriteRequestItemList;
       write.ItemList->Items.push_back(item);
 
-      if (soap_call___s0__Write(
-              &soap, opc_endpoint, NULL, &write, &write_response)
-          == SOAP_OK) {
+      if (soap_call___s0__Write(&soap, opc_endpoint, NULL, &write, &write_response) == SOAP_OK)
+      {
         // Check item errors
         server_state->RequestCnt++;
-      } else {
+      }
+      else
+      {
         // Error returned from soap
         server_state->RequestCnt++;
         fault();
@@ -889,20 +904,22 @@ void opc_provider::writeAttribute(co_procom* pcom, pwr_tOix oix,
 }
 
 // Rt only
-void opc_provider::readAttribute(
-    co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size)
+void opc_provider::readAttribute(co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size)
 {
-  if (oix >= m_list.size() || oix <= 0) {
+  if (oix >= m_list.size() || oix <= 0)
+  {
     pcom->provideStatus(GDH__NOSUCHOBJ);
     return;
   }
 
-  if (offset + size > m_list[oix]->po.body_size) {
+  if (offset + size > m_list[oix]->po.body_size)
+  {
     pcom->provideStatus(GDH__NOSUCHOBJ);
     return;
   }
 
-  switch (m_list[oix]->po.cid) {
+  switch (m_list[oix]->po.cid)
+  {
   case pwr_cClass_Opc_String:
   case pwr_cClass_Opc_Boolean:
   case pwr_cClass_Opc_Float:
@@ -921,30 +938,30 @@ void opc_provider::readAttribute(
   case pwr_cClass_Opc_Duration:
   case pwr_cClass_Opc_QName:
     // Value has the same offset for all opctype classes
-    if (offset
-        == (unsigned int)((char*)&((pwr_sClass_Opc_String*)m_list[oix]->po.body)
-                              ->Value
-               - (char*)m_list[oix]->po.body)) {
+    if (offset == (unsigned int)((char*)&((pwr_sClass_Opc_String*)m_list[oix]->po.body)->Value -
+                                 (char*)m_list[oix]->po.body))
+    {
       _s0__Read read;
       _s0__ReadResponse read_response;
 
       s0__ReadRequestItem* item = new s0__ReadRequestItem();
-      item->ItemName = new std::string(cnv_iso8859_to_utf8(
-          m_list[oix]->item_name, strlen(m_list[oix]->item_name) + 1));
+      item->ItemName =
+          new std::string(cnv_iso8859_to_utf8(m_list[oix]->item_name, strlen(m_list[oix]->item_name) + 1));
       read.ItemList = new s0__ReadRequestItemList;
       read.ItemList->Items.push_back(item);
 
-      if (soap_call___s0__Read(&soap, opc_endpoint, NULL, &read, &read_response)
-          == SOAP_OK) {
+      if (soap_call___s0__Read(&soap, opc_endpoint, NULL, &read, &read_response) == SOAP_OK)
+      {
         server_state->RequestCnt++;
-        if (read_response.RItemList
-            && read_response.RItemList->Items.size() > 0) {
-          opc_convert_opctype_to_pwrtype(
-              &((pwr_sClass_Opc_String*)m_list[oix]->po.body)->Value,
-              m_list[oix]->size, read_response.RItemList->Items[0]->Value,
-              (pwr_eType)m_list[oix]->type);
+        if (read_response.RItemList && read_response.RItemList->Items.size() > 0)
+        {
+          opc_convert_opctype_to_pwrtype(&((pwr_sClass_Opc_String*)m_list[oix]->po.body)->Value,
+                                         m_list[oix]->size, read_response.RItemList->Items[0]->Value,
+                                         (pwr_eType)m_list[oix]->type);
         }
-      } else {
+      }
+      else
+      {
         // Error returned from soap
         server_state->RequestCnt++;
         fault();
@@ -956,23 +973,24 @@ void opc_provider::readAttribute(
     break;
   }
 
-  void* p
-      = (void*)((unsigned long)m_list[oix]->po.body + (unsigned long)offset);
+  void* p = (void*)((unsigned long)m_list[oix]->po.body + (unsigned long)offset);
   pcom->provideAttr(GDH__SUCCESS, oix, size, p);
 }
 
 // Rt only
-void opc_provider::subAssociateBuffer(
-    co_procom* pcom, void** buff, int oix, int offset, int size, pwr_tSubid sid)
+void opc_provider::subAssociateBuffer(co_procom* pcom, void** buff, int oix, int offset, int size,
+                                      pwr_tSubid sid)
 {
-  if (oix >= (int)m_list.size()) {
+  if (oix >= (int)m_list.size())
+  {
     *buff = 0;
     return;
   }
 
   *buff = (char*)m_list[oix]->po.body + offset;
 
-  switch (m_list[oix]->po.cid) {
+  switch (m_list[oix]->po.cid)
+  {
   case pwr_cClass_Opc_String:
   case pwr_cClass_Opc_Boolean:
   case pwr_cClass_Opc_Float:
@@ -992,7 +1010,8 @@ void opc_provider::subAssociateBuffer(
   case pwr_cClass_Opc_Date:
   case pwr_cClass_Opc_Duration:
   case pwr_cClass_Opc_QName:
-    if (*buff == ((pwr_sClass_Opc_String*)m_list[oix]->po.body)->Value) {
+    if (*buff == ((pwr_sClass_Opc_String*)m_list[oix]->po.body)->Value)
+    {
       // Add opc subscription
       _s0__Subscribe subscribe;
       _s0__SubscribeResponse subscribe_response;
@@ -1004,8 +1023,8 @@ void opc_provider::subAssociateBuffer(
 
       subscribe.ItemList = new s0__SubscribeRequestItemList();
       s0__SubscribeRequestItem* ritem = new s0__SubscribeRequestItem();
-      ritem->ItemName = new std::string(cnv_iso8859_to_utf8(
-          m_list[oix]->item_name, strlen(m_list[oix]->item_name) + 1));
+      ritem->ItemName =
+          new std::string(cnv_iso8859_to_utf8(m_list[oix]->item_name, strlen(m_list[oix]->item_name) + 1));
       sprintf(handle, "%d", oix);
       ritem->ClientItemHandle = new std::string(handle);
       ritem->RequestedSamplingRate = (int*)malloc(sizeof(int));
@@ -1013,26 +1032,28 @@ void opc_provider::subAssociateBuffer(
 
       subscribe.ItemList->Items.push_back(ritem);
 
-      if (soap_call___s0__Subscribe(
-              &soap, opc_endpoint, NULL, &subscribe, &subscribe_response)
-          == SOAP_OK) {
+      if (soap_call___s0__Subscribe(&soap, opc_endpoint, NULL, &subscribe, &subscribe_response) == SOAP_OK)
+      {
         opcprv_sub sub;
 
         server_state->RequestCnt++;
-        if (subscribe_response.ServerSubHandle) {
+        if (subscribe_response.ServerSubHandle)
+        {
           sub.handle = *subscribe_response.ServerSubHandle;
           sub.oix = oix;
           m_sublist[sid.rix] = sub;
 
-          if (subscribe_response.RItemList
-              && subscribe_response.RItemList->Items.size()) {
-            for (int i = 0; i < (int)subscribe_response.RItemList->Items.size();
-                 i++) {
+          if (subscribe_response.RItemList && subscribe_response.RItemList->Items.size())
+          {
+            for (int i = 0; i < (int)subscribe_response.RItemList->Items.size(); i++)
+            {
               // subscribe_response.RItemList->Items[i]->ItemValue...
             }
           }
         }
-      } else {
+      }
+      else
+      {
         // Error returned from soap
         server_state->RequestCnt++;
         fault();
@@ -1052,18 +1073,21 @@ void opc_provider::subAssociateBuffer(
 void opc_provider::subDisassociateBuffer(co_procom* pcom, pwr_tSubid sid)
 {
   sublist_iterator it = m_sublist.find(sid.rix);
-  if (it != m_sublist.end()) {
+  if (it != m_sublist.end())
+  {
     // Cancel subscription
     _s0__SubscriptionCancel subcancel;
     _s0__SubscriptionCancelResponse subcancel_response;
 
     subcancel.ServerSubHandle = new std::string(it->second.handle);
 
-    if (soap_call___s0__SubscriptionCancel(
-            &soap, opc_endpoint, NULL, &subcancel, &subcancel_response)
-        == SOAP_OK) {
+    if (soap_call___s0__SubscriptionCancel(&soap, opc_endpoint, NULL, &subcancel, &subcancel_response) ==
+        SOAP_OK)
+    {
       server_state->RequestCnt++;
-    } else {
+    }
+    else
+    {
       // Error returned from soap
       server_state->RequestCnt++;
       fault();
@@ -1082,67 +1106,76 @@ void opc_provider::cyclic(co_procom* pcom)
   _s0__SubscriptionPolledRefresh subpoll;
   _s0__SubscriptionPolledRefreshResponse subpoll_response;
 
-  for (sublist_iterator it = m_sublist.begin(); it != m_sublist.end(); it++) {
+  for (sublist_iterator it = m_sublist.begin(); it != m_sublist.end(); it++)
+  {
     subpoll.ServerSubHandles.push_back(it->second.handle);
     size++;
   }
 
-  if (size) {
-    if (soap_call___s0__SubscriptionPolledRefresh(
-            &soap, opc_endpoint, NULL, &subpoll, &subpoll_response)
-        == SOAP_OK) {
+  if (size)
+  {
+    if (soap_call___s0__SubscriptionPolledRefresh(&soap, opc_endpoint, NULL, &subpoll, &subpoll_response) ==
+        SOAP_OK)
+    {
       server_state->RequestCnt++;
-      if ((int)subpoll_response.RItemList.size() != size) {
+      if ((int)subpoll_response.RItemList.size() != size)
+      {
         return;
       }
 
       int idx = 0;
-      for (sublist_iterator it = m_sublist.begin(); it != m_sublist.end();
-           it++) {
-        if (subpoll_response.RItemList[idx]->Items.size()) {
-          if (subpoll_response.RItemList[idx]->Items[0]->ResultID) {
+      for (sublist_iterator it = m_sublist.begin(); it != m_sublist.end(); it++)
+      {
+        if (subpoll_response.RItemList[idx]->Items.size())
+        {
+          if (subpoll_response.RItemList[idx]->Items[0]->ResultID)
+          {
             int code;
-            if (opc_string_to_resultcode((char*)subpoll_response.RItemList[idx]
-                                             ->Items[0]
-                                             ->ResultID->c_str(),
-                    &code)) {
-              if (code == opc_eResultCode_E_NOSUBSCRIPTION) {
+            if (opc_string_to_resultcode((char*)subpoll_response.RItemList[idx]->Items[0]->ResultID->c_str(),
+                                         &code))
+            {
+              if (code == opc_eResultCode_E_NOSUBSCRIPTION)
+              {
                 // Subscription removed, add new subscription
                 reconnect = true;
                 break;
-              } else {
+              }
+              else
+              {
                 server_state->LastError = code;
                 server_state->ErrorRequestCnt = server_state->RequestCnt;
               }
             }
-          } else {
+          }
+          else
+          {
             pwr_tOix oix = it->second.oix;
             opc_convert_opctype_to_pwrtype(
-                (void*)((pwr_sClass_Opc_String*)m_list[oix]->po.body)->Value,
-                m_list[oix]->size,
-                subpoll_response.RItemList[idx]->Items[0]->Value,
-                (pwr_eType)m_list[oix]->type);
+                (void*)((pwr_sClass_Opc_String*)m_list[oix]->po.body)->Value, m_list[oix]->size,
+                subpoll_response.RItemList[idx]->Items[0]->Value, (pwr_eType)m_list[oix]->type);
           }
         }
         idx++;
       }
 
-      if (reconnect) {
+      if (reconnect)
+      {
         int idx = 0;
         std::map<pwr_tUInt32, opcprv_sub> sublist_add;
         std::map<pwr_tUInt32, opcprv_sub> sublist_erase;
 
-        for (sublist_iterator it = m_sublist.begin(); it != m_sublist.end();
-             it++) {
-          if (subpoll_response.RItemList[idx]->Items.size()) {
-            if (subpoll_response.RItemList[idx]->Items[0]->ResultID) {
+        for (sublist_iterator it = m_sublist.begin(); it != m_sublist.end(); it++)
+        {
+          if (subpoll_response.RItemList[idx]->Items.size())
+          {
+            if (subpoll_response.RItemList[idx]->Items[0]->ResultID)
+            {
               int code;
               if (opc_string_to_resultcode(
-                      (char*)subpoll_response.RItemList[idx]
-                          ->Items[0]
-                          ->ResultID->c_str(),
-                      &code)) {
-                if (code == opc_eResultCode_E_NOSUBSCRIPTION) {
+                      (char*)subpoll_response.RItemList[idx]->Items[0]->ResultID->c_str(), &code))
+              {
+                if (code == opc_eResultCode_E_NOSUBSCRIPTION)
+                {
                   // Subscription removed, add new subscription
                   server_state->LastError = code;
                   server_state->ErrorRequestCnt = server_state->RequestCnt;
@@ -1153,16 +1186,13 @@ void opc_provider::cyclic(co_procom* pcom)
                   pwr_tUInt32 rix = it->first;
 
                   subscribe.Options = new s0__RequestOptions();
-                  subscribe.Options->ReturnItemTime
-                      = (bool*)malloc(sizeof(bool));
+                  subscribe.Options->ReturnItemTime = (bool*)malloc(sizeof(bool));
                   *subscribe.Options->ReturnItemTime = true;
 
                   subscribe.ItemList = new s0__SubscribeRequestItemList();
-                  s0__SubscribeRequestItem* ritem
-                      = new s0__SubscribeRequestItem();
+                  s0__SubscribeRequestItem* ritem = new s0__SubscribeRequestItem();
                   ritem->ItemName = new std::string(
-                      cnv_iso8859_to_utf8(m_list[oix]->item_name,
-                          strlen(m_list[oix]->item_name) + 1));
+                      cnv_iso8859_to_utf8(m_list[oix]->item_name, strlen(m_list[oix]->item_name) + 1));
                   ritem->ClientItemHandle = new std::string(it->second.handle);
                   ritem->RequestedSamplingRate = (int*)malloc(sizeof(int));
                   *ritem->RequestedSamplingRate = 1000;
@@ -1174,9 +1204,9 @@ void opc_provider::cyclic(co_procom* pcom)
 
                   printf("Reconnect: %s\n", m_list[oix]->item_name);
 
-                  if (soap_call___s0__Subscribe(&soap, opc_endpoint, NULL,
-                          &subscribe, &subscribe_response)
-                      == SOAP_OK) {
+                  if (soap_call___s0__Subscribe(&soap, opc_endpoint, NULL, &subscribe, &subscribe_response) ==
+                      SOAP_OK)
+                  {
                     opcprv_sub sub;
 
                     // Insert new subscription with new handle
@@ -1187,15 +1217,16 @@ void opc_provider::cyclic(co_procom* pcom)
 
                     server_state->RequestCnt++;
 
-                    if (subscribe_response.RItemList
-                        && subscribe_response.RItemList->Items.size()) {
-                      for (int i = 0;
-                           i < (int)subscribe_response.RItemList->Items.size();
-                           i++) {
+                    if (subscribe_response.RItemList && subscribe_response.RItemList->Items.size())
+                    {
+                      for (int i = 0; i < (int)subscribe_response.RItemList->Items.size(); i++)
+                      {
                         // subscribe_response.RItemList->Items[i]->ItemValue...
                       }
                     }
-                  } else {
+                  }
+                  else
+                  {
                     // Error returned from soap
                     server_state->RequestCnt++;
                     fault();
@@ -1215,17 +1246,19 @@ void opc_provider::cyclic(co_procom* pcom)
         idx++;
 
         // Remove old subscriptions to m_sublist
-        for (sublist_iterator it = sublist_erase.begin();
-             it != sublist_erase.end(); it++) {
+        for (sublist_iterator it = sublist_erase.begin(); it != sublist_erase.end(); it++)
+        {
           m_sublist.erase(it->first);
         }
         // Add new subscriptions to m_sublist
-        for (sublist_iterator it = sublist_add.begin(); it != sublist_add.end();
-             it++) {
+        for (sublist_iterator it = sublist_add.begin(); it != sublist_add.end(); it++)
+        {
           m_sublist[it->first] = it->second;
         }
       }
-    } else {
+    }
+    else
+    {
       // Error returned from soap
       server_state->RequestCnt++;
       fault();
@@ -1265,20 +1298,23 @@ char* opc_provider::longname(pwr_tOix oix)
 {
   if (m_list[oix]->po.fthoix == 0)
     strcpy(m_list[oix]->po.lname, m_list[oix]->po.name);
-  else {
-    strcpy(m_list[oix]->po.lname, longname(m_list[oix]->po.fthoix));
-    strcat(m_list[oix]->po.lname, "-");
-    strcat(m_list[oix]->po.lname, m_list[oix]->po.name);
+  else
+  {
+    char tmp[sizeof(m_list[oix]->po.lname)];
+    snprintf(tmp, sizeof(tmp), "%s-%s", longname(m_list[oix]->po.fthoix), m_list[oix]->po.name);
+    strcpy(m_list[oix]->po.lname, tmp);
   }
   return m_list[oix]->po.lname;
 }
 
 bool opc_provider::find(pwr_tOix fthoix, char* name, pwr_tOix* oix)
 {
-  for (int i = 0; i < (int)m_list.size(); i++) {
-    if (!(m_list[i]->po.flags & procom_obj_mFlags_Deleted)) {
-      if (m_list[i]->po.fthoix == fthoix
-          && str_NoCaseStrcmp(name, m_list[i]->po.name) == 0) {
+  for (int i = 0; i < (int)m_list.size(); i++)
+  {
+    if (!(m_list[i]->po.flags & procom_obj_mFlags_Deleted))
+    {
+      if (m_list[i]->po.fthoix == fthoix && str_NoCaseStrcmp(name, m_list[i]->po.name) == 0)
+      {
         *oix = m_list[i]->po.oix;
         return true;
       }
@@ -1293,21 +1329,18 @@ void opc_provider::get_server_state()
   _s0__GetStatusResponse get_status_response;
   get_status.ClientRequestHandle = new std::string("Opc Client");
 
-  if (soap_call___s0__GetStatus(
-          &soap, opc_endpoint, NULL, &get_status, &get_status_response)
-      == SOAP_OK) {
+  if (soap_call___s0__GetStatus(&soap, opc_endpoint, NULL, &get_status, &get_status_response) == SOAP_OK)
+  {
     server_state->RequestCnt++;
     if (get_status_response.Status->VendorInfo)
-      strcpy(server_state->VendorInfo,
-          get_status_response.Status->VendorInfo->c_str());
+      strcpy(server_state->VendorInfo, get_status_response.Status->VendorInfo->c_str());
     if (get_status_response.Status->ProductVersion)
-      strcpy(server_state->ProductVersion,
-          get_status_response.Status->ProductVersion->c_str());
-    opc_time_OPCAsciiToA((char*)get_status_response.Status->StartTime.c_str(),
-        &server_state->StartTime);
-    server_state->ServerState
-        = get_status_response.GetStatusResult->ServerState;
-  } else {
+      strcpy(server_state->ProductVersion, get_status_response.Status->ProductVersion->c_str());
+    opc_time_OPCAsciiToA((char*)get_status_response.Status->StartTime.c_str(), &server_state->StartTime);
+    server_state->ServerState = get_status_response.GetStatusResult->ServerState;
+  }
+  else
+  {
     server_state->RequestCnt++;
     server_state->ServerState = s0__serverState__commFault;
     fault();
@@ -1323,12 +1356,12 @@ char* opc_provider::name_to_objectname(char* name)
   static char n[32];
   char *s, *t;
 
-  for (s = name, t = n; *s; s++) {
+  for (s = name, t = n; *s; s++)
+  {
     if (t - n >= (int)sizeof(n) - 1)
       break;
 
-    if (*s == '[' || *s == ']' || *s == '-' || *s == '/' || *s == '.' 
-	|| *s == ' ')
+    if (*s == '[' || *s == ']' || *s == '-' || *s == '/' || *s == '.' || *s == ' ')
       *t = '$';
     else
       *t = *s;
@@ -1338,8 +1371,7 @@ char* opc_provider::name_to_objectname(char* name)
   return n;
 }
 
-void opc_provider::errlog(
-    std::string* item, std::vector<s0__OPCError*>& errvect)
+void opc_provider::errlog(std::string* item, std::vector<s0__OPCError*>& errvect)
 {
   for (int i = 0; i < (int)errvect.size(); i++)
     printf("OPC Error: %s  %s\n", item->c_str(), errvect[i]->ID.c_str());
@@ -1364,7 +1396,8 @@ int main(int argc, char* argv[])
   int server_id;
 
   /* Read arguments */
-  if (argc < 4) {
+  if (argc < 4)
+  {
     usage();
     exit(0);
   }
@@ -1372,13 +1405,16 @@ int main(int argc, char* argv[])
   strncpy(extern_vid, argv[2], sizeof(extern_vid));
   strncpy(extern_volume_name, argv[3], sizeof(extern_volume_name));
 
-  if (argc >= 5) {
+  if (argc >= 5)
+  {
     sts = sscanf(argv[4], "%d", &server_id);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       usage();
       exit(0);
     }
-  } else
+  }
+  else
     server_id = 200;
 
   strcpy(opc_endpoint, server_url);
@@ -1387,12 +1423,12 @@ int main(int argc, char* argv[])
 
   opc_provider provider(pvd_eEnv_Rt);
   rt_procom procom(&provider,
-      errh_eNAnix, // Application index
-      "opc_provider", // Process name
-      server_id, // Sid
-      opc_vid, // Vid
-      opc_vname, // Volume name
-      0); // Global
+                   errh_eNAnix,    // Application index
+                   "opc_provider", // Process name
+                   server_id,      // Sid
+                   opc_vid,        // Vid
+                   opc_vname,      // Volume name
+                   0);             // Global
 
   procom.init();
 

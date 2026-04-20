@@ -47,26 +47,27 @@
 #include "pwr.h"
 #include "co_tree.h"
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(name, 1), pwr_Bits(naddr, 1), pwr_Bits(port, 1),
-      pwr_Bits(flags, 1), pwr_Bits(fill_0, 4), , , ,
+  pwr_32Bits(pwr_Bits(name, 1), pwr_Bits(naddr, 1), pwr_Bits(port, 1), pwr_Bits(flags, 1),
+             pwr_Bits(fill_0, 4), , , ,
 
-      pwr_Bits(fill_1, 8), , , , , , , , pwr_Bits(idx, 8), , , , , , , ,
-      pwr_Bits(type, 8), , , , , , , ) b;
+             pwr_Bits(fill_1, 8), , , , , , , , pwr_Bits(idx, 8), , , , , , , , pwr_Bits(type, 8), , , , , ,
+             , ) b;
 
 #define qini_mNode__ 0
 #define qini_mNode_name pwr_Bit(0)
 #define qini_mNode_naddr pwr_Bit(1)
 #define qini_mNode_last pwr_Bit(2)
-#define qini_mNode_sequence                                                    \
-  (qini_mSeg_first | qini_mSeg_middle | qini_mSeg_last)
+#define qini_mNode_sequence (qini_mSeg_first | qini_mSeg_middle | qini_mSeg_last)
 
 #define qini_mNode_ (~qini_mNode__)
 
 } qini_mNode;
 
-typedef struct {
+typedef struct
+{
   tree_sNode tree;
   pwr_tNodeId nid;
   qini_mNode flags;
@@ -86,7 +87,6 @@ typedef struct {
 } qini_sNode;
 
 int qini_ParseFile(FILE*, tree_sTable*, int*, int*, int*);
-pwr_tBoolean qini_BuildDb(
-    pwr_tStatus*, tree_sTable*, qini_sNode*, void*, qcom_tBus);
+pwr_tBoolean qini_BuildDb(pwr_tStatus*, tree_sTable*, qini_sNode*, void*, qcom_tBus);
 
 #endif

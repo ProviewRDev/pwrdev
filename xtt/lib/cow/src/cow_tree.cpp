@@ -52,16 +52,12 @@
 #include "cow_tree.h"
 #include "cow_treenav.h"
 
-CowTree::~CowTree()
-{
-}
+CowTree::~CowTree() {}
 
-CowTree::CowTree(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist,
-    int xn_item_cnt, unsigned int xn_options,
-    pwr_tStatus (*xn_get_object_info_cb)(
-        void*, pwr_tAttrRef*, char*, int, char*, char*, int),
-    pwr_tStatus (*xn_get_node_info_cb)(void*, char*, char*, int),
-    pwr_tStatus (*xn_action_cb)(void*, pwr_tAttrRef*))
+CowTree::CowTree(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist, int xn_item_cnt, unsigned int xn_options,
+                 pwr_tStatus (*xn_get_object_info_cb)(void*, pwr_tAttrRef*, char*, int, char*, char*, int),
+                 pwr_tStatus (*xn_get_node_info_cb)(void*, char*, char*, int),
+                 pwr_tStatus (*xn_action_cb)(void*, pwr_tAttrRef*))
     : parent_ctx(xn_parent_ctx), close_cb(0), wow(0)
 {
   get_object_info_cb = xn_get_object_info_cb;
@@ -108,15 +104,9 @@ void CowTree::activate_zoom_out()
   treenav->zoom(1.0 / 1.18);
 }
 
-void CowTree::activate_zoom_reset()
-{
-  treenav->unzoom();
-}
+void CowTree::activate_zoom_reset() { treenav->unzoom(); }
 
-void CowTree::activate_help()
-{
-  CoXHelp::dhelp("overview", "", navh_eHelpFile_Base, NULL, 0);
-}
+void CowTree::activate_help() { CoXHelp::dhelp("overview", "", navh_eHelpFile_Base, NULL, 0); }
 
 int CowTree::activate_button_ok()
 {
@@ -124,14 +114,17 @@ int CowTree::activate_button_ok()
   pwr_tAttrRef aref;
   pwr_tStatus sts = 0;
 
-  if (!treenav->get_select(&item)) {
+  if (!treenav->get_select(&item))
+  {
     message('E', "Select an object");
     return 0;
   }
 
-  switch (item->type) {
+  switch (item->type)
+  {
   case treenav_eItemType_Object:
-  case treenav_eItemType_TreeObject: {
+  case treenav_eItemType_TreeObject:
+  {
     TreeNav_object* hi = &((TrItemObject*)item)->item;
 
     aref = hi->aref;
@@ -152,14 +145,17 @@ int CowTree::get_select_cb(void* ctx, pwr_tAttrRef* aref)
   CowTree* cowtree = (CowTree*)ctx;
   TrItemBase* item;
 
-  if (!cowtree->treenav->get_select(&item)) {
+  if (!cowtree->treenav->get_select(&item))
+  {
     cowtree->message('E', "Select an storage item");
     return 0;
   }
 
-  switch (item->type) {
+  switch (item->type)
+  {
   case treenav_eItemType_Object:
-  case treenav_eItemType_TreeObject: {
+  case treenav_eItemType_TreeObject:
+  {
     TreeNav_object* hi = &((TrItemObject*)item)->item;
 
     *aref = hi->aref;
@@ -171,17 +167,15 @@ int CowTree::get_select_cb(void* ctx, pwr_tAttrRef* aref)
   return 1;
 }
 
-pwr_tStatus CowTree::get_object_info(void* ctx, pwr_tAttrRef* aref, char* name,
-    int nsize, char* cname, char* descr, int dsize)
+pwr_tStatus CowTree::get_object_info(void* ctx, pwr_tAttrRef* aref, char* name, int nsize, char* cname,
+                                     char* descr, int dsize)
 {
   CowTree* cowtree = (CowTree*)ctx;
 
-  return (cowtree->get_object_info_cb)(
-      cowtree->parent_ctx, aref, name, nsize, cname, descr, dsize);
+  return (cowtree->get_object_info_cb)(cowtree->parent_ctx, aref, name, nsize, cname, descr, dsize);
 }
 
-pwr_tStatus CowTree::get_node_info(
-    void* ctx, char* name, char* descr, int dsize)
+pwr_tStatus CowTree::get_node_info(void* ctx, char* name, char* descr, int dsize)
 {
   CowTree* cowtree = (CowTree*)ctx;
 

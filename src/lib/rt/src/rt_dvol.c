@@ -44,8 +44,7 @@
 
 /* Adopt an object.  */
 
-static gdb_sObject* adoptObject(
-    pwr_tStatus* sts, gdb_sObject* op, gdb_sObject* pop, cvol_sNotify* nmp)
+static gdb_sObject* adoptObject(pwr_tStatus* sts, gdb_sObject* op, gdb_sObject* pop, cvol_sNotify* nmp)
 {
   gdb_AssumeLocked;
 
@@ -59,9 +58,12 @@ static gdb_sObject* adoptObject(
   hash_Insert(sts, gdbroot->family_ht, op);
   op->l.flags.b.inFamilyTab = 1;
 
-  if (nmp != NULL) {
-    switch (nmp->subtype) {
-    case net_eMsg_createObject: {
+  if (nmp != NULL)
+  {
+    switch (nmp->subtype)
+    {
+    case net_eMsg_createObject:
+    {
       net_sCreateObject* cp = &nmp->msg.c;
 
       cp->sib.flink = op->g.sib.flink;
@@ -75,7 +77,8 @@ static gdb_sObject* adoptObject(
 
       break;
     }
-    case net_eMsg_moveObject: {
+    case net_eMsg_moveObject:
+    {
       net_sMoveObject* mp = &nmp->msg.m;
 
       mp->sib = op->g.sib;
@@ -100,14 +103,16 @@ static gdb_sObject* adoptObject(
 
 /* Unadopt an object.  */
 
-static gdb_sObject* unadoptObject(
-    pwr_tStatus* sts, gdb_sObject* op, gdb_sObject* pop, cvol_sNotify* nmp)
+static gdb_sObject* unadoptObject(pwr_tStatus* sts, gdb_sObject* op, gdb_sObject* pop, cvol_sNotify* nmp)
 {
   gdb_AssumeLocked;
 
-  if (nmp != NULL) {
-    switch (nmp->subtype) {
-    case net_eMsg_deleteObject: {
+  if (nmp != NULL)
+  {
+    switch (nmp->subtype)
+    {
+    case net_eMsg_deleteObject:
+    {
       net_sDeleteObject* dp = &nmp->msg.d;
 
       dp->sib.flink = op->g.sib.flink;
@@ -117,7 +122,8 @@ static gdb_sObject* unadoptObject(
 
       break;
     }
-    case net_eMsg_moveObject: {
+    case net_eMsg_moveObject:
+    {
       net_sMoveObject* mp = &nmp->msg.m;
 
       mp->osib.flink = op->g.sib.flink;
@@ -134,12 +140,15 @@ static gdb_sObject* unadoptObject(
 
   vol_RemoveSiblist(sts, op, pop);
 
-  if (nmp != NULL) {
+  if (nmp != NULL)
+  {
     /* Copying the parent must be deferred until after the unadopt,
        since parent might be affected by that... */
 
-    switch (nmp->subtype) {
-    case net_eMsg_deleteObject: {
+    switch (nmp->subtype)
+    {
+    case net_eMsg_deleteObject:
+    {
       net_sDeleteObject* dp = &nmp->msg.d;
 
       dp->par.oid = pop->g.oid;
@@ -147,7 +156,8 @@ static gdb_sObject* unadoptObject(
 
       break;
     }
-    case net_eMsg_moveObject: {
+    case net_eMsg_moveObject:
+    {
       net_sMoveObject* mp = &nmp->msg.m;
 
       mp->opar.oid = pop->g.oid;
@@ -171,13 +181,13 @@ static gdb_sObject* unadoptObject(
    is allocated for the object which must not
    exist. All reachable nodes are notified about this new object.  */
 
-gdb_sObject* dvol_CreateObject(pwr_tStatus* sts, cdh_sParseName* pn,
-    pwr_tClassId cid, pwr_tUInt32 size, pwr_tObjid oid /* Requested objid, */
-    )
+gdb_sObject* dvol_CreateObject(pwr_tStatus* sts, cdh_sParseName* pn, pwr_tClassId cid, pwr_tUInt32 size,
+                               pwr_tObjid oid /* Requested objid, */
+)
 {
   static cvol_sNotify cm; /* Cannot be on the stack for VAXELN */
-  pwr_tObjid poid; /* Objid of parent (or pwr_cNObjid) */
-  pwr_tInt32 size2; /* Size of the new object */
+  pwr_tObjid poid;        /* Objid of parent (or pwr_cNObjid) */
+  pwr_tInt32 size2;       /* Size of the new object */
   gdb_sClass* cp;
   gdb_sObject* tmp_op;
   gdb_sObject* op;
@@ -201,7 +211,8 @@ gdb_sObject* dvol_CreateObject(pwr_tStatus* sts, cdh_sParseName* pn,
   /* Check parent.  */
 
   pop = vol_NameToParentObject(sts, pn, gdb_mLo_dynamic, vol_mTrans_all);
-  if (pop == NULL) {
+  if (pop == NULL)
+  {
     if (pn->nObject > 1)
       pwr_Return(NULL, sts, GDH__BADPARENT);
 
@@ -212,11 +223,12 @@ gdb_sObject* dvol_CreateObject(pwr_tStatus* sts, cdh_sParseName* pn,
     else
       poid.vid = oid.vid;
 
-    pop = vol_OidToObject(
-        sts, poid, gdb_mLo_dynamic, vol_mTrans_all, cvol_eHint_none);
+    pop = vol_OidToObject(sts, poid, gdb_mLo_dynamic, vol_mTrans_all, cvol_eHint_none);
     if (pop == NULL)
       return NULL;
-  } else {
+  }
+  else
+  {
     poid = pop->g.oid;
     if (cdh_ObjidIsNotNull(oid) && oid.vid != pop->g.oid.vid)
       pwr_Return(NULL, sts, GDH__BADPARENT);
@@ -232,8 +244,7 @@ gdb_sObject* dvol_CreateObject(pwr_tStatus* sts, cdh_sParseName* pn,
   /* Make sure that the name is unique.  */
 
   pn->object[pn->nObject - 1].poid = poid;
-  if (hash_Search(sts, gdbroot->family_ht, &pn->object[pn->nObject - 1])
-      != NULL)
+  if (hash_Search(sts, gdbroot->family_ht, &pn->object[pn->nObject - 1]) != NULL)
     pwr_Return(NULL, sts, GDH__DUPLNAME);
 
   if (cdh_ObjidIsNull(oid))
@@ -242,12 +253,13 @@ gdb_sObject* dvol_CreateObject(pwr_tStatus* sts, cdh_sParseName* pn,
   if (hash_Search(sts, gdbroot->oid_ht, &oid) != NULL)
     return NULL;
 
-  tmp_op = op = gdb_AddObject(sts, pn->object[pn->nObject - 1].name.orig, oid,
-      cid, size2, poid, net_mGo__, pwr_cNObjid);
+  tmp_op = op = gdb_AddObject(sts, pn->object[pn->nObject - 1].name.orig, oid, cid, size2, poid, net_mGo__,
+                              pwr_cNObjid);
   if (op == NULL)
     return NULL;
 
-  do {
+  do
+  {
     /* We have alloced an object header.
        Free it if something happens.  */
 
@@ -300,8 +312,7 @@ pwr_tBoolean dvol_DeleteObject(pwr_tStatus* sts, pwr_tObjid oid)
   if (oid.oix == pwr_cNObjectIx)
     pwr_Return(FALSE, sts, GDH__VOLDELETE);
 
-  op = vol_OidToObject(
-      sts, oid, gdb_mLo_dynamic, vol_mTrans_none, cvol_eHint_none);
+  op = vol_OidToObject(sts, oid, gdb_mLo_dynamic, vol_mTrans_none, cvol_eHint_none);
   if (op == NULL)
     return FALSE;
 
@@ -334,12 +345,13 @@ pwr_tBoolean dvol_DeleteObject(pwr_tStatus* sts, pwr_tObjid oid)
    All reachable nodes, who have mounted the volume in question,
    are notified about the removal of this object.  */
 
-static pwr_tBoolean delete_children(pwr_tStatus *sts, gdb_sObject *op)
+static pwr_tBoolean delete_children(pwr_tStatus* sts, gdb_sObject* op)
 {
-  while (op->g.flags.b.isParent) {
+  while (op->g.flags.b.isParent)
+  {
     if (!dvol_DeleteObjectTree(sts, op->g.soid))
       return FALSE;
-  }	
+  }
   pwr_Return(TRUE, sts, GDH__SUCCESS);
 }
 
@@ -356,15 +368,14 @@ pwr_tBoolean dvol_DeleteObjectTree(pwr_tStatus* sts, pwr_tObjid oid)
   if (oid.oix == pwr_cNObjectIx)
     pwr_Return(FALSE, sts, GDH__VOLDELETE);
 
-  op = vol_OidToObject(
-      sts, oid, gdb_mLo_dynamic, vol_mTrans_none, cvol_eHint_none);
+  op = vol_OidToObject(sts, oid, gdb_mLo_dynamic, vol_mTrans_none, cvol_eHint_none);
   if (op == NULL)
     return FALSE;
 
-  if (op->g.flags.b.isParent && cdh_ObjidIsNotNull(op->g.soid)) {
+  if (op->g.flags.b.isParent && cdh_ObjidIsNotNull(op->g.soid))
+  {
     if (!delete_children(sts, op))
       return FALSE;
-
   }
 
   p_op = pool_Address(NULL, gdbroot->pool, op->l.por);
@@ -429,8 +440,9 @@ gdb_sObject* dvol_MoveObject(pwr_tStatus* sts, pwr_tObjid oid, pwr_tObjid poid)
     pwr_Return(op, sts, GDH__SUCCESS);
 
   for (/* Detect potential hierarchy loops.  */
-      tmp_op = old_pop; tmp_op != NULL && tmp_op->g.oid.oix != pwr_cNObjectIx;
-      tmp_op = pool_Address(sts, gdbroot->pool, tmp_op->l.por)) {
+       tmp_op = old_pop; tmp_op != NULL && tmp_op->g.oid.oix != pwr_cNObjectIx;
+       tmp_op = pool_Address(sts, gdbroot->pool, tmp_op->l.por))
+  {
     if (tmp_op == op) /* Loop detected! */
       pwr_Return(NULL, sts, GDH__CHILDSELF);
   }
@@ -467,8 +479,7 @@ gdb_sObject* dvol_MoveObject(pwr_tStatus* sts, pwr_tObjid oid, pwr_tObjid poid)
    All reachable nodes, who have mounted the volume in question,
    are notified about the renaming of this object.  */
 
-gdb_sObject* dvol_RenameObject(
-    pwr_tStatus* sts, pwr_tObjid oid, cdh_sParseName* pn)
+gdb_sObject* dvol_RenameObject(pwr_tStatus* sts, pwr_tObjid oid, cdh_sParseName* pn)
 {
   static cvol_sNotify rm; /* Cannot be on the stack for VAXELN */
 

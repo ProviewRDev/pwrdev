@@ -47,43 +47,26 @@
 /*----------------------------------------------------------------------------*\
    Init method for the Powerlink module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
    Read method for the Powerlink module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
    Write method for the Powerlink module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
    Close method for the Powerlink module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
-pwr_dExport pwr_BindIoMethods(Epl_CNServerModule)
-    = { pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardRead),
-        pwr_BindIoMethod(IoCardWrite), pwr_BindIoMethod(IoCardClose),
-        pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Epl_CNServerModule) = {
+    pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardRead), pwr_BindIoMethod(IoCardWrite),
+    pwr_BindIoMethod(IoCardClose), pwr_NullMethod};

@@ -58,15 +58,12 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-RtMonGtk::RtMonGtk(void* rtmon_parent_ctx, GtkWidget* rtmon_parent_wid,
-    const char* rtmon_name, const char* rtmon_display, pwr_tStatus* status)
-    : RtMon(rtmon_parent_ctx, rtmon_name, rtmon_display, status),
-      parent_wid(rtmon_parent_wid), clock_cursor(0), timerid(0),
-      old_status(9999)
+RtMonGtk::RtMonGtk(void* rtmon_parent_ctx, GtkWidget* rtmon_parent_wid, const char* rtmon_name,
+                   const char* rtmon_display, pwr_tStatus* status)
+    : RtMon(rtmon_parent_ctx, rtmon_name, rtmon_display, status), parent_wid(rtmon_parent_wid),
+      clock_cursor(0), timerid(0), old_status(9999)
 {
   char nodename[80];
   char title[200];
@@ -77,13 +74,12 @@ RtMonGtk::RtMonGtk(void* rtmon_parent_ctx, GtkWidget* rtmon_parent_wid,
   strcat(title, " ");
   strcat(title, rtmon_name);
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 340,
-      "default-width", 480, "title", title, NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 340, "default-width", 480, "title",
+                                      title, NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(
-      toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
   int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
 
@@ -93,29 +89,24 @@ RtMonGtk::RtMonGtk(void* rtmon_parent_ctx, GtkWidget* rtmon_parent_wid,
 
   // Menu
   // Accelerators
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File entry
-  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Close"));
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Close"));
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   // GtkWidget *file_reset = gtk_menu_item_new_with_mnemonic(
   // CoWowGtk::translate_utf8("_Reset Runtime"));
   // g_signal_connect(file_reset, "activate", G_CALLBACK(activate_reset), this);
 
-  file_xtt = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Start Runtime Navigator"));
+  file_xtt = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Start Runtime Navigator"));
   g_signal_connect(file_xtt, "activate", G_CALLBACK(activate_xtt), this);
 
-  file_op = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Start Operator Environment"));
+  file_op = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Start Operator Environment"));
   g_signal_connect(file_op, "activate", G_CALLBACK(activate_op), this);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
@@ -124,82 +115,66 @@ RtMonGtk::RtMonGtk(void* rtmon_parent_ctx, GtkWidget* rtmon_parent_wid,
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_op);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
 
-  GtkWidget* file
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
+  GtkWidget* file = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // View menu
-  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Zoom _In"));
-  g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
-  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _In"));
+  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
+  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Zoom _Out"));
-  g_signal_connect(
-      view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
-  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Out"));
+  g_signal_connect(view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
+  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Zoom _Reset"));
-  g_signal_connect(
-      view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Reset"));
+  g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_out);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_reset);
 
-  GtkWidget* view
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
+  GtkWidget* view = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), view);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Menu Help
-  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Help"));
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
-  gtk_widget_add_accelerator(
-      help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
 
-  GtkWidget* help
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+  GtkWidget* help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
-  nodelistnav = new NodelistNavGtk(this, vbox, 0, nodename,
-      nodelist_eMode_SystemStatus, (nl_mLayout)0, 0, 0, &nodelistnav_widget);
+  nodelistnav = new NodelistNavGtk(this, vbox, 0, nodename, nodelist_eMode_SystemStatus, (nl_mLayout)0, 0, 0,
+                                   &nodelistnav_widget);
 
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
   pwr_tFileName fname;
-  wutl_tools_item(tools, 
-      dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", 
-      G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png",
+                  G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 1);
 
-  wutl_tools_item(tools, 
-      dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", 
-      G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png",
+                  G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 1);
 
-  wutl_tools_item(tools,
-      dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", 
-      G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 1, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png",
+                  G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 1, 1);
 
-  tools_xtt = wutl_tools_item(tools,
-      dark_theme ? "$pwr_exe/ico_navigator_d_30.png" : "$pwr_exe/ico_navigator_l_30.png", 
+  tools_xtt = wutl_tools_item(
+      tools, dark_theme ? "$pwr_exe/ico_navigator_d_30.png" : "$pwr_exe/ico_navigator_l_30.png",
       G_CALLBACK(activate_xtt), "Start Runtime Navigator", this, 1, 1);
 
-  tools_op = wutl_tools_item(tools,
-      dark_theme ? "$pwr_exe/ico_opplace_d_30.png" : "$pwr_exe/ico_opplace_l_30.png", 
-      G_CALLBACK(activate_op), "Start Operator Environment", this, 1, 1);
+  tools_op =
+      wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_opplace_d_30.png" : "$pwr_exe/ico_opplace_l_30.png",
+                      G_CALLBACK(activate_op), "Start Operator Environment", this, 1, 1);
 
   // Button box
   dcli_translate_filename(fname, "$pwr_exe/pwr_logofully.png");
@@ -258,8 +233,7 @@ RtMonGtk::RtMonGtk(void* rtmon_parent_ctx, GtkWidget* rtmon_parent_wid,
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(bbox_vbox), FALSE, FALSE, 10);
-  gtk_box_pack_end(
-      GTK_BOX(vbox), GTK_WIDGET(nodelistnav_widget), TRUE, TRUE, 0);
+  gtk_box_pack_end(GTK_BOX(vbox), GTK_WIDGET(nodelistnav_widget), TRUE, TRUE, 0);
 
   gtk_container_add(GTK_CONTAINER(toplevel), vbox);
   gtk_widget_show_all(toplevel);
@@ -278,14 +252,15 @@ static gboolean rtmon_scan(void* data)
 {
   RtMonGtk* rtmon = (RtMonGtk*)data;
 
-  if (rtmon->nodelistnav->node_list[0].item->data.SystemStatus
-      != rtmon->old_status) {
+  if (rtmon->nodelistnav->node_list[0].item->data.SystemStatus != rtmon->old_status)
+  {
     char text[20];
     char widget_name[80];
     pwr_tStatus sts = rtmon->nodelistnav->node_list[0].item->data.SystemStatus;
 
     int dark_theme = CoWow::DarkTheme();
-    if (sts == PWR__SRVCONNECTION) {
+    if (sts == PWR__SRVCONNECTION)
+    {
       strcpy(widget_name, dark_theme ? "darkgray" : "gray");
       strcpy(text, "Down");
       gtk_widget_set_sensitive(rtmon->bbox_start, TRUE);
@@ -298,14 +273,21 @@ static gboolean rtmon_scan(void* data)
 
       g_object_set(rtmon->bbox_image, "visible", FALSE, NULL);
       g_object_set(rtmon->bbox_image_gray, "visible", TRUE, NULL);
-    } else {
-      if (((sts & 7) == 2) || ((sts & 7) == 4)) {
+    }
+    else
+    {
+      if (((sts & 7) == 2) || ((sts & 7) == 4))
+      {
         strcpy(widget_name, dark_theme ? "darkred" : "red");
         strcpy(text, "Running");
-      } else if ((sts & 7) == 0) {
+      }
+      else if ((sts & 7) == 0)
+      {
         strcpy(widget_name, dark_theme ? "darkyellow" : "yellow");
         strcpy(text, "Running");
-      } else {
+      }
+      else
+      {
         strcpy(widget_name, dark_theme ? "darkgreen" : "green");
         strcpy(text, "Running");
       }
@@ -319,7 +301,7 @@ static gboolean rtmon_scan(void* data)
       g_object_set(rtmon->bbox_image, "visible", TRUE, NULL);
       g_object_set(rtmon->bbox_image_gray, "visible", FALSE, NULL);
     }
-    
+
     wutl_widget_name_suffix_add(rtmon->bbox_label_eb, widget_name);
     gtk_label_set_text(GTK_LABEL(rtmon->bbox_label), text);
 
@@ -341,25 +323,18 @@ RtMonGtk::~RtMonGtk()
   gtk_widget_destroy(toplevel);
 }
 
-void RtMonGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void RtMonGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
 void RtMonGtk::set_clock_cursor()
 {
   if (!clock_cursor)
-    clock_cursor = gdk_cursor_new_for_display(
-        gtk_widget_get_display(toplevel), GDK_WATCH);
+    clock_cursor = gdk_cursor_new_for_display(gtk_widget_get_display(toplevel), GDK_WATCH);
 
   gdk_window_set_cursor(gtk_widget_get_window(toplevel), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(toplevel));
 }
 
-void RtMonGtk::reset_cursor()
-{
-  gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL);
-}
+void RtMonGtk::reset_cursor() { gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL); }
 
 void RtMonGtk::free_cursor()
 {
@@ -367,8 +342,7 @@ void RtMonGtk::free_cursor()
     g_object_unref(clock_cursor);
 }
 
-gboolean RtMonGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean RtMonGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   RtMonGtk* rtmon = (RtMonGtk*)data;
 

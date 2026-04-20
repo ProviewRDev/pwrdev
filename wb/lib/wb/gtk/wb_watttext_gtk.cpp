@@ -63,14 +63,15 @@ void WAttTextGtk::action_text_changed(GtkTextBuffer* w, gpointer data)
   watttext->modified = 1;
 }
 
-void WAttTextGtk::action_text_inserted(
-    GtkTextBuffer* w, GtkTextIter* iter, gchar* str, gint len, gpointer data)
+void WAttTextGtk::action_text_inserted(GtkTextBuffer* w, GtkTextIter* iter, gchar* str, gint len,
+                                       gpointer data)
 {
   WAttTextGtk* watttext = (WAttTextGtk*)data;
 
   int count = gtk_text_buffer_get_char_count(w);
 
-  if (count > watttext->input_max_length) {
+  if (count > watttext->input_max_length)
+  {
     // Remove inserted chars (note that iter now points at the end of the
     // inserted text)
     GtkTextIter start_iter;
@@ -81,7 +82,8 @@ void WAttTextGtk::action_text_inserted(
 
     CoWowGtk wow(watttext->toplevel);
     wow.DisplayError("Error message", "Attribute size exceeded");
-  } else
+  }
+  else
     watttext->message(' ', "");
 }
 //
@@ -166,12 +168,10 @@ void WAttTextGtk::activate_cancel(GtkWidget* w, gpointer data)
 
 void WAttTextGtk::activate_help(GtkWidget* w, gpointer data)
 {
-  CoXHelp::dhelp("objecttexteditor_refman", 0, navh_eHelpFile_Other,
-      "$pwr_lang/man_dg.dat", true);
+  CoXHelp::dhelp("objecttexteditor_refman", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
 }
 
-gboolean WAttTextGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean WAttTextGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   WAttTextGtk* watttext = (WAttTextGtk*)data;
 
@@ -181,17 +181,17 @@ gboolean WAttTextGtk::action_inputfocus(
   return FALSE;
 }
 
-void WAttTextGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void WAttTextGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
 void WAttTextGtk::set_editmode(int editmode, ldh_tSesContext ldhses)
 {
-  if (!this->editmode && editmode) {
+  if (!this->editmode && editmode)
+  {
     gtk_text_view_set_editable(GTK_TEXT_VIEW(textview), TRUE);
     gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(textview), TRUE);
-  } else if (this->editmode && !editmode) {
+  }
+  else if (this->editmode && !editmode)
+  {
     gtk_text_view_set_editable(GTK_TEXT_VIEW(textview), FALSE);
     gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(textview), FALSE);
   }
@@ -208,26 +208,29 @@ void WAttTextGtk::set_attr_value()
   gchar *text, *textutf8;
   unsigned char* s;
 
-  if (editmode) {
+  if (editmode)
+  {
     GtkTextIter start_iter, end_iter;
     gtk_text_buffer_get_start_iter(textbuffer, &start_iter);
     gtk_text_buffer_get_end_iter(textbuffer, &end_iter);
 
-    textutf8
-        = gtk_text_buffer_get_text(textbuffer, &start_iter, &end_iter, FALSE);
+    textutf8 = gtk_text_buffer_get_text(textbuffer, &start_iter, &end_iter, FALSE);
     text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
     g_free(textutf8);
 
-    if (text) {
+    if (text)
+    {
       // Replace ctrl characters with space
-      for (s = (unsigned char*)text; *s; s++) {
+      for (s = (unsigned char*)text; *s; s++)
+      {
         if (*s < ' ' && *s != 10 && *s != 13)
           *s = ' ';
       }
 
       sts = ldh_SetObjectPar(ldhses, aref.Objid, "DevBody", aname, text, size);
       g_free(text);
-    } else
+    }
+    else
       wow->DisplayError("Input error", "Invalid character");
   }
 }
@@ -252,15 +255,12 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
   return FALSE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
-    ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref, int wa_editmode,
-    pwr_tStatus* status)
-    : WAttText(wa_parent_ctx, wa_ldhses, wa_aref, wa_editmode, status),
-      parent_wid(wa_parent_wid), toplevel(0), init(1)
+WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx, ldh_tSesContext wa_ldhses,
+                         pwr_sAttrRef wa_aref, int wa_editmode, pwr_tStatus* status)
+    : WAttText(wa_parent_ctx, wa_ldhses, wa_aref, wa_editmode, status), parent_wid(wa_parent_wid),
+      toplevel(0), init(1)
 {
   int sts;
   int size;
@@ -270,25 +270,24 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
     return;
 
   sts = ldh_AttrRefToName(ldhses, &aref, ldh_eName_Hierarchy, &namep, &size);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *status = sts;
     return;
   }
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 700,
-      "default-width", 800, "title", CoWowGtk::convert_utf8(namep), NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 700, "default-width", 800, "title",
+                                      CoWowGtk::convert_utf8(namep), NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(
-      toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
   // Menu
   // Accelerators
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
@@ -296,20 +295,18 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   // File entry
   GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkWidget* file_save = gtk_menu_item_new_with_mnemonic("_Save");
   g_signal_connect(file_save, "activate", G_CALLBACK(activate_save), this);
-  gtk_widget_add_accelerator(file_save, "activate", accel_g, 's',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_save, "activate", accel_g, 's', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_saveandclose
-      = gtk_menu_item_new_with_mnemonic("S_ave and close");
-  g_signal_connect(
-      file_saveandclose, "activate", G_CALLBACK(activate_saveandclose), this);
-  gtk_widget_add_accelerator(file_saveandclose, "activate", accel_g, 't',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  GtkWidget* file_saveandclose = gtk_menu_item_new_with_mnemonic("S_ave and close");
+  g_signal_connect(file_saveandclose, "activate", G_CALLBACK(activate_saveandclose), this);
+  gtk_widget_add_accelerator(file_saveandclose, "activate", accel_g, 't', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_save);
@@ -321,23 +318,20 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // Edit entry
-  GtkWidget *edit_cut = gtk_menu_item_new_with_mnemonic("C_ut");
-  g_signal_connect(
-      edit_cut, "activate", G_CALLBACK(activate_cut), this);
-  gtk_widget_add_accelerator(edit_cut, "activate", accel_g, 'x',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  GtkWidget* edit_cut = gtk_menu_item_new_with_mnemonic("C_ut");
+  g_signal_connect(edit_cut, "activate", G_CALLBACK(activate_cut), this);
+  gtk_widget_add_accelerator(edit_cut, "activate", accel_g, 'x', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
-  GtkWidget *edit_copy = gtk_menu_item_new_with_mnemonic("_Copy");
-  g_signal_connect(
-      edit_copy, "activate", G_CALLBACK(activate_copy), this);
-  gtk_widget_add_accelerator(edit_copy, "activate", accel_g, 'c',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  GtkWidget* edit_copy = gtk_menu_item_new_with_mnemonic("_Copy");
+  g_signal_connect(edit_copy, "activate", G_CALLBACK(activate_copy), this);
+  gtk_widget_add_accelerator(edit_copy, "activate", accel_g, 'c', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
-  GtkWidget *edit_paste = gtk_menu_item_new_with_mnemonic("_Paste");
-  g_signal_connect(
-      edit_paste, "activate", G_CALLBACK(activate_paste), this);
-  gtk_widget_add_accelerator(edit_paste, "activate", accel_g, 'v',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  GtkWidget* edit_paste = gtk_menu_item_new_with_mnemonic("_Paste");
+  g_signal_connect(edit_paste, "activate", G_CALLBACK(activate_paste), this);
+  gtk_widget_add_accelerator(edit_paste, "activate", accel_g, 'v', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* edit_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_copy);
@@ -349,11 +343,10 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit), GTK_WIDGET(edit_menu));
 
   // Help entry
-  GtkWidget* help_help
-      = gtk_menu_item_new_with_mnemonic("_Help");
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
-  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -367,10 +360,8 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   utility = ((WUtility*)parent_ctx)->utype;
 
   textbuffer = gtk_text_buffer_new(NULL);
-  g_signal_connect_after(
-      textbuffer, "insert-text", G_CALLBACK(action_text_inserted), this);
-  g_signal_connect_after(
-      textbuffer, "changed", G_CALLBACK(action_text_changed), this);
+  g_signal_connect_after(textbuffer, "insert-text", G_CALLBACK(action_text_inserted), this);
+  g_signal_connect_after(textbuffer, "changed", G_CALLBACK(action_text_changed), this);
 
   textview = gtk_text_view_new_with_buffer(textbuffer);
   GtkWidget* viewport = gtk_viewport_new(NULL, NULL);
@@ -405,16 +396,17 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   gtk_container_add(GTK_CONTAINER(toplevel), vbox);
   gtk_widget_show_all(toplevel);
 
-  if (utility == wb_eUtility_Wtt) {
-    ((Wtt*)parent_ctx)
-        ->register_utility((void*)this, wb_eUtility_AttrTextEditor);
+  if (utility == wb_eUtility_Wtt)
+  {
+    ((Wtt*)parent_ctx)->register_utility((void*)this, wb_eUtility_AttrTextEditor);
   }
 
   char* value;
   ldh_sAttrRefInfo ainfo;
 
   sts = ldh_GetAttrRefInfo(ldhses, &aref, &ainfo);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *status = sts;
     return;
   }
@@ -425,9 +417,9 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
 
   strncpy(aname, s + 1, sizeof(aname));
 
-  sts = ldh_GetObjectPar(
-      ldhses, aref.Objid, "DevBody", aname, (char**)&value, &size);
-  if (EVEN(sts)) {
+  sts = ldh_GetObjectPar(ldhses, aref.Objid, "DevBody", aname, (char**)&value, &size);
+  if (EVEN(sts))
+  {
     *status = sts;
     return;
   }
@@ -447,7 +439,8 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
 
   free(value);
 
-  if (!editmode) {
+  if (!editmode)
+  {
     gtk_text_view_set_editable(GTK_TEXT_VIEW(textview), FALSE);
     gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(textview), FALSE);
   }

@@ -34,9 +34,15 @@
  * General Public License plus this exception.
  */
 
+#ifndef rt_io_card_read_h
+#define rt_io_card_read_h
+
+#include "rt_io_base.h"
+
 /*----------------------------------------------------------------------------*\
   Prototypes for io methods
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp);
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp);
+
+#endif

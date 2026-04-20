@@ -41,28 +41,24 @@
 
 class CnvCtx;
 
-typedef enum {
+typedef enum
+{
   xml_mStatus_xtthelp = 1 << 0,
   xml_mStatus_paragraph = 1 << 1,
   xml_mStatus_table = 1 << 2,
   xml_mStatus_topic = 1 << 3
 } xml_mStatus;
 
-class CnvXtthelpToXml : public CnvXtthelpTo {
-  public:
-  CnvXtthelpToXml(CnvCtx* cnv_ctx) : ctx(cnv_ctx), first_topic(1), status(0)
-  {
-  }
+class CnvXtthelpToXml : public CnvXtthelpTo
+{
+public:
+  CnvXtthelpToXml(CnvCtx* cnv_ctx) : ctx(cnv_ctx), first_topic(1), status(0) {}
   virtual ~CnvXtthelpToXml();
 
-  Cnv_eXtthelpToType type()
-  {
-    return Cnv_eXtthelpToType_Xml;
-  }
-  void* insert(navh_eItemType item_type, const char* text1, const char* text2,
-      const char* text3, const char* link, const char* link_bookmark,
-      const char* file_name, navh_eHelpFile file_type, int help_index,
-      const char* bookmark, int coding);
+  Cnv_eXtthelpToType type() { return Cnv_eXtthelpToType_Xml; }
+  void* insert(navh_eItemType item_type, const char* text1, const char* text2, const char* text3,
+               const char* link, const char* link_bookmark, const char* file_name, navh_eHelpFile file_type,
+               int help_index, const char* bookmark, int coding);
   void subject_to_fname(char* fname, const char* subject, int path);
   void cnv_text(char* to, const char* from);
 

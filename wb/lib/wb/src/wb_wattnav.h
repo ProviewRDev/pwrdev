@@ -43,14 +43,18 @@
 #define wattnav_cVersion "X3.3b"
 #define WATTNAV_BROW_MAX 25
 
-typedef enum { wattnav_eType_Object, wattnav_eType_CrossRef } wattnav_eType;
+typedef enum
+{
+  wattnav_eType_Object,
+  wattnav_eType_CrossRef
+} wattnav_eType;
 
-class WAttNav {
+class WAttNav
+{
 public:
-  WAttNav(void* wa_parent_ctx, wattnav_eType wa_type, const char* wa_name,
-      ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref, int wa_editmode,
-      int wa_advanced_user, int wa_display_objectname, wb_eUtility wa_utility,
-      pwr_tStatus* status);
+  WAttNav(void* wa_parent_ctx, wattnav_eType wa_type, const char* wa_name, ldh_tSesContext wa_ldhses,
+          pwr_sAttrRef wa_aref, int wa_editmode, int wa_advanced_user, int wa_display_objectname,
+          wb_eUtility wa_utility, pwr_tStatus* status);
   virtual ~WAttNav();
 
   void* parent_ctx;
@@ -69,18 +73,12 @@ public:
   wb_eUtility utility;
   int displayed;
 
-  virtual void set_inputfocus()
-  {
-  }
-  virtual pwr_tStatus get_selection(char* str, int size)
-  {
-    return 0;
-  }
+  virtual void set_inputfocus() {}
+  virtual pwr_tStatus get_selection(char* str, int size) { return 0; }
 
   void start_trace(pwr_tObjid Objid, char* object_str);
   int set_attr_value(brow_tObject node, char* name, char* value_str);
-  int check_attr(int* multiline, brow_tObject* node, char* name,
-      char** init_value, int* size);
+  int check_attr(int* multiline, brow_tObject* node, char* name, char** init_value, int* size);
   int get_select(pwr_sAttrRef* attrref, int* is_attr);
   void message(char sev, const char* text);
   void force_trace_scan();

@@ -41,7 +41,8 @@
 
 class wb_treeimport;
 
-class wb_treeexport {
+class wb_treeexport
+{
 public:
   virtual bool exportTree(wb_treeimport& i, pwr_tOid oid) = 0;
   virtual bool exportTreeIsImplemented() = 0;

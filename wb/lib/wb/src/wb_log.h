@@ -44,7 +44,8 @@
 
 #define wlog_cLogFile "$pwrp_db/wb_history.log"
 
-typedef enum {
+typedef enum
+{
   wlog_eCategory_,
   wlog_eCategory_WbLogin,
   wlog_eCategory_ConfiguratorSave,
@@ -67,11 +68,10 @@ typedef enum {
   wlog_eCategory__,
 } wlog_eCategory;
 
-class VItem {
+class VItem
+{
 public:
-  VItem(char* t) : text(t), has_comment(false), disable(false)
-  {
-  }
+  VItem(char* t) : text(t), has_comment(false), disable(false) {}
   std::string text;
   bool has_comment;
   bool disable;
@@ -80,32 +80,20 @@ public:
 class wb_log;
 class wb_session;
 
-class wb_log {
+class wb_log
+{
 public:
-  wb_log()
-  {
-  }
-  static void log(wb_session* session, wlog_eCategory category, pwr_tVid vid,
-      unsigned int opt = 0);
-  static void log(wb_session* session, wlog_eCategory category, pwr_tOid oid,
-      unsigned int opt = 0);
-  static void log(wb_session* session, wlog_eCategory category,
-      pwr_tAttrRef aref, unsigned int opt = 0);
-  static void log(wlog_eCategory category, const char* str, const char* comment,
-      unsigned int opt = 0);
+  wb_log() {}
+  static void log(wb_session* session, wlog_eCategory category, pwr_tVid vid, unsigned int opt = 0);
+  static void log(wb_session* session, wlog_eCategory category, pwr_tOid oid, unsigned int opt = 0);
+  static void log(wb_session* session, wlog_eCategory category, pwr_tAttrRef aref, unsigned int opt = 0);
+  static void log(wlog_eCategory category, const char* str, const char* comment, unsigned int opt = 0);
   static void category_to_string(wlog_eCategory category, char* str);
   static void string_to_category(char* str, wlog_eCategory* category);
-  static void push()
-  {
-    CoLog::dpush();
-  }
-  static void pull()
-  {
-    CoLog::dpull();
-  }
+  static void push() { CoLog::dpush(); }
+  static void pull() { CoLog::dpull(); }
   static void generate_html(char* filename, pwr_tStatus* sts);
-  static void gen_cb(
-      void* ctx, pwr_tTime time, char* s1, char* s2, char* s3, char* s4);
+  static void gen_cb(void* ctx, pwr_tTime time, char* s1, char* s2, char* s3, char* s4);
   static void filter(std::vector<VItem>& v);
 };
 

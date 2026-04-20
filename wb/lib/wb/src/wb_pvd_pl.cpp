@@ -38,7 +38,8 @@
 
 #include "pwr_baseclasses.h"
 
-extern "C" {
+extern "C"
+{
 #include "co_cnf.h"
 #include "co_dcli.h"
 }
@@ -56,7 +57,8 @@ static char* pwrp_status_to_string(int value)
 {
   static char str[80];
 
-  switch (value) {
+  switch (value)
+  {
   case 2:
     strcpy(str, "Database doesn't exist");
     break;
@@ -150,19 +152,23 @@ static char* pwrp_status_to_string(int value)
   return str;
 }
 
-void wb_pvd_pl::writeAttribute(co_procom* pcom, pwr_tOix oix,
-    unsigned int offset, unsigned int size, char* buffer)
+void wb_pvd_pl::writeAttribute(co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size,
+                               char* buffer)
 {
-  if (oix >= m_list.size() || oix <= 0) {
+  if (oix >= m_list.size() || oix <= 0)
+  {
     pcom->provideStatus(LDH__NOSUCHOBJ);
     return;
   }
 
-  switch (m_list[oix].cid) {
-  case pwr_cClass_ProjectReg: {
+  switch (m_list[oix].cid)
+  {
+  case pwr_cClass_ProjectReg:
+  {
     pwr_sClass_ProjectReg body;
 
-    if (offset == (unsigned int)((char*)&body.Project - (char*)&body)) {
+    if (offset == (unsigned int)((char*)&body.Project - (char*)&body))
+    {
       m_list[oix].flags |= pl_mFlags_ProjectModified;
       str_ToLower(buffer, buffer);
 
@@ -172,16 +178,17 @@ void wb_pvd_pl::writeAttribute(co_procom* pcom, pwr_tOix oix,
       unsigned int path_offset;
 
       path_offset = (unsigned int)((char*)&body.Path - (char*)&body);
-      strcpy(path, (char*)((unsigned long)m_list[oix].body
-                       + (unsigned long)path_offset));
-      if ((s = strrchr(path, '/'))) {
+      strcpy(path, (char*)((unsigned long)m_list[oix].body + (unsigned long)path_offset));
+      if ((s = strrchr(path, '/')))
+      {
         strncpy(s + 1, buffer, sizeof(path) - strlen(path));
-        strncpy((char*)((unsigned long)m_list[oix].body
-                    + (unsigned long)path_offset),
-            path, sizeof(body.Path));
+        strncpy((char*)((unsigned long)m_list[oix].body + (unsigned long)path_offset), path,
+                sizeof(body.Path));
       }
       m_list[oix].flags |= pl_mFlags_PathModified;
-    } else if (offset == (unsigned int)((char*)&body.Path - (char*)&body)) {
+    }
+    else if (offset == (unsigned int)((char*)&body.Path - (char*)&body))
+    {
       m_list[oix].flags |= pl_mFlags_PathModified;
     }
     break;
@@ -192,15 +199,16 @@ void wb_pvd_pl::writeAttribute(co_procom* pcom, pwr_tOix oix,
   rt_pvd_file::writeAttribute(pcom, oix, offset, size, buffer);
 }
 
-void wb_pvd_pl::createObject(
-    co_procom* pcom, pwr_tOix destoix, int desttype, pwr_tCid cid, char* name)
+void wb_pvd_pl::createObject(co_procom* pcom, pwr_tOix destoix, int desttype, pwr_tCid cid, char* name)
 {
   pwr_tOix oix = next_oix;
 
   rt_pvd_file::createObject(pcom, destoix, desttype, cid, name);
 
-  switch (cid) {
-  case pwr_cClass_ProjectReg: {
+  switch (cid)
+  {
+  case pwr_cClass_ProjectReg:
+  {
     char defaultpath[80];
     pwr_tObjName lowname;
     pwr_tOix boix;
@@ -213,9 +221,9 @@ void wb_pvd_pl::createObject(
     strcat(defaultpath, lowname);
 
     find(root, "Bases", &boix);
-    if (m_list[boix].lchoix != 0) {
-      pwr_sClass_BaseReg* basebody
-          = (pwr_sClass_BaseReg*)m_list[m_list[boix].lchoix].body;
+    if (m_list[boix].lchoix != 0)
+    {
+      pwr_sClass_BaseReg* basebody = (pwr_sClass_BaseReg*)m_list[m_list[boix].lchoix].body;
       strcpy(body->Version, basebody->Version);
     }
     strcpy(body->Path, defaultpath);
@@ -261,12 +269,15 @@ bool wb_pvd_pl::check_list(pwr_tStatus* sts)
   pwr_tCmd cmd;
   int csts;
 
-  for (int i = 0; i < (int)m_list.size(); i++) {
+  for (int i = 0; i < (int)m_list.size(); i++)
+  {
     if (m_list[i].flags & pl_mFlags_Disabled)
       continue;
 
-    switch (m_list[i].cid) {
-    case pwr_cClass_BaseReg: {
+    switch (m_list[i].cid)
+    {
+    case pwr_cClass_BaseReg:
+    {
       pwr_sClass_BaseReg* body = (pwr_sClass_BaseReg*)m_list[i].body;
       pwr_sClass_BaseReg* origbody = (pwr_sClass_BaseReg*)m_list[i].userdata;
       pwr_tOid oid;
@@ -274,126 +285,135 @@ bool wb_pvd_pl::check_list(pwr_tStatus* sts)
       oid.oix = m_list[i].oix;
       oid.vid = ldh_cProjectListVolume;
 
-      if (m_list[i].flags & procom_obj_mFlags_Deleted
-          && !(m_list[i].flags & procom_obj_mFlags_Created)) {
-      } else if (!(m_list[i].flags & procom_obj_mFlags_Deleted)) {
-        if (streq(body->Path, "")) {
-          sprintf(
-              msg, "Path is missing, in object %s", longname(m_list[i].oix));
+      if (m_list[i].flags & procom_obj_mFlags_Deleted && !(m_list[i].flags & procom_obj_mFlags_Created))
+      {
+      }
+      else if (!(m_list[i].flags & procom_obj_mFlags_Deleted))
+      {
+        if (streq(body->Path, ""))
+        {
+          sprintf(msg, "Path is missing, in object %s", longname(m_list[i].oix));
           MsgWindow::message('E', msg, msgw_ePop_No, oid);
           error_cnt++;
         }
-        if (streq(body->Version, "")) {
-          sprintf(
-              msg, "Version is missing, in object %s", longname(m_list[i].oix));
+        if (streq(body->Version, ""))
+        {
+          sprintf(msg, "Version is missing, in object %s", longname(m_list[i].oix));
           MsgWindow::message('E', msg, msgw_ePop_No, oid);
           error_cnt++;
         }
-        if (!streq(body->Path, origbody->Path)) {
+        if (!streq(body->Path, origbody->Path))
+        {
           // Check new path
         }
       }
       break;
     }
-    case pwr_cClass_ProjectReg: {
+    case pwr_cClass_ProjectReg:
+    {
       pwr_sClass_ProjectReg* body = (pwr_sClass_ProjectReg*)m_list[i].body;
-      pwr_sClass_ProjectReg* origbody
-          = (pwr_sClass_ProjectReg*)m_list[i].userdata;
+      pwr_sClass_ProjectReg* origbody = (pwr_sClass_ProjectReg*)m_list[i].userdata;
       pwr_tOid oid;
 
       oid.oix = m_list[i].oix;
       oid.vid = ldh_cProjectListVolume;
 
-      if (m_list[i].flags & procom_obj_mFlags_Deleted
-          && !(m_list[i].flags & procom_obj_mFlags_Created)) {
+      if (m_list[i].flags & procom_obj_mFlags_Deleted && !(m_list[i].flags & procom_obj_mFlags_Created))
+      {
         // Project deleted
-        sprintf(msg, "delete project %s with file tree and databases\n",
-            body->Project);
+        sprintf(msg, "delete project %s with file tree and databases\n", body->Project);
         if (strlen(text) + strlen(msg) < sizeof(text))
           strcat(text, msg);
         actions_found++;
-      } else if (!(m_list[i].flags & procom_obj_mFlags_Deleted)) {
-        if (streq(body->Project, "")) {
-          sprintf(
-              msg, "Project is missing, in object %s", longname(m_list[i].oix));
+      }
+      else if (!(m_list[i].flags & procom_obj_mFlags_Deleted))
+      {
+        if (streq(body->Project, ""))
+        {
+          sprintf(msg, "Project is missing, in object %s", longname(m_list[i].oix));
           MsgWindow::message('E', msg, msgw_ePop_No, oid);
           error_cnt++;
-        } else if (streq(body->Version, "")) {
-          sprintf(
-              msg, "Version is missing, in object %s", longname(m_list[i].oix));
+        }
+        else if (streq(body->Version, ""))
+        {
+          sprintf(msg, "Version is missing, in object %s", longname(m_list[i].oix));
           MsgWindow::message('E', msg, msgw_ePop_No, oid);
           error_cnt++;
-        } else {
+        }
+        else
+        {
           pwr_tOix boix;
 
           find(root, "Bases", &boix);
-          if (!find(boix, basename(body->Version), &boix)) {
-            sprintf(msg, "Version not found, in object %s",
-                longname(m_list[i].oix));
+          if (!find(boix, basename(body->Version), &boix))
+          {
+            sprintf(msg, "Version not found, in object %s", longname(m_list[i].oix));
             MsgWindow::message('E', msg, msgw_ePop_No, oid);
             error_cnt++;
           }
           if (body->Path[strlen(body->Path) - 1] == '/')
             body->Path[strlen(body->Path) - 1] = 0;
 
-          if (m_list[i].flags & procom_obj_mFlags_Created) {
-            if (strchr(body->Project, '_') != 0) {
-              sprintf(msg,
-                  "Invalid project name, '_' not allowed, in object %s",
-                  longname(m_list[i].oix));
+          if (m_list[i].flags & procom_obj_mFlags_Created)
+          {
+            if (strchr(body->Project, '_') != 0)
+            {
+              sprintf(msg, "Invalid project name, '_' not allowed, in object %s", longname(m_list[i].oix));
               MsgWindow::message('E', msg, msgw_ePop_No, oid);
               error_cnt++;
-            } else if (streq(body->CopyFrom, "")) {
+            }
+            else if (streq(body->CopyFrom, ""))
+            {
               // Create project
               // Check destination path
               sprintf(cmd, "wb_pvd_pl.sh check create %s", body->Path);
               csts = system(cmd);
-              if ((csts >>= 8) != 0) {
-                sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts),
-                    longname(m_list[i].oix));
+              if ((csts >>= 8) != 0)
+              {
+                sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts), longname(m_list[i].oix));
                 MsgWindow::message('E', msg, msgw_ePop_No);
                 error_cnt++;
               }
 
-              sprintf(msg, "create project %s, version %s, path %s\n",
-                  body->Project, body->Version, body->Path);
+              sprintf(msg, "create project %s, version %s, path %s\n", body->Project, body->Version,
+                      body->Path);
               if (strlen(text) + strlen(msg) < sizeof(text))
                 strcat(text, msg);
               actions_found++;
-            } else {
+            }
+            else
+            {
               // Copy project
               // Check destination path
               sprintf(cmd, "wb_pvd_pl.sh check create %s", body->Path);
               csts = system(cmd);
-              if ((csts >>= 8) != 0) {
-                sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts),
-                    longname(m_list[i].oix));
+              if ((csts >>= 8) != 0)
+              {
+                sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts), longname(m_list[i].oix));
                 MsgWindow::message('E', msg, msgw_ePop_No);
                 error_cnt++;
               }
 
-              sprintf(msg, "copy project %s to %s, path %s\n", body->CopyFrom,
-                  body->Project, body->Path);
+              sprintf(msg, "copy project %s to %s, path %s\n", body->CopyFrom, body->Project, body->Path);
               if (strlen(text) + strlen(msg) < sizeof(text))
                 strcat(text, msg);
               actions_found++;
             }
-          } else if (m_list[i].flags & pl_mFlags_PathModified
-              && !streq(body->Path, origbody->Path)) {
+          }
+          else if (m_list[i].flags & pl_mFlags_PathModified && !streq(body->Path, origbody->Path))
+          {
             // Move project
             // Check source and destination path
-            sprintf(cmd, "wb_pvd_pl.sh check move %s %s", origbody->Path,
-                body->Path);
+            sprintf(cmd, "wb_pvd_pl.sh check move %s %s", origbody->Path, body->Path);
             csts = system(cmd);
-            if ((csts >>= 8) != 0) {
-              sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts),
-                  longname(m_list[i].oix));
+            if ((csts >>= 8) != 0)
+            {
+              sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts), longname(m_list[i].oix));
               MsgWindow::message('E', msg, msgw_ePop_No);
               error_cnt++;
             }
 
-            sprintf(msg, "move project %s from %s to %s\n", body->Project,
-                origbody->Path, body->Path);
+            sprintf(msg, "move project %s from %s to %s\n", body->Project, origbody->Path, body->Path);
             if (strlen(text) + strlen(msg) < sizeof(text))
               strcat(text, msg);
             actions_found++;
@@ -405,18 +425,19 @@ bool wb_pvd_pl::check_list(pwr_tStatus* sts)
     default:;
     }
   }
-  if (error_cnt) {
+  if (error_cnt)
+  {
     sprintf(msg, "%d error(s) found, Save aborted", error_cnt);
     MsgWindow::message('E', msg, msgw_ePop_Yes);
     *sts = LDH__SYNTAX;
     return false;
   }
-  if (actions_found) {
+  if (actions_found)
+  {
     CoWow* wow = MsgWindow::get_wow();
 
     if (wow)
-      wow->DisplayQuestion(
-          (void*)this, "Confirm Actions", text, confirm_actions_ok, 0, 0);
+      wow->DisplayQuestion((void*)this, "Confirm Actions", text, confirm_actions_ok, 0, 0);
     *sts = LDH__CONFIRM;
     return false;
   }
@@ -431,83 +452,88 @@ void wb_pvd_pl::process_list(pwr_tStatus* sts)
   pwr_tCmd cmd;
   int csts;
 
-  for (int i = 0; i < (int)m_list.size(); i++) {
+  for (int i = 0; i < (int)m_list.size(); i++)
+  {
     if (m_list[i].flags & pl_mFlags_Disabled)
       continue;
 
-    switch (m_list[i].cid) {
-    case pwr_cClass_ProjectReg: {
+    switch (m_list[i].cid)
+    {
+    case pwr_cClass_ProjectReg:
+    {
       pwr_sClass_ProjectReg* body = (pwr_sClass_ProjectReg*)m_list[i].body;
 
-      if (m_list[i].flags & procom_obj_mFlags_Deleted
-          && !(m_list[i].flags & procom_obj_mFlags_Created)) {
+      if (m_list[i].flags & procom_obj_mFlags_Deleted && !(m_list[i].flags & procom_obj_mFlags_Created))
+      {
         sprintf(cmd, "pwrp_env.sh delete project %s noconfirm", body->Project);
         csts = system(cmd);
-        if ((csts >>= 8) != 0) {
-          sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts),
-              longname(m_list[i].oix));
+        if ((csts >>= 8) != 0)
+        {
+          sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts), longname(m_list[i].oix));
           MsgWindow::message('E', msg, msgw_ePop_Yes);
           return;
         }
-      } else if (m_list[i].flags & procom_obj_mFlags_Created
-          && !(m_list[i].flags & procom_obj_mFlags_Deleted)) {
-        if (streq(body->CopyFrom, "")) {
+      }
+      else if (m_list[i].flags & procom_obj_mFlags_Created && !(m_list[i].flags & procom_obj_mFlags_Deleted))
+      {
+        if (streq(body->CopyFrom, ""))
+        {
           printf("-- Project created %s\n", longname(i));
 
-          sprintf(cmd, "wb_pvd_pl.sh create project %s %s %s \"%s\" \"%s\"",
-              body->Project, body->Version, body->Path, longname(m_list[i].oix),
-              body->Description);
+          sprintf(cmd, "wb_pvd_pl.sh create project %s %s %s \"%s\" \"%s\"", body->Project, body->Version,
+                  body->Path, longname(m_list[i].oix), body->Description);
           csts = system(cmd);
-          if ((csts >>= 8) != 0) {
-            sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts),
-                longname(m_list[i].oix));
-            MsgWindow::message('E', msg, msgw_ePop_Yes);
-            return;
-          }
-        } else {
-          sprintf(cmd, "pwrp_env.sh copy project %s %s %s %s noconfirm",
-              body->CopyFrom, body->Project, body->Path,
-              longname(m_list[i].oix));
-          csts = system(cmd);
-          if ((csts >>= 8) != 0) {
-            sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts),
-                longname(m_list[i].oix));
+          if ((csts >>= 8) != 0)
+          {
+            sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts), longname(m_list[i].oix));
             MsgWindow::message('E', msg, msgw_ePop_Yes);
             return;
           }
         }
-      } else if (!(m_list[i].flags & procom_obj_mFlags_Deleted)) {
+        else
+        {
+          sprintf(cmd, "pwrp_env.sh copy project %s %s %s %s noconfirm", body->CopyFrom, body->Project,
+                  body->Path, longname(m_list[i].oix));
+          csts = system(cmd);
+          if ((csts >>= 8) != 0)
+          {
+            sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts), longname(m_list[i].oix));
+            MsgWindow::message('E', msg, msgw_ePop_Yes);
+            return;
+          }
+        }
+      }
+      else if (!(m_list[i].flags & procom_obj_mFlags_Deleted))
+      {
         pwr_sClass_ProjectReg* body = (pwr_sClass_ProjectReg*)m_list[i].body;
-        pwr_sClass_ProjectReg* origbody
-            = (pwr_sClass_ProjectReg*)m_list[i].userdata;
+        pwr_sClass_ProjectReg* origbody = (pwr_sClass_ProjectReg*)m_list[i].userdata;
 
-        if (m_list[i].flags & pl_mFlags_ProjectModified) {
+        if (m_list[i].flags & pl_mFlags_ProjectModified)
+        {
           printf("-- Project modified %s\n", longname(i));
         }
-        if (m_list[i].flags & pl_mFlags_ProjectModified
-            && !streq(body->Project, origbody->Project)) {
+        if (m_list[i].flags & pl_mFlags_ProjectModified && !streq(body->Project, origbody->Project))
+        {
           printf("-- Project Name modified %s\n", longname(i));
 
-          sprintf(cmd, "pwrp_env.sh modify project %s -n %s", origbody->Project,
-              body->Project);
+          sprintf(cmd, "pwrp_env.sh modify project %s -n %s", origbody->Project, body->Project);
           csts = system(cmd);
-          if ((csts >>= 8) != 0) {
-            sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts),
-                longname(m_list[i].oix));
+          if ((csts >>= 8) != 0)
+          {
+            sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts), longname(m_list[i].oix));
             MsgWindow::message('E', msg, msgw_ePop_Yes);
             return;
           }
         }
-        if (m_list[i].flags & pl_mFlags_PathModified
-            && !streq(body->Path, origbody->Path)) {
+        if (m_list[i].flags & pl_mFlags_PathModified && !streq(body->Path, origbody->Path))
+        {
           printf("-- Project Path modified %s\n", longname(i));
 
-          sprintf(cmd, "pwrp_env.sh modify project %s -r %s", origbody->Project,
-              body->Path);
+          sprintf(cmd, "pwrp_env.sh modify project %s -r %s", origbody->Project, body->Path);
           csts = system(cmd);
-          if ((csts >>= 8) != 0) {
-            sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts),
-                longname(m_list[i].oix));
+          if ((csts >>= 8) != 0)
+          {
+            sprintf(msg, "%s, in object %s", pwrp_status_to_string(csts), longname(m_list[i].oix));
             MsgWindow::message('E', msg, msgw_ePop_Yes);
             return;
           }
@@ -529,18 +555,21 @@ void wb_pvd_pl::save_list(pwr_tStatus* sts)
   dcli_translate_filename(fname, "$pwra_db/pwr_projectlist.dat");
   dcli_save_file_versions(fname);
   of.open(fname);
-  if (!of) {
+  if (!of)
+  {
     *sts = LDH__FILEOPEN;
     return;
   }
 
-  for (int oix = m_list[0].fchoix; oix; oix = m_list[oix].fwsoix) {
+  for (int oix = m_list[0].fchoix; oix; oix = m_list[oix].fwsoix)
+  {
     save_item(oix, of);
   }
   of.close();
 
   // Disable deletet objects
-  for (int i = 0; i < (int)m_list.size(); i++) {
+  for (int i = 0; i < (int)m_list.size(); i++)
+  {
     if (m_list[i].flags & procom_obj_mFlags_Deleted)
       m_list[i].flags |= pl_mFlags_Disabled;
   }
@@ -555,35 +584,40 @@ void wb_pvd_pl::save_item(pwr_tOix oix, std::ofstream& of)
   if (m_list[oix].userdata)
     memcpy(m_list[oix].userdata, m_list[oix].body, m_list[oix].userdata_size);
 
-  switch (m_list[oix].cid) {
-  case pwr_eClass_Hier: {
+  switch (m_list[oix].cid)
+  {
+  case pwr_eClass_Hier:
+  {
     pwr_sHier* body = (pwr_sHier*)m_list[oix].body;
     if (oix != 1)
-      of << "!**Menu " << m_list[oix].name << " { // " << body->Description
-         << '\n';
-    for (int ix = m_list[oix].fchoix; ix; ix = m_list[ix].fwsoix) {
+      of << "!**Menu " << m_list[oix].name << " { // " << body->Description << '\n';
+    for (int ix = m_list[oix].fchoix; ix; ix = m_list[ix].fwsoix)
+    {
       save_item(ix, of);
     }
     if (oix != 1)
       of << "!**}\n";
     break;
   }
-  case pwr_cClass_ProjectReg: {
+  case pwr_cClass_ProjectReg:
+  {
     char hname[120];
     pwr_sClass_ProjectReg* body = (pwr_sClass_ProjectReg*)m_list[oix].body;
     strcpy(body->CopyFrom, "");
 
     strcpy(hname, longname(oix));
 
-    of << body->Project << "	" << body->Version << "	" << body->Path
-       << "	" << hname << "	\"" << body->Description << "\"\n";
+    of << body->Project << "	" << body->Version << "	" << body->Path << "	" << hname << "	\""
+       << body->Description << "\"\n";
 
-    for (int ix = m_list[oix].fchoix; ix; ix = m_list[ix].fwsoix) {
+    for (int ix = m_list[oix].fchoix; ix; ix = m_list[ix].fwsoix)
+    {
       save_item(ix, of);
     }
     break;
   }
-  case pwr_cClass_BaseReg: {
+  case pwr_cClass_BaseReg:
+  {
     pwr_sClass_BaseReg* body = (pwr_sClass_BaseReg*)m_list[oix].body;
 
     of << "%base " << body->Version << "	" << body->Path << '\n';
@@ -629,26 +663,33 @@ void wb_pvd_pl::load(pwr_tStatus* rsts)
 
   dcli_translate_filename(fname, "$pwra_db/pwr_projectlist.dat");
   is.open(fname);
-  if (!is) {
+  if (!is)
+  {
     *rsts = LDH__NEWFILE;
     return;
   }
 
-  while (is.getline(line, sizeof(line))) {
+  while (is.getline(line, sizeof(line)))
+  {
     line_cnt++;
-    if (line[0] == '!') {
-      if (str_StartsWith(line, "!**Menu")) {
+    if (line[0] == '!')
+    {
+      if (str_StartsWith(line, "!**Menu"))
+      {
         // Add Hier
         char* s = strstr(line, "// ");
-        if (s) {
+        if (s)
+        {
           strncpy(description, s + 3, sizeof(description));
           description[sizeof(description) - 1] = 0;
-        } else
+        }
+        else
           strcpy(description, "");
 
-        num = dcli_parse(line, " 	", "", (char*)line_item,
-            sizeof(line_item) / sizeof(line_item[0]), sizeof(line_item[0]), 0);
-        if (num < 3) {
+        num = dcli_parse(line, " 	", "", (char*)line_item, sizeof(line_item) / sizeof(line_item[0]),
+                         sizeof(line_item[0]), 0);
+        if (num < 3)
+        {
           std::cout << "Syntax error " << fname << " row " << line_cnt << '\n';
           continue;
         }
@@ -675,8 +716,11 @@ void wb_pvd_pl::load(pwr_tStatus* rsts)
 
         menu_stack[menu_cnt] = hieritem.oix;
         menu_cnt++;
-      } else if (str_StartsWith(line, "!**}")) {
-        if (menu_cnt == 0) {
+      }
+      else if (str_StartsWith(line, "!**}"))
+      {
+        if (menu_cnt == 0)
+        {
           std::cout << "Syntax error " << fname << " row " << line_cnt << '\n';
           continue;
         }
@@ -686,11 +730,13 @@ void wb_pvd_pl::load(pwr_tStatus* rsts)
     }
     str_trim(line, line);
 
-    num = dcli_parse(line, " 	", "", (char*)line_item,
-        sizeof(line_item) / sizeof(line_item[0]), sizeof(line_item[0]), 0);
-    if (str_StartsWith(line, "%base")) {
+    num = dcli_parse(line, " 	", "", (char*)line_item, sizeof(line_item) / sizeof(line_item[0]),
+                     sizeof(line_item[0]), 0);
+    if (str_StartsWith(line, "%base"))
+    {
       // Insert BaseReg under baseroot
-      if (num != 3) {
+      if (num != 3)
+      {
         std::cout << "Syntax error " << fname << " row " << line_cnt << '\n';
         continue;
       }
@@ -703,8 +749,7 @@ void wb_pvd_pl::load(pwr_tStatus* rsts)
       baseitem.bwsoix = m_list[baseitem.fthoix].lchoix;
       baseitem.fwsoix = 0;
       baseitem.body_size = sizeof(pwr_sClass_BaseReg);
-      pwr_sClass_BaseReg* basebody
-          = (pwr_sClass_BaseReg*)calloc(1, baseitem.body_size);
+      pwr_sClass_BaseReg* basebody = (pwr_sClass_BaseReg*)calloc(1, baseitem.body_size);
       baseitem.body = basebody;
       strcpy(basebody->Description, "");
       strcpy(basebody->Version, line_item[1]);
@@ -724,7 +769,8 @@ void wb_pvd_pl::load(pwr_tStatus* rsts)
       continue;
     }
 
-    if (num != 5) {
+    if (num != 5)
+    {
       std::cout << "Syntax error " << fname << " row " << line_cnt << '\n';
       continue;
     }
@@ -732,7 +778,8 @@ void wb_pvd_pl::load(pwr_tStatus* rsts)
     // For backward compability, create the path (pre V4.1)
     bool hier_created;
     pwr_tOix hieroix;
-    if ((hier_created = create_hier(line_item[3], &hieroix))) {
+    if ((hier_created = create_hier(line_item[3], &hieroix)))
+    {
       menu_stack[menu_cnt++] = hieroix;
     }
 
@@ -743,8 +790,7 @@ void wb_pvd_pl::load(pwr_tStatus* rsts)
       strcpy(projitem.name, line_item[3]);
 
     projitem.body_size = sizeof(pwr_sClass_ProjectReg);
-    pwr_sClass_ProjectReg* projbody
-        = (pwr_sClass_ProjectReg*)calloc(1, projitem.body_size);
+    pwr_sClass_ProjectReg* projbody = (pwr_sClass_ProjectReg*)calloc(1, projitem.body_size);
 
     projitem.body = projbody;
     strncpy(projbody->Version, line_item[1], sizeof(projbody->Version));
@@ -785,13 +831,14 @@ bool wb_pvd_pl::create_hier(char* hier, pwr_tOix* oix)
   pwr_tOix ix;
   bool created = false;
 
-  num = dcli_parse(hier, "-", "", (char*)segment_name,
-      sizeof(segment_name) / sizeof(segment_name[0]), sizeof(segment_name[0]),
-      0);
+  num = dcli_parse(hier, "-", "", (char*)segment_name, sizeof(segment_name) / sizeof(segment_name[0]),
+                   sizeof(segment_name[0]), 0);
 
-  for (int i = 0; i < num - 1; i++) {
+  for (int i = 0; i < num - 1; i++)
+  {
     // Check if name exist
-    if (!find(fthoix, segment_name[i], &ix)) {
+    if (!find(fthoix, segment_name[i], &ix))
+    {
       // Create this hierarchy object
       procom_obj hieritem;
       strcpy(hieritem.name, segment_name[i]);
@@ -815,7 +862,8 @@ bool wb_pvd_pl::create_hier(char* hier, pwr_tOix* oix)
 
       fthoix = hieritem.oix;
       created = true;
-    } else
+    }
+    else
       fthoix = ix;
   }
   *oix = fthoix;
@@ -829,7 +877,8 @@ char* wb_pvd_pl::basename(char* version)
   static char str[80];
 
   strcpy(str, "Base");
-  for (s = version, t = &str[strlen(str)]; *s; s++) {
+  for (s = version, t = &str[strlen(str)]; *s; s++)
+  {
     if (*s == '.')
       continue;
     *t++ = *s;

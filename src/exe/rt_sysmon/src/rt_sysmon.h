@@ -39,7 +39,8 @@
 
 #include <vector>
 
-extern "C" {
+extern "C"
+{
 #include "pwr_baseclasses.h"
 #include "rt_qcom.h"
 }
@@ -49,7 +50,8 @@ extern "C" {
 /*! \addtogroup rt */
 /*@{*/
 
-class sysmon_object {
+class sysmon_object
+{
 public:
   sysmon_object(pwr_sAttrRef* arp);
   virtual ~sysmon_object();
@@ -65,41 +67,33 @@ protected:
   pwr_tCid cid;
   int scan_div;
   int scan_cnt;
-  virtual void exec()
-  {
-  }
+  virtual void exec() {}
 };
 
-class disksup_object : public sysmon_object {
+class disksup_object : public sysmon_object
+{
 public:
-  disksup_object(pwr_sAttrRef* arp) : sysmon_object(arp)
-  {
-  }
+  disksup_object(pwr_sAttrRef* arp) : sysmon_object(arp) {}
 
   void exec();
 };
 
 //! Monitoring of system supervisory objects.
 /*! ...
-*/
+ */
 
-class rt_sysmon {
+class rt_sysmon
+{
 public:
-  rt_sysmon() : sysmon_cnt(0), scan_time(10)
-  {
-  }
+  rt_sysmon() : sysmon_cnt(0), scan_time(10) {}
 
   void init(qcom_sQid* qid);
   void open();
   void close();
   void scan();
-  double scantime()
-  {
-    return scan_time;
-  }
+  double scantime() { return scan_time; }
   static int connect_alarm();
-  static int alarm_send(
-      pwr_tOid oid, char* alarm_text, char* alarm_name, int alarm_prio);
+  static int alarm_send(pwr_tOid oid, char* alarm_text, char* alarm_name, int alarm_prio);
 
 private:
   std::vector<sysmon_object*> objects;

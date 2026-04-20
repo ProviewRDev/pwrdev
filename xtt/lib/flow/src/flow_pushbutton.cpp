@@ -42,10 +42,9 @@
 #include "flow_pushbutton.h"
 #include "flow_msg.h"
 
-FlowPushButton::FlowPushButton(FlowCtx* flow_ctx, char* p_name, double x1,
-    double y1, double width, double height)
-    : ctx(flow_ctx), pos(flow_ctx, x1, y1),
-      r(flow_ctx, x1, y1, width, height, flow_eDrawType_Line, 1),
+FlowPushButton::FlowPushButton(FlowCtx* flow_ctx, char* p_name, double x1, double y1, double width,
+                               double height)
+    : ctx(flow_ctx), pos(flow_ctx, x1, y1), r(flow_ctx, x1, y1, width, height, flow_eDrawType_Line, 1),
       t(flow_ctx, p_name, x1, y1 + height / 2, flow_eDrawType_TextRoboto, 1)
 {
   strcpy(name, p_name);
@@ -64,12 +63,10 @@ void FlowPushButton::draw(int ll_x, int ll_y, int ur_x, int ur_y)
   //  r.draw( &pos, 0);
   //  t.draw( &pos, 0);
 
-  ctx->fdraw->rect(ctx, pos.z_x + r.ll.z_x, pos.z_y + r.ll.z_y,
-      r.ur.z_x - r.ll.z_x, r.ur.z_y - r.ll.z_y, r.draw_type, r.line_width - 1,
-      0, 0);
-  ctx->fdraw->text(ctx, pos.z_x + t.p.z_x, pos.z_y + t.p.z_y, t.text,
-      strlen(t.text), t.draw_type, t.text_size, 0, 0, 0,
-      ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * t.text_size));
+  ctx->fdraw->rect(ctx, pos.z_x + r.ll.z_x, pos.z_y + r.ll.z_y, r.ur.z_x - r.ll.z_x, r.ur.z_y - r.ll.z_y,
+                   r.draw_type, r.line_width - 1, 0, 0);
+  ctx->fdraw->text(ctx, pos.z_x + t.p.z_x, pos.z_y + t.p.z_y, t.text, strlen(t.text), t.draw_type,
+                   t.text_size, 0, 0, 0, ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * t.text_size));
 }
 
 int FlowPushButton::event_handler(flow_eEvent event, int x, int y)
@@ -77,11 +74,13 @@ int FlowPushButton::event_handler(flow_eEvent event, int x, int y)
   int sts;
 
   sts = 0;
-  switch (event) {
+  switch (event)
+  {
   case flow_eEvent_MB1Click:
 
-    if (r.ll.z_x + pos.z_x <= x && x <= r.ur.z_x + pos.z_x
-        && r.ll.z_y + pos.z_y <= y && y <= r.ur.z_y + pos.z_y) {
+    if (r.ll.z_x + pos.z_x <= x && x <= r.ur.z_x + pos.z_x && r.ll.z_y + pos.z_y <= y &&
+        y <= r.ur.z_y + pos.z_y)
+    {
       sts = FLOW__NO_PROPAGATE;
       if (streq(name, "Zoom in"))
         ctx->zoom(1.25);
@@ -101,16 +100,19 @@ int FlowPushButton::event_handler(flow_eEvent event, int x, int y)
         ctx->cut();
       else if (streq(name, "Paste"))
         ctx->paste();
-      else if (streq(name, "ConType")) {
+      else if (streq(name, "ConType"))
+      {
         int i;
-        for (i = 0; i < ctx->a_cc.size(); i++) {
+        for (i = 0; i < ctx->a_cc.size(); i++)
+        {
           if (ctx->default_conclass == ctx->a_cc[i])
             break;
         }
         if (++i >= ctx->a_cc.size())
           i = 0;
         ctx->set_default_conclass(ctx->a_cc[i]);
-      } else
+      }
+      else
         std::cout << "Unknown pushbutton\n";
       break;
     default:;

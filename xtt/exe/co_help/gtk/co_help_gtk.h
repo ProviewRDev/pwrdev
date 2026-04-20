@@ -41,7 +41,8 @@
 
 #include "co_help_main.h"
 
-class CoHelpGtk : public CoHelpMain {
+class CoHelpGtk : public CoHelpMain
+{
 public:
   CoHelpGtk(int argc, char* argv[], int* sts);
   ~CoHelpGtk();

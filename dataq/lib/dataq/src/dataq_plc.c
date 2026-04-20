@@ -38,13 +38,14 @@
 
 #include "pwr.h"
 
-typedef struct {
-  pwr_tDataRef                        Data pwr_dAlignLW;
-  pwr_tBoolean                        Front pwr_dAlignW;
-  pwr_tBoolean                        Back pwr_dAlignW;
-  pwr_tRefId                          Dlid pwr_dAlignW;
-  pwr_tBoolean                        Select pwr_dAlignW;
-  pwr_tBoolean                        SelectOld pwr_dAlignW;
+typedef struct
+{
+  pwr_tDataRef Data pwr_dAlignLW;
+  pwr_tBoolean Front pwr_dAlignW;
+  pwr_tBoolean Back pwr_dAlignW;
+  pwr_tRefId Dlid pwr_dAlignW;
+  pwr_tBoolean Select pwr_dAlignW;
+  pwr_tBoolean SelectOld pwr_dAlignW;
 } pwr_tDataQBus;
 
 #include "co_cdh.h"
@@ -65,7 +66,7 @@ typedef struct {
 static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o);
 
 /*      DataQ
-*/
+ */
 void DataQFo_init_time(pwr_sClass_DataQFo* o)
 {
   pwr_sAttrRef attrref;
@@ -75,13 +76,14 @@ void DataQFo_init_time(pwr_sClass_DataQFo* o)
 
   /* Get new object pointers at restart av plc program */
   data_index = (pwr_sClass_DataQBus*)&co->Data[0];
-  for (i = 1; i <= co->DataSize; i++) {
+  for (i = 1; i <= co->DataSize; i++)
+  {
     attrref = data_index->Data.Aref;
-    sts = gdh_DLRefObjectInfoAttrref(
-        &attrref, (pwr_tAddress*)&data_index->Data.Ptr, &data_index->Dlid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&data_index->Data.Ptr, &data_index->Dlid);
     data_index++;
   }
-  if (co->DataSize) {
+  if (co->DataSize)
+  {
     data_index = (pwr_sClass_DataQBus*)&co->Data[0];
     data_index += co->DataSize - 1;
     memcpy(&co->Super.Trp.DataL, data_index, sizeof(*data_index));
@@ -100,9 +102,9 @@ void DataQFo_init(pwr_sClass_DataQFo* o)
   pwr_tDlid dlid;
   pwr_sClass_DataQ1* co;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
-  if (EVEN(sts)) {
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  if (EVEN(sts))
+  {
     o->PlcConnectP = 0;
     return;
   }
@@ -112,14 +114,17 @@ void DataQFo_init(pwr_sClass_DataQFo* o)
 
   if (!(co->Super.Config.Function & pwr_mDataQOptionsMask_Backup))
     DataQFo_init_time(o);
-  else {
+  else
+  {
     /* Backup, reset all nonvalid pointers */
     data_index = (pwr_sClass_DataQBus*)&co->Data[0];
-    for (i = 1; i <= co->DataSize; i++) {
+    for (i = 1; i <= co->DataSize; i++)
+    {
       data_index->Data.Ptr = NULL;
       data_index++;
     }
-    if (co->DataSize) {
+    if (co->DataSize)
+    {
       co->Super.Trp.DataL.Data.Ptr = NULL;
       o->DataLast.Data.Ptr = NULL;
     }
@@ -128,7 +133,6 @@ void DataQFo_init(pwr_sClass_DataQFo* o)
   if (co->Super.Config.MaxSize > co->Super.Intern.DataElements)
     co->Super.Config.MaxSize = co->Super.Intern.DataElements;
 }
-
 
 /*_*
   DataQFo
@@ -153,20 +157,24 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
 
   pwr_sClass_DataQ1* co = (pwr_sClass_DataQ1*)o->PlcConnectP;
 
-  if (co->Super.Config.Function == pwr_eDataQFunctionEnum_StoreQueue) {
+  if (co->Super.Config.Function == pwr_eDataQFunctionEnum_StoreQueue)
+  {
     DataQStoreFo_exec(tp, o);
     return;
   }
 
-  if (co->Super.Intern.InitTime) {
+  if (co->Super.Intern.InitTime)
+  {
     if (!(co->Super.Intern.ReloadDone & pwr_mDataQBackupMask_BackupLoaded))
       return;
-    else {
+    else
+    {
       lck_LockNMps;
       DataQFo_init_time(o);
       co->Super.Intern.ReloadDone &= ~pwr_mDataQBackupMask_BackupLoaded;
     }
-  } else
+  }
+  else
     lck_LockNMps;
 
   if (o->FrontNew)
@@ -176,17 +184,19 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
   if (co->Super.Config.MaxSize > NMPS_CELL_MAXSIZE)
     co->Super.Config.MaxSize = NMPS_CELL_MAXSIZE;
 
-  if (o->ResetObjectP || co->Super.Intern.QReset) {
-    if ((o->ResetObjectP && *o->ResetObjectP) || co->Super.Intern.QReset) {
+  if (o->ResetObjectP || co->Super.Intern.QReset)
+  {
+    if ((o->ResetObjectP && *o->ResetObjectP) || co->Super.Intern.QReset)
+    {
       data_index = (pwr_sClass_DataQBus*)&co->Data[0];
-      for (i = 1; i <= co->DataSize; i++) {
+      for (i = 1; i <= co->DataSize; i++)
+      {
         sts = gdh_DLUnrefObjectInfo(data_index->Dlid);
         if (co->Super.Config.Options & pwr_mDataQOptionsMask_DeleteWhenReset)
           sts = gdh_DeleteObject(data_index->Data.Aref.Objid);
         data_index++;
       }
-      memset(&co->Data[0], 0, co->DataSize * 
-	  sizeof(pwr_sClass_DataQBus));
+      memset(&co->Data[0], 0, co->DataSize * sizeof(pwr_sClass_DataQBus));
       memset(&co->Super.Trp.DataL, 0, sizeof(pwr_sClass_DataQBus));
       memset(&o->DataLast, 0, sizeof(pwr_sClass_DataQBus));
       memset(&o->Data1, 0, sizeof(pwr_sClass_DataQBus));
@@ -194,7 +204,7 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       co->Super.Intern.QueueFull = o->QueueFull;
       co->DataSize = 0;
       if (!o->OldReset)
-	co->Super.Intern.RQReset = 1;
+        co->Super.Intern.RQReset = 1;
       if (co->Super.Config.Options & pwr_mDataQOptionsMask_Backup)
         co->Super.Intern.BackupNow = 1;
     }
@@ -202,51 +212,61 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       o->OldReset = *o->ResetObjectP;
     co->Super.Intern.QReset = 0;
   }
-  if ( co->Super.Config.Options & pwr_mDataQOptionsMask_CheckObjects) {
+  if (co->Super.Config.Options & pwr_mDataQOptionsMask_CheckObjects)
+  {
     data_index = &co->Data[0];
-    for ( i = 0; i < co->DataSize; i++) {
+    for (i = 0; i < co->DataSize; i++)
+    {
       sts = gdh_CheckLocalObject(data_index->Data.Aref.Objid);
-      if ( EVEN(sts)) {
-	/* Remove object */
-	sts = gdh_DLUnrefObjectInfo(data_index->Dlid);
-	if (i < co->DataSize) {
-	  size = (co->DataSize - i) * sizeof(*data_max);
+      if (EVEN(sts))
+      {
+        /* Remove object */
+        sts = gdh_DLUnrefObjectInfo(data_index->Dlid);
+        if (i < co->DataSize)
+        {
+          size = (co->DataSize - i) * sizeof(*data_max);
 #if defined OS_LINUX
-	  tmp_buf = malloc(size);
-	  memcpy(tmp_buf, (char*)data_index + sizeof(*data_max), size);
-	  memcpy(data_index, tmp_buf, size);
-	  free(tmp_buf);
+          tmp_buf = malloc(size);
+          memcpy(tmp_buf, (char*)data_index + sizeof(*data_max), size);
+          memcpy(data_index, tmp_buf, size);
+          free(tmp_buf);
 #else
-	  memcpy(data_index, (char*)data_index + sizeof(*data_max), size);
+          memcpy(data_index, (char*)data_index + sizeof(*data_max), size);
 #endif
-	}
-	data_last = &co->Data[0];
-	data_last += co->DataSize - 1;
-	memset(data_last, 0, sizeof(*data_last));
-	o->QueueFull = 0;
-	co->Super.Intern.QueueFull = o->QueueFull;
-	co->DataSize--;
-	if (co->DataSize > 0) {
-	  data_last--;
-	  memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
-	  memcpy(&o->DataLast, data_last, sizeof(*data_last));
-	} else {
-	  memset(&co->Super.Trp.DataL, 0, sizeof(*data_last));
-	  memset(&o->DataLast, 0, sizeof(*data_last));
-	}
-	i--;
+        }
+        data_last = &co->Data[0];
+        data_last += co->DataSize - 1;
+        memset(data_last, 0, sizeof(*data_last));
+        o->QueueFull = 0;
+        co->Super.Intern.QueueFull = o->QueueFull;
+        co->DataSize--;
+        if (co->DataSize > 0)
+        {
+          data_last--;
+          memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
+          memcpy(&o->DataLast, data_last, sizeof(*data_last));
+        }
+        else
+        {
+          memset(&co->Super.Trp.DataL, 0, sizeof(*data_last));
+          memset(&o->DataLast, 0, sizeof(*data_last));
+        }
+        i--;
       }
       else
-	data_index++;
+        data_index++;
     }
   }
 
-  if (co->Super.Control.Commit) {
+  if (co->Super.Control.Commit)
+  {
     /* Insert new object in Front position */
 
-    switch (co->Super.Control.Operation) {
+    switch (co->Super.Control.Operation)
+    {
     case pwr_eDataQCtlEnum_Insert:
       co->Super.Control.Index = 1;
+    /* fall through */
     case pwr_eDataQCtlEnum_InsertIndex:
       /* Direct link to extern objid */
       if (co->Super.Control.Index <= 0 || co->Super.Control.Index > co->Super.Config.MaxSize)
@@ -255,44 +275,44 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
         co->Super.Control.Status = DATAQ__QUEUEFULL;
       else if (co->Super.Control.Index > co->DataSize + 1)
         co->Super.Control.Status = DATAQ__EXTERNIDX;
-      else {
-	data_index = (pwr_sClass_DataQBus*)&co->Data[0];
-	for ( i = 0; i < co->DataSize; i++) {
-	  if ( cdh_ObjidIsEqual(data_index->Data.Aref.Objid, co->Super.Control.Objid)) {
-	    co->Super.Control.Status = DATAQ__DATAALREXIST;
-	    co->Super.Control.Commit = 0;
-	    data_index = 0;
-	    break;
-	  }
-	  data_index++;
-	}
-	if ( !data_index)
-	  break;
+      else
+      {
+        data_index = (pwr_sClass_DataQBus*)&co->Data[0];
+        for (i = 0; i < co->DataSize; i++)
+        {
+          if (cdh_ObjidIsEqual(data_index->Data.Aref.Objid, co->Super.Control.Objid))
+          {
+            co->Super.Control.Status = DATAQ__DATAALREXIST;
+            co->Super.Control.Commit = 0;
+            data_index = 0;
+            break;
+          }
+          data_index++;
+        }
+        if (!data_index)
+          break;
 
         extern_attrref = cdh_ObjidToAref(co->Super.Control.Objid);
-        co->Super.Control.Status = gdh_DLRefObjectInfoAttrref(
-            &extern_attrref, (pwr_tAddress*)&data_pointer, &data_dlid);
+        co->Super.Control.Status =
+            gdh_DLRefObjectInfoAttrref(&extern_attrref, (pwr_tAddress*)&data_pointer, &data_dlid);
       }
-      if (ODD(co->Super.Control.Status)) {
+      if (ODD(co->Super.Control.Status))
+      {
         co->Super.Control.Commit = 0;
         data_index = &co->Data[0];
         data_index += co->Super.Control.Index - 1;
 
-        if (co->DataSize >= co->Super.Control.Index) {
+        if (co->DataSize >= co->Super.Control.Index)
+        {
 #if defined OS_LINUX
-          tmp_buf = malloc((co->DataSize - co->Super.Control.Index + 1)
-              * sizeof(*data_max));
-          memcpy(
-              tmp_buf, data_index, (co->DataSize - co->Super.Control.Index + 1)
-                  * sizeof(*data_max));
+          tmp_buf = malloc((co->DataSize - co->Super.Control.Index + 1) * sizeof(*data_max));
+          memcpy(tmp_buf, data_index, (co->DataSize - co->Super.Control.Index + 1) * sizeof(*data_max));
           memcpy((char*)data_index + sizeof(*data_max), tmp_buf,
-              (co->DataSize - co->Super.Control.Index + 1)
-                  * sizeof(*data_max));
+                 (co->DataSize - co->Super.Control.Index + 1) * sizeof(*data_max));
           free(tmp_buf);
 #else
           memcpy((char*)data_index + sizeof(*data_max), data_index,
-              (co->DataSize - co->Super.Control.Index + 1)
-                  * sizeof(*data_max));
+                 (co->DataSize - co->Super.Control.Index + 1) * sizeof(*data_max));
 #endif
         }
         data_index->Data.Ptr = (pwr_tVoid*)data_pointer;
@@ -302,42 +322,46 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
         data_index->Dlid = data_dlid;
 
         co->DataSize++;
-        if (co->DataSize == co->Super.Config.MaxSize) {
+        if (co->DataSize == co->Super.Config.MaxSize)
+        {
           o->QueueFull = 1;
-	  co->Super.Intern.QueueFull = o->QueueFull;
-	}
+          co->Super.Intern.QueueFull = o->QueueFull;
+        }
         data_last = &co->Data[0];
         data_last += co->DataSize - 1;
         memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
         memcpy(&o->DataLast, data_last, sizeof(*data_last));
         if (co->Super.Control.Operation == pwr_eDataQCtlEnum_Insert)
           o->FrontNew = 1;
-	co->Super.Control.Status = DATAQ__SUCCESS;
-      } else
+        co->Super.Control.Status = DATAQ__SUCCESS;
+      }
+      else
         co->Super.Control.Commit = 0;
       o->Data1 = co->Data[0];
       break;
     case pwr_eDataQCtlEnum_DeleteObjid:
     case pwr_eDataQCtlEnum_RemoveObjid:
       data_index = (pwr_sClass_DataQBus*)&co->Data[0];
-      for (co->Super.Control.Index = 1; co->Super.Control.Index <= co->DataSize;
-           co->Super.Control.Index++) {
-        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-                sizeof(pwr_tObjid)))
+      for (co->Super.Control.Index = 1; co->Super.Control.Index <= co->DataSize; co->Super.Control.Index++)
+      {
+        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
           break;
         data_index++;
       }
-      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
+      {
         co->Super.Control.Status = DATAQ__DATANOTFOUND;
         co->Super.Control.Commit = 0;
         break;
       }
+    /* fall through */
     case pwr_eDataQCtlEnum_Delete:
       if (co->Super.Control.Operation == pwr_eDataQCtlEnum_Delete)
         co->Super.Control.Index = 1;
+    /* fall through */
     case pwr_eDataQCtlEnum_DeleteIndex:
-      if (co->Super.Control.Index > co->DataSize || co->Super.Control.Index <= 0) {
+      if (co->Super.Control.Index > co->DataSize || co->Super.Control.Index <= 0)
+      {
         co->Super.Control.Status = DATAQ__EXTERNIDX;
         co->Super.Control.Commit = 0;
         break;
@@ -346,11 +370,12 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       data_index = &co->Data[0];
       data_index += co->Super.Control.Index - 1;
       sts = gdh_DLUnrefObjectInfo(data_index->Dlid);
-      if (co->Super.Config.Options & pwr_mDataQOptionsMask_DeleteWhenRemove
-          && co->Super.Control.Operation != pwr_eDataQCtlEnum_RemoveObjid)
+      if (co->Super.Config.Options & pwr_mDataQOptionsMask_DeleteWhenRemove &&
+          co->Super.Control.Operation != pwr_eDataQCtlEnum_RemoveObjid)
         sts = gdh_DeleteObject(data_index->Data.Aref.Objid);
 
-      if (co->Super.Control.Index < co->DataSize) {
+      if (co->Super.Control.Index < co->DataSize)
+      {
         size = (co->DataSize - co->Super.Control.Index) * sizeof(*data_max);
 #if defined OS_LINUX
         tmp_buf = malloc(size);
@@ -368,11 +393,14 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       co->Super.Intern.QueueFull = o->QueueFull;
       co->DataSize--;
       co->Super.Control.Commit = 0;
-      if (co->DataSize > 0) {
+      if (co->DataSize > 0)
+      {
         data_last--;
         memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
         memcpy(&o->DataLast, data_last, sizeof(*data_last));
-      } else {
+      }
+      else
+      {
         memset(&co->Super.Trp.DataL, 0, sizeof(*data_last));
         memset(&o->DataLast, 0, sizeof(*data_last));
       }
@@ -381,27 +409,28 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       break;
     case pwr_eDataQCtlEnum_MoveForward:
       data_index = &co->Data[0];
-      for (co->Super.Control.Index = 1; co->Super.Control.Index <= co->DataSize;
-           co->Super.Control.Index++) {
-        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-                sizeof(pwr_tObjid)))
+      for (co->Super.Control.Index = 1; co->Super.Control.Index <= co->DataSize; co->Super.Control.Index++)
+      {
+        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
           break;
         data_index++;
       }
-      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
+      {
         co->Super.Control.Status = DATAQ__DATANOTFOUND;
         co->Super.Control.Commit = 0;
         break;
       }
-      if (co->Super.Control.Index >= co->DataSize) {
+      if (co->Super.Control.Index >= co->DataSize)
+      {
         co->Super.Control.Status = DATAQ__EXTERNIDX;
         co->Super.Control.Commit = 0;
         break;
       }
       data_index = &co->Data[0];
       data_index += co->Super.Control.Index - 1;
-      if (!(data_index->Front && data_index->Back)) {
+      if (!(data_index->Front && data_index->Back))
+      {
         co->Super.Control.Status = DATAQ__DATASPLIT;
         co->Super.Control.Commit = 0;
         break;
@@ -411,7 +440,8 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       memcpy(data_index, &data_tmp, sizeof(*data_index));
       co->Super.Control.Commit = 0;
 
-      if (co->Super.Control.Index == co->DataSize - 1) {
+      if (co->Super.Control.Index == co->DataSize - 1)
+      {
         data_last = &co->Data[0];
         data_last += co->DataSize - 1;
         memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
@@ -422,27 +452,28 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       break;
     case pwr_eDataQCtlEnum_MoveBackward:
       data_index = (pwr_sClass_DataQBus*)&co->Data[0];
-      for (co->Super.Control.Index = 1; co->Super.Control.Index <= co->DataSize;
-           co->Super.Control.Index++) {
-        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-                sizeof(pwr_tObjid)))
+      for (co->Super.Control.Index = 1; co->Super.Control.Index <= co->DataSize; co->Super.Control.Index++)
+      {
+        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
           break;
         data_index++;
       }
-      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
+      {
         co->Super.Control.Status = DATAQ__DATANOTFOUND;
         co->Super.Control.Commit = 0;
         break;
       }
-      if (co->Super.Control.Index <= 1) {
+      if (co->Super.Control.Index <= 1)
+      {
         co->Super.Control.Status = DATAQ__EXTERNIDX;
         co->Super.Control.Commit = 0;
         break;
       }
       data_index = &co->Data[0];
       data_index += co->Super.Control.Index - 1;
-      if (!(data_index->Front && data_index->Back)) {
+      if (!(data_index->Front && data_index->Back))
+      {
         co->Super.Control.Status = DATAQ__DATASPLIT;
         co->Super.Control.Commit = 0;
         break;
@@ -452,7 +483,8 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       memcpy(data_index, &data_tmp, sizeof(*data_index));
       co->Super.Control.Commit = 0;
 
-      if (co->Super.Control.Index == co->DataSize) {
+      if (co->Super.Control.Index == co->DataSize)
+      {
         data_last = &co->Data[0];
         data_last += co->DataSize - 1;
         memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
@@ -465,36 +497,38 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     if (co->Super.Config.Options & pwr_mDataQOptionsMask_Backup)
       co->Super.Intern.BackupNow = 1;
   }
-  if (co->Super.Trp.InFlag) {
-    if (co->Super.Config.Function == pwr_eDataQFunctionEnum_EndQueue) {
-      switch (co->Super.Trp.InOpType) {
+  if (co->Super.Trp.InFlag)
+  {
+    if (co->Super.Config.Function == pwr_eDataQFunctionEnum_EndQueue)
+    {
+      switch (co->Super.Trp.InOpType)
+      {
       case pwr_eQTrpOpEnum_ForwardUnit:
-	/* Wait for dataq_server to send feedback */
-	if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewFeedback &&
-	    co->Data[0].Data.Ptr)
-	  break;
-	if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_IsFeedbackTarget &&
-	    !co->Data[0].Data.Ptr) {
-	  co->Data[0].Data.Ptr = co->Super.Trp.InPtr;
-	  co->Data[0].Data.Aref = cdh_ObjidToAref(co->Super.Trp.InObjid);
-	  co->Data[0].Front = 1;
-	  co->Data[0].Back = 1;
-	  co->Data[0].Dlid = co->Super.Trp.InDlid;
-	  co->Super.Intern.RQStatus |= pwr_mRemoteDataQStatusMask_NewFeedback;
-	  break;
-	}
-	if (!(co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewFeedback) &&
-	    co->Data[0].Data.Ptr) {
-	  memset(&co->Data[0], 0, sizeof(pwr_sClass_DataQBus));
-	}
+        /* Wait for dataq_server to send feedback */
+        if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewFeedback && co->Data[0].Data.Ptr)
+          break;
+        if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_IsFeedbackTarget && !co->Data[0].Data.Ptr)
+        {
+          co->Data[0].Data.Ptr = co->Super.Trp.InPtr;
+          co->Data[0].Data.Aref = cdh_ObjidToAref(co->Super.Trp.InObjid);
+          co->Data[0].Front = 1;
+          co->Data[0].Back = 1;
+          co->Data[0].Dlid = co->Super.Trp.InDlid;
+          co->Super.Intern.RQStatus |= pwr_mRemoteDataQStatusMask_NewFeedback;
+          break;
+        }
+        if (!(co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewFeedback) && co->Data[0].Data.Ptr)
+        {
+          memset(&co->Data[0], 0, sizeof(pwr_sClass_DataQBus));
+        }
 
-	/* Remove inserted object */
-	sts = gdh_DLUnrefObjectInfo(co->Super.Trp.InDlid);
-	if (co->Super.Config.Options & pwr_mDataQOptionsMask_DeleteWhenRemove)
-	  sts = gdh_DeleteObject(co->Super.Trp.InObjid);
-	co->Super.Trp.InFlag = 0;
-	o->FrontNew = 1;
-	break;
+        /* Remove inserted object */
+        sts = gdh_DLUnrefObjectInfo(co->Super.Trp.InDlid);
+        if (co->Super.Config.Options & pwr_mDataQOptionsMask_DeleteWhenRemove)
+          sts = gdh_DeleteObject(co->Super.Trp.InObjid);
+        co->Super.Trp.InFlag = 0;
+        o->FrontNew = 1;
+        break;
       }
       lck_UnlockNMps;
       return;
@@ -502,21 +536,22 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
 
     /* Insert new object in Front position */
 
-    switch (co->Super.Trp.InOpType) {
+    switch (co->Super.Trp.InOpType)
+    {
     case pwr_eQTrpOpEnum_ForwardFront:
       /* Insert at front of object front of data */
       if (o->QueueFull)
-	break;
-      
-      if (co->DataSize > 0) {
+        break;
+
+      if (co->DataSize > 0)
+      {
 #if defined OS_LINUX
         tmp_buf = malloc(co->DataSize * sizeof(*data_max));
         memcpy(tmp_buf, &co->Data[0], co->DataSize * sizeof(*data_max));
         memcpy(&co->Data[1], tmp_buf, co->DataSize * sizeof(*data_max));
         free(tmp_buf);
 #else
-        memcpy(&co->Data[1], &co->Data[0],
-            co->DataSize * sizeof(*data_max));
+        memcpy(&co->Data[1], &co->Data[0], co->DataSize * sizeof(*data_max));
 #endif
       }
       co->Data[0].Data.Ptr = co->Super.Trp.InPtr;
@@ -527,9 +562,10 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       co->Data[0].Dlid = co->Super.Trp.InDlid;
       o->FrontNew = 1;
       co->DataSize++;
-      if (co->DataSize == co->Super.Config.MaxSize) {
+      if (co->DataSize == co->Super.Config.MaxSize)
+      {
         o->QueueFull = 1;
-	co->Super.Intern.QueueFull = o->QueueFull;
+        co->Super.Intern.QueueFull = o->QueueFull;
       }
       data_last = &co->Data[0];
       data_last += co->DataSize - 1;
@@ -538,15 +574,16 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       o->Data1 = co->Data[0];
       break;
     case pwr_eQTrpOpEnum_ForwardBack:
-      if (memcmp(&co->Data[0].Data.Aref.Objid, &co->Super.Trp.InObjid,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&co->Data[0].Data.Aref.Objid, &co->Super.Trp.InObjid, sizeof(pwr_tObjid)))
+      {
         /* This it not the correct object */
         co->Super.Trp.InFlag = 0;
         lck_UnlockNMps;
         return;
       }
       co->Data[0].Back = 1;
-      if (co->DataSize == 1) {
+      if (co->DataSize == 1)
+      {
         co->Super.Trp.DataL.Back = 1;
         o->DataLast.Back = 1;
       }
@@ -555,21 +592,21 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       break;
     case pwr_eQTrpOpEnum_ForwardUnit:
       if (o->QueueFull)
-	break;
+        break;
       if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewData)
-	break;
+        break;
       if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewFeedback)
-	break;
+        break;
 
-      if (co->DataSize > 0) {
+      if (co->DataSize > 0)
+      {
 #if defined OS_LINUX
         tmp_buf = malloc(co->DataSize * sizeof(*data_max));
         memcpy(tmp_buf, &co->Data[0], co->DataSize * sizeof(*data_max));
         memcpy(&co->Data[1], tmp_buf, co->DataSize * sizeof(*data_max));
         free(tmp_buf);
 #else
-        memcpy(&co->Data[1], &co->Data[0],
-            co->DataSize * sizeof(*data_max));
+        memcpy(&co->Data[1], &co->Data[0], co->DataSize * sizeof(*data_max));
 #endif
       }
       co->Data[0].Data.Ptr = co->Super.Trp.InPtr;
@@ -584,21 +621,23 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
       memcpy(&o->DataLast, data_last, sizeof(*data_last));
       co->DataSize++;
-      if (co->DataSize == co->Super.Config.MaxSize) {
+      if (co->DataSize == co->Super.Config.MaxSize)
+      {
         o->QueueFull = 1;
-	co->Super.Intern.QueueFull = o->QueueFull;
+        co->Super.Intern.QueueFull = o->QueueFull;
       }
       o->Data1 = co->Data[0];
       if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_HasRemote)
-	co->Super.Intern.RQStatus |= pwr_mRemoteDataQStatusMask_NewData;
-      if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_IsFeedbackTarget) {
-	co->Super.Intern.RQStatus |= pwr_mRemoteDataQStatusMask_NewFeedback;
+        co->Super.Intern.RQStatus |= pwr_mRemoteDataQStatusMask_NewData;
+      if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_IsFeedbackTarget)
+      {
+        co->Super.Intern.RQStatus |= pwr_mRemoteDataQStatusMask_NewFeedback;
       }
       break;
     case pwr_eQTrpOpEnum_ReverseBack:
       /* Insert at rear of object back of data */
       if (o->QueueFull)
-	break;
+        break;
 
       data_last = (pwr_sClass_DataQBus*)&co->Data[0];
       data_last += co->DataSize;
@@ -610,9 +649,10 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       co->Super.Trp.InFlag = 0;
       o->RearNew = 1;
       co->DataSize++;
-      if (co->DataSize == co->Super.Config.MaxSize) {
+      if (co->DataSize == co->Super.Config.MaxSize)
+      {
         o->QueueFull = 1;
-	co->Super.Intern.QueueFull = o->QueueFull;
+        co->Super.Intern.QueueFull = o->QueueFull;
       }
       memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
       memcpy(&o->DataLast, data_last, sizeof(*data_last));
@@ -621,7 +661,7 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     case pwr_eQTrpOpEnum_ReverseUnit:
       /* Insert at rear of object all of data */
       if (o->QueueFull)
-	break;
+        break;
 
       data_last = &co->Data[0];
       data_last += co->DataSize;
@@ -633,9 +673,10 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       co->Super.Trp.InFlag = 0;
       co->DataSize++;
       o->RearNew = 1;
-      if (co->DataSize == co->Super.Config.MaxSize) {
+      if (co->DataSize == co->Super.Config.MaxSize)
+      {
         o->QueueFull = 1;
-	co->Super.Intern.QueueFull = o->QueueFull;
+        co->Super.Intern.QueueFull = o->QueueFull;
       }
       memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
       memcpy(&o->DataLast, data_last, sizeof(*data_last));
@@ -644,8 +685,8 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     case pwr_eQTrpOpEnum_ReverseFront:
       data_last = &co->Data[0];
       data_last += co->DataSize - 1;
-      if (memcmp(&data_last->Data.Aref.Objid, &co->Super.Trp.InObjid,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_last->Data.Aref.Objid, &co->Super.Trp.InObjid, sizeof(pwr_tObjid)))
+      {
         /* This it not the correct object */
         co->Super.Trp.InFlag = 0;
         lck_UnlockNMps;
@@ -661,17 +702,20 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     if (co->Super.Config.Options & pwr_mDataQOptionsMask_Backup)
       co->Super.Intern.BackupNow = 1;
   }
-  if (co->Super.Trp.OutRearFlag) {
+  if (co->Super.Trp.OutRearFlag)
+  {
     /* Remove an object in Rear position */
 
-    switch (co->Super.Trp.OutRearOpType) {
+    switch (co->Super.Trp.OutRearOpType)
+    {
     case pwr_eQTrpOpEnum_Back:
     case pwr_eQTrpOpEnum_Unit:
 
       /* Get the last data */
-      if (co->DataSize == 0) {
+      if (co->DataSize == 0)
+      {
         co->Super.Trp.OutRearFlag = 0;
-	break;
+        break;
       }
 
       data_last = &co->Data[0];
@@ -681,11 +725,14 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       o->QueueFull = 0;
       co->Super.Intern.QueueFull = o->QueueFull;
       co->DataSize--;
-      if (co->DataSize != 0) {
+      if (co->DataSize != 0)
+      {
         data_last--;
         memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
         memcpy(&o->DataLast, data_last, sizeof(*data_last));
-      } else {
+      }
+      else
+      {
         memset(&co->Super.Trp.DataL, 0, sizeof(*data_last));
         memset(&o->DataLast, 0, sizeof(*data_last));
       }
@@ -697,35 +744,35 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       data_last->Front = 0;
       co->Super.Trp.OutRearFlag = 0;
       co->Super.Trp.DataL.Front = 0; /* Korrigeras !!! */
-      o->DataLast.Front = 0; /* Korrigeras !!! */
+      o->DataLast.Front = 0;         /* Korrigeras !!! */
       o->Data1 = co->Data[0];
       break;
     }
     if (co->Super.Config.Options & pwr_mDataQOptionsMask_Backup)
       co->Super.Intern.BackupNow = 1;
   }
-  if (co->Super.Trp.OutFrontFlag) {
+  if (co->Super.Trp.OutFrontFlag)
+  {
     /* Remove an object in Front position */
 
-    switch (co->Super.Trp.OutFrontOpType) {
+    switch (co->Super.Trp.OutFrontOpType)
+    {
     case pwr_eQTrpOpEnum_Front:
     case pwr_eQTrpOpEnum_Unit:
 
       /* Get the last data */
-      if (co->DataSize == 0) {
+      if (co->DataSize == 0)
+      {
         co->Super.Trp.OutFrontFlag = 0;
-	break;
+        break;
       }
 #if defined OS_LINUX
       tmp_buf = malloc((co->DataSize - 1) * sizeof(*data_last));
-      memcpy(tmp_buf, &co->Data[1],
-          (co->DataSize - 1) * sizeof(*data_last));
-      memcpy(&co->Data[0], tmp_buf,
-          (co->DataSize - 1) * sizeof(*data_last));
+      memcpy(tmp_buf, &co->Data[1], (co->DataSize - 1) * sizeof(*data_last));
+      memcpy(&co->Data[0], tmp_buf, (co->DataSize - 1) * sizeof(*data_last));
       free(tmp_buf);
 #else
-      memcpy(&co->Data[0], &co->Data[1],
-          (co->DataSize - 1) * sizeof(*data_last));
+      memcpy(&co->Data[0], &co->Data[1], (co->DataSize - 1) * sizeof(*data_last));
 #endif
       data_last = &co->Data[0];
       data_last += co->DataSize - 1;
@@ -734,11 +781,14 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       co->Super.Intern.QueueFull = o->QueueFull;
       co->DataSize--;
       co->Super.Trp.OutFrontFlag = 0;
-      if (co->DataSize != 0) {
+      if (co->DataSize != 0)
+      {
         data_last--;
         memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
         memcpy(&o->DataLast, data_last, sizeof(*data_last));
-      } else {
+      }
+      else
+      {
         memset(&co->Super.Trp.DataL, 0, sizeof(*data_last));
         memset(&o->DataLast, 0, sizeof(*data_last));
       }
@@ -747,7 +797,8 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     case pwr_eQTrpOpEnum_Back:
       co->Data[0].Back = 0;
       co->Super.Trp.OutFrontFlag = 0;
-      if (co->DataSize == 1) {
+      if (co->DataSize == 1)
+      {
         co->Super.Trp.DataL.Back = 0;
         o->DataLast.Back = 0;
       }
@@ -784,15 +835,18 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
 
   pwr_sClass_DataQ1* co = (pwr_sClass_DataQ1*)o->PlcConnectP;
 
-  if (co->Super.Intern.InitTime) {
+  if (co->Super.Intern.InitTime)
+  {
     if (!(co->Super.Intern.ReloadDone & pwr_mDataQBackupMask_BackupLoaded))
       return;
-    else {
+    else
+    {
       lck_LockNMps;
       DataQFo_init_time((pwr_sClass_DataQFo*)o);
       co->Super.Intern.ReloadDone &= ~pwr_mDataQBackupMask_BackupLoaded;
     }
-  } else
+  }
+  else
     lck_LockNMps;
 
   if (o->FrontNew)
@@ -802,17 +856,19 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
   if (co->Super.Config.MaxSize > NMPS_CELL_MAXSIZE)
     co->Super.Config.MaxSize = NMPS_CELL_MAXSIZE;
 
-  if (o->ResetObjectP || co->Super.Intern.QReset) {
-    if ((o->ResetObjectP && *o->ResetObjectP) || co->Super.Intern.QReset) {
+  if (o->ResetObjectP || co->Super.Intern.QReset)
+  {
+    if ((o->ResetObjectP && *o->ResetObjectP) || co->Super.Intern.QReset)
+    {
       data_index = (pwr_sClass_DataQBus*)&co->Data[0];
-      for (i = 1; i <= co->DataSize; i++) {
+      for (i = 1; i <= co->DataSize; i++)
+      {
         sts = gdh_DLUnrefObjectInfo(data_index->Dlid);
         if (co->Super.Config.Options & pwr_mDataQOptionsMask_DeleteWhenReset)
           sts = gdh_DeleteObject(data_index->Data.Aref.Objid);
         data_index++;
       }
-      memset(&co->Data[0], 0, co->DataSize * 
-	  sizeof(pwr_sClass_DataQBus));
+      memset(&co->Data[0], 0, co->DataSize * sizeof(pwr_sClass_DataQBus));
       memset(&co->Super.Trp.DataL, 0, sizeof(pwr_sClass_DataQBus));
       memset(&o->DataLast, 0, sizeof(pwr_sClass_DataQBus));
       memset(&o->Data1, 0, sizeof(pwr_sClass_DataQBus));
@@ -820,7 +876,7 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       co->Super.Intern.QueueFull = o->QueueFull;
       co->DataSize = 0;
       if (!o->OldReset)
-	co->Super.Intern.RQReset = 1;
+        co->Super.Intern.RQReset = 1;
       if (co->Super.Config.Options & pwr_mDataQOptionsMask_Backup)
         co->Super.Intern.BackupNow = 1;
     }
@@ -829,47 +885,53 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     co->Super.Intern.QReset = 0;
   }
 
-  if ( co->Super.Config.Options & pwr_mDataQOptionsMask_CheckObjects) {
+  if (co->Super.Config.Options & pwr_mDataQOptionsMask_CheckObjects)
+  {
     data_index = &co->Data[0];
-    for ( i = 0; i < co->DataSize; i++) {
+    for (i = 0; i < co->DataSize; i++)
+    {
       sts = gdh_CheckLocalObject(data_index->Data.Aref.Objid);
-      if ( EVEN(sts)) {
-	/* Remove object */
-	sts = gdh_DLUnrefObjectInfo(data_index->Dlid);
-	if (i < co->DataSize) {
-	  size = (co->DataSize - i) * sizeof(*data_max);
+      if (EVEN(sts))
+      {
+        /* Remove object */
+        sts = gdh_DLUnrefObjectInfo(data_index->Dlid);
+        if (i < co->DataSize)
+        {
+          size = (co->DataSize - i) * sizeof(*data_max);
 #if defined OS_LINUX
-	  tmp_buf = malloc(size);
-	  memcpy(tmp_buf, (char*)data_index + sizeof(*data_max), size);
-	  memcpy(data_index, tmp_buf, size);
-	  free(tmp_buf);
+          tmp_buf = malloc(size);
+          memcpy(tmp_buf, (char*)data_index + sizeof(*data_max), size);
+          memcpy(data_index, tmp_buf, size);
+          free(tmp_buf);
 #else
-	  memcpy(data_index, (char*)data_index + sizeof(*data_max), size);
+          memcpy(data_index, (char*)data_index + sizeof(*data_max), size);
 #endif
-	}
-	data_last = &co->Data[0];
-	data_last += co->DataSize - 1;
-	memset(data_last, 0, sizeof(*data_last));
-	o->QueueFull = 0;
-	co->Super.Intern.QueueFull = o->QueueFull;
-	co->DataSize--;
-	if ((co->Super.Intern.SelectIndex != 0)
-	    && (co->Super.Intern.SelectIndex > i))
-	  co->Super.Intern.SelectIndex--;
-	i--;
+        }
+        data_last = &co->Data[0];
+        data_last += co->DataSize - 1;
+        memset(data_last, 0, sizeof(*data_last));
+        o->QueueFull = 0;
+        co->Super.Intern.QueueFull = o->QueueFull;
+        co->DataSize--;
+        if ((co->Super.Intern.SelectIndex != 0) && (co->Super.Intern.SelectIndex > i))
+          co->Super.Intern.SelectIndex--;
+        i--;
       }
       else
-	data_index++;
+        data_index++;
     }
   }
 
-  if (co->Super.Control.Commit) {
+  if (co->Super.Control.Commit)
+  {
     /* Insert new object in Front position */
 
-    switch (co->Super.Control.Operation) {
+    switch (co->Super.Control.Operation)
+    {
     case pwr_eDataQCtlEnum_Insert:
     case pwr_eDataQCtlEnum_InsertSelect:
       co->Super.Control.Index = 1;
+    /* fall through */
     case pwr_eDataQCtlEnum_InsertIndex:
       /* Direct link to extern objid */
       if (co->Super.Control.Index <= 0 || co->Super.Control.Index > co->Super.Config.MaxSize)
@@ -878,44 +940,44 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
         co->Super.Control.Status = DATAQ__QUEUEFULL;
       else if (co->Super.Control.Index > co->DataSize + 1)
         co->Super.Control.Status = DATAQ__EXTERNIDX;
-      else {
-	data_index = &co->Data[0];
-	for ( i = 0; i < co->DataSize; i++) {
-	  if ( cdh_ObjidIsEqual(data_index->Data.Aref.Objid, co->Super.Control.Objid)) {
-	    co->Super.Control.Status = DATAQ__DATAALREXIST;
-	    co->Super.Control.Commit = 0;
-	    data_index = 0;
-	    break;
-	  }
-	  data_index++;
-	}
-	if ( !data_index)
-	  break;
+      else
+      {
+        data_index = &co->Data[0];
+        for (i = 0; i < co->DataSize; i++)
+        {
+          if (cdh_ObjidIsEqual(data_index->Data.Aref.Objid, co->Super.Control.Objid))
+          {
+            co->Super.Control.Status = DATAQ__DATAALREXIST;
+            co->Super.Control.Commit = 0;
+            data_index = 0;
+            break;
+          }
+          data_index++;
+        }
+        if (!data_index)
+          break;
 
         extern_attrref = cdh_ObjidToAref(co->Super.Control.Objid);
-        co->Super.Control.Status = gdh_DLRefObjectInfoAttrref(
-            &extern_attrref, (pwr_tAddress*)&data_pointer, &data_dlid);
+        co->Super.Control.Status =
+            gdh_DLRefObjectInfoAttrref(&extern_attrref, (pwr_tAddress*)&data_pointer, &data_dlid);
       }
-      if (ODD(co->Super.Control.Status)) {
+      if (ODD(co->Super.Control.Status))
+      {
         co->Super.Control.Commit = 0;
         data_index = &co->Data[0];
         data_index += co->Super.Control.Index - 1;
 
-        if (co->DataSize >= co->Super.Control.Index) {
+        if (co->DataSize >= co->Super.Control.Index)
+        {
 #if defined OS_LINUX
-          tmp_buf = malloc((co->DataSize - co->Super.Control.Index + 1)
-              * sizeof(*data_max));
-          memcpy(
-              tmp_buf, data_index, (co->DataSize - co->Super.Control.Index + 1)
-                  * sizeof(*data_max));
+          tmp_buf = malloc((co->DataSize - co->Super.Control.Index + 1) * sizeof(*data_max));
+          memcpy(tmp_buf, data_index, (co->DataSize - co->Super.Control.Index + 1) * sizeof(*data_max));
           memcpy((char*)data_index + sizeof(*data_max), tmp_buf,
-              (co->DataSize - co->Super.Control.Index + 1)
-                  * sizeof(*data_max));
+                 (co->DataSize - co->Super.Control.Index + 1) * sizeof(*data_max));
           free(tmp_buf);
 #else
           memcpy((char*)data_index + sizeof(*data_max), data_index,
-              (co->DataSize - co->Super.Control.Index + 1)
-                  * sizeof(*data_max));
+                 (co->DataSize - co->Super.Control.Index + 1) * sizeof(*data_max));
 #endif
         }
         data_index->Data.Ptr = (pwr_tVoid*)data_pointer;
@@ -923,54 +985,62 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
         data_index->Front = 1;
         data_index->Back = 1;
         data_index->Dlid = data_dlid;
-        if (co->Super.Control.Operation == pwr_eDataQCtlEnum_InsertSelect) {
+        if (co->Super.Control.Operation == pwr_eDataQCtlEnum_InsertSelect)
+        {
           data_index->Select = 1;
         }
         co->DataSize++;
-        if (co->DataSize == co->Super.Config.MaxSize) {
+        if (co->DataSize == co->Super.Config.MaxSize)
+        {
           o->QueueFull = 1;
-	  co->Super.Intern.QueueFull = o->QueueFull;
-	}
-        if ((co->Super.Control.Operation == pwr_eDataQCtlEnum_Insert)
-            || (co->Super.Control.Operation == pwr_eDataQCtlEnum_InsertSelect))
+          co->Super.Intern.QueueFull = o->QueueFull;
+        }
+        if ((co->Super.Control.Operation == pwr_eDataQCtlEnum_Insert) ||
+            (co->Super.Control.Operation == pwr_eDataQCtlEnum_InsertSelect))
           o->FrontNew = 1;
-        if ((co->Super.Intern.SelectIndex != 0)
-            && (co->Super.Intern.SelectIndex >= co->Super.Control.Index))
+        if ((co->Super.Intern.SelectIndex != 0) && (co->Super.Intern.SelectIndex >= co->Super.Control.Index))
           co->Super.Intern.SelectIndex++;
-      } else
+      }
+      else
         co->Super.Control.Commit = 0;
       o->Data1 = co->Data[0];
       break;
     case pwr_eDataQCtlEnum_SelectObjid:
       data_index = &co->Data[0];
-      for (i = 1; i <= co->DataSize; i++) {
-        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-                sizeof(pwr_tObjid))) {
+      for (i = 1; i <= co->DataSize; i++)
+      {
+        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
+        {
           data_index->Select = 1;
           break;
         }
         data_index++;
       }
-      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
+      {
         co->Super.Control.Status = DATAQ__DATANOTFOUND;
       }
       co->Super.Control.Commit = 0;
       break;
     case pwr_eDataQCtlEnum_UnselectObjid:
       data_index = &co->Data[0];
-      for (i = 1; i <= co->DataSize; i++) {
-        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-                sizeof(pwr_tObjid))) {
+      for (i = 1; i <= co->DataSize; i++)
+      {
+        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
+        {
           if (data_index->Select)
             co->Super.Intern.DataSelected--;
           data_index->Select = 0;
-          if (i == co->Super.Intern.SelectIndex) {
-            if (co->Super.Intern.DataSelected > 0) {
+          if (i == co->Super.Intern.SelectIndex)
+          {
+            if (co->Super.Intern.DataSelected > 0)
+            {
               data_last = &co->Data[0];
               data_last += co->DataSize - 1;
-              for (i = co->DataSize; i > 0; i--) {
-                if (data_last->Select) {
+              for (i = co->DataSize; i > 0; i--)
+              {
+                if (data_last->Select)
+                {
                   memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
                   memcpy(&o->DataLast, data_last, sizeof(*data_last));
                   co->Super.Intern.SelectIndex = i;
@@ -978,7 +1048,9 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
                 }
                 data_last--;
               }
-            } else {
+            }
+            else
+            {
               memset(&co->Super.Trp.DataL, 0, sizeof(*data_last));
               memset(&o->DataLast, 0, sizeof(*data_last));
               co->Super.Intern.SelectIndex = 0;
@@ -988,8 +1060,8 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
         }
         data_index++;
       }
-      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
+      {
         co->Super.Control.Status = DATAQ__DATANOTFOUND;
       }
       co->Super.Control.Commit = 0;
@@ -997,24 +1069,26 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     case pwr_eDataQCtlEnum_DeleteObjid:
     case pwr_eDataQCtlEnum_RemoveObjid:
       data_index = &co->Data[0];
-      for (co->Super.Control.Index = 1; co->Super.Control.Index <= co->DataSize;
-           co->Super.Control.Index++) {
-        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-                sizeof(pwr_tObjid)))
+      for (co->Super.Control.Index = 1; co->Super.Control.Index <= co->DataSize; co->Super.Control.Index++)
+      {
+        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
           break;
         data_index++;
       }
-      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
+      {
         co->Super.Control.Status = DATAQ__DATANOTFOUND;
         co->Super.Control.Commit = 0;
         break;
       }
+    /* fall through */
     case pwr_eDataQCtlEnum_Delete:
       if (co->Super.Control.Operation == pwr_eDataQCtlEnum_Delete)
         co->Super.Control.Index = 1;
+    /* fall through */
     case pwr_eDataQCtlEnum_DeleteIndex:
-      if (co->Super.Control.Index > co->DataSize) {
+      if (co->Super.Control.Index > co->DataSize)
+      {
         co->Super.Control.Status = DATAQ__EXTERNIDX;
         co->Super.Control.Commit = 0;
         break;
@@ -1023,19 +1097,24 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       data_index = &co->Data[0];
       data_index += co->Super.Control.Index - 1;
       sts = gdh_DLUnrefObjectInfo(data_index->Dlid);
-      if (co->Super.Config.Options & pwr_mDataQOptionsMask_DeleteWhenRemove
-          && co->Super.Control.Operation != pwr_eDataQCtlEnum_RemoveObjid)
+      if (co->Super.Config.Options & pwr_mDataQOptionsMask_DeleteWhenRemove &&
+          co->Super.Control.Operation != pwr_eDataQCtlEnum_RemoveObjid)
         sts = gdh_DeleteObject(data_index->Data.Aref.Objid);
 
       /* Look for new last selected if data is selected */
-      if (data_index->Select) {
+      if (data_index->Select)
+      {
         co->Super.Intern.DataSelected--;
-        if (co->Super.Intern.SelectIndex == co->Super.Control.Index) {
-          if (co->Super.Intern.DataSelected > 0) {
+        if (co->Super.Intern.SelectIndex == co->Super.Control.Index)
+        {
+          if (co->Super.Intern.DataSelected > 0)
+          {
             data_index = &co->Data[0];
             data_index += co->DataSize - 1;
-            for (i = co->DataSize; i > 0; i--) {
-              if (data_index->Select && i != co->Super.Control.Index) {
+            for (i = co->DataSize; i > 0; i--)
+            {
+              if (data_index->Select && i != co->Super.Control.Index)
+              {
                 memcpy(&co->Super.Trp.DataL, data_index, sizeof(*data_index));
                 memcpy(&o->DataLast, data_index, sizeof(*data_index));
                 co->Super.Intern.SelectIndex = i;
@@ -1043,7 +1122,9 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
               }
               data_index--;
             }
-          } else {
+          }
+          else
+          {
             memset(&co->Super.Trp.DataL, 0, sizeof(*data_last));
             memset(&o->DataLast, 0, sizeof(*data_last));
             co->Super.Intern.SelectIndex = 0;
@@ -1051,7 +1132,8 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
         }
       }
 
-      if (co->Super.Control.Index < co->DataSize) {
+      if (co->Super.Control.Index < co->DataSize)
+      {
         size = (co->DataSize - co->Super.Control.Index) * sizeof(*data_max);
 #if defined OS_LINUX
         tmp_buf = malloc(size);
@@ -1070,35 +1152,35 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       co->DataSize--;
       co->Super.Control.Commit = 0;
       data_last--;
-      if ((co->Super.Intern.SelectIndex != 0)
-          && (co->Super.Intern.SelectIndex > co->Super.Control.Index))
+      if ((co->Super.Intern.SelectIndex != 0) && (co->Super.Intern.SelectIndex > co->Super.Control.Index))
         co->Super.Intern.SelectIndex--;
       o->Data1 = co->Data[0];
       co->Super.Control.Status = DATAQ__SUCCESS;
       break;
     case pwr_eDataQCtlEnum_MoveForward:
       data_index = &co->Data[0];
-      for (co->Super.Control.Index = 1; co->Super.Control.Index <= co->DataSize;
-           co->Super.Control.Index++) {
-        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-                sizeof(pwr_tObjid)))
+      for (co->Super.Control.Index = 1; co->Super.Control.Index <= co->DataSize; co->Super.Control.Index++)
+      {
+        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
           break;
         data_index++;
       }
-      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
+      {
         co->Super.Control.Status = DATAQ__DATANOTFOUND;
         co->Super.Control.Commit = 0;
         break;
       }
-      if (co->Super.Control.Index >= co->DataSize) {
+      if (co->Super.Control.Index >= co->DataSize)
+      {
         co->Super.Control.Status = DATAQ__EXTERNIDX;
         co->Super.Control.Commit = 0;
         break;
       }
       data_index = &co->Data[0];
       data_index += co->Super.Control.Index - 1;
-      if (!(data_index->Front && data_index->Back)) {
+      if (!(data_index->Front && data_index->Back))
+      {
         co->Super.Control.Status = 2; /* Felkod !!! */
         co->Super.Control.Commit = 0;
         break;
@@ -1114,8 +1196,8 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
 
       co->Super.Control.Commit = 0;
 
-      if ((co->Super.Intern.DataSelected == 0)
-          && (co->Super.Control.Index == co->DataSize - 1)) {
+      if ((co->Super.Intern.DataSelected == 0) && (co->Super.Control.Index == co->DataSize - 1))
+      {
         data_last = &co->Data[0];
         data_last += co->DataSize - 1;
         memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
@@ -1126,27 +1208,28 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       break;
     case pwr_eDataQCtlEnum_MoveBackward:
       data_index = &co->Data[0];
-      for (co->Super.Control.Index = 1; co->Super.Control.Index <= co->DataSize;
-           co->Super.Control.Index++) {
-        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-                sizeof(pwr_tObjid)))
+      for (co->Super.Control.Index = 1; co->Super.Control.Index <= co->DataSize; co->Super.Control.Index++)
+      {
+        if (!memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
           break;
         data_index++;
       }
-      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->Data.Aref.Objid, &co->Super.Control.Objid, sizeof(pwr_tObjid)))
+      {
         co->Super.Control.Status = DATAQ__DATANOTFOUND;
         co->Super.Control.Commit = 0;
         break;
       }
-      if (co->Super.Control.Index <= 1) {
+      if (co->Super.Control.Index <= 1)
+      {
         co->Super.Control.Status = DATAQ__EXTERNIDX;
         co->Super.Control.Commit = 0;
         break;
       }
       data_index = &co->Data[0];
       data_index += co->Super.Control.Index - 1;
-      if (!(data_index->Front && data_index->Back)) {
+      if (!(data_index->Front && data_index->Back))
+      {
         co->Super.Control.Status = DATAQ__DATASPLIT;
         co->Super.Control.Commit = 0;
         break;
@@ -1162,8 +1245,8 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
 
       co->Super.Control.Commit = 0;
 
-      if ((co->Super.Intern.DataSelected == 0)
-          && (co->Super.Control.Index == co->DataSize)) {
+      if ((co->Super.Intern.DataSelected == 0) && (co->Super.Control.Index == co->DataSize))
+      {
         data_last = &co->Data[0];
         data_last += co->DataSize - 1;
         memcpy(&co->Super.Trp.DataL, data_last, sizeof(*data_last));
@@ -1179,8 +1262,10 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
   /* Count and find new selected objects */
   co->Super.Intern.DataSelected = 0;
   data_index = &co->Data[0];
-  for (i = 1; i <= co->DataSize; i++) {
-    if (data_index->Select && !data_index->SelectOld) {
+  for (i = 1; i <= co->DataSize; i++)
+  {
+    if (data_index->Select && !data_index->SelectOld)
+    {
       memcpy(&co->Super.Trp.DataL, data_index, sizeof(*data_index));
       memcpy(&o->DataLast, data_index, sizeof(*data_index));
       co->Super.Intern.SelectIndex = i;
@@ -1193,12 +1278,15 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     data_index->SelectOld = data_index->Select;
     data_index++;
   }
-  if ((co->Super.Config.Options & pwr_mDataQOptionsMask_SingleSelect)
-      || (co->Super.Config.Options & pwr_mDataQOptionsMask_OneSelect)) {
+  if ((co->Super.Config.Options & pwr_mDataQOptionsMask_SingleSelect) ||
+      (co->Super.Config.Options & pwr_mDataQOptionsMask_OneSelect))
+  {
     /* Unselect everyone except last selected */
-    if (co->Super.Intern.DataSelected > 1) {
+    if (co->Super.Intern.DataSelected > 1)
+    {
       data_index = &co->Data[0];
-      for (i = 1; i <= co->DataSize; i++) {
+      for (i = 1; i <= co->DataSize; i++)
+      {
         if (i != co->Super.Intern.SelectIndex)
           data_index->Select = 0;
         data_index++;
@@ -1208,8 +1296,10 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
         co->Super.Intern.BackupNow = 1;
     }
   }
-  if (co->Super.Config.Options & pwr_mDataQOptionsMask_OneSelect) {
-    if ((co->Super.Intern.DataSelected == 0) && (co->DataSize != 0)) {
+  if (co->Super.Config.Options & pwr_mDataQOptionsMask_OneSelect)
+  {
+    if ((co->Super.Intern.DataSelected == 0) && (co->DataSize != 0))
+    {
       data_index = &co->Data[0];
       data_index += co->DataSize - 1;
       data_index->Select = 1;
@@ -1222,31 +1312,35 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
         co->Super.Intern.BackupNow = 1;
     }
   }
-  if (co->Super.Intern.DataSelected == 0) {
+  if (co->Super.Intern.DataSelected == 0)
+  {
     memset(&co->Super.Trp.DataL, 0, sizeof(*data_last));
     memset(&o->DataLast, 0, sizeof(*data_last));
     co->Super.Intern.SelectIndex = 0;
   }
 
-  if (co->Super.Trp.InFlag) {
+  if (co->Super.Trp.InFlag)
+  {
     /* Insert new object in Front position */
 
-    switch (co->Super.Trp.InOpType) {
+    switch (co->Super.Trp.InOpType)
+    {
     case pwr_eQTrpOpEnum_ForwardFront:
       /* Insert at front of object front of data */
-      if (o->QueueFull) {
+      if (o->QueueFull)
+      {
         lck_UnlockNMps;
         return;
       }
-      if (co->DataSize > 0) {
+      if (co->DataSize > 0)
+      {
 #if defined OS_LINUX
         tmp_buf = malloc(co->DataSize * sizeof(*data_max));
         memcpy(tmp_buf, &co->Data[0], co->DataSize * sizeof(*data_max));
         memcpy(&co->Data[1], tmp_buf, co->DataSize * sizeof(*data_max));
         free(tmp_buf);
 #else
-        memcpy(&co->Data[1], &co->Data[0],
-            co->DataSize * sizeof(*data_max));
+        memcpy(&co->Data[1], &co->Data[0], co->DataSize * sizeof(*data_max));
 #endif
       }
       co->Data[0].Data.Ptr = co->Super.Trp.InPtr;
@@ -1260,22 +1354,24 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       co->DataSize++;
       if (co->Super.Intern.DataSelected > 0)
         co->Super.Intern.SelectIndex++;
-      if (co->DataSize == co->Super.Config.MaxSize) {
+      if (co->DataSize == co->Super.Config.MaxSize)
+      {
         o->QueueFull = 1;
-	co->Super.Intern.QueueFull = o->QueueFull;
+        co->Super.Intern.QueueFull = o->QueueFull;
       }
       o->Data1 = co->Data[0];
       break;
     case pwr_eQTrpOpEnum_ForwardBack:
-      if (memcmp(&co->Data[0].Data.Aref.Objid, &co->Super.Trp.InObjid,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&co->Data[0].Data.Aref.Objid, &co->Super.Trp.InObjid, sizeof(pwr_tObjid)))
+      {
         /* This it not the correct object */
         co->Super.Trp.InFlag = 0;
         lck_UnlockNMps;
         return;
       }
       co->Data[0].Back = 1;
-      if (co->Super.Intern.SelectIndex == 1) {
+      if (co->Super.Intern.SelectIndex == 1)
+      {
         co->Super.Trp.DataL.Back = 1;
         o->DataLast.Back = 1;
       }
@@ -1283,19 +1379,20 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       o->Data1 = co->Data[0];
       break;
     case pwr_eQTrpOpEnum_ForwardUnit:
-      if (o->QueueFull) {
+      if (o->QueueFull)
+      {
         lck_UnlockNMps;
         return;
       }
-      if (co->DataSize > 0) {
+      if (co->DataSize > 0)
+      {
 #if defined OS_LINUX
         tmp_buf = malloc(co->DataSize * sizeof(*data_max));
         memcpy(tmp_buf, &co->Data[0], co->DataSize * sizeof(*data_max));
         memcpy(&co->Data[1], tmp_buf, co->DataSize * sizeof(*data_max));
         free(tmp_buf);
 #else
-        memcpy(&o->Data2P, &co->Data[0],
-            co->DataSize * sizeof(*data_max));
+        memcpy(&o->Data2P, &co->Data[0], co->DataSize * sizeof(*data_max));
 #endif
       }
       co->Data[0].Data.Ptr = co->Super.Trp.InPtr;
@@ -1309,15 +1406,17 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       if (co->Super.Intern.DataSelected > 0)
         co->Super.Intern.SelectIndex++;
       co->DataSize++;
-      if (co->DataSize == co->Super.Config.MaxSize) {
+      if (co->DataSize == co->Super.Config.MaxSize)
+      {
         o->QueueFull = 1;
-	co->Super.Intern.QueueFull = o->QueueFull;
+        co->Super.Intern.QueueFull = o->QueueFull;
       }
       o->Data1 = co->Data[0];
       break;
     case pwr_eQTrpOpEnum_ReverseBack:
       /* Insert at rear of object back of data */
-      if (o->QueueFull) {
+      if (o->QueueFull)
+      {
         lck_UnlockNMps;
         return;
       }
@@ -1330,15 +1429,17 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       data_last->Dlid = co->Super.Trp.InDlid;
       co->Super.Trp.InFlag = 0;
       co->DataSize++;
-      if (co->DataSize == co->Super.Config.MaxSize) {
+      if (co->DataSize == co->Super.Config.MaxSize)
+      {
         o->QueueFull = 1;
-	co->Super.Intern.QueueFull = o->QueueFull;
+        co->Super.Intern.QueueFull = o->QueueFull;
       }
       o->Data1 = co->Data[0];
       break;
     case pwr_eQTrpOpEnum_ReverseUnit:
       /* Insert at rear of object all of data */
-      if (o->QueueFull) {
+      if (o->QueueFull)
+      {
         lck_UnlockNMps;
         return;
       }
@@ -1351,17 +1452,18 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       data_last->Dlid = co->Super.Trp.InDlid;
       co->Super.Trp.InFlag = 0;
       co->DataSize++;
-      if (co->DataSize == co->Super.Config.MaxSize) {
+      if (co->DataSize == co->Super.Config.MaxSize)
+      {
         o->QueueFull = 1;
-	co->Super.Intern.QueueFull = o->QueueFull;
+        co->Super.Intern.QueueFull = o->QueueFull;
       }
       o->Data1 = co->Data[0];
       break;
     case pwr_eQTrpOpEnum_ReverseFront:
       data_last = &co->Data[0];
       data_last += co->DataSize - 1;
-      if (memcmp(&data_last->Data.Aref.Objid, &co->Super.Trp.InObjid,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_last->Data.Aref.Objid, &co->Super.Trp.InObjid, sizeof(pwr_tObjid)))
+      {
         /* This it not the correct object */
         co->Super.Trp.InFlag = 0;
         lck_UnlockNMps;
@@ -1375,14 +1477,17 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     if (co->Super.Config.Options & pwr_mDataQOptionsMask_Backup)
       co->Super.Intern.BackupNow = 1;
   }
-  if (co->Super.Trp.OutRearFlag) {
+  if (co->Super.Trp.OutRearFlag)
+  {
     /* Remove an object in Rear position */
 
-    switch (co->Super.Trp.OutRearOpType) {
+    switch (co->Super.Trp.OutRearOpType)
+    {
     case pwr_eQTrpOpEnum_Unit:
 
       /* Get the last data */
-      if (co->DataSize == 0) {
+      if (co->DataSize == 0)
+      {
         co->Super.Trp.OutRearFlag = 0;
         lck_UnlockNMps;
         return;
@@ -1391,7 +1496,8 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       data_index = &co->Data[0];
       data_index += co->Super.Intern.SelectIndex - 1;
 
-      if (co->Super.Intern.SelectIndex < co->DataSize) {
+      if (co->Super.Intern.SelectIndex < co->DataSize)
+      {
         size = (co->DataSize - co->Super.Intern.SelectIndex) * sizeof(*data_max);
 #if defined OS_LINUX
         tmp_buf = malloc(size);
@@ -1410,11 +1516,14 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       co->DataSize--;
       co->Super.Intern.DataSelected--;
       /* Find next selected, search backwards */
-      if (co->Super.Intern.DataSelected > 0) {
+      if (co->Super.Intern.DataSelected > 0)
+      {
         data_index = &co->Data[0];
         data_index += co->DataSize - 1;
-        for (i = co->DataSize; i > 0; i--) {
-          if (data_index->Select) {
+        for (i = co->DataSize; i > 0; i--)
+        {
+          if (data_index->Select)
+          {
             memcpy(&co->Super.Trp.DataL, data_index, sizeof(*data_index));
             memcpy(&o->DataLast, data_index, sizeof(*data_index));
             co->Super.Intern.SelectIndex = i;
@@ -1422,7 +1531,9 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
           }
           data_index--;
         }
-      } else {
+      }
+      else
+      {
         memset(&co->Super.Trp.DataL, 0, sizeof(*data_last));
         memset(&o->DataLast, 0, sizeof(*data_last));
         co->Super.Intern.SelectIndex = 0;
@@ -1434,28 +1545,36 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       co->Super.Intern.BackupNow = 1;
     o->Data1 = co->Data[0];
   }
-  if (co->Super.Trp.OutFrontFlag) {
+  if (co->Super.Trp.OutFrontFlag)
+  {
     /* Remove an object in Front position */
 
-    switch (co->Super.Trp.OutFrontOpType) {
+    switch (co->Super.Trp.OutFrontOpType)
+    {
     case pwr_eQTrpOpEnum_Front:
     case pwr_eQTrpOpEnum_Unit:
 
       /* Get the last data */
-      if (co->DataSize == 0) {
+      if (co->DataSize == 0)
+      {
         co->Super.Trp.OutFrontFlag = 0;
         lck_UnlockNMps;
         return;
       }
 
-      if (co->Data[0].Select) {
+      if (co->Data[0].Select)
+      {
         co->Super.Intern.DataSelected--;
-        if (co->Super.Intern.SelectIndex == 1) {
-          if (co->Super.Intern.DataSelected > 0) {
+        if (co->Super.Intern.SelectIndex == 1)
+        {
+          if (co->Super.Intern.DataSelected > 0)
+          {
             data_index = &co->Data[0];
             data_index += co->DataSize - 1;
-            for (i = co->DataSize; i > 1; i--) {
-              if (data_index->Select) {
+            for (i = co->DataSize; i > 1; i--)
+            {
+              if (data_index->Select)
+              {
                 memcpy(&co->Super.Trp.DataL, data_index, sizeof(*data_index));
                 memcpy(&o->DataLast, data_index, sizeof(*data_index));
                 co->Super.Intern.SelectIndex = i;
@@ -1463,7 +1582,9 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
               }
               data_index--;
             }
-          } else {
+          }
+          else
+          {
             memset(&co->Super.Trp.DataL, 0, sizeof(*data_last));
             memset(&o->DataLast, 0, sizeof(*data_last));
             co->Super.Intern.SelectIndex = 0;
@@ -1475,14 +1596,11 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
 
 #if defined OS_LINUX
       tmp_buf = malloc((co->DataSize - 1) * sizeof(*data_last));
-      memcpy(tmp_buf, &co->Data[1],
-          (co->DataSize - 1) * sizeof(*data_last));
-      memcpy(&co->Data[0], tmp_buf,
-          (co->DataSize - 1) * sizeof(*data_last));
+      memcpy(tmp_buf, &co->Data[1], (co->DataSize - 1) * sizeof(*data_last));
+      memcpy(&co->Data[0], tmp_buf, (co->DataSize - 1) * sizeof(*data_last));
       free(tmp_buf);
 #else
-      memcpy(&co->Data[0], &co->Data[1],
-          (co->DataSize - 1) * sizeof(*data_last));
+      memcpy(&co->Data[0], &co->Data[1], (co->DataSize - 1) * sizeof(*data_last));
 #endif
       data_last = &co->Data[0];
       data_last += co->DataSize - 1;
@@ -1496,7 +1614,8 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     case pwr_eQTrpOpEnum_Back:
       co->Data[0].Back = 0;
       co->Super.Trp.OutFrontFlag = 0;
-      if (co->DataSize == co->Super.Intern.SelectIndex) {
+      if (co->DataSize == co->Super.Intern.SelectIndex)
+      {
         co->Super.Trp.DataL.Back = 0;
         o->DataLast.Back = 0;
       }
@@ -1518,10 +1637,10 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
 */
 void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o)
 {
-  pwr_sClass_DataQFo *outp = (pwr_sClass_DataQFo*)o->OutP;
-  pwr_sClass_DataQ1 *coutp = (pwr_sClass_DataQ1*)outp->PlcConnectP;
-  pwr_sClass_DataQFo *inp = (pwr_sClass_DataQFo*)o->InP;
-  pwr_sClass_DataQ1 *cinp = (pwr_sClass_DataQ1*)inp->PlcConnectP;
+  pwr_sClass_DataQFo* outp = (pwr_sClass_DataQFo*)o->OutP;
+  pwr_sClass_DataQ1* coutp = (pwr_sClass_DataQ1*)outp->PlcConnectP;
+  pwr_sClass_DataQFo* inp = (pwr_sClass_DataQFo*)o->InP;
+  pwr_sClass_DataQ1* cinp = (pwr_sClass_DataQ1*)inp->PlcConnectP;
 
   if (!coutp || !cinp)
     return;
@@ -1529,45 +1648,47 @@ void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o)
   if (o->Error)
     o->Error = 0;
 
-  if ((((*(o->TriggForwFrontP) && !o->OldTriggForwFront) || 
-      (*(o->TriggForwFrontP) && o->Options & pwr_mQTrpOptionsMask_LevelTrigg) || 
-      o->FuncAllForward) &&
+  if ((((*(o->TriggForwFrontP) && !o->OldTriggForwFront) ||
+        (*(o->TriggForwFrontP) && o->Options & pwr_mQTrpOptionsMask_LevelTrigg) || o->FuncAllForward) &&
        !o->ManualMode) ||
-      (o->ManualMode && o->ManTriggForwFront)) {
-    if (o->Function == pwr_eQTrpFunctionEnum_MoveWholeObject) {
+      (o->ManualMode && o->ManTriggForwFront))
+  {
+    if (o->Function == pwr_eQTrpFunctionEnum_MoveWholeObject)
+    {
       /* Move all of data */
       /* Check destination */
-      if (outp->QueueFull) {
+      if (outp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEFULL;
+        o->Status = DATAQ__QUEUEFULL;
         goto trp_return;
       }
-      if ((coutp->Super.Trp.InFlag &&
-	   (coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardUnit ||
-	    coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardBack ||
-	    coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardFront)) ||
-	  coutp->Super.Trp.OutFrontFlag)
+      if ((coutp->Super.Trp.InFlag && (coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardUnit ||
+                                       coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardBack ||
+                                       coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardFront)) ||
+          coutp->Super.Trp.OutFrontFlag)
         return;
 
       /* Check source */
-      if (cinp->Super.Intern.NumberOfData == 0) {
+      if (cinp->Super.Intern.NumberOfData == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trp_return;
       }
-      if ((cinp->Super.Trp.InFlag && 
-	   (cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseUnit ||
-	    cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseBack ||
-	    cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseFront)) ||
-	  cinp->Super.Trp.OutRearFlag)
+      if ((cinp->Super.Trp.InFlag && (cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseUnit ||
+                                      cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseBack ||
+                                      cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseFront)) ||
+          cinp->Super.Trp.OutRearFlag)
         return;
 
       /* Check that both Back and Front is in the in cell */
-      if (!(cinp->Super.Trp.DataL.Back && cinp->Super.Trp.DataL.Front)) {
+      if (!(cinp->Super.Trp.DataL.Back && cinp->Super.Trp.DataL.Front))
+      {
         o->Error = 1;
-	o->Status = DATAQ__DATASPLIT;
+        o->Status = DATAQ__DATASPLIT;
         goto trp_return;
       }
 
@@ -1580,32 +1701,38 @@ void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o)
       coutp->Super.Trp.InOpType = pwr_eQTrpOpEnum_ForwardUnit;
       cinp->Super.Trp.OutRearOpType = pwr_eQTrpOpEnum_Unit;
       o->Status = DATAQ__SUCCESS;
-
-    } else if ((o->Function == pwr_eQTrpFunctionEnum_MoveAllObjects)
-        || (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty)) {
+    }
+    else if ((o->Function == pwr_eQTrpFunctionEnum_MoveAllObjects) ||
+             (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty))
+    {
       /* Move all of data */
       /* Check destination */
-      if (*(o->TriggForwFrontP) && !o->OldTriggForwFront) {
+      if (*(o->TriggForwFrontP) && !o->OldTriggForwFront)
+      {
         /* This is the first object to move */
-        if (o->FuncAllReverse || o->FuncAllForward) {
+        if (o->FuncAllReverse || o->FuncAllForward)
+        {
           /* We are already busy moving last trigg */
           return;
         }
 
-        if (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty) {
-          if (coutp->Super.Intern.NumberOfData != 0) {
+        if (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty)
+        {
+          if (coutp->Super.Intern.NumberOfData != 0)
+          {
             /* Destination cell is not empty */
             o->Error = 1;
-	    o->Status = DATAQ__DESTNOTEMPTY;
+            o->Status = DATAQ__DESTNOTEMPTY;
             goto trp_return;
           }
         }
       }
 
-      if (outp->QueueFull) {
+      if (outp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEFULL;
+        o->Status = DATAQ__QUEUEFULL;
         o->FuncAllForward = 0;
         goto trp_return;
       }
@@ -1613,16 +1740,18 @@ void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o)
         return;
 
       /* Check source */
-      if (cinp->Super.Intern.NumberOfData == 0) {
+      if (cinp->Super.Intern.NumberOfData == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trp_return;
       }
       if (cinp->Super.Trp.OutRearFlag)
         return;
 
-      if (o->Options & pwr_mQTrpOptionsMask_Slow && o->FuncAllForward == 1) {
+      if (o->Options & pwr_mQTrpOptionsMask_Slow && o->FuncAllForward == 1)
+      {
         /* Wait till next scan */
         o->FuncAllForward = 2;
         goto trp_return;
@@ -1642,59 +1771,66 @@ void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o)
         o->FuncAllForward = 0;
       else
         o->FuncAllForward = 1;
-    } else {
+    }
+    else
+    {
       /* Move front of data */
       /* Check destination */
-      if (outp->QueueFull) {
+      if (outp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEFULL;
+        o->Status = DATAQ__QUEUEFULL;
         goto trp_return;
       }
-      if ((coutp->Super.Trp.InFlag && 
-	   (coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardUnit ||
-	    coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardBack ||
-	    coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardFront)) ||
-	  coutp->Super.Trp.OutFrontFlag)
+      if ((coutp->Super.Trp.InFlag && (coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardUnit ||
+                                       coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardBack ||
+                                       coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardFront)) ||
+          coutp->Super.Trp.OutFrontFlag)
         return;
 
       /* Check source */
-      if (cinp->DataSize == 0) {
+      if (cinp->DataSize == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trp_return;
       }
-      if ((cinp->Super.Trp.InFlag && 
-	   (cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseUnit ||
-	    cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseBack ||
-	    cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseFront)) ||
-	  cinp->Super.Trp.OutRearFlag)
+      if ((cinp->Super.Trp.InFlag && (cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseUnit ||
+                                      cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseBack ||
+                                      cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseFront)) ||
+          cinp->Super.Trp.OutRearFlag)
         return;
 
-      if (cinp->Super.Trp.DataL.Data.Ptr == coutp->Data[0].Data.Ptr) {
-	/* This should be a Back trigg */
-	o->Error = 1;
-	o->Status = DATAQ__DESTPRESENT;
-	goto trp_return;
+      if (cinp->Super.Trp.DataL.Data.Ptr == coutp->Data[0].Data.Ptr)
+      {
+        /* This should be a Back trigg */
+        o->Error = 1;
+        o->Status = DATAQ__DESTPRESENT;
+        goto trp_return;
       }
-      if (coutp->Data[0].Front && !coutp->Data[0].Back) {
-	/* Destination data is split */
-	o->Error = 1;
-	o->Status = DATAQ__DATASPLIT;
-	goto trp_return;
+      if (coutp->Data[0].Front && !coutp->Data[0].Back)
+      {
+        /* Destination data is split */
+        o->Error = 1;
+        o->Status = DATAQ__DATASPLIT;
+        goto trp_return;
       }
-      if (o->Options & pwr_mQTrpOptionsMask_NoExtend) {
-	if (!cinp->Super.Trp.DataL.Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCBACK;
-	  goto trp_return;
-	}
-	if (!cinp->Super.Trp.DataL.Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCFRONT;
-	  goto trp_return;
-	}
+      if (o->Options & pwr_mQTrpOptionsMask_NoExtend)
+      {
+        if (!cinp->Super.Trp.DataL.Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCBACK;
+          goto trp_return;
+        }
+        if (!cinp->Super.Trp.DataL.Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCFRONT;
+          goto trp_return;
+        }
       }
 
       /* Transport data */
@@ -1710,53 +1846,64 @@ void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o)
   }
 
   if ((*(o->TriggForwBackP) && !o->OldTriggForwBack && !o->ManualMode) ||
-      (o->ManualMode && o->ManTriggForwBack)) {
+      (o->ManualMode && o->ManTriggForwBack))
+  {
     /* Check source */
-    if (cinp->DataSize == 0) {
+    if (cinp->DataSize == 0)
+    {
       /* Nothing to transport */
       o->Error = 1;
       o->Status = DATAQ__QUEUEEMPTY;
       goto trp_return;
     }
 
-    if ((coutp->Super.Trp.InFlag && 
-	 (coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardUnit ||
-	  coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardBack ||
-	  coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardFront)) ||
-	 coutp->Super.Trp.OutFrontFlag)
+    if ((coutp->Super.Trp.InFlag && (coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardUnit ||
+                                     coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardBack ||
+                                     coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardFront)) ||
+        coutp->Super.Trp.OutFrontFlag)
       return;
 
-    if ((cinp->Super.Trp.InFlag && 
-	 (cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseUnit ||
-	  cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseBack ||
-	  cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseFront)) ||
-	 cinp->Super.Trp.OutRearFlag)
+    if ((cinp->Super.Trp.InFlag && (cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseUnit ||
+                                    cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseBack ||
+                                    cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseFront)) ||
+        cinp->Super.Trp.OutRearFlag)
       return;
 
-    if (cinp->Super.Trp.DataL.Data.Ptr != coutp->Data[0].Data.Ptr) {
+    if (cinp->Super.Trp.DataL.Data.Ptr != coutp->Data[0].Data.Ptr)
+    {
       /* This should be a Front trigg */
       o->Error = 1;
       o->Status = DATAQ__DESTNOTPRESENT;
       goto trp_return;
-    } else {
-      if (o->Options & pwr_mQTrpOptionsMask_NoExtend) {
-	if (cinp->Super.Trp.DataL.Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCFRONT;
-	  goto trp_return;
-	} else if (!cinp->Super.Trp.DataL.Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCBACK;
-	  goto trp_return;
-	} else if (!coutp->Data[0].Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__DESTFRONT;
-	  goto trp_return;
-	} else if (coutp->Data[0].Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__DESTBACK;
-	  goto trp_return;
-	}
+    }
+    else
+    {
+      if (o->Options & pwr_mQTrpOptionsMask_NoExtend)
+      {
+        if (cinp->Super.Trp.DataL.Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCFRONT;
+          goto trp_return;
+        }
+        else if (!cinp->Super.Trp.DataL.Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCBACK;
+          goto trp_return;
+        }
+        else if (!coutp->Data[0].Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__DESTFRONT;
+          goto trp_return;
+        }
+        else if (coutp->Data[0].Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__DESTBACK;
+          goto trp_return;
+        }
       }
     }
 
@@ -1772,62 +1919,70 @@ void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o)
   }
 
   if ((*(o->TriggReverseBackP) && !o->OldTriggReverseBack && !o->ManualMode) ||
-      (o->ManualMode && o->ManTriggReverseBack)) {
+      (o->ManualMode && o->ManTriggReverseBack))
+  {
     /* Check destination */
-    if (inp->QueueFull) {
+    if (inp->QueueFull)
+    {
       /* Destination cell is full */
       o->Error = 1;
       o->Status = DATAQ__QUEUEFULL;
       goto trp_return;
     }
-    if ((cinp->Super.Trp.InFlag && 
-	 (cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseUnit ||
-	  cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseBack ||
-	  cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseFront)) ||
-	 cinp->Super.Trp.OutRearFlag)
+    if ((cinp->Super.Trp.InFlag && (cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseUnit ||
+                                    cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseBack ||
+                                    cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseFront)) ||
+        cinp->Super.Trp.OutRearFlag)
       return;
 
     /* Check source */
-    if (coutp->DataSize == 0) {
+    if (coutp->DataSize == 0)
+    {
       /* Nothing to transport */
       o->Error = 1;
       o->Status = DATAQ__QUEUEEMPTY;
       goto trp_return;
     }
-    if ((coutp->Super.Trp.InFlag && 
-	 (coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardUnit ||
-	  coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardBack ||
-	  coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardFront)) ||
-	 coutp->Super.Trp.OutFrontFlag)
+    if ((coutp->Super.Trp.InFlag && (coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardUnit ||
+                                     coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardBack ||
+                                     coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardFront)) ||
+        coutp->Super.Trp.OutFrontFlag)
       return;
 
-    if (!coutp->Data[0].Back) {
+    if (!coutp->Data[0].Back)
+    {
       o->Error = 1;
       o->Status = DATAQ__SRCBACK;
       goto trp_return;
     }
 
-    if (cinp->Super.Trp.DataL.Data.Ptr == coutp->Data[0].Data.Ptr) {
+    if (cinp->Super.Trp.DataL.Data.Ptr == coutp->Data[0].Data.Ptr)
+    {
       /* This should be a Front trigg */
       o->Error = 1;
       o->Status = DATAQ__DESTPRESENT;
       goto trp_return;
     }
-    if (cinp->Super.Trp.DataL.Back && !cinp->Super.Trp.DataL.Front) {
+    if (cinp->Super.Trp.DataL.Back && !cinp->Super.Trp.DataL.Front)
+    {
       /* Destination data is split */
       o->Error = 1;
       o->Status = DATAQ__DATASPLIT;
       goto trp_return;
     }
-    if (o->Options & pwr_mQTrpOptionsMask_NoExtend) {
-      if (!coutp->Data[0].Back) {
-	o->Error = 1;
-	o->Status = DATAQ__SRCBACK;
-	  goto trp_return;
-      } else if (!coutp->Data[0].Front) {
-	o->Error = 1;
-	o->Status = DATAQ__SRCFRONT;
-	goto trp_return;
+    if (o->Options & pwr_mQTrpOptionsMask_NoExtend)
+    {
+      if (!coutp->Data[0].Back)
+      {
+        o->Error = 1;
+        o->Status = DATAQ__SRCBACK;
+        goto trp_return;
+      }
+      else if (!coutp->Data[0].Front)
+      {
+        o->Error = 1;
+        o->Status = DATAQ__SRCFRONT;
+        goto trp_return;
       }
     }
 
@@ -1842,44 +1997,46 @@ void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o)
     o->Status = DATAQ__SUCCESS;
   }
 
-  if ((((*(o->TriggReverseFrontP) && !o->OldTriggReverseFront) || 
-      (*(o->TriggReverseFrontP) && o->Options & pwr_mQTrpOptionsMask_LevelTrigg) || 
-      o->FuncAllReverse) &&
-       !o->ManualMode) || 
-      (o->ManualMode && o->ManTriggReverseFront)) {
-    if (o->Function == pwr_eQTrpFunctionEnum_MoveWholeObject) {
+  if ((((*(o->TriggReverseFrontP) && !o->OldTriggReverseFront) ||
+        (*(o->TriggReverseFrontP) && o->Options & pwr_mQTrpOptionsMask_LevelTrigg) || o->FuncAllReverse) &&
+       !o->ManualMode) ||
+      (o->ManualMode && o->ManTriggReverseFront))
+  {
+    if (o->Function == pwr_eQTrpFunctionEnum_MoveWholeObject)
+    {
       /* Check destination */
-      if (inp->QueueFull) {
+      if (inp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEFULL;
+        o->Status = DATAQ__QUEUEFULL;
         goto trp_return;
       }
-      if ((cinp->Super.Trp.InFlag && 
-	   (cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseUnit ||
-	    cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseBack ||
-	    cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseFront)) ||
-	   cinp->Super.Trp.OutRearFlag)
+      if ((cinp->Super.Trp.InFlag && (cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseUnit ||
+                                      cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseBack ||
+                                      cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseFront)) ||
+          cinp->Super.Trp.OutRearFlag)
         return;
 
       /* Check source */
-      if (coutp->DataSize == 0) {
+      if (coutp->DataSize == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trp_return;
       }
-      if ((coutp->Super.Trp.InFlag && 
-	   (coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardUnit ||
-	    coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardBack ||
-	    coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardFront)) ||
-	   coutp->Super.Trp.OutFrontFlag)
+      if ((coutp->Super.Trp.InFlag && (coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardUnit ||
+                                       coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardBack ||
+                                       coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardFront)) ||
+          coutp->Super.Trp.OutFrontFlag)
         return;
 
       /* Check that both Front and Back is in the cell */
-      if (!(coutp->Data[0].Back && coutp->Data[0].Front)) {
+      if (!(coutp->Data[0].Back && coutp->Data[0].Front))
+      {
         o->Error = 1;
-	o->Status = DATAQ__DATASPLIT;
+        o->Status = DATAQ__DATASPLIT;
         goto trp_return;
       }
 
@@ -1892,30 +2049,36 @@ void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o)
       cinp->Super.Trp.InOpType = pwr_eQTrpOpEnum_ReverseUnit;
       coutp->Super.Trp.OutFrontOpType = pwr_eQTrpOpEnum_Unit;
       o->Status = DATAQ__SUCCESS;
-
-    } else if ((o->Function == pwr_eQTrpFunctionEnum_MoveAllObjects)
-        || (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty)) {
-      if (*(o->TriggReverseFrontP) && !o->OldTriggReverseFront) {
+    }
+    else if ((o->Function == pwr_eQTrpFunctionEnum_MoveAllObjects) ||
+             (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty))
+    {
+      if (*(o->TriggReverseFrontP) && !o->OldTriggReverseFront)
+      {
         /* This is the first object to move */
-        if (o->FuncAllReverse || o->FuncAllForward) {
+        if (o->FuncAllReverse || o->FuncAllForward)
+        {
           /* We are already busy moving last trigg */
           return;
         }
 
         /* Check destination */
-        if (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty) {
-          if (cinp->DataSize) {
+        if (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty)
+        {
+          if (cinp->DataSize)
+          {
             /* Destination cell is not empty */
             o->Error = 1;
-	    o->Status = DATAQ__DESTNOTEMPTY;
+            o->Status = DATAQ__DESTNOTEMPTY;
             goto trp_return;
           }
         }
       }
-      if (inp->QueueFull) {
+      if (inp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__DESTFULL;
+        o->Status = DATAQ__DESTFULL;
         o->FuncAllReverse = 0;
         goto trp_return;
       }
@@ -1923,22 +2086,25 @@ void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o)
         return;
 
       /* Check source */
-      if (coutp->Super.Intern.NumberOfData == 0) {
+      if (coutp->Super.Intern.NumberOfData == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trp_return;
       }
       if (coutp->Super.Trp.OutFrontFlag)
         return;
 
-      if (cinp->Super.Trp.DataL.Data.Ptr == coutp->Data[0].Data.Ptr) {
+      if (cinp->Super.Trp.DataL.Data.Ptr == coutp->Data[0].Data.Ptr)
+      {
         o->Error = 1;
-	o->Status = DATAQ__DESTPRESENT;
+        o->Status = DATAQ__DESTPRESENT;
         goto trp_return;
       }
 
-      if (o->Options & pwr_mQTrpOptionsMask_Slow && o->FuncAllForward == 1) {
+      if (o->Options & pwr_mQTrpOptionsMask_Slow && o->FuncAllForward == 1)
+      {
         /* Wait till next scan */
         o->FuncAllForward = 2;
         goto trp_return;
@@ -1958,54 +2124,66 @@ void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o)
         o->FuncAllReverse = 0;
       else
         o->FuncAllReverse = 1;
-    } else {
+    }
+    else
+    {
 
-      if ((cinp->Super.Trp.InFlag && 
-	   (cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseUnit ||
-	    cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseBack ||
-	    cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseFront)) ||
-	  cinp->Super.Trp.OutRearFlag)
+      if ((cinp->Super.Trp.InFlag && (cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseUnit ||
+                                      cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseBack ||
+                                      cinp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ReverseFront)) ||
+          cinp->Super.Trp.OutRearFlag)
         return;
 
       /* Check source */
-      if (coutp->Super.Intern.NumberOfData == 0) {
+      if (coutp->Super.Intern.NumberOfData == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trp_return;
       }
-      if ((coutp->Super.Trp.InFlag && 
-	   (coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardUnit ||
-	    coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardBack ||
-	    coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardFront)) ||
-	   coutp->Super.Trp.OutFrontFlag)
+      if ((coutp->Super.Trp.InFlag && (coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardUnit ||
+                                       coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardBack ||
+                                       coutp->Super.Trp.InOpType == pwr_eQTrpOpEnum_ForwardFront)) ||
+          coutp->Super.Trp.OutFrontFlag)
         return;
 
-      if (cinp->Super.Trp.DataL.Data.Ptr != coutp->Data[0].Data.Ptr) {
+      if (cinp->Super.Trp.DataL.Data.Ptr != coutp->Data[0].Data.Ptr)
+      {
         /* This should be a Back trigg */
-	o->Status = DATAQ__DESTNOTPRESENT;
+        o->Status = DATAQ__DESTNOTPRESENT;
         o->Error = 1;
         goto trp_return;
-      } else {
-	if (o->Options & pwr_mQTrpOptionsMask_NoExtend) {
-	  if (!cinp->Super.Trp.DataL.Back) {
-	    o->Error = 1;
-	    o->Status = DATAQ__DESTBACK;
-	    goto trp_return;
-	  } else if (cinp->Super.Trp.DataL.Front) {
-	    o->Error = 1;
-	    o->Status = DATAQ__DESTFRONT;
-	    goto trp_return;
-	  } else if (!coutp->Data[0].Front) {
-	    o->Error = 1;
-	    o->Status = DATAQ__SRCFRONT;
-	    goto trp_return;
-	  } else if (coutp->Data[0].Back) {
-	    o->Error = 1;
-	    o->Status = DATAQ__SRCBACK;
-	    goto trp_return;
-	  }
-	}
+      }
+      else
+      {
+        if (o->Options & pwr_mQTrpOptionsMask_NoExtend)
+        {
+          if (!cinp->Super.Trp.DataL.Back)
+          {
+            o->Error = 1;
+            o->Status = DATAQ__DESTBACK;
+            goto trp_return;
+          }
+          else if (cinp->Super.Trp.DataL.Front)
+          {
+            o->Error = 1;
+            o->Status = DATAQ__DESTFRONT;
+            goto trp_return;
+          }
+          else if (!coutp->Data[0].Front)
+          {
+            o->Error = 1;
+            o->Status = DATAQ__SRCFRONT;
+            goto trp_return;
+          }
+          else if (coutp->Data[0].Back)
+          {
+            o->Error = 1;
+            o->Status = DATAQ__SRCBACK;
+            goto trp_return;
+          }
+        }
       }
 
       /* Transport data */
@@ -2031,7 +2209,8 @@ trp_return:
   o->ManTriggReverseFront = 0;
   o->ManTriggReverseBack = 0;
 
-  if (o->Options & pwr_mQTrpOptionsMask_ResetTrigg) {
+  if (o->Options & pwr_mQTrpOptionsMask_ResetTrigg)
+  {
     /* Reset the trigg flags */
     o->TriggForwFront = 0;
     o->TriggReverseFront = 0;
@@ -2047,10 +2226,10 @@ trp_return:
 */
 void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
 {
-  pwr_sClass_DataQFo *outp = (pwr_sClass_DataQFo*)o->OutP;
-  pwr_sClass_DataQ1 *coutp = (pwr_sClass_DataQ1*)outp->PlcConnectP;
-  pwr_sClass_DataQFo *inp = (pwr_sClass_DataQFo*)o->InP;
-  pwr_sClass_DataQ1 *cinp = (pwr_sClass_DataQ1*)inp->PlcConnectP;
+  pwr_sClass_DataQFo* outp = (pwr_sClass_DataQFo*)o->OutP;
+  pwr_sClass_DataQ1* coutp = (pwr_sClass_DataQ1*)outp->PlcConnectP;
+  pwr_sClass_DataQFo* inp = (pwr_sClass_DataQFo*)o->InP;
+  pwr_sClass_DataQ1* cinp = (pwr_sClass_DataQ1*)inp->PlcConnectP;
 
   if (!coutp || !cinp)
     return;
@@ -2058,38 +2237,41 @@ void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
   if (o->Error)
     o->Error = 0;
 
-  if ((((*(o->TriggForwFrontP) && !o->OldTriggForwFront) || 
-      (*(o->TriggForwFrontP) && o->Options & pwr_mQTrpOptionsMask_LevelTrigg) || 
-      o->FuncAllForward) &&
+  if ((((*(o->TriggForwFrontP) && !o->OldTriggForwFront) ||
+        (*(o->TriggForwFrontP) && o->Options & pwr_mQTrpOptionsMask_LevelTrigg) || o->FuncAllForward) &&
        !o->ManualMode) ||
-      (o->ManualMode && o->ManTriggForwFront)) {
-    if (o->Function == pwr_eQTrpFunctionEnum_MoveWholeObject) {
+      (o->ManualMode && o->ManTriggForwFront))
+  {
+    if (o->Function == pwr_eQTrpFunctionEnum_MoveWholeObject)
+    {
       /* Move all of data */
       /* Check destination */
-      if (outp->QueueFull) {
+      if (outp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__DESTFULL;
+        o->Status = DATAQ__DESTFULL;
         goto trprr_return;
       }
       if (coutp->Super.Trp.InFlag || coutp->Super.Trp.OutRearFlag)
         return;
 
       /* Check source */
-      if (cinp->Super.Intern.NumberOfData == 0) {
+      if (cinp->Super.Intern.NumberOfData == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trprr_return;
       }
       if (cinp->Super.Trp.OutRearFlag)
         return;
 
       /* Check that both Back and Front is in the in cell */
-      if (!(cinp->Super.Trp.DataL.Back
-              && cinp->Super.Trp.DataL.Front)) {
+      if (!(cinp->Super.Trp.DataL.Back && cinp->Super.Trp.DataL.Front))
+      {
         o->Error = 1;
-	o->Status = DATAQ__DATASPLIT;
+        o->Status = DATAQ__DATASPLIT;
         goto trprr_return;
       }
 
@@ -2102,32 +2284,38 @@ void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
       coutp->Super.Trp.InOpType = pwr_eQTrpOpEnum_ReverseUnit;
       cinp->Super.Trp.OutRearOpType = pwr_eQTrpOpEnum_Unit;
       o->Status = DATAQ__SUCCESS;
-
-    } else if ((o->Function == pwr_eQTrpFunctionEnum_MoveAllObjects)
-        || (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty)) {
+    }
+    else if ((o->Function == pwr_eQTrpFunctionEnum_MoveAllObjects) ||
+             (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty))
+    {
       /* Move all of data */
       /* Check destination */
-      if (*(o->TriggForwFrontP) && !o->OldTriggForwFront) {
+      if (*(o->TriggForwFrontP) && !o->OldTriggForwFront)
+      {
         /* This is the first object to move */
-        if (o->FuncAllReverse || o->FuncAllForward) {
+        if (o->FuncAllReverse || o->FuncAllForward)
+        {
           /* We are already busy moving last trigg */
           return;
         }
 
-        if (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty) {
-          if (coutp->Super.Intern.NumberOfData != 0) {
+        if (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty)
+        {
+          if (coutp->Super.Intern.NumberOfData != 0)
+          {
             /* Destination cell is not empty */
             o->Error = 1;
-	    o->Status = DATAQ__DESTNOTEMPTY;
+            o->Status = DATAQ__DESTNOTEMPTY;
             goto trprr_return;
           }
         }
       }
 
-      if (outp->QueueFull) {
+      if (outp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__DESTFULL;
+        o->Status = DATAQ__DESTFULL;
         o->FuncAllForward = 0;
         goto trprr_return;
       }
@@ -2135,16 +2323,18 @@ void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
         return;
 
       /* Check source */
-      if (cinp->Super.Intern.NumberOfData == 0) {
+      if (cinp->Super.Intern.NumberOfData == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trprr_return;
       }
       if (cinp->Super.Trp.OutRearFlag)
         return;
 
-      if (o->Options & pwr_mQTrpOptionsMask_Slow && o->FuncAllForward == 1) {
+      if (o->Options & pwr_mQTrpOptionsMask_Slow && o->FuncAllForward == 1)
+      {
         /* Wait till next scan */
         o->FuncAllForward = 2;
         goto trprr_return;
@@ -2164,49 +2354,59 @@ void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
         o->FuncAllForward = 0;
       else
         o->FuncAllForward = 1;
-    } else {
+    }
+    else
+    {
       /* Move front of data */
       /* Check destination */
-      if (outp->QueueFull) {
+      if (outp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__DESTFULL;
+        o->Status = DATAQ__DESTFULL;
         goto trprr_return;
       }
       if (coutp->Super.Trp.InFlag || coutp->Super.Trp.OutRearFlag)
         return;
 
       /* Check source */
-      if (cinp->Super.Intern.NumberOfData == 0) {
+      if (cinp->Super.Intern.NumberOfData == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trprr_return;
       }
       if (cinp->Super.Trp.OutRearFlag)
         return;
 
-      if (cinp->Super.Trp.DataL.Data.Ptr == coutp->Data[0].Data.Ptr) {
-	/* This should be a Back trigg */
-	o->Status = DATAQ__DESTPRESENT;
-	o->Error = 1;
-	goto trprr_return;
-      } 
-      if (!coutp->Super.Trp.DataL.Front && coutp->Super.Trp.DataL.Back) {
-	o->Error = 1;
-	o->Status = DATAQ__DATASPLIT;
-	goto trprr_return;
+      if (cinp->Super.Trp.DataL.Data.Ptr == coutp->Data[0].Data.Ptr)
+      {
+        /* This should be a Back trigg */
+        o->Status = DATAQ__DESTPRESENT;
+        o->Error = 1;
+        goto trprr_return;
       }
-      if (o->Options & pwr_mQTrpOptionsMask_NoExtend) {
-	if (!cinp->Super.Trp.DataL.Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCBACK;
-	  goto trprr_return;
-	} else if (!cinp->Super.Trp.DataL.Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCFRONT;
-	  goto trprr_return;
-	}
+      if (!coutp->Super.Trp.DataL.Front && coutp->Super.Trp.DataL.Back)
+      {
+        o->Error = 1;
+        o->Status = DATAQ__DATASPLIT;
+        goto trprr_return;
+      }
+      if (o->Options & pwr_mQTrpOptionsMask_NoExtend)
+      {
+        if (!cinp->Super.Trp.DataL.Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCBACK;
+          goto trprr_return;
+        }
+        else if (!cinp->Super.Trp.DataL.Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCFRONT;
+          goto trprr_return;
+        }
       }
 
       /* Transport data */
@@ -2222,12 +2422,14 @@ void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
   }
 
   if ((*(o->TriggForwBackP) && !o->OldTriggForwBack && !o->ManualMode) ||
-      (o->ManualMode && o->ManTriggForwBack)) {
+      (o->ManualMode && o->ManTriggForwBack))
+  {
     if (coutp->Super.Trp.InFlag || coutp->Super.Trp.OutRearFlag)
       return;
 
     /* Check source */
-    if (cinp->Super.Intern.NumberOfData == 0) {
+    if (cinp->Super.Intern.NumberOfData == 0)
+    {
       /* Nothing to transport */
       o->Error = 1;
       o->Status = DATAQ__QUEUEEMPTY;
@@ -2236,30 +2438,41 @@ void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
     if (cinp->Super.Trp.OutRearFlag)
       return;
 
-    if (cinp->Super.Trp.DataL.Data.Ptr != coutp->Super.Trp.DataL.Data.Ptr) {
+    if (cinp->Super.Trp.DataL.Data.Ptr != coutp->Super.Trp.DataL.Data.Ptr)
+    {
       /* This should be a Front trigg */
       o->Error = 1;
       o->Status = DATAQ__DESTNOTPRESENT;
       goto trprr_return;
-    } else {
-      if (o->Options & pwr_mQTrpOptionsMask_NoExtend) {
-	if (!cinp->Super.Trp.DataL.Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCBACK;
-	  goto trprr_return;
-	} else if (cinp->Super.Trp.DataL.Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCFRONT;
-	  goto trprr_return;
-	} else if (!coutp->Super.Trp.DataL.Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__DESTBACK;
-	  goto trprr_return;
-	} else if (coutp->Super.Trp.DataL.Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__DESTFRONT;
-	  goto trprr_return;
-	}
+    }
+    else
+    {
+      if (o->Options & pwr_mQTrpOptionsMask_NoExtend)
+      {
+        if (!cinp->Super.Trp.DataL.Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCBACK;
+          goto trprr_return;
+        }
+        else if (cinp->Super.Trp.DataL.Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCFRONT;
+          goto trprr_return;
+        }
+        else if (!coutp->Super.Trp.DataL.Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__DESTBACK;
+          goto trprr_return;
+        }
+        else if (coutp->Super.Trp.DataL.Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__DESTFRONT;
+          goto trprr_return;
+        }
       }
     }
 
@@ -2274,15 +2487,16 @@ void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
     o->Status = DATAQ__SUCCESS;
   }
 
-  if ((*(o->TriggReverseBackP) && !o->OldTriggReverseBack &&
-       !o->ManualMode) ||
-      (o->ManualMode && o->ManTriggReverseBack)) {
+  if ((*(o->TriggReverseBackP) && !o->OldTriggReverseBack && !o->ManualMode) ||
+      (o->ManualMode && o->ManTriggReverseBack))
+  {
     /* Check destination */
     if (cinp->Super.Trp.InFlag || cinp->Super.Trp.OutRearFlag)
       return;
 
     /* Check source */
-    if (coutp->Super.Intern.NumberOfData == 0) {
+    if (coutp->Super.Intern.NumberOfData == 0)
+    {
       /* Nothing to transport */
       o->Error = 1;
       o->Status = DATAQ__QUEUEEMPTY;
@@ -2291,35 +2505,47 @@ void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
     if (coutp->Super.Trp.OutRearFlag)
       return;
 
-    if (!coutp->Super.Trp.DataL.Back) {
+    if (!coutp->Super.Trp.DataL.Back)
+    {
       o->Error = 1;
       o->Status = DATAQ__DESTBACK;
       goto trprr_return;
     }
 
-    if (cinp->Super.Trp.DataL.Data.Ptr != coutp->Super.Trp.DataL.Data.Ptr) {
+    if (cinp->Super.Trp.DataL.Data.Ptr != coutp->Super.Trp.DataL.Data.Ptr)
+    {
       o->Error = 1;
       o->Status = DATAQ__DESTNOTPRESENT;
       goto trprr_return;
-    } else {
-      if (o->Options & pwr_mQTrpOptionsMask_NoExtend) {
-	if (!cinp->Super.Trp.DataL.Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCBACK;
-	  goto trprr_return;
-	} else if (cinp->Super.Trp.DataL.Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCFRONT;
-	  goto trprr_return;
-	} else if (!coutp->Super.Trp.DataL.Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__DESTBACK;
-	  goto trprr_return;
-	} else if (coutp->Super.Trp.DataL.Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__DESTFRONT;
-	  goto trprr_return;
-	}
+    }
+    else
+    {
+      if (o->Options & pwr_mQTrpOptionsMask_NoExtend)
+      {
+        if (!cinp->Super.Trp.DataL.Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCBACK;
+          goto trprr_return;
+        }
+        else if (cinp->Super.Trp.DataL.Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCFRONT;
+          goto trprr_return;
+        }
+        else if (!coutp->Super.Trp.DataL.Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__DESTBACK;
+          goto trprr_return;
+        }
+        else if (coutp->Super.Trp.DataL.Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__DESTFRONT;
+          goto trprr_return;
+        }
       }
     }
 
@@ -2333,37 +2559,40 @@ void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
     coutp->Super.Trp.OutRearOpType = pwr_eQTrpOpEnum_Back;
   }
 
-  if ((((*(o->TriggReverseFrontP) && !o->OldTriggReverseFront) || 
-       (*(o->TriggReverseFrontP) && o->Options & pwr_mQTrpOptionsMask_LevelTrigg) || 
-       o->FuncAllReverse) &&
-      !o->ManualMode) ||
-      (o->ManualMode && o->ManTriggReverseFront)) {
-    if (o->Function == pwr_eQTrpFunctionEnum_MoveWholeObject) {
+  if ((((*(o->TriggReverseFrontP) && !o->OldTriggReverseFront) ||
+        (*(o->TriggReverseFrontP) && o->Options & pwr_mQTrpOptionsMask_LevelTrigg) || o->FuncAllReverse) &&
+       !o->ManualMode) ||
+      (o->ManualMode && o->ManTriggReverseFront))
+  {
+    if (o->Function == pwr_eQTrpFunctionEnum_MoveWholeObject)
+    {
       /* Check destination */
-      if (inp->QueueFull) {
+      if (inp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__DESTFULL;
+        o->Status = DATAQ__DESTFULL;
         goto trprr_return;
       }
       if (cinp->Super.Trp.InFlag || cinp->Super.Trp.OutRearFlag)
         return;
 
       /* Check source */
-      if (coutp->Super.Intern.NumberOfData == 0) {
+      if (coutp->Super.Intern.NumberOfData == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trprr_return;
       }
       if (coutp->Super.Trp.OutRearFlag)
         return;
 
       /* Check that both Front and Back is in the cell */
-      if (!(coutp->Super.Trp.DataL.Back
-              && coutp->Super.Trp.DataL.Front)) {
+      if (!(coutp->Super.Trp.DataL.Back && coutp->Super.Trp.DataL.Front))
+      {
         o->Error = 1;
-	o->Status = DATAQ__DATASPLIT;
+        o->Status = DATAQ__DATASPLIT;
         goto trprr_return;
       }
 
@@ -2376,30 +2605,36 @@ void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
       cinp->Super.Trp.InOpType = pwr_eQTrpOpEnum_ReverseUnit;
       coutp->Super.Trp.OutRearOpType = pwr_eQTrpOpEnum_Unit;
       o->Status = DATAQ__SUCCESS;
-
-    } else if ((o->Function == pwr_eQTrpFunctionEnum_MoveAllObjects)
-        || (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty)) {
-      if (*(o->TriggReverseFrontP) && !o->OldTriggReverseFront) {
+    }
+    else if ((o->Function == pwr_eQTrpFunctionEnum_MoveAllObjects) ||
+             (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty))
+    {
+      if (*(o->TriggReverseFrontP) && !o->OldTriggReverseFront)
+      {
         /* This is the first object to move */
-        if (o->FuncAllReverse || o->FuncAllForward) {
+        if (o->FuncAllReverse || o->FuncAllForward)
+        {
           /* We are already busy moving last trigg */
           return;
         }
 
         /* Check destination */
-        if (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty) {
-          if (cinp->Super.Intern.NumberOfData) {
+        if (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty)
+        {
+          if (cinp->Super.Intern.NumberOfData)
+          {
             /* Destination cell is not empty */
             o->Error = 1;
-	    o->Status = DATAQ__DESTNOTEMPTY;
+            o->Status = DATAQ__DESTNOTEMPTY;
             goto trprr_return;
           }
         }
       }
-      if (inp->QueueFull) {
+      if (inp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__DESTFULL;
+        o->Status = DATAQ__DESTFULL;
         o->FuncAllReverse = 0;
         goto trprr_return;
       }
@@ -2407,22 +2642,25 @@ void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
         return;
 
       /* Check source */
-      if (coutp->Super.Intern.NumberOfData == 0) {
+      if (coutp->Super.Intern.NumberOfData == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trprr_return;
       }
       if (coutp->Super.Trp.OutRearFlag)
         return;
 
-      if (cinp->Super.Trp.DataL.Data.Ptr == coutp->Super.Trp.DataL.Data.Ptr) {
+      if (cinp->Super.Trp.DataL.Data.Ptr == coutp->Super.Trp.DataL.Data.Ptr)
+      {
         o->Error = 1;
-	o->Status = DATAQ__DESTPRESENT;
+        o->Status = DATAQ__DESTPRESENT;
         goto trprr_return;
       }
 
-      if (o->Options & pwr_mQTrpOptionsMask_Slow && o->FuncAllForward == 1) {
+      if (o->Options & pwr_mQTrpOptionsMask_Slow && o->FuncAllForward == 1)
+      {
         /* Wait till next scan */
         o->FuncAllForward = 2;
         goto trprr_return;
@@ -2442,41 +2680,50 @@ void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o)
         o->FuncAllReverse = 0;
       else
         o->FuncAllReverse = 1;
-    } else {
+    }
+    else
+    {
       if (cinp->Super.Trp.InFlag || cinp->Super.Trp.OutRearFlag)
         return;
 
       /* Check source */
-      if (coutp->Super.Intern.NumberOfData == 0) {
+      if (coutp->Super.Intern.NumberOfData == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trprr_return;
       }
       if (coutp->Super.Trp.OutRearFlag)
         return;
 
-      if (cinp->Super.Trp.DataL.Data.Ptr == coutp->Super.Trp.DataL.Data.Ptr) {
+      if (cinp->Super.Trp.DataL.Data.Ptr == coutp->Super.Trp.DataL.Data.Ptr)
+      {
         /* This should be a Back trigg */
         o->Error = 1;
-	o->Status = DATAQ__DESTPRESENT;
+        o->Status = DATAQ__DESTPRESENT;
         goto trprr_return;
-      } 
-      if (!cinp->Super.Trp.DataL.Front && cinp->Super.Trp.DataL.Back) {
-	o->Error = 1;
-	o->Status = DATAQ__DATASPLIT;
-	goto trprr_return;	
       }
-      if (o->Options & pwr_mQTrpOptionsMask_NoExtend) {
-	if (!coutp->Super.Trp.DataL.Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCBACK;
-	  goto trprr_return;
-	} else if (!coutp->Super.Trp.DataL.Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCFRONT;
-	  goto trprr_return;
-	}
+      if (!cinp->Super.Trp.DataL.Front && cinp->Super.Trp.DataL.Back)
+      {
+        o->Error = 1;
+        o->Status = DATAQ__DATASPLIT;
+        goto trprr_return;
+      }
+      if (o->Options & pwr_mQTrpOptionsMask_NoExtend)
+      {
+        if (!coutp->Super.Trp.DataL.Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCBACK;
+          goto trprr_return;
+        }
+        else if (!coutp->Super.Trp.DataL.Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCFRONT;
+          goto trprr_return;
+        }
       }
 
       /* Transport data */
@@ -2502,7 +2749,8 @@ trprr_return:
   o->ManTriggReverseFront = 0;
   o->ManTriggReverseBack = 0;
 
-  if (o->Options & pwr_mQTrpOptionsMask_ResetTrigg) {
+  if (o->Options & pwr_mQTrpOptionsMask_ResetTrigg)
+  {
     /* Reset the trigg flags */
     o->TriggForwFront = 0;
     o->TriggReverseFront = 0;
@@ -2518,10 +2766,10 @@ trprr_return:
 */
 void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
 {
-  pwr_sClass_DataQFo *outp = (pwr_sClass_DataQFo*)o->OutP;
-  pwr_sClass_DataQ1 *coutp = (pwr_sClass_DataQ1*)outp->PlcConnectP;
-  pwr_sClass_DataQFo *inp = (pwr_sClass_DataQFo*)o->InP;
-  pwr_sClass_DataQ1 *cinp = (pwr_sClass_DataQ1*)inp->PlcConnectP;
+  pwr_sClass_DataQFo* outp = (pwr_sClass_DataQFo*)o->OutP;
+  pwr_sClass_DataQ1* coutp = (pwr_sClass_DataQ1*)outp->PlcConnectP;
+  pwr_sClass_DataQFo* inp = (pwr_sClass_DataQFo*)o->InP;
+  pwr_sClass_DataQ1* cinp = (pwr_sClass_DataQ1*)inp->PlcConnectP;
 
   if (!coutp || !cinp)
     return;
@@ -2530,36 +2778,40 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
     o->Error = 0;
 
   if ((((*(o->TriggForwFrontP) && !o->OldTriggForwFront) ||
-	(*(o->TriggForwFrontP) && o->Options & pwr_mQTrpOptionsMask_LevelTrigg) ||
-	o->FuncAllForward) && 
-       !o->ManualMode) || 
-      (o->ManTriggForwFront && o->ManualMode)) {
-    if (o->Function == pwr_eQTrpFunctionEnum_MoveWholeObject) {
+        (*(o->TriggForwFrontP) && o->Options & pwr_mQTrpOptionsMask_LevelTrigg) || o->FuncAllForward) &&
+       !o->ManualMode) ||
+      (o->ManTriggForwFront && o->ManualMode))
+  {
+    if (o->Function == pwr_eQTrpFunctionEnum_MoveWholeObject)
+    {
       /* Move all of data */
       /* Check destination */
-      if (outp->QueueFull) {
+      if (outp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__DESTFULL;
+        o->Status = DATAQ__DESTFULL;
         goto trpff_return;
       }
       if (coutp->Super.Trp.InFlag || coutp->Super.Trp.OutFrontFlag)
         return;
 
       /* Check source */
-      if (cinp->DataSize == 0) {
+      if (cinp->DataSize == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trpff_return;
       }
       if (cinp->Super.Trp.OutFrontFlag)
         return;
 
       /* Check that both Back and Front is in the in cell */
-      if (!(cinp->Data[0].Back && cinp->Data[0].Front)) {
+      if (!(cinp->Data[0].Back && cinp->Data[0].Front))
+      {
         o->Error = 1;
-	o->Status = DATAQ__DATASPLIT;
+        o->Status = DATAQ__DATASPLIT;
         goto trpff_return;
       }
 
@@ -2572,31 +2824,38 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
       coutp->Super.Trp.InOpType = pwr_eQTrpOpEnum_ForwardUnit;
       cinp->Super.Trp.OutFrontOpType = pwr_eQTrpOpEnum_Unit;
       o->Status = DATAQ__SUCCESS;
-    } else if ((o->Function == pwr_eQTrpFunctionEnum_MoveAllObjects)
-        || (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty)) {
+    }
+    else if ((o->Function == pwr_eQTrpFunctionEnum_MoveAllObjects) ||
+             (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty))
+    {
       /* Move all of data */
       /* Check destination */
-      if (*(o->TriggForwFrontP) && !o->OldTriggForwFront) {
+      if (*(o->TriggForwFrontP) && !o->OldTriggForwFront)
+      {
         /* This is the first object to move */
-        if (o->FuncAllReverse || o->FuncAllForward) {
+        if (o->FuncAllReverse || o->FuncAllForward)
+        {
           /* We are already busy moving last trigg */
           return;
         }
 
-        if (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty) {
-          if (coutp->DataSize != 0) {
+        if (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty)
+        {
+          if (coutp->DataSize != 0)
+          {
             /* Destination cell is not empty */
             o->Error = 1;
-	    o->Status = DATAQ__DESTNOTEMPTY;
+            o->Status = DATAQ__DESTNOTEMPTY;
             goto trpff_return;
           }
         }
       }
 
-      if (outp->QueueFull) {
+      if (outp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__DESTFULL;
+        o->Status = DATAQ__DESTFULL;
         o->FuncAllForward = 0;
         goto trpff_return;
       }
@@ -2604,16 +2863,18 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
         return;
 
       /* Check source */
-      if (cinp->DataSize == 0) {
+      if (cinp->DataSize == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trpff_return;
       }
       if (cinp->Super.Trp.OutFrontFlag)
         return;
 
-      if (o->Options & pwr_mQTrpOptionsMask_Slow && o->FuncAllForward == 1) {
+      if (o->Options & pwr_mQTrpOptionsMask_Slow && o->FuncAllForward == 1)
+      {
         /* Wait till next scan */
         o->FuncAllForward = 2;
         goto trpff_return;
@@ -2633,46 +2894,58 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
         o->FuncAllForward = 0;
       else
         o->FuncAllForward = 1;
-    } else {
+    }
+    else
+    {
       /* Move front of data */
       /* Check destination */
       if (coutp->Super.Trp.InFlag || coutp->Super.Trp.OutFrontFlag)
         return;
 
       /* Check source */
-      if (cinp->DataSize == 0) {
+      if (cinp->DataSize == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trpff_return;
       }
       if (cinp->Super.Trp.OutFrontFlag)
         return;
 
-      if (cinp->Data[0].Data.Ptr != coutp->Data[0].Data.Ptr) {
+      if (cinp->Data[0].Data.Ptr != coutp->Data[0].Data.Ptr)
+      {
         /* This should be a Back trigg */
         o->Error = 1;
-	o->Status = DATAQ__DESTNOTPRESENT;
+        o->Status = DATAQ__DESTNOTPRESENT;
         goto trpff_return;
-      } 
-      if (o->Options & pwr_mQTrpOptionsMask_NoExtend) {
-	if (cinp->Data[0].Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCBACK;
-	  goto trpff_return;
-	} else if (!cinp->Data[0].Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCFRONT;
-	  goto trpff_return;
-	} else if (coutp->Data[0].Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__DESTBACK;
-	  goto trpff_return;
-	} else if (!coutp->Data[0].Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__DESTFRONT;
-	  goto trpff_return;
-	}
+      }
+      if (o->Options & pwr_mQTrpOptionsMask_NoExtend)
+      {
+        if (cinp->Data[0].Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCBACK;
+          goto trpff_return;
+        }
+        else if (!cinp->Data[0].Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCFRONT;
+          goto trpff_return;
+        }
+        else if (coutp->Data[0].Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__DESTBACK;
+          goto trpff_return;
+        }
+        else if (!coutp->Data[0].Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__DESTFRONT;
+          goto trpff_return;
+        }
       }
 
       /* Transport data */
@@ -2684,23 +2957,25 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
       cinp->Super.Trp.OutFrontFlag = 1;
       cinp->Super.Trp.OutFrontOpType = pwr_eQTrpOpEnum_Front;
       o->Status = DATAQ__SUCCESS;
-
     }
   }
 
   if ((*(o->TriggForwBackP) && !o->OldTriggForwBack && !o->ManualMode) ||
-      (o->ManTriggForwBack && o->ManualMode)) {
+      (o->ManTriggForwBack && o->ManualMode))
+  {
     if (coutp->Super.Trp.InFlag || coutp->Super.Trp.OutFrontFlag)
       return;
 
     /* Check source */
-    if (outp->QueueFull) {
+    if (outp->QueueFull)
+    {
       /* Destination cell is full */
       o->Error = 1;
       o->Status = DATAQ__DESTFULL;
       goto trpff_return;
     }
-    if (cinp->DataSize == 0) {
+    if (cinp->DataSize == 0)
+    {
       /* Nothing to transport */
       o->Error = 1;
       o->Status = DATAQ__QUEUEEMPTY;
@@ -2709,26 +2984,32 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
     if (cinp->Super.Trp.OutRearFlag)
       return;
 
-    if (cinp->Data[0].Data.Ptr == coutp->Data[0].Data.Ptr) {
+    if (cinp->Data[0].Data.Ptr == coutp->Data[0].Data.Ptr)
+    {
       /* This should be a Front trigg */
       o->Error = 1;
       o->Status = DATAQ__DESTPRESENT;
       goto trpff_return;
     }
-    if (coutp->Data[0].Front && !coutp->Data[0].Back) {
+    if (coutp->Data[0].Front && !coutp->Data[0].Back)
+    {
       o->Error = 1;
       o->Status = DATAQ__DATASPLIT;
       goto trpff_return;
     }
-    if (o->Options & pwr_mQTrpOptionsMask_NoExtend) {
-      if (!cinp->Data[0].Back) {
-	o->Error = 1;
-	o->Status = DATAQ__SRCBACK;
-	goto trpff_return;
-      } else if (!cinp->Data[0].Front) {
-	o->Error = 1;
-	o->Status = DATAQ__SRCFRONT;
-	goto trpff_return;
+    if (o->Options & pwr_mQTrpOptionsMask_NoExtend)
+    {
+      if (!cinp->Data[0].Back)
+      {
+        o->Error = 1;
+        o->Status = DATAQ__SRCBACK;
+        goto trpff_return;
+      }
+      else if (!cinp->Data[0].Front)
+      {
+        o->Error = 1;
+        o->Status = DATAQ__SRCFRONT;
+        goto trpff_return;
       }
     }
 
@@ -2744,9 +3025,11 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
   }
 
   if ((*(o->TriggReverseBackP) && !o->OldTriggReverseBack && !o->ManualMode) ||
-      (o->ManTriggReverseBack && o->ManualMode)) {
+      (o->ManTriggReverseBack && o->ManualMode))
+  {
     /* Check destination */
-    if (inp->QueueFull) {
+    if (inp->QueueFull)
+    {
       /* Destination cell is full */
       o->Error = 1;
       o->Status = DATAQ__DESTFULL;
@@ -2756,7 +3039,8 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
       return;
 
     /* Check source */
-    if (coutp->DataSize == 0) {
+    if (coutp->DataSize == 0)
+    {
       /* Nothing to transport */
       o->Error = 1;
       o->Status = DATAQ__QUEUEEMPTY;
@@ -2766,25 +3050,31 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
     if (coutp->Super.Trp.OutFrontFlag)
       return;
 
-    if (cinp->Data[0].Data.Ptr == coutp->Data[0].Data.Ptr) {
+    if (cinp->Data[0].Data.Ptr == coutp->Data[0].Data.Ptr)
+    {
       o->Error = 1;
       o->Status = DATAQ__DESTPRESENT;
       goto trpff_return;
     }
-    if (cinp->Data[0].Front && !cinp->Data[0].Back) {
+    if (cinp->Data[0].Front && !cinp->Data[0].Back)
+    {
       o->Error = 1;
       o->Status = DATAQ__DATASPLIT;
       goto trpff_return;
     }
-    if (o->Options & pwr_mQTrpOptionsMask_NoExtend) {
-      if (!coutp->Data[0].Back) {
-	o->Error = 1;
-	o->Status = DATAQ__SRCBACK;
-	goto trpff_return;
-      } else if (!coutp->Data[0].Front) {
-	o->Error = 1;
-	o->Status = DATAQ__SRCFRONT;
-	goto trpff_return;
+    if (o->Options & pwr_mQTrpOptionsMask_NoExtend)
+    {
+      if (!coutp->Data[0].Back)
+      {
+        o->Error = 1;
+        o->Status = DATAQ__SRCBACK;
+        goto trpff_return;
+      }
+      else if (!coutp->Data[0].Front)
+      {
+        o->Error = 1;
+        o->Status = DATAQ__SRCFRONT;
+        goto trpff_return;
       }
     }
 
@@ -2799,36 +3089,40 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
     o->Status = DATAQ__SUCCESS;
   }
 
-  if ((((*(o->TriggReverseFrontP) && !o->OldTriggReverseFront) || 
-	(*(o->TriggReverseFrontP) && o->Options & pwr_mQTrpOptionsMask_LevelTrigg) || 
-	o->FuncAllReverse) &&
+  if ((((*(o->TriggReverseFrontP) && !o->OldTriggReverseFront) ||
+        (*(o->TriggReverseFrontP) && o->Options & pwr_mQTrpOptionsMask_LevelTrigg) || o->FuncAllReverse) &&
        !o->ManualMode) ||
-      (o->ManualMode && o->ManTriggReverseFront)) {
-    if (o->Function == pwr_eQTrpFunctionEnum_MoveWholeObject) {
+      (o->ManualMode && o->ManTriggReverseFront))
+  {
+    if (o->Function == pwr_eQTrpFunctionEnum_MoveWholeObject)
+    {
       /* Check destination */
-      if (inp->QueueFull) {
+      if (inp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__DESTFULL;
+        o->Status = DATAQ__DESTFULL;
         goto trpff_return;
       }
       if (cinp->Super.Trp.InFlag || cinp->Super.Trp.OutFrontFlag)
         return;
 
       /* Check source */
-      if (coutp->DataSize == 0) {
+      if (coutp->DataSize == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trpff_return;
       }
       if (coutp->Super.Trp.OutFrontFlag)
         return;
 
       /* Check that Front is in the cell */
-      if (!coutp->Data[0].Front) {
+      if (!coutp->Data[0].Front)
+      {
         o->Error = 1;
-	o->Status = DATAQ__SRCFRONT;
+        o->Status = DATAQ__SRCFRONT;
         goto trpff_return;
       }
 
@@ -2841,30 +3135,36 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
       cinp->Super.Trp.InOpType = pwr_eQTrpOpEnum_ForwardUnit;
       coutp->Super.Trp.OutFrontOpType = pwr_eQTrpOpEnum_Unit;
       o->Status = DATAQ__SUCCESS;
-
-    } else if ((o->Function == pwr_eQTrpFunctionEnum_MoveAllObjects)
-        || (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty)) {
-      if (*(o->TriggReverseFrontP) && !o->OldTriggReverseFront) {
+    }
+    else if ((o->Function == pwr_eQTrpFunctionEnum_MoveAllObjects) ||
+             (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty))
+    {
+      if (*(o->TriggReverseFrontP) && !o->OldTriggReverseFront)
+      {
         /* This is the first object to move */
-        if (o->FuncAllReverse || o->FuncAllForward) {
+        if (o->FuncAllReverse || o->FuncAllForward)
+        {
           /* We are already busy moving last trigg */
           return;
         }
 
         /* Check destination */
-        if (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty) {
-          if (cinp->DataSize) {
+        if (o->Function == pwr_eQTrpFunctionEnum_MoveAllObjectsIfEmpty)
+        {
+          if (cinp->DataSize)
+          {
             /* Destination cell is not empty */
             o->Error = 1;
-	    o->Status = DATAQ__DESTNOTEMPTY;
+            o->Status = DATAQ__DESTNOTEMPTY;
             goto trpff_return;
           }
         }
       }
-      if (inp->QueueFull) {
+      if (inp->QueueFull)
+      {
         /* Destination cell is full */
         o->Error = 1;
-	o->Status = DATAQ__DESTFULL;
+        o->Status = DATAQ__DESTFULL;
         o->FuncAllReverse = 0;
         goto trpff_return;
       }
@@ -2872,22 +3172,25 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
         return;
 
       /* Check source */
-      if (coutp->DataSize == 0) {
+      if (coutp->DataSize == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trpff_return;
       }
       if (coutp->Super.Trp.OutFrontFlag)
         return;
 
-      if (cinp->Data[0].Data.Ptr == coutp->Data[0].Data.Ptr) {
+      if (cinp->Data[0].Data.Ptr == coutp->Data[0].Data.Ptr)
+      {
         o->Error = 1;
-	o->Status = DATAQ__DESTPRESENT;
+        o->Status = DATAQ__DESTPRESENT;
         goto trpff_return;
       }
 
-      if (o->Options & pwr_mQTrpOptionsMask_Slow && o->FuncAllForward == 1) {
+      if (o->Options & pwr_mQTrpOptionsMask_Slow && o->FuncAllForward == 1)
+      {
         /* Wait till next scan */
         o->FuncAllForward = 2;
         goto trpff_return;
@@ -2907,50 +3210,63 @@ void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o)
         o->FuncAllReverse = 0;
       else
         o->FuncAllReverse = 1;
-    } else {
+    }
+    else
+    {
       if (cinp->Super.Trp.InFlag || cinp->Super.Trp.OutFrontFlag)
         return;
 
       /* Check source */
-      if (coutp->DataSize == 0) {
+      if (coutp->DataSize == 0)
+      {
         /* Nothing to transport */
         o->Error = 1;
-	o->Status = DATAQ__QUEUEEMPTY;
+        o->Status = DATAQ__QUEUEEMPTY;
         goto trpff_return;
       }
       if (coutp->Super.Trp.OutFrontFlag)
         return;
 
-      if (!coutp->Data[0].Front) {
-	o->Error = 1;
-	o->Status = DATAQ__SRCFRONT;
-	goto trpff_return;
+      if (!coutp->Data[0].Front)
+      {
+        o->Error = 1;
+        o->Status = DATAQ__SRCFRONT;
+        goto trpff_return;
       }
 
-      if (cinp->Data[0].Data.Ptr != coutp->Data[0].Data.Ptr) {
+      if (cinp->Data[0].Data.Ptr != coutp->Data[0].Data.Ptr)
+      {
         /* This should be a Back trigg */
         o->Error = 1;
-	o->Status = DATAQ__DESTNOTPRESENT;
+        o->Status = DATAQ__DESTNOTPRESENT;
         goto trpff_return;
-      } 
-      if (o->Options & pwr_mQTrpOptionsMask_NoExtend) {
-	if (cinp->Data[0].Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__DESTBACK;
-	  goto trpff_return;
-	} else if (!cinp->Data[0].Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__DESTFRONT;
-	  goto trpff_return;
-	} else if (coutp->Data[0].Back) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCBACK;
-	  goto trpff_return;
-	} else if (!coutp->Data[0].Front) {
-	  o->Error = 1;
-	  o->Status = DATAQ__SRCFRONT;
-	    goto trpff_return;
-	}
+      }
+      if (o->Options & pwr_mQTrpOptionsMask_NoExtend)
+      {
+        if (cinp->Data[0].Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__DESTBACK;
+          goto trpff_return;
+        }
+        else if (!cinp->Data[0].Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__DESTFRONT;
+          goto trpff_return;
+        }
+        else if (coutp->Data[0].Back)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCBACK;
+          goto trpff_return;
+        }
+        else if (!coutp->Data[0].Front)
+        {
+          o->Error = 1;
+          o->Status = DATAQ__SRCFRONT;
+          goto trpff_return;
+        }
       }
 
       /* Transport data */
@@ -2970,13 +3286,14 @@ trpff_return:
   o->OldTriggReverseFront = *(o->TriggReverseFrontP);
   o->OldTriggForwBack = *(o->TriggForwBackP);
   o->OldTriggReverseBack = *(o->TriggReverseBackP);
-      
+
   o->ManTriggForwFront = 0;
   o->ManTriggForwBack = 0;
   o->ManTriggReverseFront = 0;
   o->ManTriggReverseBack = 0;
-     
-  if (o->Options & pwr_mQTrpOptionsMask_ResetTrigg) {
+
+  if (o->Options & pwr_mQTrpOptionsMask_ResetTrigg)
+  {
     /* Reset the trigg flags */
     o->TriggForwFront = 0;
     o->TriggReverseFront = 0;
@@ -2985,14 +3302,14 @@ trpff_return:
   }
 }
 
-void QOrder_init(pwr_sClass_QOrder* o)
-{
-}
+void QOrder_init(pwr_sClass_QOrder* o) {}
 
 void QOrder_exec(plc_sThread* tp, pwr_sClass_QOrder* o)
 {
-  if (o->InP->Data.Ptr != o->PtrOld) {
-    if (o->Status) {
+  if (o->InP->Data.Ptr != o->PtrOld)
+  {
+    if (o->Status)
+    {
       // Reset for one scan
       o->Status = 0;
       return;
@@ -3003,12 +3320,14 @@ void QOrder_exec(plc_sThread* tp, pwr_sClass_QOrder* o)
     else
       o->New = 0;
     o->PtrOld = o->InP->Data.Ptr;
-  } else
+  }
+  else
     o->New = 0;
 
   o->Out.Front = o->InP->Front;
   o->Out.Back = o->InP->Back;
-  if (o->New) {    
+  if (o->New)
+  {
     o->Out.Data = o->InP->Data;
     o->Out.New = 1;
   }
@@ -3018,7 +3337,8 @@ void QOrder_exec(plc_sThread* tp, pwr_sClass_QOrder* o)
 void QOrder_exec2(plc_sThread* tp, pwr_sClass_QOrder* o, pwr_tBoolean Status)
 {
   o->Out.Status = Status;
-  if (!Status && o->StatusOld) {
+  if (!Status && o->StatusOld)
+  {
     o->Out.New = 0;
     o->Out.Data = pwr_cNDataRef;
     o->Out.Back = 0;
@@ -3037,9 +3357,9 @@ void RemoteDataQFo_init(pwr_sClass_RemoteDataQFo* o)
   pwr_tStatus sts;
   pwr_tDlid dlid;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
-  if (EVEN(sts)) {
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  if (EVEN(sts))
+  {
     o->PlcConnectP = 0;
     return;
   }
@@ -3053,7 +3373,8 @@ void RemoteDataQFo_exec(plc_sThread* tp, pwr_sClass_RemoteDataQFo* o)
 
   if (o->Feedback)
     o->Feedback = 0;
-  else if (co->Feedback) {
+  else if (co->Feedback)
+  {
     o->Feedback = 1;
     co->Feedback = 0;
   }
@@ -3064,26 +3385,24 @@ void RemoteDataQFo_exec(plc_sThread* tp, pwr_sClass_RemoteDataQFo* o)
 
   @aref qremoteorder QRemoteOrder
 */
-void QRemoteOrder_init(pwr_sClass_QRemoteOrder* o)
-{
-  QOrder_init((pwr_sClass_QOrder *)o);
-}
+void QRemoteOrder_init(pwr_sClass_QRemoteOrder* o) { QOrder_init((pwr_sClass_QOrder*)o); }
 
 void QRemoteOrder_exec(plc_sThread* tp, pwr_sClass_QRemoteOrder* o)
 {
-  QOrder_exec(tp, (pwr_sClass_QOrder *)o);
+  QOrder_exec(tp, (pwr_sClass_QOrder*)o);
 }
 
 void QRemoteOrder_exec2(plc_sThread* tp, pwr_sClass_QRemoteOrder* o, pwr_tBoolean Status)
 {
-  QOrder_exec2(tp, (pwr_sClass_QOrder *)o, Status);
+  QOrder_exec2(tp, (pwr_sClass_QOrder*)o, Status);
   if (Status && !o->QRStatusOld)
     o->QRStatus = 1;
   if (!Status && o->QRStatusOld)
     o->QRStatusReset = 1;
   if (o->Feedback)
     o->Feedback = 0;
-  else if (o->QRFeedback) {
+  else if (o->QRFeedback)
+  {
     o->Feedback = 1;
     o->QRFeedback = 0;
   }
@@ -3099,33 +3418,41 @@ void QTargetOrder_exec(plc_sThread* tp, pwr_sClass_QTargetOrder* o)
 {
   if (o->Out.New)
     o->Out.New = 0;
-  else {
-    if (o->New) {
+  else
+  {
+    if (o->New)
+    {
       if (cdh_ObjidIsNotNull(o->DataObject))
         gdh_DLUnrefObjectInfo(o->DataDlid);
       o->Out.Data.Aref = cdh_ObjidToAref(o->DataObject);
-      pwr_tStatus sts = gdh_DLRefObjectInfoAttrref(&o->Out.Data.Aref, &o->Out.Data.Ptr, &o->DataDlid); 
-      if (EVEN(sts)) {
-	o->DataObject = pwr_cNOid;
-	o->Out.Data.Ptr = 0;
-	o->Out.Data.Aref.Objid = pwr_cNOid;
-      } else {
-	o->Out.New = 1;
-	o->Out.Status = 1;
-	o->Out.Front = 1;
-	o->Out.Back = 1;
+      pwr_tStatus sts = gdh_DLRefObjectInfoAttrref(&o->Out.Data.Aref, &o->Out.Data.Ptr, &o->DataDlid);
+      if (EVEN(sts))
+      {
+        o->DataObject = pwr_cNOid;
+        o->Out.Data.Ptr = 0;
+        o->Out.Data.Aref.Objid = pwr_cNOid;
+      }
+      else
+      {
+        o->Out.New = 1;
+        o->Out.Status = 1;
+        o->Out.Front = 1;
+        o->Out.Back = 1;
       }
       o->New = 0;
     }
   }
-  if (o->QTStatusReset) {
+  if (o->QTStatusReset)
+  {
     o->QTStatusReset = 0;
     o->QTFeedback = 1;
   }
-  if (*o->FeedbackP && !o->FeedbackOld && !o->QTFeedback) {
+  if (*o->FeedbackP && !o->FeedbackOld && !o->QTFeedback)
+  {
     o->QTFeedback = 1;
   }
-  if (!o->QTFeedback && o->QTFeedbackOld) {
+  if (!o->QTFeedback && o->QTFeedbackOld)
+  {
     o->Out.Status = 0;
     gdh_DLUnrefObjectInfo(o->DataDlid);
     o->DataDlid = pwr_cNDlid;
@@ -3139,7 +3466,6 @@ void QTargetOrder_exec(plc_sThread* tp, pwr_sClass_QTargetOrder* o)
   o->QTFeedbackOld = o->QTFeedback;
 }
 
-
 /*_*
   QCreateData
 
@@ -3147,8 +3473,8 @@ void QTargetOrder_exec(plc_sThread* tp, pwr_sClass_QTargetOrder* o)
 */
 void QCreateData_exec(plc_sThread* tp, pwr_sClass_QCreateData* o)
 {
-  pwr_sClass_DataQFo *outp = (pwr_sClass_DataQFo*)o->OutP;
-  pwr_sClass_DataQ1 *coutp = (pwr_sClass_DataQ1*)outp->PlcConnectP;
+  pwr_sClass_DataQFo* outp = (pwr_sClass_DataQFo*)o->OutP;
+  pwr_sClass_DataQ1* coutp = (pwr_sClass_DataQ1*)outp->PlcConnectP;
 
   if (!coutp)
     return;
@@ -3156,8 +3482,10 @@ void QCreateData_exec(plc_sThread* tp, pwr_sClass_QCreateData* o)
   if (o->Error)
     o->Error = 0;
 
-  if (o->Transport) {
-    if (outp->QueueFull) {
+  if (o->Transport)
+  {
+    if (outp->QueueFull)
+    {
       /* Destination cell is full */
       o->Error = 1;
       o->Status = DATAQ__DESTFULL;
@@ -3178,14 +3506,16 @@ void QCreateData_exec(plc_sThread* tp, pwr_sClass_QCreateData* o)
     o->Transport = 0;
   }
 
-  if (*o->CreateP && !o->OldCreate) {
+  if (*o->CreateP && !o->OldCreate)
+  {
     pwr_tStatus sts;
     pwr_tOName name;
     pwr_tOid oid;
     pwr_tRefId dlid;
-    void *data_p;
+    void* data_p;
 
-    if (outp->QueueFull) {
+    if (outp->QueueFull)
+    {
       /* Destination cell is full */
       o->Error = 1;
       o->Status = DATAQ__DESTFULL;
@@ -3193,22 +3523,26 @@ void QCreateData_exec(plc_sThread* tp, pwr_sClass_QCreateData* o)
     }
 
     sts = gdh_ObjidToName(o->DataParent, name, sizeof(name), cdh_mName_volumeStrict);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       o->Error = 1;
       o->Status = DATAQ__PARENT;
       return;
     }
-    if (name[strlen(name)-1] != ':')
+    if (name[strlen(name) - 1] != ':')
       strcat(name, "-");
-    if (strchr(o->DataName, '%')) {
+    if (strchr(o->DataName, '%'))
+    {
       snprintf(&name[strlen(name)], sizeof(name), o->DataName, o->NameIdx);
       o->NameIdx++;
-    } else {
-      snprintf(&name[strlen(name)], sizeof(name), "%s%d", o->DataName, o->NameIdx); 
     }
-    sts = gdh_CreateObject(name, o->DataClass, 0, &oid, pwr_cNOid, 0, 
-	pwr_cNOid);
-    if (EVEN(sts)) {
+    else
+    {
+      snprintf(&name[strlen(name)], sizeof(name), "%s%d", o->DataName, o->NameIdx);
+    }
+    sts = gdh_CreateObject(name, o->DataClass, 0, &oid, pwr_cNOid, 0, pwr_cNOid);
+    if (EVEN(sts))
+    {
       o->Error = 1;
       o->Status = sts;
       return;
@@ -3216,7 +3550,8 @@ void QCreateData_exec(plc_sThread* tp, pwr_sClass_QCreateData* o)
 
     pwr_tAttrRef aref = cdh_ObjidToAref(oid);
     sts = gdh_DLRefObjectInfoAttrref(&aref, (pwr_tAddress*)&data_p, &dlid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       o->Error = 1;
       o->Status = sts;
       return;

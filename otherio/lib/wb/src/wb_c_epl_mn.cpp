@@ -61,14 +61,11 @@ static pwr_tStatus Configure(ldh_sMenuCall* ip)
   return 1;
 }
 
-static pwr_tStatus ConfigureFilter(ldh_sMenuCall* ip)
-{
-  return 1;
-}
+static pwr_tStatus ConfigureFilter(ldh_sMenuCall* ip) { return 1; }
 
 /*----------------------------------------------------------------------------*\
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(Epl_MN) = { pwr_BindMethod(Configure),
-  pwr_BindMethod(ConfigureFilter), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(Epl_MN) = {pwr_BindMethod(Configure), pwr_BindMethod(ConfigureFilter),
+                                       pwr_NullMethod};

@@ -67,20 +67,23 @@ s0 = "http://www.proview.se/webservices/statussrv/1.0/"
  *                                                                            *
 \******************************************************************************/
 
-class xsd__anyType {
+class xsd__anyType
+{
   _XML __item;
   struct soap* soap;
 };
 
 /// Class wrapper for built-in type "xs:int" derived from xsd__anyType
-class xsd__int : public xsd__anyType {
-  public:
+class xsd__int : public xsd__anyType
+{
+public:
   int __item;
 };
 
 /// Class wrapper for built-in type "xs:string" derived from xsd__anyType
-class xsd__string : public xsd__anyType {
-  public:
+class xsd__string : public xsd__anyType
+{
+public:
   std::string __item;
 };
 
@@ -119,8 +122,9 @@ class _s0__RtMonStartResponse;
 
 /// "http://www.proview.se/webservices/statussrv/1.0/":GetStatus is a
 /// complexType.
-class _s0__GetStatus {
-  public:
+class _s0__GetStatus
+{
+public:
   /// Attribute ClientRequestHandle of type xs:string.
   @std::string* ClientRequestHandle 0; ///< Optional attribute.
   /// A handle to the soap struct that manages this instance (automatically set)
@@ -132,8 +136,9 @@ class _s0__GetStatus {
 
 /// "http://www.proview.se/webservices/statussrv/1.0/":GetStatusResponse is a
 /// complexType.
-class _s0__GetStatusResponse {
-  public:
+class _s0__GetStatusResponse
+{
+public:
   /// Element Version of type xs:string.
   std::string Version 1; ///< Required element.
   /// Element SystemStatus of type xs:int.
@@ -181,8 +186,9 @@ class _s0__GetStatusResponse {
 
 /// "http://www.proview.se/webservices/statussrv/1.0/":GetExtStatus is a
 /// complexType.
-class _s0__GetExtStatus {
-  public:
+class _s0__GetExtStatus
+{
+public:
   /// Attribute ClientRequestHandle of type xs:string.
   @std::string* ClientRequestHandle 0; ///< Optional attribute.
   /// A handle to the soap struct that manages this instance (automatically set)
@@ -195,8 +201,9 @@ class _s0__GetExtStatus {
 
 /// "http://www.proview.se/webservices/statussrv/1.0/":GetExtStatusResponse is a
 /// complexType.
-class _s0__GetExtStatusResponse {
-  public:
+class _s0__GetExtStatusResponse
+{
+public:
   /// Element ServerSts1 of type xs:int.
   int ServerSts1 1; ///< Required element.
   /// Element ServerSts1Str of type xs:string.
@@ -447,8 +454,9 @@ class _s0__GetExtStatusResponse {
 /// complexType.
 
 /// "http://www.proview.se/webservices/statussrv/1.0/":Restart is a complexType.
-class _s0__Restart {
-  public:
+class _s0__Restart
+{
+public:
   /// Attribute ClientRequestHandle of type xs:string.
   @std::string* ClientRequestHandle 0; ///< Optional attribute.
   /// A handle to the soap struct that manages this instance (automatically set)
@@ -460,8 +468,9 @@ class _s0__Restart {
 
 /// "http://www.proview.se/webservices/statussrv/1.0/":RestartResponse is a
 /// complexType.
-class _s0__RestartResponse {
-  public:
+class _s0__RestartResponse
+{
+public:
   /// Attribute ClientRequestHandle of type xs:string.
   @std::string* ClientRequestHandle 0; ///< Optional attribute.
   /// A handle to the soap struct that manages this instance (automatically set)
@@ -473,8 +482,9 @@ class _s0__RestartResponse {
 
 /// "http://www.proview.se/webservices/statussrv/1.0/":XttStart is a
 /// complexType.
-class _s0__XttStart {
-  public:
+class _s0__XttStart
+{
+public:
   /// Element OpPlace of type xs:string.
   std::string* OpPlace 0; ///< Optional element.
   /// Element Language of type xs:string.
@@ -494,8 +504,9 @@ class _s0__XttStart {
 
 /// "http://www.proview.se/webservices/statussrv/1.0/":XttStartResponse is a
 /// complexType.
-class _s0__XttStartResponse {
-  public:
+class _s0__XttStartResponse
+{
+public:
   /// Attribute ClientRequestHandle of type xs:string.
   @std::string* ClientRequestHandle 0; ///< Optional attribute.
   /// A handle to the soap struct that manages this instance (automatically set)
@@ -507,8 +518,9 @@ class _s0__XttStartResponse {
 
 /// "http://www.proview.se/webservices/statussrv/1.0/":RtMonStart is a
 /// complexType.
-class _s0__RtMonStart {
-  public:
+class _s0__RtMonStart
+{
+public:
   /// Element Language of type xs:string.
   std::string* Language 0; ///< Optional element.
   /// Element Display of type xs:string.
@@ -527,8 +539,9 @@ class _s0__RtMonStart {
 
 /// "http://www.proview.se/webservices/statussrv/1.0/":RtMonStartResponse is a
 /// complexType.
-class _s0__RtMonStartResponse {
-  public:
+class _s0__RtMonStartResponse
+{
+public:
   /// Attribute ClientRequestHandle of type xs:string.
   @std::string* ClientRequestHandle 0; ///< Optional attribute.
   /// A handle to the soap struct that manages this instance (automatically set)
@@ -623,9 +636,9 @@ C++ proxy class (defined in soapServiceProxy.h):
 // gsoap s0   service method-style:	GetStatus document
 // gsoap s0   service method-encoding:	GetStatus literal
 // gsoap s0   service method-action:	GetStatus s0:GetStatus
-int __s0__GetStatus(_s0__GetStatus* s0__GetStatus, ///< Request parameter
-    _s0__GetStatusResponse* s0__GetStatusResponse ///< Response parameter
-    );
+int __s0__GetStatus(_s0__GetStatus* s0__GetStatus,                ///< Request parameter
+                    _s0__GetStatusResponse* s0__GetStatusResponse ///< Response parameter
+);
 
 /******************************************************************************\
  *                                                                            *
@@ -675,10 +688,9 @@ C++ proxy class (defined in soapServiceProxy.h):
 // gsoap s0   service method-style:	GetExtStatus document
 // gsoap s0   service method-encoding:	GetExtStatus literal
 // gsoap s0   service method-action:	GetExtStatus s0:GetExtStatus
-int __s0__GetExtStatus(
-    _s0__GetExtStatus* s0__GetExtStatus, ///< Request parameter
-    _s0__GetExtStatusResponse* s0__GetExtStatusResponse ///< Response parameter
-    );
+int __s0__GetExtStatus(_s0__GetExtStatus* s0__GetExtStatus,                ///< Request parameter
+                       _s0__GetExtStatusResponse* s0__GetExtStatusResponse ///< Response parameter
+);
 
 /******************************************************************************\
  *                                                                            *
@@ -728,9 +740,9 @@ C++ proxy class (defined in soapServiceProxy.h):
 // gsoap s0   service method-style:	Restart document
 // gsoap s0   service method-encoding:	Restart literal
 // gsoap s0   service method-action:	Restart s0:Restart
-int __s0__Restart(_s0__Restart* s0__Restart, ///< Request parameter
-    _s0__RestartResponse* s0__RestartResponse ///< Response parameter
-    );
+int __s0__Restart(_s0__Restart* s0__Restart,                ///< Request parameter
+                  _s0__RestartResponse* s0__RestartResponse ///< Response parameter
+);
 
 /******************************************************************************\
  *                                                                            *
@@ -780,9 +792,9 @@ C++ proxy class (defined in soapServiceProxy.h):
 // gsoap s0   service method-style:	XttStart document
 // gsoap s0   service method-encoding:	XttStart literal
 // gsoap s0   service method-action:	XttStart s0:XttStart
-int __s0__XttStart(_s0__XttStart* s0__XttStart, ///< Request parameter
-    _s0__XttStartResponse* s0__XttStartResponse ///< Response parameter
-    );
+int __s0__XttStart(_s0__XttStart* s0__XttStart,                ///< Request parameter
+                   _s0__XttStartResponse* s0__XttStartResponse ///< Response parameter
+);
 
 /******************************************************************************\
  *                                                                            *
@@ -832,8 +844,8 @@ C++ proxy class (defined in soapServiceProxy.h):
 // gsoap s0   service method-style:	RtMonStart document
 // gsoap s0   service method-encoding:	RtMonStart literal
 // gsoap s0   service method-action:	RtMonStart s0:RtMonStart
-int __s0__RtMonStart(_s0__RtMonStart* s0__RtMonStart, ///< Request parameter
-    _s0__RtMonStartResponse* s0__RtMonStartResponse ///< Response parameter
-    );
+int __s0__RtMonStart(_s0__RtMonStart* s0__RtMonStart,                ///< Request parameter
+                     _s0__RtMonStartResponse* s0__RtMonStartResponse ///< Response parameter
+);
 
 /* End of statussrv_msg.h */

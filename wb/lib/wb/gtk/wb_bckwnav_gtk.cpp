@@ -42,13 +42,11 @@
 
 #include "wb_bckwnav_gtk.h"
 
-WbBckWNavGtk::WbBckWNavGtk(void* l_parent_ctx, GtkWidget* l_parent_wid,
-    ldh_tSession l_ldhses, wb_bck_list* l_list, int l_editmode, GtkWidget** w)
-    : WbBckWNav(l_parent_ctx, l_ldhses, l_list, l_editmode),
-      parent_wid(l_parent_wid)
+WbBckWNavGtk::WbBckWNavGtk(void* l_parent_ctx, GtkWidget* l_parent_wid, ldh_tSession l_ldhses,
+                           wb_bck_list* l_list, int l_editmode, GtkWidget** w)
+    : WbBckWNav(l_parent_ctx, l_ldhses, l_list, l_editmode), parent_wid(l_parent_wid)
 {
-  form_widget
-      = scrolledbrowwidgetgtk_new(WbBckWNav::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetgtk_new(WbBckWNav::init_brow_cb, this, &brow_widget);
 
   gtk_widget_show_all(brow_widget);
 
@@ -65,7 +63,4 @@ WbBckWNavGtk::~WbBckWNavGtk()
   gtk_widget_destroy(form_widget);
 }
 
-void WbBckWNavGtk::set_input_focus()
-{
-  gtk_widget_grab_focus(brow_widget);
-}
+void WbBckWNavGtk::set_input_focus() { gtk_widget_grab_focus(brow_widget); }

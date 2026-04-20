@@ -40,7 +40,8 @@
 
 const int opc_cPropertySize = 17;
 
-typedef enum {
+typedef enum
+{
   opc_mProperty_DataType = 1 << 0,
   opc_mProperty_Value = 1 << 1,
   opc_mProperty_Quality = 1 << 2,
@@ -60,7 +61,8 @@ typedef enum {
   opc_mProperty_TimeZone = 1 << 16
 } opc_mProperty;
 
-typedef enum {
+typedef enum
+{
   opc_mRequestOption_ReturnErrorText = 1 << 0,
   opc_mRequestOption_ReturnDiagnosticInfo = 1 << 1,
   opc_mRequestOption_ReturnItemTime = 1 << 2,
@@ -70,7 +72,8 @@ typedef enum {
 
 const int opc_cDataTypeSize = 20;
 
-typedef enum {
+typedef enum
+{
   opc_eDataType_string,
   opc_eDataType_boolean,
   opc_eDataType_float,
@@ -94,7 +97,8 @@ typedef enum {
   opc_eDataType_
 } opc_eDataType;
 
-typedef enum {
+typedef enum
+{
   opc_eResultCode_S_,
   opc_eResultCode_S_CLAMP,
   opc_eResultCode_S_DATAQUEUEOVERFLOW,
@@ -122,36 +126,29 @@ typedef enum {
   opc_eResultCode__
 } opc_eResultCode;
 
-void opcsrv_returnerror(struct soap* soap, std::vector<s0__OPCError*>& errors,
-    std::string** rc, int err_code, unsigned int options);
-bool opc_requestoptions_to_mask(
-    s0__RequestOptions* options, unsigned int* mask);
+void opcsrv_returnerror(struct soap* soap, std::vector<s0__OPCError*>& errors, std::string** rc, int err_code,
+                        unsigned int options);
+bool opc_requestoptions_to_mask(s0__RequestOptions* options, unsigned int* mask);
 char* opc_datetime(pwr_tTime* tp);
 pwr_tStatus time_AtoOPCAscii(pwr_tTime* tp, char* buf, int bufsize);
 pwr_tStatus opc_time_OPCAsciiToA(char* tstr, pwr_tTime* ts);
 const char* opc_resultcode_to_string(int code);
 const char* opc_resultcode_to_text(int code);
 bool opc_string_to_resultcode(char* str, int* code);
-xsd__anyType* opc_opctype_to_value(
-    struct soap* soap, void* bufp, int size, int opc_type);
-bool opc_convert_pwrtype_to_opctype(
-    void* bufin, void* bufout, int size, int opc_type, int pwr_type);
-bool opc_convert_opctype_to_pwrtype(
-    void* bufp, int size, xsd__anyType* value, pwr_eType pwr_type);
+xsd__anyType* opc_opctype_to_value(struct soap* soap, void* bufp, int size, int opc_type);
+bool opc_convert_pwrtype_to_opctype(void* bufin, void* bufout, int size, int opc_type, int pwr_type);
+bool opc_convert_opctype_to_pwrtype(void* bufp, int size, xsd__anyType* value, pwr_eType pwr_type);
 bool opc_string_to_opctype(const char* str, int* type);
 char* opc_opctype_to_string(int type);
 bool opc_pwrtype_to_opctype(int pwrtype, int* opctype);
 bool opc_opctype_to_pwrtype(int type, int* pwrtype);
 bool opc_pwrtype_to_string(int type, char** str);
 
-bool opc_get_property(std::vector<s0__ItemProperty*> properties,
-    unsigned int mask, xsd__anyType** valp);
+bool opc_get_property(std::vector<s0__ItemProperty*> properties, unsigned int mask, xsd__anyType** valp);
 
-void opc_mask_to_propertynames(
-    std::vector<std::string>& pnames, unsigned int mask);
+void opc_mask_to_propertynames(std::vector<std::string>& pnames, unsigned int mask);
 
-bool opc_propertynames_to_mask(
-    std::vector<std::string>& pnames, unsigned int* mask);
+bool opc_propertynames_to_mask(std::vector<std::string>& pnames, unsigned int* mask);
 
 bool opc_quality_to_string(int quality, char** str);
 

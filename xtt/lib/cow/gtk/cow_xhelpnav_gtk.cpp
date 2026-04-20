@@ -45,25 +45,21 @@
 
 #include "flow_browwidget_gtk.h"
 
-extern "C" {
+extern "C"
+{
 #include "co_api.h"
 }
 
-void CoXHelpNavGtk::pop()
-{
-}
+void CoXHelpNavGtk::pop() {}
 
 //
 // Create the navigator widget
 //
-CoXHelpNavGtk::CoXHelpNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-    char* xn_name, xhelp_eUtility xn_utility, GtkWidget** w,
-    pwr_tStatus* status)
-    : CoXHelpNav(xn_parent_ctx, xn_name, xn_utility, status),
-      parent_wid(xn_parent_wid)
+CoXHelpNavGtk::CoXHelpNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, char* xn_name,
+                             xhelp_eUtility xn_utility, GtkWidget** w, pwr_tStatus* status)
+    : CoXHelpNav(xn_parent_ctx, xn_name, xn_utility, status), parent_wid(xn_parent_wid)
 {
-  form_widget = scrolledbrowwidgetgtk_new(
-      CoXHelpNav::init_brow_base_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetgtk_new(CoXHelpNav::init_brow_base_cb, this, &brow_widget);
 
   gtk_widget_show_all(brow_widget);
 
@@ -80,7 +76,8 @@ CoXHelpNavGtk::~CoXHelpNavGtk()
 {
   closing_down = 1;
 
-  for (int i = 0; i < brow_cnt; i++) {
+  for (int i = 0; i < brow_cnt; i++)
+  {
     if (i != 0)
       brow_DeleteSecondaryCtx(brow_stack[i]->ctx);
     brow_stack[i]->free_pixmaps();
@@ -90,7 +87,4 @@ CoXHelpNavGtk::~CoXHelpNavGtk()
   gtk_widget_destroy(form_widget);
 }
 
-void CoXHelpNavGtk::set_inputfocus()
-{
-  gtk_widget_grab_focus(brow_widget);
-}
+void CoXHelpNavGtk::set_inputfocus() { gtk_widget_grab_focus(brow_widget); }

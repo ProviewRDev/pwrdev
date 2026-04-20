@@ -54,7 +54,8 @@
 
 #define ge_ePeriod_Markers ((time_ePeriod)1000)
 
-typedef enum {
+typedef enum
+{
   curve_mOptions_FullScreen = 1 << 0,
   curve_mOptions_Maximize = 1 << 1,
   curve_mOptions_FullMaximize = 1 << 2,
@@ -77,7 +78,8 @@ typedef enum {
   curve_mOptions_TimeRangeMonth = 1 << 19
 } curve_mOptions;
 
-typedef enum {
+typedef enum
+{
   curve_mEnable_New = 1 << 0,
   curve_mEnable_Save = 1 << 1,
   curve_mEnable_Open = 1 << 2,
@@ -92,23 +94,30 @@ typedef enum {
   curve_mEnable_DigitalSplit = 1 << 11
 } curve_mEnable;
 
-typedef enum {
+typedef enum
+{
   curve_eDataType_LogFile,
   curve_eDataType_DsTrend,
   curve_eDataType_MultiTrend,
   curve_eDataType_ODBC
 } curve_eDataType;
 
-typedef enum { curve_eAxis_x, curve_eAxis_y } curve_eAxis;
+typedef enum
+{
+  curve_eAxis_x,
+  curve_eAxis_y
+} curve_eAxis;
 
-typedef enum {
+typedef enum
+{
   curve_eTimeFormat_Float,
   curve_eTimeFormat_HourMinute,
   curve_eTimeFormat_DayHour
 } curve_eTimeFormat;
 
 //! Contains data for the curves.
-class GeCurveData {
+class GeCurveData
+{
 public:
   GeCurveData(curve_eDataType datatype);
   curve_eDataType type;
@@ -155,10 +164,9 @@ public:
   void get_borders();
   void get_default_axis();
   void select_color(bool dark_bg);
-  void scale(int axis_type, int value_type, double min_value, double max_value,
-      double* min_value_axis, double* max_value_axis, int* trend_lines,
-      int* axis_lines, int* axis_linelongq, int* axis_valueq, char* format,
-      double* axis_width, int not_zero, int allow_odd, int exact);
+  void scale(int axis_type, int value_type, double min_value, double max_value, double* min_value_axis,
+             double* max_value_axis, int* trend_lines, int* axis_lines, int* axis_linelongq, int* axis_valueq,
+             char* format, double* axis_width, int not_zero, int allow_odd, int exact);
   ~GeCurveData();
 };
 
@@ -166,7 +174,8 @@ class CoWow;
 class CurveCtx;
 
 //! A curve window used for trends and logging curves.
-class GeCurve {
+class GeCurve
+{
 public:
   void* parent_ctx;
   char name[80];
@@ -236,65 +245,26 @@ public:
   time_ePeriod current_period;
   int fill_curves;
 
-  GeCurve(void* gc_parent_ctx, char* curve_name, char* filename,
-      GeCurveData* curve_data, int pos_right, int gc_width, int gc_height,
-      unsigned int options, int color_theme);
+  GeCurve(void* gc_parent_ctx, char* curve_name, char* filename, GeCurveData* curve_data, int pos_right,
+          int gc_width, int gc_height, unsigned int options, int color_theme);
   virtual ~GeCurve();
-  virtual void write_title(char* str)
-  {
-  }
-  virtual void pop()
-  {
-  }
-  virtual void resize()
-  {
-  }
-  virtual void open_minmax(int idx)
-  {
-  }
-  virtual void open_export(
-      pwr_tTime* from, pwr_tTime* to, int rows, char* filename)
-  {
-  }
-  virtual void axis_set_width(int width)
-  {
-  }
-  virtual void enable(unsigned int mask)
-  {
-  }
-  virtual void setup(unsigned int mask)
-  {
-  }
-  virtual void set_times(pwr_tTime* from, pwr_tTime* to)
-  {
-  }
-  virtual void set_times_sensitivity(int sensitive)
-  {
-  }
-  virtual pwr_tStatus get_times(pwr_tTime* from, pwr_tTime* to)
-  {
-    return 0;
-  }
-  virtual int get_period(time_ePeriod* period)
-  {
-    return 0;
-  }
-  virtual void set_period(time_ePeriod period, int nocallback)
-  {
-  }
-  virtual void set_clock_cursor()
-  {
-  }
-  virtual void reset_cursor()
-  {
-  }
-  virtual void* get_widget()
-  {
-    return 0;
-  }
-  void set_inputfocus()
-  {
-  }
+  virtual void write_title(char* str) {}
+  virtual void pop() {}
+  virtual void resize() {}
+  virtual void open_minmax(int idx) {}
+  virtual void open_export(pwr_tTime* from, pwr_tTime* to, int rows, char* filename) {}
+  virtual void axis_set_width(int width) {}
+  virtual void enable(unsigned int mask) {}
+  virtual void setup(unsigned int mask) {}
+  virtual void set_times(pwr_tTime* from, pwr_tTime* to) {}
+  virtual void set_times_sensitivity(int sensitive) {}
+  virtual pwr_tStatus get_times(pwr_tTime* from, pwr_tTime* to) { return 0; }
+  virtual int get_period(time_ePeriod* period) { return 0; }
+  virtual void set_period(time_ePeriod period, int nocallback) {}
+  virtual void set_clock_cursor() {}
+  virtual void reset_cursor() {}
+  virtual void* get_widget() { return 0; }
+  void set_inputfocus() {}
 
   int read_file(char* filename);
   int configure_curves();
@@ -327,10 +297,7 @@ public:
   void set_curvedata(GeCurveData* curve_data);
   void redraw();
   void x_to_points(double x, double* time, double* values);
-  void set_center_from_window(int val)
-  {
-    center_from_window = val;
-  }
+  void set_center_from_window(int val) { center_from_window = val; }
   void set_title(const char* str);
   void update_color_theme(int ct);
   void set_times_markers();

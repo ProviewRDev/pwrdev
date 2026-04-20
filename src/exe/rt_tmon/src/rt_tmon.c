@@ -57,7 +57,8 @@
 
 typedef struct s_Timer sTimer;
 
-struct s_Timer {
+struct s_Timer
+{
   struct LstHead ll;
   time_tClock clock;
   pwr_tBoolean wrapped;
@@ -102,7 +103,7 @@ static void waitClock(time_tClock c, int* tmo_ms);
 
 static void setInterval(time_tClock* c, pwr_tUInt32 i);
 
-static void executeExpired(struct LstHead * lh, pwr_tBoolean force);
+static void executeExpired(struct LstHead* lh, pwr_tBoolean force);
 
 static void getNewTimers();
 
@@ -124,19 +125,25 @@ int main(int argc, char** argv)
 
   init();
 
-  if (!qcom_CreateQ(&sts, &my_q, NULL, "events")) {
+  if (!qcom_CreateQ(&sts, &my_q, NULL, "events"))
+  {
     exit(sts);
   }
-  if (!qcom_Bind(&sts, &my_q, &qcom_cQini)) {
+  if (!qcom_Bind(&sts, &my_q, &qcom_cQini))
+  {
     exit(-1);
   }
 
   gdbroot->db->log.b.tmon = 0;
 
-  for (wait_clock = 0;;) {
-    if (wait_clock != 0) {
+  for (wait_clock = 0;;)
+  {
+    if (wait_clock != 0)
+    {
       waitClock(wait_clock, &tmo_ms);
-    } else {
+    }
+    else
+    {
       tmo_ms = 0;
     }
 
@@ -144,15 +151,18 @@ int main(int argc, char** argv)
 
     get.data = NULL;
     qcom_Get(&sts, &my_q, &get, tmo_ms);
-    if (sts != QCOM__TMO && sts != QCOM__QEMPTY) {
-      if (get.type.b == qcom_eBtype_event) {
+    if (sts != QCOM__TMO && sts != QCOM__QEMPTY)
+    {
+      if (get.type.b == qcom_eBtype_event)
+      {
         event(&get);
       }
       qcom_Free(&sts, get.data);
     }
 
     now_clock = time_Clock(NULL, NULL);
-    if (now_clock < last_clock) {
+    if (now_clock < last_clock)
+    {
       errh_Info("The uptime clock has wrapped");
       toggleWrapped();
       executeExpired(&wrap_lh, 1);
@@ -177,7 +187,8 @@ static void event(qcom_sGet* get)
     return;
 
   new_event.m = ep->mask;
-  if (new_event.b.terminate) {
+  if (new_event.b.terminate)
+  {
     exit(0);
   }
 }
@@ -191,7 +202,8 @@ static void sancAdd(sTimer* tp)
   gdb_sNode* np;
   pool_sQlink* nl;
 
-  if (first) {
+  if (first)
+  {
 #ifdef OS_LINUX
     cycle = 1 * sysconf(_SC_CLK_TCK);
 #else
@@ -204,8 +216,9 @@ static void sancAdd(sTimer* tp)
   if (gdbroot->db->log.b.tmon)
     errh_Info("sancAdd: %u", tp->clock);
 
-  for (nl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->nod_lh);
-       nl != &gdbroot->db->nod_lh; nl = pool_Qsucc(NULL, gdbroot->pool, nl)) {
+  for (nl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->nod_lh); nl != &gdbroot->db->nod_lh;
+       nl = pool_Qsucc(NULL, gdbroot->pool, nl))
+  {
     np = pool_Qitem(nl, gdb_sNode, nod_ll);
 
     if (!np->flags.b.active || np == gdbroot->my_node || np == gdbroot->no_node)
@@ -228,7 +241,8 @@ static void sancExpired(sTimer* tp)
   gdb_sNode* np;
   pool_sQlink* nl;
 
-  if (first) {
+  if (first)
+  {
 #ifdef OS_LINUX
     cycle = 60 * sysconf(_SC_CLK_TCK);
 #else
@@ -241,8 +255,8 @@ static void sancExpired(sTimer* tp)
   if (gdbroot->db->log.b.tmon)
     errh_Info("sancExpired: %u", tp->clock);
 
-  for (nl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->nod_lh);
-       nl != &gdbroot->db->nod_lh;) {
+  for (nl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->nod_lh); nl != &gdbroot->db->nod_lh;)
+  {
     np = pool_Qitem(nl, gdb_sNode, nod_ll);
     nl = pool_Qsucc(NULL, gdbroot->pool, nl);
 
@@ -266,7 +280,8 @@ static void sansCheck(sTimer* tp)
   gdb_sNode* np;
   pool_sQlink* nl;
 
-  if (first) {
+  if (first)
+  {
 #ifdef OS_LINUX
     cycle = 2 * sysconf(_SC_CLK_TCK);
 #else
@@ -281,8 +296,8 @@ static void sansCheck(sTimer* tp)
 
   sansm_Check();
 
-  for (nl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->nod_lh);
-       nl != &gdbroot->db->nod_lh;) {
+  for (nl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->nod_lh); nl != &gdbroot->db->nod_lh;)
+  {
     np = pool_Qitem(nl, gdb_sNode, nod_ll);
     nl = pool_Qsucc(NULL, gdbroot->pool, nl);
 
@@ -304,7 +319,8 @@ static void subcCheck(sTimer* tp)
   static time_tClock cycle;
   static pwr_tBoolean first = 1;
 
-  if (first) {
+  if (first)
+  {
     setInterval(&cycle, gdbroot->db->subc_chk_int);
     first = 0;
   }
@@ -328,10 +344,13 @@ static void subbCheck(sTimer* tp)
   if (gdbroot->db->log.b.tmon)
     errh_Info("subbCheck: %u", tp->clock);
 
-  if (subsm_SendBuffer(bp)) {
+  if (subsm_SendBuffer(bp))
+  {
     setTimer(tp, msToClock(NULL, bp->dt));
     insertTimer(tp);
-  } else {
+  }
+  else
+  {
     freeTimer(tp);
   }
 }
@@ -343,7 +362,8 @@ static void cacheTrim(sTimer* tp)
   static time_tClock cycle;
   static pwr_tBoolean first = 1;
 
-  if (first) {
+  if (first)
+  {
 #ifdef OS_LINUX
     cycle = 1 * sysconf(_SC_CLK_TCK);
 #else
@@ -368,21 +388,25 @@ static void cacheTrim(sTimer* tp)
 
 static void insertTimer(sTimer* tp)
 {
-  struct LstHead * tl;
+  struct LstHead* tl;
   sTimer* tip;
 
-  if (LstEmpty(&timer_lh)) {
+  if (LstEmpty(&timer_lh))
+  {
     LstInsert(&timer_lh, &tp->ll);
     return;
   }
 
-  for (tl = timer_lh.prev; tl != &timer_lh; tl = tl->prev) {
+  for (tl = timer_lh.prev; tl != &timer_lh; tl = tl->prev)
+  {
     tip = LstEntry(tl, sTimer, ll);
 
-    if (tp->wrapped) {
+    if (tp->wrapped)
+    {
       if (!tip->wrapped || tip->clock < tp->clock)
         break;
-    } else if (!tip->wrapped && tip->clock < tp->clock)
+    }
+    else if (!tip->wrapped && tip->clock < tp->clock)
       break;
   }
 
@@ -401,7 +425,8 @@ static sTimer* newTimer(time_tClock* clock, void* data, void (*exec)())
 
   if (clock == NULL)
     tp->clock = now_clock;
-  else {
+  else
+  {
     tp->clock = *clock;
     tp->wrapped = (*clock < now_clock);
   }
@@ -423,12 +448,14 @@ static sTimer* allocTimer()
 {
   const int cAllocCount = 100;
   sTimer* ftp;
-  struct LstHead * ftl;
+  struct LstHead* ftl;
   int i;
 
-  if (LstEmpty(&free_lh)) {
+  if (LstEmpty(&free_lh))
+  {
     ftp = (sTimer*)calloc(cAllocCount, sizeof(sTimer));
-    for (i = 0; i < cAllocCount; i++, ftp++) {
+    for (i = 0; i < cAllocCount; i++, ftp++)
+    {
       LstInsert(&free_lh, &ftp->ll);
     }
   }
@@ -470,21 +497,22 @@ static void waitClock(time_tClock diff, int* tmo_ms)
   //    pwr_tTime  wait;
   static int tics_per_sec = 0;
 
-  if (tics_per_sec == 0) {
+  if (tics_per_sec == 0)
+  {
     tics_per_sec = sysconf(_SC_CLK_TCK);
   }
   //    printf("waitClock: %d\n", diff);
   //    time_ClockToD(NULL, (pwr_tDeltaTime *)&wait, diff);
   *tmo_ms = diff * 1000 / tics_per_sec;
-//    *tmo_ms = wait.tv_sec * 1000 + wait.tv_nsec / 1000000;
-//    nanosleep(&wait, &rmt);
+  //    *tmo_ms = wait.tv_sec * 1000 + wait.tv_nsec / 1000000;
+  //    nanosleep(&wait, &rmt);
 }
 
 /* .  */
 
 static void setInterval(time_tClock* c,
 
-    pwr_tUInt32 i)
+                        pwr_tUInt32 i)
 {
   if (i == 0)
     return;
@@ -496,23 +524,26 @@ static void setInterval(time_tClock* c,
 #endif
 }
 
-static void executeExpired(struct LstHead * lh, pwr_tBoolean force)
+static void executeExpired(struct LstHead* lh, pwr_tBoolean force)
 {
-  struct LstHead * tl;
+  struct LstHead* tl;
   sTimer* tp;
 
   gdb_AssumeUnlocked;
 
   gdb_ScopeLock
   {
-    LstForEach(tl, lh) {
+    LstForEach(tl, lh)
+    {
       tp = LstEntry(tl, sTimer, ll);
 
-      if (force || (!tp->wrapped && tp->clock <= now_clock)) {
+      if (force || (!tp->wrapped && tp->clock <= now_clock))
+      {
         LstRemove(tl);
         LstNull(tl);
         tp->exec(tp);
-      } else
+      }
+      else
         break;
     }
   }
@@ -532,12 +563,13 @@ static void getNewTimers()
   {
     /* Get all new timers and insert them into local timer queue.  */
 
-    for (tql = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->tmonq_lh);
-         tql != &gdbroot->db->tmonq_lh;
-         tql = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->tmonq_lh)) {
+    for (tql = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->tmonq_lh); tql != &gdbroot->db->tmonq_lh;
+         tql = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->tmonq_lh))
+    {
       tqp = pool_Qitem(tql, gdb_sTmonQlink, ll);
 
-      switch (tqp->type) {
+      switch (tqp->type)
+      {
       case gdb_eTmon_subbCheck:
         bp = pool_Qitem(tql, sub_sBuffer, tmonq.ll);
         if (gdbroot->db->log.b.tmon)
@@ -558,23 +590,27 @@ static void getNewTimers()
 static void getWaitClock(time_tClock* wait_clock, time_tClock last_clock)
 {
   int diff;
-  struct LstHead * tl;
+  struct LstHead* tl;
   sTimer* tp;
 
   tl = timer_lh.next;
   tp = LstEntry(tl, sTimer, ll);
 
-  if (now_clock < last_clock) {
-    if (tp->wrapped) {
+  if (now_clock < last_clock)
+  {
+    if (tp->wrapped)
+    {
       diff = tp->clock - now_clock;
       if (diff < 0)
         *wait_clock = 0;
       else
         *wait_clock = diff;
-    } else
+    }
+    else
       *wait_clock = 0;
-
-  } else {
+  }
+  else
+  {
     diff = tp->clock - now_clock;
     if (diff < 0)
       *wait_clock = 0;
@@ -592,14 +628,16 @@ static void init()
   errh_SetStatus(PWR__SRVSTARTUP);
 
   qcom_Init(&sts, 0, "pwr_tmon");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("qcom_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   sts = gdh_Init("pwr_tmon");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -629,19 +667,22 @@ static void init()
 
 static void toggleWrapped()
 {
-  struct LstHead * tl;
-  struct LstHead * ntl;
+  struct LstHead* tl;
+  struct LstHead* ntl;
   sTimer* tp;
   struct LstHead* tlh = &timer_lh;
 
-  for (tl = tlh->next; tl != tlh; tl = ntl) {
+  for (tl = tlh->next; tl != tlh; tl = ntl)
+  {
     tp = LstEntry(tl, sTimer, ll);
     ntl = tl->next;
 
-    if (!tp->wrapped) {
+    if (!tp->wrapped)
+    {
       LstRemove(tl);
       LstInsert(&wrap_lh, &tp->ll);
-    } else
+    }
+    else
       tp->wrapped = 0;
   }
 }

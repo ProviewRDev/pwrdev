@@ -45,10 +45,11 @@
 
 class PalQtTraceObject;
 
-class PalQt : public Pal {
+class PalQt : public Pal
+{
 public:
-  PalQt(void* parent_ctx, const char* name, ldh_tSesContext ldhses,
-      const char* root_name, QWidget** w, pwr_tStatus* status);
+  PalQt(void* parent_ctx, const char* name, ldh_tSesContext ldhses, const char* root_name, QWidget** w,
+        pwr_tStatus* status);
   ~PalQt();
 
   QWidget* brow_widget;
@@ -64,7 +65,8 @@ private:
   PalQtTraceObject* trace_obj;
 };
 
-class PalQtTraceObject : public QObject {
+class PalQtTraceObject : public QObject
+{
   Q_OBJECT
 
 public:

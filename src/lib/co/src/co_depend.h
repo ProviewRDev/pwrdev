@@ -44,13 +44,14 @@
 
 #include "pwr.h"
 
-class CoDepend {
-  private:
+class CoDepend
+{
+private:
   std::vector<std::string> depend;
   pwr_tFileName filename;
   pwr_tFileName dependfile;
 
-  public:
+public:
   CoDepend();
   void add(const char* dname);
   void set_dependfile(char* dname);

@@ -41,8 +41,7 @@
 #include "wb_pwrb_msg.h"
 #include "wb_build.h"
 
-static pwr_tStatus PostCreate(
-    ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
 {
   pwr_tOid oid;
   pwr_tCid cid;
@@ -53,13 +52,11 @@ static pwr_tStatus PostCreate(
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_CreateObject(
-      Session, &oid, "100ms", cid, Object, ldh_eDest_IntoLast);
+  sts = ldh_CreateObject(Session, &oid, "100ms", cid, Object, ldh_eDest_IntoLast);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_SetObjectPar(
-      Session, oid, "RtBody", "ScanTime", (char*)&scan_time, sizeof(scan_time));
+  sts = ldh_SetObjectPar(Session, oid, "RtBody", "ScanTime", (char*)&scan_time, sizeof(scan_time));
   if (EVEN(sts))
     return sts;
 
@@ -78,5 +75,4 @@ static pwr_tStatus Build(ldh_sMenuCall* ip)
   return build.sts();
 }
 
-pwr_dExport pwr_BindMethods(PlcProcess)
-    = { pwr_BindMethod(PostCreate), pwr_BindMethod(Build), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(PlcProcess) = {pwr_BindMethod(PostCreate), pwr_BindMethod(Build), pwr_NullMethod};

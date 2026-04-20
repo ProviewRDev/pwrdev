@@ -76,10 +76,9 @@ LOCAL_DATA
 #pragma check_stack(off)
 #endif
 
-FUNCTION LOCAL INT16 fm7gdl_get_ctxt_data_len(
-    IN USIGN8 service,  /* Service             */
-    IN USIGN8 primitive /* Service-Primitive   */
-    )
+FUNCTION LOCAL INT16 fm7gdl_get_ctxt_data_len(IN USIGN8 service,  /* Service             */
+                                              IN USIGN8 primitive /* Service-Primitive   */
+)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -107,11 +106,10 @@ possible return values:
   }
 }
 
-FUNCTION LOCAL INT16 fm7gdl_get_crl_data_len(
-    IN USIGN8 service,      /* Service             */
-    IN USIGN8 primitive,    /* Service-Primitive   */
-    IN USIGN8 FAR* data_ptr /* pointer to data     */
-    )
+FUNCTION LOCAL INT16 fm7gdl_get_crl_data_len(IN USIGN8 service,      /* Service             */
+                                             IN USIGN8 primitive,    /* Service-Primitive   */
+                                             IN USIGN8 FAR* data_ptr /* pointer to data     */
+)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -169,11 +167,10 @@ possible return values:
   }
 }
 
-FUNCTION LOCAL INT16 fm7gdl_get_s_r_value_data_len(
-    IN USIGN8 service,      /* Service             */
-    IN USIGN8 primitive,    /* Service-Primitive   */
-    IN USIGN8 FAR* data_ptr /* pointer to data     */
-    )
+FUNCTION LOCAL INT16 fm7gdl_get_s_r_value_data_len(IN USIGN8 service,      /* Service             */
+                                                   IN USIGN8 primitive,    /* Service-Primitive   */
+                                                   IN USIGN8 FAR* data_ptr /* pointer to data     */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -233,9 +230,8 @@ possible return values:
   }
 }
 
-FUNCTION LOCAL INT16 fm7gdl_get_ident_data_len(
-    IN USIGN8 primitive /* Service-Primitive   */
-    )
+FUNCTION LOCAL INT16 fm7gdl_get_ident_data_len(IN USIGN8 primitive /* Service-Primitive   */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -329,7 +325,7 @@ possible return values:
 }
 
 FUNCTION LOCAL INT16 fm7gdl_get_error_data_len(IN USIGN8 service /* Service  */
-                                               )
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -406,13 +402,12 @@ possible return values:
   }
 }
 
-FUNCTION PUBLIC INT16 fm7gdl_get_data_len(
-    IN INT16 result,         /* Service-Result */
-    IN USIGN8 service,       /* Service */
-    IN USIGN8 primitive,     /* Service-Primitive */
-    IN USIGN8 FAR* data_ptr, /* pointer to data */
-    OUT INT16* data_len_ptr  /* length of data */
-    )
+FUNCTION PUBLIC INT16 fm7gdl_get_data_len(IN INT16 result,         /* Service-Result */
+                                          IN USIGN8 service,       /* Service */
+                                          IN USIGN8 primitive,     /* Service-Primitive */
+                                          IN USIGN8 FAR* data_ptr, /* pointer to data */
+                                          OUT INT16* data_len_ptr  /* length of data */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -453,8 +448,7 @@ possible return values:
   case FM7_SET_VALUE_REM:
   case FM7_READ_VALUE_REM:
     if (result == POS)
-      *data_len_ptr =
-          fm7gdl_get_s_r_value_data_len(service, primitive, data_ptr);
+      *data_len_ptr = fm7gdl_get_s_r_value_data_len(service, primitive, data_ptr);
     else
       *data_len_ptr = fm7gdl_get_error_data_len(service);
     break;

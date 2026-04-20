@@ -3,7 +3,8 @@
 #include <stsdef.h>
 #include "co_tree.h"
 
-typedef struct {
+typedef struct
+{
   tree_sNode node;
   unsigned int id;
   unsigned int cnt;
@@ -49,10 +50,11 @@ main()
   int i;
   clock_t kl;
 
-  test = tree_CreateTable(sizeof(unsigned int), offsetof(sTest, id),
-      sizeof(sTest), 100, tree_eComp_user, compare);
+  test = tree_CreateTable(sizeof(unsigned int), offsetof(sTest, id), sizeof(sTest), 100, tree_eComp_user,
+                          compare);
 
-  for (i = 10000; i > 0; i--) {
+  for (i = 10000; i > 0; i--)
+  {
     kl = i;
     Node = (sTest*)tree_Find(test, &kl);
     if (Node == NULL)

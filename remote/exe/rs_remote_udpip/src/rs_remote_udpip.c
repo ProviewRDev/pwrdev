@@ -133,8 +133,8 @@ static int ReadRemnodeEnumAttribute(const char* attribute, int default_value)
   if (EVEN(sts))
     return default_value;
 
-  if (snprintf(attribute_name, sizeof(attribute_name), "%s.%s", object_name, attribute)
-      >= (int)sizeof(attribute_name))
+  if (snprintf(attribute_name, sizeof(attribute_name), "%s.%s", object_name, attribute) >=
+      (int)sizeof(attribute_name))
     return default_value;
 
   sts = gdh_GetObjectInfo(attribute_name, &value, sizeof(value));
@@ -153,7 +153,8 @@ static void LoadSocketOptions(void)
 
 static const char* PmtuDiscoveryToString(int pmtu_discovery)
 {
-  switch (pmtu_discovery) {
+  switch (pmtu_discovery)
+  {
   case udp_ePmtuDiscovery_Default:
     return "Default";
   case udp_ePmtuDiscovery_Dont:
@@ -169,7 +170,8 @@ static int ApplySocketOptions(int sock)
 {
   int opt;
 
-  switch (socket_options.pmtu_discovery) {
+  switch (socket_options.pmtu_discovery)
+  {
   case udp_ePmtuDiscovery_Default:
     return 1;
   case udp_ePmtuDiscovery_Dont:
@@ -178,7 +180,7 @@ static int ApplySocketOptions(int sock)
     break;
 #else
     errh_Error("UDP Path MTU discovery mode %s is not supported on this platform",
-        PmtuDiscoveryToString(socket_options.pmtu_discovery));
+               PmtuDiscoveryToString(socket_options.pmtu_discovery));
     return 0;
 #endif
   case udp_ePmtuDiscovery_Do:
@@ -187,7 +189,7 @@ static int ApplySocketOptions(int sock)
     break;
 #else
     errh_Error("UDP Path MTU discovery mode %s is not supported on this platform",
-        PmtuDiscoveryToString(socket_options.pmtu_discovery));
+               PmtuDiscoveryToString(socket_options.pmtu_discovery));
     return 0;
 #endif
   default:
@@ -196,9 +198,10 @@ static int ApplySocketOptions(int sock)
   }
 
 #if defined(IP_MTU_DISCOVER)
-  if (setsockopt(sock, IPPROTO_IP, IP_MTU_DISCOVER, &opt, sizeof(opt)) < 0) {
+  if (setsockopt(sock, IPPROTO_IP, IP_MTU_DISCOVER, &opt, sizeof(opt)) < 0)
+  {
     errh_Error("setsockopt(IP_MTU_DISCOVER=%s) failed, %s",
-        PmtuDiscoveryToString(socket_options.pmtu_discovery), strerror(errno));
+               PmtuDiscoveryToString(socket_options.pmtu_discovery), strerror(errno));
     return 0;
   }
 #endif

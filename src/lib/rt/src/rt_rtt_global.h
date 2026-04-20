@@ -42,21 +42,21 @@
 #include "rt_rtt.h"
 
 /*************************************************************************
-*  	Globala variabler i rtt
-**************************************************************************/
+ *  	Globala variabler i rtt
+ **************************************************************************/
 
 extern char rtt_version[10];
-extern rtt_t_helptext* rtt_command_helptext;
-extern rtt_t_helptext* rtt_script_helptext;
+extern rtt_t_helptext *rtt_command_helptext;
+extern rtt_t_helptext *rtt_script_helptext;
 extern rtt_t_helptext rtt_appl_helptext[];
 extern rtt_t_comtbl rtt_command_table[];
 extern unsigned long rtt_chn[4];
-extern rtt_t_recall* rtt_recallbuff;
-extern rtt_t_recall* rtt_value_recallbuff;
+extern rtt_t_recall *rtt_recallbuff;
+extern rtt_t_recall *rtt_value_recallbuff;
 extern menu_ctx rtt_collectionmenuctx;
-extern rtt_t_menu_upd* rtt_collectionmenulist;
-extern rtt_t_menu_alarm* rtt_menu_eventlist;
-extern rtt_t_menu_alarm* rtt_menu_alarmlist;
+extern rtt_t_menu_upd *rtt_collectionmenulist;
+extern rtt_t_menu_alarm *rtt_menu_eventlist;
+extern rtt_t_menu_alarm *rtt_menu_alarmlist;
 extern menu_ctx rtt_alarm_ctx;
 extern menu_ctx rtt_event_ctx;
 extern int rtt_commandmode;
@@ -93,7 +93,7 @@ extern char rtt_os[20];
 extern char rtt_hw[20];
 extern int rtt_verify;
 extern int rtt_file_on;
-extern FILE* rtt_outfile;
+extern FILE *rtt_outfile;
 extern int rtt_print_message;
 extern int rtt_print_command;
 extern int rtt_command_level;
@@ -117,7 +117,7 @@ extern int rtt_noredraw;
 
 char rtt_version[10] = pwrv_cPwrVersionStr;
 menu_ctx rtt_collectionmenuctx = 0;
-rtt_t_menu_upd* rtt_collectionmenulist = 0;
+rtt_t_menu_upd *rtt_collectionmenulist = 0;
 menu_ctx rtt_alarm_ctx = 0;
 menu_ctx rtt_event_ctx = 0;
 int rtt_rtdb_offset = 0;
@@ -126,7 +126,7 @@ int rtt_mode_address = 0;
 int rtt_commandmode = 0;
 int rtt_quiet = 0;
 char rtt_ConfigureObject[80] = "";
-pwr_tObjid rtt_UserObject = { 0, 0 };
+pwr_tObjid rtt_UserObject = {0, 0};
 char rtt_DefaultVMSNode[80] = "";
 unsigned char rtt_AlarmAutoLoad = 0;
 unsigned char rtt_AlarmMessage = 0;
@@ -144,8 +144,8 @@ char rtt_AlarmText4[80] = "";
 char rtt_AlarmText5[80] = "";
 int rtt_fastkey = 0;
 unsigned long rtt_chn[4];
-rtt_t_recall* rtt_recallbuff;
-rtt_t_recall* rtt_value_recallbuff;
+rtt_t_recall *rtt_recallbuff;
+rtt_t_recall *rtt_value_recallbuff;
 unsigned long rtt_priv;
 char rtt_user[40] = "";
 char rtt_time[80];
@@ -164,7 +164,7 @@ char rtt_os[20] = "cygwin";
 #endif
 int rtt_verify = 0;
 int rtt_file_on = 0;
-FILE* rtt_outfile;
+FILE *rtt_outfile;
 int rtt_print_message = 0;
 int rtt_print_command = 0;
 int rtt_command_level = 0;
@@ -178,7 +178,7 @@ char rtt_default_directory[80] = "";
 int rtt_scantime = 1000;
 char rtt_symbolfilename[80] = "";
 int rtt_signal_test_mode = 0;
-char rtt_arg[10][80] = { "", "", "", "", "", "", "", "", "", "" };
+char rtt_arg[10][80] = {"", "", "", "", "", "", "", "", "", ""};
 int rtt_args = 0;
 int rtt_flash = 0;
 int rtt_message_off = 0;

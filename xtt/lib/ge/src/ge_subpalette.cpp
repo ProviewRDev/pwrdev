@@ -48,26 +48,20 @@
 #include "ge_dyn.h"
 #include "ge_subpalette.h"
 
-class LocalFile {
+class LocalFile
+{
 public:
   pwr_tFileName name;
 };
 
-bool subpalette_cmp(LocalFile p1, LocalFile p2)
-{
-  return strcmp(p1.name, p2.name) < 0;
-}
+bool subpalette_cmp(LocalFile p1, LocalFile p2) { return strcmp(p1.name, p2.name) < 0; }
 
 //
 // Convert attribute string to value
 //
-void SubPalette::message(char sev, char* text)
-{
-  (message_cb)(parent_ctx, sev, text);
-}
+void SubPalette::message(char sev, char* text) { (message_cb)(parent_ctx, sev, text); }
 
-SubPaletteBrow::SubPaletteBrow(BrowCtx* brow_ctx, void* xn)
-    : ctx(brow_ctx), subpalette(xn)
+SubPaletteBrow::SubPaletteBrow(BrowCtx* brow_ctx, void* xn) : ctx(brow_ctx), subpalette(xn)
 {
   memset(pixmaps, 0, sizeof(pixmaps));
 }
@@ -80,7 +74,8 @@ void SubPaletteBrow::free_pixmaps()
   brow_FreeAnnotPixmap(ctx, pixmap_leaf);
   brow_FreeAnnotPixmap(ctx, pixmap_map);
   brow_FreeAnnotPixmap(ctx, pixmap_openmap);
-  for (int i = 0; i < SUBP_PIXMAPS_SIZE - 1; i++) {
+  for (int i = 0; i < SUBP_PIXMAPS_SIZE - 1; i++)
+  {
     if (pixmaps[i])
       brow_FreeAnnotPixmap(ctx, pixmaps[i]);
   }
@@ -357,11 +352,9 @@ void SubPaletteBrow::allocate_pixmaps()
 //
 // Create the navigator widget
 //
-SubPalette::SubPalette(
-    void* xn_parent_ctx, const char* xn_name, pwr_tStatus* status)
-    : parent_ctx(xn_parent_ctx), trace_started(0), message_cb(NULL),
-      traverse_focus_cb(NULL), set_focus_cb(NULL), help_cb(NULL),
-      menu_tree(NULL), path_cnt(0), displayed(0)
+SubPalette::SubPalette(void* xn_parent_ctx, const char* xn_name, pwr_tStatus* status)
+    : parent_ctx(xn_parent_ctx), trace_started(0), message_cb(NULL), traverse_focus_cb(NULL),
+      set_focus_cb(NULL), help_cb(NULL), menu_tree(NULL), path_cnt(0), displayed(0)
 {
   strcpy(name, xn_name);
   *status = 1;
@@ -370,14 +363,9 @@ SubPalette::SubPalette(
 //
 //  Delete a nav context
 //
-SubPalette::~SubPalette()
-{
-}
+SubPalette::~SubPalette() {}
 
-SubPaletteBrow::~SubPaletteBrow()
-{
-  free_pixmaps();
-}
+SubPaletteBrow::~SubPaletteBrow() { free_pixmaps(); }
 
 //
 //  Return associated class of selected object
@@ -398,7 +386,8 @@ int SubPalette::get_select(char* text, char* filename)
   free(node_list);
 
   sts = 0;
-  switch (item->type) {
+  switch (item->type)
+  {
   case subpalette_eItemType_File:
     strcpy(filename, ((ItemFile*)item)->filename);
     strcpy(text, ((ItemFile*)item)->name);
@@ -417,7 +406,8 @@ static int subpalette_brow_cb(FlowCtx* ctx, flow_tEvent event)
   SubPalette* subpalette;
   ItemLocalSubGraphs* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
@@ -426,43 +416,55 @@ static int subpalette_brow_cb(FlowCtx* ctx, flow_tEvent event)
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&subpalette);
   char null_str[] = "";
   subpalette->message(' ', null_str);
-  switch (event->event) {
-  case flow_eEvent_Key_PageDown: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(subpalette->brow->ctx, 0.9);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(subpalette->brow->ctx, -0.9);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(subpalette->brow->ctx, 0.1);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(subpalette->brow->ctx, -0.1);
     break;
   }
-  case flow_eEvent_Key_Up: {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(subpalette->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLastVisible(subpalette->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              subpalette->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(subpalette->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetLastVisible(subpalette->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(subpalette->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -478,26 +480,33 @@ static int subpalette_brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(subpalette->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirstVisible(subpalette->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              subpalette->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(subpalette->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetFirstVisible(subpalette->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(subpalette->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -524,10 +533,12 @@ static int subpalette_brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (subpalette->set_focus_cb)
       (subpalette->set_focus_cb)(subpalette->parent_ctx, subpalette);
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -539,10 +550,12 @@ static int subpalette_brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(
-              subpalette->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(subpalette->brow->ctx, event->object.object))
+      {
         brow_SelectClear(subpalette->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(subpalette->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(subpalette->brow->ctx, event->object.object);
@@ -552,23 +565,25 @@ static int subpalette_brow_cb(FlowCtx* ctx, flow_tEvent event)
       brow_SelectClear(subpalette->brow->ctx);
     }
     break;
-  case flow_eEvent_MB3Press: {
-    switch (event->object.object_type) {
+  case flow_eEvent_MB3Press:
+  {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       ItemFile* item;
       brow_GetUserData(event->object.object, (void**)&item);
       if (item->type != subpalette_eItemType_File)
         break;
 
-      subpalette->create_popup_menu(
-          item->filename, event->any.x_pixel, event->any.y_pixel);
+      subpalette->create_popup_menu(item->filename, event->any.x_pixel, event->any.y_pixel);
       break;
     default:;
     }
     break;
   }
   case flow_eEvent_Key_Return:
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     int node_count;
 
@@ -582,7 +597,8 @@ static int subpalette_brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_Key_PF4:
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
@@ -596,10 +612,12 @@ static int subpalette_brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (brow_IsOpen(node_list[0]))
       // Close this node
       object = node_list[0];
-    else {
+    else
+    {
       // Close parent
       sts = brow_GetParent(subpalette->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(node_list);
         return 1;
       }
@@ -617,7 +635,8 @@ static int subpalette_brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_MB1DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
       item->open_children(subpalette, event->object.x, event->object.y);
@@ -625,12 +644,14 @@ static int subpalette_brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
     break;
-  case flow_eEvent_Key_Tab: {
+  case flow_eEvent_Key_Tab:
+  {
     if (subpalette->traverse_focus_cb)
       (subpalette->traverse_focus_cb)(subpalette->parent_ctx, subpalette);
     break;
   }
-  case flow_eEvent_Map: {
+  case flow_eEvent_Map:
+  {
     subpalette->displayed = 1;
     break;
   }
@@ -648,22 +669,18 @@ void SubPaletteBrow::create_nodeclasses()
 
   // Create common-class
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
+  brow_CreateNodeClass(ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
   brow_AddAnnotPixmap(nc_object, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_object, 1.5, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_object, 1.5, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddAnnotPixmap(nc_object, 1, 7.8, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFrame(nc_object, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create subgraph-class
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorSubgraph", flow_eNodeGroup_Common, &nc_sub);
+  brow_CreateNodeClass(ctx, "NavigatorSubgraph", flow_eNodeGroup_Common, &nc_sub);
   brow_AddAnnotPixmap(nc_sub, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_sub, 1, 1.4, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_sub, 2.7, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_sub, 2.7, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_sub, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 
@@ -706,34 +723,43 @@ void SubPalette::select_by_name(char* name)
   Item* item = NULL;
   int sts;
 
-  for (;;) {
+  for (;;)
+  {
     if (!t)
       break;
 
     level++;
     strcpy(itemname, t);
-    if ((s = strchr(itemname, '-'))) {
+    if ((s = strchr(itemname, '-')))
+    {
       *s = 0;
       t += (s - itemname + 1);
-
-    } else
+    }
+    else
       t = 0;
 
-    if (level == 1) {
+    if (level == 1)
+    {
       brow_GetObjectList(brow->ctx, &nodelist, &nodecnt);
-      for (int i = 0; i < nodecnt; i++) {
+      for (int i = 0; i < nodecnt; i++)
+      {
         brow_GetUserData(nodelist[i], (void**)&item);
-        if (streq(itemname, item->name)) {
+        if (streq(itemname, item->name))
+        {
           current = nodelist[i];
         }
       }
-    } else {
+    }
+    else
+    {
       current = 0;
       item->open_children(this, 0, 0);
       for (sts = brow_GetChild(brow->ctx, item->node, &child); ODD(sts);
-           sts = brow_GetNextSibling(brow->ctx, child, &child)) {
+           sts = brow_GetNextSibling(brow->ctx, child, &child))
+      {
         brow_GetUserData(child, (void**)&item);
-        if (str_NoCaseStrcmp(itemname, item->name) == 0) {
+        if (str_NoCaseStrcmp(itemname, item->name) == 0)
+        {
           current = child;
           break;
         }
@@ -745,7 +771,8 @@ void SubPalette::select_by_name(char* name)
   brow_ResetNodraw(brow->ctx);
   brow_Redraw(brow->ctx, 0);
 
-  if (current) {
+  if (current)
+  {
     brow_SetInverse(current, 1);
     brow_SelectInsert(brow->ctx, current);
     if (!brow_IsVisible(brow->ctx, current, flow_eVisible_Full))
@@ -770,8 +797,8 @@ void SubPalette::menu_tree_build(char* filename)
   fp.close();
 }
 
-subpalette_sMenu* SubPalette::menu_tree_build_children(
-    std::ifstream* fp, int* line_cnt, char* filename, subpalette_sMenu* parent)
+subpalette_sMenu* SubPalette::menu_tree_build_children(std::istream* fp, int* line_cnt, char* filename,
+                                                       subpalette_sMenu* parent)
 {
   subpalette_sMenu *menu_p = NULL, *prev = NULL;
   subpalette_sMenu* return_menu = NULL;
@@ -782,7 +809,8 @@ subpalette_sMenu* SubPalette::menu_tree_build_children(
   char type[120];
   int pixmap;
 
-  while (1) {
+  while (1)
+  {
     fp->getline(line, sizeof(line));
     if (line[0] == 0)
       break;
@@ -793,16 +821,20 @@ subpalette_sMenu* SubPalette::menu_tree_build_children(
     if (nr < 1)
       printf("** Syntax error in file %s, line %d", filename, *line_cnt);
 
-    if (streq(type, "{")) {
+    if (streq(type, "{"))
+    {
       if (nr != 1 || !menu_p)
         printf("** Syntax error in file %s, line %d", filename, *line_cnt);
-      menu_p->child_list
-          = menu_tree_build_children(fp, line_cnt, filename, menu_p);
-    } else if (streq(type, "}")) {
+      menu_p->child_list = menu_tree_build_children(fp, line_cnt, filename, menu_p);
+    }
+    else if (streq(type, "}"))
+    {
       if (nr != 1)
         printf("** Syntax error in file %s, line %d", filename, *line_cnt);
       return return_menu;
-    } else if (streq(type, "menu")) {
+    }
+    else if (streq(type, "menu"))
+    {
       if (nr != 2)
         printf("** Syntax error in file %s, line %d", filename, *line_cnt);
 
@@ -810,13 +842,17 @@ subpalette_sMenu* SubPalette::menu_tree_build_children(
       menu_p->parent = parent;
       menu_p->item_type = subpalette_eItemType_Menu;
       strcpy(menu_p->title, name);
-      if (first) {
+      if (first)
+      {
         return_menu = menu_p;
         first = 0;
-      } else
+      }
+      else
         prev->next = menu_p;
       prev = menu_p;
-    } else if (streq(type, "localsubgraphs")) {
+    }
+    else if (streq(type, "localsubgraphs"))
+    {
       if (nr != 3)
         printf("** Syntax error in file %s, line %d", filename, *line_cnt);
 
@@ -825,13 +861,17 @@ subpalette_sMenu* SubPalette::menu_tree_build_children(
       menu_p->item_type = subpalette_eItemType_LocalSubGraphs;
       strcpy(menu_p->title, name);
       strcpy(menu_p->file, file);
-      if (first) {
+      if (first)
+      {
         return_menu = menu_p;
         first = 0;
-      } else
+      }
+      else
         prev->next = menu_p;
       prev = menu_p;
-    } else if (streq(type, "subgraph")) {
+    }
+    else if (streq(type, "subgraph"))
+    {
       if (nr != 4)
         printf("** Syntax error in file %s, line %d", filename, *line_cnt);
 
@@ -841,13 +881,17 @@ subpalette_sMenu* SubPalette::menu_tree_build_children(
       strcpy(menu_p->title, name);
       dcli_get_defaultfilename(file, menu_p->file, ".pwsg");
       menu_p->pixmap = pixmap;
-      if (first) {
+      if (first)
+      {
         return_menu = menu_p;
         first = 0;
-      } else
+      }
+      else
         prev->next = menu_p;
       prev = menu_p;
-    } else if (streq(type, "path")) {
+    }
+    else if (streq(type, "path"))
+    {
       if (nr != 1)
         printf("** Syntax error in file %s, line %d", filename, *line_cnt);
 
@@ -865,7 +909,8 @@ subpalette_sMenu* SubPalette::menu_tree_build_children(
         printf("** Syntax error in file %s, line %d", filename, *line_cnt);
 
       path_cnt = 0;
-      while (1) {
+      while (1)
+      {
         fp->getline(line, sizeof(line));
         if (line[0] == 0)
           break;
@@ -875,11 +920,14 @@ subpalette_sMenu* SubPalette::menu_tree_build_children(
         nr = sscanf(line, "%s %s %s %d", type, name, file, &pixmap);
         if (nr < 1)
           printf("** Syntax error in file %s, line %d", filename, *line_cnt);
-        if (streq(type, "}")) {
+        if (streq(type, "}"))
+        {
           if (nr != 1)
             printf("** Syntax error in file %s, line %d", filename, *line_cnt);
           break;
-        } else {
+        }
+        else
+        {
           if (path_cnt > 10)
             break;
 
@@ -893,17 +941,15 @@ subpalette_sMenu* SubPalette::menu_tree_build_children(
   return return_menu;
 }
 
-void SubPalette::menu_tree_free()
-{
-  menu_tree_free_children(menu_tree);
-}
+void SubPalette::menu_tree_free() { menu_tree_free_children(menu_tree); }
 
 void SubPalette::menu_tree_free_children(subpalette_sMenu* first_child)
 {
   subpalette_sMenu *menu_p, *next;
 
   menu_p = next = first_child;
-  while (next) {
+  while (next)
+  {
     next = menu_p->next;
     free((char*)menu_p);
   }
@@ -922,42 +968,24 @@ void SubPaletteBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, subpalette);
 
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, subpalette_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-      subpalette_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF4, flow_eEventType_CallBack, subpalette_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_Return, flow_eEventType_CallBack,
-      subpalette_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, subpalette_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, subpalette_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack,
-      subpalette_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack,
-      subpalette_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, subpalette_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, subpalette_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack,
-      subpalette_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack,
-      subpalette_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, subpalette_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack,
-      subpalette_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, subpalette_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Tab, flow_eEventType_CallBack, subpalette_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Map, flow_eEventType_CallBack, subpalette_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF4, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Return, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Tab, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Map, flow_eEventType_CallBack, subpalette_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, subpalette_brow_cb);
 }
 
 //
@@ -980,71 +1008,57 @@ int SubPalette::init_brow_cb(FlowCtx* fctx, void* client_data)
   return 1;
 }
 
-ItemLocalSubGraphs::ItemLocalSubGraphs(SubPalette* subpalette, char* item_name,
-    char* item_filename, brow_tNode dest, flow_eDest dest_code)
+ItemLocalSubGraphs::ItemLocalSubGraphs(SubPalette* subpalette, char* item_name, char* item_filename,
+                                       brow_tNode dest, flow_eDest dest_code)
     : Item(subpalette_eItemType_LocalSubGraphs)
 {
   strcpy(name, item_name);
   strcpy(filename, item_filename);
 
-  brow_CreateNode(subpalette->brow->ctx, item_name, subpalette->brow->nc_object,
-      dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(subpalette->brow->ctx, item_name, subpalette->brow->nc_object, dest, dest_code, (void*)this,
+                  1, &node);
 
   brow_SetAnnotPixmap(node, 0, subpalette->brow->pixmap_map);
 
   brow_SetAnnotation(node, 0, item_name, strlen(item_name));
 }
 
-ItemFile::ItemFile(SubPalette* subpalette, char* item_name, char* item_filename,
-    int item_pixmap, brow_tNode dest, flow_eDest dest_code)
+ItemFile::ItemFile(SubPalette* subpalette, char* item_name, char* item_filename, int item_pixmap,
+                   brow_tNode dest, flow_eDest dest_code)
     : Item(subpalette_eItemType_File), pixmap(item_pixmap)
 {
   strcpy(name, item_name);
   strcpy(filename, item_filename);
 
-  brow_CreateNode(subpalette->brow->ctx, item_name, subpalette->brow->nc_sub,
-      dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(subpalette->brow->ctx, item_name, subpalette->brow->nc_sub, dest, dest_code, (void*)this, 1,
+                  &node);
 
   brow_SetAnnotPixmap(node, 0, subpalette->brow->pixmap_leaf);
-  if (0 <= (pixmap - 1) && (pixmap - 1) < SUBP_PIXMAPS_SIZE
-      && subpalette->brow->pixmaps[pixmap - 1])
+  if (0 <= (pixmap - 1) && (pixmap - 1) < SUBP_PIXMAPS_SIZE && subpalette->brow->pixmaps[pixmap - 1])
     brow_SetAnnotPixmap(node, 1, subpalette->brow->pixmaps[pixmap - 1]);
 
   brow_SetAnnotation(node, 0, item_name, strlen(item_name));
 }
 
-ItemFile::~ItemFile()
-{
-}
+ItemFile::~ItemFile() {}
 
-Item::Item(subpalette_eItemType item_type) : type(item_type), node(0)
-{
-  strcpy(name, "");
-}
+Item::Item(subpalette_eItemType item_type) : type(item_type), node(0) { strcpy(name, ""); }
 
-Item::~Item()
-{
-}
+Item::~Item() {}
 
-int Item::open_children(SubPalette* subpalette, double x, double y)
-{
-  return 0;
-}
+int Item::open_children(SubPalette* subpalette, double x, double y) { return 0; }
 
-int Item::close(SubPalette* subpalette, double x, double y)
-{
-  return 0;
-}
+int Item::close(SubPalette* subpalette, double x, double y) { return 0; }
 
-int ItemLocalSubGraphs::open_children(
-    SubPalette* subpalette, double x, double y)
+int ItemLocalSubGraphs::open_children(SubPalette* subpalette, double x, double y)
 {
   double node_x, node_y;
   int child_exist;
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(subpalette->brow->ctx);
     brow_CloseNode(subpalette->brow->ctx, node);
@@ -1055,7 +1069,9 @@ int ItemLocalSubGraphs::open_children(
     brow_ResetOpen(node, subpalette_mOpen_All);
     brow_ResetNodraw(subpalette->brow->ctx);
     brow_Redraw(subpalette->brow->ctx, node_y);
-  } else {
+  }
+  else
+  {
     int sts;
     char found_file[120];
     char fname[120];
@@ -1074,19 +1090,23 @@ int ItemLocalSubGraphs::open_children(
 
     child_exist = 0;
 
-    nr = dcli_parse(filename, ",", "", (char*)file_str,
-        sizeof(file_str) / sizeof(file_str[0]), sizeof(file_str[0]), 0);
-    for (i = 0; i < nr; i++) {
+    nr = dcli_parse(filename, ",", "", (char*)file_str, sizeof(file_str) / sizeof(file_str[0]),
+                    sizeof(file_str[0]), 0);
+    for (i = 0; i < nr; i++)
+    {
       dcli_translate_filename(fname, file_str[i]);
       sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         LocalFile f;
         strcpy(f.name, found_file);
         fvect.push_back(f);
       }
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_NEXT);
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           LocalFile f;
           strcpy(f.name, found_file);
           fvect.push_back(f);
@@ -1097,20 +1117,22 @@ int ItemLocalSubGraphs::open_children(
 
     std::sort(fvect.begin(), fvect.end(), subpalette_cmp);
 
-    for (i = 0; i < (int)fvect.size(); i++) {
+    for (i = 0; i < (int)fvect.size(); i++)
+    {
       dcli_parse_filename(fvect[i].name, dev, dir, file, type, &version);
       str_ToLower(text, file);
       text[0] = toupper(text[0]);
 
       // Skip next pages in animations
-      if (!((s = strstr(text, "__p")) && sscanf(s + 3, "%d", &idx))) {
-        new ItemFile(
-            subpalette, text, fvect[i].name, 0, node, flow_eDest_IntoLast);
+      if (!((s = strstr(text, "__p")) && sscanf(s + 3, "%d", &idx)))
+      {
+        new ItemFile(subpalette, text, fvect[i].name, 0, node, flow_eDest_IntoLast);
         child_exist = 1;
       }
     }
 
-    if (child_exist) {
+    if (child_exist)
+    {
       brow_SetOpen(node, subpalette_mOpen_Children);
       brow_SetAnnotPixmap(node, 0, subpalette->brow->pixmap_openmap);
     }
@@ -1125,7 +1147,8 @@ int ItemLocalSubGraphs::close(SubPalette* subpalette, double x, double y)
 {
   double node_x, node_y;
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_GetNodePosition(node, &node_x, &node_y);
     brow_SetNodraw(subpalette->brow->ctx);
@@ -1138,17 +1161,16 @@ int ItemLocalSubGraphs::close(SubPalette* subpalette, double x, double y)
   return 1;
 }
 
-ItemMenu::ItemMenu(SubPalette* subpalette, const char* item_name,
-    brow_tNode dest, flow_eDest dest_code, subpalette_sMenu** item_child_list,
-    int item_is_root)
-    : Item(subpalette_eItemType_Menu), child_list(item_child_list),
-      is_root(item_is_root)
+ItemMenu::ItemMenu(SubPalette* subpalette, const char* item_name, brow_tNode dest, flow_eDest dest_code,
+                   subpalette_sMenu** item_child_list, int item_is_root)
+    : Item(subpalette_eItemType_Menu), child_list(item_child_list), is_root(item_is_root)
 {
   type = subpalette_eItemType_Menu;
   strcpy(name, item_name);
-  if (!is_root) {
-    brow_CreateNode(subpalette->brow->ctx, name, subpalette->brow->nc_object,
-        dest, dest_code, (void*)this, 1, &node);
+  if (!is_root)
+  {
+    brow_CreateNode(subpalette->brow->ctx, name, subpalette->brow->nc_object, dest, dest_code, (void*)this, 1,
+                    &node);
 
     // Set pixmap
     if (*child_list)
@@ -1164,13 +1186,15 @@ int ItemMenu::open_children(SubPalette* subpalette, double x, double y)
 {
   int action_open = 0;
 
-  if (!is_root) {
+  if (!is_root)
+  {
     if (!brow_IsOpen(node))
       action_open = 1;
     else
       action_open = 0;
   }
-  if (action_open || is_root) {
+  if (action_open || is_root)
+  {
     // Display childlist
     double node_x, node_y;
     Item* item;
@@ -1182,32 +1206,34 @@ int ItemMenu::open_children(SubPalette* subpalette, double x, double y)
       node_y = 0;
     brow_SetNodraw(subpalette->brow->ctx);
     menu = *child_list;
-    while (menu) {
-      switch (menu->item_type) {
+    while (menu)
+    {
+      switch (menu->item_type)
+      {
       case subpalette_eItemType_Menu:
-        item = (Item*)new ItemMenu(subpalette, menu->title, node,
-            flow_eDest_IntoLast, &menu->child_list, 0);
+        item = (Item*)new ItemMenu(subpalette, menu->title, node, flow_eDest_IntoLast, &menu->child_list, 0);
         break;
       case subpalette_eItemType_File:
-        item = (Item*)new ItemFile(subpalette, menu->title, menu->file,
-            menu->pixmap, node, flow_eDest_IntoLast);
+        item =
+            (Item*)new ItemFile(subpalette, menu->title, menu->file, menu->pixmap, node, flow_eDest_IntoLast);
         break;
       case subpalette_eItemType_LocalSubGraphs:
-        item = (Item*)new ItemLocalSubGraphs(
-            subpalette, menu->title, menu->file, node, flow_eDest_IntoLast);
+        item = (Item*)new ItemLocalSubGraphs(subpalette, menu->title, menu->file, node, flow_eDest_IntoLast);
         break;
 
       default:;
       }
       menu = menu->next;
-      if (!is_root) {
+      if (!is_root)
+      {
         brow_SetOpen(node, subpalette_mOpen_Children);
         brow_SetAnnotPixmap(node, 0, subpalette->brow->pixmap_openmap);
       }
     }
     brow_ResetNodraw(subpalette->brow->ctx);
     brow_Redraw(subpalette->brow->ctx, node_y);
-  } else
+  }
+  else
     close(subpalette, x, y);
   return 1;
 }
@@ -1216,7 +1242,8 @@ int ItemMenu::close(SubPalette* subpalette, double x, double y)
 {
   double node_x, node_y;
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_GetNodePosition(node, &node_x, &node_y);
     brow_SetNodraw(subpalette->brow->ctx);

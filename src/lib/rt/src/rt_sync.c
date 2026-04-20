@@ -42,10 +42,7 @@
 #include "rt_sync.h"
 #include "rt_sync_msg.h"
 
-pwr_tStatus sync_CondInit(thread_sCond* cp)
-{
-  return errno_Status(pthread_cond_init(&cp->c, NULL));
-}
+pwr_tStatus sync_CondInit(thread_sCond* cp) { return errno_Status(pthread_cond_init(&cp->c, NULL)); }
 
 pwr_tStatus sync_CondSignal(thread_sCond* cp)
 {
@@ -53,17 +50,8 @@ pwr_tStatus sync_CondSignal(thread_sCond* cp)
   return errno_Status(pthread_cond_signal(&cp->c));
 }
 
-pwr_tStatus sync_MutexInit(thread_sMutex* mp)
-{
-  return errno_Status(pthread_mutex_init(mp, NULL));
-}
+pwr_tStatus sync_MutexInit(thread_sMutex* mp) { return errno_Status(pthread_mutex_init(mp, NULL)); }
 
-pwr_tStatus sync_MutexLock(thread_sMutex* mp)
-{
-  return errno_Status(pthread_mutex_lock(mp));
-}
+pwr_tStatus sync_MutexLock(thread_sMutex* mp) { return errno_Status(pthread_mutex_lock(mp)); }
 
-pwr_tStatus sync_MutexUnlock(thread_sMutex* mp)
-{
-  return errno_Status(pthread_mutex_unlock(mp));
-}
+pwr_tStatus sync_MutexUnlock(thread_sMutex* mp) { return errno_Status(pthread_mutex_unlock(mp)); }

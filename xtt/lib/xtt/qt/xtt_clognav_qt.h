@@ -43,7 +43,8 @@
 
 #include "xtt_clognav.h"
 
-class CLogNavQt : public CLogNav {
+class CLogNavQt : public CLogNav
+{
 public:
   CLogNavQt(void* ev_parent_ctx, QWidget** w);
   ~CLogNavQt();

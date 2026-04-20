@@ -52,9 +52,8 @@
 static int comp_dbs_name(tree_sTable* tp, tree_sNode* x, tree_sNode* y);
 
 wb_dbs::wb_dbs(wb_vrep* v)
-    : m_oid(pwr_cNOid), m_rtonly(0), m_warnings(0), m_errors(0), m_nObjects(0),
-      m_nTreeObjects(0), m_nClassObjects(0), m_nNameObjects(0),
-      m_nRbodyObjects(0), m_nDbodyObjects(0), m_oep(0), m_depend(0)
+    : m_oid(pwr_cNOid), m_rtonly(0), m_warnings(0), m_errors(0), m_nObjects(0), m_nTreeObjects(0),
+      m_nClassObjects(0), m_nNameObjects(0), m_nRbodyObjects(0), m_nDbodyObjects(0), m_oep(0), m_depend(0)
 {
   pwr_tStatus sts;
 
@@ -73,20 +72,20 @@ wb_dbs::wb_dbs(wb_vrep* v)
   //@todo strcpy(m_volume.className, m_ohp->chp->db.name.data);
   m_volume.dvVersion = getDvVersion(m_v);
 
-  sprintf(m_fileName, dbs_cNameVolume, dbs_cDirectory, cdh_Low(m_v->name()));
+  snprintf(m_fileName, sizeof(m_fileName), dbs_cNameVolume, dbs_cDirectory, cdh_Low(m_v->name()));
   dcli_translate_filename(m_fileName, m_fileName);
 
-  m_oid_th = tree_CreateTable(&sts, sizeof(pwr_tOid), offsetof(sOentry, o.oid),
-      sizeof(sOentry), 1000, tree_Comp_oid);
+  m_oid_th = tree_CreateTable(&sts, sizeof(pwr_tOid), offsetof(sOentry, o.oid), sizeof(sOentry), 1000,
+                              tree_Comp_oid);
 
-  m_name_th = tree_CreateTable(&sts, sizeof(dbs_sName), offsetof(sNentry, n),
-      sizeof(sNentry), 1000, comp_dbs_name);
+  m_name_th =
+      tree_CreateTable(&sts, sizeof(dbs_sName), offsetof(sNentry, n), sizeof(sNentry), 1000, comp_dbs_name);
 
-  m_class_th = tree_CreateTable(&sts, sizeof(pwr_tCid), offsetof(sCentry, c),
-      sizeof(sCentry), 1000, tree_Comp_cid);
+  m_class_th =
+      tree_CreateTable(&sts, sizeof(pwr_tCid), offsetof(sCentry, c), sizeof(sCentry), 1000, tree_Comp_cid);
 
-  m_vol_th = tree_CreateTable(&sts, sizeof(pwr_tVid), offsetof(sVentry, v.vid),
-      sizeof(sVentry), 10, tree_Comp_vid);
+  m_vol_th =
+      tree_CreateTable(&sts, sizeof(pwr_tVid), offsetof(sVentry, v.vid), sizeof(sVentry), 10, tree_Comp_vid);
 }
 
 wb_dbs::~wb_dbs()
@@ -98,20 +97,11 @@ wb_dbs::~wb_dbs()
   tree_DeleteTable(&sts, m_class_th);
 }
 
-void wb_dbs::setFileName(const char* name)
-{
-  dcli_translate_filename(m_fileName, name);
-}
+void wb_dbs::setFileName(const char* name) { dcli_translate_filename(m_fileName, name); }
 
-void wb_dbs::getFileName(char* name)
-{
-  strcpy(name, m_fileName);
-}
+void wb_dbs::getFileName(char* name) { strcpy(name, m_fileName); }
 
-void wb_dbs::setTime(const pwr_tTime t)
-{
-  m_volume.time = t;
-}
+void wb_dbs::setTime(const pwr_tTime t) { m_volume.time = t; }
 
 static int comp_dbs_name(tree_sTable* tp, tree_sNode* x, tree_sNode* y)
 {
@@ -152,7 +142,8 @@ void wb_dbs::checkObject(sOentry* oep)
   sNentry* nep;
 
   // Check object
-  if (!oep->flags.b.exist) {
+  if (!oep->flags.b.exist)
+  {
     printf("** Object does not exist!\n");
   }
 
@@ -166,11 +157,11 @@ void wb_dbs::checkObject(sOentry* oep)
 
   classInsert(oep);
 
-  switch (oep->o.cid) {
+  switch (oep->o.cid)
+  {
   case pwr_eClass_ClassDef:
     // Version is dependent of attribute objects
-    m_v->merep()->classVersion(
-        &sts, cdh_ClassObjidToId(oep->o.oid), &oep->o.time);
+    m_v->merep()->classVersion(&sts, cdh_ClassObjidToId(oep->o.oid), &oep->o.time);
     break;
   case pwr_eClass_LibHier:
     if (!cdh_isClassVolumeClass(m_volume.cid))
@@ -184,8 +175,8 @@ void wb_dbs::checkObject(sOentry* oep)
   case pwr_eClass_CreateVolume:
   case pwr_eClass_MountObject:
   case pwr_eClass_MountDynObject:
-    if (m_volume.cid == pwr_eClass_RootVolume
-        || m_volume.cid == pwr_eClass_VolatileVolume) {
+    if (m_volume.cid == pwr_eClass_RootVolume || m_volume.cid == pwr_eClass_VolatileVolume)
+    {
       // Root volume or cloned volume
       oep->o.flags.b.isMountClient = 1;
     }
@@ -198,8 +189,10 @@ void wb_dbs::checkObject(sOentry* oep)
 
   // Check all children
   sib_lh = sib_ll = &oep->o.sib_lh;
-  for (sep = oep->foep; sep != 0; sep = sep->aoep) {
-    if (sep->poep != oep) {
+  for (sep = oep->foep; sep != 0; sep = sep->aoep)
+  {
+    if (sep->poep != oep)
+    {
       printf("** Object not linked to right parent!\n");
     }
 
@@ -208,8 +201,7 @@ void wb_dbs::checkObject(sOentry* oep)
     sep->o.pref = oep->ref;
     dbs_Qinsert(&sts, sib_ll, &sep->o.sib_ll, sib_lh);
     sib_ll = &sep->o.sib_ll;
-    oep->o.flags.b.isMountClean
-        |= sep->o.flags.b.isMountClean && !sep->o.flags.b.isMountClient;
+    oep->o.flags.b.isMountClean |= sep->o.flags.b.isMountClean && !sep->o.flags.b.isMountClient;
     nChild++;
   }
 
@@ -217,23 +209,25 @@ void wb_dbs::checkObject(sOentry* oep)
   memset(&n, 0, sizeof(n));
   n.poix = oep->o.oid.oix;
   nep = (sNentry*)tree_FindSuccessor(&sts, m_name_th, &n);
-  if (nep != NULL && nep->n.poix == oep->o.oid.oix) {
+  if (nep != NULL && nep->n.poix == oep->o.oid.oix)
+  {
     oep->o.name_bt.start = nep->ref;
   }
 
   n.poix += 1;
   nep = (sNentry*)tree_FindPredecessor(&sts, m_name_th, &n);
-  if (nep != NULL && nep->n.poix == oep->o.oid.oix) {
+  if (nep != NULL && nep->n.poix == oep->o.oid.oix)
+  {
     oep->o.name_bt.end = nep->ref;
   }
 
   oep->o.name_bt.rsize = dbs_dAlign(sizeof(dbs_sName));
 }
 
-bool wb_dbs::importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid,
-    pwr_tOid boid, pwr_tOid aoid, pwr_tOid foid, pwr_tOid loid,
-    const char* name, const char* normname, pwr_mClassDef flags, pwr_tTime time,
-    pwr_tTime rbTime, pwr_tTime dbTime, size_t rbSize, size_t dbSize)
+bool wb_dbs::importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid, pwr_tOid aoid,
+                        pwr_tOid foid, pwr_tOid loid, const char* name, const char* normname,
+                        pwr_mClassDef flags, pwr_tTime time, pwr_tTime rbTime, pwr_tTime dbTime,
+                        size_t rbSize, size_t dbSize)
 {
   sNentry* nep;
   sOentry* oep;
@@ -243,12 +237,16 @@ bool wb_dbs::importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid,
     printf("** Error: object is null!\n");
 
   oep = (sOentry*)tree_Insert(&sts, m_oid_th, &oid);
-  if (sts == TREE__INSERTED) {
-  } else if (oep->flags.b.exist) {
+  if (sts == TREE__INSERTED)
+  {
+  }
+  else if (oep->flags.b.exist)
+  {
     printf("** Error: object is already inserted!\n");
   }
 
-  if (oid.oix == pwr_cNOix) {
+  if (oid.oix == pwr_cNOix)
+  {
     // this is the volume object
     m_oep = oep;
   }
@@ -287,7 +285,8 @@ bool wb_dbs::importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid,
 
   oep->o.time = time;
 
-  if (cdh_ObjidIsNotNull(poid)) {
+  if (cdh_ObjidIsNotNull(poid))
+  {
     dbs_sName n;
 
     /* insert into name table */
@@ -304,7 +303,8 @@ bool wb_dbs::importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid,
 
   oep->o.rbody.time = rbTime;
   oep->o.rbody.size = rbSize;
-  if (rbSize > 0) {
+  if (rbSize > 0)
+  {
     oep->rbody.oid = oid;
     oep->rbody.size = dbs_dAlign(rbSize);
     m_volume.rbodySize += oep->rbody.size;
@@ -312,12 +312,14 @@ bool wb_dbs::importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid,
 
   oep->o.dbody.time = dbTime;
   oep->o.dbody.size = dbSize;
-  if (oep->o.dbody.size > 0) {
+  if (oep->o.dbody.size > 0)
+  {
     oep->dbody.oid = oid;
     oep->dbody.size = dbs_dAlign(oep->o.dbody.size);
   }
 
-  if (cid == pwr_eClass_ClassDef) {
+  if (cid == pwr_eClass_ClassDef)
+  {
     // Version is dependent of attribute objects
     // m_v->merep()->classVersion(&sts, cdh_ClassObjidToId(oid), &oep->o.time);
   }
@@ -329,7 +331,8 @@ pwr_tStatus wb_dbs::closeFile(pwr_tBoolean doDelete)
 {
   if (m_fp != NULL)
     fclose(m_fp);
-  if (doDelete && *m_fileName != '\0') {
+  if (doDelete && *m_fileName != '\0')
+  {
     if (remove(m_fileName) == 0)
       printf("-- Deleted file: %s\n", m_fileName);
   }
@@ -427,7 +430,8 @@ pwr_tBoolean wb_dbs::createFile()
   if (EVEN(sts))
     goto error_handler;
 
-  if (!m_rtonly) {
+  if (!m_rtonly)
+  {
     sts = writeReferencedVolumes();
     if (EVEN(sts))
       goto error_handler;
@@ -440,7 +444,7 @@ pwr_tBoolean wb_dbs::createFile()
   printf("-- Successfully created load file for volume '%s'\n", m_v->name());
   printf("-- %d objects with a total body size of %d bytes were written to new "
          "file.\n",
-      m_volume.cardinality, m_volume.rbodySize);
+         m_volume.cardinality, m_volume.rbodySize);
 
   return 1;
 
@@ -458,13 +462,15 @@ pwr_tStatus wb_dbs::openFile()
   int ret;
 
   m_fp = fopen(m_fileName, "w+b");
-  if (m_fp == NULL) {
+  if (m_fp == NULL)
+  {
     printf("** Cannot open file: %s\n", m_fileName);
     perror("   Reason");
     return LDH__FILEOPEN;
   }
 
-  if ((ret = stat(m_fileName, &sb)) != 0) {
+  if ((ret = stat(m_fileName, &sb)) != 0)
+  {
     sts = errno_GetStatus();
     return sts;
   }
@@ -492,8 +498,7 @@ pwr_tStatus wb_dbs::writeSectFile(size_t size)
   strcpy(fp->userName, "");
   strcpy(fp->comment, "");
 
-  pdrmem_create(
-      &pdrs, (char*)fp, sizeof(*fp), PDR_DECODE, fp->format, fp->format);
+  pdrmem_create(&pdrs, (char*)fp, sizeof(*fp), PDR_DECODE, fp->format, fp->format);
   if (!pdr_dbs_sFile(&pdrs, fp))
     return LDH__XDR;
 
@@ -539,8 +544,7 @@ pwr_tStatus wb_dbs::writeSectDirectory()
   if (fwrite(&m_sect, sizeof(m_sect), 1, m_fp) < 1)
     return LDH__FILEWRITE;
 
-  assert(ftell(m_fp)
-      == (long)(m_sect[dbs_eSect_dir].offset + m_sect[dbs_eSect_dir].size));
+  assert(ftell(m_fp) == (long)(m_sect[dbs_eSect_dir].offset + m_sect[dbs_eSect_dir].size));
 
   return LDH__SUCCESS;
 }
@@ -558,8 +562,7 @@ pwr_tStatus wb_dbs::writeSectVolume()
   if (fwrite(v, sizeof(v), 1, m_fp) < 1)
     return LDH__FILEWRITE;
 
-  assert(ftell(m_fp) == (long)(m_sect[dbs_eSect_volume].offset
-                            + m_sect[dbs_eSect_volume].size));
+  assert(ftell(m_fp) == (long)(m_sect[dbs_eSect_volume].offset + m_sect[dbs_eSect_volume].size));
 
   return LDH__SUCCESS;
 }
@@ -580,7 +583,8 @@ pwr_tStatus wb_dbs::prepareSectVolref()
 
   cid.pwr = pwr_cNCid;
   cep = (sCentry*)tree_FindSuccessor(&sts, m_class_th, &cid.pwr);
-  while (cep) {
+  while (cep)
+  {
     cdh_uVid vid;
 
     vid.pwr = pwr_cNVid;
@@ -588,7 +592,8 @@ pwr_tStatus wb_dbs::prepareSectVolref()
     vid.v.vid_0 = cid.c.vid_0;
     vid.v.vid_1 = cid.c.vid_1;
 
-    if (vid.pwr != m_volume.vid) {
+    if (vid.pwr != m_volume.vid)
+    {
       wb_mvrep* mvrep = m_v->merep()->volume(&sts, vid.pwr);
       if (EVEN(sts))
         throw wb_error_str("Metavolume not found");
@@ -598,7 +603,8 @@ pwr_tStatus wb_dbs::prepareSectVolref()
       sVentry* vep;
 
       vep = (sVentry*)tree_Insert(&sts, m_vol_th, &vid.pwr);
-      if (sts == TREE__INSERTED) {
+      if (sts == TREE__INSERTED)
+      {
         /* was inserted now */
         dbs_Open(&sts, &vep->env, mvrep->fileName());
 
@@ -607,22 +613,27 @@ pwr_tStatus wb_dbs::prepareSectVolref()
 
         strcpy(vep->v.name, mvrep->name());
         vep->v.cid = mvrep->cid();
-        if (m_volume.cid == pwr_eClass_DetachedClassVolume) {
+        if (m_volume.cid == pwr_eClass_DetachedClassVolume)
+        {
           vep->v.time.tv_sec = dvVersion;
           vep->v.time.tv_nsec = 0;
-        } else
+        }
+        else
           vep->v.time = vep->env.file.time;
         vep->v.size = vep->env.file.size;
         vep->v.offset = 0;
 
         int i = 0;
-        while ((vp = dbs_VolRef(&sts, i, (dbs_sVolRef*)v, &vep->env)) != NULL) {
+        while ((vp = dbs_VolRef(&sts, i, (dbs_sVolRef*)v, &vep->env)) != NULL)
+        {
           sVentry* nvep;
           i++;
           nvep = (sVentry*)tree_Insert(&sts, m_vol_th, &vp->vid);
-          if (sts == TREE__INSERTED) {
+          if (sts == TREE__INSERTED)
+          {
             wb_mvrep* nmvrep = m_v->merep()->volume(&sts, vp->vid);
-            if (EVEN(sts)) {
+            if (EVEN(sts))
+            {
               printf("** Classvolume %s referenced but not loaded\n", vp->name);
               throw wb_error_str("Metavolume not loaded");
             }
@@ -636,10 +647,12 @@ pwr_tStatus wb_dbs::prepareSectVolref()
 
             strcpy(nvep->v.name, vp->name);
             nvep->v.cid = vp->cid;
-            if (m_volume.cid == pwr_eClass_DetachedClassVolume) {
+            if (m_volume.cid == pwr_eClass_DetachedClassVolume)
+            {
               nvep->v.time.tv_sec = dvVersion;
               nvep->v.time.tv_nsec = 0;
-            } else
+            }
+            else
               nvep->v.time = vp->time;
             // nvep->v.dvVersion = vp->dvVersion;
             nvep->v.size = vp->size;
@@ -659,10 +672,14 @@ pwr_tStatus wb_dbs::prepareSectVolref()
   int nVolume = 0;
   sVentry* vep;
   vep = (sVentry*)tree_Minimum(&sts, m_vol_th);
-  while (vep) {
-    if (vep->env.file.cookie == 0) {
+  while (vep)
+  {
+    if (vep->env.file.cookie == 0)
+    {
       printf("  volume not found: %d\n", vep->v.vid);
-    } else {
+    }
+    else
+    {
       nVolume++;
       m_sect[dbs_eSect_volref].size += sizeof(v);
     }
@@ -683,10 +700,14 @@ pwr_tStatus wb_dbs::writeSectVolref(size_t size)
   // Search trhough all found volumes and get their volrefs
   sVentry* vep;
   vep = (sVentry*)tree_Minimum(&sts, m_vol_th);
-  while (vep) {
-    if (vep->env.file.cookie == 0) {
+  while (vep)
+  {
+    if (vep->env.file.cookie == 0)
+    {
       printf("  volume not found: %d\n", vep->v.vid);
-    } else {
+    }
+    else
+    {
       vep->v.offset = dbs_dAlign(size);
       size += vep->v.size = dbs_dAlign(vep->v.size);
       char v[dbs_dAlign(sizeof(dbs_sVolRef))];
@@ -699,8 +720,7 @@ pwr_tStatus wb_dbs::writeSectVolref(size_t size)
     vep = (sVentry*)tree_Successor(&sts, m_vol_th, vep);
   }
 
-  assert(ftell(m_fp) == (long)(m_sect[dbs_eSect_volref].offset
-                            + m_sect[dbs_eSect_volref].size));
+  assert(ftell(m_fp) == (long)(m_sect[dbs_eSect_volref].offset + m_sect[dbs_eSect_volref].size));
 
   return LDH__SUCCESS;
 }
@@ -710,10 +730,14 @@ static pwr_tStatus copyFile(FILE* sfp, FILE* tfp, size_t size)
   char buf[512];
   size_t bytes;
 
-  while (size > 0) {
-    if (size > sizeof(buf)) {
+  while (size > 0)
+  {
+    if (size > sizeof(buf))
+    {
       bytes = sizeof(buf);
-    } else {
+    }
+    else
+    {
       bytes = size;
     }
     size -= bytes;
@@ -735,10 +759,14 @@ pwr_tStatus wb_dbs::writeReferencedVolumes()
   // Search trhough all found volumes and get their volrefs
   sVentry* vep;
   vep = (sVentry*)tree_Minimum(&sts, m_vol_th);
-  while (vep) {
-    if (vep->env.file.cookie == 0) {
+  while (vep)
+  {
+    if (vep->env.file.cookie == 0)
+    {
       printf("  volume not found: %d\n", vep->v.vid);
-    } else {
+    }
+    else
+    {
       if (fseek(m_fp, vep->v.offset, SEEK_SET) != 0)
         return LDH__FILEPOS;
       if (fseek(vep->env.f, 0, SEEK_SET) != 0)
@@ -772,7 +800,8 @@ pwr_tStatus wb_dbs::writeSectOid()
   memset(o, 0, sizeof(o));
 
   oep = (sOentry*)tree_Minimum(NULL, m_oid_th);
-  while (oep != NULL) {
+  while (oep != NULL)
+  {
     op->oid = oep->o.oid;
     op->ref = oep->ref;
 
@@ -782,8 +811,7 @@ pwr_tStatus wb_dbs::writeSectOid()
     oep = (sOentry*)tree_Successor(NULL, m_oid_th, (tree_sNode*)oep);
   }
 
-  assert(ftell(m_fp)
-      == (long)(m_sect[dbs_eSect_oid].offset + m_sect[dbs_eSect_oid].size));
+  assert(ftell(m_fp) == (long)(m_sect[dbs_eSect_oid].offset + m_sect[dbs_eSect_oid].size));
 
   return LDH__SUCCESS;
 }
@@ -822,8 +850,7 @@ pwr_tStatus wb_dbs::writeSectObject()
 
   writeTree(m_oep, m_fp);
 
-  assert(ftell(m_fp) == (long)(m_sect[dbs_eSect_object].offset
-                            + m_sect[dbs_eSect_object].size));
+  assert(ftell(m_fp) == (long)(m_sect[dbs_eSect_object].offset + m_sect[dbs_eSect_object].size));
 
   return LDH__SUCCESS;
 }
@@ -839,17 +866,19 @@ bool wb_dbs::importDbody(pwr_tOid oid, size_t size, void* body)
   memset(b, 0, sizeof(b));
 
   oep = (sOentry*)tree_Find(&sts, m_oid_th, &oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
   }
 
-  if (oep->dbody.size == 0) {
+  if (oep->dbody.size == 0)
+  {
     if (size != 0)
       printf("error dbody size %zd %s\n", size, cdh_ObjidToString(oid, 0));
     return true;
   }
 
-  oep->o.dbody.ref = dbs_dMakeRef(dbs_eSect_dbody,
-      m_sect[dbs_eSect_dbody].size + dbs_dAlign(sizeof(dbs_sBody)));
+  oep->o.dbody.ref =
+      dbs_dMakeRef(dbs_eSect_dbody, m_sect[dbs_eSect_dbody].size + dbs_dAlign(sizeof(dbs_sBody)));
   m_sect[dbs_eSect_dbody].size += oep->dbody.size + sizeof(b);
 
   memcpy(b, &oep->dbody, sizeof(oep->dbody));
@@ -872,8 +901,7 @@ pwr_tStatus wb_dbs::writeSectDbody()
 
   m_v->exportDbody(*this);
 
-  assert(ftell(m_fp)
-      == (long)(m_sect[dbs_eSect_dbody].offset + m_sect[dbs_eSect_dbody].size));
+  assert(ftell(m_fp) == (long)(m_sect[dbs_eSect_dbody].offset + m_sect[dbs_eSect_dbody].size));
 
   return LDH__SUCCESS;
 }
@@ -889,7 +917,8 @@ bool wb_dbs::importRbody(pwr_tOid oid, size_t size, void* body)
   memset(b, 0, sizeof(b));
 
   oep = (sOentry*)tree_Find(&sts, m_oid_th, &oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
   }
 
   if (oep->o.flags.b.isMountClient)
@@ -898,14 +927,14 @@ bool wb_dbs::importRbody(pwr_tOid oid, size_t size, void* body)
   if (oep->o.flags.b.isAliasClient)
     getAliasServer(oep, body);
 
-  if (oep->rbody.size == 0) {
+  if (oep->rbody.size == 0)
+  {
     if (size != 0)
       printf("error rbody size %zd %s\n", size, cdh_ObjidToString(oid, 0));
     return true;
   }
 
-  oep->o.rbody.ref
-      = dbs_dMakeRef(dbs_eSect_rbody, m_sect[dbs_eSect_rbody].size + sizeof(b));
+  oep->o.rbody.ref = dbs_dMakeRef(dbs_eSect_rbody, m_sect[dbs_eSect_rbody].size + sizeof(b));
   m_sect[dbs_eSect_rbody].size += oep->rbody.size + sizeof(b);
 
   memcpy(b, &oep->rbody, sizeof(oep->rbody));
@@ -928,8 +957,7 @@ pwr_tStatus wb_dbs::writeSectRbody()
 
   m_v->exportRbody(*this);
 
-  assert(ftell(m_fp)
-      == (long)(m_sect[dbs_eSect_rbody].offset + m_sect[dbs_eSect_rbody].size));
+  assert(ftell(m_fp) == (long)(m_sect[dbs_eSect_rbody].offset + m_sect[dbs_eSect_rbody].size));
 
   return LDH__SUCCESS;
 }
@@ -945,7 +973,8 @@ pwr_tStatus wb_dbs::writeSectName()
     return LDH__FILEPOS;
 
   nep = (sNentry*)tree_Minimum(NULL, m_name_th);
-  while (nep != NULL) {
+  while (nep != NULL)
+  {
     nep->n.ref = nep->oep->ref;
 
     if (fwrite(&nep->n, dbs_dAlign(sizeof(nep->n)), 1, m_fp) < 1)
@@ -954,8 +983,7 @@ pwr_tStatus wb_dbs::writeSectName()
     nep = (sNentry*)tree_Successor(NULL, m_name_th, (tree_sNode*)nep);
   }
 
-  assert(ftell(m_fp)
-      == (long)(m_sect[dbs_eSect_name].offset + m_sect[dbs_eSect_name].size));
+  assert(ftell(m_fp) == (long)(m_sect[dbs_eSect_name].offset + m_sect[dbs_eSect_name].size));
 
   return LDH__SUCCESS;
 }
@@ -971,15 +999,15 @@ pwr_tStatus wb_dbs::writeSectClass()
     return LDH__FILEPOS;
 
   cep = (sCentry*)tree_Minimum(NULL, m_class_th);
-  while (cep != NULL) {
+  while (cep != NULL)
+  {
     if (fwrite(&cep->c, dbs_dAlign(sizeof(cep->c)), 1, m_fp) < 1)
       return LDH__FILEWRITE;
 
     cep = (sCentry*)tree_Successor(NULL, m_class_th, (tree_sNode*)cep);
   }
 
-  assert(ftell(m_fp)
-      == (long)(m_sect[dbs_eSect_class].offset + m_sect[dbs_eSect_class].size));
+  assert(ftell(m_fp) == (long)(m_sect[dbs_eSect_class].offset + m_sect[dbs_eSect_class].size));
 
   return LDH__SUCCESS;
 }
@@ -989,7 +1017,8 @@ void wb_dbs::buildSectOid()
   sOentry* oep;
 
   oep = (sOentry*)tree_Minimum(NULL, m_oid_th);
-  while (oep != NULL) {
+  while (oep != NULL)
+  {
     oep->oidref = dbs_dMakeRef(dbs_eSect_oid, m_sect[dbs_eSect_oid].size);
     m_sect[dbs_eSect_oid].size += dbs_dAlign(sizeof(dbs_sOid));
 
@@ -997,7 +1026,8 @@ void wb_dbs::buildSectOid()
   }
 
   oep = (sOentry*)tree_Minimum(NULL, m_oid_th);
-  if (oep != NULL) {
+  if (oep != NULL)
+  {
     m_volume.oid_bt.start = oep->oidref;
     oep = (sOentry*)tree_Maximum(NULL, m_oid_th);
     m_volume.oid_bt.end = oep->oidref;
@@ -1012,7 +1042,8 @@ void wb_dbs::buildSectName()
   /* allocate space for all name entries in name section*/
 
   nep = (sNentry*)tree_Minimum(NULL, m_name_th);
-  while (nep != NULL) {
+  while (nep != NULL)
+  {
     nep->ref = dbs_dMakeRef(dbs_eSect_name, m_sect[dbs_eSect_name].size);
     m_sect[dbs_eSect_name].size += dbs_dAlign(sizeof(dbs_sName));
     m_nNameObjects++;
@@ -1021,7 +1052,8 @@ void wb_dbs::buildSectName()
   }
 
   nep = (sNentry*)tree_Minimum(NULL, m_name_th);
-  if (nep != NULL) {
+  if (nep != NULL)
+  {
     m_volume.name_bt.start = nep->ref;
     nep = (sNentry*)tree_Maximum(NULL, m_name_th);
     m_volume.name_bt.end = nep->ref;
@@ -1041,15 +1073,16 @@ void wb_dbs::buildSectClass()
   /* allocate space for all name entries in name section*/
 
   cep = (sCentry*)tree_Minimum(NULL, m_class_th);
-  while (cep != NULL) {
-    ref = cep->ref
-        = dbs_dMakeRef(dbs_eSect_class, m_sect[dbs_eSect_class].size);
+  while (cep != NULL)
+  {
+    ref = cep->ref = dbs_dMakeRef(dbs_eSect_class, m_sect[dbs_eSect_class].size);
     m_sect[dbs_eSect_class].size += dbs_dAlign(sizeof(dbs_sClass));
     dbs_Qinit(&sts, &cep->c.o_lh, ref + offsetof(dbs_sClass, o_lh));
 
     // Link all object instances to this class
     o_lh = o_ll = &cep->c.o_lh;
-    for (oep = cep->o_lh; oep != 0; oep = oep->o_ll) {
+    for (oep = cep->o_lh; oep != 0; oep = oep->o_ll)
+    {
       cep->c.nObjects++;
       m_nClassObjects++;
       dbs_Qinsert(&sts, o_ll, &oep->o.o_ll, o_lh);
@@ -1060,7 +1093,8 @@ void wb_dbs::buildSectClass()
   }
 
   cep = (sCentry*)tree_Minimum(NULL, m_class_th);
-  if (cep != NULL) {
+  if (cep != NULL)
+  {
     m_volume.class_bt.start = cep->ref;
     cep = (sCentry*)tree_Maximum(NULL, m_class_th);
     m_volume.class_bt.end = cep->ref;
@@ -1068,14 +1102,14 @@ void wb_dbs::buildSectClass()
   }
 }
 
-void wb_dbs::cidInsert(
-    pwr_tStatus* sts, pwr_tCid cid, pwr_sAttrRef* arp, sCentry** cep)
+void wb_dbs::cidInsert(pwr_tStatus* sts, pwr_tCid cid, pwr_sAttrRef* arp, sCentry** cep)
 {
   *cep = (sCentry*)tree_Insert(sts, m_class_th, &cid);
   if (!arp)
     return;
 
-  if (*sts == TREE__INSERTED) {
+  if (*sts == TREE__INSERTED)
+  {
     // Insert depending classes
     pwr_tCid* lst;
     pwr_sAttrRef* arlst;
@@ -1087,31 +1121,36 @@ void wb_dbs::cidInsert(
     pwr_tCid cast_cid;
 
     m_v->merep()->classDependency(&lsts, cid, &lst, &arlst, &cnt);
-    for (int i = 0; i < cnt; i++) {
+    for (int i = 0; i < cnt; i++)
+    {
       aref = cdh_ArefAdd(arp, &arlst[i]);
       cidInsert(&lsts, lst[i], &aref, &entry);
 
-      if (aref.Flags.b.CastAttr) {
+      if (aref.Flags.b.CastAttr)
+      {
         cast_aref = cdh_ArefToCastAref(&aref);
 
         wb_volume v(m_v);
         wb_attribute a = v.attribute(&cast_aref);
-        if (a) {
+        if (a)
+        {
           a.value(&cast_cid);
-          if (cast_cid != pwr_cNCid) {
+          if (cast_cid != pwr_cNCid)
+          {
             wb_cdef cd = v.cdef(cast_cid);
             if (cd)
               cidInsert(&lsts, cast_cid, 0, &entry);
             else
-              printf("** Invalid cast class %s\n",
-                  cdh_ObjidToString(aref.Objid, 1));
+              printf("** Invalid cast class %s\n", cdh_ObjidToString(aref.Objid, 1));
           }
         }
       }
     }
     free(lst);
     free(arlst);
-  } else if (!(cdh_CidToVid(cid) == 1 && cdh_CidToVid(cid) == 2)) {
+  }
+  else if (!(cdh_CidToVid(cid) == 1 && cdh_CidToVid(cid) == 2))
+  {
     // Check class of casted attribute for every instance
     pwr_tCid* lst;
     pwr_sAttrRef* arlst;
@@ -1123,23 +1162,26 @@ void wb_dbs::cidInsert(
     pwr_tCid cast_cid;
 
     m_v->merep()->classDependency(&lsts, cid, &lst, &arlst, &cnt);
-    for (int i = 0; i < cnt; i++) {
+    for (int i = 0; i < cnt; i++)
+    {
       aref = cdh_ArefAdd(arp, &arlst[i]);
 
-      if (aref.Flags.b.CastAttr) {
+      if (aref.Flags.b.CastAttr)
+      {
         cast_aref = cdh_ArefToCastAref(&aref);
 
         wb_volume v(m_v);
         wb_attribute a = v.attribute(&cast_aref);
-        if (a) {
+        if (a)
+        {
           a.value(&cast_cid);
-          if (cast_cid != pwr_cNCid) {
+          if (cast_cid != pwr_cNCid)
+          {
             wb_cdef cd = v.cdef(cast_cid);
             if (cd)
               cidInsert(&lsts, cast_cid, 0, &entry);
             else
-              printf("** Invalid cast class %s\n",
-                  cdh_ObjidToString(aref.Objid, 1));
+              printf("** Invalid cast class %s\n", cdh_ObjidToString(aref.Objid, 1));
           }
         }
       }
@@ -1156,25 +1198,26 @@ void wb_dbs::classInsert(sOentry* oep)
   pwr_sAttrRef aref = cdh_ObjidToAref(oep->o.oid);
 
   cidInsert(&sts, oep->o.cid, &aref, &cep);
-  if (sts == TREE__INSERTED) {
+  if (sts == TREE__INSERTED)
+  {
     /* was inserted now */
 
     cep->o_lh = cep->o_lt = oep;
-  } else {
+  }
+  else
+  {
     /* was allready present */
     if (!cep->o_lt)
       cep->o_lh = cep->o_lt = oep;
-    else {
+    else
+    {
       cep->o_lt->o_ll = oep;
       cep->o_lt = oep;
     }
   }
 }
 
-bool wb_dbs::importMeta(dbs_sMenv* mep)
-{
-  return true;
-}
+bool wb_dbs::importMeta(dbs_sMenv* mep) { return true; }
 
 void wb_dbs::getAliasServer(sOentry* oep, void* p)
 {
@@ -1184,7 +1227,8 @@ void wb_dbs::getAliasServer(sOentry* oep, void* p)
 
   oep->o.flags.b.isAliasClient = 0;
 
-  if (cdh_ObjidIsNull(alias->Object)) {
+  if (cdh_ObjidIsNull(alias->Object))
+  {
     printf("!! Alias does not refer to any object!\n");
     printf("   Alias:  %s\n", pathName(oep));
     printf("   Alias will not be loaded.\n");
@@ -1192,7 +1236,8 @@ void wb_dbs::getAliasServer(sOentry* oep, void* p)
     return;
   }
 
-  if (alias->Object.vid != m_volume.vid) {
+  if (alias->Object.vid != m_volume.vid)
+  {
     printf("!! Alias refers to object outside own volume!\n");
     printf("   Alias:  %s\n", pathName(oep));
     printf("   Object: %s\n", cdh_ObjidToString(alias->Object, 1));
@@ -1202,7 +1247,8 @@ void wb_dbs::getAliasServer(sOentry* oep, void* p)
   }
 
   aep = (sOentry*)tree_Find(&sts, m_oid_th, &alias->Object);
-  if (!aep) {
+  if (!aep)
+  {
     printf("!! Alias refers to a non existing object!\n");
     printf("   Alias:  %s\n", pathName(oep));
     printf("   Alias will not be loaded.\n");
@@ -1210,7 +1256,8 @@ void wb_dbs::getAliasServer(sOentry* oep, void* p)
     return;
   }
 
-  if (aep->o.flags.b.devOnly) {
+  if (aep->o.flags.b.devOnly)
+  {
     printf("!! An alias may not refer to a non runtime object!\n");
     printf("   Alias:  %s\n", pathName(oep));
     printf("   Object: %s\n", pathName(aep));
@@ -1219,7 +1266,8 @@ void wb_dbs::getAliasServer(sOentry* oep, void* p)
     return;
   }
 
-  switch (aep->o.cid) {
+  switch (aep->o.cid)
+  {
   case pwr_eClass_Alias:
     printf("!! An alias may not refer to another alias!\n");
     printf("   Alias:  %s\n", pathName(oep));
@@ -1250,14 +1298,17 @@ char* wb_dbs::pathName(sOentry* oep)
   if (level == 0)
     buff[0] = '\0';
 
-  if (oep != m_oep) {
+  if (oep != m_oep)
+  {
     level++;
     pathName(oep->poep);
     level--;
     strcat(buff, oep->o.name);
     if (level > 0)
       strcat(buff, "-");
-  } else {
+  }
+  else
+  {
     strcat(buff, oep->o.name);
     strcat(buff, ":");
   }
@@ -1266,21 +1317,25 @@ char* wb_dbs::pathName(sOentry* oep)
 
 void wb_dbs::getMountServer(sOentry* oep, void* p)
 {
-  switch (oep->o.cid) {
-  case pwr_eClass_MountObject: {
+  switch (oep->o.cid)
+  {
+  case pwr_eClass_MountObject:
+  {
     pwr_sMountObject* mountObject;
     mountObject = (pwr_sMountObject*)p;
     oep->o.soid = mountObject->Object;
     break;
   }
-  case pwr_eClass_MountVolume: {
+  case pwr_eClass_MountVolume:
+  {
     pwr_sMountVolume* mountVolume;
     mountVolume = (pwr_sMountVolume*)p;
     oep->o.soid = pwr_cNOid;
     oep->o.soid.vid = mountVolume->Volume;
     break;
   }
-  case pwr_eClass_CreateVolume: {
+  case pwr_eClass_CreateVolume:
+  {
     pwr_sCreateVolume* createVolume;
     createVolume = (pwr_sCreateVolume*)p;
     oep->o.soid = pwr_cNOid;
@@ -1296,7 +1351,8 @@ pwr_tUInt32 wb_dbs::getDvVersion(wb_vrep* v)
 {
   pwr_tUInt32 dvVersion = 0;
 
-  if (cdh_isClassVolumeClass(v->cid())) {
+  if (cdh_isClassVolumeClass(v->cid()))
+  {
     // Get DvVersion from volume object body
     pwr_tObjName name;
     pwr_sClassVolume body;

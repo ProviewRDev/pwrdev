@@ -38,7 +38,8 @@
 #include "co_nav_crr.h"
 #include "co_tst_log.h"
 
-extern "C" {
+extern "C"
+{
 #include "co_api.h"
 #include "co_dcli.h"
 }
@@ -49,34 +50,22 @@ extern "C" {
 //  c api to co_lng
 //
 
-void lng_get_uid(char* in, char* out)
-{
-  Lng::get_uid(in, out);
-}
+void lng_get_uid(char* in, char* out) { Lng::get_uid(in, out); }
 
-char* lng_translate(const char* str)
-{
-  return Lng::translate(str);
-}
+char* lng_translate(const char* str) { return Lng::translate(str); }
 
-void lng_set(char* str)
-{
-  Lng::set(str);
-}
+void lng_set(char* str) { Lng::set(str); }
 
-char* lng_get_language_str()
-{
-  return Lng::get_language_str();
-}
+char* lng_get_language_str() { return Lng::get_language_str(); }
 
 //
 //  c api to co_crr
 //
 
 int crr_signal(void* parent_ctx, char* signalname,
-    void (*insert_cb)(void*, void*, navc_eItemType, char*, char*, int),
-    int (*name_to_objid_cb)(void*, char*, pwr_tObjid*),
-    int (*get_volume_cb)(void*, pwr_tVid*, pwr_tVid))
+               void (*insert_cb)(void*, void*, navc_eItemType, char*, char*, int),
+               int (*name_to_objid_cb)(void*, char*, pwr_tObjid*),
+               int (*get_volume_cb)(void*, pwr_tVid*, pwr_tVid))
 {
   int sts;
   NavCrr* navcrr = new NavCrr(parent_ctx, 0);
@@ -90,9 +79,9 @@ int crr_signal(void* parent_ctx, char* signalname,
 }
 
 int crr_object(void* parent_ctx, char* objectname,
-    void (*insert_cb)(void*, void*, navc_eItemType, char*, char*, int),
-    int (*name_to_objid_cb)(void*, char*, pwr_tObjid*),
-    int (*get_volume_cb)(void*, pwr_tVid*, pwr_tVid))
+               void (*insert_cb)(void*, void*, navc_eItemType, char*, char*, int),
+               int (*name_to_objid_cb)(void*, char*, pwr_tObjid*),
+               int (*get_volume_cb)(void*, pwr_tVid*, pwr_tVid))
 {
   int sts;
   NavCrr* navcrr = new NavCrr(parent_ctx, 0);
@@ -106,30 +95,25 @@ int crr_object(void* parent_ctx, char* objectname,
   return sts;
 }
 
-void *tst_log_open(pwr_tStatus *sts, char *category, char *file)
+void* tst_log_open(pwr_tStatus* sts, char* category, char* file)
 {
-  tst_log *log = new tst_log(sts, category, file);
-  return (void *)log;
+  tst_log* log = new tst_log(sts, category, file);
+  return (void*)log;
 }
 
-void tst_log_close(void *log)
+void tst_log_close(void* log) { delete (tst_log*)log; }
+
+void tst_log_log(void* log, const char severity, const char* text1, const char* text2)
 {
-  delete (tst_log *)log;
+  ((tst_log*)log)->log(severity, text1, text2);
 }
 
-void tst_log_log(void *log, const char severity, const char *text1, 
-		 const char *text2)
+void tst_log_slog(void* log, const char severity, const char* text1, const char* text2, pwr_tStatus status)
 {
-  ((tst_log *)log)->log(severity, text1, text2);
+  ((tst_log*)log)->log(severity, text1, text2, status);
 }
 
-void tst_log_slog(void *log, const char severity, const char *text1, 
-		  const char *text2, pwr_tStatus status)
-{
-  ((tst_log *)log)->log(severity, text1, text2, status);
-}
-
-void tst_log_vlog(void *log, const char severity, const char *format, ...)
+void tst_log_vlog(void* log, const char severity, const char* format, ...)
 {
   va_list ap;
   char msg[200];
@@ -137,5 +121,5 @@ void tst_log_vlog(void *log, const char severity, const char *format, ...)
   va_start(ap, format);
   vsnprintf(msg, sizeof(msg), format, ap);
   va_end(ap);
-  ((tst_log *)log)->log(severity, msg);
+  ((tst_log*)log)->log(severity, msg);
 }

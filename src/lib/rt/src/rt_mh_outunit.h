@@ -41,161 +41,161 @@
 #include "rt_qcom.h"
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #define mh_cSelLSize 40
 
-typedef pwr_tUInt32 mh_mOutunitFlags;
+  typedef pwr_tUInt32 mh_mOutunitFlags;
 
 #define mh_mOutunitFlags_ReadWait 1
 
-/**
- * @defgroup MSGH_O Outunits
- * @ingroup  MSGH_FC
- * @{
- */
+  /**
+   * @defgroup MSGH_O Outunits
+   * @ingroup  MSGH_FC
+   * @{
+   */
 
-/* Callback prototypes */
+  /* Callback prototypes */
 
-/**
- * @brief Callback function to handle aknowledge messages.
- *
- * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
- * The function can have any name, but the address to the routine should be
- * passed in the mh_OutunitConnect call.
- * The mh_OutunitReceive calls this function if an acknowledge message arrives.
- * @param mh_sAck Addres of an acknowledge message.
- * @return pwr_tStatus - Status return in standard VMS-format.
- */
-typedef pwr_tStatus (*mh_cbOutunitAck)(mh_sAck*);
+  /**
+   * @brief Callback function to handle aknowledge messages.
+   *
+   * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
+   * The function can have any name, but the address to the routine should be
+   * passed in the mh_OutunitConnect call.
+   * The mh_OutunitReceive calls this function if an acknowledge message arrives.
+   * @param mh_sAck Addres of an acknowledge message.
+   * @return pwr_tStatus - Status return in standard VMS-format.
+   */
+  typedef pwr_tStatus (*mh_cbOutunitAck)(mh_sAck*);
 
-/**
- * @brief  Callback function to handle alarm messages.
- *
- * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
- * The function can have any name, but the address to the routine should be
- * passed in
- * the mh_OutunitConnect call.
- * The mh_Outunit API calls this function if an alarm message arrives.
- * @param mh_sMessage Address of an alarm message.
- * @return pwr_tStatus - Status return in standard VMS-format.
- */
-typedef pwr_tStatus (*mh_cbOutunitAlarm)(mh_sMessage*);
+  /**
+   * @brief  Callback function to handle alarm messages.
+   *
+   * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
+   * The function can have any name, but the address to the routine should be
+   * passed in
+   * the mh_OutunitConnect call.
+   * The mh_Outunit API calls this function if an alarm message arrives.
+   * @param mh_sMessage Address of an alarm message.
+   * @return pwr_tStatus - Status return in standard VMS-format.
+   */
+  typedef pwr_tStatus (*mh_cbOutunitAlarm)(mh_sMessage*);
 
-/**
- * @brief  Callback function to handle block messages.
- *
- * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
- * The function can have any name, but the address to the routine should be
- * passed
- * in the mh_OutunitConnect call.
- * The mh_Outunit API calls this function if a block message arrives.
- * @param mh_sBlock Address of a block message.
- * @return pwr_tStatus - Status return in standard VMS-format.
- */
-typedef pwr_tStatus (*mh_cbOutunitBlock)(mh_sBlock*);
+  /**
+   * @brief  Callback function to handle block messages.
+   *
+   * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
+   * The function can have any name, but the address to the routine should be
+   * passed
+   * in the mh_OutunitConnect call.
+   * The mh_Outunit API calls this function if a block message arrives.
+   * @param mh_sBlock Address of a block message.
+   * @return pwr_tStatus - Status return in standard VMS-format.
+   */
+  typedef pwr_tStatus (*mh_cbOutunitBlock)(mh_sBlock*);
 
-/**
- * @brief Callback function to handle cancel messages.
- *
- * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
- * The function can have any name, but the address to the routine should be
- * passed
- * in the mh_OutunitConnect call.
- * The mh_Outunit API calls this function if a cancel message arrives.
- * @param mh_sReturn Address of an cancel message.
- * @return pwr_tStatus - Status return in standard VMS-format.
- */
-typedef pwr_tStatus (*mh_cbOutunitCancel)(mh_sReturn*);
+  /**
+   * @brief Callback function to handle cancel messages.
+   *
+   * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
+   * The function can have any name, but the address to the routine should be
+   * passed
+   * in the mh_OutunitConnect call.
+   * The mh_Outunit API calls this function if a cancel message arrives.
+   * @param mh_sReturn Address of an cancel message.
+   * @return pwr_tStatus - Status return in standard VMS-format.
+   */
+  typedef pwr_tStatus (*mh_cbOutunitCancel)(mh_sReturn*);
 
-/**
- * @brief Callback function to clear alarmlist.
- *
- * This is a callback function. It should be declared to the mh_Outunit API
- * at the mh_OutunitConnect call. The function can have any name, but the
- * address to the routine should be passed in the mh_OutunitConnect call.
- * @param pwr_tNodeIndex PAMS address of the node of which alarms
- * should be cleared.
- * @return pwr_tStatus - Status return in standard VMS-format.
- */
-typedef pwr_tStatus (*mh_cbOutunitClearAlarmList)(pwr_tNodeIndex);
+  /**
+   * @brief Callback function to clear alarmlist.
+   *
+   * This is a callback function. It should be declared to the mh_Outunit API
+   * at the mh_OutunitConnect call. The function can have any name, but the
+   * address to the routine should be passed in the mh_OutunitConnect call.
+   * @param pwr_tNodeIndex PAMS address of the node of which alarms
+   * should be cleared.
+   * @return pwr_tStatus - Status return in standard VMS-format.
+   */
+  typedef pwr_tStatus (*mh_cbOutunitClearAlarmList)(pwr_tNodeIndex);
 
-/**
- * @brief  Callback function to clear blocklist.
- *
- * @param pwr_tNodeIndex PAMS address of the node of which blocks
- * should be cleared.
- * @return pwr_tStatus - Status return in standard VMS-format.
- */
-typedef pwr_tStatus (*mh_cbOutunitClearBlockList)(pwr_tNodeIndex);
+  /**
+   * @brief  Callback function to clear blocklist.
+   *
+   * @param pwr_tNodeIndex PAMS address of the node of which blocks
+   * should be cleared.
+   * @return pwr_tStatus - Status return in standard VMS-format.
+   */
+  typedef pwr_tStatus (*mh_cbOutunitClearBlockList)(pwr_tNodeIndex);
 
-/**
- * @brief Callback function to handle info messages.
- *
- * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
- * The function can have any name, but the address to the routine should be
- * passed
- * in the mh_OutunitConnect call.
- * The mh_Outunit API calls this function if an info message arrives.
- * @param mh_sMessage Address of an info message.
- * @return pwr_tStatus - Status return in standard VMS-format.
- */
-typedef pwr_tStatus (*mh_cbOutunitInfo)(mh_sMessage*);
+  /**
+   * @brief Callback function to handle info messages.
+   *
+   * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
+   * The function can have any name, but the address to the routine should be
+   * passed
+   * in the mh_OutunitConnect call.
+   * The mh_Outunit API calls this function if an info message arrives.
+   * @param mh_sMessage Address of an info message.
+   * @return pwr_tStatus - Status return in standard VMS-format.
+   */
+  typedef pwr_tStatus (*mh_cbOutunitInfo)(mh_sMessage*);
 
-/**
- * @brief Callback function to handle return messages.
- *
- * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
- * The function can have any name, but the address to the routine should be
- * passed
- * in the mh_OutunitConnect call.
- * The mh_Outunit API calls this function if a return message arrives.
- * @param mh_sReturn Address of a return message.
- * @return pwr_tStatus - Status return in standard VMS-format.
- */
-typedef pwr_tStatus (*mh_cbOutunitReturn)(mh_sReturn*);
+  /**
+   * @brief Callback function to handle return messages.
+   *
+   * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
+   * The function can have any name, but the address to the routine should be
+   * passed
+   * in the mh_OutunitConnect call.
+   * The mh_Outunit API calls this function if a return message arrives.
+   * @param mh_sReturn Address of a return message.
+   * @return pwr_tStatus - Status return in standard VMS-format.
+   */
+  typedef pwr_tStatus (*mh_cbOutunitReturn)(mh_sReturn*);
 
-/**
- * @brief Callback function to handle alarm status messages.
- *
- * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
- * The function can have any name, but the address to the routine should be
- * passed
- * in the mh_OutunitConnect call.
- * The mh_Outunit API calls this function if an alarm status message arrives.
- * @param mh_sAlarmStatus Address of a alarm status message.
- * @return pwr_tStatus - Status return in standard VMS-format.
- */
-typedef pwr_tStatus (*mh_cbOutunitAlarmStatus)(mh_sAlarmStatus*);
+  /**
+   * @brief Callback function to handle alarm status messages.
+   *
+   * It should be declared to the mh_Outunit API at the mh_OutunitConnect call.
+   * The function can have any name, but the address to the routine should be
+   * passed
+   * in the mh_OutunitConnect call.
+   * The mh_Outunit API calls this function if an alarm status message arrives.
+   * @param mh_sAlarmStatus Address of a alarm status message.
+   * @return pwr_tStatus - Status return in standard VMS-format.
+   */
+  typedef pwr_tStatus (*mh_cbOutunitAlarmStatus)(mh_sAlarmStatus*);
 
-/* Exported functions */
+  /* Exported functions */
 
-pwr_tStatus mh_OutunitAck(mh_sEventId* Id);
-pwr_tStatus mh_OutunitBlock(pwr_tObjid Object, mh_eEventPrio Prio);
+  pwr_tStatus mh_OutunitAck(mh_sEventId* Id);
+  pwr_tStatus mh_OutunitBlock(pwr_tObjid Object, mh_eEventPrio Prio);
 
-pwr_tStatus mh_OutunitConnect(
-    pwr_tObjid Outunit, mh_eOutunitType Type, mh_mOutunitFlags Flags,
-    mh_cbOutunitAck Callback_Ack, mh_cbOutunitAlarm Callback_Alarm,
-    mh_cbOutunitBlock Callback_Block, mh_cbOutunitCancel Callback_Cancel,
-    mh_cbOutunitClearAlarmList Callback_ClearAlarmList,
-    mh_cbOutunitClearBlockList Callback_ClearBlockList,
-    mh_cbOutunitInfo Callback_Info, mh_cbOutunitReturn Callback_Return,
-    mh_cbOutunitAlarmStatus Callback_AlarmStatus
+  pwr_tStatus mh_OutunitConnect(pwr_tObjid Outunit, mh_eOutunitType Type, mh_mOutunitFlags Flags,
+                                mh_cbOutunitAck Callback_Ack, mh_cbOutunitAlarm Callback_Alarm,
+                                mh_cbOutunitBlock Callback_Block, mh_cbOutunitCancel Callback_Cancel,
+                                mh_cbOutunitClearAlarmList Callback_ClearAlarmList,
+                                mh_cbOutunitClearBlockList Callback_ClearBlockList,
+                                mh_cbOutunitInfo Callback_Info, mh_cbOutunitReturn Callback_Return,
+                                mh_cbOutunitAlarmStatus Callback_AlarmStatus
 
-    );
-pwr_tStatus mh_OutunitDisconnect();
-pwr_tStatus mh_OutunitReceive();
+  );
+  pwr_tStatus mh_OutunitDisconnect();
+  pwr_tStatus mh_OutunitReceive();
 
-/* Sets the timeout time in ms for mh_OutunitReceive.
- * This routine must be called before mh_OutunitReceive.
- * An negative number means wait forever
- */
-pwr_tStatus mh_OutunitSetTimeout(int Timeout);
+  /* Sets the timeout time in ms for mh_OutunitReceive.
+   * This routine must be called before mh_OutunitReceive.
+   * An negative number means wait forever
+   */
+  pwr_tStatus mh_OutunitSetTimeout(int Timeout);
 
-pwr_tStatus mh_OutunitUpdate();
+  pwr_tStatus mh_OutunitUpdate();
 
-pwr_tStatus mh_OutunitAlarmRequest(mh_sOutunitAlarmReq* msg);
+  pwr_tStatus mh_OutunitAlarmRequest(mh_sOutunitAlarmReq* msg);
 
 /** @} */
 #if defined __cplusplus

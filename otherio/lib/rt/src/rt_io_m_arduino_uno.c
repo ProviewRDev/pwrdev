@@ -62,7 +62,8 @@
 #define AI_MAX_SIZE 4
 #define AO_MAX_SIZE 4
 
-typedef enum {
+typedef enum
+{
   ard_eMsgType_No = 0,
   ard_eMsgType_DoWrite = 1,
   ard_eMsgType_DiRead = 2,
@@ -77,7 +78,8 @@ typedef enum {
   ard_eMsgType_ConnectRes = 11
 } ard_eMsgType;
 
-typedef struct {
+typedef struct
+{
   pwr_tTime ErrTime;
   int fd;
   int DiSize;
@@ -121,7 +123,8 @@ typedef struct {
 #define ARD__NOMSG 14
 #define ARD__CHECKSUM 16
 
-typedef struct {
+typedef struct
+{
   unsigned char size __attribute__((aligned(1)));
   unsigned char id __attribute__((aligned(1)));
   unsigned char type __attribute__((aligned(1)));
@@ -130,8 +133,7 @@ typedef struct {
 
 static void add_checksum(void* buf);
 static int check_checksum(void* buf);
-static int receive(int fd, int id, ard_sMsg* rmsg, int size, float tmo,
-    pwr_sClass_Arduino_Uno* op);
+static int receive(int fd, int id, ard_sMsg* rmsg, int size, float tmo, pwr_sClass_Arduino_Uno* op);
 
 static int close_device(io_sLocal* local)
 {
@@ -139,17 +141,16 @@ static int close_device(io_sLocal* local)
   return IO__SUCCESS;
 }
 
-static int open_device(
-    io_sLocal* local, pwr_sClass_Arduino_Uno* op, io_sCard* cp)
+static int open_device(io_sLocal* local, pwr_sClass_Arduino_Uno* op, io_sCard* cp)
 {
   struct termios tty_attributes;
   int sts;
 
   // Open device
   local->fd = open(op->Device, O_RDWR | O_NDELAY | O_NOCTTY);
-  if (local->fd == -1) {
-    errh_Error(
-        "IO Init Card '%s', unable to open device %s", cp->Name, op->Device);
+  if (local->fd == -1)
+  {
+    errh_Error("IO Init Card '%s', unable to open device %s", cp->Name, op->Device);
     op->Status = pwr_eArduino_StatusEnum_NoSuchDevice;
     return IO__INITFAIL;
   }
@@ -158,7 +159,8 @@ static int open_device(
 #if defined OS_LINUX
   tty_attributes.c_cflag &= ~CBAUD; // maska bort all hastighet
 #endif
-  switch (op->BaudRate) {
+  switch (op->BaudRate)
+  {
   case 300:
     tty_attributes.c_cflag |= B300;
     break;
@@ -193,15 +195,14 @@ static int open_device(
 
   tty_attributes.c_iflag &= ~(BRKINT | ICRNL | IMAXBEL | HUPCL | IXON);
   tty_attributes.c_oflag &= ~(OPOST | ONLCR);
-  tty_attributes.c_lflag
-      &= ~(ISIG | ICANON | IEXTEN | ECHO | ECHOE | ECHOK | ECHOCTL | ECHOKE);
+  tty_attributes.c_lflag &= ~(ISIG | ICANON | IEXTEN | ECHO | ECHOE | ECHOK | ECHOCTL | ECHOKE);
   tty_attributes.c_cc[VMIN] = 1;
   tty_attributes.c_cc[VTIME] = 0;
   tty_attributes.c_cc[VEOF] = 1;
   sts = tcsetattr(local->fd, TCSANOW, &tty_attributes);
-  if (sts < 0) {
-    errh_Error("IO Init Card '%s', unable to set baud rate on device %s",
-        cp->Name, op->Device);
+  if (sts < 0)
+  {
+    errh_Error("IO Init Card '%s', unable to set baud rate on device %s", cp->Name, op->Device);
     op->Status = pwr_eArduino_StatusEnum_DeviceSetupError;
     return IO__INITFAIL;
   }
@@ -213,8 +214,7 @@ static int open_device(
   return IO__SUCCESS;
 }
 
-static int send_configuration(
-    io_sLocal* local, pwr_sClass_Arduino_Uno* op, io_sCard* cp)
+static int send_configuration(io_sLocal* local, pwr_sClass_Arduino_Uno* op, io_sCard* cp)
 {
   unsigned char wdg;
   int i;
@@ -225,7 +225,8 @@ static int send_configuration(
     wdg = 0;
   else if (op->WatchdogTime > 255)
     wdg = 255;
-  else {
+  else
+  {
     wdg = op->WatchdogTime * 10;
     if (wdg < 1)
       wdg = 1;
@@ -270,9 +271,12 @@ static int send_configuration(
   sts = write(local->fd, &msg, msg.size);
 
   sts = receive(local->fd, msg.id, &rmsg, 1, op->Timeout, op);
-  if (sts & 1) {
+  if (sts & 1)
+  {
     op->Status = rmsg.data[0];
-  } else {
+  }
+  else
+  {
     errh_Error("IO Init Card '%s', config error: %d", cp->Name, sts);
     op->Status = sts;
     if (sts == pwr_eArduino_StatusEnum_NoMessage)
@@ -283,8 +287,7 @@ static int send_configuration(
   return IO__SUCCESS;
 }
 
-static int send_connect_request(
-    io_sLocal* local, pwr_sClass_Arduino_Uno* op, io_sCard* cp)
+static int send_connect_request(io_sLocal* local, pwr_sClass_Arduino_Uno* op, io_sCard* cp)
 {
   int sts;
 
@@ -301,24 +304,25 @@ static int send_connect_request(
   sts = write(local->fd, &msg, msg.size);
 
   sts = receive(local->fd, msg.id, &rmsg, 23, op->Timeout, op);
-  if (sts & 1) {
+  if (sts & 1)
+  {
     if (rmsg.type != ard_eMsgType_ConnectRes)
       return IO__INITFAIL;
 
     op->Status = rmsg.data[0];
     local->VersionMajor = rmsg.data[1];
     local->VersionMinor = rmsg.data[2];
-    snprintf(op->FirmwareVersion, sizeof(op->FirmwareVersion), "%s",
-        (char*)&rmsg.data[3]);
-  } else {
+    snprintf(op->FirmwareVersion, sizeof(op->FirmwareVersion), "%s", (char*)&rmsg.data[3]);
+  }
+  else
+  {
     return IO__INITFAIL;
   }
 
   return IO__SUCCESS;
 }
 
-static int open_and_connect(
-    io_sLocal* local, pwr_sClass_Arduino_Uno* op, io_sCard* cp)
+static int open_and_connect(io_sLocal* local, pwr_sClass_Arduino_Uno* op, io_sCard* cp)
 {
   int sts;
 
@@ -326,7 +330,8 @@ static int open_and_connect(
   if (EVEN(sts))
     return sts;
 
-  if (op->Options & pwr_mArduino_OptionsMask_ConnectionRequest) {
+  if (op->Options & pwr_mArduino_OptionsMask_ConnectionRequest)
+  {
     sts = send_connect_request(local, op, cp);
     if (EVEN(sts))
       return sts;
@@ -368,17 +373,19 @@ static int check_checksum(void* buf)
 
 static void get_tv(struct timeval* tv, float t)
 {
-  if (t < FLT_EPSILON) {
+  if (t < FLT_EPSILON)
+  {
     tv->tv_sec = 1;
     tv->tv_usec = 0;
-  } else {
+  }
+  else
+  {
     tv->tv_sec = t;
     tv->tv_usec = (t - (float)tv->tv_sec) * 1000000;
   }
 }
 
-static int receive(int fd, int id, ard_sMsg* rmsg, int size, float tmo,
-    pwr_sClass_Arduino_Uno* op)
+static int receive(int fd, int id, ard_sMsg* rmsg, int size, float tmo, pwr_sClass_Arduino_Uno* op)
 {
   fd_set rfd;
   struct timeval tv;
@@ -391,7 +398,8 @@ static int receive(int fd, int id, ard_sMsg* rmsg, int size, float tmo,
 
   FD_ZERO(&rfd);
   FD_SET(fd, &rfd);
-  while (1) {
+  while (1)
+  {
     get_tv(&tv, tmo);
     sts = select(fd + 1, &rfd, NULL, NULL, &tv);
     if (sts == 0)
@@ -404,7 +412,8 @@ static int receive(int fd, int id, ard_sMsg* rmsg, int size, float tmo,
     if (msize == 0)
       return ARD__NOMSG;
 
-    while (msize < rmsg->size) {
+    while (msize < rmsg->size)
+    {
       get_tv(&tv, tmo);
       sts = select(fd + 1, &rfd, NULL, NULL, &tv);
       if (sts == 0)
@@ -419,16 +428,20 @@ static int receive(int fd, int id, ard_sMsg* rmsg, int size, float tmo,
       // logg( "Receive read ++");
     }
 
-    if (rmsg->type == ard_eMsgType_Debug) {
+    if (rmsg->type == ard_eMsgType_Debug)
+    {
       int i;
-      printf("Debug (id %d, size %d, type %d): ", rmsg->id, rmsg->size - 3,
-          rmsg->type);
+      printf("Debug (id %d, size %d, type %d): ", rmsg->id, rmsg->size - 3, rmsg->type);
       for (i = 0; i < rmsg->size - 3; i++)
         printf("%u ", rmsg->data[i]);
       printf("\n");
-    } else {
-      if (rmsg->size == size + 3 && rmsg->id == id) {
-        if (op->Options & pwr_mArduino_OptionsMask_Checksum) {
+    }
+    else
+    {
+      if (rmsg->size == size + 3 && rmsg->id == id)
+      {
+        if (op->Options & pwr_mArduino_OptionsMask_Checksum)
+        {
           if (!check_checksum(rmsg))
             return ARD__CHECKSUM;
 
@@ -441,8 +454,7 @@ static int receive(int fd, int id, ard_sMsg* rmsg, int size, float tmo,
   return ARD__NOMSG;
 }
 
-static int apoll(ard_sMsg* msg, io_sLocal* local, ard_eMsgType mtype,
-    pwr_sClass_Arduino_Uno* op)
+static int apoll(ard_sMsg* msg, io_sLocal* local, ard_eMsgType mtype, pwr_sClass_Arduino_Uno* op)
 {
   int sts;
 
@@ -465,8 +477,7 @@ static int apoll(ard_sMsg* msg, io_sLocal* local, ard_eMsgType mtype,
   return sts;
 }
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local;
   pwr_sClass_Arduino_Uno* op = (pwr_sClass_Arduino_Uno*)cp->op;
@@ -480,59 +491,77 @@ static pwr_tStatus IoCardInit(
   cp->Local = local;
   local->IdCnt = 1;
 
-  for (i = 0; i < cp->ChanListSize; i++) {
-    if (cp->chanlist[i].cop && cp->chanlist[i].sop
-        && cp->chanlist[i].ChanClass == pwr_cClass_ChanDi) {
+  for (i = 0; i < cp->ChanListSize; i++)
+  {
+    if (cp->chanlist[i].cop && cp->chanlist[i].sop && cp->chanlist[i].ChanClass == pwr_cClass_ChanDi)
+    {
       number = ((pwr_sClass_ChanDi*)cp->chanlist[i].cop)->Number;
       number_byte = number / 8;
       number_bit = number % 8;
-      if (number_byte >= D_MAX_SIZE) {
+      if (number_byte >= D_MAX_SIZE)
+      {
         errh_Error("IO Init Card '%s', max number exceeded", cp->Name);
         op->Status = pwr_eArduino_StatusEnum_DiConfigureError;
         return IO__INITFAIL;
-      } else if (local->DChanList[number]) {
+      }
+      else if (local->DChanList[number])
+      {
         errh_Error("IO Init Card '%s', number already configured", cp->Name);
         op->Status = pwr_eArduino_StatusEnum_DiConfigureError;
         return IO__INITFAIL;
-      } else {
+      }
+      else
+      {
         if (local->DiSize < number_byte + 1)
           local->DiSize = number_byte + 1;
         local->DiMask[number_byte] |= 1 << number_bit;
         local->DChanList[number] = &cp->chanlist[i];
       }
-    } else if (cp->chanlist[i].cop && cp->chanlist[i].sop
-        && cp->chanlist[i].ChanClass == pwr_cClass_ChanDo) {
+    }
+    else if (cp->chanlist[i].cop && cp->chanlist[i].sop && cp->chanlist[i].ChanClass == pwr_cClass_ChanDo)
+    {
       number = ((pwr_sClass_ChanDo*)cp->chanlist[i].cop)->Number;
       number_byte = number / 8;
       number_bit = number % 8;
-      if (number_byte >= D_MAX_SIZE) {
+      if (number_byte >= D_MAX_SIZE)
+      {
         errh_Error("IO Init Card '%s', max number exceeded", cp->Name);
         op->Status = pwr_eArduino_StatusEnum_DoConfigureError;
         return IO__INITFAIL;
-      } else if (local->DChanList[number]) {
+      }
+      else if (local->DChanList[number])
+      {
         errh_Error("IO Init Card '%s', number already configured", cp->Name);
         op->Status = pwr_eArduino_StatusEnum_DoConfigureError;
         return IO__INITFAIL;
-      } else {
+      }
+      else
+      {
         if (local->DoSize < number_byte + 1)
           local->DoSize = number_byte + 1;
         local->DoMask[number_byte] |= 1 << number_bit;
         local->DChanList[number] = &cp->chanlist[i];
       }
-    } else if (cp->chanlist[i].cop && cp->chanlist[i].sop
-        && cp->chanlist[i].ChanClass == pwr_cClass_ChanAi) {
+    }
+    else if (cp->chanlist[i].cop && cp->chanlist[i].sop && cp->chanlist[i].ChanClass == pwr_cClass_ChanAi)
+    {
       number = ((pwr_sClass_ChanAi*)cp->chanlist[i].cop)->Number;
       number_byte = number / 8;
       number_bit = number % 8;
-      if (number_byte >= AI_MAX_SIZE) {
+      if (number_byte >= AI_MAX_SIZE)
+      {
         errh_Error("IO Init Card '%s', max number exceeded", cp->Name);
         op->Status = pwr_eArduino_StatusEnum_AiConfigureError;
         return IO__INITFAIL;
-      } else if (local->AiChanList[number]) {
+      }
+      else if (local->AiChanList[number])
+      {
         errh_Error("IO Init Card '%s', number already configured", cp->Name);
         op->Status = pwr_eArduino_StatusEnum_AiConfigureError;
         return IO__INITFAIL;
-      } else {
+      }
+      else
+      {
         if (local->AiSize < number_byte + 1)
           local->AiSize = number_byte + 1;
         local->AiMask[number_byte] |= 1 << number_bit;
@@ -542,20 +571,26 @@ static pwr_tStatus IoCardInit(
         // Calculate conversion coefficients
         io_AiRangeToCoef(&cp->chanlist[i]);
       }
-    } else if (cp->chanlist[i].cop && cp->chanlist[i].sop
-        && cp->chanlist[i].ChanClass == pwr_cClass_ChanAo) {
+    }
+    else if (cp->chanlist[i].cop && cp->chanlist[i].sop && cp->chanlist[i].ChanClass == pwr_cClass_ChanAo)
+    {
       number = ((pwr_sClass_ChanAo*)cp->chanlist[i].cop)->Number;
       number_byte = number / 8;
       number_bit = number % 8;
-      if (number_byte >= AO_MAX_SIZE) {
+      if (number_byte >= AO_MAX_SIZE)
+      {
         errh_Error("IO Init Card '%s', max number exceeded", cp->Name);
         op->Status = pwr_eArduino_StatusEnum_AoConfigureError;
         return IO__INITFAIL;
-      } else if (local->AoChanList[number]) {
+      }
+      else if (local->AoChanList[number])
+      {
         errh_Error("IO Init Card '%s', number already configured", cp->Name);
         op->Status = pwr_eArduino_StatusEnum_AoConfigureError;
         return IO__INITFAIL;
-      } else {
+      }
+      else
+      {
         if (local->AoSize < number_byte + 1)
           local->AoSize = number_byte + 1;
         local->AoMask[number_byte] |= 1 << number_bit;
@@ -577,8 +612,7 @@ static pwr_tStatus IoCardInit(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local = cp->Local;
 
@@ -590,8 +624,7 @@ static pwr_tStatus IoCardClose(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local = cp->Local;
   pwr_sClass_Arduino_Uno* op = (pwr_sClass_Arduino_Uno*)cp->op;
@@ -607,21 +640,25 @@ static pwr_tStatus IoCardRead(
   if (local->Reopendev || local->Reconnect)
     return IO__SUCCESS;
 
-  if (local->ReceiveWriteRespons) {
+  if (local->ReceiveWriteRespons)
+  {
     local->ReceiveWriteRespons = 0;
   }
 
-  if (local->AiSize) {
+  if (local->AiSize)
+  {
     skip_ai = 0;
 
-    if (op->AiScanInterval > 1) {
+    if (op->AiScanInterval > 1)
+    {
       skip_ai = local->AiIntervalCnt;
 
       local->AiIntervalCnt++;
       if (local->AiIntervalCnt >= op->AiScanInterval)
         local->AiIntervalCnt = 0;
     }
-  } else
+  }
+  else
     skip_ai = 1;
 
   if (local->DiSize && skip_ai)
@@ -640,7 +677,8 @@ static pwr_tStatus IoCardRead(
 
   local->DiPendingPoll = 0;
 
-  if (mtype == ard_eMsgType_ReadAll) {
+  if (mtype == ard_eMsgType_ReadAll)
+  {
     // Both Ai and Di
 
     ard_sMsg rmsg;
@@ -650,22 +688,27 @@ static pwr_tStatus IoCardRead(
     pwr_tInt32 ivalue;
     pwr_tFloat32 actvalue;
 
-    sts = receive(local->fd, local->DiPollId, &rmsg,
-        local->DiSize + local->AiNum * 2, op->Timeout, op);
+    sts = receive(local->fd, local->DiPollId, &rmsg, local->DiSize + local->AiNum * 2, op->Timeout, op);
     op->Status = sts;
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       op->ErrorCount++;
-      if (sts == ARD__NOMSG
-          && op->Options & pwr_mArduino_OptionsMask_SerialPort) {
+      if (sts == ARD__NOMSG && op->Options & pwr_mArduino_OptionsMask_SerialPort)
+      {
         local->Reconnect = 1;
       }
-    } else {
+    }
+    else
+    {
       // printf( "Read: %u %u  (%d)\n", rmsg.data[0], rmsg.data[1], sts);
 
-      for (i = 0; i < local->DiSize; i++) {
-        for (j = 0; j < 8; j++) {
+      for (i = 0; i < local->DiSize; i++)
+      {
+        for (j = 0; j < 8; j++)
+        {
           m = 1 << j;
-          if (local->DiMask[i] & m) {
+          if (local->DiMask[i] & m)
+          {
             chanp = local->DChanList[i * 8 + j];
             pwr_sClass_ChanDi* cop = (pwr_sClass_ChanDi*)chanp->cop;
 
@@ -677,41 +720,45 @@ static pwr_tStatus IoCardRead(
     }
 
     int ai_cnt = 0;
-    for (i = 0; i < local->AiSize; i++) {
-      for (j = 0; j < 8; j++) {
+    for (i = 0; i < local->AiSize; i++)
+    {
+      for (j = 0; j < 8; j++)
+      {
         m = 1 << j;
-        if (local->AiMask[i] & m) {
+        if (local->AiMask[i] & m)
+        {
           io_sChannel* chanp = local->AiChanList[i * 8 + j];
           pwr_sClass_ChanAi* cop = (pwr_sClass_ChanAi*)chanp->cop;
           pwr_sClass_Ai* sop = (pwr_sClass_Ai*)chanp->sop;
 
-          if (cop->ConversionOn) {
+          if (cop->ConversionOn)
+          {
             if (cop->CalculateNewCoef)
               // Request to calculate new coefficients
               io_AiRangeToCoef(chanp);
 
-            ivalue = rmsg.data[local->DiSize + ai_cnt * 2] * 256
-                + rmsg.data[local->DiSize + ai_cnt * 2 + 1];
+            ivalue = rmsg.data[local->DiSize + ai_cnt * 2] * 256 + rmsg.data[local->DiSize + ai_cnt * 2 + 1];
             io_ConvertAi(cop, ivalue, &actvalue);
 
             // Filter
-            if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0
-                && sop->FilterAttribute[0] > ctx->ScanTime) {
-              actvalue = *(pwr_tFloat32*)chanp->vbp
-                  + ctx->ScanTime / sop->FilterAttribute[0]
-                      * (actvalue - *(pwr_tFloat32*)chanp->vbp);
+            if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0 &&
+                sop->FilterAttribute[0] > ctx->ScanTime)
+            {
+              actvalue = *(pwr_tFloat32*)chanp->vbp +
+                         ctx->ScanTime / sop->FilterAttribute[0] * (actvalue - *(pwr_tFloat32*)chanp->vbp);
             }
 
             *(pwr_tFloat32*)chanp->vbp = actvalue;
-            sop->SigValue
-                = cop->SigValPolyCoef1 * ivalue + cop->SigValPolyCoef0;
+            sop->SigValue = cop->SigValPolyCoef1 * ivalue + cop->SigValPolyCoef0;
             sop->RawValue = ivalue;
           }
           ai_cnt++;
         }
       }
     }
-  } else if (mtype == ard_eMsgType_DiRead) {
+  }
+  else if (mtype == ard_eMsgType_DiRead)
+  {
     // Only Di, no Ai
 
     ard_sMsg rmsg;
@@ -719,22 +766,27 @@ static pwr_tStatus IoCardRead(
     int i, j;
     unsigned char m;
 
-    sts = receive(
-        local->fd, local->DiPollId, &rmsg, local->DiSize, op->Timeout, op);
+    sts = receive(local->fd, local->DiPollId, &rmsg, local->DiSize, op->Timeout, op);
     op->Status = sts;
-    if (EVEN(sts)) {
-      if (sts == ARD__NOMSG
-          && op->Options & pwr_mArduino_OptionsMask_SerialPort) {
+    if (EVEN(sts))
+    {
+      if (sts == ARD__NOMSG && op->Options & pwr_mArduino_OptionsMask_SerialPort)
+      {
         local->Reconnect = 1;
       }
       op->ErrorCount++;
-    } else {
+    }
+    else
+    {
       // printf( "Read: %u %u  (%d)\n", rmsg.data[0], rmsg.data[1], sts);
 
-      for (i = 0; i < local->DiSize; i++) {
-        for (j = 0; j < 8; j++) {
+      for (i = 0; i < local->DiSize; i++)
+      {
+        for (j = 0; j < 8; j++)
+        {
           m = 1 << j;
-          if (local->DiMask[i] & m) {
+          if (local->DiMask[i] & m)
+          {
             chanp = local->DChanList[i * 8 + j];
             pwr_sClass_ChanDi* cop = (pwr_sClass_ChanDi*)chanp->cop;
 
@@ -744,47 +796,54 @@ static pwr_tStatus IoCardRead(
         }
       }
     }
-  } else if (mtype == ard_eMsgType_AiRead) {
+  }
+  else if (mtype == ard_eMsgType_AiRead)
+  {
     // Only Ai, no Di
 
-    if (!skip_ai) {
+    if (!skip_ai)
+    {
       ard_sMsg rmsg;
       pwr_tInt32 ivalue;
       pwr_tFloat32 actvalue;
 
-      sts = receive(
-          local->fd, local->DiPollId, &rmsg, local->AiNum * 2, op->Timeout, op);
-      if (EVEN(sts)) {
-      } else {
+      sts = receive(local->fd, local->DiPollId, &rmsg, local->AiNum * 2, op->Timeout, op);
+      if (EVEN(sts))
+      {
+      }
+      else
+      {
         int ai_cnt = 0;
-        for (i = 0; i < local->AiSize; i++) {
-          for (j = 0; j < 8; j++) {
+        for (i = 0; i < local->AiSize; i++)
+        {
+          for (j = 0; j < 8; j++)
+          {
             m = 1 << j;
-            if (local->AiMask[i] & m) {
+            if (local->AiMask[i] & m)
+            {
               io_sChannel* chanp = local->AiChanList[i * 8 + j];
               pwr_sClass_ChanAi* cop = (pwr_sClass_ChanAi*)chanp->cop;
               pwr_sClass_Ai* sop = (pwr_sClass_Ai*)chanp->sop;
 
-              if (cop->ConversionOn) {
+              if (cop->ConversionOn)
+              {
                 if (cop->CalculateNewCoef)
                   // Request to calculate new coefficients
                   io_AiRangeToCoef(chanp);
 
-                ivalue
-                    = rmsg.data[ai_cnt * 2] * 256 + rmsg.data[ai_cnt * 2 + 1];
+                ivalue = rmsg.data[ai_cnt * 2] * 256 + rmsg.data[ai_cnt * 2 + 1];
                 io_ConvertAi(cop, ivalue, &actvalue);
 
                 // Filter
-                if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0
-                    && sop->FilterAttribute[0] > ctx->ScanTime) {
-                  actvalue = *(pwr_tFloat32*)chanp->vbp
-                      + ctx->ScanTime / sop->FilterAttribute[0]
-                          * (actvalue - *(pwr_tFloat32*)chanp->vbp);
+                if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0 &&
+                    sop->FilterAttribute[0] > ctx->ScanTime)
+                {
+                  actvalue = *(pwr_tFloat32*)chanp->vbp + ctx->ScanTime / sop->FilterAttribute[0] *
+                                                              (actvalue - *(pwr_tFloat32*)chanp->vbp);
                 }
 
                 *(pwr_tFloat32*)chanp->vbp = actvalue;
-                sop->SigValue
-                    = cop->SigValPolyCoef1 * ivalue + cop->SigValPolyCoef0;
+                sop->SigValue = cop->SigValPolyCoef1 * ivalue + cop->SigValPolyCoef0;
                 sop->RawValue = ivalue;
               }
               ai_cnt++;
@@ -795,13 +854,14 @@ static pwr_tStatus IoCardRead(
     }
   }
 
-  if (op->ErrorCount >= op->ErrorSoftLimit
-      && error_count < op->ErrorSoftLimit) {
+  if (op->ErrorCount >= op->ErrorSoftLimit && error_count < op->ErrorSoftLimit)
+  {
     errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
     ctx->IOHandler->CardErrorSoftLimit = 1;
     ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
   }
-  if (op->ErrorCount >= op->ErrorHardLimit) {
+  if (op->ErrorCount >= op->ErrorHardLimit)
+  {
     errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
     ctx->Node->EmergBreakTrue = 1;
     ctx->IOHandler->CardErrorHardLimit = 1;
@@ -812,8 +872,7 @@ static pwr_tStatus IoCardRead(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local = cp->Local;
   pwr_sClass_Arduino_Uno* op = (pwr_sClass_Arduino_Uno*)cp->op;
@@ -825,59 +884,79 @@ static pwr_tStatus IoCardWrite(
   int skip_ao;
   io_sChannel* chanp;
 
-  if (local->Reopendev) {
+  if (local->Reopendev)
+  {
     local->ReopendevCnt++;
-    if (local->ReopendevCnt * ctx->ScanTime > 5.0) {
+    if (local->ReopendevCnt * ctx->ScanTime > 5.0)
+    {
       close_device(local);
       sts = open_and_connect(local, op, cp);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         local->Reopendev = 1;
         local->ReopendevCnt = 0;
         return IO__SUCCESS;
-      } else
+      }
+      else
         local->Reopendev = 0;
-    } else
+    }
+    else
       return IO__SUCCESS;
-  } else if (local->Reconnect) {
+  }
+  else if (local->Reconnect)
+  {
     local->ReconnectCnt++;
-    if (local->ReconnectCnt * ctx->ScanTime > 5.0) {
-      if (op->Options & pwr_mArduino_OptionsMask_ConnectionRequest) {
+    if (local->ReconnectCnt * ctx->ScanTime > 5.0)
+    {
+      if (op->Options & pwr_mArduino_OptionsMask_ConnectionRequest)
+      {
         sts = send_connect_request(local, op, cp);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           local->Reconnect = 1;
           local->ReconnectCnt = 0;
           return IO__SUCCESS;
-        } else
+        }
+        else
           local->Reconnect = 0;
-      } else
+      }
+      else
         local->Reconnect = 0;
-    } else
+    }
+    else
       return IO__SUCCESS;
   }
 
-  if (local->AoSize) {
+  if (local->AoSize)
+  {
     skip_ao = 0;
 
-    if (op->AoScanInterval > 1) {
+    if (op->AoScanInterval > 1)
+    {
       skip_ao = local->AoIntervalCnt;
 
       local->AoIntervalCnt++;
       if (local->AoIntervalCnt >= op->AoScanInterval)
         local->AoIntervalCnt = 0;
     }
-  } else
+  }
+  else
     skip_ao = 1;
 
-  if (local->DoSize && skip_ao) {
+  if (local->DoSize && skip_ao)
+  {
     memset(&msg, 0, sizeof(msg));
     msg.size = local->DoSize + 3;
     msg.id = local->IdCnt++;
     msg.type = ard_eMsgType_DoWrite;
 
-    for (i = 0; i < local->DoSize; i++) {
-      for (j = 0; j < 8; j++) {
+    for (i = 0; i < local->DoSize; i++)
+    {
+      for (j = 0; j < 8; j++)
+      {
         m = 1 << j;
-        if (local->DoMask[i] & m) {
+        if (local->DoMask[i] & m)
+        {
           chanp = local->DChanList[i * 8 + j];
           pwr_sClass_ChanDo* cop = (pwr_sClass_ChanDo*)chanp->cop;
           pwr_tInt32 do_actval;
@@ -898,12 +977,16 @@ static pwr_tStatus IoCardWrite(
       add_checksum(&msg);
 
     sts = write(local->fd, &msg, msg.size);
-    if (sts > 0) {
+    if (sts > 0)
+    {
       local->ReceiveWriteRespons = 1;
       local->WriteId = msg.id;
     }
-  } else if (local->AoSize && !local->DoSize) {
-    if (!skip_ao) {
+  }
+  else if (local->AoSize && !local->DoSize)
+  {
+    if (!skip_ao)
+    {
       ard_sMsg msg;
       int value;
 
@@ -916,10 +999,13 @@ static pwr_tStatus IoCardWrite(
       msg.type = ard_eMsgType_AoWrite;
 
       int ao_cnt = 0;
-      for (i = 0; i < local->AoSize; i++) {
-        for (j = 0; j < 8; j++) {
+      for (i = 0; i < local->AoSize; i++)
+      {
+        for (j = 0; j < 8; j++)
+        {
           m = 1 << j;
-          if (local->AoMask[i] & m) {
+          if (local->AoMask[i] & m)
+          {
             io_sChannel* chanp = local->AoChanList[i * 8 + j];
             pwr_sClass_ChanAo* cop = (pwr_sClass_ChanAo*)chanp->cop;
             pwr_sClass_Ao* sop = (pwr_sClass_Ao*)chanp->sop;
@@ -931,10 +1017,10 @@ static pwr_tStatus IoCardWrite(
             if (cop->TestOn)
               value = round(cop->TestValue * cop->OutPolyCoef1 + cop->OutPolyCoef0);
             else
-              value = round(*(pwr_tFloat32*)chanp->vbp * cop->OutPolyCoef1
-			    + cop->OutPolyCoef0);
+              value = round(*(pwr_tFloat32*)chanp->vbp * cop->OutPolyCoef1 + cop->OutPolyCoef0);
 
-            if (op->Options & pwr_mArduino_OptionsMask_Ao16Bit) {
+            if (op->Options & pwr_mArduino_OptionsMask_Ao16Bit)
+            {
               if (value < 0)
                 value = 0;
               else if (value > 65535)
@@ -942,7 +1028,9 @@ static pwr_tStatus IoCardWrite(
 
               msg.data[ao_cnt * 2] = value / 256;
               msg.data[ao_cnt * 2 + 1] = value % 256;
-            } else {
+            }
+            else
+            {
               if (value < 0)
                 value = 0;
               else if (value > 255)
@@ -951,8 +1039,7 @@ static pwr_tStatus IoCardWrite(
               msg.data[ao_cnt] = value;
             }
 
-            sop->SigValue = cop->SigValPolyCoef1 * *(pwr_tFloat32*)chanp->vbp
-                + cop->SigValPolyCoef0;
+            sop->SigValue = cop->SigValPolyCoef1 * *(pwr_tFloat32*)chanp->vbp + cop->SigValPolyCoef0;
             sop->RawValue = value;
             ao_cnt++;
           }
@@ -964,12 +1051,15 @@ static pwr_tStatus IoCardWrite(
         add_checksum(&msg);
 
       sts = write(local->fd, &msg, msg.size);
-      if (sts > 0) {
+      if (sts > 0)
+      {
         local->ReceiveWriteRespons = 1;
         local->WriteId = msg.id;
       }
     }
-  } else if (local->DoSize && !skip_ao) {
+  }
+  else if (local->DoSize && !skip_ao)
+  {
     memset(&msg, 0, sizeof(msg));
     if (op->Options & pwr_mArduino_OptionsMask_Ao16Bit)
       msg.size = local->DoSize + local->AoNum * 2 + 3;
@@ -978,10 +1068,13 @@ static pwr_tStatus IoCardWrite(
     msg.id = local->IdCnt++;
     msg.type = ard_eMsgType_WriteAll;
 
-    for (i = 0; i < local->DoSize; i++) {
-      for (j = 0; j < 8; j++) {
+    for (i = 0; i < local->DoSize; i++)
+    {
+      for (j = 0; j < 8; j++)
+      {
         m = 1 << j;
-        if (local->DoMask[i] & m) {
+        if (local->DoMask[i] & m)
+        {
           chanp = local->DChanList[i * 8 + j];
           pwr_sClass_ChanDo* cop = (pwr_sClass_ChanDo*)chanp->cop;
           pwr_tInt32 do_actval;
@@ -1000,10 +1093,13 @@ static pwr_tStatus IoCardWrite(
     int value;
 
     int ao_cnt = 0;
-    for (i = 0; i < local->AoSize; i++) {
-      for (j = 0; j < 8; j++) {
+    for (i = 0; i < local->AoSize; i++)
+    {
+      for (j = 0; j < 8; j++)
+      {
         m = 1 << j;
-        if (local->AoMask[i] & m) {
+        if (local->AoMask[i] & m)
+        {
           io_sChannel* chanp = local->AoChanList[i * 8 + j];
           pwr_sClass_ChanAo* cop = (pwr_sClass_ChanAo*)chanp->cop;
           pwr_sClass_Ao* sop = (pwr_sClass_Ao*)chanp->sop;
@@ -1013,13 +1109,12 @@ static pwr_tStatus IoCardWrite(
             io_AoRangeToCoef(chanp);
 
           if (cop->TestOn)
-            value
-	      = round(cop->TestValue * cop->OutPolyCoef1 + cop->OutPolyCoef0);
+            value = round(cop->TestValue * cop->OutPolyCoef1 + cop->OutPolyCoef0);
           else
-            value = round(*(pwr_tFloat32*)chanp->vbp * cop->OutPolyCoef1
-			  + cop->OutPolyCoef0);
+            value = round(*(pwr_tFloat32*)chanp->vbp * cop->OutPolyCoef1 + cop->OutPolyCoef0);
 
-          if (op->Options & pwr_mArduino_OptionsMask_Ao16Bit) {
+          if (op->Options & pwr_mArduino_OptionsMask_Ao16Bit)
+          {
             if (value < 0)
               value = 0;
             else if (value > 65535)
@@ -1027,7 +1122,9 @@ static pwr_tStatus IoCardWrite(
 
             msg.data[local->DoSize + ao_cnt * 2] = value / 256;
             msg.data[local->DoSize + ao_cnt * 2 + 1] = value % 256;
-          } else {
+          }
+          else
+          {
             if (value < 0)
               value = 0;
             else if (value > 255)
@@ -1041,8 +1138,7 @@ static pwr_tStatus IoCardWrite(
           else if (value > 255)
             value = 255;
 
-          sop->SigValue = cop->SigValPolyCoef1 * *(pwr_tFloat32*)chanp->vbp
-              + cop->SigValPolyCoef0;
+          sop->SigValue = cop->SigValPolyCoef1 * *(pwr_tFloat32*)chanp->vbp + cop->SigValPolyCoef0;
           sop->RawValue = value;
           ao_cnt++;
         }
@@ -1054,25 +1150,28 @@ static pwr_tStatus IoCardWrite(
       add_checksum(&msg);
 
     sts = write(local->fd, &msg, msg.size);
-    if (sts > 0) {
+    if (sts > 0)
+    {
       local->ReceiveWriteRespons = 1;
       local->WriteId = msg.id;
     }
   }
-  if (sts < 0) {
+  if (sts < 0)
+  {
     /* Connection lost, open device again */
     local->Reopendev = 1;
     local->ReopendevCnt = 0;
     return IO__SUCCESS;
   }
 
-  if (op->ErrorCount >= op->ErrorSoftLimit
-      && error_count < op->ErrorSoftLimit) {
+  if (op->ErrorCount >= op->ErrorSoftLimit && error_count < op->ErrorSoftLimit)
+  {
     errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
     ctx->IOHandler->CardErrorSoftLimit = 1;
     ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
   }
-  if (op->ErrorCount >= op->ErrorHardLimit) {
+  if (op->ErrorCount >= op->ErrorHardLimit)
+  {
     errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
     ctx->Node->EmergBreakTrue = 1;
     ctx->IOHandler->CardErrorHardLimit = 1;
@@ -1080,17 +1179,20 @@ static pwr_tStatus IoCardWrite(
     return IO__ERRDEVICE;
   }
 
-  if (op->Options & pwr_mArduino_OptionsMask_OptimizedDiPoll) {
+  if (op->Options & pwr_mArduino_OptionsMask_OptimizedDiPoll)
+  {
     ard_sMsg msg;
     int skip_ai;
     ard_eMsgType mtype;
 
-    if (local->AiSize) {
+    if (local->AiSize)
+    {
       skip_ai = 0;
 
       if (op->AiScanInterval > 1)
         skip_ai = local->AiIntervalCnt;
-    } else
+    }
+    else
       skip_ai = 1;
 
     if (local->DiSize && skip_ai)
@@ -1110,6 +1212,6 @@ static pwr_tStatus IoCardWrite(
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(Arduino_Uno) = { pwr_BindIoMethod(IoCardInit),
-  pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead),
-  pwr_BindIoMethod(IoCardWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Arduino_Uno) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                              pwr_BindIoMethod(IoCardRead), pwr_BindIoMethod(IoCardWrite),
+                                              pwr_NullMethod};

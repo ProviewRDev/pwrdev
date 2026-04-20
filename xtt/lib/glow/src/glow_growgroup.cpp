@@ -45,8 +45,7 @@
 #include "glow_nodegroup.h"
 #include "glow_msg.h"
 
-GrowGroup::GrowGroup(
-    GrowCtx* glow_ctx, const char* name, GlowArray& array, int nodraw)
+GrowGroup::GrowGroup(GrowCtx* glow_ctx, const char* name, GlowArray& array, int nodraw)
     : GrowNode(glow_ctx, name, 0, 0, 0, nodraw, 0)
 {
   object_type = glow_eObjectType_GrowGroup;
@@ -55,8 +54,7 @@ GrowGroup::GrowGroup(
   get_node_borders();
 }
 
-GrowGroup::GrowGroup(GrowCtx* glow_ctx, const char* name)
-    : GrowNode(glow_ctx, name, 0, 0, 0)
+GrowGroup::GrowGroup(GrowCtx* glow_ctx, const char* name) : GrowNode(glow_ctx, name, 0, 0, 0)
 {
   object_type = glow_eObjectType_GrowGroup;
 }
@@ -77,8 +75,9 @@ GrowGroup::~GrowGroup()
 
 void GrowGroup::copy_from(const GrowGroup& n)
 {
-  memcpy((void *)this, (void *)&n, sizeof(n));
-  if (n.dynamicsize) {
+  memcpy((void*)this, (void*)&n, sizeof(n));
+  if (n.dynamicsize)
+  {
     dynamic = (char*)calloc(1, n.dynamicsize);
     memcpy(dynamic, n.nc->dynamic, n.dynamicsize);
   }
@@ -89,8 +88,7 @@ void GrowGroup::copy_from(const GrowGroup& n)
   nc->a.set_parent(this);
 
   if (ctx->userdata_copy_callback)
-    (ctx->userdata_copy_callback)(
-        this, user_data, &user_data, glow_eUserdataCbType_Node);
+    (ctx->userdata_copy_callback)(this, user_data, &user_data, glow_eUserdataCbType_Node);
 }
 
 void GrowGroup::ungroup()
@@ -99,7 +97,7 @@ void GrowGroup::ungroup()
   ((GlowNodeGroup*)nc)->ungroup(&trf);
 }
 
-void GrowGroup::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowGroup::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowGroup) << '\n';
   fp << int(glow_eSave_GrowGroup_grownode_part) << '\n';
@@ -109,21 +107,24 @@ void GrowGroup::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowGroup::open(std::ifstream& fp)
+void GrowGroup::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowGroup: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowGroup:
       break;
     case glow_eSave_GrowGroup_grownode_part:
@@ -150,10 +151,10 @@ int GrowGroup::trace_scan()
 {
   int sts;
 
-  if (trace.p && ctx->trace_scan_func) {
+  if (trace.p && ctx->trace_scan_func)
+  {
     sts = ctx->trace_scan_func((void*)this, trace.p);
-    if (sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED
-        || sts == GLOW__SWAPTERMINATED)
+    if (sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED)
       return sts;
   }
 
@@ -191,11 +192,15 @@ int GrowGroup::get_object_group(GlowArrayElem* object, GlowArrayElem** group)
 {
   int sts;
 
-  for (int i = 0; i < nc->a.size(); i++) {
-    if (nc->a[i] == object) {
+  for (int i = 0; i < nc->a.size(); i++)
+  {
+    if (nc->a[i] == object)
+    {
       *group = this;
       return 1;
-    } else if (nc->a[i]->type() == glow_eObjectType_GrowGroup) {
+    }
+    else if (nc->a[i]->type() == glow_eObjectType_GrowGroup)
+    {
       sts = ((GrowGroup*)nc->a[i])->get_object_group(object, group);
       if (ODD(sts))
         return sts;
@@ -204,19 +209,19 @@ int GrowGroup::get_object_group(GlowArrayElem* object, GlowArrayElem** group)
   return 0;
 }
 
-int GrowGroup::get_background_object_limits(GlowTransform* t,
-    glow_eTraceType type, double x, double y, GlowArrayElem** background,
-    double* min, double* max, glow_eDirection* direction)
+int GrowGroup::get_background_object_limits(GlowTransform* t, glow_eTraceType type, double x, double y,
+                                            GlowArrayElem** background, double* min, double* max,
+                                            glow_eDirection* direction)
 {
   int sts;
 
-  if (t) {
+  if (t)
+  {
     GlowTransform trf_tot = *t * trf;
-    sts = nc->a.get_background_object_limits(
-        &trf_tot, type, x, y, background, min, max, direction);
-  } else
-    sts = nc->a.get_background_object_limits(
-        &trf, type, x, y, background, min, max, direction);
+    sts = nc->a.get_background_object_limits(&trf_tot, type, x, y, background, min, max, direction);
+  }
+  else
+    sts = nc->a.get_background_object_limits(&trf, type, x, y, background, min, max, direction);
   return sts;
 }
 
@@ -224,13 +229,14 @@ GlowArrayElem* GrowGroup::get_node_from_name(char* name)
 {
   int i;
 
-  for (i = 0; i < nc->a.a_size; i++) {
-    if ((nc->a.a[i]->type() == glow_eObjectType_Node
-            || nc->a.a[i]->type() == glow_eObjectType_GrowNode
-            || nc->a.a[i]->type() == glow_eObjectType_GrowConGlue)
-        && streq(((GlowNode*)nc->a.a[i])->n_name, name))
+  for (i = 0; i < nc->a.a_size; i++)
+  {
+    if ((nc->a.a[i]->type() == glow_eObjectType_Node || nc->a.a[i]->type() == glow_eObjectType_GrowNode ||
+         nc->a.a[i]->type() == glow_eObjectType_GrowConGlue) &&
+        streq(((GlowNode*)nc->a.a[i])->n_name, name))
       return nc->a.a[i];
-    else if (nc->a.a[i]->type() == glow_eObjectType_GrowGroup) {
+    else if (nc->a.a[i]->type() == glow_eObjectType_GrowGroup)
+    {
       GlowArrayElem* n = ((GrowGroup*)nc->a.a[i])->get_node_from_name(name);
       if (n)
         return n;
@@ -243,28 +249,32 @@ void GrowGroup::call_redraw_node_cons()
 {
   ctx->redraw_node_cons(this);
 
-  for (int i = 0; i < nc->a.a_size; i++) {
+  for (int i = 0; i < nc->a.a_size; i++)
+  {
     nc->a.a[i]->call_redraw_node_cons();
   }
 }
 
 void GrowGroup::link_insert(void** start)
 {
-  for (int i = 0; i < nc->a.a_size; i++) {
-    if (nc->a[i]->type() == glow_eObjectType_Node
-        || nc->a[i]->type() == glow_eObjectType_GrowNode
-        || nc->a[i]->type() == glow_eObjectType_GrowGroup)
+  for (int i = 0; i < nc->a.a_size; i++)
+  {
+    if (nc->a[i]->type() == glow_eObjectType_Node || nc->a[i]->type() == glow_eObjectType_GrowNode ||
+        nc->a[i]->type() == glow_eObjectType_GrowGroup)
       nc->a.a[i]->link_insert(start);
   }
 }
 
 void GrowGroup::convert(glow_eConvert version)
 {
-  switch (version) {
-  case glow_eConvert_V34: {
+  switch (version)
+  {
+  case glow_eConvert_V34:
+  {
     // Conversion of colors
     GrowNode::convert(version);
-    for (int i = 0; i < nc->a.a_size; i++) {
+    for (int i = 0; i < nc->a.a_size; i++)
+    {
       nc->a.a[i]->convert(version);
     }
 
@@ -273,10 +283,7 @@ void GrowGroup::convert(glow_eConvert version)
   }
 }
 
-void GrowGroup::set_rootnode(void* node)
-{
-  nc->a.set_rootnode(node);
-}
+void GrowGroup::set_rootnode(void* node) { nc->a.set_rootnode(node); }
 
 int GrowGroup::clear()
 {
@@ -286,7 +293,4 @@ int GrowGroup::clear()
   return 1;
 }
 
-int GrowGroup::export_script(GlowExportScript* es, void* o, void* m)
-{
-  return es->group(this, o, m);
-}
+int GrowGroup::export_script(GlowExportScript* es, void* o, void* m) { return es->group(this, o, m); }

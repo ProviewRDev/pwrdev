@@ -43,12 +43,12 @@
 
 #include "cow_wow_gtk.h"
 
-class GeCurveGtk : public GeCurve {
+class GeCurveGtk : public GeCurve
+{
 public:
-  GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget, char* curve_name,
-      char* filename, GeCurveData* curve_data, int pos_right, int gc_width,
-      int gc_height, unsigned int gc_options, int gc_color_theme,
-      void* basewidget);
+  GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget, char* curve_name, char* filename,
+             GeCurveData* curve_data, int pos_right, int gc_width, int gc_height, unsigned int gc_options,
+             int gc_color_theme, void* basewidget);
   GtkWidget* parent_wid;
   GtkWidget* grow_widget;
   GtkWidget* curve_widget;
@@ -155,10 +155,8 @@ public:
   static void activate_export_ok(GtkWidget* w, gpointer data);
   static void activate_export_cancel(GtkWidget* w, gpointer data);
   static void activate_export_browse(GtkWidget* w, gpointer data);
-  static void export_file_selected_cb(
-      void* ctx, char* filename, wow_eFileSelType file_type);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static void export_file_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
 };
 
 #endif

@@ -44,12 +44,12 @@
 class CoLogin;
 class WAttText;
 
-class WNavGtk : public WNav {
+class WNavGtk : public WNav
+{
 public:
-  WNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name,
-      const char* xn_layout, GtkWidget** w, ldh_tSesContext xn_ldhses,
-      wnav_sStartMenu* root_menu, wnav_eWindowType xn_type,
-      pwr_tStatus* status);
+  WNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name, const char* xn_layout,
+          GtkWidget** w, ldh_tSesContext xn_ldhses, wnav_sStartMenu* root_menu, wnav_eWindowType xn_type,
+          pwr_tStatus* status);
   ~WNavGtk();
 
   GtkWidget* parent_wid;
@@ -73,35 +73,31 @@ public:
   WGe* wge_new(char* name, char* filename, char* object_name, int modal);
   void create_popup_menu(pwr_tAttrRef aref, int x, int y);
   int get_selection(char* str, int len);
-  int open_foe(const char* name, pwr_tOid plcpgm, void** foectx, int map_window,
-      ldh_eAccess access, pwr_tOid oid);
-  void wda_new(pwr_tOid oid, pwr_tCid cid, char* attribute, int edit_mode,
-      int advuser, int display_objectname);
+  int open_foe(const char* name, pwr_tOid plcpgm, void** foectx, int map_window, ldh_eAccess access,
+               pwr_tOid oid);
+  void wda_new(pwr_tOid oid, pwr_tCid cid, char* attribute, int edit_mode, int advuser,
+               int display_objectname);
   void message_dialog(char* title, char* text);
   int confirm_dialog(char* title, char* text, int display_cancel, int* cancel);
   int continue_dialog(char* title, char* text);
   int prompt_dialog(char* title, char* text, char** value);
   void wge_subwindow_loop(WGe* wge);
   void wge_modal_loop(WGe* wge);
-  bool has_window()
-  {
-    return parent_wid;
-  }
+  bool has_window() { return parent_wid; }
   wb_utl* utl_new();
   WRev* rev_new();
   void logw_new(char* item, wlog_eCategory* categories, int show_item);
-  CoLogin* login_new(const char* name, const char* groupname,
-      void (*bc_success)(void*), void (*bc_cancel)(void*), pwr_tStatus* status);
+  CoLogin* login_new(const char* name, const char* groupname, void (*bc_success)(void*),
+                     void (*bc_cancel)(void*), pwr_tStatus* status);
   WCrr* wcrr_new(pwr_tAttrRef* aref, pwr_tStatus* status);
   WbBckW* bckw_new(char* name, wb_bck_list* list, pwr_tStatus* status);
   WbExpW* expw_new(char* name, int type, pwr_tStatus* status);
   WAttText* watttext_new(pwr_tAttrRef aref, int editmode, pwr_tStatus* status);
 
   static void trace_scan(WNavGtk* wnav);
-  static void sel_lose_cb(
-      GtkWidget* w, GdkEventSelection* event, gpointer data);
-  static void sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
-      guint info, guint time_stamp, gpointer data);
+  static void sel_lose_cb(GtkWidget* w, GdkEventSelection* event, gpointer data);
+  static void sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data, guint info, guint time_stamp,
+                             gpointer data);
 };
 
 #endif

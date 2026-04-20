@@ -53,11 +53,7 @@ wb_bdrep* wb_bdrep::ref()
   return this;
 }
 
-wb_bdrep::wb_bdrep(wb_orep& o)
-    : m_nRef(0), m_orep(&o), m_sts(LDH__SUCCESS), m_merep(0)
-{
-  m_orep->ref();
-}
+wb_bdrep::wb_bdrep(wb_orep& o) : m_nRef(0), m_orep(&o), m_sts(LDH__SUCCESS), m_merep(0) { m_orep->ref(); }
 
 wb_bdrep::wb_bdrep(wb_adrep* adrep) : m_nRef(0), m_merep(0)
 {
@@ -68,10 +64,7 @@ wb_bdrep::wb_bdrep(wb_adrep* adrep) : m_nRef(0), m_merep(0)
   m_sts = LDH__SUCCESS;
 }
 
-wb_bdrep::~wb_bdrep()
-{
-  m_orep->unref();
-}
+wb_bdrep::~wb_bdrep() { m_orep->unref(); }
 
 wb_adrep* wb_bdrep::adrep(pwr_tStatus* sts)
 {
@@ -85,7 +78,8 @@ wb_adrep* wb_bdrep::adrep(pwr_tStatus* sts)
 wb_adrep* wb_bdrep::adrep(pwr_tStatus* sts, const char* aname)
 {
   wb_attrname n(aname);
-  if (n.evenSts()) {
+  if (n.evenSts())
+  {
     *sts = n.sts();
     return 0;
   }
@@ -94,14 +88,17 @@ wb_adrep* wb_bdrep::adrep(pwr_tStatus* sts, const char* aname)
   wb_adrep* adrep = 0;
   wb_adrep* old = 0;
 
-  for (int i = 0; i < n.attributes(); i++) {
+  for (int i = 0; i < n.attributes(); i++)
+  {
     bool next_attr = false;
     wb_name an(n.attribute(i));
     wb_orep* orep = bd->m_orep->vrep()->child(sts, bd->m_orep, an);
-    while (EVEN(*sts)) {
+    while (EVEN(*sts))
+    {
       // Try Super attribute
       orep = bd->m_orep->vrep()->first(sts, bd->m_orep);
-      if (EVEN(*sts)) {
+      if (EVEN(*sts))
+      {
         if (bd != this)
           delete bd;
         if (adrep)
@@ -109,7 +106,8 @@ wb_adrep* wb_bdrep::adrep(pwr_tStatus* sts, const char* aname)
         return 0;
       }
 
-      if (str_NoCaseStrcmp(orep->name(), "Super") == 0) {
+      if (str_NoCaseStrcmp(orep->name(), "Super") == 0)
+      {
         if (adrep)
           old = adrep;
 
@@ -125,7 +123,8 @@ wb_adrep* wb_bdrep::adrep(pwr_tStatus* sts, const char* aname)
         if (bd != this)
           delete bd;
         bd = cd->bdrep(sts, pwr_eBix_rt);
-        if (EVEN(*sts)) {
+        if (EVEN(*sts))
+        {
           delete cd;
           return 0;
         }
@@ -133,8 +132,11 @@ wb_adrep* wb_bdrep::adrep(pwr_tStatus* sts, const char* aname)
         delete cd;
 
         orep = bd->m_orep->vrep()->child(sts, bd->m_orep, an);
-      } else {
-        if (adrep && adrep->flags() & PWR_MASK_CASTATTR && n.hasSuper()) {
+      }
+      else
+      {
+        if (adrep && adrep->flags() & PWR_MASK_CASTATTR && n.hasSuper())
+        {
           // Allow additional super attributesegement for casted attributes
           next_attr = true;
           break;
@@ -151,20 +153,22 @@ wb_adrep* wb_bdrep::adrep(pwr_tStatus* sts, const char* aname)
       old = adrep;
 
     adrep = new wb_adrep(*orep);
-    if (i != 0) {
+    if (i != 0)
+    {
       if (n.hasAttrIndex(i - 1))
         adrep->add(old, n.attrIndex(i - 1));
       else
         adrep->add(old);
       delete old;
     }
-    if (n.hasAttrIndex(i)
-        && (n.attrIndex(i) >= adrep->nElement() || n.attrIndex(i) < 0)) {
+    if (n.hasAttrIndex(i) && (n.attrIndex(i) >= adrep->nElement() || n.attrIndex(i) < 0))
+    {
       *sts = LDH__ATTRINDEX;
       return 0;
     }
 
-    if ((i != n.attributes() - 1) && adrep->isClass()) {
+    if ((i != n.attributes() - 1) && adrep->isClass())
+    {
       wb_cdrep* cd;
       if (m_merep)
         cd = m_merep->cdrep(sts, adrep->subClass());
@@ -176,13 +180,16 @@ wb_adrep* wb_bdrep::adrep(pwr_tStatus* sts, const char* aname)
       if (bd != this)
         delete bd;
       bd = cd->bdrep(sts, pwr_eBix_rt);
-      if (EVEN(*sts)) {
+      if (EVEN(*sts))
+      {
         delete cd;
         return 0;
       }
 
       delete cd;
-    } else if ((i != n.attributes() - 1) && !adrep->isClass()) {
+    }
+    else if ((i != n.attributes() - 1) && !adrep->isClass())
+    {
       // To many attribute
       delete adrep;
       *sts = LDH__NOSUCHATTR;
@@ -195,7 +202,8 @@ wb_adrep* wb_bdrep::adrep(pwr_tStatus* sts, const char* aname)
 
 wb_adrep* wb_bdrep::super(pwr_tStatus* sts)
 {
-  if (bix() != pwr_eBix_rt) {
+  if (bix() != pwr_eBix_rt)
+  {
     *sts = LDH__NOSUCHATTR;
     return 0;
   }
@@ -204,7 +212,8 @@ wb_adrep* wb_bdrep::super(pwr_tStatus* sts)
   if (EVEN(*sts))
     return 0;
 
-  if (str_NoCaseStrcmp(orep->name(), "Super") != 0) {
+  if (str_NoCaseStrcmp(orep->name(), "Super") != 0)
+  {
     *sts = LDH__NOSUCHATTR;
     orep->ref();
     orep->unref();
@@ -215,10 +224,7 @@ wb_adrep* wb_bdrep::super(pwr_tStatus* sts)
   return adrep;
 }
 
-pwr_eBix wb_bdrep::bix()
-{
-  return cdh_oixToBix(m_orep->oid().oix);
-}
+pwr_eBix wb_bdrep::bix() { return cdh_oixToBix(m_orep->oid().oix); }
 
 size_t wb_bdrep::size()
 {
@@ -259,8 +265,10 @@ int wb_bdrep::nAttribute()
   wb_orep* old;
 
   wb_orep* orep = m_orep->vrep()->first(&sts, m_orep);
-  while (ODD(sts)) {
-    switch (orep->cid()) {
+  while (ODD(sts))
+  {
+    switch (orep->cid())
+    {
     case pwr_eClass_Param:
     case pwr_eClass_Intern:
     case pwr_eClass_Input:
@@ -281,30 +289,15 @@ int wb_bdrep::nAttribute()
   return attr_count;
 }
 
-pwr_tOid wb_bdrep::boid()
-{
-  return m_orep->oid();
-}
+pwr_tOid wb_bdrep::boid() { return m_orep->oid(); }
 
-pwr_tCid wb_bdrep::bcid()
-{
-  return m_orep->cid();
-}
+pwr_tCid wb_bdrep::bcid() { return m_orep->cid(); }
 
-const char* wb_bdrep::name() const
-{
-  return m_orep->name();
-}
+const char* wb_bdrep::name() const { return m_orep->name(); }
 
-wb_name wb_bdrep::longName() const
-{
-  return m_orep->longName();
-}
+wb_name wb_bdrep::longName() const { return m_orep->longName(); }
 
-pwr_tTime wb_bdrep::modTime()
-{
-  return m_orep->treeModTime();
-}
+pwr_tTime wb_bdrep::modTime() { return m_orep->treeModTime(); }
 
 char* wb_bdrep::structName()
 {

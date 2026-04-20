@@ -45,14 +45,18 @@
 /*! \addtogroup rt */
 /*@{*/
 
-typedef enum { sim_eNMpsClear_All, sim_eNMpsClear_NoBackup } sim_eNMpsClear;
+typedef enum
+{
+  sim_eNMpsClear_All,
+  sim_eNMpsClear_NoBackup
+} sim_eNMpsClear;
 
-class rt_sim {
-  public:
+class rt_sim
+{
+public:
   rt_sim()
-      : scan_time(0.5), ioconf(0), thread_cnt(0), select_thread_cnt(0),
-        state_stored(false), halt_order_active(false), load_order_active(false),
-        disable_old(0)
+      : scan_time(0.5), ioconf(0), thread_cnt(0), select_thread_cnt(0), state_stored(false),
+        halt_order_active(false), load_order_active(false), disable_old(0)
   {
     memset(plcpgm_stored_scanoff, 0, sizeof(plcpgm_stored_scanoff));
   }
@@ -60,10 +64,7 @@ class rt_sim {
   void open();
   void close();
   void scan();
-  double scantime()
-  {
-    return scan_time;
-  }
+  double scantime() { return scan_time; }
   pwr_tStatus print_object(FILE* fp, pwr_tOid oid);
   pwr_tStatus store();
   pwr_tStatus load();

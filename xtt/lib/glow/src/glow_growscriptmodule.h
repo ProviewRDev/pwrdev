@@ -37,6 +37,8 @@
 #ifndef glow_growscriptmodule_h
 #define glow_growscriptmodule_h
 
+#include <iosfwd>
+
 #include "glow_growrect.h"
 
 /*! \file glow_growscriptmodule.h
@@ -54,7 +56,8 @@
   object is clicked on, moved etc.
 */
 
-class GrowScriptModule : public GrowRect {
+class GrowScriptModule : public GrowRect
+{
 public:
   //! Constuctor
   /*!
@@ -72,12 +75,10 @@ public:
     \param fill_d_type	Fill color.
     \param nodraw	Don't draw the object now.
   */
-  GrowScriptModule(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0,
-      double w = 0, double h = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int fill_rect = 0,
-      int display_border = 1, glow_eDrawType fill_d_type = glow_eDrawType_Line,
-      int nodraw = 0);
+  GrowScriptModule(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0, double w = 0,
+                   double h = 0, glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
+                   glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int fill_rect = 0,
+                   int display_border = 1, glow_eDrawType fill_d_type = glow_eDrawType_Line, int nodraw = 0);
 
   //! Destructor
   /*! Remove the object from context, and erase it from the screen.
@@ -89,22 +90,19 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Get the object type
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowScriptModule;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowScriptModule; }
 
   int export_script(GlowExportScript* es, void* o, void* m);
 

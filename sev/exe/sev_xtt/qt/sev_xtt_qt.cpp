@@ -38,16 +38,13 @@
 #include "co_string.h"
 
 #include "cow_qt_helpers.h"
-//#include "cow_style_qt.h"
+// #include "cow_style_qt.h"
 
 #include "xtt_tbl_qt.h"
 
 #include <QApplication>
 
-void tbl_close_cb(void* tbl)
-{
-  exit(0);
-}
+void tbl_close_cb(void* tbl) { exit(0); }
 
 int main(int argc, char* argv[])
 {
@@ -61,36 +58,42 @@ int main(int argc, char* argv[])
   log_setLevel(LOG_TRACE);
 
   // Get options
-  for (int i = 1; i < argc; i++) {
-    if (streq(argv[i], "-s") && i + 1 < argc) {
+  for (int i = 1; i < argc; i++)
+  {
+    if (streq(argv[i], "-s") && i + 1 < argc)
+    {
       strncpy(servername, argv[i + 1], sizeof(servername));
       i++;
     }
   }
 
   sts = qcom_Init(&sts, &aid, "sev_xtt");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     throw co_error(sts);
   }
 
   sevcli_init(&sts, &sevcli);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("Sev client init error %u\n", sts);
     exit(0);
   }
 
-  if (!streq(servername, "")) {
+  if (!streq(servername, ""))
+  {
     sevcli_set_servernode(&sts, sevcli, servername);
   }
 
   sevcli_get_itemlist(&sts, sevcli, &items, &itemcnt);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("Sev client get itemlist error %u\n", sts);
     exit(0);
   }
 
   QApplication app(argc, argv);
-  //QApplication::setStyle(new PwrStyle());
+  // QApplication::setStyle(new PwrStyle());
 
   setlocale(LC_NUMERIC, "POSIX");
   setlocale(LC_TIME, "en_US");

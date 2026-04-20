@@ -77,26 +77,22 @@
 
 #include "xtt_hotkey_gtk.h"
 
-HotkeyAction::HotkeyAction(const char* name, void (*action)(char*, char *, void*))
-      : m_action(action)
+HotkeyAction::HotkeyAction(const char* name, void (*action)(char*, char*, void*)) : m_action(action)
 {
   strcpy(m_name, name);
 }
 
-HotkeyAction::HotkeyAction(const HotkeyAction& x) : m_action(x.m_action)
-{
-  strcpy(m_name, x.m_name);
-}
+HotkeyAction::HotkeyAction(const HotkeyAction& x) : m_action(x.m_action) { strcpy(m_name, x.m_name); }
 
-HotkeyKey::HotkeyKey(int mod, int keysym, char* action_name, char* action_arg1,
-		     char *action_arg2)
-      : m_mod(mod), m_keysym(keysym), m_action(0), m_userdata(0)
+HotkeyKey::HotkeyKey(int mod, int keysym, char* action_name, char* action_arg1, char* action_arg2)
+    : m_mod(mod), m_keysym(keysym), m_action(0), m_userdata(0)
 {
   strcpy(m_action_name, action_name);
   strcpy(m_action_arg1, action_arg1);
   strcpy(m_action_arg2, action_arg2);
 }
-HotkeyKey::HotkeyKey(const HotkeyKey& x) : m_mod(x.m_mod), m_keysym(x.m_keysym), m_action(x.m_action), m_userdata(x.m_userdata)
+HotkeyKey::HotkeyKey(const HotkeyKey& x)
+    : m_mod(x.m_mod), m_keysym(x.m_keysym), m_action(x.m_action), m_userdata(x.m_userdata)
 {
   strcpy(m_action_name, x.m_action_name);
   strcpy(m_action_arg1, x.m_action_arg1);
@@ -105,19 +101,20 @@ HotkeyKey::HotkeyKey(const HotkeyKey& x) : m_mod(x.m_mod), m_keysym(x.m_keysym),
 
 void HotkeyKey::set_action(HotkeyAction* action, void* userdata)
 {
-  if (streq(m_action_name, action->m_name)) {
+  if (streq(m_action_name, action->m_name))
+  {
     m_action = action->m_action;
     m_userdata = userdata;
   }
 }
 
-void XttHotkey::register_action(
-    const char* name, void (*action)(char*, char *, void*), void* userdata)
+void XttHotkey::register_action(const char* name, void (*action)(char*, char*, void*), void* userdata)
 {
   HotkeyAction a(name, action);
   m_actions.push_back(a);
 
-  for (int i = 0; i < (int)m_keys.size(); i++) {
+  for (int i = 0; i < (int)m_keys.size(); i++)
+  {
     m_keys[i].set_action(&m_actions[m_actions.size() - 1], userdata);
   }
 }
@@ -128,9 +125,7 @@ XttHotkey::XttHotkey(const char* filename)
   read_file();
 }
 
-XttHotkey::~XttHotkey()
-{
-}
+XttHotkey::~XttHotkey() {}
 
 int XttHotkey::read_file()
 {
@@ -147,7 +142,8 @@ int XttHotkey::read_file()
   if (!fp)
     return 0;
 
-  while (dcli_read_line(line, sizeof(line), fp)) {
+  while (dcli_read_line(line, sizeof(line), fp))
+  {
     int mod = 0;
     int keysym;
     char keystr[20] = "";
@@ -161,40 +157,44 @@ int XttHotkey::read_file()
     if (line[0] == 0 || line[0] == '#')
       continue;
 
-    n = dcli_parse(
-        line, ":", "", (char*)p1, sizeof(p1) / sizeof(p1[0]), sizeof(p1[0]), 0);
-    if (n != 2) {
+    n = dcli_parse(line, ":", "", (char*)p1, sizeof(p1) / sizeof(p1[0]), sizeof(p1[0]), 0);
+    if (n != 2)
+    {
       printf("Syntax error, %s, row %d\n", m_filename, row);
       continue;
     }
     str_trim(p1[0], p1[0]);
     str_trim(p1[1], p1[1]);
 
-    n = dcli_parse(p1[0], " 	", "", (char*)p2, sizeof(p2) / sizeof(p2[0]),
-        sizeof(p2[0]), 0);
-    if (n < 1) {
+    n = dcli_parse(p1[0], " 	", "", (char*)p2, sizeof(p2) / sizeof(p2[0]), sizeof(p2[0]), 0);
+    if (n < 1)
+    {
       printf("Syntax error, %s, row %d\n", m_filename, row);
       continue;
     }
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < n; i++)
+    {
       if (str_NoCaseStrcmp(p2[i], "Control") == 0)
         mod |= ControlMask;
       else if (str_NoCaseStrcmp(p2[i], "Shift") == 0)
         mod |= ShiftMask;
       else if (str_NoCaseStrcmp(p2[i], "Alt") == 0)
         mod |= Mod1Mask;
-      else if (str_NoCaseStrncmp(p2[i], "<key>", 5) == 0) {
+      else if (str_NoCaseStrncmp(p2[i], "<key>", 5) == 0)
+      {
         strcpy(keystr, &p2[i][5]);
         str_trim(keystr, keystr);
-      } else {
+      }
+      else
+      {
         printf("Syntax error, %s, row %d\n", m_filename, row);
         break;
       }
     }
 
-    n = dcli_parse(p1[1], "(", "", (char*)p2, sizeof(p2) / sizeof(p2[0]),
-        sizeof(p2[0]), 0);
-    if (n < 2) {
+    n = dcli_parse(p1[1], "(", "", (char*)p2, sizeof(p2) / sizeof(p2[0]), sizeof(p2[0]), 0);
+    if (n < 2)
+    {
       printf("Syntax error, %s, row %d\n", m_filename, row);
       continue;
     }
@@ -203,18 +203,21 @@ int XttHotkey::read_file()
     strcpy(action_arg1, p2[1]);
     if ((s = strrchr(action_arg1, ')')))
       *s = 0;
-    else {
+    else
+    {
       printf("Syntax error, %s, row %d\n", m_filename, row);
       continue;
     }
-    if ((s = strstr(action_arg1, ","))) {
-      strcpy(action_arg2, s+1);
+    if ((s = strstr(action_arg1, ",")))
+    {
+      strcpy(action_arg2, s + 1);
       *s = 0;
     }
     else
       strcpy(action_arg2, "");
     keysym = XStringToKeysym(keystr);
-    if (!keysym) {
+    if (!keysym)
+    {
       printf("Syntax error, %s, row %d\n", m_filename, row);
       continue;
     }
@@ -225,7 +228,8 @@ int XttHotkey::read_file()
 
   fclose(fp);
 
-  for (i = 0; i < (int)m_keys.size(); i++) {
+  for (i = 0; i < (int)m_keys.size(); i++)
+  {
     grab_key(m_keys[i].m_keysym, m_keys[i].m_mod);
   }
 
@@ -239,19 +243,20 @@ int XttHotkey::event_handler(GdkXEvent* xevent, gpointer data)
   GdkDisplay* display = gdk_display_get_default();
   Display* dp = gdk_x11_display_get_xdisplay(display);
 
-  if (e->type == KeyPress) {
+  if (e->type == KeyPress)
+  {
     int key = e->keycode;
     int keysym = XkbKeycodeToKeysym(dp, key, 0, 0);
 
-    for (int i = 0; i < (int)hotkey->m_keys.size(); i++) {
-      if (hotkey->m_keys[i].m_keysym == keysym
-          && hotkey->m_keys[i].m_mod
-              == (int)(e->state & ~LockMask & ~Mod2Mask & ~Mod3Mask & ~Mod4Mask
-                     & ~Mod5Mask)) {
+    for (int i = 0; i < (int)hotkey->m_keys.size(); i++)
+    {
+      if (hotkey->m_keys[i].m_keysym == keysym &&
+          hotkey->m_keys[i].m_mod ==
+              (int)(e->state & ~LockMask & ~Mod2Mask & ~Mod3Mask & ~Mod4Mask & ~Mod5Mask))
+      {
         if (hotkey->m_keys[i].m_action)
-          (hotkey->m_keys[i].m_action)(
-              hotkey->m_keys[i].m_action_arg1, hotkey->m_keys[i].m_action_arg2, 
-	      hotkey->m_keys[i].m_userdata);
+          (hotkey->m_keys[i].m_action)(hotkey->m_keys[i].m_action_arg1, hotkey->m_keys[i].m_action_arg2,
+                                       hotkey->m_keys[i].m_userdata);
       }
     }
   }

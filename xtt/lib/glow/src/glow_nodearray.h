@@ -37,11 +37,14 @@
 #ifndef glow_array_h
 #define glow_array_h
 
+#include <iosfwd>
+
 #include "glow_array_elem.h"
 
 typedef void* glow_tAddress;
 
-typedef enum {
+typedef enum
+{
   glow_eElemTypeRectangle,
   glow_eElemTypeCircle,
   glow_eElemTypeLine,
@@ -50,15 +53,13 @@ typedef enum {
   glow_eElemTypeConnection
 } glow_eElemType;
 
-class GlowArray {
+class GlowArray
+{
 public:
   GlowArray(int allocate = 10, int incr = 10);
   GlowArrayElem* operator[](int idx);
   friend std::ostream& operator<<(std::ostream& o, const GlowArray a);
-  int size()
-  {
-    return a_size;
-  }
+  int size() { return a_size; }
   void insert(GlowArrayElem* element);
   void zoom();
   friend class GlowNodeClass;

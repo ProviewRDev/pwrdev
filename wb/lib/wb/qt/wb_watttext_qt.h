@@ -46,10 +46,11 @@
 
 class WAttTextQtWidget;
 
-class WAttTextQt : public WAttText {
+class WAttTextQt : public WAttText
+{
 public:
-  WAttTextQt(void* wa_parent_ctx, ldh_tSesContext wa_ldhses,
-      pwr_sAttrRef wa_aref, int wa_editmode, pwr_tStatus* status);
+  WAttTextQt(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref, int wa_editmode,
+             pwr_tStatus* status);
   ~WAttTextQt();
   QLabel* msg_label;
   QTextEdit* textbuffer;
@@ -65,7 +66,8 @@ private:
   WAttTextQtWidget* toplevel;
 };
 
-class WAttTextQtWidget : public QWidget {
+class WAttTextQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

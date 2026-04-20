@@ -57,31 +57,34 @@ main()
   printf("-- Starting QCOM on node: %s\n", my_name);
 
   f = fopen("sys$login:ld_hosts_001.dat", "r");
-  if (f == NULL) {
+  if (f == NULL)
+  {
     perror("sys$login:ld_hosts_001.dat");
     exit(1);
   }
 
-  nodes = tree_CreateTable(sizeof(pwr_tNodeId), offsetof(qini_sNode, nid),
-      sizeof(qini_sNode), 10, tree_eComp_nid, NULL);
+  nodes = tree_CreateTable(sizeof(pwr_tNodeId), offsetof(qini_sNode, nid), sizeof(qini_sNode), 10,
+                           tree_eComp_nid, NULL);
 
   errors = qini_ParseFile(f, nodes);
-  if (errors != 0) {
+  if (errors != 0)
+  {
     printf("** %d errors where found, qcom will not be started!\n", errors);
     exit(1);
   }
 
-  for (nep = tree_Minimum(nodes); nep != NULL;
-       nep = tree_Successor(nodes, nep)) {
-    printf("%s %d %d %d %d\n", nep->name, nep->nid, nep->naddr, nep->port,
-        nep->connect);
-    if (streq(my_name, nep->name)) {
+  for (nep = tree_Minimum(nodes); nep != NULL; nep = tree_Successor(nodes, nep))
+  {
+    printf("%s %d %d %d %d\n", nep->name, nep->nid, nep->naddr, nep->port, nep->connect);
+    if (streq(my_name, nep->name))
+    {
       printf("-- My nid is: %d\n", nep->nid);
       me = nep;
     }
   }
 
-  if (me == NULL) {
+  if (me == NULL)
+  {
     printf("** Could not find myself!\n");
     exit(1);
   }

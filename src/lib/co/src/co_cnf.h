@@ -41,10 +41,11 @@
    Configuration file. */
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-char* cnf_get_value(const char* name, char* value, int size);
+  char* cnf_get_value(const char* name, char* value, int size);
 
 #ifdef __cplusplus
 }

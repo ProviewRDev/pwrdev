@@ -42,7 +42,8 @@
 
 void wb_vrepdbs::unref()
 {
-  if (--m_nRef == 0) {
+  if (--m_nRef == 0)
+  {
     pwr_tStatus sts;
 
     dbs_Unmap(&sts, m_dbsmep);
@@ -56,8 +57,8 @@ wb_vrep* wb_vrepdbs::ref()
   return this;
 }
 
-wb_vrepdbs::wb_vrepdbs(wb_erep* erep, wb_merep* merep, const char* fileName,
-    const char* name, pwr_tVid vid, pwr_tCid cid)
+wb_vrepdbs::wb_vrepdbs(wb_erep* erep, wb_merep* merep, const char* fileName, const char* name, pwr_tVid vid,
+                       pwr_tCid cid)
     : m_erep(erep), m_merep(merep), m_nRef(0), m_duplicate(false)
 {
   strcpy(m_fileName, fileName);
@@ -73,8 +74,7 @@ wb_vrepdbs::wb_vrepdbs(wb_erep* erep, wb_merep* merep, const char* fileName,
   m_merep = new wb_merep(m_erep, (wb_mvrep*)this);
 }
 
-wb_vrepdbs::wb_vrepdbs(wb_erep* erep, const char* fileName)
-    : m_erep(erep), m_nRef(0), m_duplicate(false)
+wb_vrepdbs::wb_vrepdbs(wb_erep* erep, const char* fileName) : m_erep(erep), m_nRef(0), m_duplicate(false)
 {
   strcpy(m_fileName, fileName);
 
@@ -87,10 +87,8 @@ wb_vrepdbs::wb_vrepdbs(wb_erep* erep, const char* fileName)
   m_merep = new wb_merep(m_erep, (wb_mvrep*)this);
 }
 
-wb_vrepdbs::wb_vrepdbs(wb_erep* erep, wb_merep* merep, const char* fileName,
-    dbs_sMenv* mep, dbs_sVenv* vep)
-    : m_erep(erep), m_merep(merep), m_nRef(0), m_dbsmep(mep), m_dbsvep(vep),
-      m_duplicate(false)
+wb_vrepdbs::wb_vrepdbs(wb_erep* erep, wb_merep* merep, const char* fileName, dbs_sMenv* mep, dbs_sVenv* vep)
+    : m_erep(erep), m_merep(merep), m_nRef(0), m_dbsmep(mep), m_dbsvep(vep), m_duplicate(false)
 {
   strcpy(m_fileName, fileName);
   strcpy(m_name, m_dbsvep->vp->name);
@@ -103,9 +101,11 @@ dbs_sVenv* wb_vrepdbs::dbsenv()
 {
   pwr_tStatus sts;
 
-  if (!m_isDbsenvLoaded) {
+  if (!m_isDbsenvLoaded)
+  {
     m_dbsmep = dbs_Map(&sts, m_fileName);
-    if (!m_dbsmep) {
+    if (!m_dbsmep)
+    {
       throw wb_error(sts);
     }
 
@@ -117,10 +117,10 @@ dbs_sVenv* wb_vrepdbs::dbsenv()
     m_vid = m_dbsvep->vp->vid;
     m_cid = m_dbsvep->vp->cid;
 
-    for (int i = 0; i < dbs_nVolRef(&sts, m_dbsmep); i++) {
+    for (int i = 0; i < dbs_nVolRef(&sts, m_dbsmep); i++)
+    {
       dbs_sVenv* vep = dbs_Vmap(&sts, i + 1, m_dbsmep);
-      wb_vrepdbs* vp
-          = new wb_vrepdbs(m_erep, m_merep, m_fileName, m_dbsmep, vep);
+      wb_vrepdbs* vp = new wb_vrepdbs(m_erep, m_merep, m_fileName, m_dbsmep, vep);
       m_merep->addDbs(&sts, (wb_mvrep*)vp);
     }
   }
@@ -139,92 +139,45 @@ bool wb_vrepdbs::load()
   return rsts;
 }
 
-pwr_tOid wb_vrepdbs::oid(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->oid();
-}
+pwr_tOid wb_vrepdbs::oid(pwr_tStatus* sts, const wb_orep* o) { return o->oid(); }
 
-pwr_tVid wb_vrepdbs::vid(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->vid();
-}
+pwr_tVid wb_vrepdbs::vid(pwr_tStatus* sts, const wb_orep* o) { return o->vid(); }
 
-pwr_tOix wb_vrepdbs::oix(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->oix();
-}
+pwr_tOix wb_vrepdbs::oix(pwr_tStatus* sts, const wb_orep* o) { return o->oix(); }
 
-pwr_tCid wb_vrepdbs::cid(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->cid();
-}
+pwr_tCid wb_vrepdbs::cid(pwr_tStatus* sts, const wb_orep* o) { return o->cid(); }
 
-pwr_tOid wb_vrepdbs::poid(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->foid();
-}
+pwr_tOid wb_vrepdbs::poid(pwr_tStatus* sts, const wb_orep* o) { return o->foid(); }
 
-pwr_tOid wb_vrepdbs::foid(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->foid();
-}
+pwr_tOid wb_vrepdbs::foid(pwr_tStatus* sts, const wb_orep* o) { return o->foid(); }
 
-pwr_tOid wb_vrepdbs::loid(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->loid();
-}
+pwr_tOid wb_vrepdbs::loid(pwr_tStatus* sts, const wb_orep* o) { return o->loid(); }
 
-pwr_tOid wb_vrepdbs::boid(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->boid();
-}
+pwr_tOid wb_vrepdbs::boid(pwr_tStatus* sts, const wb_orep* o) { return o->boid(); }
 
-pwr_tOid wb_vrepdbs::aoid(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->aoid();
-}
+pwr_tOid wb_vrepdbs::aoid(pwr_tStatus* sts, const wb_orep* o) { return o->aoid(); }
 
-const char* wb_vrepdbs::objectName(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->name();
-}
+const char* wb_vrepdbs::objectName(pwr_tStatus* sts, const wb_orep* o) { return o->name(); }
 
-void wb_vrepdbs::fileName(char* fname)
-{
-  strcpy(m_fileName, fname);
-}
+void wb_vrepdbs::fileName(char* fname) { strcpy(m_fileName, fname); }
 
-wb_name wb_vrepdbs::longName(pwr_tStatus* sts, const wb_orep* o)
-{
-  return wb_name();
-}
+wb_name wb_vrepdbs::longName(pwr_tStatus* sts, const wb_orep* o) { return wb_name(); }
 
-pwr_tTime wb_vrepdbs::ohTime(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->ohTime();
-}
+pwr_tTime wb_vrepdbs::ohTime(pwr_tStatus* sts, const wb_orep* o) { return o->ohTime(); }
 
-pwr_tTime wb_vrepdbs::rbTime(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->rbTime();
-}
+pwr_tTime wb_vrepdbs::rbTime(pwr_tStatus* sts, const wb_orep* o) { return o->rbTime(); }
 
-pwr_tTime wb_vrepdbs::dbTime(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->dbTime();
-}
+pwr_tTime wb_vrepdbs::dbTime(pwr_tStatus* sts, const wb_orep* o) { return o->dbTime(); }
 
-pwr_mClassDef wb_vrepdbs::flags(pwr_tStatus* sts, const wb_orep* o)
-{
-  return o->flags();
-}
+pwr_mClassDef wb_vrepdbs::flags(pwr_tStatus* sts, const wb_orep* o) { return o->flags(); }
 
 wb_orep* wb_vrepdbs::object(pwr_tStatus* sts, pwr_tOid oid)
 {
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = dbs_OidToObject(sts, dbsenv(), oid);
-  if (op == 0) {
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -238,11 +191,13 @@ wb_orep* wb_vrepdbs::object(pwr_tStatus* sts, wb_name& name)
 
   dbs_sObject* op = dbs_VolumeObject(sts, dbsenv());
 
-  for (int i = 0; op && name.hasSegment(i); i++) {
+  for (int i = 0; op && name.hasSegment(i); i++)
+  {
     op = dbs_Child(sts, dbsenv(), op, name.normSegment(i));
   }
 
-  if (op == 0) {
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -250,14 +205,13 @@ wb_orep* wb_vrepdbs::object(pwr_tStatus* sts, wb_name& name)
   return new (this) wb_orepdbs(op);
 }
 
-wb_orep* wb_vrepdbs::object(
-    pwr_tStatus* sts, const wb_orep* parent, wb_name& name)
+wb_orep* wb_vrepdbs::object(pwr_tStatus* sts, const wb_orep* parent, wb_name& name)
 {
   *sts = LDH__SUCCESS;
 
-  dbs_sObject* op = dbs_Child(sts, dbsenv(), ((wb_orepdbs*)parent)->o(),
-      name.normName(cdh_mName_object));
-  if (op == 0) {
+  dbs_sObject* op = dbs_Child(sts, dbsenv(), ((wb_orepdbs*)parent)->o(), name.normName(cdh_mName_object));
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -265,15 +219,15 @@ wb_orep* wb_vrepdbs::object(
   return new (this) wb_orepdbs(op);
 }
 
-wb_orep* wb_vrepdbs::createObject(pwr_tStatus* sts, wb_cdef cdef,
-    wb_destination& d, wb_name& name, pwr_tOix oix)
+wb_orep* wb_vrepdbs::createObject(pwr_tStatus* sts, wb_cdef cdef, wb_destination& d, wb_name& name,
+                                  pwr_tOix oix)
 {
   *sts = LDH__NYI;
   return 0;
 }
 
-wb_orep* wb_vrepdbs::copyObject(pwr_tStatus* sts, const wb_orep* orep,
-    wb_destination& d, wb_name& name, pwr_tOix oix)
+wb_orep* wb_vrepdbs::copyObject(pwr_tStatus* sts, const wb_orep* orep, wb_destination& d, wb_name& name,
+                                pwr_tOix oix)
 {
   *sts = LDH__NYI;
   return 0;
@@ -327,28 +281,31 @@ bool wb_vrepdbs::abort(pwr_tStatus* sts)
   return true;
 }
 
-bool wb_vrepdbs::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix,
-    size_t offset, size_t size, void* p)
+bool wb_vrepdbs::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, size_t offset, size_t size,
+                                void* p)
 {
   *sts = LDH__NYI;
   return false;
 }
 
-void* wb_vrepdbs::readAttribute(pwr_tStatus* sts, const wb_orep* o,
-    pwr_eBix bix, size_t offset, size_t size, void* p)
+void* wb_vrepdbs::readAttribute(pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, size_t offset, size_t size,
+                                void* p)
 { // note! must be compensated for offset !
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = ((wb_orepdbs*)o)->o();
   void* bp = dbs_Body(sts, dbsenv(), op, bix);
 
-  if (bp == 0) {
+  if (bp == 0)
+  {
     *sts = LDH__NOSUCHBODY;
     return 0;
   }
 
-  if (p) {
-    switch (bix) {
+  if (p)
+  {
+    switch (bix)
+    {
     case pwr_eBix_rt:
       memcpy(p, (char*)bp + offset, MIN(op->rbody.size - offset, size));
       break;
@@ -365,21 +322,23 @@ void* wb_vrepdbs::readAttribute(pwr_tStatus* sts, const wb_orep* o,
   return (void*)((char*)bp + offset);
 }
 
-void* wb_vrepdbs::readBody(
-    pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, void* p)
+void* wb_vrepdbs::readBody(pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, void* p)
 {
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = ((wb_orepdbs*)o)->o();
   void* bp = dbs_Body(sts, dbsenv(), op, bix);
 
-  if (bp == 0) {
+  if (bp == 0)
+  {
     *sts = LDH__NOSUCHBODY;
     return 0;
   }
 
-  if (p) {
-    switch (bix) {
+  if (p)
+  {
+    switch (bix)
+    {
     case pwr_eBix_rt:
       memcpy(p, bp, op->rbody.size);
       break;
@@ -407,7 +366,8 @@ wb_orep* wb_vrepdbs::ancestor(pwr_tStatus* sts, const wb_orep* o)
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = dbs_Ancestor(sts, dbsenv(), ((wb_orepdbs*)o)->o());
-  if (op == 0) {
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -420,7 +380,8 @@ wb_orep* wb_vrepdbs::parent(pwr_tStatus* sts, const wb_orep* o)
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = dbs_Parent(sts, dbsenv(), ((wb_orepdbs*)o)->o());
-  if (op == 0 || op->oid.oix == 0) {
+  if (op == 0 || op->oid.oix == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -433,7 +394,8 @@ wb_orep* wb_vrepdbs::after(pwr_tStatus* sts, const wb_orep* o)
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = dbs_After(sts, dbsenv(), ((wb_orepdbs*)o)->o());
-  if (op == 0) {
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -446,7 +408,8 @@ wb_orep* wb_vrepdbs::before(pwr_tStatus* sts, const wb_orep* o)
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = dbs_Before(sts, dbsenv(), ((wb_orepdbs*)o)->o());
-  if (op == 0) {
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -459,7 +422,8 @@ wb_orep* wb_vrepdbs::first(pwr_tStatus* sts, const wb_orep* o)
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = dbs_First(sts, dbsenv(), ((wb_orepdbs*)o)->o());
-  if (op == 0) {
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -471,9 +435,9 @@ wb_orep* wb_vrepdbs::child(pwr_tStatus* sts, const wb_orep* o, wb_name& name)
 {
   *sts = LDH__SUCCESS;
 
-  dbs_sObject* op
-      = dbs_Child(sts, dbsenv(), ((wb_orepdbs*)o)->o(), name.normObject());
-  if (op == 0) {
+  dbs_sObject* op = dbs_Child(sts, dbsenv(), ((wb_orepdbs*)o)->o(), name.normObject());
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -486,7 +450,8 @@ wb_orep* wb_vrepdbs::last(pwr_tStatus* sts, const wb_orep* o)
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = dbs_Last(sts, dbsenv(), ((wb_orepdbs*)o)->o());
-  if (op == 0) {
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -499,7 +464,8 @@ wb_orep* wb_vrepdbs::object(pwr_tStatus* sts, pwr_tCid cid)
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = dbs_ClassToObject(sts, dbsenv(), cid);
-  if (op == 0) {
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -512,7 +478,8 @@ wb_orep* wb_vrepdbs::next(pwr_tStatus* sts, const wb_orep* o)
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = dbs_Next(sts, dbsenv(), ((wb_orepdbs*)o)->o());
-  if (op == 0) {
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -525,7 +492,8 @@ wb_orep* wb_vrepdbs::previous(pwr_tStatus* sts, const wb_orep* o)
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = dbs_Previous(sts, dbsenv(), ((wb_orepdbs*)o)->o());
-  if (op == 0) {
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -533,17 +501,15 @@ wb_orep* wb_vrepdbs::previous(pwr_tStatus* sts, const wb_orep* o)
   return new (this) wb_orepdbs(op);
 }
 
-wb_srep* wb_vrepdbs::newSession()
-{
-  return (wb_srep*)0;
-}
+wb_srep* wb_vrepdbs::newSession() { return (wb_srep*)0; }
 
 wb_orep* wb_vrepdbs::object(pwr_tStatus* sts)
 {
   *sts = LDH__SUCCESS;
 
   dbs_sObject* op = dbs_Object(sts, dbsenv());
-  if (op == 0) {
+  if (op == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -551,10 +517,7 @@ wb_orep* wb_vrepdbs::object(pwr_tStatus* sts)
   return new (this) wb_orepdbs(op);
 }
 
-bool wb_vrepdbs::isLocal(const wb_orep*)
-{
-  return false;
-}
+bool wb_vrepdbs::isLocal(const wb_orep*) { return false; }
 
 pwr_tCid wb_vrepdbs::cid() const
 {
@@ -562,15 +525,9 @@ pwr_tCid wb_vrepdbs::cid() const
   ;
 }
 
-pwr_tVid wb_vrepdbs::vid() const
-{
-  return m_vid;
-}
+pwr_tVid wb_vrepdbs::vid() const { return m_vid; }
 
-wb_erep* wb_vrepdbs::erep()
-{
-  return m_erep;
-}
+wb_erep* wb_vrepdbs::erep() { return m_erep; }
 
 wb_vrep* wb_vrepdbs::next()
 {
@@ -579,15 +536,9 @@ wb_vrep* wb_vrepdbs::next()
   return m_erep->nextVolume(&sts, vid());
 }
 
-wb_merep* wb_vrepdbs::merep() const
-{
-  return m_merep;
-}
+wb_merep* wb_vrepdbs::merep() const { return m_merep; }
 
-bool wb_vrepdbs::createSnapshot(const char*, const pwr_tTime*, const int rtonly)
-{
-  return false;
-}
+bool wb_vrepdbs::createSnapshot(const char*, const pwr_tTime*, const int rtonly) { return false; }
 
 wb_orepdbs* wb_vrepdbs::new_wb_orepdbs(size_t size)
 {
@@ -596,10 +547,7 @@ wb_orepdbs* wb_vrepdbs::new_wb_orepdbs(size_t size)
   return o;
 }
 
-void wb_vrepdbs::delete_wb_orepdbs(void* p)
-{
-  free(p);
-}
+void wb_vrepdbs::delete_wb_orepdbs(void* p) { free(p); }
 
 void wb_vrepdbs::objectName(const wb_orep* o, char* str)
 {
@@ -610,20 +558,17 @@ void wb_vrepdbs::objectName(const wb_orep* o, char* str)
   dbs_ObjectToName(&sts, dbsenv(), ((wb_orepdbs*)o)->o(), str);
 }
 
-bool wb_vrepdbs::exportVolume(wb_import& i)
-{
-  return i.importVolume(*this);
-}
+bool wb_vrepdbs::exportVolume(wb_import& i) { return i.importVolume(*this); }
 
 bool wb_vrepdbs::exportHead(wb_import& i)
 {
   dbs_sObject* op = 0;
   pwr_tStatus sts;
 
-  while ((op = dbs_NextHead(&sts, dbsenv(), op))) {
-    i.importHead(op->oid, op->cid, op->poid, op->boid, op->aoid, op->foid,
-        op->loid, op->name, op->normname, op->ohFlags, op->time, op->rbody.time,
-        op->dbody.time, op->rbody.size, op->dbody.size);
+  while ((op = dbs_NextHead(&sts, dbsenv(), op)))
+  {
+    i.importHead(op->oid, op->cid, op->poid, op->boid, op->aoid, op->foid, op->loid, op->name, op->normname,
+                 op->ohFlags, op->time, op->rbody.time, op->dbody.time, op->rbody.size, op->dbody.size);
   }
 
   return true;
@@ -634,7 +579,8 @@ bool wb_vrepdbs::exportRbody(wb_import& i)
   dbs_sBody* bp = 0;
   pwr_tStatus sts;
 
-  while ((bp = dbs_NextRbody(&sts, dbsenv(), bp))) {
+  while ((bp = dbs_NextRbody(&sts, dbsenv(), bp)))
+  {
     i.importRbody(bp->oid, bp->size, (void*)(bp + 1));
   }
 
@@ -646,17 +592,15 @@ bool wb_vrepdbs::exportDbody(wb_import& i)
   dbs_sBody* bp = 0;
   pwr_tStatus sts;
 
-  while ((bp = dbs_NextDbody(&sts, dbsenv(), bp))) {
+  while ((bp = dbs_NextDbody(&sts, dbsenv(), bp)))
+  {
     i.importDbody(bp->oid, bp->size, (void*)(bp + 1));
   }
 
   return true;
 }
 
-bool wb_vrepdbs::exportDocBlock(wb_import& i)
-{
-  return false;
-}
+bool wb_vrepdbs::exportDocBlock(wb_import& i) { return false; }
 
 bool wb_vrepdbs::exportMeta(wb_import& i)
 {
@@ -677,8 +621,7 @@ bool wb_vrepdbs::exportTree(wb_treeimport& i, pwr_tOid oid)
   return true;
 }
 
-bool wb_vrepdbs::exportTreeObject(
-    wb_treeimport& i, dbs_sObject* op, bool isRoot)
+bool wb_vrepdbs::exportTreeObject(wb_treeimport& i, dbs_sObject* op, bool isRoot)
 {
   pwr_tStatus sts;
   dbs_sObject* before = dbs_Before(&sts, dbsenv(), op);
@@ -699,8 +642,8 @@ bool wb_vrepdbs::exportTreeObject(
   if (op->dbody.size)
     dbody = dbs_Body(&sts, dbsenv(), op, pwr_eBix_dev);
 
-  i.importTreeObject(m_merep, op->oid, op->cid, parentoid, beforeoid, op->name,
-      op->ohFlags, op->rbody.size, op->dbody.size, rbody, dbody);
+  i.importTreeObject(m_merep, op->oid, op->cid, parentoid, beforeoid, op->name, op->ohFlags, op->rbody.size,
+                     op->dbody.size, rbody, dbody);
 
   if (first)
     exportTreeObject(i, first, false);
@@ -713,7 +656,8 @@ bool wb_vrepdbs::exportTreeObject(
 
 bool wb_vrepdbs::time(pwr_tTime* t)
 {
-  if (m_dbsmep) {
+  if (m_dbsmep)
+  {
     *t = m_dbsmep->venv->vp->time;
     return true;
   }

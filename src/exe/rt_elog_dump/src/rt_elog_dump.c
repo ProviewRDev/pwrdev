@@ -73,8 +73,7 @@ static int current_pos = 0;
 static int current_col = 0;
 // static int cols[] = {8, 22, 8, 22, 22, 17, 3, 40, 40, 8, 22, 8, 2, 8, 8, 8,
 // 1};
-static int cols[] = { 8, 30, 38, 60, 82, 99, 102, 142, 182, 190, 202, 210, 212,
-  220, 228, 236, 237 };
+static int cols[] = {8, 30, 38, 60, 82, 99, 102, 142, 182, 190, 202, 210, 212, 220, 228, 236, 237};
 
 void usage()
 {
@@ -111,7 +110,8 @@ int col_print(FILE* fp, char* format, ...)
   current_pos += strlen(buf);
 
   incr = 0;
-  for (i = 0; i < cols[current_col] - current_pos - 1; i++) {
+  for (i = 0; i < cols[current_col] - current_pos - 1; i++)
+  {
     incr++;
     fprintf(fp, " ");
   }
@@ -128,19 +128,22 @@ int main(int argc, char* argv[])
   FILE* outFile = NULL;
   pwr_tInt32 ret;
 
-  if (argc > 1
-      && (streq(argv[1], "-h") || streq(argv[1], "--help"))) {
+  if (argc > 1 && (streq(argv[1], "-h") || streq(argv[1], "--help")))
+  {
     usage();
     exit(0);
   }
 
-  if (argc == 3) {
+  if (argc == 3)
+  {
     if (argv[2] != NULL)
       outFile = fopen(argv[2], "w");
-  } else
+  }
+  else
     outFile = fopen(DUMPFILE, "w");
 
-  if (outFile == NULL) {
+  if (outFile == NULL)
+  {
     printf("** Unable to open file, terminating\n");
     exit(1);
   }
@@ -151,7 +154,8 @@ int main(int argc, char* argv[])
   ReadFromDBAndPutInFile(outFile);
   new_row(outFile);
   fclose(outFile);
-  if ((ret = dataBaseP->close(dataBaseP, 0) != 0)) {
+  if ((ret = dataBaseP->close(dataBaseP, 0) != 0))
+  {
     printf("error db_close: %s\n", db_strerror(ret));
   }
   if (argc == 3)
@@ -169,7 +173,8 @@ void Init(char* fname)
   dcli_translate_filename(dbName, fname);
 
   /*create the database if it's not already created*/
-  if ((ret = db_create(&dataBaseP, NULL, 0)) != 0) {
+  if ((ret = db_create(&dataBaseP, NULL, 0)) != 0)
+  {
     /*error creating db-handle send the mess to errh, then exit*/
     printf("error db_create: %s\n", db_strerror(ret));
     printf("** Error when creating db handle, terminating\n");
@@ -177,13 +182,13 @@ void Init(char* fname)
   }
 
 #if (DB_VERSION_MAJOR > 3) && (DB_VERSION_MINOR > 0)
-  ret = dataBaseP->open(
-      dataBaseP, NULL, dbName, NULL, DATABASETYPE, DB_RDONLY, 0);
+  ret = dataBaseP->open(dataBaseP, NULL, dbName, NULL, DATABASETYPE, DB_RDONLY, 0);
 #else
   ret = dataBaseP->open(dataBaseP, dbName, NULL, DATABASETYPE, DB_RDONLY, 0);
 #endif
 
-  if (ret != 0) {
+  if (ret != 0)
+  {
     /*error opening/creating db send the mess to errh, then exit*/
     printf("error db_open: %s\n", db_strerror(ret));
     exit(1);
@@ -201,7 +206,8 @@ void ReadFromDBAndPutInFile(FILE* outFile)
   WriteColumnNames(outFile);
 
   /* Acquire a cursor for the database. */
-  if ((ret = dataBaseP->cursor(dataBaseP, NULL, &dbcp, 0)) != 0) {
+  if ((ret = dataBaseP->cursor(dataBaseP, NULL, &dbcp, 0)) != 0)
+  {
     printf("error dataBaseP->cursor: %s\n", db_strerror(ret));
     exit(1);
   }
@@ -210,25 +216,29 @@ void ReadFromDBAndPutInFile(FILE* outFile)
   memset(&key, 0, sizeof(key));
   memset(&data, 0, sizeof(data));
 
-  if ((ret = dbcp->c_get(dbcp, &key, &data, DB_FIRST)) == 0) {
+  if ((ret = dbcp->c_get(dbcp, &key, &data, DB_FIRST)) == 0)
+  {
     eventp = data.data;
     sts = Write(eventp, outFile);
     nrOfEvents++;
   }
 
-  while ((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0) {
+  while ((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0)
+  {
     eventp = data.data;
     sts = Write(eventp, outFile);
     nrOfEvents++;
   }
-  if (ret != DB_NOTFOUND) {
+  if (ret != DB_NOTFOUND)
+  {
     printf("error dbcp->c_get: %s\n", db_strerror(ret));
     printf("** Error reading post number %u, terminating\n", nrOfEvents);
     exit(1);
   }
   printf("-- Number of events written to file: %u\n", nrOfEvents);
   /*Close the cursor*/
-  if ((ret = dbcp->c_close(dbcp)) != 0) {
+  if ((ret = dbcp->c_close(dbcp)) != 0)
+  {
     printf("Error dbcp->c_close(): %s\n", db_strerror(ret));
   }
 }
@@ -256,7 +266,8 @@ void WriteColumnNames(FILE* outFile)
 
 int Write(sEvent* sp, FILE* outFile)
 {
-  switch (sp->EventType) {
+  switch (sp->EventType)
+  {
   case mh_eEvent_Alarm:
   case mh_eEvent_MaintenanceAlarm:
   case mh_eEvent_SystemAlarm:
@@ -306,14 +317,12 @@ void printMess(sEvent* sp, FILE* outFile)
   col_print(outFile, "%s", sp->Mess.message.EventName);
   col_print(outFile, "");
   col_print(outFile, "");
-  switch (sp->Mess.message.SupInfo.SupType) {
+  switch (sp->Mess.message.SupInfo.SupType)
+  {
   case mh_eSupType_Analog:
-    col_print(
-        outFile, "%.2f", sp->Mess.message.SupInfo.mh_uSupInfo_u.A.ActualValue);
-    col_print(
-        outFile, "%.2f", sp->Mess.message.SupInfo.mh_uSupInfo_u.A.CtrlLimit);
-    col_print(
-        outFile, "%.2f", sp->Mess.message.SupInfo.mh_uSupInfo_u.A.Hysteres);
+    col_print(outFile, "%.2f", sp->Mess.message.SupInfo.mh_uSupInfo_u.A.ActualValue);
+    col_print(outFile, "%.2f", sp->Mess.message.SupInfo.mh_uSupInfo_u.A.CtrlLimit);
+    col_print(outFile, "%.2f", sp->Mess.message.SupInfo.mh_uSupInfo_u.A.Hysteres);
     col_print(outFile, "%s", sp->Mess.message.SupInfo.mh_uSupInfo_u.A.Unit);
     col_print(outFile, "");
     col_print(outFile, "%u", sp->Mess.message.SupInfo.mh_uSupInfo_u.A.High);
@@ -323,8 +332,7 @@ void printMess(sEvent* sp, FILE* outFile)
     col_print(outFile, "");
     col_print(outFile, "");
     col_print(outFile, "");
-    col_print(
-        outFile, "%u", sp->Mess.message.SupInfo.mh_uSupInfo_u.D.ActualValue);
+    col_print(outFile, "%u", sp->Mess.message.SupInfo.mh_uSupInfo_u.D.ActualValue);
     col_print(outFile, "%u", sp->Mess.message.SupInfo.mh_uSupInfo_u.D.High);
     break;
   case mh_eSupType__:
@@ -359,14 +367,13 @@ void printAck(sEvent* sp, FILE* outFile)
   col_print(outFile, "%u", sp->Mess.ack.TargetId.Idx);
 
   event_time = net_NetTimeToTime(&(sp->Mess.ack.DetectTime));
-  time_AtoAscii(
-      &event_time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
+  time_AtoAscii(&event_time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
   col_print(outFile, "%s", time_str);
 
-  switch (sp->Mess.ack.SupInfo.SupType) {
+  switch (sp->Mess.ack.SupInfo.SupType)
+  {
   case mh_eSupType_Analog:
-    col_print(
-        outFile, "%.2f", sp->Mess.ack.SupInfo.mh_uSupInfo_u.A.ActualValue);
+    col_print(outFile, "%.2f", sp->Mess.ack.SupInfo.mh_uSupInfo_u.A.ActualValue);
     col_print(outFile, "%.2f", sp->Mess.ack.SupInfo.mh_uSupInfo_u.A.CtrlLimit);
     col_print(outFile, "%.2f", sp->Mess.ack.SupInfo.mh_uSupInfo_u.A.Hysteres);
     col_print(outFile, "%s", sp->Mess.ack.SupInfo.mh_uSupInfo_u.A.Unit);
@@ -411,14 +418,13 @@ void printRet(sEvent* sp, FILE* outFile)
   col_print(outFile, "%u", sp->Mess.ret.TargetId.Idx);
 
   event_time = net_NetTimeToTime(&(sp->Mess.ret.DetectTime));
-  time_AtoAscii(
-      &event_time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
+  time_AtoAscii(&event_time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
   col_print(outFile, "%s", time_str);
 
-  switch (sp->Mess.ret.SupInfo.SupType) {
+  switch (sp->Mess.ret.SupInfo.SupType)
+  {
   case mh_eSupType_Analog:
-    col_print(
-        outFile, "%.2f", sp->Mess.ret.SupInfo.mh_uSupInfo_u.A.ActualValue);
+    col_print(outFile, "%.2f", sp->Mess.ret.SupInfo.mh_uSupInfo_u.A.ActualValue);
     col_print(outFile, "%.2f", sp->Mess.ret.SupInfo.mh_uSupInfo_u.A.CtrlLimit);
     col_print(outFile, "%.2f", sp->Mess.ret.SupInfo.mh_uSupInfo_u.A.Hysteres);
     col_print(outFile, "%s", sp->Mess.ret.SupInfo.mh_uSupInfo_u.A.Unit);
@@ -463,8 +469,7 @@ void printBlock(sEvent* sp, FILE* outFile)
   col_print(outFile, "%u", sp->Mess.block.TargetId.Idx);
 
   event_time = net_NetTimeToTime(&(sp->Mess.block.DetectTime));
-  time_AtoAscii(
-      &event_time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
+  time_AtoAscii(&event_time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
   col_print(outFile, "%s", time_str);
 
   col_print(outFile, "");
@@ -483,8 +488,7 @@ void printMsgInfo(mh_sMsgInfo* mp, FILE* outFile)
   col_print(outFile, "%d", mp->Id.Nix);
 
   event_time = net_NetTimeToTime(&(mp->Id.BirthTime));
-  time_AtoAscii(
-      &event_time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
+  time_AtoAscii(&event_time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
   col_print(outFile, "%s", time_str);
 
   col_print(outFile, "%d", mp->Id.Idx);
@@ -495,8 +499,7 @@ void printMsgInfo(mh_sMsgInfo* mp, FILE* outFile)
   printEventFlags(outFile, mp->EventFlags);
 
   event_time = net_NetTimeToTime(&(mp->EventTime));
-  time_AtoAscii(
-      &event_time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
+  time_AtoAscii(&event_time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
   col_print(outFile, "%s", time_str);
 
   // col_print(outFile, "%s",mp->EventName_V3);
@@ -538,7 +541,8 @@ void printEventFlags(FILE* outFile, int flags)
 
 void convertEventType(int type, char* ret)
 {
-  switch (type) {
+  switch (type)
+  {
   case mh_eEvent_Alarm:
     strcpy(ret, "Alarm");
     break;
@@ -592,7 +596,8 @@ void convertEventType(int type, char* ret)
 
 void convertEventPrio(int prio, char* ret)
 {
-  switch (prio) {
+  switch (prio)
+  {
   case mh_eEventPrio_A:
     strcpy(ret, "A");
     break;

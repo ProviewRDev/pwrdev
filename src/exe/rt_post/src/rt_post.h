@@ -54,17 +54,15 @@ typedef enum _pwr_ePostType
 /*! \addtogroup rt */
 /*@{*/
 
-class rt_post {
-  public:
+class rt_post
+{
+public:
   rt_post();
   void init(qcom_sQid* qid);
   void open();
   void close();
   void scan();
-  double scantime()
-  {
-    return scan_time;
-  }
+  double scantime() { return scan_time; }
   void format_cmd(char* cmd, char* format, char* address, char* text);
   void replace_symbol(char* outstr, char* instr);
   void email_register(mh_sEventId* id);

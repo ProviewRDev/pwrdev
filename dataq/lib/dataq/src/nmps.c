@@ -57,7 +57,7 @@
 /* 		NMPS RUTINER			*/
 
 /*      NMpsCell
-*/
+ */
 void NMpsCell_init_time(pwr_sClass_NMpsCell* object)
 {
   pwr_sAttrRef attrref;
@@ -66,13 +66,14 @@ void NMpsCell_init_time(pwr_sClass_NMpsCell* object)
 
   /* Get new object pointers at restart av plc program */
   data_index = (plc_t_DataInfo*)&object->Data1P;
-  for (i = 1; i <= object->LastIndex; i++) {
+  for (i = 1; i <= object->LastIndex; i++)
+  {
     attrref = data_index->DataP.Aref;
-    sts = gdh_DLRefObjectInfoAttrref(
-        &attrref, (pwr_tAddress*)&data_index->DataP, &data_index->Data_Dlid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&data_index->DataP, &data_index->Data_Dlid);
     data_index++;
   }
-  if (object->LastIndex) {
+  if (object->LastIndex)
+  {
     data_index = (plc_t_DataInfo*)&object->Data1P;
     data_index += object->LastIndex - 1;
     memcpy(&object->DataLP, data_index, sizeof(*data_index));
@@ -92,14 +93,17 @@ void NMpsCell_init(pwr_sClass_NMpsCell* object)
 
   if (!(object->Function & NMPS_CELLFUNC_BACKUP))
     NMpsCell_init_time(object);
-  else {
+  else
+  {
     /* Backup, reset all nonvalid pointers */
     data_index = (plc_t_DataInfo*)&object->Data1P;
-    for (i = 1; i <= object->LastIndex; i++) {
+    for (i = 1; i <= object->LastIndex; i++)
+    {
       data_index->DataP.Ptr = NULL;
       data_index++;
     }
-    if (object->LastIndex) {
+    if (object->LastIndex)
+    {
       object->DataLP.Ptr = NULL;
       object->DataLastP.Ptr = NULL;
     }
@@ -127,15 +131,18 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
   char* tmp_buf;
 #endif
 
-  if (object->InitTime) {
+  if (object->InitTime)
+  {
     if (!(object->ReloadDone & NMPS_CELL_RELOADDONE))
       return;
-    else {
+    else
+    {
       lck_LockNMps;
       NMpsCell_init_time(object);
       object->ReloadDone &= ~NMPS_CELL_RELOADDONE;
     }
-  } else
+  }
+  else
     lck_LockNMps;
 
   if (object->FrontNew)
@@ -145,65 +152,77 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
   if (object->MaxSize > NMPS_CELL_MAXSIZE)
     object->MaxSize = NMPS_CELL_MAXSIZE;
 
-  if (object->ResetObjectP) {
-    if (*object->ResetObjectP) {
+  if (object->ResetObjectP)
+  {
+    if (*object->ResetObjectP)
+    {
       data_index = (plc_t_DataInfo*)&object->Data1P;
-      for (i = 1; i <= object->LastIndex; i++) {
+      for (i = 1; i <= object->LastIndex; i++)
+      {
         sts = gdh_DLUnrefObjectInfo(data_index->Data_Dlid);
         if (object->Function & NMPS_CELLFUNC_RESETDELETE)
           sts = gdh_DeleteObject(data_index->DataP.Aref.Objid);
         data_index++;
       }
       reloaddone = object->ReloadDone;
-      memset(&object->CellFull, 0, sizeof(pwr_sClass_NMpsCell)
-              - ((unsigned long)(&object->CellFull) - (unsigned long)object));
+      memset(&object->CellFull, 0,
+             sizeof(pwr_sClass_NMpsCell) - ((unsigned long)(&object->CellFull) - (unsigned long)object));
       object->ReloadDone = reloaddone;
       if (object->Function & NMPS_CELLFUNC_BACKUP)
         object->BackupNow = 1;
     }
   }
-  if ( object->Function & NMPS_CELLFUNC_CHECKOBJECTS) {
+  if (object->Function & NMPS_CELLFUNC_CHECKOBJECTS)
+  {
     data_index = (plc_t_DataInfo*)&object->Data1P;
-    for ( i = 0; i < object->LastIndex; i++) {
+    for (i = 0; i < object->LastIndex; i++)
+    {
       sts = gdh_CheckLocalObject(data_index->DataP.Aref.Objid);
-      if ( EVEN(sts)) {
-	/* Remove object */
-	sts = gdh_DLUnrefObjectInfo(data_index->Data_Dlid);
-	if (i < object->LastIndex) {
-	  size = (object->LastIndex - i) * sizeof(*data_max);
+      if (EVEN(sts))
+      {
+        /* Remove object */
+        sts = gdh_DLUnrefObjectInfo(data_index->Data_Dlid);
+        if (i < object->LastIndex)
+        {
+          size = (object->LastIndex - i) * sizeof(*data_max);
 #if defined OS_LINUX
-	  tmp_buf = malloc(size);
-	  memcpy(tmp_buf, (char*)data_index + sizeof(*data_max), size);
-	  memcpy(data_index, tmp_buf, size);
-	  free(tmp_buf);
+          tmp_buf = malloc(size);
+          memcpy(tmp_buf, (char*)data_index + sizeof(*data_max), size);
+          memcpy(data_index, tmp_buf, size);
+          free(tmp_buf);
 #else
-	  memcpy(data_index, (char*)data_index + sizeof(*data_max), size);
+          memcpy(data_index, (char*)data_index + sizeof(*data_max), size);
 #endif
-	}
-	data_last = (plc_t_DataInfo*)&object->Data1P;
-	data_last += object->LastIndex - 1;
-	memset(data_last, 0, sizeof(*data_last));
-	object->CellFull = 0;
-	object->LastIndex--;
-	if (object->LastIndex > 0) {
-	  data_last--;
-	  memcpy(&object->DataLP, data_last, sizeof(*data_last));
-	  memcpy(&object->DataLastP, data_last, sizeof(*data_last));
-	} else {
-	  memset(&object->DataLP, 0, sizeof(*data_last));
-	  memset(&object->DataLastP, 0, sizeof(*data_last));
-	}
-	i--;
+        }
+        data_last = (plc_t_DataInfo*)&object->Data1P;
+        data_last += object->LastIndex - 1;
+        memset(data_last, 0, sizeof(*data_last));
+        object->CellFull = 0;
+        object->LastIndex--;
+        if (object->LastIndex > 0)
+        {
+          data_last--;
+          memcpy(&object->DataLP, data_last, sizeof(*data_last));
+          memcpy(&object->DataLastP, data_last, sizeof(*data_last));
+        }
+        else
+        {
+          memset(&object->DataLP, 0, sizeof(*data_last));
+          memset(&object->DataLastP, 0, sizeof(*data_last));
+        }
+        i--;
       }
       else
-	data_index++;
+        data_index++;
     }
   }
 
-  if (object->ExternFlag) {
+  if (object->ExternFlag)
+  {
     /* Insert new object in Front position */
 
-    switch (object->ExternOpType) {
+    switch (object->ExternOpType)
+    {
     case NMPS_OPTYPE_EXTINSERT:
       object->ExternIndex = 1;
     case NMPS_OPTYPE_EXTINSERT_IDX:
@@ -214,44 +233,44 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
         object->ExternStatus = 2; /* Felkod !!! */
       else if (object->ExternIndex > object->LastIndex + 1)
         object->ExternStatus = 2; /* Felkod !!! */
-      else {
-	data_index = (plc_t_DataInfo*)&object->Data1P;
-	for ( i = 0; i < object->LastIndex; i++) {
-	  if ( cdh_ObjidIsEqual(data_index->DataP.Aref.Objid, object->ExternObjId)) {
-	    object->ExternStatus = 2;
-	    object->ExternFlag = 0;
-	    data_index = 0;
-	    break;
-	  }
-	  data_index++;
-	}
-	if ( !data_index)
-	  break;
+      else
+      {
+        data_index = (plc_t_DataInfo*)&object->Data1P;
+        for (i = 0; i < object->LastIndex; i++)
+        {
+          if (cdh_ObjidIsEqual(data_index->DataP.Aref.Objid, object->ExternObjId))
+          {
+            object->ExternStatus = 2;
+            object->ExternFlag = 0;
+            data_index = 0;
+            break;
+          }
+          data_index++;
+        }
+        if (!data_index)
+          break;
 
         extern_attrref = cdh_ObjidToAref(object->ExternObjId);
-        object->ExternStatus = gdh_DLRefObjectInfoAttrref(
-            &extern_attrref, (pwr_tAddress*)&data_pointer, &data_dlid);
+        object->ExternStatus =
+            gdh_DLRefObjectInfoAttrref(&extern_attrref, (pwr_tAddress*)&data_pointer, &data_dlid);
       }
-      if (ODD(object->ExternStatus)) {
+      if (ODD(object->ExternStatus))
+      {
         object->ExternFlag = 0;
         data_index = (plc_t_DataInfo*)&object->Data1P;
         data_index += object->ExternIndex - 1;
 
-        if (object->LastIndex >= object->ExternIndex) {
+        if (object->LastIndex >= object->ExternIndex)
+        {
 #if defined OS_LINUX
-          tmp_buf = malloc((object->LastIndex - object->ExternIndex + 1)
-              * sizeof(*data_max));
-          memcpy(
-              tmp_buf, data_index, (object->LastIndex - object->ExternIndex + 1)
-                  * sizeof(*data_max));
+          tmp_buf = malloc((object->LastIndex - object->ExternIndex + 1) * sizeof(*data_max));
+          memcpy(tmp_buf, data_index, (object->LastIndex - object->ExternIndex + 1) * sizeof(*data_max));
           memcpy((char*)data_index + sizeof(*data_max), tmp_buf,
-              (object->LastIndex - object->ExternIndex + 1)
-                  * sizeof(*data_max));
+                 (object->LastIndex - object->ExternIndex + 1) * sizeof(*data_max));
           free(tmp_buf);
 #else
           memcpy((char*)data_index + sizeof(*data_max), data_index,
-              (object->LastIndex - object->ExternIndex + 1)
-                  * sizeof(*data_max));
+                 (object->LastIndex - object->ExternIndex + 1) * sizeof(*data_max));
 #endif
         }
         data_index->DataP.Ptr = (pwr_tFloat32*)data_pointer;
@@ -269,21 +288,21 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
         memcpy(&object->DataLastP, data_last, sizeof(*data_last));
         if (object->ExternOpType == NMPS_OPTYPE_EXTINSERT)
           object->FrontNew = 1;
-      } else
+      }
+      else
         object->ExternFlag = 0;
       break;
     case NMPS_OPTYPE_EXTDELETE_OBJID:
     case NMPS_OPTYPE_EXTREMOVE_OBJID:
       data_index = (plc_t_DataInfo*)&object->Data1P;
-      for (object->ExternIndex = 1; object->ExternIndex <= object->LastIndex;
-           object->ExternIndex++) {
-        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-                sizeof(pwr_tObjid)))
+      for (object->ExternIndex = 1; object->ExternIndex <= object->LastIndex; object->ExternIndex++)
+      {
+        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
           break;
         data_index++;
       }
-      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
@@ -292,7 +311,8 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       if (object->ExternOpType == NMPS_OPTYPE_EXTDELETE)
         object->ExternIndex = 1;
     case NMPS_OPTYPE_EXTDELETE_IDX:
-      if (object->ExternIndex > object->LastIndex) {
+      if (object->ExternIndex > object->LastIndex)
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
@@ -301,11 +321,11 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       data_index = (plc_t_DataInfo*)&object->Data1P;
       data_index += object->ExternIndex - 1;
       sts = gdh_DLUnrefObjectInfo(data_index->Data_Dlid);
-      if (object->Function & NMPS_CELLFUNC_DELETE
-          && object->ExternOpType != NMPS_OPTYPE_EXTREMOVE_OBJID)
+      if (object->Function & NMPS_CELLFUNC_DELETE && object->ExternOpType != NMPS_OPTYPE_EXTREMOVE_OBJID)
         sts = gdh_DeleteObject(data_index->DataP.Aref.Objid);
 
-      if (object->ExternIndex < object->LastIndex) {
+      if (object->ExternIndex < object->LastIndex)
+      {
         size = (object->LastIndex - object->ExternIndex) * sizeof(*data_max);
 #if defined OS_LINUX
         tmp_buf = malloc(size);
@@ -322,11 +342,14 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       object->CellFull = 0;
       object->LastIndex--;
       object->ExternFlag = 0;
-      if (object->LastIndex > 0) {
+      if (object->LastIndex > 0)
+      {
         data_last--;
         memcpy(&object->DataLP, data_last, sizeof(*data_last));
         memcpy(&object->DataLastP, data_last, sizeof(*data_last));
-      } else {
+      }
+      else
+      {
         memset(&object->DataLP, 0, sizeof(*data_last));
         memset(&object->DataLastP, 0, sizeof(*data_last));
       }
@@ -334,27 +357,28 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       break;
     case NMPS_OPTYPE_EXTMOVEFORW_OBJID:
       data_index = (plc_t_DataInfo*)&object->Data1P;
-      for (object->ExternIndex = 1; object->ExternIndex <= object->LastIndex;
-           object->ExternIndex++) {
-        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-                sizeof(pwr_tObjid)))
+      for (object->ExternIndex = 1; object->ExternIndex <= object->LastIndex; object->ExternIndex++)
+      {
+        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
           break;
         data_index++;
       }
-      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
       }
-      if (object->ExternIndex >= object->LastIndex) {
+      if (object->ExternIndex >= object->LastIndex)
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
       }
       data_index = (plc_t_DataInfo*)&object->Data1P;
       data_index += object->ExternIndex - 1;
-      if (!(data_index->Data_Front && data_index->Data_Back)) {
+      if (!(data_index->Data_Front && data_index->Data_Back))
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
@@ -364,7 +388,8 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       memcpy(data_index, &data_tmp, sizeof(*data_index));
       object->ExternFlag = 0;
 
-      if (object->ExternIndex == object->LastIndex - 1) {
+      if (object->ExternIndex == object->LastIndex - 1)
+      {
         data_last = (plc_t_DataInfo*)&object->Data1P;
         data_last += object->LastIndex - 1;
         memcpy(&object->DataLP, data_last, sizeof(*data_last));
@@ -374,27 +399,28 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       break;
     case NMPS_OPTYPE_EXTMOVEBACKW_OBJID:
       data_index = (plc_t_DataInfo*)&object->Data1P;
-      for (object->ExternIndex = 1; object->ExternIndex <= object->LastIndex;
-           object->ExternIndex++) {
-        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-                sizeof(pwr_tObjid)))
+      for (object->ExternIndex = 1; object->ExternIndex <= object->LastIndex; object->ExternIndex++)
+      {
+        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
           break;
         data_index++;
       }
-      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
       }
-      if (object->ExternIndex <= 1) {
+      if (object->ExternIndex <= 1)
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
       }
       data_index = (plc_t_DataInfo*)&object->Data1P;
       data_index += object->ExternIndex - 1;
-      if (!(data_index->Data_Front && data_index->Data_Back)) {
+      if (!(data_index->Data_Front && data_index->Data_Back))
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
@@ -404,7 +430,8 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       memcpy(data_index, &data_tmp, sizeof(*data_index));
       object->ExternFlag = 0;
 
-      if (object->ExternIndex == object->LastIndex) {
+      if (object->ExternIndex == object->LastIndex)
+      {
         data_last = (plc_t_DataInfo*)&object->Data1P;
         data_last += object->LastIndex - 1;
         memcpy(&object->DataLP, data_last, sizeof(*data_last));
@@ -416,25 +443,28 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
     if (object->Function & NMPS_CELLFUNC_BACKUP)
       object->BackupNow = 1;
   }
-  if (object->InFlag) {
+  if (object->InFlag)
+  {
     /* Insert new object in Front position */
 
-    switch (object->InOpType) {
+    switch (object->InOpType)
+    {
     case NMPS_OPTYPE_FORWARD_FRONT:
       /* Insert at front of object front of data */
-      if (object->CellFull) {
+      if (object->CellFull)
+      {
         lck_UnlockNMps;
         return;
       }
-      if (object->LastIndex > 0) {
+      if (object->LastIndex > 0)
+      {
 #if defined OS_LINUX
         tmp_buf = malloc(object->LastIndex * sizeof(*data_max));
         memcpy(tmp_buf, &object->Data1P, object->LastIndex * sizeof(*data_max));
         memcpy(&object->Data2P, tmp_buf, object->LastIndex * sizeof(*data_max));
         free(tmp_buf);
 #else
-        memcpy(&object->Data2P, &object->Data1P,
-            object->LastIndex * sizeof(*data_max));
+        memcpy(&object->Data2P, &object->Data1P, object->LastIndex * sizeof(*data_max));
 #endif
       }
       object->Data1P.Ptr = object->InPointer;
@@ -453,34 +483,36 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       memcpy(&object->DataLastP, data_last, sizeof(*data_last));
       break;
     case NMPS_OPTYPE_FORWARD_BACK:
-      if (memcmp(&object->Data1P.Aref.Objid, &object->InObjId,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&object->Data1P.Aref.Objid, &object->InObjId, sizeof(pwr_tObjid)))
+      {
         /* This it not the correct object */
         object->InFlag = 0;
         lck_UnlockNMps;
         return;
       }
       object->Data1_Back = 1;
-      if (object->LastIndex == 1) {
+      if (object->LastIndex == 1)
+      {
         object->DataL_Back = 1;
         object->DataLast_Back = 1;
       }
       object->InFlag = 0;
       break;
     case NMPS_OPTYPE_FORWARD_UNIT:
-      if (object->CellFull) {
+      if (object->CellFull)
+      {
         lck_UnlockNMps;
         return;
       }
-      if (object->LastIndex > 0) {
+      if (object->LastIndex > 0)
+      {
 #if defined OS_LINUX
         tmp_buf = malloc(object->LastIndex * sizeof(*data_max));
         memcpy(tmp_buf, &object->Data1P, object->LastIndex * sizeof(*data_max));
         memcpy(&object->Data2P, tmp_buf, object->LastIndex * sizeof(*data_max));
         free(tmp_buf);
 #else
-        memcpy(&object->Data2P, &object->Data1P,
-            object->LastIndex * sizeof(*data_max));
+        memcpy(&object->Data2P, &object->Data1P, object->LastIndex * sizeof(*data_max));
 #endif
       }
       object->Data1P.Ptr = object->InPointer;
@@ -500,7 +532,8 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       break;
     case NMPS_OPTYPE_REVERSE_BACK:
       /* Insert at rear of object back of data */
-      if (object->CellFull) {
+      if (object->CellFull)
+      {
         lck_UnlockNMps;
         return;
       }
@@ -521,7 +554,8 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       break;
     case NMPS_OPTYPE_REVERSE_UNIT:
       /* Insert at rear of object all of data */
-      if (object->CellFull) {
+      if (object->CellFull)
+      {
         lck_UnlockNMps;
         return;
       }
@@ -543,8 +577,8 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
     case NMPS_OPTYPE_REVERSE_FRONT:
       data_last = (plc_t_DataInfo*)&object->Data1P;
       data_last += object->LastIndex - 1;
-      if (memcmp(&data_last->DataP.Aref.Objid, &object->InObjId,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_last->DataP.Aref.Objid, &object->InObjId, sizeof(pwr_tObjid)))
+      {
         /* This it not the correct object */
         object->InFlag = 0;
         lck_UnlockNMps;
@@ -559,15 +593,18 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
     if (object->Function & NMPS_CELLFUNC_BACKUP)
       object->BackupNow = 1;
   }
-  if (object->OutRearFlag) {
+  if (object->OutRearFlag)
+  {
     /* Remove an object in Rear position */
 
-    switch (object->OutRearOpType) {
+    switch (object->OutRearOpType)
+    {
     case NMPS_OPTYPE_BACK:
     case NMPS_OPTYPE_UNIT:
 
       /* Get the last data */
-      if (object->LastIndex == 0) {
+      if (object->LastIndex == 0)
+      {
         object->OutRearFlag = 0;
         lck_UnlockNMps;
         return;
@@ -579,11 +616,14 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       object->OutRearFlag = 0;
       object->CellFull = 0;
       object->LastIndex--;
-      if (object->LastIndex != 0) {
+      if (object->LastIndex != 0)
+      {
         data_last--;
         memcpy(&object->DataLP, data_last, sizeof(*data_last));
         memcpy(&object->DataLastP, data_last, sizeof(*data_last));
-      } else {
+      }
+      else
+      {
         memset(&object->DataLP, 0, sizeof(*data_last));
         memset(&object->DataLastP, 0, sizeof(*data_last));
       }
@@ -593,36 +633,36 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       data_last += object->LastIndex - 1;
       data_last->Data_Front = 0;
       object->OutRearFlag = 0;
-      object->DataL_Front = 0; /* Korrigeras !!! */
+      object->DataL_Front = 0;    /* Korrigeras !!! */
       object->DataLast_Front = 0; /* Korrigeras !!! */
       break;
     }
     if (object->Function & NMPS_CELLFUNC_BACKUP)
       object->BackupNow = 1;
   }
-  if (object->OutFrontFlag) {
+  if (object->OutFrontFlag)
+  {
     /* Remove an object in Front position */
 
-    switch (object->OutFrontOpType) {
+    switch (object->OutFrontOpType)
+    {
     case NMPS_OPTYPE_FRONT:
     case NMPS_OPTYPE_UNIT:
 
       /* Get the last data */
-      if (object->LastIndex == 0) {
+      if (object->LastIndex == 0)
+      {
         object->OutFrontFlag = 0;
         lck_UnlockNMps;
         return;
       }
 #if defined OS_LINUX
       tmp_buf = malloc((object->LastIndex - 1) * sizeof(*data_last));
-      memcpy(tmp_buf, &object->Data2P,
-          (object->LastIndex - 1) * sizeof(*data_last));
-      memcpy(&object->Data1P, tmp_buf,
-          (object->LastIndex - 1) * sizeof(*data_last));
+      memcpy(tmp_buf, &object->Data2P, (object->LastIndex - 1) * sizeof(*data_last));
+      memcpy(&object->Data1P, tmp_buf, (object->LastIndex - 1) * sizeof(*data_last));
       free(tmp_buf);
 #else
-      memcpy(&object->Data1P, &object->Data2P,
-          (object->LastIndex - 1) * sizeof(*data_last));
+      memcpy(&object->Data1P, &object->Data2P, (object->LastIndex - 1) * sizeof(*data_last));
 #endif
       data_last = (plc_t_DataInfo*)&object->Data1P;
       data_last += object->LastIndex - 1;
@@ -630,11 +670,14 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
       object->CellFull = 0;
       object->LastIndex--;
       object->OutFrontFlag = 0;
-      if (object->LastIndex != 0) {
+      if (object->LastIndex != 0)
+      {
         data_last--;
         memcpy(&object->DataLP, data_last, sizeof(*data_last));
         memcpy(&object->DataLastP, data_last, sizeof(*data_last));
-      } else {
+      }
+      else
+      {
         memset(&object->DataLP, 0, sizeof(*data_last));
         memset(&object->DataLastP, 0, sizeof(*data_last));
       }
@@ -642,7 +685,8 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
     case NMPS_OPTYPE_BACK:
       object->Data1_Back = 0;
       object->OutFrontFlag = 0;
-      if (object->LastIndex == 1) {
+      if (object->LastIndex == 1)
+      {
         object->DataL_Back = 0;
         object->DataLast_Back = 0;
       }
@@ -657,7 +701,7 @@ void NMpsCell_exec(plc_sThread* tp, pwr_sClass_NMpsCell* object)
 }
 
 /*      NMpsStoreCell
-*/
+ */
 void NMpsStoreCell_init(pwr_sClass_NMpsStoreCell* object)
 {
   plc_t_DataInfo* data_index;
@@ -668,14 +712,17 @@ void NMpsStoreCell_init(pwr_sClass_NMpsStoreCell* object)
 
   if (!(object->Function & NMPS_CELLFUNC_BACKUP))
     NMpsCell_init_time((pwr_sClass_NMpsCell*)object);
-  else {
+  else
+  {
     /* Backup, reset all nonvalid pointers */
     data_index = (plc_t_DataInfo*)&object->Data1P;
-    for (i = 1; i <= object->LastIndex; i++) {
+    for (i = 1; i <= object->LastIndex; i++)
+    {
       data_index->DataP.Ptr = NULL;
       data_index++;
     }
-    if (object->LastIndex) {
+    if (object->LastIndex)
+    {
       object->DataLP.Ptr = NULL;
       object->DataLastP.Ptr = NULL;
     }
@@ -704,15 +751,18 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
   char* tmp_buf;
 #endif
 
-  if (object->InitTime) {
+  if (object->InitTime)
+  {
     if (!(object->ReloadDone & NMPS_CELL_RELOADDONE))
       return;
-    else {
+    else
+    {
       lck_LockNMps;
       NMpsCell_init_time((pwr_sClass_NMpsCell*)object);
       object->ReloadDone &= ~NMPS_CELL_RELOADDONE;
     }
-  } else
+  }
+  else
     lck_LockNMps;
 
   if (object->FrontNew)
@@ -722,61 +772,69 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
   if (object->MaxSize > NMPS_CELL_MAXSIZE)
     object->MaxSize = NMPS_CELL_MAXSIZE;
 
-  if (object->ResetObjectP) {
-    if (*object->ResetObjectP) {
+  if (object->ResetObjectP)
+  {
+    if (*object->ResetObjectP)
+    {
       data_index = (plc_t_DataInfo*)&object->Data1P;
-      for (i = 1; i <= object->LastIndex; i++) {
+      for (i = 1; i <= object->LastIndex; i++)
+      {
         sts = gdh_DLUnrefObjectInfo(data_index->Data_Dlid);
         if (object->Function & NMPS_CELLFUNC_RESETDELETE)
           sts = gdh_DeleteObject(data_index->DataP.Aref.Objid);
         data_index++;
       }
       reloaddone = object->ReloadDone;
-      memset(&object->CellFull, 0, sizeof(pwr_sClass_NMpsStoreCell)
-              - ((unsigned long)(&object->CellFull) - (unsigned long)object));
+      memset(&object->CellFull, 0,
+             sizeof(pwr_sClass_NMpsStoreCell) - ((unsigned long)(&object->CellFull) - (unsigned long)object));
       object->ReloadDone = reloaddone;
       if (object->Function & NMPS_CELLFUNC_BACKUP)
         object->BackupNow = 1;
     }
   }
 
-  if ( object->Function & NMPS_CELLFUNC_CHECKOBJECTS) {
+  if (object->Function & NMPS_CELLFUNC_CHECKOBJECTS)
+  {
     data_index = (plc_t_DataInfo*)&object->Data1P;
-    for ( i = 0; i < object->LastIndex; i++) {
+    for (i = 0; i < object->LastIndex; i++)
+    {
       sts = gdh_CheckLocalObject(data_index->DataP.Aref.Objid);
-      if ( EVEN(sts)) {
-	/* Remove object */
-	sts = gdh_DLUnrefObjectInfo(data_index->Data_Dlid);
-	if (i < object->LastIndex) {
-	  size = (object->LastIndex - i) * sizeof(*data_max);
+      if (EVEN(sts))
+      {
+        /* Remove object */
+        sts = gdh_DLUnrefObjectInfo(data_index->Data_Dlid);
+        if (i < object->LastIndex)
+        {
+          size = (object->LastIndex - i) * sizeof(*data_max);
 #if defined OS_LINUX
-	  tmp_buf = malloc(size);
-	  memcpy(tmp_buf, (char*)data_index + sizeof(*data_max), size);
-	  memcpy(data_index, tmp_buf, size);
-	  free(tmp_buf);
+          tmp_buf = malloc(size);
+          memcpy(tmp_buf, (char*)data_index + sizeof(*data_max), size);
+          memcpy(data_index, tmp_buf, size);
+          free(tmp_buf);
 #else
-	  memcpy(data_index, (char*)data_index + sizeof(*data_max), size);
+          memcpy(data_index, (char*)data_index + sizeof(*data_max), size);
 #endif
-	}
-	data_last = (plc_t_DataInfo*)&object->Data1P;
-	data_last += object->LastIndex - 1;
-	memset(data_last, 0, sizeof(*data_last));
-	object->CellFull = 0;
-	object->LastIndex--;
-	if ((object->SelectIndex != 0)
-	    && (object->SelectIndex > i))
-	  object->SelectIndex--;
-	i--;
+        }
+        data_last = (plc_t_DataInfo*)&object->Data1P;
+        data_last += object->LastIndex - 1;
+        memset(data_last, 0, sizeof(*data_last));
+        object->CellFull = 0;
+        object->LastIndex--;
+        if ((object->SelectIndex != 0) && (object->SelectIndex > i))
+          object->SelectIndex--;
+        i--;
       }
       else
-	data_index++;
+        data_index++;
     }
   }
 
-  if (object->ExternFlag) {
+  if (object->ExternFlag)
+  {
     /* Insert new object in Front position */
 
-    switch (object->ExternOpType) {
+    switch (object->ExternOpType)
+    {
     case NMPS_OPTYPE_EXTINSERT:
     case NMPS_OPTYPE_EXTINSERTSELECT:
       object->ExternIndex = 1;
@@ -788,44 +846,44 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
         object->ExternStatus = 2; /* Felkod !!! */
       else if (object->ExternIndex > object->LastIndex + 1)
         object->ExternStatus = 2; /* Felkod !!! */
-      else {
-	data_index = (plc_t_DataInfo*)&object->Data1P;
-	for ( i = 0; i < object->LastIndex; i++) {
-	  if ( cdh_ObjidIsEqual(data_index->DataP.Aref.Objid, object->ExternObjId)) {
-	    object->ExternStatus = 2;
-	    object->ExternFlag = 0;
-	    data_index = 0;
-	    break;
-	  }
-	  data_index++;
-	}
-	if ( !data_index)
-	  break;
+      else
+      {
+        data_index = (plc_t_DataInfo*)&object->Data1P;
+        for (i = 0; i < object->LastIndex; i++)
+        {
+          if (cdh_ObjidIsEqual(data_index->DataP.Aref.Objid, object->ExternObjId))
+          {
+            object->ExternStatus = 2;
+            object->ExternFlag = 0;
+            data_index = 0;
+            break;
+          }
+          data_index++;
+        }
+        if (!data_index)
+          break;
 
         extern_attrref = cdh_ObjidToAref(object->ExternObjId);
-        object->ExternStatus = gdh_DLRefObjectInfoAttrref(
-            &extern_attrref, (pwr_tAddress*)&data_pointer, &data_dlid);
+        object->ExternStatus =
+            gdh_DLRefObjectInfoAttrref(&extern_attrref, (pwr_tAddress*)&data_pointer, &data_dlid);
       }
-      if (ODD(object->ExternStatus)) {
+      if (ODD(object->ExternStatus))
+      {
         object->ExternFlag = 0;
         data_index = (plc_t_DataInfo*)&object->Data1P;
         data_index += object->ExternIndex - 1;
 
-        if (object->LastIndex >= object->ExternIndex) {
+        if (object->LastIndex >= object->ExternIndex)
+        {
 #if defined OS_LINUX
-          tmp_buf = malloc((object->LastIndex - object->ExternIndex + 1)
-              * sizeof(*data_max));
-          memcpy(
-              tmp_buf, data_index, (object->LastIndex - object->ExternIndex + 1)
-                  * sizeof(*data_max));
+          tmp_buf = malloc((object->LastIndex - object->ExternIndex + 1) * sizeof(*data_max));
+          memcpy(tmp_buf, data_index, (object->LastIndex - object->ExternIndex + 1) * sizeof(*data_max));
           memcpy((char*)data_index + sizeof(*data_max), tmp_buf,
-              (object->LastIndex - object->ExternIndex + 1)
-                  * sizeof(*data_max));
+                 (object->LastIndex - object->ExternIndex + 1) * sizeof(*data_max));
           free(tmp_buf);
 #else
           memcpy((char*)data_index + sizeof(*data_max), data_index,
-              (object->LastIndex - object->ExternIndex + 1)
-                  * sizeof(*data_max));
+                 (object->LastIndex - object->ExternIndex + 1) * sizeof(*data_max));
 #endif
         }
         data_index->DataP.Ptr = (pwr_tVoid*)data_pointer;
@@ -833,51 +891,58 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
         data_index->Data_Front = 1;
         data_index->Data_Back = 1;
         data_index->Data_Dlid = data_dlid;
-        if (object->ExternOpType == NMPS_OPTYPE_EXTINSERTSELECT) {
+        if (object->ExternOpType == NMPS_OPTYPE_EXTINSERTSELECT)
+        {
           data_index->Data_Select = 1;
         }
         object->LastIndex++;
         if (object->LastIndex == object->MaxSize)
           object->CellFull = 1;
-        if ((object->ExternOpType == NMPS_OPTYPE_EXTINSERT)
-            || (object->ExternOpType == NMPS_OPTYPE_EXTINSERTSELECT))
+        if ((object->ExternOpType == NMPS_OPTYPE_EXTINSERT) ||
+            (object->ExternOpType == NMPS_OPTYPE_EXTINSERTSELECT))
           object->FrontNew = 1;
-        if ((object->SelectIndex != 0)
-            && (object->SelectIndex >= object->ExternIndex))
+        if ((object->SelectIndex != 0) && (object->SelectIndex >= object->ExternIndex))
           object->SelectIndex++;
-      } else
+      }
+      else
         object->ExternFlag = 0;
       break;
     case NMPS_OPTYPE_EXTSELECT_OBJID:
       data_index = (plc_t_DataInfo*)&object->Data1P;
-      for (i = 1; i <= object->LastIndex; i++) {
-        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-                sizeof(pwr_tObjid))) {
+      for (i = 1; i <= object->LastIndex; i++)
+      {
+        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
+        {
           data_index->Data_Select = 1;
           break;
         }
         data_index++;
       }
-      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
+      {
         object->ExternStatus = 2; /* Felkod !!! */
       }
       object->ExternFlag = 0;
       break;
     case NMPS_OPTYPE_EXTUNSELECT_OBJID:
       data_index = (plc_t_DataInfo*)&object->Data1P;
-      for (i = 1; i <= object->LastIndex; i++) {
-        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-                sizeof(pwr_tObjid))) {
+      for (i = 1; i <= object->LastIndex; i++)
+      {
+        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
+        {
           if (data_index->Data_Select)
             object->DataSelected--;
           data_index->Data_Select = 0;
-          if (i == object->SelectIndex) {
-            if (object->DataSelected > 0) {
+          if (i == object->SelectIndex)
+          {
+            if (object->DataSelected > 0)
+            {
               data_last = (plc_t_DataInfo*)&object->Data1P;
               data_last += object->LastIndex - 1;
-              for (i = object->LastIndex; i > 0; i--) {
-                if (data_last->Data_Select) {
+              for (i = object->LastIndex; i > 0; i--)
+              {
+                if (data_last->Data_Select)
+                {
                   memcpy(&object->DataLP, data_last, sizeof(*data_last));
                   memcpy(&object->DataLastP, data_last, sizeof(*data_last));
                   object->SelectIndex = i;
@@ -885,7 +950,9 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
                 }
                 data_last--;
               }
-            } else {
+            }
+            else
+            {
               memset(&object->DataLP, 0, sizeof(*data_last));
               memset(&object->DataLastP, 0, sizeof(*data_last));
               object->SelectIndex = 0;
@@ -895,8 +962,8 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
         }
         data_index++;
       }
-      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
+      {
         object->ExternStatus = 2; /* Felkod !!! */
       }
       object->ExternFlag = 0;
@@ -904,15 +971,14 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
     case NMPS_OPTYPE_EXTDELETE_OBJID:
     case NMPS_OPTYPE_EXTREMOVE_OBJID:
       data_index = (plc_t_DataInfo*)&object->Data1P;
-      for (object->ExternIndex = 1; object->ExternIndex <= object->LastIndex;
-           object->ExternIndex++) {
-        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-                sizeof(pwr_tObjid)))
+      for (object->ExternIndex = 1; object->ExternIndex <= object->LastIndex; object->ExternIndex++)
+      {
+        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
           break;
         data_index++;
       }
-      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
@@ -921,7 +987,8 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
       if (object->ExternOpType == NMPS_OPTYPE_EXTDELETE)
         object->ExternIndex = 1;
     case NMPS_OPTYPE_EXTDELETE_IDX:
-      if (object->ExternIndex > object->LastIndex) {
+      if (object->ExternIndex > object->LastIndex)
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
@@ -930,19 +997,23 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
       data_index = (plc_t_DataInfo*)&object->Data1P;
       data_index += object->ExternIndex - 1;
       sts = gdh_DLUnrefObjectInfo(data_index->Data_Dlid);
-      if (object->Function & NMPS_CELLFUNC_DELETE
-          && object->ExternOpType != NMPS_OPTYPE_EXTREMOVE_OBJID)
+      if (object->Function & NMPS_CELLFUNC_DELETE && object->ExternOpType != NMPS_OPTYPE_EXTREMOVE_OBJID)
         sts = gdh_DeleteObject(data_index->DataP.Aref.Objid);
 
       /* Look for new last selected if data is selected */
-      if (data_index->Data_Select) {
+      if (data_index->Data_Select)
+      {
         object->DataSelected--;
-        if (object->SelectIndex == object->ExternIndex) {
-          if (object->DataSelected > 0) {
+        if (object->SelectIndex == object->ExternIndex)
+        {
+          if (object->DataSelected > 0)
+          {
             data_index = (plc_t_DataInfo*)&object->Data1P;
             data_index += object->LastIndex - 1;
-            for (i = object->LastIndex; i > 0; i--) {
-              if (data_index->Data_Select && i != object->ExternIndex) {
+            for (i = object->LastIndex; i > 0; i--)
+            {
+              if (data_index->Data_Select && i != object->ExternIndex)
+              {
                 memcpy(&object->DataLP, data_index, sizeof(*data_index));
                 memcpy(&object->DataLastP, data_index, sizeof(*data_index));
                 object->SelectIndex = i;
@@ -950,7 +1021,9 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
               }
               data_index--;
             }
-          } else {
+          }
+          else
+          {
             memset(&object->DataLP, 0, sizeof(*data_last));
             memset(&object->DataLastP, 0, sizeof(*data_last));
             object->SelectIndex = 0;
@@ -958,7 +1031,8 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
         }
       }
 
-      if (object->ExternIndex < object->LastIndex) {
+      if (object->ExternIndex < object->LastIndex)
+      {
         size = (object->LastIndex - object->ExternIndex) * sizeof(*data_max);
 #if defined OS_LINUX
         tmp_buf = malloc(size);
@@ -976,34 +1050,34 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
       object->LastIndex--;
       object->ExternFlag = 0;
       data_last--;
-      if ((object->SelectIndex != 0)
-          && (object->SelectIndex > object->ExternIndex))
+      if ((object->SelectIndex != 0) && (object->SelectIndex > object->ExternIndex))
         object->SelectIndex--;
       object->ExternStatus = 1; /* Felkod Success!!! */
       break;
     case NMPS_OPTYPE_EXTMOVEFORW_OBJID:
       data_index = (plc_t_DataInfo*)&object->Data1P;
-      for (object->ExternIndex = 1; object->ExternIndex <= object->LastIndex;
-           object->ExternIndex++) {
-        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-                sizeof(pwr_tObjid)))
+      for (object->ExternIndex = 1; object->ExternIndex <= object->LastIndex; object->ExternIndex++)
+      {
+        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
           break;
         data_index++;
       }
-      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
       }
-      if (object->ExternIndex >= object->LastIndex) {
+      if (object->ExternIndex >= object->LastIndex)
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
       }
       data_index = (plc_t_DataInfo*)&object->Data1P;
       data_index += object->ExternIndex - 1;
-      if (!(data_index->Data_Front && data_index->Data_Back)) {
+      if (!(data_index->Data_Front && data_index->Data_Back))
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
@@ -1019,8 +1093,8 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
 
       object->ExternFlag = 0;
 
-      if ((object->DataSelected == 0)
-          && (object->ExternIndex == object->LastIndex - 1)) {
+      if ((object->DataSelected == 0) && (object->ExternIndex == object->LastIndex - 1))
+      {
         data_last = (plc_t_DataInfo*)&object->Data1P;
         data_last += object->LastIndex - 1;
         memcpy(&object->DataLP, data_last, sizeof(*data_last));
@@ -1030,27 +1104,28 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
       break;
     case NMPS_OPTYPE_EXTMOVEBACKW_OBJID:
       data_index = (plc_t_DataInfo*)&object->Data1P;
-      for (object->ExternIndex = 1; object->ExternIndex <= object->LastIndex;
-           object->ExternIndex++) {
-        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-                sizeof(pwr_tObjid)))
+      for (object->ExternIndex = 1; object->ExternIndex <= object->LastIndex; object->ExternIndex++)
+      {
+        if (!memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
           break;
         data_index++;
       }
-      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_index->DataP.Aref.Objid, &object->ExternObjId, sizeof(pwr_tObjid)))
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
       }
-      if (object->ExternIndex <= 1) {
+      if (object->ExternIndex <= 1)
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
       }
       data_index = (plc_t_DataInfo*)&object->Data1P;
       data_index += object->ExternIndex - 1;
-      if (!(data_index->Data_Front && data_index->Data_Back)) {
+      if (!(data_index->Data_Front && data_index->Data_Back))
+      {
         object->ExternStatus = 2; /* Felkod !!! */
         object->ExternFlag = 0;
         break;
@@ -1066,8 +1141,8 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
 
       object->ExternFlag = 0;
 
-      if ((object->DataSelected == 0)
-          && (object->ExternIndex == object->LastIndex)) {
+      if ((object->DataSelected == 0) && (object->ExternIndex == object->LastIndex))
+      {
         data_last = (plc_t_DataInfo*)&object->Data1P;
         data_last += object->LastIndex - 1;
         memcpy(&object->DataLP, data_last, sizeof(*data_last));
@@ -1082,8 +1157,10 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
   /* Count and find new selected objects */
   object->DataSelected = 0;
   data_index = (plc_t_DataInfo*)&object->Data1P;
-  for (i = 1; i <= object->LastIndex; i++) {
-    if (data_index->Data_Select && !data_index->Data_OldSelect) {
+  for (i = 1; i <= object->LastIndex; i++)
+  {
+    if (data_index->Data_Select && !data_index->Data_OldSelect)
+    {
       memcpy(&object->DataLP, data_index, sizeof(*data_index));
       memcpy(&object->DataLastP, data_index, sizeof(*data_index));
       object->SelectIndex = i;
@@ -1096,12 +1173,14 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
     data_index->Data_OldSelect = data_index->Data_Select;
     data_index++;
   }
-  if ((object->Function & NMPS_CELLFUNC_SINGELSELECT)
-      || (object->Function & NMPS_CELLFUNC_ONESELECT)) {
+  if ((object->Function & NMPS_CELLFUNC_SINGELSELECT) || (object->Function & NMPS_CELLFUNC_ONESELECT))
+  {
     /* Unselect everyone except last selected */
-    if (object->DataSelected > 1) {
+    if (object->DataSelected > 1)
+    {
       data_index = (plc_t_DataInfo*)&object->Data1P;
-      for (i = 1; i <= object->LastIndex; i++) {
+      for (i = 1; i <= object->LastIndex; i++)
+      {
         if (i != object->SelectIndex)
           data_index->Data_Select = 0;
         data_index++;
@@ -1111,8 +1190,10 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
         object->BackupNow = 1;
     }
   }
-  if (object->Function & NMPS_CELLFUNC_ONESELECT) {
-    if ((object->DataSelected == 0) && (object->LastIndex != 0)) {
+  if (object->Function & NMPS_CELLFUNC_ONESELECT)
+  {
+    if ((object->DataSelected == 0) && (object->LastIndex != 0))
+    {
       data_index = (plc_t_DataInfo*)&object->Data1P;
       data_index += object->LastIndex - 1;
       data_index->Data_Select = 1;
@@ -1125,31 +1206,35 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
         object->BackupNow = 1;
     }
   }
-  if (object->DataSelected == 0) {
+  if (object->DataSelected == 0)
+  {
     memset(&object->DataLP, 0, sizeof(*data_last));
     memset(&object->DataLastP, 0, sizeof(*data_last));
     object->SelectIndex = 0;
   }
 
-  if (object->InFlag) {
+  if (object->InFlag)
+  {
     /* Insert new object in Front position */
 
-    switch (object->InOpType) {
+    switch (object->InOpType)
+    {
     case NMPS_OPTYPE_FORWARD_FRONT:
       /* Insert at front of object front of data */
-      if (object->CellFull) {
+      if (object->CellFull)
+      {
         lck_UnlockNMps;
         return;
       }
-      if (object->LastIndex > 0) {
+      if (object->LastIndex > 0)
+      {
 #if defined OS_LINUX
         tmp_buf = malloc(object->LastIndex * sizeof(*data_max));
         memcpy(tmp_buf, &object->Data1P, object->LastIndex * sizeof(*data_max));
         memcpy(&object->Data2P, tmp_buf, object->LastIndex * sizeof(*data_max));
         free(tmp_buf);
 #else
-        memcpy(&object->Data2P, &object->Data1P,
-            object->LastIndex * sizeof(*data_max));
+        memcpy(&object->Data2P, &object->Data1P, object->LastIndex * sizeof(*data_max));
 #endif
       }
       object->Data1P.Ptr = object->InPointer;
@@ -1167,34 +1252,36 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
         object->CellFull = 1;
       break;
     case NMPS_OPTYPE_FORWARD_BACK:
-      if (memcmp(&object->Data1P.Aref.Objid, &object->InObjId,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&object->Data1P.Aref.Objid, &object->InObjId, sizeof(pwr_tObjid)))
+      {
         /* This it not the correct object */
         object->InFlag = 0;
         lck_UnlockNMps;
         return;
       }
       object->Data1_Back = 1;
-      if (object->SelectIndex == 1) {
+      if (object->SelectIndex == 1)
+      {
         object->DataL_Back = 1;
         object->DataLast_Back = 1;
       }
       object->InFlag = 0;
       break;
     case NMPS_OPTYPE_FORWARD_UNIT:
-      if (object->CellFull) {
+      if (object->CellFull)
+      {
         lck_UnlockNMps;
         return;
       }
-      if (object->LastIndex > 0) {
+      if (object->LastIndex > 0)
+      {
 #if defined OS_LINUX
         tmp_buf = malloc(object->LastIndex * sizeof(*data_max));
         memcpy(tmp_buf, &object->Data1P, object->LastIndex * sizeof(*data_max));
         memcpy(&object->Data2P, tmp_buf, object->LastIndex * sizeof(*data_max));
         free(tmp_buf);
 #else
-        memcpy(&object->Data2P, &object->Data1P,
-            object->LastIndex * sizeof(*data_max));
+        memcpy(&object->Data2P, &object->Data1P, object->LastIndex * sizeof(*data_max));
 #endif
       }
       object->Data1P.Ptr = object->InPointer;
@@ -1213,7 +1300,8 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
       break;
     case NMPS_OPTYPE_REVERSE_BACK:
       /* Insert at rear of object back of data */
-      if (object->CellFull) {
+      if (object->CellFull)
+      {
         lck_UnlockNMps;
         return;
       }
@@ -1231,7 +1319,8 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
       break;
     case NMPS_OPTYPE_REVERSE_UNIT:
       /* Insert at rear of object all of data */
-      if (object->CellFull) {
+      if (object->CellFull)
+      {
         lck_UnlockNMps;
         return;
       }
@@ -1250,8 +1339,8 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
     case NMPS_OPTYPE_REVERSE_FRONT:
       data_last = (plc_t_DataInfo*)&object->Data1P;
       data_last += object->LastIndex - 1;
-      if (memcmp(&data_last->DataP.Aref.Objid, &object->InObjId,
-              sizeof(pwr_tObjid))) {
+      if (memcmp(&data_last->DataP.Aref.Objid, &object->InObjId, sizeof(pwr_tObjid)))
+      {
         /* This it not the correct object */
         object->InFlag = 0;
         lck_UnlockNMps;
@@ -1264,14 +1353,17 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
     if (object->Function & NMPS_CELLFUNC_BACKUP)
       object->BackupNow = 1;
   }
-  if (object->OutRearFlag) {
+  if (object->OutRearFlag)
+  {
     /* Remove an object in Rear position */
 
-    switch (object->OutRearOpType) {
+    switch (object->OutRearOpType)
+    {
     case NMPS_OPTYPE_UNIT:
 
       /* Get the last data */
-      if (object->LastIndex == 0) {
+      if (object->LastIndex == 0)
+      {
         object->OutRearFlag = 0;
         lck_UnlockNMps;
         return;
@@ -1280,7 +1372,8 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
       data_index = (plc_t_DataInfo*)&object->Data1P;
       data_index += object->SelectIndex - 1;
 
-      if (object->SelectIndex < object->LastIndex) {
+      if (object->SelectIndex < object->LastIndex)
+      {
         size = (object->LastIndex - object->SelectIndex) * sizeof(*data_max);
 #if defined OS_LINUX
         tmp_buf = malloc(size);
@@ -1298,11 +1391,14 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
       object->LastIndex--;
       object->DataSelected--;
       /* Find next selected, search backwards */
-      if (object->DataSelected > 0) {
+      if (object->DataSelected > 0)
+      {
         data_index = (plc_t_DataInfo*)&object->Data1P;
         data_index += object->LastIndex - 1;
-        for (i = object->LastIndex; i > 0; i--) {
-          if (data_index->Data_Select) {
+        for (i = object->LastIndex; i > 0; i--)
+        {
+          if (data_index->Data_Select)
+          {
             memcpy(&object->DataLP, data_index, sizeof(*data_index));
             memcpy(&object->DataLastP, data_index, sizeof(*data_index));
             object->SelectIndex = i;
@@ -1310,7 +1406,9 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
           }
           data_index--;
         }
-      } else {
+      }
+      else
+      {
         memset(&object->DataLP, 0, sizeof(*data_last));
         memset(&object->DataLastP, 0, sizeof(*data_last));
         object->SelectIndex = 0;
@@ -1321,28 +1419,36 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
     if (object->Function & NMPS_CELLFUNC_BACKUP)
       object->BackupNow = 1;
   }
-  if (object->OutFrontFlag) {
+  if (object->OutFrontFlag)
+  {
     /* Remove an object in Front position */
 
-    switch (object->OutFrontOpType) {
+    switch (object->OutFrontOpType)
+    {
     case NMPS_OPTYPE_FRONT:
     case NMPS_OPTYPE_UNIT:
 
       /* Get the last data */
-      if (object->LastIndex == 0) {
+      if (object->LastIndex == 0)
+      {
         object->OutFrontFlag = 0;
         lck_UnlockNMps;
         return;
       }
 
-      if (object->Data1_Select) {
+      if (object->Data1_Select)
+      {
         object->DataSelected--;
-        if (object->SelectIndex == 1) {
-          if (object->DataSelected > 0) {
+        if (object->SelectIndex == 1)
+        {
+          if (object->DataSelected > 0)
+          {
             data_index = (plc_t_DataInfo*)&object->Data1P;
             data_index += object->LastIndex - 1;
-            for (i = object->LastIndex; i > 1; i--) {
-              if (data_index->Data_Select) {
+            for (i = object->LastIndex; i > 1; i--)
+            {
+              if (data_index->Data_Select)
+              {
                 memcpy(&object->DataLP, data_index, sizeof(*data_index));
                 memcpy(&object->DataLastP, data_index, sizeof(*data_index));
                 object->SelectIndex = i;
@@ -1350,7 +1456,9 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
               }
               data_index--;
             }
-          } else {
+          }
+          else
+          {
             memset(&object->DataLP, 0, sizeof(*data_last));
             memset(&object->DataLastP, 0, sizeof(*data_last));
             object->SelectIndex = 0;
@@ -1362,14 +1470,11 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
 
 #if defined OS_LINUX
       tmp_buf = malloc((object->LastIndex - 1) * sizeof(*data_last));
-      memcpy(tmp_buf, &object->Data2P,
-          (object->LastIndex - 1) * sizeof(*data_last));
-      memcpy(&object->Data1P, tmp_buf,
-          (object->LastIndex - 1) * sizeof(*data_last));
+      memcpy(tmp_buf, &object->Data2P, (object->LastIndex - 1) * sizeof(*data_last));
+      memcpy(&object->Data1P, tmp_buf, (object->LastIndex - 1) * sizeof(*data_last));
       free(tmp_buf);
 #else
-      memcpy(&object->Data1P, &object->Data2P,
-          (object->LastIndex - 1) * sizeof(*data_last));
+      memcpy(&object->Data1P, &object->Data2P, (object->LastIndex - 1) * sizeof(*data_last));
 #endif
       data_last = (plc_t_DataInfo*)&object->Data1P;
       data_last += object->LastIndex - 1;
@@ -1381,7 +1486,8 @@ void NMpsStoreCell_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell* object)
     case NMPS_OPTYPE_BACK:
       object->Data1_Back = 0;
       object->OutFrontFlag = 0;
-      if (object->LastIndex == object->SelectIndex) {
+      if (object->LastIndex == object->SelectIndex)
+      {
         object->DataL_Back = 0;
         object->DataLast_Back = 0;
       }
@@ -1407,8 +1513,10 @@ void NMpsOutCell_exec(plc_sThread* tp, pwr_sClass_NMpsOutCell* object)
   if (object->FrontNew)
     object->FrontNew = 0;
 
-  if (object->InFlag) {
-    switch (object->InOpType) {
+  if (object->InFlag)
+  {
+    switch (object->InOpType)
+    {
     case NMPS_OPTYPE_FORWARD_UNIT:
       sts = gdh_DLUnrefObjectInfo(object->InDlid);
       if (object->Function & NMPS_CELLFUNC_DELETE)
@@ -1430,13 +1538,15 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
   if (object->Status)
     object->Status = 0;
 
-  if ((*(object->TriggForwFrontP) && !object->OldTriggForwFront)
-      || (*(object->TriggForwFrontP) && object->Function & NMPS_TRPFUNC_LEVEL)
-      || object->FuncAllForward) {
-    if (object->Function & NMPS_TRPFUNC_UNIT) {
+  if ((*(object->TriggForwFrontP) && !object->OldTriggForwFront) ||
+      (*(object->TriggForwFrontP) && object->Function & NMPS_TRPFUNC_LEVEL) || object->FuncAllForward)
+  {
+    if (object->Function & NMPS_TRPFUNC_UNIT)
+    {
       /* Move all of data */
       /* Check destination */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         goto trp_return;
@@ -1445,7 +1555,8 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trp_return;
@@ -1454,37 +1565,40 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
         return;
 
       /* Check that both Back and Front is in the in cell */
-      if (!(((pwr_sClass_NMpsCell*)(object->InP))->DataL_Back
-              && ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Front)) {
+      if (!(((pwr_sClass_NMpsCell*)(object->InP))->DataL_Back &&
+            ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Front))
+      {
         object->Status = 1;
         goto trp_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
       ((pwr_sClass_NMpsCell*)(object->OutP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType
-          = NMPS_OPTYPE_FORWARD_UNIT;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType = NMPS_OPTYPE_FORWARD_UNIT;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutRearOpType = NMPS_OPTYPE_UNIT;
-    } else if ((object->Function & NMPS_TRPFUNC_ALL)
-        || (object->Function & NMPS_TRPFUNC_ALLEMPTY)) {
+    }
+    else if ((object->Function & NMPS_TRPFUNC_ALL) || (object->Function & NMPS_TRPFUNC_ALLEMPTY))
+    {
       /* Move all of data */
       /* Check destination */
-      if (*(object->TriggForwFrontP) && !object->OldTriggForwFront) {
+      if (*(object->TriggForwFrontP) && !object->OldTriggForwFront)
+      {
         /* This is the first object to move */
-        if (object->FuncAllReverse || object->FuncAllForward) {
+        if (object->FuncAllReverse || object->FuncAllForward)
+        {
           /* We are already busy moving last trigg */
           return;
         }
 
-        if (object->Function & NMPS_TRPFUNC_ALLEMPTY) {
-          if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData != 0) {
+        if (object->Function & NMPS_TRPFUNC_ALLEMPTY)
+        {
+          if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData != 0)
+          {
             /* Destination cell is not empty */
             object->Status = 1;
             goto trp_return;
@@ -1492,7 +1606,8 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
         }
       }
 
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         object->FuncAllForward = 0;
@@ -1502,7 +1617,8 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trp_return;
@@ -1510,33 +1626,34 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
       if (((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag)
         return;
 
-      if (object->Function & NMPS_TRPFUNC_SLOW && object->FuncAllForward == 1) {
+      if (object->Function & NMPS_TRPFUNC_SLOW && object->FuncAllForward == 1)
+      {
         /* Wait till next scan */
         object->FuncAllForward = 2;
         goto trp_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
       ((pwr_sClass_NMpsCell*)(object->OutP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType
-          = NMPS_OPTYPE_FORWARD_UNIT;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType = NMPS_OPTYPE_FORWARD_UNIT;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutRearOpType = NMPS_OPTYPE_UNIT;
 
       if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 1)
         object->FuncAllForward = 0;
       else
         object->FuncAllForward = 1;
-    } else {
+    }
+    else
+    {
       /* Move front of data */
       /* Check destination */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         goto trp_return;
@@ -1545,7 +1662,8 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trp_return;
@@ -1553,31 +1671,31 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
       if (((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag)
         return;
 
-      if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr
-          == ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr ==
+          ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr)
+      {
         /* This should be a Back trigg */
         object->Status = 1;
         goto trp_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
       ((pwr_sClass_NMpsCell*)(object->OutP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType
-          = NMPS_OPTYPE_FORWARD_FRONT;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType = NMPS_OPTYPE_FORWARD_FRONT;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutRearOpType = NMPS_OPTYPE_FRONT;
     }
   }
 
-  if (*(object->TriggForwBackP) && !object->OldTriggForwBack) {
+  if (*(object->TriggForwBackP) && !object->OldTriggForwBack)
+  {
     /* Check source */
-    if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 0) {
+    if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 0)
+    {
       /* Nothing to transport */
       object->Status = 1;
       goto trp_return;
@@ -1585,29 +1703,30 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
     if (((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag)
       return;
 
-    if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr
-        != ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr) {
+    if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr !=
+        ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr)
+    {
       /* This should be a Front trigg */
       object->Status = 1;
       goto trp_return;
     }
 
     /* Transport data */
-    ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer
-        = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
-    ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId
-        = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
-    ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid
-        = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
+    ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
+    ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId =
+        ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
+    ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
     ((pwr_sClass_NMpsCell*)(object->OutP))->InFlag = 1;
     ((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag = 1;
     ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType = NMPS_OPTYPE_FORWARD_BACK;
     ((pwr_sClass_NMpsCell*)(object->InP))->OutRearOpType = NMPS_OPTYPE_BACK;
   }
 
-  if (*(object->TriggReverseBackP) && !object->OldTriggReverseBack) {
+  if (*(object->TriggReverseBackP) && !object->OldTriggReverseBack)
+  {
     /* Check destination */
-    if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull) {
+    if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull)
+    {
       /* Destination cell is full */
       object->Status = 1;
       goto trp_return;
@@ -1616,7 +1735,8 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
       return;
 
     /* Check source */
-    if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 0) {
+    if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 0)
+    {
       /* Nothing to transport */
       object->Status = 1;
       goto trp_return;
@@ -1624,33 +1744,33 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
     if (((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag)
       return;
 
-    if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr
-        == ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr) {
+    if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr ==
+        ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr)
+    {
       /* This should be a Front trigg */
       object->Status = 1;
       goto trp_return;
     }
 
     /* Transport data */
-    ((pwr_sClass_NMpsCell*)(object->InP))->InPointer
-        = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
-    ((pwr_sClass_NMpsCell*)(object->InP))->InObjId
-        = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
-    ((pwr_sClass_NMpsCell*)(object->InP))->InDlid
-        = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
+    ((pwr_sClass_NMpsCell*)(object->InP))->InPointer = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
+    ((pwr_sClass_NMpsCell*)(object->InP))->InObjId =
+        ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
+    ((pwr_sClass_NMpsCell*)(object->InP))->InDlid = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
     ((pwr_sClass_NMpsCell*)(object->InP))->InFlag = 1;
     ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag = 1;
     ((pwr_sClass_NMpsCell*)(object->InP))->InOpType = NMPS_OPTYPE_REVERSE_BACK;
     ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontOpType = NMPS_OPTYPE_BACK;
   }
 
-  if ((*(object->TriggReverseFrontP) && !object->OldTriggReverseFront)
-      || (*(object->TriggReverseFrontP)
-             && object->Function & NMPS_TRPFUNC_LEVEL)
-      || object->FuncAllReverse) {
-    if (object->Function & NMPS_TRPFUNC_UNIT) {
+  if ((*(object->TriggReverseFrontP) && !object->OldTriggReverseFront) ||
+      (*(object->TriggReverseFrontP) && object->Function & NMPS_TRPFUNC_LEVEL) || object->FuncAllReverse)
+  {
+    if (object->Function & NMPS_TRPFUNC_UNIT)
+    {
       /* Check destination */
-      if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         goto trp_return;
@@ -1659,7 +1779,8 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trp_return;
@@ -1668,44 +1789,47 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
         return;
 
       /* Check that both Front and Back is in the cell */
-      if (!(((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Back
-              && ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Front)) {
+      if (!(((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Back &&
+            ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Front))
+      {
         object->Status = 1;
         goto trp_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
       ((pwr_sClass_NMpsCell*)(object->InP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType
-          = NMPS_OPTYPE_REVERSE_UNIT;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType = NMPS_OPTYPE_REVERSE_UNIT;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontOpType = NMPS_OPTYPE_UNIT;
-
-    } else if ((object->Function & NMPS_TRPFUNC_ALL)
-        || (object->Function & NMPS_TRPFUNC_ALLEMPTY)) {
-      if (*(object->TriggReverseFrontP) && !object->OldTriggReverseFront) {
+    }
+    else if ((object->Function & NMPS_TRPFUNC_ALL) || (object->Function & NMPS_TRPFUNC_ALLEMPTY))
+    {
+      if (*(object->TriggReverseFrontP) && !object->OldTriggReverseFront)
+      {
         /* This is the first object to move */
-        if (object->FuncAllReverse || object->FuncAllForward) {
+        if (object->FuncAllReverse || object->FuncAllForward)
+        {
           /* We are already busy moving last trigg */
           return;
         }
 
         /* Check destination */
-        if (object->Function & NMPS_TRPFUNC_ALLEMPTY) {
-          if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex) {
+        if (object->Function & NMPS_TRPFUNC_ALLEMPTY)
+        {
+          if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex)
+          {
             /* Destination cell is not empty */
             object->Status = 1;
             goto trp_return;
           }
         }
       }
-      if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         object->FuncAllReverse = 0;
@@ -1715,7 +1839,8 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trp_return;
@@ -1723,38 +1848,40 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
       if (((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag)
         return;
 
-      if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr
-          == ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr ==
+          ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr)
+      {
         object->Status = 1;
         goto trp_return;
       }
 
-      if (object->Function & NMPS_TRPFUNC_SLOW && object->FuncAllForward == 1) {
+      if (object->Function & NMPS_TRPFUNC_SLOW && object->FuncAllForward == 1)
+      {
         /* Wait till next scan */
         object->FuncAllForward = 2;
         goto trp_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
       ((pwr_sClass_NMpsCell*)(object->InP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType
-          = NMPS_OPTYPE_REVERSE_UNIT;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType = NMPS_OPTYPE_REVERSE_UNIT;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontOpType = NMPS_OPTYPE_UNIT;
 
       if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 1)
         object->FuncAllReverse = 0;
       else
         object->FuncAllReverse = 1;
-    } else {
+    }
+    else
+    {
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trp_return;
@@ -1762,26 +1889,23 @@ void NMpsTrp_exec(plc_sThread* tp, pwr_sClass_NMpsTrp* object)
       if (((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag)
         return;
 
-      if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr
-          != ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr !=
+          ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr)
+      {
         /* This should be a Back trigg */
         object->Status = 1;
         goto trp_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
       ((pwr_sClass_NMpsCell*)(object->InP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType
-          = NMPS_OPTYPE_REVERSE_FRONT;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontOpType
-          = NMPS_OPTYPE_FRONT;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType = NMPS_OPTYPE_REVERSE_FRONT;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontOpType = NMPS_OPTYPE_FRONT;
     }
   }
 
@@ -1791,7 +1915,8 @@ trp_return:
   object->OldTriggForwBack = *(object->TriggForwBackP);
   object->OldTriggReverseBack = *(object->TriggReverseBackP);
 
-  if (object->Function & NMPS_TRPFUNC_TRIGGRESET) {
+  if (object->Function & NMPS_TRPFUNC_TRIGGRESET)
+  {
     /* Reset the trigg flags */
     object->TriggForwFront = 0;
     object->TriggReverseFront = 0;
@@ -1810,13 +1935,15 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
   if (object->Status)
     object->Status = 0;
 
-  if ((*(object->TriggForwFrontP) && !object->OldTriggForwFront)
-      || (*(object->TriggForwFrontP) && object->Function & NMPS_TRPFUNC_LEVEL)
-      || object->FuncAllForward) {
-    if (object->Function & NMPS_TRPFUNC_UNIT) {
+  if ((*(object->TriggForwFrontP) && !object->OldTriggForwFront) ||
+      (*(object->TriggForwFrontP) && object->Function & NMPS_TRPFUNC_LEVEL) || object->FuncAllForward)
+  {
+    if (object->Function & NMPS_TRPFUNC_UNIT)
+    {
       /* Move all of data */
       /* Check destination */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         goto trprr_return;
@@ -1825,7 +1952,8 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trprr_return;
@@ -1834,37 +1962,40 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
         return;
 
       /* Check that both Back and Front is in the in cell */
-      if (!(((pwr_sClass_NMpsCell*)(object->InP))->DataL_Back
-              && ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Front)) {
+      if (!(((pwr_sClass_NMpsCell*)(object->InP))->DataL_Back &&
+            ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Front))
+      {
         object->Status = 1;
         goto trprr_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
       ((pwr_sClass_NMpsCell*)(object->OutP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType
-          = NMPS_OPTYPE_REVERSE_UNIT;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType = NMPS_OPTYPE_REVERSE_UNIT;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutRearOpType = NMPS_OPTYPE_UNIT;
-    } else if ((object->Function & NMPS_TRPFUNC_ALL)
-        || (object->Function & NMPS_TRPFUNC_ALLEMPTY)) {
+    }
+    else if ((object->Function & NMPS_TRPFUNC_ALL) || (object->Function & NMPS_TRPFUNC_ALLEMPTY))
+    {
       /* Move all of data */
       /* Check destination */
-      if (*(object->TriggForwFrontP) && !object->OldTriggForwFront) {
+      if (*(object->TriggForwFrontP) && !object->OldTriggForwFront)
+      {
         /* This is the first object to move */
-        if (object->FuncAllReverse || object->FuncAllForward) {
+        if (object->FuncAllReverse || object->FuncAllForward)
+        {
           /* We are already busy moving last trigg */
           return;
         }
 
-        if (object->Function & NMPS_TRPFUNC_ALLEMPTY) {
-          if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData != 0) {
+        if (object->Function & NMPS_TRPFUNC_ALLEMPTY)
+        {
+          if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData != 0)
+          {
             /* Destination cell is not empty */
             object->Status = 1;
             goto trprr_return;
@@ -1872,7 +2003,8 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
         }
       }
 
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         object->FuncAllForward = 0;
@@ -1882,7 +2014,8 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trprr_return;
@@ -1890,33 +2023,34 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
       if (((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag)
         return;
 
-      if (object->Function & NMPS_TRPFUNC_SLOW && object->FuncAllForward == 1) {
+      if (object->Function & NMPS_TRPFUNC_SLOW && object->FuncAllForward == 1)
+      {
         /* Wait till next scan */
         object->FuncAllForward = 2;
         goto trprr_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
       ((pwr_sClass_NMpsCell*)(object->OutP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType
-          = NMPS_OPTYPE_REVERSE_UNIT;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType = NMPS_OPTYPE_REVERSE_UNIT;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutRearOpType = NMPS_OPTYPE_UNIT;
 
       if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 1)
         object->FuncAllForward = 0;
       else
         object->FuncAllForward = 1;
-    } else {
+    }
+    else
+    {
       /* Move front of data */
       /* Check destination */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         goto trprr_return;
@@ -1925,7 +2059,8 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trprr_return;
@@ -1933,31 +2068,31 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
       if (((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag)
         return;
 
-      if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr
-          == ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr ==
+          ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr)
+      {
         /* This should be a Back trigg */
         object->Status = 1;
         goto trprr_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
       ((pwr_sClass_NMpsCell*)(object->OutP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType
-          = NMPS_OPTYPE_REVERSE_BACK;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType = NMPS_OPTYPE_REVERSE_BACK;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutRearOpType = NMPS_OPTYPE_FRONT;
     }
   }
 
-  if (*(object->TriggForwBackP) && !object->OldTriggForwBack) {
+  if (*(object->TriggForwBackP) && !object->OldTriggForwBack)
+  {
     /* Check source */
-    if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 0) {
+    if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData == 0)
+    {
       /* Nothing to transport */
       object->Status = 1;
       goto trprr_return;
@@ -1965,30 +2100,30 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
     if (((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag)
       return;
 
-    if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr
-        != ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr) {
+    if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr !=
+        ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr)
+    {
       /* This should be a Front trigg */
       object->Status = 1;
       goto trprr_return;
     }
 
     /* Transport data */
-    ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer
-        = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
-    ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId
-        = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
-    ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid
-        = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
+    ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer = ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr;
+    ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId =
+        ((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Aref.Objid;
+    ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid = ((pwr_sClass_NMpsCell*)(object->InP))->DataL_Dlid;
     ((pwr_sClass_NMpsCell*)(object->OutP))->InFlag = 1;
     ((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag = 1;
-    ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType
-        = NMPS_OPTYPE_REVERSE_FRONT;
+    ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType = NMPS_OPTYPE_REVERSE_FRONT;
     ((pwr_sClass_NMpsCell*)(object->InP))->OutRearOpType = NMPS_OPTYPE_BACK;
   }
 
-  if (*(object->TriggReverseBackP) && !object->OldTriggReverseBack) {
+  if (*(object->TriggReverseBackP) && !object->OldTriggReverseBack)
+  {
     /* Check destination */
-    if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull) {
+    if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull)
+    {
       /* Destination cell is full */
       object->Status = 1;
       goto trprr_return;
@@ -1997,7 +2132,8 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
       return;
 
     /* Check source */
-    if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 0) {
+    if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 0)
+    {
       /* Nothing to transport */
       object->Status = 1;
       goto trprr_return;
@@ -2005,33 +2141,33 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
     if (((pwr_sClass_NMpsCell*)(object->OutP))->OutRearFlag)
       return;
 
-    if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr
-        == ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr) {
+    if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr ==
+        ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr)
+    {
       /* This should be a Front trigg */
       object->Status = 1;
       goto trprr_return;
     }
 
     /* Transport data */
-    ((pwr_sClass_NMpsCell*)(object->InP))->InPointer
-        = ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr;
-    ((pwr_sClass_NMpsCell*)(object->InP))->InObjId
-        = ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Aref.Objid;
-    ((pwr_sClass_NMpsCell*)(object->InP))->InDlid
-        = ((pwr_sClass_NMpsCell*)(object->OutP))->DataL_Dlid;
+    ((pwr_sClass_NMpsCell*)(object->InP))->InPointer = ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr;
+    ((pwr_sClass_NMpsCell*)(object->InP))->InObjId =
+        ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Aref.Objid;
+    ((pwr_sClass_NMpsCell*)(object->InP))->InDlid = ((pwr_sClass_NMpsCell*)(object->OutP))->DataL_Dlid;
     ((pwr_sClass_NMpsCell*)(object->InP))->InFlag = 1;
     ((pwr_sClass_NMpsCell*)(object->OutP))->OutRearFlag = 1;
     ((pwr_sClass_NMpsCell*)(object->InP))->InOpType = NMPS_OPTYPE_REVERSE_BACK;
     ((pwr_sClass_NMpsCell*)(object->OutP))->OutRearOpType = NMPS_OPTYPE_FRONT;
   }
 
-  if ((*(object->TriggReverseFrontP) && !object->OldTriggReverseFront)
-      || (*(object->TriggReverseFrontP)
-             && object->Function & NMPS_TRPFUNC_LEVEL)
-      || object->FuncAllReverse) {
-    if (object->Function & NMPS_TRPFUNC_UNIT) {
+  if ((*(object->TriggReverseFrontP) && !object->OldTriggReverseFront) ||
+      (*(object->TriggReverseFrontP) && object->Function & NMPS_TRPFUNC_LEVEL) || object->FuncAllReverse)
+  {
+    if (object->Function & NMPS_TRPFUNC_UNIT)
+    {
       /* Check destination */
-      if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         goto trprr_return;
@@ -2040,7 +2176,8 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trprr_return;
@@ -2049,44 +2186,47 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
         return;
 
       /* Check that both Front and Back is in the cell */
-      if (!(((pwr_sClass_NMpsCell*)(object->OutP))->DataL_Back
-              && ((pwr_sClass_NMpsCell*)(object->OutP))->DataL_Front)) {
+      if (!(((pwr_sClass_NMpsCell*)(object->OutP))->DataL_Back &&
+            ((pwr_sClass_NMpsCell*)(object->OutP))->DataL_Front))
+      {
         object->Status = 1;
         goto trprr_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->DataL_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer = ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid = ((pwr_sClass_NMpsCell*)(object->OutP))->DataL_Dlid;
       ((pwr_sClass_NMpsCell*)(object->InP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutRearFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType
-          = NMPS_OPTYPE_REVERSE_UNIT;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType = NMPS_OPTYPE_REVERSE_UNIT;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutRearOpType = NMPS_OPTYPE_UNIT;
-
-    } else if ((object->Function & NMPS_TRPFUNC_ALL)
-        || (object->Function & NMPS_TRPFUNC_ALLEMPTY)) {
-      if (*(object->TriggReverseFrontP) && !object->OldTriggReverseFront) {
+    }
+    else if ((object->Function & NMPS_TRPFUNC_ALL) || (object->Function & NMPS_TRPFUNC_ALLEMPTY))
+    {
+      if (*(object->TriggReverseFrontP) && !object->OldTriggReverseFront)
+      {
         /* This is the first object to move */
-        if (object->FuncAllReverse || object->FuncAllForward) {
+        if (object->FuncAllReverse || object->FuncAllForward)
+        {
           /* We are already busy moving last trigg */
           return;
         }
 
         /* Check destination */
-        if (object->Function & NMPS_TRPFUNC_ALLEMPTY) {
-          if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData) {
+        if (object->Function & NMPS_TRPFUNC_ALLEMPTY)
+        {
+          if (((pwr_sClass_NMpsCell*)(object->InP))->NumberOfData)
+          {
             /* Destination cell is not empty */
             object->Status = 1;
             goto trprr_return;
           }
         }
       }
-      if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         object->FuncAllReverse = 0;
@@ -2096,7 +2236,8 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trprr_return;
@@ -2104,38 +2245,40 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
       if (((pwr_sClass_NMpsCell*)(object->OutP))->OutRearFlag)
         return;
 
-      if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr
-          == ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr ==
+          ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr)
+      {
         object->Status = 1;
         goto trprr_return;
       }
 
-      if (object->Function & NMPS_TRPFUNC_SLOW && object->FuncAllForward == 1) {
+      if (object->Function & NMPS_TRPFUNC_SLOW && object->FuncAllForward == 1)
+      {
         /* Wait till next scan */
         object->FuncAllForward = 2;
         goto trprr_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->DataL_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer = ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid = ((pwr_sClass_NMpsCell*)(object->OutP))->DataL_Dlid;
       ((pwr_sClass_NMpsCell*)(object->InP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutRearFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType
-          = NMPS_OPTYPE_REVERSE_UNIT;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType = NMPS_OPTYPE_REVERSE_UNIT;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutRearOpType = NMPS_OPTYPE_UNIT;
 
       if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 1)
         object->FuncAllReverse = 0;
       else
         object->FuncAllReverse = 1;
-    } else {
+    }
+    else
+    {
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->NumberOfData == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
 
@@ -2144,24 +2287,22 @@ void NMpsTrpRR_exec(plc_sThread* tp, pwr_sClass_NMpsTrpRR* object)
       if (((pwr_sClass_NMpsCell*)(object->OutP))->OutRearFlag)
         return;
 
-      if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr
-          != ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->DataLP.Ptr !=
+          ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr)
+      {
         /* This should be a Back trigg */
         object->Status = 1;
         goto trprr_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->DataL_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer = ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->OutP))->DataLP.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid = ((pwr_sClass_NMpsCell*)(object->OutP))->DataL_Dlid;
       ((pwr_sClass_NMpsCell*)(object->InP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutRearFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType
-          = NMPS_OPTYPE_REVERSE_FRONT;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType = NMPS_OPTYPE_REVERSE_FRONT;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutRearOpType = NMPS_OPTYPE_BACK;
     }
   }
@@ -2172,7 +2313,8 @@ trprr_return:
   object->OldTriggForwBack = *(object->TriggForwBackP);
   object->OldTriggReverseBack = *(object->TriggReverseBackP);
 
-  if (object->Function & NMPS_TRPFUNC_TRIGGRESET) {
+  if (object->Function & NMPS_TRPFUNC_TRIGGRESET)
+  {
     /* Reset the trigg flags */
     object->TriggForwFront = 0;
     object->TriggReverseFront = 0;
@@ -2191,13 +2333,15 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
   if (object->Status)
     object->Status = 0;
 
-  if ((*(object->TriggForwFrontP) && !object->OldTriggForwFront)
-      || (*(object->TriggForwFrontP) && object->Function & NMPS_TRPFUNC_LEVEL)
-      || object->FuncAllForward) {
-    if (object->Function & NMPS_TRPFUNC_UNIT) {
+  if ((*(object->TriggForwFrontP) && !object->OldTriggForwFront) ||
+      (*(object->TriggForwFrontP) && object->Function & NMPS_TRPFUNC_LEVEL) || object->FuncAllForward)
+  {
+    if (object->Function & NMPS_TRPFUNC_UNIT)
+    {
       /* Move all of data */
       /* Check destination */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         goto trpff_return;
@@ -2206,7 +2350,8 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trpff_return;
@@ -2215,37 +2360,40 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
         return;
 
       /* Check that both Back and Front is in the in cell */
-      if (!(((pwr_sClass_NMpsCell*)(object->InP))->Data1_Back
-              && ((pwr_sClass_NMpsCell*)(object->InP))->Data1_Front)) {
+      if (!(((pwr_sClass_NMpsCell*)(object->InP))->Data1_Back &&
+            ((pwr_sClass_NMpsCell*)(object->InP))->Data1_Front))
+      {
         object->Status = 1;
         goto trpff_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->InP))->Data1_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer = ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid = ((pwr_sClass_NMpsCell*)(object->InP))->Data1_Dlid;
       ((pwr_sClass_NMpsCell*)(object->OutP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutFrontFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType
-          = NMPS_OPTYPE_FORWARD_UNIT;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType = NMPS_OPTYPE_FORWARD_UNIT;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutFrontOpType = NMPS_OPTYPE_UNIT;
-    } else if ((object->Function & NMPS_TRPFUNC_ALL)
-        || (object->Function & NMPS_TRPFUNC_ALLEMPTY)) {
+    }
+    else if ((object->Function & NMPS_TRPFUNC_ALL) || (object->Function & NMPS_TRPFUNC_ALLEMPTY))
+    {
       /* Move all of data */
       /* Check destination */
-      if (*(object->TriggForwFrontP) && !object->OldTriggForwFront) {
+      if (*(object->TriggForwFrontP) && !object->OldTriggForwFront)
+      {
         /* This is the first object to move */
-        if (object->FuncAllReverse || object->FuncAllForward) {
+        if (object->FuncAllReverse || object->FuncAllForward)
+        {
           /* We are already busy moving last trigg */
           return;
         }
 
-        if (object->Function & NMPS_TRPFUNC_ALLEMPTY) {
-          if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex != 0) {
+        if (object->Function & NMPS_TRPFUNC_ALLEMPTY)
+        {
+          if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex != 0)
+          {
             /* Destination cell is not empty */
             object->Status = 1;
             goto trpff_return;
@@ -2253,7 +2401,8 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
         }
       }
 
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         object->FuncAllForward = 0;
@@ -2263,7 +2412,8 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trpff_return;
@@ -2271,33 +2421,34 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
       if (((pwr_sClass_NMpsCell*)(object->InP))->OutFrontFlag)
         return;
 
-      if (object->Function & NMPS_TRPFUNC_SLOW && object->FuncAllForward == 1) {
+      if (object->Function & NMPS_TRPFUNC_SLOW && object->FuncAllForward == 1)
+      {
         /* Wait till next scan */
         object->FuncAllForward = 2;
         goto trpff_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->InP))->Data1_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer = ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid = ((pwr_sClass_NMpsCell*)(object->InP))->Data1_Dlid;
       ((pwr_sClass_NMpsCell*)(object->OutP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutFrontFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType
-          = NMPS_OPTYPE_FORWARD_UNIT;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType = NMPS_OPTYPE_FORWARD_UNIT;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutFrontOpType = NMPS_OPTYPE_UNIT;
 
       if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 1)
         object->FuncAllForward = 0;
       else
         object->FuncAllForward = 1;
-    } else {
+    }
+    else
+    {
       /* Move front of data */
       /* Check destination */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         goto trpff_return;
@@ -2306,7 +2457,8 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trpff_return;
@@ -2314,31 +2466,31 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
       if (((pwr_sClass_NMpsCell*)(object->InP))->OutFrontFlag)
         return;
 
-      if (((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr
-          == ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr ==
+          ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr)
+      {
         /* This should be a Back trigg */
         object->Status = 1;
         goto trpff_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->InP))->Data1_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer = ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid = ((pwr_sClass_NMpsCell*)(object->InP))->Data1_Dlid;
       ((pwr_sClass_NMpsCell*)(object->OutP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutFrontFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType
-          = NMPS_OPTYPE_FORWARD_FRONT;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType = NMPS_OPTYPE_FORWARD_FRONT;
       ((pwr_sClass_NMpsCell*)(object->InP))->OutFrontOpType = NMPS_OPTYPE_BACK;
     }
   }
 
-  if (*(object->TriggForwBackP) && !object->OldTriggForwBack) {
+  if (*(object->TriggForwBackP) && !object->OldTriggForwBack)
+  {
     /* Check source */
-    if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 0) {
+    if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex == 0)
+    {
       /* Nothing to transport */
       object->Status = 1;
       goto trpff_return;
@@ -2346,29 +2498,30 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
     if (((pwr_sClass_NMpsCell*)(object->InP))->OutRearFlag)
       return;
 
-    if (((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr
-        != ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr) {
+    if (((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr !=
+        ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr)
+    {
       /* This should be a Front trigg */
       object->Status = 1;
       goto trpff_return;
     }
 
     /* Transport data */
-    ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer
-        = ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr;
-    ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId
-        = ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Aref.Objid;
-    ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid
-        = ((pwr_sClass_NMpsCell*)(object->InP))->Data1_Dlid;
+    ((pwr_sClass_NMpsCell*)(object->OutP))->InPointer = ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr;
+    ((pwr_sClass_NMpsCell*)(object->OutP))->InObjId =
+        ((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Aref.Objid;
+    ((pwr_sClass_NMpsCell*)(object->OutP))->InDlid = ((pwr_sClass_NMpsCell*)(object->InP))->Data1_Dlid;
     ((pwr_sClass_NMpsCell*)(object->OutP))->InFlag = 1;
     ((pwr_sClass_NMpsCell*)(object->InP))->OutFrontFlag = 1;
     ((pwr_sClass_NMpsCell*)(object->OutP))->InOpType = NMPS_OPTYPE_FORWARD_BACK;
     ((pwr_sClass_NMpsCell*)(object->InP))->OutFrontOpType = NMPS_OPTYPE_FRONT;
   }
 
-  if (*(object->TriggReverseBackP) && !object->OldTriggReverseBack) {
+  if (*(object->TriggReverseBackP) && !object->OldTriggReverseBack)
+  {
     /* Check destination */
-    if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull) {
+    if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull)
+    {
       /* Destination cell is full */
       object->Status = 1;
       goto trpff_return;
@@ -2377,7 +2530,8 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
       return;
 
     /* Check source */
-    if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 0) {
+    if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 0)
+    {
       /* Nothing to transport */
       object->Status = 1;
       goto trpff_return;
@@ -2385,33 +2539,33 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
     if (((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag)
       return;
 
-    if (((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr
-        == ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr) {
+    if (((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr ==
+        ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr)
+    {
       /* This should be a Front trigg */
       object->Status = 1;
       goto trpff_return;
     }
 
     /* Transport data */
-    ((pwr_sClass_NMpsCell*)(object->InP))->InPointer
-        = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
-    ((pwr_sClass_NMpsCell*)(object->InP))->InObjId
-        = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
-    ((pwr_sClass_NMpsCell*)(object->InP))->InDlid
-        = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
+    ((pwr_sClass_NMpsCell*)(object->InP))->InPointer = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
+    ((pwr_sClass_NMpsCell*)(object->InP))->InObjId =
+        ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
+    ((pwr_sClass_NMpsCell*)(object->InP))->InDlid = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
     ((pwr_sClass_NMpsCell*)(object->InP))->InFlag = 1;
     ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag = 1;
     ((pwr_sClass_NMpsCell*)(object->InP))->InOpType = NMPS_OPTYPE_FORWARD_FRONT;
     ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontOpType = NMPS_OPTYPE_BACK;
   }
 
-  if ((*(object->TriggReverseFrontP) && !object->OldTriggReverseFront)
-      || (*(object->TriggReverseFrontP)
-             && object->Function & NMPS_TRPFUNC_LEVEL)
-      || object->FuncAllReverse) {
-    if (object->Function & NMPS_TRPFUNC_UNIT) {
+  if ((*(object->TriggReverseFrontP) && !object->OldTriggReverseFront) ||
+      (*(object->TriggReverseFrontP) && object->Function & NMPS_TRPFUNC_LEVEL) || object->FuncAllReverse)
+  {
+    if (object->Function & NMPS_TRPFUNC_UNIT)
+    {
       /* Check destination */
-      if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         goto trpff_return;
@@ -2420,7 +2574,8 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trpff_return;
@@ -2429,44 +2584,47 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
         return;
 
       /* Check that both Front and Back is in the cell */
-      if (!(((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Back
-              && ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Front)) {
+      if (!(((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Back &&
+            ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Front))
+      {
         object->Status = 1;
         goto trpff_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
       ((pwr_sClass_NMpsCell*)(object->InP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType
-          = NMPS_OPTYPE_FORWARD_UNIT;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType = NMPS_OPTYPE_FORWARD_UNIT;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontOpType = NMPS_OPTYPE_UNIT;
-
-    } else if ((object->Function & NMPS_TRPFUNC_ALL)
-        || (object->Function & NMPS_TRPFUNC_ALLEMPTY)) {
-      if (*(object->TriggReverseFrontP) && !object->OldTriggReverseFront) {
+    }
+    else if ((object->Function & NMPS_TRPFUNC_ALL) || (object->Function & NMPS_TRPFUNC_ALLEMPTY))
+    {
+      if (*(object->TriggReverseFrontP) && !object->OldTriggReverseFront)
+      {
         /* This is the first object to move */
-        if (object->FuncAllReverse || object->FuncAllForward) {
+        if (object->FuncAllReverse || object->FuncAllForward)
+        {
           /* We are already busy moving last trigg */
           return;
         }
 
         /* Check destination */
-        if (object->Function & NMPS_TRPFUNC_ALLEMPTY) {
-          if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex) {
+        if (object->Function & NMPS_TRPFUNC_ALLEMPTY)
+        {
+          if (((pwr_sClass_NMpsCell*)(object->InP))->LastIndex)
+          {
             /* Destination cell is not empty */
             object->Status = 1;
             goto trpff_return;
           }
         }
       }
-      if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->CellFull)
+      {
         /* Destination cell is full */
         object->Status = 1;
         object->FuncAllReverse = 0;
@@ -2476,7 +2634,8 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
         return;
 
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trpff_return;
@@ -2484,38 +2643,40 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
       if (((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag)
         return;
 
-      if (((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr
-          == ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr ==
+          ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr)
+      {
         object->Status = 1;
         goto trpff_return;
       }
 
-      if (object->Function & NMPS_TRPFUNC_SLOW && object->FuncAllForward == 1) {
+      if (object->Function & NMPS_TRPFUNC_SLOW && object->FuncAllForward == 1)
+      {
         /* Wait till next scan */
         object->FuncAllForward = 2;
         goto trpff_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
       ((pwr_sClass_NMpsCell*)(object->InP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType
-          = NMPS_OPTYPE_FORWARD_UNIT;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType = NMPS_OPTYPE_FORWARD_UNIT;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontOpType = NMPS_OPTYPE_UNIT;
 
       if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 1)
         object->FuncAllReverse = 0;
       else
         object->FuncAllReverse = 1;
-    } else {
+    }
+    else
+    {
       /* Check source */
-      if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 0) {
+      if (((pwr_sClass_NMpsCell*)(object->OutP))->LastIndex == 0)
+      {
         /* Nothing to transport */
         object->Status = 1;
         goto trpff_return;
@@ -2523,26 +2684,23 @@ void NMpsTrpFF_exec(plc_sThread* tp, pwr_sClass_NMpsTrpFF* object)
       if (((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag)
         return;
 
-      if (((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr
-          != ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr) {
+      if (((pwr_sClass_NMpsCell*)(object->InP))->Data1P.Ptr !=
+          ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr)
+      {
         /* This should be a Back trigg */
         object->Status = 1;
         goto trpff_return;
       }
 
       /* Transport data */
-      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid
-          = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InPointer = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Ptr;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InObjId =
+          ((pwr_sClass_NMpsCell*)(object->OutP))->Data1P.Aref.Objid;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InDlid = ((pwr_sClass_NMpsCell*)(object->OutP))->Data1_Dlid;
       ((pwr_sClass_NMpsCell*)(object->InP))->InFlag = 1;
       ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontFlag = 1;
-      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType
-          = NMPS_OPTYPE_FORWARD_BACK;
-      ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontOpType
-          = NMPS_OPTYPE_FRONT;
+      ((pwr_sClass_NMpsCell*)(object->InP))->InOpType = NMPS_OPTYPE_FORWARD_BACK;
+      ((pwr_sClass_NMpsCell*)(object->OutP))->OutFrontOpType = NMPS_OPTYPE_FRONT;
     }
   }
 
@@ -2552,7 +2710,8 @@ trpff_return:
   object->OldTriggForwBack = *(object->TriggForwBackP);
   object->OldTriggReverseBack = *(object->TriggReverseBackP);
 
-  if (object->Function & NMPS_TRPFUNC_TRIGGRESET) {
+  if (object->Function & NMPS_TRPFUNC_TRIGGRESET)
+  {
     /* Reset the trigg flags */
     object->TriggForwFront = 0;
     object->TriggReverseFront = 0;
@@ -2628,15 +2787,13 @@ void DataMux_exec(plc_sThread* tp, pwr_sClass_DataMux* o)
   pwr_tDataRef** inp = &o->In0P;
 
   idx = o->Index = *o->IndexP;
-  idx = idx < 0 ? 0 : (idx > DATAMUX_SIZE - 1
-                              ? DATAMUX_SIZE - 1
-                              : (idx > o->MaxIndex ? o->MaxIndex : idx));
+  idx = idx < 0 ? 0 : (idx > DATAMUX_SIZE - 1 ? DATAMUX_SIZE - 1 : (idx > o->MaxIndex ? o->MaxIndex : idx));
   inp = (pwr_tDataRef**)((char*)inp + idx * pwr_cInputOffsetDataRef);
   o->ActVal = **inp;
 }
 
 /*      NMpsMirrorCell
-*/
+ */
 void NMpsMirrorCell_init(object) pwr_sClass_NMpsMirrorCell* object;
 {
   pwr_sAttrRef attrref;
@@ -2646,17 +2803,20 @@ void NMpsMirrorCell_init(object) pwr_sClass_NMpsMirrorCell* object;
   /* Get new object pointers at restart av plc program */
   data_index = (plc_t_DataInfoMirCell*)&object->Data1P;
   memset(&attrref, 0, sizeof(attrref));
-  for (i = 0; i < object->LastIndex; i++) {
+  for (i = 0; i < object->LastIndex; i++)
+  {
     attrref = data_index->DataP.Aref;
-    sts = gdh_DLRefObjectInfoAttrref(
-        &attrref, (pwr_tAddress*)&data_index->DataP, &data_index->Data_Dlid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&data_index->DataP, &data_index->Data_Dlid);
     data_index++;
   }
-  if (object->LastIndex) {
+  if (object->LastIndex)
+  {
     data_index = (plc_t_DataInfoMirCell*)&object->Data1P;
     data_index += object->LastIndex - 1;
     memcpy(&object->DataLastP, data_index, sizeof(*data_index));
-  } else {
+  }
+  else
+  {
     memset(&object->DataLastP, 0, sizeof(*data_index));
   }
   object->InitFlag = 1;
@@ -2679,21 +2839,25 @@ void NMpsMirrorCell_exec(plc_sThread* tp, pwr_sClass_NMpsMirrorCell* object)
   /* Get new object pointers to new objects */
   data_index = (plc_t_DataInfoMirCell*)object->TempArea;
   memset(&attrref, 0, sizeof(attrref));
-  for (i = 0; i < object->TempLastIndex; i++) {
-    if (data_index->DataP.Ptr == 0) {
+  for (i = 0; i < object->TempLastIndex; i++)
+  {
+    if (data_index->DataP.Ptr == 0)
+    {
       attrref = data_index->DataP.Aref;
-      sts = gdh_DLRefObjectInfoAttrref(
-          &attrref, (pwr_tAddress*)&data_index->DataP, &data_index->Data_Dlid);
+      sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&data_index->DataP, &data_index->Data_Dlid);
     }
     data_index++;
   }
   memcpy(&object->Data1P, object->TempArea, sizeof(object->TempArea));
   object->LastIndex = object->TempLastIndex;
-  if (object->LastIndex) {
+  if (object->LastIndex)
+  {
     data_index = (plc_t_DataInfoMirCell*)&object->Data1P;
     data_index += object->LastIndex - 1;
     memcpy(&object->DataLastP, data_index, sizeof(*data_index));
-  } else {
+  }
+  else
+  {
     memset(&object->DataLastP, 0, sizeof(*data_index));
   }
   if (object->LastIndex == object->MaxSize)
@@ -2702,7 +2866,8 @@ void NMpsMirrorCell_exec(plc_sThread* tp, pwr_sClass_NMpsMirrorCell* object)
     object->CellFull = 0;
 
   object->UpdateFlag = 0;
-  if (object->BackupNowMsg) {
+  if (object->BackupNowMsg)
+  {
     object->BackupNow = 1;
     object->BackupNowMsg = 0;
   }
@@ -2716,7 +2881,8 @@ int nmps_RemoveData(pwr_tObjid objid)
   pwr_sClass_NMpsStoreCell* scell_p;
 
   sts = gdh_GetClassList(pwr_cClass_NMpsCell, &cell_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(cell_objid, (pwr_tAddress*)&cell_p);
     if (EVEN(sts))
       return sts;
@@ -2726,7 +2892,8 @@ int nmps_RemoveData(pwr_tObjid objid)
     sts = gdh_GetNextObject(cell_objid, &cell_objid);
   }
   sts = gdh_GetClassList(pwr_cClass_NMpsStoreCell, &cell_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(cell_objid, (pwr_tAddress*)&scell_p);
     if (EVEN(sts))
       return sts;
@@ -2746,7 +2913,8 @@ int nmps_RemoveAndDeleteData(pwr_tObjid objid)
   pwr_sClass_NMpsStoreCell* scell_p;
 
   sts = gdh_GetClassList(pwr_cClass_NMpsCell, &cell_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(cell_objid, (pwr_tAddress*)&cell_p);
     if (EVEN(sts))
       return sts;
@@ -2756,7 +2924,8 @@ int nmps_RemoveAndDeleteData(pwr_tObjid objid)
     sts = gdh_GetNextObject(cell_objid, &cell_objid);
   }
   sts = gdh_GetClassList(pwr_cClass_NMpsStoreCell, &cell_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(cell_objid, (pwr_tAddress*)&scell_p);
     if (EVEN(sts))
       return sts;
@@ -2783,9 +2952,9 @@ void DataFWrite_exec(plc_sThread* tp, pwr_sClass_DataFWrite* o)
   if (o->Error)
     o->Error = 0;
 
-  if (*o->ConditionP && !o->CondOld) {
-    pwr_tAttrRef aref
-        = cdh_ObjidToAref(*(pwr_tOid*)((char*)o->DataP + pwr_cAlignLW));
+  if (*o->ConditionP && !o->CondOld)
+  {
+    pwr_tAttrRef aref = cdh_ObjidToAref(*(pwr_tOid*)((char*)o->DataP + pwr_cAlignLW));
 
     o->WriteStatus = gdh_FWriteObject(*o->FileNameP, &aref);
     if (EVEN(o->WriteStatus))
@@ -2807,9 +2976,9 @@ void DataFRead_exec(plc_sThread* tp, pwr_sClass_DataFRead* o)
   if (o->Error)
     o->Error = 0;
 
-  if (*o->ConditionP && !o->CondOld) {
-    pwr_tAttrRef aref
-        = cdh_ObjidToAref(*(pwr_tOid*)((char*)o->DataP + pwr_cAlignLW));
+  if (*o->ConditionP && !o->CondOld)
+  {
+    pwr_tAttrRef aref = cdh_ObjidToAref(*(pwr_tOid*)((char*)o->DataP + pwr_cAlignLW));
 
     o->ReadStatus = gdh_FReadObject(*o->FileNameP, &aref);
     if (EVEN(o->ReadStatus))
@@ -2821,18 +2990,12 @@ void DataFRead_exec(plc_sThread* tp, pwr_sClass_DataFRead* o)
   o->CondOld = *o->ConditionP;
 }
 
-void NMpsCell60_init(pwr_sClass_NMpsCell60* object)
-{
-  NMpsCell_init((pwr_sClass_NMpsCell*)object);
-}
+void NMpsCell60_init(pwr_sClass_NMpsCell60* object) { NMpsCell_init((pwr_sClass_NMpsCell*)object); }
 void NMpsCell60_exec(plc_sThread* tp, pwr_sClass_NMpsCell60* object)
 {
   NMpsCell_exec(tp, (pwr_sClass_NMpsCell*)object);
 }
-void NMpsCell120_init(pwr_sClass_NMpsCell120* object)
-{
-  NMpsCell_init((pwr_sClass_NMpsCell*)object);
-}
+void NMpsCell120_init(pwr_sClass_NMpsCell120* object) { NMpsCell_init((pwr_sClass_NMpsCell*)object); }
 void NMpsCell120_exec(plc_sThread* tp, pwr_sClass_NMpsCell120* object)
 {
   NMpsCell_exec(tp, (pwr_sClass_NMpsCell*)object);

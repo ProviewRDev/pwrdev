@@ -53,34 +53,27 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer expw)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
-    ldh_tSession expw_ldhses, const char* expw_name, int l_type, int l_editmode,
-    pwr_tStatus* status)
-    : WbExpW(
-          expw_parent_ctx, expw_ldhses, expw_name, l_type, l_editmode, status),
-      parent_wid(expw_parent_wid)
+WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid, ldh_tSession expw_ldhses,
+                     const char* expw_name, int l_type, int l_editmode, pwr_tStatus* status)
+    : WbExpW(expw_parent_ctx, expw_ldhses, expw_name, l_type, l_editmode, status), parent_wid(expw_parent_wid)
 {
   const int window_width = 1100;
   const int window_height = 600;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      window_height, "default-width", window_width, "title", expw_name, NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height, "default-width",
+                                      window_width, "title", expw_name, NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(toplevel, "focus-in-event",
-      G_CALLBACK(WbExpWGtk::action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(WbExpWGtk::action_inputfocus), this);
 
   int dark_theme = wutl_get_dark_theme(toplevel);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
@@ -88,12 +81,11 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
   // File Entry
   GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   file_export = gtk_menu_item_new_with_mnemonic(btext);
-  g_signal_connect(
-      file_export, "activate", G_CALLBACK(activate_export), this);
+  g_signal_connect(file_export, "activate", G_CALLBACK(activate_export), this);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_export);
@@ -104,28 +96,21 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
 
   // Edit menu
   GtkWidget* edit_update = gtk_menu_item_new_with_mnemonic("_Update");
-  g_signal_connect(
-      edit_update, "activate", G_CALLBACK(activate_update), this);
-  gtk_widget_add_accelerator(edit_update, "activate", accel_g, 'u',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(edit_update, "activate", G_CALLBACK(activate_update), this);
+  gtk_widget_add_accelerator(edit_update, "activate", accel_g, 'u', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   edit_check_all = gtk_menu_item_new_with_mnemonic("_Check all");
-  g_signal_connect(edit_check_all, "activate",
-      G_CALLBACK(activate_check_all), this);
+  g_signal_connect(edit_check_all, "activate", G_CALLBACK(activate_check_all), this);
 
   edit_check_clear = gtk_menu_item_new_with_mnemonic("C_heck clear");
-  g_signal_connect(edit_check_clear, "activate",
-      G_CALLBACK(activate_check_clear), this);
+  g_signal_connect(edit_check_clear, "activate", G_CALLBACK(activate_check_clear), this);
 
   edit_check_reset = gtk_menu_item_new_with_mnemonic("Check _reset");
-  g_signal_connect(edit_check_reset, "activate",
-      G_CALLBACK(activate_check_reset), this);
+  g_signal_connect(edit_check_reset, "activate", G_CALLBACK(activate_check_reset), this);
 
   edit_show_all = gtk_check_menu_item_new_with_mnemonic("_Show all");
-  g_signal_connect(
-      edit_show_all, "activate", G_CALLBACK(activate_show_all), this);
-  gtk_widget_add_accelerator(edit_show_all, "activate", accel_g, 'a',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(edit_show_all, "activate", G_CALLBACK(activate_show_all), this);
+  gtk_widget_add_accelerator(edit_show_all, "activate", accel_g, 'a', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* edit_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_update);
@@ -140,20 +125,15 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
 
   // View menu
   GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic("Zoom _In");
-  g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
-  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
+  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic("Zoom _Out");
-  g_signal_connect(
-      view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
-  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
+  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic("Zoom _Reset");
-  g_signal_connect(view_zoom_reset, "activate",
-      G_CALLBACK(activate_zoom_reset), this);
+  g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
@@ -166,8 +146,7 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
 
   // Help Entry
   GtkWidget* help_help = gtk_menu_item_new_with_mnemonic("_Help");
-  g_signal_connect(
-      help_help, "activate", G_CALLBACK(activate_help), this);
+  g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -180,7 +159,8 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
   pwr_tFileName icon;
 
-  switch (type) {
+  switch (type)
+  {
   case expw_eType_Export:
     strcpy(icon, dark_theme ? "$pwr_exe/ico_send_d_30.png" : "$pwr_exe/ico_send_l_30.png");
     break;
@@ -192,30 +172,24 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
     break;
   }
 
-  wutl_tools_item(tools, icon, G_CALLBACK(activate_export), 
-      action, this, 1, 0);
+  wutl_tools_item(tools, icon, G_CALLBACK(activate_export), action, this, 1, 0);
 
-  wutl_tools_item(tools, 
-      dark_theme ? "$pwr_exe/ico_refresh_d_30.png" : "$pwr_exe/ico_refresh_l_30.png", 
-      G_CALLBACK(activate_update), "Update", this, 1, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_refresh_d_30.png" : "$pwr_exe/ico_refresh_l_30.png",
+                  G_CALLBACK(activate_update), "Update", this, 1, 0);
 
-  wutl_tools_item(tools, 
-      dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", 
-      G_CALLBACK(activate_zoom_in), "Zoom in", this, 0, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png",
+                  G_CALLBACK(activate_zoom_in), "Zoom in", this, 0, 0);
 
-  wutl_tools_item(tools,
-      dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", 
-      G_CALLBACK(activate_zoom_out), "Zoom out", this, 0, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png",
+                  G_CALLBACK(activate_zoom_out), "Zoom out", this, 0, 0);
 
-  wutl_tools_item(tools,
-      dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", 
-      G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 0, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png",
+                  G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 0, 0);
 
   form = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Create expwnav
-  expwnav = new WbExpWNavGtk(
-      this, form, expw_ldhses, l_type, l_editmode, &nav_widget);
+  expwnav = new WbExpWNavGtk(this, form, expw_ldhses, l_type, l_editmode, &nav_widget);
 
   gtk_box_pack_start(GTK_BOX(form), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(form), GTK_WIDGET(tools), FALSE, FALSE, 0);
@@ -246,16 +220,16 @@ void WbExpWGtk::print()
 {
   pwr_tStatus sts;
 
-  CoWowGtk::CreateBrowPrintDialogGtk(name, expwnav->brow->ctx,
-      flow_eOrientation_Portrait, 1.0, (void*)toplevel, &sts);
+  CoWowGtk::CreateBrowPrintDialogGtk(name, expwnav->brow->ctx, flow_eOrientation_Portrait, 1.0,
+                                     (void*)toplevel, &sts);
 }
 
-gboolean WbExpWGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean WbExpWGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   WbExpWGtk* expw = (WbExpWGtk*)data;
 
-  if (expw) {
+  if (expw)
+  {
     if (expw->focustimer.disabled())
       return FALSE;
 
@@ -267,8 +241,7 @@ gboolean WbExpWGtk::action_inputfocus(
 
 void WbExpWGtk::set_title(char* title)
 {
-  char* titleutf8
-      = g_convert(title, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  char* titleutf8 = g_convert(title, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
   gtk_window_set_title(GTK_WINDOW(toplevel), titleutf8);
   g_free(titleutf8);
 }
@@ -319,8 +292,7 @@ void WbExpWGtk::activate_show_all(GtkWidget* w, gpointer data)
 {
   WbExpW* expw = (WbExpW*)data;
 
-  int set = (int)gtk_check_menu_item_get_active(
-      GTK_CHECK_MENU_ITEM(((WbExpWGtk*)expw)->edit_show_all));
+  int set = (int)gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(((WbExpWGtk*)expw)->edit_show_all));
   expw->expwnav->set_show_all(set);
 }
 
@@ -350,9 +322,7 @@ void WbExpWGtk::activate_help(GtkWidget* w, gpointer data)
   WbExpW* expw = (WbExpW*)data;
 
   if (expw->type == expw_eType_Export || expw->type == expw_eType_Import)
-    CoXHelp::dhelp("exportimport_refman", 0, navh_eHelpFile_Other,
-        "$pwr_lang/man_dg.dat", true);
+    CoXHelp::dhelp("exportimport_refman", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
   else if (expw->type == expw_eType_BuildDirectories)
-    CoXHelp::dhelp("builddir_refman", 0, navh_eHelpFile_Other,
-        "$pwr_lang/man_dg.dat", true);
+    CoXHelp::dhelp("builddir_refman", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
 }

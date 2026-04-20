@@ -6,8 +6,6 @@ ProviewR is an open-source industrial process control system with a modular arch
 
 ## Core Architecture
 
-You understand the build system in src/doc/man/man_pwre.fodt
-
 ### Module Structure
 The codebase is organized into specialized modules, each with a consistent directory layout:
 - `lib/` - Core libraries and shared functionality  
@@ -17,20 +15,94 @@ The codebase is organized into specialized modules, each with a consistent direc
 - `exp/` - Export/interface definitions
 - `doc/` - Module documentation
 
-**Key Modules:**
-- **rt** - Runtime system and core engine
-- **xtt** - Process graphics and HMI (Human Machine Interface) 
-- **wb** - Workbench/configurator tools
-- **nmps** - Network Message Passing System
-- **dataq** - Data queue management for historical data
-- **profibus/otherio** - Industrial protocol implementations
-- **java** - Java web interface components
+**Core:**
+- **src** — Core runtime engine, common libraries (`co`, `rt`, `msg`), QCom IPC, PLC execution, I/O handling, shared memory (GDB/GDH)
+- **xtt** — Process graphics HMI with Glow/Grow/Flow graphics engine, operator views, and trends
+- **wb** — Workbench configurator for system configuration, PLC programming, class editing, and build management
+
+**Data & Communication:**
+- **nmps** — Distributed data cell communication for redundant/mirrored systems
+- **dataq** — Time-series data queue with backup server for historical storage
+- **sev** — Storage Environment for historical event/trend data (MySQL, SQLite, HDF5 backends)
+- **tlog** — Trend logging for continuous time-series data collection and archival
+- **remote** — Remote communication: TCP/IP, Websphere MQ, RK512, ALCM protocols
+- **opc** — OPC XML/DA server and client for industrial interoperability
+
+**Industrial I/O & Protocols:**
+- **profibus** — Profibus DP master protocol and device support with GSD file integration
+- **otherio** — Multi-protocol I/O: Modbus TCP, GPIO, POWERLINK, CifX, USB (Arduino, joystick), UDP, MQTT
+- **ssabox** — PSS9000 modular I/O cards (DI/DO/AI/AO/PI, remote racks)
+
+**Manufacturer Equipment:**
+- **abb** — ABB frequency converters (ACS800/ACS880) via Profibus PPO and Profinet/PowerLink
+- **siemens** — Siemens ET200M/S distributed I/O, Sinamics G120 drives, diagnostic repeater
+- **klocknermoeller** — Klöckner & Moeller motor protective devices (PKZ circuit breaker)
+- **inor** — Inor temperature sensors (VRS sensor)
+- **telemecanique** — Schneider Electric (Telemecanique) industrial equipment
+- **othermanu** — Eurotherm tyristors, Danfoss FC300, SEW Movidrive, Janitza power analyzers
+
+**Utilities & Components:**
+- **bcomp** — Base component library: PID controllers, sensors, actuators, burner control, valves
+- **simul** — Signal generators (triangle, square, sine) and process simulators for testing
+- **misc** — Miscellaneous demo utilities
+- **java** — Java/web interface framework (JOP) with browser-based operator window and graphics rendering
+
+**Project & Testing:**
+- **project** — Demo projects and test configurations (`pwrdemo`, `pwrtest01`–`03`)
+- **test** — Test utilities and XTT test suite for system validation
 
 ### Build System Architecture
 
-ProviewR uses a sophisticated Perl-based build system (`pwre.pl`) that manages module dependencies and cross-compilation:
+ProviewR uses a Perl-based build system (`pwre.pl`) that manages module dependencies and cross-compilation. See `src/doc/man/man_pwre.fodt` for full reference.
 
+**Quick reference:**
+```bash
+pwre init latest                  # Initialize build environment
+pwre module <name>                # Switch to module (rt, xtt, wb, profibus, …)
+pwre build module                 # Build current module
+pwre method_build <module> gtk    # Build GUI-dependent programs
+pwre build_all_modules gtk        # Full project build
+pwre configure                    # Check installed dependencies
+```
 
+**Build variables** are defined in `src/tools/bld/src/variables.mk`. Key variables: `pwre_btype` (dbg/rls), `pwre_os`, `pwre_hw`, `pwre_conf_gtk`/`pwre_conf_qt`.
+
+**Generic makefiles** in `src/tools/bld/src/` provide reusable build rules:
+
+| Makefile | Purpose |
+|----------|---------|
+| `variables.mk` | Common variables, compiler/linker flags, warning flags, paths |
+| `exe_generic.mk` | Executable programs (C/C++ compile + link rules) |
+| `lib_generic.mk` | Static libraries (compile to `.o`, archive to `.a`) |
+| `link_rule_generic.mk` | Default link rule for executables |
+| `wbl_generic.mk` | Workbench Load files (WBL → C → object compilation) |
+| `msg_generic.mk` | Message files (`.msg` → C source generation) |
+| `mmi_generic.mk` | MMI/HMI resource files (copy/install PWG, XTT help, etc.) |
+| `jpwr_generic.mk` | Java (jpwr) compilation and JAR packaging |
+| `jsw_generic.mk` | JavaScript web components (copy/bundle JS/HTML/CSS) |
+| `aapp_generic.mk` | Android app build rules |
+
+All generic makefiles include `variables.mk`. Module-level makefiles (e.g. `xtt/lib/ge/src/os_linux/hw_x86_64/makefile`) set `type_name`, `comp_name`, list sources, then include the appropriate generic makefile.
+
+### Compiler Warning Policy
+
+Warnings are configured in the `warnings` variable in `variables.mk`. The project uses `-Wall -Wextra` as baseline, with these suppressions:
+
+| Suppressed warning | Reason |
+|--------------------|--------|
+| `-Wno-unused-parameter` | Callback-heavy codebase with fixed function signatures |
+| `-Wno-unused-but-set-parameter` | Same — required by callback/interface contracts |
+| `-Wno-unused-but-set-variable` | Conditional compilation, debug variables |
+| `-Wno-sign-compare` | Pervasive `int` vs `size_t` mixing in C code |
+| `-Wno-missing-field-initializers` | `= {0}` partial struct init is idiomatic |
+| `-Wno-cast-function-type` | Required by GTK `G_CALLBACK()` / `g_signal_connect()` API |
+| `-Wno-narrowing` | C++ brace-init pedantry in C-style code |
+| `-Wno-format-truncation` | `snprintf` is designed to truncate — warning is informational |
+| `-Wno-stringop-truncation` | `strncpy(dst, src, sizeof(dst))` is standard idiom for fixed-size struct fields; audited 2026-04 |
+
+**Currently under evaluation** (commented out, being tested for re-enablement):
+- `-Wno-format-overflow` — catches provably-too-small `sprintf` buffers; real bugs
+- `-Wno-implicit-fallthrough` — catches missing `break` in `switch`; real bugs. GCC respects `/* fall through */` comments for intentional cases
 
 ### Component Integration Patterns
 
@@ -42,6 +114,41 @@ ProviewR uses a sophisticated Perl-based build system (`pwre.pl`) that manages m
 - **GDH** (Global Data Handler) manages real-time data access across the system
 
 ## Development Conventions
+
+### Debug vs Release Builds
+
+ProviewR supports two build types controlled by `pwre_btype` in `src/tools/bld/src/variables.mk`:
+
+| | Debug (`dbg`) | Release (`rls`) |
+|--|--|--|
+| Compiler flags | `-g -D_GNU_SOURCE` | `-O3 -D_GNU_SOURCE -DPWR_NDEBUG` |
+| `pwr_Assert(a)` | Checks condition, `exit()` on failure | **No-op**: `((void)0)` |
+| Optimization | None | Full (`-O3`) |
+
+**Critical rule: Never put side effects inside `pwr_Assert()`.** The expression is completely eliminated in release builds. Use proper error handling instead.
+
+### Key Macros (from `src/exp/inc/src/pwr.h`)
+
+```c
+pwr_dStatus(sts, status, ists)     // Declare local status var, init to ists
+pwr_Return(value, sts, error)      // Set *sts = error, return value
+pwr_ReturnVoid(sts, error)         // Set *sts = error, return (void)
+pwr_StatusBreak(var, error)        // Set var = error, break
+ODD(sts)                           // Success check (lowest bit set)
+EVEN(sts)                          // Failure check (lowest bit clear)
+pwr_Assert(condition)              // Debug-only assertion — NO-OP in rls!
+```
+
+Always check `EVEN(sts)` after status-returning function calls.
+
+### Shared Memory and Locking
+
+The runtime uses shared memory segments (`/tmp/pwr_rtdb_*`, `/tmp/pwr_pool_*`, `/tmp/pwr_qdb_*`). Locking conventions:
+
+- Use scoped lock macros: `gdb_ScopeLock { ... } gdb_ScopeUnlock` and `qdb_ScopeLock { ... } qdb_ScopeUnlock`
+- Use `break` (not `return`) to exit scoped lock blocks — `return` would skip the unlock
+- Recursive locks are not allowed — `qdb_LockOwned` check catches double-lock in debug
+- Shared memory struct changes require version bump (`gdb_cVersion`, `qdb_cVersion`) or runtime bugcheck
 
 ### File Organization Patterns
 - GTK implementations use `*_gtk.cpp` suffix pattern
@@ -97,66 +204,19 @@ The system uses `/usr/local/adm` or local `adm/` directories for configuration. 
 The system supports both GTK and Qt through compile-time selection. When working on UI components, maintain separation between framework-specific code and business logic.
 
 ### Graphics Framework
-ProviewR has a layered graphics framework in `xtt/lib/`:
+Layered graphics in `xtt/lib/`: Glow (primitives) → Grow (HMI objects) → specialized contexts. Flow handles PLC flow charts, Ge is the graphics editor, Cow provides common dialogs. Each graphics area has a GTK widget (`*_gtk.cpp`) wrapping a platform-agnostic context.
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| **Glow** | `glow/src/glow_*.cpp` | Base graphics library - primitives, contexts, events |
-| **Grow** | `glow/src/glow_grow*.cpp` | Rich HMI objects (bars, trends, sliders, images) |
-| **Flow** | `flow/src/flow_*.cpp` | Flow chart editor for PLC programming |
-| **Brow** | `glow/src/glow_browctx.cpp` | Browser/tree view navigation |
-| **Ge** | `ge/src/ge_*.cpp` | Graphics Editor application |
-| **Cow** | `cow/src/cow_*.cpp` | Common UI components and dialogs |
-
-**Key abbreviations:**
-- **Glow** = Graphics Library for Objects in Windows
-- **Grow** = Graphics with Rich Objects (extends Glow)
-- **Xtt** = eXecution Tool and Trends
-- **Wb** = Workbench
-- **Nav** = Navigator (tree-based navigation)
-
-**Context hierarchy:** `GlowCtx` → `GrowCtx` → specialized contexts (CurveCtx, ColPalCtx, KeyboardCtx)
-
-**Widget pattern:** Each graphics area has a GTK widget (`*_gtk.cpp`) wrapping a platform-agnostic context.
-
-See [GRAPHICS_FRAMEWORK.md](.github/GRAPHICS_FRAMEWORK.md) for comprehensive documentation.
+See [GRAPHICS_FRAMEWORK.md](.github/GRAPHICS_FRAMEWORK.md) for component details, context hierarchy, and widget patterns.
 
 ### Database Architecture
 
-ProviewR uses a multi-layered database architecture separating configuration-time from runtime data:
-
-| Component | Purpose |
-|-----------|---------|
-| **WBL files** | Text-based `.wb_load` object definitions in `*/wbl/` directories |
-| **BerkeleyDB** | Persistent storage for workbench editing sessions |
-| **DBS files** | ProviewR binary snapshot format (`.dbs`) for runtime loading |
-| **GDB** | In-memory runtime database with hash tables for fast lookups |
-| **GDH** | Public API for runtime data access (`gdh_*` functions) |
-| **LDH** | Workbench API for configuration (`ldh_*` functions) |
-| **RTDB** | Shared memory segment at `/tmp/pwr_rtdb_<node_id>` |
-| **Volumes** | Logical containers (RootVolume, ClassVolume, SharedVolume) |
-
 **Data flow:** WBL → LDH → BerkeleyDB → (build/export) → DBS → GDB → GDH → RTDB
 
-See [DATABASE_ARCHITECTURE.md](.github/DATABASE_ARCHITECTURE.md) for comprehensive documentation.
+Key APIs: `gdh_*` for runtime data access, `ldh_*` for workbench configuration. See [DATABASE_ARCHITECTURE.md](.github/DATABASE_ARCHITECTURE.md) for full component reference.
 
 ### QCom (Queue Communication)
 
-QCom is the core inter-process and inter-node message-passing system:
-
-| Component | Purpose |
-|-----------|---------|
-| **qcom_*** | Queue API: `qcom_Init()`, `qcom_CreateQ()`, `qcom_Put()`, `qcom_Get()` |
-| **rt_qmon** | QCom Monitor daemon - handles UDP transport between nodes |
-| **rt_neth** | Network handler - higher-level protocol (subscriptions, volumes) |
-| **QDB** | Internal shared memory database for queues and links |
-
-**Key concepts:**
-- Queue types: private, forward, broadcast, event
-- Network: UDP on port 55000 + bus number, message segmentation
-- Patterns: Request/Reply via `qcom_Request()`/`qcom_Reply()`
-
-See [QCOM.md](.github/QCOM.md) for comprehensive documentation.
+Core IPC system using shared-memory queues. API: `qcom_Init()`, `qcom_CreateQ()`, `qcom_Put()`, `qcom_Get()`. UDP transport between nodes via `rt_qmon`. See [QCOM.md](.github/QCOM.md) for queue types, network protocol, and patterns.
 
 ### Module Dependencies
 Understand the build dependency chain when making changes:
@@ -166,6 +226,48 @@ Understand the build dependency chain when making changes:
 ### Real-time Considerations
 This is a real-time industrial control system. Changes to rt module components, data handling, or timing-sensitive code require careful consideration of system performance and deterministic behavior.
 
+### Mixed-Version Runtime
+When modifying class definitions or network protocol structs, see [mixed-version-runtime-compatibility.md](.github/mixed-version-runtime-compatibility.md) for rules on safe class changes and when to increment `netver`.
+
+### Code Formatting
+- **C/C++**: `.clang-format` at project root (LLVM-based, Allman braces, 110-column limit). Use `clang-format` to format.
+- **JavaScript/HTML/CSS**: Prettier via `pnpm format` (targets `java/jsw/**/*.{css,html,js,jsi}`).
+
+### Testing
+Tests are standalone C executables in `src/tst/`, `src/lib/rt/tst/`, and `src/lib/co/tst/`. They are built as part of the normal module build — no separate test runner or framework. Run them directly after building.
+
+### File Encoding — ISO 8859-1 Gotcha
+
+**~60 source files are encoded in ISO 8859-1** (Latin-1), not UTF-8. They contain Swedish characters (å ä ö Å Ä Ö) in comments and string literals. **Any tool that silently re-encodes to UTF-8 will corrupt these files and break the build** (GCC rejects the byte sequences).
+
+**Rules:**
+- **Never use VS Code `replace_string_in_file` / `multi_replace_string_in_file`** on these files — they convert to UTF-8 on save.
+- Use `LANG=C LC_ALL=C sed -i` for edits to preserve byte-level encoding.
+- If a file gets corrupted: `git checkout HEAD -- <file>`, then re-apply changes with `sed`.
+- Verify encoding after edits: `file <path>` should report `ISO-8859 text`, not `UTF-8`.
+- When the project is eventually migrated to UTF-8, all of these files must be batch-converted (e.g. `iconv -f ISO-8859-1 -t UTF-8`) and the build verified.
+
+**ISO 8859-1 source files (by module):**
+
+| Module | Files |
+|--------|-------|
+| `src/lib/co/` | `co_ccm.c`, `co_cdh.c`, `co_dcli.c`, `co_dcli_input.c` |
+| `src/lib/rt/` | `rt_rtt_command.c`, `rt_rtt_dir.c`, `rt_rtt_global.h`, `rt_rtt_helptext.h`, `rt_plc_io.c`, `rt_io_base.h`, `rt_subc.c` |
+| `src/exe/` | `wb_rtt.c`, `twolist.c`, `cnv_classdep.cpp`, `rt_epri.c`, `rt_qmon.c` |
+| `xtt/lib/` | `ge_graph_ccm.c`, `glow_keyboardctx.cpp`, `xtt_hist.cpp`, `xtt_sevhist.cpp` |
+| `wb/lib/` | `wb_nrep.cpp`, `wb_trv.cpp`, `wb_foe_dataarithm.c`, `wb_wblindex.c` |
+| `dataq/` | `dataq_backup.c`, `dataq_backup_dump.c`, `dataq_appl.c` |
+| `nmps/` | `rs_nmps_bck.c`, `rs_nmps_bck_dump.c`, `nmps_appl.c` |
+| `remote/` | `rs_remote_3964r.c`, `rs_remote_3964r_vnet.c`, `rs_remote_alcm.c`, `rs_remote_dmq.c`, `rs_remote_pams.c`, `rs_remote_rk512.c`, `rs_remote_serial.c`, `remote_remio_utils.c`, `remote_utils.c` |
+| `ssabox/` | `rt_io_m_ssab_pidup.c`, `ssabox_as_ode_solvers.h`, `ssabox_as_phasor_methods.h`, `ssabox_plc_antisway.c/.h`, `ssabox_plc_servoreg.c/.h`, `ssabox_ssabutil.c`, `ssabox_ssabutil_matrix.c` |
+| `otherio/` | `rt_io_m_mb_rtu_master.c`, `rt_io_m_mb_rtu_server.c`, `libusbio.h`, `usbio_dummy_functions.c` |
+| `java/` | `jpwr_rt_mh.c`, `jpwr_rt_hist.cpp` |
+| `tlog/` | `rs_tlog.c` |
+| `project/` | `ra_cdhtest.cpp`, `ra_gdhtest.cpp`, `ra_nethtest.cpp`, `wa_ldhtest.cpp` |
+| `src/tools/` | `docker/pwrtest02/wa_ldhtest.cpp` |
+
+To regenerate this list: `find . -name '*.c' -o -name '*.cpp' -o -name '*.h' | xargs file 2>/dev/null | grep -i iso-8859`
+
 ## Getting Started
 1. Examine existing module structure in `src/` for patterns
 2. Use `pwre.pl` commands to understand build dependencies  
@@ -173,5 +275,6 @@ This is a real-time industrial control system. Changes to rt module components, 
 4. Review [DATABASE_ARCHITECTURE.md](.github/DATABASE_ARCHITECTURE.md) for data layer understanding
 5. Review [QCOM.md](.github/QCOM.md) for inter-process communication
 6. Review [UPGRADE.md](.github/UPGRADE.md) for the project upgrade infrastructure
+7. Review [mixed-version-runtime-compatibility.md](.github/mixed-version-runtime-compatibility.md) for class change safety rules
 
 The modular architecture allows focused development while maintaining system integrity through well-defined interfaces and consistent build patterns.

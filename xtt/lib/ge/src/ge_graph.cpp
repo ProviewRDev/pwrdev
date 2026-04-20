@@ -3898,7 +3898,7 @@ void graph_keyboard_cb(void* ctx, int action, int type)
 
 void graph_userdata_save_cb(void* f, void* object, glow_eUserdataCbType utype)
 {
-  std::ofstream* fp = (std::ofstream*)f;
+  std::ostream* fp = (std::ostream*)f;
 
   switch (utype)
   {
@@ -3962,7 +3962,7 @@ static void graph_scriptexec_cb(void* ctx, char* filename)
 
 static void graph_userdata_open_cb(void* f, void* object, glow_eUserdataCbType utype)
 {
-  std::ifstream* fp = (std::ifstream*)f;
+  std::istream* fp = (std::istream*)f;
   Graph* graph;
 
   switch (utype)
@@ -4049,6 +4049,25 @@ void graph_userdata_copy_cb(void* object, void* old_data, void** new_data, glow_
 
       *new_data = (void*)new_dyn;
     }
+    break;
+  }
+  case glow_eUserdataCbType_Ctx:
+    break;
+  }
+}
+
+static void graph_userdata_close_cb(void* object, void* data, glow_eUserdataCbType utype)
+{
+  switch (utype)
+  {
+  case glow_eUserdataCbType_NodeClass:
+  case glow_eUserdataCbType_Node:
+  {
+    grow_SetUserData(object, 0);
+    if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
+      delete (GeDash*)data;
+    else
+      delete (GeDyn*)data;
     break;
   }
   case glow_eUserdataCbType_Ctx:
@@ -4154,7 +4173,8 @@ void GraphGrow::grow_setup()
   grow_EnableEvent(ctx, glow_eEvent_AnteRegionSelect, glow_eEventType_CallBack, graph_grow_cb);
   grow_EnableEvent(ctx, glow_eEvent_AnteRegionAddSelect, glow_eEventType_CallBack, graph_grow_cb);
 
-  grow_RegisterUserDataCallbacks(ctx, graph_userdata_save_cb, graph_userdata_open_cb, graph_userdata_copy_cb);
+  grow_RegisterUserDataCallbacks(ctx, graph_userdata_save_cb, graph_userdata_open_cb, graph_userdata_copy_cb,
+                                 graph_userdata_close_cb);
   grow_RegisterScriptExecCallback(ctx, graph_scriptexec_cb);
 }
 
@@ -5388,7 +5408,7 @@ int Graph::sound(pwr_tAttrRef* aref)
 
 int Graph::export_plcfo(char* filename) { return grow_ExportFlow(grow->ctx, filename); }
 
-static int script_dyn_cb(void* dyn, grow_tObject o, std::ofstream& fp, char* indentation)
+static int script_dyn_cb(void* dyn, grow_tObject o, std::ostream& fp, char* indentation)
 {
   char prefix[80] = "";
 
@@ -7578,7 +7598,7 @@ char* Graph::get_next_object_name(const char* prefix, const char* suffix)
 
 void Graph::set_text_coding(lng_eCoding coding)
 {
-  glow_eTextCoding c;
+  glow_eTextCoding c = glow_eTextCoding_ISO8859_1;
 
   switch (coding)
   {
@@ -7633,7 +7653,10 @@ static void graph_free_dyn(grow_tObject object)
 
     grow_GetUserData(object, (void**)&dyn);
     if (dyn)
+    {
+      grow_SetUserData(object, 0);
       delete dyn;
+    }
   }
   else if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
   {
@@ -7641,7 +7664,10 @@ static void graph_free_dyn(grow_tObject object)
 
     grow_GetUserData(object, (void**)&dash);
     if (dash)
+    {
+      grow_SetUserData(object, 0);
       delete dash;
+    }
   }
 }
 

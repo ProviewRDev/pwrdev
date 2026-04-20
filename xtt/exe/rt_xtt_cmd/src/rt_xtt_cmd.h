@@ -41,7 +41,8 @@
 
 #include "xtt_xnav.h"
 
-class XttCmd {
+class XttCmd
+{
 public:
   XttCmd();
 

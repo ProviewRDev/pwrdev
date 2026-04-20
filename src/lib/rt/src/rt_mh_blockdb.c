@@ -68,13 +68,17 @@ mh_sBlockDb* mh_BlockDbOpen(char* FileName, pwr_tUInt32* size)
   /* try to open old blocking file */
   dp->File = fopen(FileName, "r+");
 
-  if (dp->File != NULL) {
+  if (dp->File != NULL)
+  {
     sprintf(msg, "BlockDbOpen: old file: %s", FileName);
     errh_Info(msg);
-    if (fread(hp, sizeof(*hp), 1, dp->File) != 1) {
+    if (fread(hp, sizeof(*hp), 1, dp->File) != 1)
+    {
       sprintf(msg, "BlockDbOpen: read header, %s", strerror(errno));
       errh_Info(msg);
-    } else {
+    }
+    else
+    {
       time_GetTime(&hp->OpenTime);
       if (size != NULL)
         *size = hp->SegSize;
@@ -88,10 +92,13 @@ mh_sBlockDb* mh_BlockDbOpen(char* FileName, pwr_tUInt32* size)
   /* try to create new blocking file */
   dp->File = fopen(FileName, "w+");
 
-  if (dp->File == NULL) {
+  if (dp->File == NULL)
+  {
     sprintf(msg, "BlockDbOpen: %s", strerror(errno));
     errh_Info(msg);
-  } else {
+  }
+  else
+  {
     sprintf(msg, "BlockDbOpen: new file, %s", FileName);
     errh_Info(msg);
 
@@ -103,7 +110,8 @@ mh_sBlockDb* mh_BlockDbOpen(char* FileName, pwr_tUInt32* size)
     /* Write a file header */
 
     hp->SectPos = sizeof(page);
-    if (fseek(dp->File, 0, SEEK_SET) == 0) {
+    if (fseek(dp->File, 0, SEEK_SET) == 0)
+    {
       memset(page, 0, sizeof(page));
       memcpy(page, hp, sizeof(*hp));
       if (size != NULL)
@@ -122,7 +130,8 @@ mh_sBlockDb* mh_BlockDbOpen(char* FileName, pwr_tUInt32* size)
 
 mh_sBlockDb* mh_BlockDbClose(mh_sBlockDb* dp)
 {
-  if (dp != NULL) {
+  if (dp != NULL)
+  {
     if (dp->File != NULL)
       fclose(dp->File);
     free(dp);
@@ -164,18 +173,20 @@ mh_sBlockDb* mh_BlockDbPut(mh_sBlockDb* dp, pwr_tUInt32 size, char* buffer)
 
   memset(page, 0, sizeof(page));
 
-  if (hp->FreeSize < size) {
+  if (hp->FreeSize < size)
+  {
     Head.SectPos = hp->SectPos + hp->SectSize;
     Head.FreeSize = Head.SectPos - sizeof(page);
-  } else {
+  }
+  else
+  {
     Head.SectPos = sizeof(page);
     Head.FreeSize = 0;
   }
 
   Head.SegSize = size;
-  Head.SectSize
-      = (size + mh_cPageAlign) & ~mh_cPageAlign; /* align with page size */
-  Head.SectSize = MAX(Head.SectSize, mh_cPageSize); /* Minimum one page */
+  Head.SectSize = (size + mh_cPageAlign) & ~mh_cPageAlign; /* align with page size */
+  Head.SectSize = MAX(Head.SectSize, mh_cPageSize);        /* Minimum one page */
   DiffSize = Head.SectSize - Head.SegSize;
 
   /* statistics */
@@ -196,7 +207,8 @@ mh_sBlockDb* mh_BlockDbPut(mh_sBlockDb* dp, pwr_tUInt32 size, char* buffer)
   if (size > 0)
     if (fwrite(buffer, size, 1, dp->File) != 1)
       goto error;
-  if (DiffSize > 0) {
+  if (DiffSize > 0)
+  {
     if (fwrite(page, DiffSize, 1, dp->File) != 1)
       goto error;
   }

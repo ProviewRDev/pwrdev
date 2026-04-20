@@ -51,14 +51,16 @@
 #include "wb_vrepced.h"
 #include "wb_palfile.h"
 
-typedef struct sTypeBuild {
+typedef struct sTypeBuild
+{
   tree_sNode node;
   pwr_tTid tid;
   int built;
   int build_started;
 } sTypeBuild;
 
-typedef struct sClassBuild {
+typedef struct sClassBuild
+{
   tree_sNode node;
   pwr_tCid cid;
   int built;
@@ -89,8 +91,8 @@ wb_vrep* wb_vrepced::ref()
   return this;
 }
 
-wb_orep* wb_vrepced::createObject(pwr_tStatus* sts, wb_cdef cdef,
-    wb_destination& d, wb_name& name, pwr_tOix oix)
+wb_orep* wb_vrepced::createObject(pwr_tStatus* sts, wb_cdef cdef, wb_destination& d, wb_name& name,
+                                  pwr_tOix oix)
 {
   wb_orep* dest;
   ldh_eDest code = d.code();
@@ -98,7 +100,8 @@ wb_orep* wb_vrepced::createObject(pwr_tStatus* sts, wb_cdef cdef,
   pwr_tOix soix = 0;
 
   dest = m_vrep->object(sts, d.oid());
-  if (!dest) {
+  if (!dest)
+  {
     *sts = LDH__BADDEST;
     return 0;
   }
@@ -122,8 +125,8 @@ wb_orep* wb_vrepced::createObject(pwr_tStatus* sts, wb_cdef cdef,
   return o;
 }
 
-wb_orep* wb_vrepced::copyObject(pwr_tStatus* sts, const wb_orep* orep,
-    wb_destination& d, wb_name& name, pwr_tOix oix)
+wb_orep* wb_vrepced::copyObject(pwr_tStatus* sts, const wb_orep* orep, wb_destination& d, wb_name& name,
+                                pwr_tOix oix)
 {
   wb_orep* dest;
   ldh_eDest code = d.code();
@@ -131,12 +134,14 @@ wb_orep* wb_vrepced::copyObject(pwr_tStatus* sts, const wb_orep* orep,
   pwr_tOix soix = 0;
 
   dest = m_vrep->object(sts, d.oid());
-  if (!dest) {
+  if (!dest)
+  {
     *sts = LDH__BADDEST;
     return 0;
   }
 
-  if (streq(orep->name(), "Template")) {
+  if (streq(orep->name(), "Template"))
+  {
     *sts = LDH__CLASSMISPLACED;
     return 0;
   }
@@ -167,12 +172,14 @@ bool wb_vrepced::moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d)
   ldh_eDest code = d.code();
 
   dest = m_vrep->object(sts, d.oid());
-  if (!dest) {
+  if (!dest)
+  {
     *sts = LDH__BADDEST;
     return 0;
   }
 
-  if (!classeditorCheckMove(orep, code, dest, sts)) {
+  if (!classeditorCheckMove(orep, code, dest, sts))
+  {
     if (EVEN(*sts))
       return 0;
   }
@@ -183,7 +190,8 @@ bool wb_vrepced::moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d)
 bool wb_vrepced::deleteObject(pwr_tStatus* sts, wb_orep* orep)
 {
   // If attribute object, change body object version time
-  switch (orep->cid()) {
+  switch (orep->cid())
+  {
   case pwr_eClass_Param:
   case pwr_eClass_Input:
   case pwr_eClass_Intern:
@@ -191,9 +199,11 @@ bool wb_vrepced::deleteObject(pwr_tStatus* sts, wb_orep* orep)
   case pwr_eClass_TargetAttribute:
   case pwr_eClass_Buffer:
   case pwr_eClass_ObjXRef:
-  case pwr_eClass_AttrXRef: {
+  case pwr_eClass_AttrXRef:
+  {
     wb_orep* p = orep->parent(sts);
-    if (p) {
+    if (p)
+    {
       pwr_sObjBodyDef pbody;
       m_vrep->readBody(sts, p, pwr_eBix_sys, &pbody);
       m_vrep->writeBody(sts, p, pwr_eBix_sys, &pbody);
@@ -209,7 +219,8 @@ bool wb_vrepced::deleteObject(pwr_tStatus* sts, wb_orep* orep)
 bool wb_vrepced::deleteFamily(pwr_tStatus* sts, wb_orep* orep)
 {
   // If attribute object, change body object version time
-  switch (orep->cid()) {
+  switch (orep->cid())
+  {
   case pwr_eClass_Param:
   case pwr_eClass_Input:
   case pwr_eClass_Intern:
@@ -217,9 +228,11 @@ bool wb_vrepced::deleteFamily(pwr_tStatus* sts, wb_orep* orep)
   case pwr_eClass_TargetAttribute:
   case pwr_eClass_Buffer:
   case pwr_eClass_ObjXRef:
-  case pwr_eClass_AttrXRef: {
+  case pwr_eClass_AttrXRef:
+  {
     wb_orep* p = orep->parent(sts);
-    if (p) {
+    if (p)
+    {
       pwr_sObjBodyDef pbody;
       m_vrep->readBody(sts, p, pwr_eBix_sys, &pbody);
       m_vrep->writeBody(sts, p, pwr_eBix_sys, &pbody);
@@ -237,28 +250,29 @@ bool wb_vrepced::renameObject(pwr_tStatus* sts, wb_orep* orep, wb_name& name)
   return m_vrep->renameObject(sts, orep, name);
 }
 
-bool wb_vrepced::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix,
-    size_t offset, size_t size, void* p)
+bool wb_vrepced::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, size_t offset, size_t size,
+                                void* p)
 {
   pwr_tTid tid;
   bool new_typeref = false;
 
   //  Check if change of TypeRef in attribute object
-  switch (o->cid()) {
+  switch (o->cid())
+  {
   case pwr_eClass_Param:
   case pwr_eClass_Intern:
   case pwr_eClass_TargetAttribute:
-    if (bix == pwr_eBix_sys && offset == offsetof(pwr_sParam, TypeRef)) {
-      m_vrep->readAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sParam, TypeRef),
-          sizeof(tid), &tid);
+    if (bix == pwr_eBix_sys && offset == offsetof(pwr_sParam, TypeRef))
+    {
+      m_vrep->readAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sParam, TypeRef), sizeof(tid), &tid);
       if (tid != *(pwr_tTid*)p && cdh_tidIsCid(*(pwr_tTid*)p))
         new_typeref = true;
     }
     break;
   case pwr_eClass_Buffer:
-    if (bix == pwr_eBix_sys && offset == offsetof(pwr_sBuffer, Class)) {
-      m_vrep->readAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sBuffer, Class),
-          sizeof(tid), &tid);
+    if (bix == pwr_eBix_sys && offset == offsetof(pwr_sBuffer, Class))
+    {
+      m_vrep->readAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sBuffer, Class), sizeof(tid), &tid);
       if (tid != *(pwr_tTid*)p && cdh_tidIsCid(*(pwr_tTid*)p))
         new_typeref = true;
     }
@@ -278,21 +292,21 @@ bool wb_vrepced::writeBody(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, void* p)
   return m_vrep->writeBody(sts, o, bix, p);
 }
 
-bool wb_vrepced::createSnapshot(
-    const char* fileName, const pwr_tTime* time, const int rtonly)
+bool wb_vrepced::createSnapshot(const char* fileName, const pwr_tTime* time, const int rtonly)
 {
   return m_vrep->createSnapshot(fileName, time, rtonly);
 }
 
 bool wb_vrepced::commit(pwr_tStatus* sts)
 {
-  m_typebuild_th = tree_CreateTable(sts, sizeof(pwr_tTid),
-      offsetof(sTypeBuild, tid), sizeof(sTypeBuild), 1000, tree_Comp_tid);
-  m_classbuild_th = tree_CreateTable(sts, sizeof(pwr_tCid),
-      offsetof(sClassBuild, cid), sizeof(sClassBuild), 1000, tree_Comp_cid);
+  m_typebuild_th = tree_CreateTable(sts, sizeof(pwr_tTid), offsetof(sTypeBuild, tid), sizeof(sTypeBuild),
+                                    1000, tree_Comp_tid);
+  m_classbuild_th = tree_CreateTable(sts, sizeof(pwr_tCid), offsetof(sClassBuild, cid), sizeof(sClassBuild),
+                                     1000, tree_Comp_cid);
 
   wb_orep* to = m_vrep->object(sts, pwr_eClass_TypeDef);
-  while (ODD(*sts)) {
+  while (ODD(*sts))
+  {
     to->ref();
     pwr_tTid tid = cdh_TypeObjidToId(to->oid());
     tree_Insert(sts, m_typebuild_th, &tid);
@@ -303,7 +317,8 @@ bool wb_vrepced::commit(pwr_tStatus* sts)
   }
 
   wb_orep* co = m_vrep->object(sts, pwr_eClass_ClassDef);
-  while (ODD(*sts)) {
+  while (ODD(*sts))
+  {
     co->ref();
     pwr_tCid cid = cdh_ClassObjidToId(co->oid());
     tree_Insert(sts, m_classbuild_th, &cid);
@@ -315,9 +330,11 @@ bool wb_vrepced::commit(pwr_tStatus* sts)
 
   m_errorCount = 0;
 
-  for (sTypeBuild* tp = (sTypeBuild*)tree_Minimum(sts, m_typebuild_th);
-       tp != NULL; tp = (sTypeBuild*)tree_Successor(sts, m_typebuild_th, tp)) {
-    if (!tp->built) {
+  for (sTypeBuild* tp = (sTypeBuild*)tree_Minimum(sts, m_typebuild_th); tp != NULL;
+       tp = (sTypeBuild*)tree_Successor(sts, m_typebuild_th, tp))
+  {
+    if (!tp->built)
+    {
       wb_orep* to = m_vrep->object(sts, cdh_TypeIdToObjid(tp->tid));
       to->ref();
       if (!buildType(sts, to))
@@ -326,10 +343,11 @@ bool wb_vrepced::commit(pwr_tStatus* sts)
     }
   }
 
-  for (sClassBuild* cp = (sClassBuild*)tree_Minimum(sts, m_classbuild_th);
-       cp != NULL;
-       cp = (sClassBuild*)tree_Successor(sts, m_classbuild_th, cp)) {
-    if (!cp->built) {
+  for (sClassBuild* cp = (sClassBuild*)tree_Minimum(sts, m_classbuild_th); cp != NULL;
+       cp = (sClassBuild*)tree_Successor(sts, m_classbuild_th, cp))
+  {
+    if (!cp->built)
+    {
       wb_orep* co = m_vrep->object(sts, cdh_ClassIdToObjid(cp->cid));
       co->ref();
       if (!buildClass(sts, co))
@@ -338,7 +356,8 @@ bool wb_vrepced::commit(pwr_tStatus* sts)
     }
   }
 
-  if (m_errorCount) {
+  if (m_errorCount)
+  {
     char msg[80];
     sprintf(msg, "ClassVolume syntax error, %d errors found", m_errorCount);
     MsgWindow::message('E', msg, msgw_ePop_Yes);
@@ -365,14 +384,16 @@ bool wb_vrepced::commit(pwr_tStatus* sts)
   str_ToLower(vname, vname);
   dcli_translate_filename(vname, vname);
 
-  try {
+  try
+  {
     wb_vrepdbs* mvs = new wb_vrepdbs(m_erep, vname);
     mvs->load();
     m_erep->merep()->addDbs(sts, (wb_mvrep*)mvs);
     MsgWindow::message('I', "Volume loaded from snapshot file", vname);
-  } catch (wb_error& e) {
-    MsgWindow::message(
-        'E', "Unable to open volume snapshot file", vname, e.what().c_str());
+  }
+  catch (wb_error& e)
+  {
+    MsgWindow::message('E', "Unable to open volume snapshot file", vname, e.what().c_str());
     return false;
   }
 
@@ -380,16 +401,16 @@ bool wb_vrepced::commit(pwr_tStatus* sts)
 
   // Create template objects for new classes
 
-  for (sClassBuild* cp = (sClassBuild*)tree_Minimum(sts, m_classbuild_th);
-       cp != NULL;
-       cp = (sClassBuild*)tree_Successor(sts, m_classbuild_th, cp)) {
+  for (sClassBuild* cp = (sClassBuild*)tree_Minimum(sts, m_classbuild_th); cp != NULL;
+       cp = (sClassBuild*)tree_Successor(sts, m_classbuild_th, cp))
+  {
     cp->built = 0;
     cp->build_started = 0;
   }
 
-  for (sClassBuild* cp = (sClassBuild*)tree_Minimum(sts, m_classbuild_th);
-       cp != NULL;
-       cp = (sClassBuild*)tree_Successor(sts, m_classbuild_th, cp)) {
+  for (sClassBuild* cp = (sClassBuild*)tree_Minimum(sts, m_classbuild_th); cp != NULL;
+       cp = (sClassBuild*)tree_Successor(sts, m_classbuild_th, cp))
+  {
     wb_orep* co = m_vrep->object(sts, cdh_ClassIdToObjid(cp->cid));
 
     co->ref();
@@ -418,14 +439,16 @@ bool wb_vrepced::commit(pwr_tStatus* sts)
   str_ToLower(vname, vname);
   dcli_translate_filename(vname, vname);
 
-  try {
+  try
+  {
     wb_vrepdbs* mvs = new wb_vrepdbs(m_erep, vname);
     mvs->load();
     m_erep->merep()->addDbs(sts, (wb_mvrep*)mvs);
     MsgWindow::message('I', "Volume loaded from snapshot file", vname);
-  } catch (wb_error& e) {
-    MsgWindow::message(
-        'E', "Unable to open volume snapshot file", vname, e.what().c_str());
+  }
+  catch (wb_error& e)
+  {
+    MsgWindow::message('E', "Unable to open volume snapshot file", vname, e.what().c_str());
     return false;
   }
 
@@ -435,26 +458,22 @@ bool wb_vrepced::commit(pwr_tStatus* sts)
   return true;
 }
 
-bool wb_vrepced::abort(pwr_tStatus* sts)
-{
-  return m_vrep->abort(sts);
-}
+bool wb_vrepced::abort(pwr_tStatus* sts) { return m_vrep->abort(sts); }
 
 // Reset NewAttribute bit in Flags
-bool wb_vrepced::resetFlagsNewAttribute(
-    pwr_tStatus* sts, wb_orep* o, pwr_tUInt32 flags)
+bool wb_vrepced::resetFlagsNewAttribute(pwr_tStatus* sts, wb_orep* o, pwr_tUInt32 flags)
 {
   flags &= ~PWR_MASK_NEWATTRIBUTE;
 
-  switch (o->cid()) {
+  switch (o->cid())
+  {
   case pwr_eClass_Param:
   case pwr_eClass_Input:
   case pwr_eClass_Output:
   case pwr_eClass_Intern:
   case pwr_eClass_TargetAttribute:
   case pwr_eClass_Buffer:
-    m_vrep->writeAttribute(sts, o, pwr_eBix_sys,
-        offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
+    m_vrep->writeAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
     if (EVEN(*sts))
       return false;
     break;
@@ -467,13 +486,13 @@ bool wb_vrepced::setFlagsNewAttribute(pwr_tStatus* sts, wb_orep* o)
 {
   pwr_tUInt32 flags;
 
-  switch (o->cid()) {
+  switch (o->cid())
+  {
   case pwr_eClass_Param:
   case pwr_eClass_Intern:
   case pwr_eClass_TargetAttribute:
   case pwr_eClass_Buffer:
-    m_vrep->readAttribute(sts, o, pwr_eBix_sys,
-        offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
+    m_vrep->readAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
     if (EVEN(*sts))
       return false;
     break;
@@ -486,13 +505,13 @@ bool wb_vrepced::setFlagsNewAttribute(pwr_tStatus* sts, wb_orep* o)
 
   flags |= PWR_MASK_NEWATTRIBUTE;
 
-  switch (o->cid()) {
+  switch (o->cid())
+  {
   case pwr_eClass_Param:
   case pwr_eClass_Intern:
   case pwr_eClass_TargetAttribute:
   case pwr_eClass_Buffer:
-    m_vrep->writeAttribute(sts, o, pwr_eBix_sys,
-        offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
+    m_vrep->writeAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
     if (EVEN(*sts))
       return false;
     break;
@@ -506,7 +525,8 @@ bool wb_vrepced::setPgmName(pwr_tStatus* sts, wb_orep* o)
 {
   pwr_tPgmName pgmname;
 
-  switch (o->cid()) {
+  switch (o->cid())
+  {
   case pwr_eClass_Param:
   case pwr_eClass_Input:
   case pwr_eClass_Output:
@@ -515,15 +535,14 @@ bool wb_vrepced::setPgmName(pwr_tStatus* sts, wb_orep* o)
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
   case pwr_eClass_Buffer:
-    m_vrep->readAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sParInfo, PgmName),
-        sizeof(pgmname), pgmname);
+    m_vrep->readAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sParInfo, PgmName), sizeof(pgmname), pgmname);
     if (EVEN(*sts))
       return false;
 
-    if (streq(pgmname, "")) {
+    if (streq(pgmname, ""))
+    {
       strcpy(pgmname, o->name());
-      m_vrep->writeAttribute(sts, o, pwr_eBix_sys,
-          offsetof(pwr_sParInfo, PgmName), sizeof(pgmname), pgmname);
+      m_vrep->writeAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sParInfo, PgmName), sizeof(pgmname), pgmname);
       if (EVEN(*sts))
         return false;
     }
@@ -545,12 +564,11 @@ bool wb_vrepced::nextCix(pwr_tStatus* sts, pwr_tOix* cix)
 
   o->ref();
 
-  m_vrep->readAttribute(sts, o, pwr_eBix_sys,
-      offsetof(pwr_sClassVolume, NextCix), sizeof(*cix), cix);
-  if (ODD(*sts)) {
+  m_vrep->readAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sClassVolume, NextCix), sizeof(*cix), cix);
+  if (ODD(*sts))
+  {
     (*cix)++;
-    m_vrep->writeAttribute(sts, o, pwr_eBix_sys,
-        offsetof(pwr_sClassVolume, NextCix), sizeof(*cix), cix);
+    m_vrep->writeAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sClassVolume, NextCix), sizeof(*cix), cix);
   }
   o->unref();
   return ODD(*sts);
@@ -567,12 +585,11 @@ bool wb_vrepced::nextTix(pwr_tStatus* sts, pwr_tOix* tix)
 
   o->ref();
 
-  m_vrep->readAttribute(sts, o, pwr_eBix_sys,
-      offsetof(pwr_sClassVolume, NextTix), sizeof(*tix), tix);
-  if (ODD(*sts)) {
+  m_vrep->readAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sClassVolume, NextTix), sizeof(*tix), tix);
+  if (ODD(*sts))
+  {
     (*tix)++;
-    m_vrep->writeAttribute(sts, o, pwr_eBix_sys,
-        offsetof(pwr_sClassVolume, NextTix), sizeof(*tix), tix);
+    m_vrep->writeAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sClassVolume, NextTix), sizeof(*tix), tix);
   }
   o->unref();
   return ODD(*sts);
@@ -580,20 +597,19 @@ bool wb_vrepced::nextTix(pwr_tStatus* sts, pwr_tOix* tix)
 
 bool wb_vrepced::nextAix(pwr_tStatus* sts, wb_orep* co, pwr_tOix* aix)
 {
-  m_vrep->readAttribute(sts, co, pwr_eBix_sys,
-      offsetof(pwr_sObjBodyDef, NextAix), sizeof(*aix), aix);
-  if (ODD(*sts)) {
+  m_vrep->readAttribute(sts, co, pwr_eBix_sys, offsetof(pwr_sObjBodyDef, NextAix), sizeof(*aix), aix);
+  if (ODD(*sts))
+  {
     (*aix)++;
-    m_vrep->writeAttribute(sts, co, pwr_eBix_sys,
-        offsetof(pwr_sObjBodyDef, NextAix), sizeof(*aix), aix);
+    m_vrep->writeAttribute(sts, co, pwr_eBix_sys, offsetof(pwr_sObjBodyDef, NextAix), sizeof(*aix), aix);
   }
   return ODD(*sts);
 }
 
-bool wb_vrepced::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
-    bool keepoid, pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid,
-    const char* name, pwr_mClassDef flags, size_t rbSize, size_t dbSize,
-    void* rbody, void* dbody, pwr_tOid woid, pwr_tOid* roid)
+bool wb_vrepced::importPasteObject(pwr_tOid destination, ldh_eDest destcode, bool keepoid, pwr_tOid oid,
+                                   pwr_tCid cid, pwr_tOid poid, pwr_tOid boid, const char* name,
+                                   pwr_mClassDef flags, size_t rbSize, size_t dbSize, void* rbody,
+                                   void* dbody, pwr_tOid woid, pwr_tOid* roid)
 {
   pwr_tStatus sts;
   pwr_tObjName namel;
@@ -601,14 +617,16 @@ bool wb_vrepced::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
   static pwr_tOix last_template_oix;
   static pwr_tOix last_template_boix;
 
-  if (cdh_ObjidIsNull(poid) && cdh_ObjidIsNull(boid)) {
+  if (cdh_ObjidIsNull(poid) && cdh_ObjidIsNull(boid))
+  {
     // Root object
     wb_orep* dest = m_vrep->object(&sts, destination);
     if (!dest)
       throw wb_error(LDH__BADDEST);
 
     dest->ref();
-    switch (destcode) {
+    switch (destcode)
+    {
     case ldh_eDest_After:
       po = dest->parent(&sts);
       break;
@@ -620,12 +638,15 @@ bool wb_vrepced::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
     }
     po->ref();
     dest->unref();
-  } else if (cdh_ObjidIsNull(poid)) {
+  }
+  else if (cdh_ObjidIsNull(poid))
+  {
     pwr_tOid boidl;
     boidl.oix = m_vrep->importTranslate(boid.oix);
     boidl.vid = m_vrep->vid();
     wb_orep* bo = m_vrep->object(&sts, boidl);
-    if (bo) {
+    if (bo)
+    {
       bo->ref();
       po = bo->parent(&sts);
       bo->unref();
@@ -633,7 +654,9 @@ bool wb_vrepced::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
       if (po)
         po->ref();
     }
-  } else {
+  }
+  else
+  {
     pwr_tOid poidl;
 
     poidl.oix = m_vrep->importTranslate(poid.oix);
@@ -642,8 +665,8 @@ bool wb_vrepced::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
     po = m_vrep->object(&sts, poidl);
     po->ref();
 
-    if (streq(name, "Template") && po && po->cid() == pwr_eClass_ClassDef
-        && !cdh_ObjidIsNull(boid)) {
+    if (streq(name, "Template") && po && po->cid() == pwr_eClass_ClassDef && !cdh_ObjidIsNull(boid))
+    {
       // Unable to paste a template object correctly, remove it
 
       // Link any forward sibling to backward sibling
@@ -661,8 +684,8 @@ bool wb_vrepced::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
   pwr_tOid woidl;
   woidl.oix = oid.oix;
   strcpy(namel, name);
-  if (!classeditorCheck(
-          ldh_eDest_IntoLast, po, cid, &woidl.oix, namel, &sts, true)) {
+  if (!classeditorCheck(ldh_eDest_IntoLast, po, cid, &woidl.oix, namel, &sts, true))
+  {
     throw wb_error(sts);
   }
   if (woidl.oix)
@@ -675,22 +698,22 @@ bool wb_vrepced::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
 
   if (woidl.oix != oid.oix)
     m_vrep->noNixIncr(1);
-  bool rsts = m_vrep->importPasteObject(destination, destcode, keepoid, oid,
-      cid, poid, boid, name, flags, rbSize, dbSize, rbody, dbody, woidl, roid);
+  bool rsts = m_vrep->importPasteObject(destination, destcode, keepoid, oid, cid, poid, boid, name, flags,
+                                        rbSize, dbSize, rbody, dbody, woidl, roid);
   if (woidl.oix != oid.oix)
     m_vrep->noNixIncr(0);
 
   return rsts;
 }
 
-bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
-    pwr_tCid cid, pwr_tOix* oix, char* name, pwr_tStatus* sts,
-    bool import_paste)
+bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest, pwr_tCid cid, pwr_tOix* oix, char* name,
+                                  pwr_tStatus* sts, bool import_paste)
 {
   wb_orep* fth;
 
   // Get father
-  switch (dest_code) {
+  switch (dest_code)
+  {
   case ldh_eDest_After:
   case ldh_eDest_Before:
     fth = dest->parent(sts);
@@ -705,10 +728,13 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
   if (fth)
     fth->ref();
 
-  if (fth) {
-    switch (fth->cid()) {
+  if (fth)
+  {
+    switch (fth->cid())
+    {
     case pwr_eClass_ObjBodyDef:
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_eClass_Param:
       case pwr_eClass_Intern:
       case pwr_eClass_Input:
@@ -725,7 +751,8 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
       }
       break;
     case pwr_eClass_ClassDef:
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_eClass_ObjBodyDef:
       case pwr_eClass_GraphPlcNode:
       case pwr_eClass_GraphPlcConnection:
@@ -747,7 +774,8 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
       }
       break;
     case pwr_eClass_ClassHier:
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_eClass_ClassDef:
         break;
       default:
@@ -757,7 +785,8 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
       }
       break;
     case pwr_eClass_TypeHier:
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_eClass_Type:
       case pwr_eClass_TypeDef:
         break;
@@ -768,7 +797,8 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
       }
       break;
     case pwr_eClass_TypeDef:
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_eClass_Bit:
       case pwr_eClass_Value:
         break;
@@ -782,37 +812,46 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
     }
   }
 
-  switch (cid) {
-  case pwr_eClass_ClassHier: {
+  switch (cid)
+  {
+  case pwr_eClass_ClassHier:
+  {
     // Top object, named Class
-    if (fth && fth->oid().oix != 0) {
+    if (fth && fth->oid().oix != 0)
+    {
       fth->unref();
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
-    if (!import_paste) {
+    if (!import_paste)
+    {
       strcpy(name, "Class");
     }
     *oix = 0;
     break;
   }
-  case pwr_eClass_TypeHier: {
+  case pwr_eClass_TypeHier:
+  {
     // Top object, named Type
-    if (fth && fth->oid().oix != 0) {
+    if (fth && fth->oid().oix != 0)
+    {
       fth->unref();
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
-    if (!import_paste) {
+    if (!import_paste)
+    {
       strcpy(name, "Type");
     }
     *oix = 0;
     break;
   }
-  case pwr_eClass_ClassDef: {
+  case pwr_eClass_ClassDef:
+  {
     // Child to ClassHier, oix from cix
     pwr_tOix cix = 0;
-    if (!fth || fth->cid() != pwr_eClass_ClassHier) {
+    if (!fth || fth->cid() != pwr_eClass_ClassHier)
+    {
       if (fth)
         fth->unref();
       *sts = LDH__CLASSMISPLACED;
@@ -824,7 +863,8 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
     if (EVEN(*sts))
       return false;
 
-    while (1) {
+    while (1)
+    {
       pwr_tOid oid;
       wb_orep* o;
 
@@ -833,14 +873,16 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
         return false;
       oid.oix = *oix;
       oid.vid = m_vid;
-      if ((o = m_vrep->object(sts, oid))) {
+      if ((o = m_vrep->object(sts, oid)))
+      {
         // oix already exist, try next cix
         o->ref();
         o->unref();
         nextCix(sts, &cix);
         if (EVEN(*sts))
           return false;
-      } else
+      }
+      else
         break;
     }
     if (!import_paste)
@@ -848,10 +890,12 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
     break;
   }
 
-  case pwr_eClass_TypeDef: {
+  case pwr_eClass_TypeDef:
+  {
     // Child to TypeHier, oix from tix
     pwr_tOix tix = 0;
-    if (!fth || fth->cid() != pwr_eClass_TypeHier) {
+    if (!fth || fth->cid() != pwr_eClass_TypeHier)
+    {
       if (fth)
         fth->unref();
       *sts = LDH__CLASSMISPLACED;
@@ -863,7 +907,8 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
     if (EVEN(*sts))
       return false;
 
-    while (1) {
+    while (1)
+    {
       pwr_tOid oid;
       wb_orep* o;
 
@@ -872,14 +917,16 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
         return false;
       oid.oix = *oix;
       oid.vid = m_vid;
-      if ((o = m_vrep->object(sts, oid))) {
+      if ((o = m_vrep->object(sts, oid)))
+      {
         // oix already exist, try next tix
         o->ref();
         o->unref();
         nextTix(sts, &tix);
         if (EVEN(*sts))
           return false;
-      } else
+      }
+      else
         break;
     }
     if (!import_paste)
@@ -887,22 +934,27 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
     break;
   }
 
-  case pwr_eClass_ObjBodyDef: {
+  case pwr_eClass_ObjBodyDef:
+  {
     // Child to ClassDef, oix from bix, named RtBody or DevBody
-    if (!fth || fth->cid() != pwr_eClass_ClassDef) {
+    if (!fth || fth->cid() != pwr_eClass_ClassDef)
+    {
       if (fth)
         fth->unref();
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
 
-    if (!import_paste) {
+    if (!import_paste)
+    {
       bool rtbody_found = false;
       bool devbody_found = false;
       wb_orep* child = fth->first(sts);
-      while (ODD(*sts)) {
+      while (ODD(*sts))
+      {
         child->ref();
-        if (child->cid() == pwr_eClass_ObjBodyDef) {
+        if (child->cid() == pwr_eClass_ObjBodyDef)
+        {
           if (cdh_oixToBix(child->oid().oix) == pwr_eBix_rt)
             rtbody_found = true;
           else if (cdh_oixToBix(child->oid().oix) == pwr_eBix_dev)
@@ -912,13 +964,15 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
         child->unref();
         child = next_child;
       }
-      if (!rtbody_found) {
+      if (!rtbody_found)
+      {
         *oix = cdh_cixToOix(cdh_oixToCix(fth->oid().oix), pwr_eBix_rt, 0);
         pwr_tOid woid;
         woid.oix = *oix;
         woid.vid = m_vid;
         wb_orep* check = m_vrep->object(sts, woid);
-        if (ODD(*sts)) {
+        if (ODD(*sts))
+        {
           *sts = LDH__CLASSMISPLACED;
           if (fth)
             fth->unref();
@@ -927,10 +981,13 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
           return false;
         }
         strcpy(name, "RtBody");
-      } else if (!devbody_found) {
+      }
+      else if (!devbody_found)
+      {
         *oix = cdh_cixToOix(cdh_oixToCix(fth->oid().oix), pwr_eBix_dev, 0);
         wb_orep* check = m_vrep->object(sts, *oix);
-        if (ODD(*sts)) {
+        if (ODD(*sts))
+        {
           *sts = LDH__CLASSMISPLACED;
           if (fth)
             fth->unref();
@@ -939,13 +996,17 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
           return false;
         }
         strcpy(name, "DevBody");
-      } else {
+      }
+      else
+      {
         if (fth)
           fth->unref();
         *sts = LDH__CLASSMISPLACED;
         return false;
       }
-    } else {
+    }
+    else
+    {
       // Use the name to choose oix
       if (streq(name, "DevBody"))
         *oix = cdh_cixToOix(cdh_oixToCix(fth->oid().oix), pwr_eBix_dev, 0);
@@ -955,7 +1016,8 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
       woid.oix = *oix;
       woid.vid = m_vid;
       wb_orep* check = m_vrep->object(sts, woid);
-      if (ODD(*sts)) {
+      if (ODD(*sts))
+      {
         *sts = LDH__CLASSMISPLACED;
         if (fth)
           fth->unref();
@@ -973,9 +1035,11 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
   case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
-  case pwr_eClass_Buffer: {
+  case pwr_eClass_Buffer:
+  {
     // Child to ObjBodyDef, oix from aix
-    if (!fth || fth->cid() != pwr_eClass_ObjBodyDef) {
+    if (!fth || fth->cid() != pwr_eClass_ObjBodyDef)
+    {
       if (fth)
         fth->unref();
       *sts = LDH__CLASSMISPLACED;
@@ -987,16 +1051,17 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
     if (EVEN(*sts))
       return false;
 
-    while (1) {
-      *oix = cdh_cixToOix(
-          cdh_oixToCix(fth->oid().oix), cdh_oixToBix(fth->oid().oix), aix);
+    while (1)
+    {
+      *oix = cdh_cixToOix(cdh_oixToCix(fth->oid().oix), cdh_oixToBix(fth->oid().oix), aix);
       pwr_tOid woid;
       woid.oix = *oix;
       woid.vid = m_vid;
       wb_orep* check = m_vrep->object(sts, woid);
       if (EVEN(*sts))
         break;
-      else {
+      else
+      {
         check->ref();
         check->unref();
         nextAix(sts, fth, &aix);
@@ -1009,31 +1074,37 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
     break;
   }
 
-  case pwr_cClass_PlcTemplate: {
+  case pwr_cClass_PlcTemplate:
+  {
     // Child to ClassDef, named Code
-    if (!fth || fth->cid() != pwr_eClass_ClassDef) {
+    if (!fth || fth->cid() != pwr_eClass_ClassDef)
+    {
       if (fth)
         fth->unref();
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
 
-    if (!import_paste) {
+    if (!import_paste)
+    {
       strcpy(name, "Code");
     }
     *oix = 0;
     break;
   }
-  case pwr_eClass_GraphPlcNode: {
+  case pwr_eClass_GraphPlcNode:
+  {
     // Child to ClassDef, named GraphPlcNode
-    if (!fth || fth->cid() != pwr_eClass_ClassDef) {
+    if (!fth || fth->cid() != pwr_eClass_ClassDef)
+    {
       if (fth)
         fth->unref();
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
 
-    if (!import_paste) {
+    if (!import_paste)
+    {
       strcpy(name, "GraphPlcNode");
     }
     *oix = 0;
@@ -1049,13 +1120,13 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
   return true;
 }
 
-bool wb_vrepced::classeditorCheckMove(
-    wb_orep* o, ldh_eDest dest_code, wb_orep* dest, pwr_tStatus* sts)
+bool wb_vrepced::classeditorCheckMove(wb_orep* o, ldh_eDest dest_code, wb_orep* dest, pwr_tStatus* sts)
 {
   wb_orep* fth;
 
   // Get father
-  switch (dest_code) {
+  switch (dest_code)
+  {
   case ldh_eDest_After:
   case ldh_eDest_Before:
     fth = dest->parent(sts);
@@ -1071,10 +1142,13 @@ bool wb_vrepced::classeditorCheckMove(
   if (fth)
     fth->ref();
 
-  if (fth) {
-    switch (fth->cid()) {
+  if (fth)
+  {
+    switch (fth->cid())
+    {
     case pwr_eClass_ObjBodyDef:
-      switch (o->cid()) {
+      switch (o->cid())
+      {
       case pwr_eClass_Param:
       case pwr_eClass_Intern:
       case pwr_eClass_Input:
@@ -1091,7 +1165,8 @@ bool wb_vrepced::classeditorCheckMove(
       }
       break;
     case pwr_eClass_ClassDef:
-      switch (o->cid()) {
+      switch (o->cid())
+      {
       case pwr_eClass_ObjBodyDef:
       case pwr_eClass_GraphPlcNode:
       case pwr_eClass_GraphPlcConnection:
@@ -1113,7 +1188,8 @@ bool wb_vrepced::classeditorCheckMove(
       }
       break;
     case pwr_eClass_ClassHier:
-      switch (o->cid()) {
+      switch (o->cid())
+      {
       case pwr_eClass_ClassDef:
         break;
       default:
@@ -1123,7 +1199,8 @@ bool wb_vrepced::classeditorCheckMove(
       }
       break;
     case pwr_eClass_TypeHier:
-      switch (o->cid()) {
+      switch (o->cid())
+      {
       case pwr_eClass_Type:
       case pwr_eClass_TypeDef:
         break;
@@ -1134,7 +1211,8 @@ bool wb_vrepced::classeditorCheckMove(
       }
       break;
     case pwr_eClass_TypeDef:
-      switch (o->cid()) {
+      switch (o->cid())
+      {
       case pwr_eClass_Bit:
       case pwr_eClass_Value:
         break;
@@ -1148,11 +1226,14 @@ bool wb_vrepced::classeditorCheckMove(
     }
   }
 
-  switch (o->cid()) {
+  switch (o->cid())
+  {
   case pwr_eClass_ClassHier:
-  case pwr_eClass_TypeHier: {
+  case pwr_eClass_TypeHier:
+  {
     // Top object
-    if (fth) {
+    if (fth)
+    {
       fth->unref();
       *sts = LDH__CLASSMISPLACED;
       return false;
@@ -1171,12 +1252,15 @@ bool wb_vrepced::classeditorCheckMove(
   case pwr_eClass_AttrXRef:
   case pwr_eClass_Buffer:
   case pwr_cClass_PlcTemplate:
-  case pwr_eClass_GraphPlcNode: {
-    if (fth) {
+  case pwr_eClass_GraphPlcNode:
+  {
+    if (fth)
+    {
       wb_orep* ftho = o->parent(sts);
       if (ftho)
         ftho->ref();
-      if (!ftho || (ftho && cdh_ObjidIsNotEqual(ftho->oid(), fth->oid()))) {
+      if (!ftho || (ftho && cdh_ObjidIsNotEqual(ftho->oid(), fth->oid())))
+      {
         if (ftho)
           ftho->unref();
         *sts = LDH__CLASSMISPLACED;
@@ -1184,7 +1268,9 @@ bool wb_vrepced::classeditorCheckMove(
       }
       if (ftho)
         ftho->unref();
-    } else {
+    }
+    else
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
@@ -1216,7 +1302,8 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
   if (!cp)
     return false;
 
-  if (cp->build_started) {
+  if (cp->build_started)
+  {
     error("Circular class dependency detected", co);
     return false;
   }
@@ -1234,7 +1321,8 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
   toid.oix = cdh_cixToOix(cdh_cidToCix(cd->cid()), pwr_eBix_template, 0);
   toid.vid = m_vid;
   wb_orep* to = m_vrep->object(sts, toid);
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     // Create a new template object
     wb_cdef cdef(cd);
     wb_destination d(co->oid(), ldh_eDest_IntoLast);
@@ -1259,7 +1347,8 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
   boid.oix = cdh_cixToOix(cdh_oixToCix(co->oid().oix), pwr_eBix_rt, 0);
 
   wb_orep* bo = m_vrep->object(sts, boid);
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     cp->built = 1;
     return true;
   }
@@ -1267,7 +1356,8 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
   bo->ref();
   wb_orep* ao = bo->first(&asts);
   wb_orep* next_ao;
-  while (ODD(asts)) {
+  while (ODD(asts))
+  {
     pwr_tTid typeref;
     pwr_tUInt32 flags;
     pwr_tUInt32 elements;
@@ -1276,33 +1366,34 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
     pwr_tOid toid;
 
     ao->ref();
-    switch (ao->cid()) {
+    switch (ao->cid())
+    {
     case pwr_eClass_Param:
     case pwr_eClass_Input:
     case pwr_eClass_Output:
     case pwr_eClass_Intern:
-    case pwr_eClass_TargetAttribute: {
-      m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-          offsetof(pwr_sParam, TypeRef), sizeof(typeref), &typeref);
+    case pwr_eClass_TargetAttribute:
+    {
+      m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, TypeRef), sizeof(typeref), &typeref);
       if (EVEN(*sts))
         return false;
 
-      m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-          offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
+      m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
       if (EVEN(*sts))
         return false;
 
-      m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-          offsetof(pwr_sParam, Info.Elements), sizeof(elements), &elements);
+      m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, Info.Elements), sizeof(elements),
+                            &elements);
       if (EVEN(*sts))
         return false;
 
-      m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-          offsetof(pwr_sParam, Info.Offset), sizeof(offset), &offset);
+      m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, Info.Offset), sizeof(offset),
+                            &offset);
       if (EVEN(*sts))
         return false;
 
-      if (!cdh_tidIsCid(typeref)) {
+      if (!cdh_tidIsCid(typeref))
+      {
         // Type attribute
         if (flags & PWR_MASK_NEWATTRIBUTE)
           resetFlagsNewAttribute(sts, ao, flags);
@@ -1313,19 +1404,18 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
       }
       break;
     }
-    case pwr_eClass_Buffer: {
-      m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Class),
-          sizeof(typeref), &typeref);
+    case pwr_eClass_Buffer:
+    {
+      m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Class), sizeof(typeref), &typeref);
       if (EVEN(*sts))
         return false;
 
-      m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-          offsetof(pwr_sBuffer, Info.Flags), sizeof(flags), &flags);
+      m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Info.Flags), sizeof(flags), &flags);
       if (EVEN(*sts))
         return false;
 
-      m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-          offsetof(pwr_sBuffer, Info.Elements), sizeof(elements), &elements);
+      m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Info.Elements), sizeof(elements),
+                            &elements);
       if (EVEN(*sts))
         return false;
       break;
@@ -1337,7 +1427,8 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
       continue;
     }
 
-    if (!(new_template || flags & PWR_MASK_NEWATTRIBUTE)) {
+    if (!(new_template || flags & PWR_MASK_NEWATTRIBUTE))
+    {
       next_ao = ao->after(&asts);
       ao->unref();
       ao = next_ao;
@@ -1350,10 +1441,11 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
     // Class attribute
 
     // Check if class in this volume
-    if (cdh_CidToVid(typeref) == m_vid) {
-      sClassBuild* cpt
-          = (sClassBuild*)tree_Find(sts, m_classbuild_th, &typeref);
-      if (!cpt) {
+    if (cdh_CidToVid(typeref) == m_vid)
+    {
+      sClassBuild* cpt = (sClassBuild*)tree_Find(sts, m_classbuild_th, &typeref);
+      if (!cpt)
+      {
         error("Error in TypeRef", ao);
         break;
       }
@@ -1362,7 +1454,8 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
         return false;
 
       cot->ref();
-      if (!cpt->built) {
+      if (!cpt->built)
+      {
         if (!buildTemplate(sts, cot))
           return false;
       }
@@ -1372,13 +1465,13 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
       boid.oix = cdh_cixToOix(cdh_cidToCix(typeref), pwr_eBix_rt, 0);
       boid.vid = m_vid;
       wb_orep* bot = m_vrep->object(sts, boid);
-      if (!bot) {
+      if (!bot)
+      {
         error("Error in TypeRef, no RtBody found", ao);
         break;
       }
       bot->ref();
-      m_vrep->readAttribute(sts, bot, pwr_eBix_sys,
-          offsetof(pwr_sObjBodyDef, Size), sizeof(size), &size);
+      m_vrep->readAttribute(sts, bot, pwr_eBix_sys, offsetof(pwr_sObjBodyDef, Size), sizeof(size), &size);
       if (EVEN(*sts))
         return false;
       bot->unref();
@@ -1398,16 +1491,20 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
       if (EVEN(*sts))
         return false;
 
-      for (int i = 0; i < (int)elements; i++) {
+      for (int i = 0; i < (int)elements; i++)
+      {
         memcpy((char*)tbody + offset + i * size, tot_body, size);
       }
       modified++;
 
       tot->unref();
       free(tot_body);
-    } else {
+    }
+    else
+    {
       wb_cdrep* cd_type = m_vrep->merep()->cdrep(sts, typeref);
-      if (EVEN(*sts)) {
+      if (EVEN(*sts))
+      {
         error("Error in TypeRef", ao);
         break;
       }
@@ -1420,7 +1517,8 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
       toid.vid = m_vid;
       cd_type->templateBody(sts, pwr_eBix_rt, tot_body, to->oid());
 
-      for (int i = 0; i < (int)elements; i++) {
+      for (int i = 0; i < (int)elements; i++)
+      {
         memcpy((char*)tbody + offset + i * size, tot_body, size);
       }
       modified++;
@@ -1448,7 +1546,8 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
     ao = next_ao;
   }
 
-  if (modified) {
+  if (modified)
+  {
     m_vrep->writeBody(sts, to, pwr_eBix_rt, tbody);
     if (EVEN(*sts))
       return false;
@@ -1463,8 +1562,7 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
   return true;
 }
 
-void wb_vrepced::updateTemplateRef(
-    wb_adrep* subattr, char* body, pwr_tAttrRef aref, pwr_tOid toid)
+void wb_vrepced::updateTemplateRef(wb_adrep* subattr, char* body, pwr_tAttrRef aref, pwr_tOid toid)
 {
   pwr_tStatus sts;
   pwr_tCid cid = subattr->subClass();
@@ -1479,34 +1577,43 @@ void wb_vrepced::updateTemplateRef(
   bdrep->ref();
   int subattr_elements = subattr->isArray() ? subattr->nElement() : 1;
 
-  for (int i = 0; i < subattr_elements; i++) {
+  for (int i = 0; i < subattr_elements; i++)
+  {
     wb_adrep* adrep = bdrep->adrep(&sts);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       int elements = adrep->isArray() ? adrep->nElement() : 1;
       adrep->ref();
-      if (adrep->isClass()) {
+      if (adrep->isClass())
+      {
         pwr_tAttrRef aaref = aref;
         aaref.Offset += i * bdrep->size();
-        updateTemplateRef(adrep, (char*)body
-                + i * (subattr->size() / subattr_elements) + adrep->offset(),
-            aaref, toid);
-      } else {
-        switch (adrep->type()) {
-        case pwr_eType_Objid: {
-          pwr_tOid* oidp = (pwr_tOid*)(body
-              + i * (subattr->size() / subattr_elements) + adrep->offset());
-          for (int j = 0; j < elements; j++) {
+        updateTemplateRef(adrep, (char*)body + i * (subattr->size() / subattr_elements) + adrep->offset(),
+                          aaref, toid);
+      }
+      else
+      {
+        switch (adrep->type())
+        {
+        case pwr_eType_Objid:
+        {
+          pwr_tOid* oidp = (pwr_tOid*)(body + i * (subattr->size() / subattr_elements) + adrep->offset());
+          for (int j = 0; j < elements; j++)
+          {
             if (cdh_ObjidIsEqual(*oidp, toid))
               *oidp = aref.Objid;
             oidp++;
           }
           break;
         }
-        case pwr_eType_AttrRef: {
-          pwr_sAttrRef* arp = (pwr_sAttrRef*)(body
-              + i * (subattr->size() / subattr_elements) + adrep->offset());
-          for (int j = 0; j < elements; j++) {
-            if (cdh_ObjidIsEqual(arp->Objid, toid)) {
+        case pwr_eType_AttrRef:
+        {
+          pwr_sAttrRef* arp =
+              (pwr_sAttrRef*)(body + i * (subattr->size() / subattr_elements) + adrep->offset());
+          for (int j = 0; j < elements; j++)
+          {
+            if (cdh_ObjidIsEqual(arp->Objid, toid))
+            {
               arp->Objid = aref.Objid;
               arp->Body = aref.Body;
               arp->Offset += aref.Offset;
@@ -1539,26 +1646,27 @@ bool wb_vrepced::buildType(pwr_tStatus* sts, wb_orep* to)
   if (!tp)
     return false;
 
-  if (tp->build_started) {
+  if (tp->build_started)
+  {
     error("Circular type dependency detected", to);
     return false;
   }
   tp->build_started = 1;
 
-  m_vrep->readAttribute(sts, to, pwr_eBix_sys, offsetof(pwr_sTypeDef, TypeRef),
-      sizeof(typeref), &typeref);
+  m_vrep->readAttribute(sts, to, pwr_eBix_sys, offsetof(pwr_sTypeDef, TypeRef), sizeof(typeref), &typeref);
   if (EVEN(*sts))
     return false;
 
-  m_vrep->readAttribute(sts, to, pwr_eBix_sys, offsetof(pwr_sTypeDef, Elements),
-      sizeof(elements), &elements);
+  m_vrep->readAttribute(sts, to, pwr_eBix_sys, offsetof(pwr_sTypeDef, Elements), sizeof(elements), &elements);
   if (EVEN(*sts))
     return false;
 
   // Check if typeref in this volume
-  if (cdh_TidToVid(typeref) == m_vid) {
+  if (cdh_TidToVid(typeref) == m_vid)
+  {
     sTypeBuild* tpt = (sTypeBuild*)tree_Find(sts, m_typebuild_th, &typeref);
-    if (!tpt) {
+    if (!tpt)
+    {
       error("Error in TypeRef", to);
       return false;
     }
@@ -1567,26 +1675,28 @@ bool wb_vrepced::buildType(pwr_tStatus* sts, wb_orep* to)
       return false;
 
     tot->ref();
-    if (!tpt->built) {
+    if (!tpt->built)
+    {
       if (!buildType(sts, tot))
         return false;
     }
 
-    m_vrep->readAttribute(sts, tot, pwr_eBix_sys, offsetof(pwr_sTypeDef, Size),
-        sizeof(size), &size);
+    m_vrep->readAttribute(sts, tot, pwr_eBix_sys, offsetof(pwr_sTypeDef, Size), sizeof(size), &size);
     if (EVEN(*sts))
       return false;
 
-    m_vrep->readAttribute(sts, tot, pwr_eBix_sys, offsetof(pwr_sTypeDef, Type),
-        sizeof(type), &type);
+    m_vrep->readAttribute(sts, tot, pwr_eBix_sys, offsetof(pwr_sTypeDef, Type), sizeof(type), &type);
     if (EVEN(*sts))
       return false;
 
     tot->unref();
     size = size * elements;
-  } else {
+  }
+  else
+  {
     wb_tdrep* td = m_vrep->merep()->tdrep(sts, typeref);
-    if (EVEN(*sts)) {
+    if (EVEN(*sts))
+    {
       error("Error in TypeRef", to);
       return false;
     }
@@ -1599,18 +1709,16 @@ bool wb_vrepced::buildType(pwr_tStatus* sts, wb_orep* to)
   }
 
   // Store data in typedef object
-  m_vrep->writeAttribute(
-      sts, to, pwr_eBix_sys, offsetof(pwr_sTypeDef, Size), sizeof(size), &size);
+  m_vrep->writeAttribute(sts, to, pwr_eBix_sys, offsetof(pwr_sTypeDef, Size), sizeof(size), &size);
   if (EVEN(*sts))
     return false;
 
-  m_vrep->writeAttribute(sts, to, pwr_eBix_sys,
-      offsetof(pwr_sTypeDef, Elements), sizeof(elements), &elements);
+  m_vrep->writeAttribute(sts, to, pwr_eBix_sys, offsetof(pwr_sTypeDef, Elements), sizeof(elements),
+                         &elements);
   if (EVEN(*sts))
     return false;
 
-  m_vrep->writeAttribute(
-      sts, to, pwr_eBix_sys, offsetof(pwr_sTypeDef, Type), sizeof(type), &type);
+  m_vrep->writeAttribute(sts, to, pwr_eBix_sys, offsetof(pwr_sTypeDef, Type), sizeof(type), &type);
   if (EVEN(*sts))
     return false;
 
@@ -1638,13 +1746,15 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
   if (!cp)
     return false;
 
-  if (cp->build_started) {
+  if (cp->build_started)
+  {
     error("Circular class dependency detected", co);
     return false;
   }
   cp->build_started = 1;
 
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 2; i++)
+  {
     pwr_tUInt32 offset = 0;
     pwr_tUInt32 paramindex = 0;
     pwr_tUInt32 size;
@@ -1655,7 +1765,8 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
 
     wb_orep* bo = m_vrep->object(sts, oid);
 
-    if (bo) {
+    if (bo)
+    {
       if (bix == pwr_eBix_rt)
         has_rtbody = true;
       numofobjbodies++;
@@ -1663,21 +1774,25 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
       bo->ref();
       wb_orep* ao = bo->first(&asts);
       wb_orep* next_ao;
-      while (ODD(asts)) {
+      while (ODD(asts))
+      {
         ao->ref();
-        switch (ao->cid()) {
+        switch (ao->cid())
+        {
         case pwr_eClass_Param:
         case pwr_eClass_Input:
         case pwr_eClass_Output:
         case pwr_eClass_Intern:
-        case pwr_eClass_TargetAttribute: {
+        case pwr_eClass_TargetAttribute:
+        {
           pwr_tTid typeref;
           pwr_tInt32 type;
           pwr_tUInt32 flags;
           pwr_tUInt32 elements;
 
           // Counters for inputs, interns and outputs
-          switch (ao->cid()) {
+          switch (ao->cid())
+          {
           case pwr_eClass_Input:
             input_cnt++;
             break;
@@ -1690,46 +1805,51 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
           default:;
           }
 
-          m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParam, TypeRef), sizeof(typeref), &typeref);
+          m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, TypeRef), sizeof(typeref),
+                                &typeref);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
+          m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, Info.Flags), sizeof(flags),
+                                &flags);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParam, Info.Elements), sizeof(elements), &elements);
+          m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, Info.Elements), sizeof(elements),
+                                &elements);
           if (EVEN(*sts))
             return false;
 
           if (elements == 0)
             elements = 1;
 
-          if (elements > 1 && !(flags & PWR_MASK_ARRAY)) {
+          if (elements > 1 && !(flags & PWR_MASK_ARRAY))
+          {
             error("Error in Elements or Flags.Array", ao);
             break;
           }
 
-          if (!cdh_tidIsCid(typeref)) {
+          if (!cdh_tidIsCid(typeref))
+          {
             // Type attribute
 
-            if (flags & PWR_MASK_CLASS) {
+            if (flags & PWR_MASK_CLASS)
+            {
               error("Error in Flags.Class", ao);
               break;
             }
 
-            if (flags & PWR_MASK_SUPERCLASS) {
+            if (flags & PWR_MASK_SUPERCLASS)
+            {
               error("Error in Flags.SuperClass", ao);
               break;
             }
 
-            if (cdh_TidToVid(typeref) == m_vid) {
-              sTypeBuild* tpt
-                  = (sTypeBuild*)tree_Find(sts, m_typebuild_th, &typeref);
-              if (!tpt) {
+            if (cdh_TidToVid(typeref) == m_vid)
+            {
+              sTypeBuild* tpt = (sTypeBuild*)tree_Find(sts, m_typebuild_th, &typeref);
+              if (!tpt)
+              {
                 error("Error in TypeRef", ao);
                 return false;
               }
@@ -1737,25 +1857,29 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
               if (!tot)
                 return false;
 
-              if (!tpt->built) {
+              if (!tpt->built)
+              {
                 if (!buildType(sts, tot))
                   return false;
               }
 
-              m_vrep->readAttribute(sts, tot, pwr_eBix_sys,
-                  offsetof(pwr_sTypeDef, Size), sizeof(size), &size);
+              m_vrep->readAttribute(sts, tot, pwr_eBix_sys, offsetof(pwr_sTypeDef, Size), sizeof(size),
+                                    &size);
               if (EVEN(*sts))
                 return false;
 
-              m_vrep->readAttribute(sts, tot, pwr_eBix_sys,
-                  offsetof(pwr_sTypeDef, Type), sizeof(type), &type);
+              m_vrep->readAttribute(sts, tot, pwr_eBix_sys, offsetof(pwr_sTypeDef, Type), sizeof(type),
+                                    &type);
               if (EVEN(*sts))
                 return false;
 
               size = size * elements;
-            } else {
+            }
+            else
+            {
               wb_tdrep* td = m_vrep->merep()->tdrep(sts, typeref);
-              if (EVEN(*sts)) {
+              if (EVEN(*sts))
+              {
                 error("Error in TypeRef", ao);
                 break;
               }
@@ -1769,21 +1893,23 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
               has_attrref = true;
             else if (type == pwr_eType_Objid)
               has_objref = true;
-          } else {
+          }
+          else
+          {
             // Class attribute
 
             if (!(flags & PWR_MASK_CLASS))
               flags |= PWR_MASK_CLASS;
 
-            if (paramindex == 0 && streq(ao->name(), "Super")
-                && !(flags & PWR_MASK_SUPERCLASS))
+            if (paramindex == 0 && streq(ao->name(), "Super") && !(flags & PWR_MASK_SUPERCLASS))
               flags |= PWR_MASK_SUPERCLASS;
 
             // Check if class in this volume
-            if (cdh_CidToVid(typeref) == m_vid) {
-              sClassBuild* cpt
-                  = (sClassBuild*)tree_Find(sts, m_classbuild_th, &typeref);
-              if (!cpt) {
+            if (cdh_CidToVid(typeref) == m_vid)
+            {
+              sClassBuild* cpt = (sClassBuild*)tree_Find(sts, m_classbuild_th, &typeref);
+              if (!cpt)
+              {
                 error("Error in TypeRef", ao);
                 break;
               }
@@ -1792,7 +1918,8 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
                 return false;
 
               cot->ref();
-              if (!cpt->built) {
+              if (!cpt->built)
+              {
                 if (!buildClass(sts, cot))
                   return false;
               }
@@ -1803,20 +1930,21 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
               boid.oix = cdh_cixToOix(cdh_cidToCix(typeref), pwr_eBix_rt, 0);
               boid.vid = m_vid;
               wb_orep* bot = m_vrep->object(sts, boid);
-              if (!bot) {
+              if (!bot)
+              {
                 error("Error in TypeRef, no RtBody found", ao);
                 break;
               }
               bot->ref();
-              m_vrep->readAttribute(sts, bot, pwr_eBix_sys,
-                  offsetof(pwr_sObjBodyDef, Size), sizeof(size), &size);
+              m_vrep->readAttribute(sts, bot, pwr_eBix_sys, offsetof(pwr_sObjBodyDef, Size), sizeof(size),
+                                    &size);
               if (EVEN(*sts))
                 return false;
               bot->unref();
 
               pwr_mClassDef cdflags;
-              m_vrep->readAttribute(sts, cot, pwr_eBix_sys,
-                  offsetof(pwr_sClassDef, Flags), sizeof(cdflags), &cdflags);
+              m_vrep->readAttribute(sts, cot, pwr_eBix_sys, offsetof(pwr_sClassDef, Flags), sizeof(cdflags),
+                                    &cdflags);
               if (EVEN(*sts))
                 return false;
 
@@ -1836,9 +1964,12 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
                 has_objxref = true;
               if (cdflags.b.AttrXRef)
                 has_attrref = true;
-            } else {
+            }
+            else
+            {
               wb_cdrep* cd = m_vrep->merep()->cdrep(sts, typeref);
-              if (EVEN(*sts)) {
+              if (EVEN(*sts))
+              {
                 error("Error in TypeRef", ao);
                 break;
               }
@@ -1862,46 +1993,42 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
             }
           }
 
-          if (ao->cid() == pwr_eClass_Input) {
+          if (ao->cid() == pwr_eClass_Input)
+          {
             offset = pwr_AlignLW(offset) + pwr_cAlignLW;
           }
-          if (cdh_tidIsCid(typeref) || flags & PWR_MASK_POINTER
-              || typeref == pwr_eType_Time || typeref == pwr_eType_DeltaTime
-              || typeref == pwr_eType_Int64 || typeref == pwr_eType_UInt64
-              || typeref == pwr_eType_Float64 || typeref == pwr_eType_CastId
-              || typeref == pwr_eType_DisableAttr
-              || streq(ao->name(), "TimerFlag"))
+          if (cdh_tidIsCid(typeref) || flags & PWR_MASK_POINTER || typeref == pwr_eType_Time ||
+              typeref == pwr_eType_DeltaTime || typeref == pwr_eType_Int64 || typeref == pwr_eType_UInt64 ||
+              typeref == pwr_eType_Float64 || typeref == pwr_eType_CastId ||
+              typeref == pwr_eType_DisableAttr || streq(ao->name(), "TimerFlag"))
             offset = pwr_AlignLW(offset);
 
           // Store data in Attribute object
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, Info.Flags), sizeof(flags),
+                                 &flags);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParam, Info.Elements), sizeof(elements), &elements);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, Info.Elements), sizeof(elements),
+                                 &elements);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParam, Info.Size), sizeof(size), &size);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, Info.Size), sizeof(size), &size);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParam, Info.Offset), sizeof(offset), &offset);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, Info.Offset), sizeof(offset),
+                                 &offset);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParam, Info.ParamIndex), sizeof(paramindex),
-              &paramindex);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, Info.ParamIndex),
+                                 sizeof(paramindex), &paramindex);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParam, Info.Type), sizeof(type), &type);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParam, Info.Type), sizeof(type), &type);
           if (EVEN(*sts))
             return false;
 
@@ -1911,9 +2038,8 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
           else
             offset += size;
 
-          if (cdh_tidIsCid(typeref) || flags & PWR_MASK_POINTER
-              || typeref == pwr_eType_CastId
-              || typeref == pwr_eType_DisableAttr)
+          if (cdh_tidIsCid(typeref) || flags & PWR_MASK_POINTER || typeref == pwr_eType_CastId ||
+              typeref == pwr_eType_DisableAttr)
             offset = pwr_AlignLW(offset);
           else
             offset = pwr_AlignW(offset);
@@ -1922,26 +2048,27 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
           break;
         }
         case pwr_eClass_AttrXRef:
-        case pwr_eClass_ObjXRef: {
+        case pwr_eClass_ObjXRef:
+        {
           pwr_tTid typeref;
           pwr_tInt32 type;
           pwr_tUInt32 flags;
           pwr_tUInt32 elements;
 
-          m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParInfo, Flags), sizeof(flags), &flags);
+          m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParInfo, Flags), sizeof(flags), &flags);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParInfo, Elements), sizeof(elements), &elements);
+          m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParInfo, Elements), sizeof(elements),
+                                &elements);
           if (EVEN(*sts))
             return false;
 
           if (elements == 0)
             elements = 1;
 
-          if (elements > 1 && !(flags & PWR_MASK_ARRAY)) {
+          if (elements > 1 && !(flags & PWR_MASK_ARRAY))
+          {
             error("Error in Elements or Flags.Array", ao);
             break;
           }
@@ -1952,7 +2079,8 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
             typeref = pwr_eType_AttrRef;
 
           wb_tdrep* td = m_vrep->merep()->tdrep(sts, typeref);
-          if (EVEN(*sts)) {
+          if (EVEN(*sts))
+          {
             error("Error in TypeRef", ao);
             break;
           }
@@ -1967,34 +2095,30 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
             has_attrxref = true;
 
           // Store data in Attribute object
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParInfo, Flags), sizeof(flags), &flags);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParInfo, Flags), sizeof(flags), &flags);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParInfo, Elements), sizeof(elements), &elements);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParInfo, Elements), sizeof(elements),
+                                 &elements);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParInfo, Size), sizeof(size), &size);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParInfo, Size), sizeof(size), &size);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParInfo, Offset), sizeof(offset), &offset);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParInfo, Offset), sizeof(offset),
+                                 &offset);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParInfo, ParamIndex), sizeof(paramindex),
-              &paramindex);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParInfo, ParamIndex),
+                                 sizeof(paramindex), &paramindex);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sParInfo, Type), sizeof(type), &type);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sParInfo, Type), sizeof(type), &type);
           if (EVEN(*sts))
             return false;
 
@@ -2002,43 +2126,45 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
           paramindex++;
           break;
         }
-        case pwr_eClass_Buffer: {
+        case pwr_eClass_Buffer:
+        {
           pwr_tCid cid;
           pwr_tInt32 type;
           pwr_tUInt32 flags;
           pwr_tUInt32 elements;
 
-          m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sBuffer, Class), sizeof(cid), &cid);
+          m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Class), sizeof(cid), &cid);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sBuffer, Info.Flags), sizeof(flags), &flags);
+          m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Info.Flags), sizeof(flags),
+                                &flags);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sBuffer, Info.Elements), sizeof(elements),
-              &elements);
+          m_vrep->readAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Info.Elements), sizeof(elements),
+                                &elements);
           if (EVEN(*sts))
             return false;
 
           if (elements == 0)
             elements = 1;
 
-          if (elements > 1 && !(flags & PWR_MASK_ARRAY)) {
+          if (elements > 1 && !(flags & PWR_MASK_ARRAY))
+          {
             error("Error in Elements or Flags.Array", ao);
             break;
           }
 
-          if (!cdh_tidIsCid(cid)) {
+          if (!cdh_tidIsCid(cid))
+          {
             error("Error in Class", ao);
             break;
           }
 
           wb_cdrep* cd = m_vrep->merep()->cdrep(sts, cid);
-          if (EVEN(*sts)) {
+          if (EVEN(*sts))
+          {
             error("Error in Class", ao);
             break;
           }
@@ -2053,35 +2179,33 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
           offset = pwr_AlignLW(offset);
 
           // Store data in Attribute object
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sBuffer, Info.Flags), sizeof(flags), &flags);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Info.Flags), sizeof(flags),
+                                 &flags);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sBuffer, Info.Elements), sizeof(elements),
-              &elements);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Info.Elements),
+                                 sizeof(elements), &elements);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sBuffer, Info.Size), sizeof(size), &size);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Info.Size), sizeof(size),
+                                 &size);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sBuffer, Info.Offset), sizeof(offset), &offset);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Info.Offset), sizeof(offset),
+                                 &offset);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sBuffer, Info.ParamIndex), sizeof(paramindex),
-              &paramindex);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Info.ParamIndex),
+                                 sizeof(paramindex), &paramindex);
           if (EVEN(*sts))
             return false;
 
-          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys,
-              offsetof(pwr_sBuffer, Info.Type), sizeof(type), &type);
+          m_vrep->writeAttribute(sts, ao, pwr_eBix_sys, offsetof(pwr_sBuffer, Info.Type), sizeof(type),
+                                 &type);
           if (EVEN(*sts))
             return false;
 
@@ -2103,14 +2227,12 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
       offset = pwr_AlignLW(offset);
 
       // Store data in Body object
-      m_vrep->writeAttribute(sts, bo, pwr_eBix_sys,
-          offsetof(pwr_sObjBodyDef, Size), sizeof(offset), &offset);
+      m_vrep->writeAttribute(sts, bo, pwr_eBix_sys, offsetof(pwr_sObjBodyDef, Size), sizeof(offset), &offset);
       if (EVEN(*sts))
         return false;
 
-      m_vrep->writeAttribute(sts, bo, pwr_eBix_sys,
-          offsetof(pwr_sObjBodyDef, NumOfParams), sizeof(paramindex),
-          &paramindex);
+      m_vrep->writeAttribute(sts, bo, pwr_eBix_sys, offsetof(pwr_sObjBodyDef, NumOfParams),
+                             sizeof(paramindex), &paramindex);
       if (EVEN(*sts))
         return false;
 
@@ -2123,17 +2245,16 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
   }
 
   // Store data in ClassDef object
-  m_vrep->writeAttribute(sts, co, pwr_eBix_sys,
-      offsetof(pwr_sClassDef, NumOfObjBodies), sizeof(numofobjbodies),
-      &numofobjbodies);
+  m_vrep->writeAttribute(sts, co, pwr_eBix_sys, offsetof(pwr_sClassDef, NumOfObjBodies),
+                         sizeof(numofobjbodies), &numofobjbodies);
   if (EVEN(*sts))
     return false;
 
-  if (has_rtbody || has_objref || has_attrref || has_objxref || has_attrxref) {
+  if (has_rtbody || has_objref || has_attrref || has_objxref || has_attrxref)
+  {
     pwr_mClassDef cflags;
 
-    m_vrep->readAttribute(sts, co, pwr_eBix_sys, offsetof(pwr_sClassDef, Flags),
-        sizeof(cflags), &cflags);
+    m_vrep->readAttribute(sts, co, pwr_eBix_sys, offsetof(pwr_sClassDef, Flags), sizeof(cflags), &cflags);
     if (EVEN(*sts))
       return false;
 
@@ -2147,22 +2268,25 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
       cflags.b.ObjXRef = 1;
     if (has_attrxref)
       cflags.b.AttrXRef = 1;
-    m_vrep->writeAttribute(sts, co, pwr_eBix_sys,
-        offsetof(pwr_sClassDef, Flags), sizeof(cflags), &cflags);
+    m_vrep->writeAttribute(sts, co, pwr_eBix_sys, offsetof(pwr_sClassDef, Flags), sizeof(cflags), &cflags);
     if (EVEN(*sts))
       return false;
   }
 
   // Set number of Input, Outputs and Interns in GraphPlcNode object
-  if (m_vrep->vid() > cdh_cSystemClassVolMax) {
+  if (m_vrep->vid() > cdh_cSystemClassVolMax)
+  {
     bool gfound = false;
     wb_orep* next_ch;
     wb_orep* ch = co->first(&asts);
-    while (ODD(asts)) {
+    while (ODD(asts))
+    {
       ch->ref();
 
-      switch (ch->cid()) {
-      case pwr_eClass_GraphPlcNode: {
+      switch (ch->cid())
+      {
+      case pwr_eClass_GraphPlcNode:
+      {
         pwr_sGraphPlcNode gbody;
 
         m_vrep->readBody(sts, ch, pwr_eBix_rt, &gbody);
@@ -2173,10 +2297,12 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
         gbody.parameters[1] = intern_cnt;
         gbody.parameters[2] = output_cnt;
 
-        if (gbody.default_mask[0] == 0 && gbody.default_mask[1] == 0) {
+        if (gbody.default_mask[0] == 0 && gbody.default_mask[1] == 0)
+        {
           unsigned int mask = 0;
           unsigned int m = 0;
-          for (int i = 0; i < input_cnt; i++) {
+          for (int i = 0; i < input_cnt; i++)
+          {
             m = i ? 2 * m : 1;
             mask += m;
           }
@@ -2184,7 +2310,8 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
 
           mask = 0;
           m = 0;
-          for (int i = 0; i < output_cnt; i++) {
+          for (int i = 0; i < output_cnt; i++)
+          {
             m = i ? 2 * m : 1;
             mask += m;
           }
@@ -2197,7 +2324,8 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
       }
       default:;
       }
-      if (gfound) {
+      if (gfound)
+      {
         ch->unref();
         break;
       }
@@ -2225,21 +2353,23 @@ void wb_vrepced::printPaletteFile()
   int menu_found = 0;
   int allclasses_found = 0;
   int palette_found = 0;
-  PalFileMenu* menu = PalFile::config_tree_build(
-      0, pal_cLocalPaletteFile, pal_eNameType_All, "", 0);
+  PalFileMenu* menu = PalFile::config_tree_build(0, pal_cLocalPaletteFile, pal_eNameType_All, "", 0);
   PalFileMenu *mp, *mp2 = NULL, *mp3 = NULL, *mp4;
   wb_orep *cedch, *cedcd, *cedgn, *otmp;
 
   // Add menu "NavigatorPalette-AllClasses-'volumename' if not found
-  for (mp = menu; mp; mp = mp->next) {
-    if (mp->item_type == pal_eMenuType_Palette
-        && str_NoCaseStrcmp(mp->title, "NavigatorPalette") == 0) {
-      for (mp2 = mp->child_list; mp2; mp2 = mp2->next) {
-        if (mp2->item_type == pal_eMenuType_Menu
-            && str_NoCaseStrcmp(mp2->title, "AllClasses") == 0) {
-          for (mp3 = mp2->child_list; mp3; mp3 = mp3->next) {
-            if (mp3->item_type == pal_eMenuType_ClassVolume
-                && str_NoCaseStrcmp(mp3->title, m_name) == 0) {
+  for (mp = menu; mp; mp = mp->next)
+  {
+    if (mp->item_type == pal_eMenuType_Palette && str_NoCaseStrcmp(mp->title, "NavigatorPalette") == 0)
+    {
+      for (mp2 = mp->child_list; mp2; mp2 = mp2->next)
+      {
+        if (mp2->item_type == pal_eMenuType_Menu && str_NoCaseStrcmp(mp2->title, "AllClasses") == 0)
+        {
+          for (mp3 = mp2->child_list; mp3; mp3 = mp3->next)
+          {
+            if (mp3->item_type == pal_eMenuType_ClassVolume && str_NoCaseStrcmp(mp3->title, m_name) == 0)
+            {
               menu_found = 1;
               break;
             }
@@ -2253,19 +2383,22 @@ void wb_vrepced::printPaletteFile()
     }
   }
 
-  if (!palette_found) {
+  if (!palette_found)
+  {
     // Create palette
     mp = new PalFileMenu("NavigatorPalette", pal_eMenuType_Palette, 0);
     mp->next = menu;
     menu = mp;
   }
-  if (!allclasses_found) {
+  if (!allclasses_found)
+  {
     // Create volume menu
     mp2 = new PalFileMenu("AllClasses", pal_eMenuType_Menu, mp);
     mp2->next = mp->child_list;
     mp->child_list = mp2;
   }
-  if (!menu_found) {
+  if (!menu_found)
+  {
     // Create volume menu
     mp3 = new PalFileMenu(m_name, pal_eMenuType_ClassVolume, mp2);
     mp3->next = mp2->child_list;
@@ -2275,12 +2408,14 @@ void wb_vrepced::printPaletteFile()
   // Replace menu "PlcEditorPalette-'volumename'-* with function object classes
   menu_found = 0;
   palette_found = 0;
-  for (mp = menu; mp; mp = mp->next) {
-    if (mp->item_type == pal_eMenuType_Palette
-        && str_NoCaseStrcmp(mp->title, "PlcEditorPalette") == 0) {
-      for (mp2 = mp->child_list; mp2; mp2 = mp2->next) {
-        if (mp2->item_type == pal_eMenuType_Menu
-            && str_NoCaseStrcmp(mp2->title, m_name) == 0) {
+  for (mp = menu; mp; mp = mp->next)
+  {
+    if (mp->item_type == pal_eMenuType_Palette && str_NoCaseStrcmp(mp->title, "PlcEditorPalette") == 0)
+    {
+      for (mp2 = mp->child_list; mp2; mp2 = mp2->next)
+      {
+        if (mp2->item_type == pal_eMenuType_Menu && str_NoCaseStrcmp(mp2->title, m_name) == 0)
+        {
           // Remove
           PalFile::config_tree_free(mp2->child_list);
           mp2->child_list = 0;
@@ -2293,31 +2428,37 @@ void wb_vrepced::printPaletteFile()
     }
   }
 
-  if (!palette_found) {
+  if (!palette_found)
+  {
     // Create palette
     mp = new PalFileMenu("PlcEditorPalette", pal_eMenuType_Palette, 0);
     mp->next = menu;
     menu = mp;
   }
-  if (!menu_found) {
+  if (!menu_found)
+  {
     // Create volume menu
     mp2 = new PalFileMenu(m_name, pal_eMenuType_Menu, mp);
     mp2->next = mp->child_list;
     mp->child_list = mp2;
   }
 
-  for (cedch = object(&sts); ODD(sts);) {
+  for (cedch = object(&sts); ODD(sts);)
+  {
     cedch->ref();
-    if (cedch->cid() == pwr_eClass_ClassHier) {
-      for (cedcd = cedch->first(&sts); ODD(sts);) {
+    if (cedch->cid() == pwr_eClass_ClassHier)
+    {
+      for (cedcd = cedch->first(&sts); ODD(sts);)
+      {
         cedcd->ref();
-        for (cedgn = cedcd->first(&sts); ODD(sts);) {
+        for (cedgn = cedcd->first(&sts); ODD(sts);)
+        {
           cedgn->ref();
-          if (cedgn->cid() == pwr_eClass_GraphPlcNode) {
+          if (cedgn->cid() == pwr_eClass_GraphPlcNode)
+          {
             // Add to menu
             mp4 = mp3;
-            mp3 = new PalFileMenu(
-                (char*)cedcd->name(), pal_eMenuType_Class, mp2);
+            mp3 = new PalFileMenu((char*)cedcd->name(), pal_eMenuType_Class, mp2);
             if (!mp2->child_list)
               mp2->child_list = mp3;
             else
@@ -2348,7 +2489,8 @@ char* wb_vrepced::fill(std::ofstream& fp, int len)
   static char str[200];
 
   char* s = str;
-  for (int i = 0; i < len; i++) {
+  for (int i = 0; i < len; i++)
+  {
     *s = ' ';
     s++;
     if (i >= (int)sizeof(str))
@@ -2366,14 +2508,16 @@ char* wb_vrepced::typeRefToName(pwr_tStatus* sts, pwr_tTid typeref, bool hpp)
   bool is_class = false;
 
   strcpy(str, "");
-  if (cdh_TidToVid(typeref) == m_vid) {
+  if (cdh_TidToVid(typeref) == m_vid)
+  {
     wb_orep* o_typeref = m_vrep->object(sts, cdh_TypeIdToObjid(typeref));
     if (!o_typeref)
       return str;
 
     o_typeref->ref();
 
-    if (cdh_tidIsCid(typeref)) {
+    if (cdh_tidIsCid(typeref))
+    {
       pwr_sObjBodyDef typeref_body;
 
       pwr_tOid boid;
@@ -2394,7 +2538,9 @@ char* wb_vrepced::typeRefToName(pwr_tStatus* sts, pwr_tTid typeref, bool hpp)
       o_typeref->unref();
 
       is_class = true;
-    } else {
+    }
+    else
+    {
       // TypeRef is type in this volume
       pwr_sTypeDef typeref_body;
 
@@ -2408,8 +2554,11 @@ char* wb_vrepced::typeRefToName(pwr_tStatus* sts, pwr_tTid typeref, bool hpp)
         strcpy(pgmname, o_typeref->name());
       o_typeref->unref();
     }
-  } else {
-    if (cdh_tidIsCid(typeref)) {
+  }
+  else
+  {
+    if (cdh_tidIsCid(typeref))
+    {
       // TypeRef is cid in other volume
       wb_cdrep* cdrep = m_vrep->merep()->cdrep(sts, typeref);
       if (EVEN(*sts))
@@ -2429,7 +2578,9 @@ char* wb_vrepced::typeRefToName(pwr_tStatus* sts, pwr_tTid typeref, bool hpp)
       delete cdrep;
 
       is_class = true;
-    } else {
+    }
+    else
+    {
       // TypeRef is type is other volume
       wb_tdrep* tdrep = m_vrep->merep()->tdrep(sts, typeref);
       if (EVEN(*sts))
@@ -2442,12 +2593,15 @@ char* wb_vrepced::typeRefToName(pwr_tStatus* sts, pwr_tTid typeref, bool hpp)
     }
   }
   *sts = LDH__SUCCESS;
-  if (hpp) {
+  if (hpp)
+  {
     if (is_class)
       sprintf(str, "pwr_Class_%s", pgmname);
     else
       sprintf(str, "pwr_t%s", pgmname);
-  } else {
+  }
+  else
+  {
     if (is_systemclass)
       sprintf(str, "pwr_s%s", pgmname);
     else if (is_class)
@@ -2477,7 +2631,8 @@ void wb_vrepced::printStructFile(bool hpp)
   dcli_translate_filename(fname, filename);
 
   fp.open(fname);
-  if (!fp) {
+  if (!fp)
+  {
     error("Unable to open structfile", 0);
     return;
   }
@@ -2488,13 +2643,13 @@ void wb_vrepced::printStructFile(bool hpp)
   else
     strcpy(incname, filename);
 
-  for (s = incname; *s; s++) {
+  for (s = incname; *s; s++)
+  {
     if (*s == '.')
       *s = '_';
   }
 
-  fp << "/*      Proview " << pwrv_cPwrVersionStr << " " << filename << " */"
-     << '\n'
+  fp << "/*      Proview " << pwrv_cPwrVersionStr << " " << filename << " */" << '\n'
      << '\n'
      << "/*      Generated by wb_ced. */\n"
      << "/*      Do not edit this file. */\n"
@@ -2509,12 +2664,16 @@ void wb_vrepced::printStructFile(bool hpp)
      << '\n';
 
   // Print Types
-  for (o_root = object(&sts); ODD(sts);) {
+  for (o_root = object(&sts); ODD(sts);)
+  {
     o_root->ref();
-    if (o_root->cid() == pwr_eClass_TypeHier) {
-      for (o_tdef = o_root->first(&sts); ODD(sts);) {
+    if (o_root->cid() == pwr_eClass_TypeHier)
+    {
+      for (o_tdef = o_root->first(&sts); ODD(sts);)
+      {
         o_tdef->ref();
-        if (o_tdef->cid() == pwr_eClass_TypeDef) {
+        if (o_tdef->cid() == pwr_eClass_TypeDef)
+        {
           // Print TypeDef
           pwr_sTypeDef tdef_body;
           pwr_tObjName typeref_pgmname, tdef_pgmname;
@@ -2524,9 +2683,9 @@ void wb_vrepced::printStructFile(bool hpp)
             throw wb_error(sts);
 
           // Get TypeRef
-          strcpy(
-              typeref_pgmname, typeRefToName(&sts, tdef_body.TypeRef, false));
-          if (EVEN(sts)) {
+          strcpy(typeref_pgmname, typeRefToName(&sts, tdef_body.TypeRef, false));
+          if (EVEN(sts))
+          {
             error("Error in TypeRef", o_tdef);
             throw wb_error(sts);
           }
@@ -2548,11 +2707,14 @@ void wb_vrepced::printStructFile(bool hpp)
 
           bool value_found = false;
           bool bit_found = false;
-          for (o_value = o_tdef->first(&sts); ODD(sts);) {
+          for (o_value = o_tdef->first(&sts); ODD(sts);)
+          {
             o_value->ref();
-            if (o_value->cid() == pwr_eClass_Value) {
+            if (o_value->cid() == pwr_eClass_Value)
+            {
               // Print value enum
-              if (!value_found) {
+              if (!value_found)
+              {
                 value_found = true;
 
                 fp << "typedef enum {\n";
@@ -2562,12 +2724,14 @@ void wb_vrepced::printStructFile(bool hpp)
               m_vrep->readBody(&sts, o_value, pwr_eBix_sys, &value_body);
 
               fp << "  pwr_e" << tdef_pgmname << "_" << value_body.PgmName
-                 << fill(fp,
-                        30 - strlen(tdef_pgmname) - strlen(value_body.PgmName))
-                 << " = " << value_body.Value << ",\n";
-            } else if (o_value->cid() == pwr_eClass_Bit) {
+                 << fill(fp, 30 - strlen(tdef_pgmname) - strlen(value_body.PgmName)) << " = "
+                 << value_body.Value << ",\n";
+            }
+            else if (o_value->cid() == pwr_eClass_Bit)
+            {
               // Print mask enum
-              if (!bit_found) {
+              if (!bit_found)
+              {
                 bit_found = true;
 
                 fp << "typedef enum {\n";
@@ -2576,16 +2740,18 @@ void wb_vrepced::printStructFile(bool hpp)
 
               m_vrep->readBody(&sts, o_value, pwr_eBix_sys, &bit_body);
 
-              fp << "  pwr_m" << tdef_pgmname << "_" << bit_body.PgmName
-                 << " = " << bit_body.Value << ",\n";
+              fp << "  pwr_m" << tdef_pgmname << "_" << bit_body.PgmName << " = " << bit_body.Value << ",\n";
             }
             otmp = o_value;
             o_value = o_value->after(&sts);
             otmp->unref();
           }
-          if (value_found) {
+          if (value_found)
+          {
             fp << "} pwr_e" << tdef_pgmname << ";\n\n" << '\n';
-          } else if (bit_found) {
+          }
+          else if (bit_found)
+          {
             fp << "} pwr_m" << tdef_pgmname << ";\n\n" << '\n';
           }
         }
@@ -2602,13 +2768,17 @@ void wb_vrepced::printStructFile(bool hpp)
   }
 
   // Print classes
-  for (o_root = object(&sts); ODD(sts);) {
+  for (o_root = object(&sts); ODD(sts);)
+  {
     o_root->ref();
-    if (o_root->cid() == pwr_eClass_ClassHier) {
-      for (o_cdef = o_root->first(&sts); ODD(sts);) {
+    if (o_root->cid() == pwr_eClass_ClassHier)
+    {
+      for (o_cdef = o_root->first(&sts); ODD(sts);)
+      {
         o_cdef->ref();
 
-        if (o_cdef->cid() == pwr_eClass_ClassDef) {
+        if (o_cdef->cid() == pwr_eClass_ClassDef)
+        {
           pwr_sClassDef cdef_body;
           bool body_found = false;
 
@@ -2616,10 +2786,12 @@ void wb_vrepced::printStructFile(bool hpp)
           if (EVEN(sts))
             throw wb_error(sts);
 
-          for (o_bdef = o_cdef->first(&sts); ODD(sts);) {
+          for (o_bdef = o_cdef->first(&sts); ODD(sts);)
+          {
             o_bdef->ref();
 
-            if (o_bdef->cid() == pwr_eClass_ObjBodyDef) {
+            if (o_bdef->cid() == pwr_eClass_ObjBodyDef)
+            {
               pwr_sObjBodyDef bdef_body;
               pwr_tObjName pgmname;
               pwr_eBix bix = cdh_oixToBix(o_bdef->oid().oix);
@@ -2639,15 +2811,16 @@ void wb_vrepced::printStructFile(bool hpp)
               else
                 strcpy(structstype, "s");
 
-              if (!body_found) {
+              if (!body_found)
+              {
                 fp << "#ifndef pwr_cClass_" << pgmname << '\n'
-                   << "#define pwr_cClass_" << pgmname << " "
-                   << cdh_ClassObjidToId(o_cdef->oid()) << "UL\n"
+                   << "#define pwr_cClass_" << pgmname << " " << cdh_ClassObjidToId(o_cdef->oid()) << "UL\n"
                    << '\n';
                 body_found = true;
               }
 
-              if (bix == pwr_eBix_rt && cdef_body.Flags.b.DevOnly) {
+              if (bix == pwr_eBix_rt && cdef_body.Flags.b.DevOnly)
+              {
                 fp << "/*   Class : " << o_cdef->name() << '\n';
                 fp << "     Body :  " << o_bdef->name() << '\n';
                 fp << "     Body is virtual\n"
@@ -2660,34 +2833,40 @@ void wb_vrepced::printStructFile(bool hpp)
 
               bool attr_found = false;
               int attr_next_alignlw = 1; // Align first attribute on longword
-              for (o_adef = o_bdef->first(&sts); ODD(sts);) {
+              for (o_adef = o_bdef->first(&sts); ODD(sts);)
+              {
                 o_adef->ref();
 
-                if (!attr_found) {
+                if (!attr_found)
+                {
                   attr_found = true;
 
                   fp << "/*_* Class : " << o_cdef->name() << '\n';
                   fp << "     Body :  " << o_bdef->name() << '\n';
-                  fp << "     @Aref " << o_cdef->name() << " pwr_"
-                     << structstype << "Class_" << pgmname << '\n'
+                  fp << "     @Aref " << o_cdef->name() << " pwr_" << structstype << "Class_" << pgmname
+                     << '\n'
                      << "*/\n"
                      << '\n';
 
-                  if (hpp) {
+                  if (hpp)
+                  {
                     if (bix == pwr_eBix_dev)
                       fp << "class pwr_dClass_" << pgmname;
                     else
                       fp << "class pwr_Class_" << pgmname;
-                  } else
+                  }
+                  else
                     fp << "typedef struct {\n";
                 }
 
-                switch (o_adef->cid()) {
+                switch (o_adef->cid())
+                {
                 case pwr_eClass_Param:
                 case pwr_eClass_Intern:
                 case pwr_eClass_Input:
                 case pwr_eClass_Output:
-                case pwr_eClass_TargetAttribute: {
+                case pwr_eClass_TargetAttribute:
+                {
                   pwr_sIntern adef_body;
                   pwr_tObjName attr_pgmname;
                   pwr_tObjName attr_typeref_pgmname;
@@ -2703,48 +2882,42 @@ void wb_vrepced::printStructFile(bool hpp)
                     strcpy(attr_pgmname, o_adef->name());
 
                   // Get TypeRef
-                  strcpy(attr_typeref_pgmname,
-                      typeRefToName(&sts, adef_body.TypeRef, hpp));
-                  if (EVEN(sts)) {
+                  strcpy(attr_typeref_pgmname, typeRefToName(&sts, adef_body.TypeRef, hpp));
+                  if (EVEN(sts))
+                  {
                     error("Error in TypeRef", o_tdef);
                     throw wb_error(sts);
                   }
 
-                  if (attr_next_alignlw
-                      || adef_body.Info.Flags & PWR_MASK_POINTER
-                      || adef_body.Info.Flags & PWR_MASK_CLASS
-                      || o_adef->cid() == pwr_eClass_Input
-                      || o_adef->cid() == pwr_eClass_Buffer
-                      || adef_body.TypeRef == pwr_eType_Int64
-                      || adef_body.TypeRef == pwr_eType_UInt64
-                      || adef_body.TypeRef == pwr_eType_Float64
-                      || adef_body.TypeRef == pwr_eType_Time
-                      || adef_body.TypeRef == pwr_eType_DeltaTime
-                      || adef_body.TypeRef == pwr_eType_CastId
-                      || adef_body.TypeRef == pwr_eType_DisableAttr
-                      || adef_body.TypeRef == pwr_eType_Int64
-                      || streq(o_adef->name(), "TimerFlag"))
+                  if (attr_next_alignlw || adef_body.Info.Flags & PWR_MASK_POINTER ||
+                      adef_body.Info.Flags & PWR_MASK_CLASS || o_adef->cid() == pwr_eClass_Input ||
+                      o_adef->cid() == pwr_eClass_Buffer || adef_body.TypeRef == pwr_eType_Int64 ||
+                      adef_body.TypeRef == pwr_eType_UInt64 || adef_body.TypeRef == pwr_eType_Float64 ||
+                      adef_body.TypeRef == pwr_eType_Time || adef_body.TypeRef == pwr_eType_DeltaTime ||
+                      adef_body.TypeRef == pwr_eType_CastId || adef_body.TypeRef == pwr_eType_DisableAttr ||
+                      adef_body.TypeRef == pwr_eType_Int64 || streq(o_adef->name(), "TimerFlag"))
                     strcpy(alignstr, " pwr_dAlignLW");
                   else
                     strcpy(alignstr, " pwr_dAlignW");
 
-                  if (adef_body.Info.Flags & PWR_MASK_CLASS
-                      || adef_body.Info.Flags & PWR_MASK_POINTER
-                      || o_adef->cid() == pwr_eClass_Buffer
-                      || adef_body.TypeRef == pwr_eType_CastId
-                      || adef_body.TypeRef == pwr_eType_DisableAttr)
+                  if (adef_body.Info.Flags & PWR_MASK_CLASS || adef_body.Info.Flags & PWR_MASK_POINTER ||
+                      o_adef->cid() == pwr_eClass_Buffer || adef_body.TypeRef == pwr_eType_CastId ||
+                      adef_body.TypeRef == pwr_eType_DisableAttr)
                     // Align next attribute on longword
                     attr_next_alignlw = 1;
                   else
                     attr_next_alignlw = 0;
 
                   bool super_attr = false;
-                  if (hpp && adef_body.Info.ParamIndex == 0) {
-                    if (adef_body.Info.Flags & PWR_MASK_SUPERCLASS) {
+                  if (hpp && adef_body.Info.ParamIndex == 0)
+                  {
+                    if (adef_body.Info.Flags & PWR_MASK_SUPERCLASS)
+                    {
                       fp << " : public " << attr_typeref_pgmname << " {\n"
                          << " public:\n";
                       super_attr = true;
-                    } else
+                    }
+                    else
                       fp << " {\n"
                          << " public:\n";
                   }
@@ -2754,26 +2927,24 @@ void wb_vrepced::printStructFile(bool hpp)
                   else
                     strcpy(pointertype, "");
 
-                  if (!super_attr) {
+                  if (!super_attr)
+                  {
                     if (o_adef->cid() == pwr_eClass_Input)
-                      fp << "  " << attr_typeref_pgmname
-                         << fill(fp, 35 - strlen(attr_typeref_pgmname)) << " "
-                         << pointertype << "*" << attr_pgmname << "P"
-                         << alignstr << ";\n";
-                    fp << "  " << attr_typeref_pgmname
-                       << fill(fp, 35 - strlen(attr_typeref_pgmname)) << " "
+                      fp << "  " << attr_typeref_pgmname << fill(fp, 35 - strlen(attr_typeref_pgmname)) << " "
+                         << pointertype << "*" << attr_pgmname << "P" << alignstr << ";\n";
+                    fp << "  " << attr_typeref_pgmname << fill(fp, 35 - strlen(attr_typeref_pgmname)) << " "
                        << pointertype << attr_pgmname;
 
                     if (adef_body.Info.Elements > 1)
-                      fp << "[" << adef_body.Info.Elements << "]" << alignstr
-                         << ";\n";
+                      fp << "[" << adef_body.Info.Elements << "]" << alignstr << ";\n";
                     else
                       fp << alignstr << ";\n";
                   }
 
                   break;
                 }
-                case pwr_eClass_Buffer: {
+                case pwr_eClass_Buffer:
+                {
                   pwr_sBuffer adef_body;
                   pwr_tObjName attr_pgmname;
                   pwr_tObjName attr_typeref_pgmname;
@@ -2795,26 +2966,25 @@ void wb_vrepced::printStructFile(bool hpp)
                        << " public:\n";
 
                   // Get TypeRef
-                  strcpy(attr_typeref_pgmname,
-                      typeRefToName(&sts, adef_body.Class, hpp));
-                  if (EVEN(sts)) {
+                  strcpy(attr_typeref_pgmname, typeRefToName(&sts, adef_body.Class, hpp));
+                  if (EVEN(sts))
+                  {
                     error("Error in TypeRef", o_tdef);
                     throw wb_error(sts);
                   }
 
-                  fp << "  " << attr_typeref_pgmname
-                     << fill(fp, 35 - strlen(attr_typeref_pgmname)) << " "
+                  fp << "  " << attr_typeref_pgmname << fill(fp, 35 - strlen(attr_typeref_pgmname)) << " "
                      << attr_pgmname;
 
                   if (adef_body.Info.Elements > 1)
-                    fp << "[" << adef_body.Info.Elements << "]" << alignstr
-                       << ";\n";
+                    fp << "[" << adef_body.Info.Elements << "]" << alignstr << ";\n";
                   else
                     fp << alignstr << ";\n";
 
                   break;
                 }
-                case pwr_eClass_ObjXRef: {
+                case pwr_eClass_ObjXRef:
+                {
                   pwr_sObjXRef adef_body;
                   pwr_tObjName attr_pgmname;
 
@@ -2838,18 +3008,17 @@ void wb_vrepced::printStructFile(bool hpp)
                     strcpy(attr_pgmname, o_adef->name());
 
                   fp << "  "
-                     << "pwr_tOid" << fill(fp, 35 - strlen("pwr_tOid")) << " "
-                     << attr_pgmname;
+                     << "pwr_tOid" << fill(fp, 35 - strlen("pwr_tOid")) << " " << attr_pgmname;
 
                   if (adef_body.Info.Elements > 1)
-                    fp << "[" << adef_body.Info.Elements << "]" << alignstr
-                       << ";\n";
+                    fp << "[" << adef_body.Info.Elements << "]" << alignstr << ";\n";
                   else
                     fp << alignstr << ";\n";
 
                   break;
                 }
-                case pwr_eClass_AttrXRef: {
+                case pwr_eClass_AttrXRef:
+                {
                   pwr_sAttrXRef adef_body;
                   pwr_tObjName attr_pgmname;
 
@@ -2873,12 +3042,10 @@ void wb_vrepced::printStructFile(bool hpp)
                     strcpy(attr_pgmname, o_adef->name());
 
                   fp << "  "
-                     << "pwr_tAttrRef" << fill(fp, 35 - strlen("pwr_tAttrRef"))
-                     << " " << attr_pgmname;
+                     << "pwr_tAttrRef" << fill(fp, 35 - strlen("pwr_tAttrRef")) << " " << attr_pgmname;
 
                   if (adef_body.Info.Elements > 1)
-                    fp << "[" << adef_body.Info.Elements << "]" << alignstr
-                       << ";\n";
+                    fp << "[" << adef_body.Info.Elements << "]" << alignstr << ";\n";
                   else
                     fp << alignstr << ";\n";
 
@@ -2892,13 +3059,12 @@ void wb_vrepced::printStructFile(bool hpp)
                 otmp->unref();
               }
 
-              if (attr_found) {
+              if (attr_found)
+              {
                 if (hpp)
                   fp << "};\n\n";
                 else
-                  fp << "} pwr_" << structstype << "Class_" << pgmname << ";"
-                     << '\n'
-                     << '\n';
+                  fp << "} pwr_" << structstype << "Class_" << pgmname << ";" << '\n' << '\n';
               }
             }
 

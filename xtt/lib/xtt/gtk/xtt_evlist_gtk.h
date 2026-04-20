@@ -41,11 +41,11 @@
 
 #include "xtt_evlist.h"
 
-class EvListGtk : public EvList {
+class EvListGtk : public EvList
+{
 public:
-  EvListGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, ev_eType ev_type,
-      int ev_size, int ev_evenname_seg, GtkWidget** w,
-      void (*ev_init_cb)(void*) = 0);
+  EvListGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, ev_eType ev_type, int ev_size, int ev_evenname_seg,
+            GtkWidget** w, void (*ev_init_cb)(void*) = 0);
   ~EvListGtk();
 
   GtkWidget* parent_wid;

@@ -77,10 +77,10 @@ GlowCtx::GlowCtx(const char* ctx_name, double zoom_fact, int offs_x, int offs_y)
       select_policy(glow_eSelectPolicy_Partial), display_level(glow_mDisplayLevel_1), scroll_size(0),
       scroll_callback(0), scroll_data(NULL), hot_mode(glow_eHotMode_Default),
       default_hot_mode(glow_eHotMode_SingleObject), hot_found(0), userdata_save_callback(0),
-      userdata_open_callback(0), userdata_copy_callback(0), version(GLOW_VERSION), inputfocus_object(0),
-      is_component(0), comment(0), hot_indication(glow_eHotIndication_LightColor), tiptext_size(2),
-      app_motion(glow_eAppMotion_Both), eventlog_callback(0), scriptexec_callback(0), customcolors(0),
-      closing_down(0)
+      userdata_open_callback(0), userdata_copy_callback(0), userdata_close_callback(0), version(GLOW_VERSION),
+      inputfocus_object(0), is_component(0), comment(0), hot_indication(glow_eHotIndication_LightColor),
+      tiptext_size(2), app_motion(glow_eAppMotion_Both), eventlog_callback(0), scriptexec_callback(0),
+      customcolors(0), closing_down(0)
 {
   a.is_bg = 1;
   a.set_active(1);
@@ -228,7 +228,7 @@ int GlowCtx::save(char* filename, glow_eSaveMode mode)
   return 1;
 }
 
-int GlowCtx::open_comment(std::ifstream& fp)
+int GlowCtx::open_comment(std::istream& fp)
 {
   char line[200];
   int incomment = 0;
@@ -259,7 +259,7 @@ int GlowCtx::open_comment(std::ifstream& fp)
   return 1;
 }
 
-void GlowCtx::save_comment(std::ofstream& fp)
+void GlowCtx::save_comment(std::ostream& fp)
 {
   bool last_blank = false;
 
@@ -1180,6 +1180,7 @@ int GlowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       }
       return 1;
     }
+  /* fall through */
   case glow_eEvent_MB1DoubleClick:
   case glow_eEvent_MB1ClickShift:
   case glow_eEvent_MB1DoubleClickShift:

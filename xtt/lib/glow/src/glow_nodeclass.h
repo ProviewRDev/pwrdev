@@ -37,6 +37,8 @@
 #ifndef glow_nodeclass_h
 #define glow_nodeclass_h
 
+#include <iosfwd>
+
 #include "glow_point.h"
 #include "glow_array.h"
 #include "co_string.h"
@@ -131,11 +133,11 @@ public:
     \param fp	Ouput file.
     \param mode	Save as graph or subgraph.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*! \param fp	Input file. */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   void draw(GlowWind* w, GlowPoint* pos, int highlight, int hot, void* node);
   void erase(GlowWind* w, GlowPoint* pos, int hot, void* node);

@@ -44,23 +44,23 @@
 
 #include "xtt_tcurve_qt.h"
 
-XttTCurveQt::XttTCurveQt(void* parent_ctx, const char* name, QWidget** w,
-    pwr_tAttrRef* xn_arefv, int xn_width, int xn_height,
-    unsigned int xn_options, int xn_color_theme, void* basewidget, int* sts)
+XttTCurveQt::XttTCurveQt(void* parent_ctx, const char* name, QWidget** w, pwr_tAttrRef* xn_arefv,
+                         int xn_width, int xn_height, unsigned int xn_options, int xn_color_theme,
+                         void* basewidget, int* sts)
     : XttTCurve(parent_ctx, name, xn_arefv, xn_color_theme, sts)
 {
   char title[250];
   strncpy(title, name, sizeof(title));
 
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     // Error from XttTCurve
     return;
   }
 
   *sts = XNAV__SUCCESS;
 
-  curve = new GeCurveQt(this, title, NULL, gcd, 1, xn_width, xn_height,
-      xn_options, color_theme, basewidget);
+  curve = new GeCurveQt(this, title, NULL, gcd, 1, xn_width, xn_height, xn_options, color_theme, basewidget);
   curve->close_cb = tcurve_close_cb;
   curve->help_cb = tcurve_help_cb;
   curve->increase_period_cb = tcurve_increase_period_cb;
@@ -74,9 +74,9 @@ XttTCurveQt::XttTCurveQt(void* parent_ctx, const char* name, QWidget** w,
   curve->save_cb = tcurve_save_cb;
   curve->remove_cb = tcurve_remove_cb;
   curve->export_cb = tcurve_export_cb;
-  curve->enable(curve_mEnable_Timebox | curve_mEnable_Export | curve_mEnable_New
-      | curve_mEnable_Open | curve_mEnable_Save | curve_mEnable_CurveType
-      | curve_mEnable_CurveTypeSquare | curve_mEnable_FillCurve);
+  curve->enable(curve_mEnable_Timebox | curve_mEnable_Export | curve_mEnable_New | curve_mEnable_Open |
+                curve_mEnable_Save | curve_mEnable_CurveType | curve_mEnable_CurveTypeSquare |
+                curve_mEnable_FillCurve);
 
   wow = new CoWowQt(((GeCurveQt*)curve)->toplevel);
   timerid = wow->timer_new();
@@ -89,7 +89,8 @@ XttTCurveQt::~XttTCurveQt()
   timerid->remove();
 
   delete curve;
-  if (gcd) {
+  if (gcd)
+  {
     delete gcd;
   }
   delete wow;

@@ -59,10 +59,7 @@ typedef void* ldh_tSesContext;
 static GtkWidget* toplevel;
 static GtkWidget* mainwindow;
 
-static void usage()
-{
-  printf("\nUsage: wb_ge [-l language] [graphname]\n");
-}
+static void usage() { printf("\nUsage: wb_ge [-l language] [graphname]\n"); }
 
 int main(int argc, char* argv[])
 {
@@ -79,37 +76,42 @@ int main(int argc, char* argv[])
   setlocale(LC_NUMERIC, "POSIX");
   setlocale(LC_TIME, "en_US");
 
-  GtkCssProvider *provider;
+  GtkCssProvider* provider;
   dcli_translate_filename(fname, "$pwr_load/wb_gtk.css");
   provider = gtk_css_provider_new();
-  gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(
-      gdk_display_get_default()), GTK_STYLE_PROVIDER(provider), 
-      GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(gdk_display_get_default()),
+                                            GTK_STYLE_PROVIDER(provider),
+                                            GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   gtk_css_provider_load_from_path(provider, fname, NULL);
   g_object_unref(provider);
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 100,
-      "default-width", 100, "title", "Pwr wb_ge", NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 100, "default-width", 100, "title",
+                                      "Pwr wb_ge", NULL);
 
   // Create help window
-  CoXHelpGtk* xhelp
-      = new CoXHelpGtk(mainwindow, 0, xhelp_eUtility_Wtt, (int*)&sts);
+  CoXHelpGtk* xhelp = new CoXHelpGtk(mainwindow, 0, xhelp_eUtility_Wtt, (int*)&sts);
   CoXHelpGtk::set_default(xhelp);
 
-  if (argc > 1) {
-    for (i = 1; i < argc; i++) {
-      if (streq(argv[i], "-l")) {
-        if (i + 1 >= argc) {
+  if (argc > 1)
+  {
+    for (i = 1; i < argc; i++)
+    {
+      if (streq(argv[i], "-l"))
+      {
+        if (i + 1 >= argc)
+        {
           usage();
           exit(0);
         }
         Lng::set(argv[i + 1]);
         i++;
-      } else
+      }
+      else
         strcpy(file, argv[i]);
     }
 
-    if (file[0] == '@') {
+    if (file[0] == '@')
+    {
       // Execute script
       pwr_tStatus sts;
 
@@ -117,7 +119,9 @@ int main(int argc, char* argv[])
       sts = gectx->command(file);
       if (EVEN(sts))
         gectx->message(sts);
-    } else {
+    }
+    else
+    {
       // Open graph
       strcpy(graph_name, file);
       gectx = new GeGtk(NULL, mainwindow, 0, 1, opt, graph_name);
@@ -125,7 +129,9 @@ int main(int argc, char* argv[])
       sprintf(fname, "@%s.pwr_com", wnav_cInitFile);
       gectx->command(fname);
     }
-  } else {
+  }
+  else
+  {
     gectx = new GeGtk(NULL, mainwindow, 0, 1, opt, NULL);
 
     sprintf(fname, "@%s.pwr_com", wnav_cInitFile);
@@ -138,8 +144,7 @@ int main(int argc, char* argv[])
   new wb_log_gtk(toplevel);
 
   // Create message window
-  MsgWindowGtk* msg_window
-      = new MsgWindowGtk(gectx, mainwindow, "Ge messages", &sts);
+  MsgWindowGtk* msg_window = new MsgWindowGtk(gectx, mainwindow, "Ge messages", &sts);
   msg_window->find_ge_cb = Ge::find_ge_cb;
   MsgWindow::set_default(msg_window);
 

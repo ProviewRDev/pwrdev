@@ -51,10 +51,9 @@
   @aref pipos PiPos
 */
 
-void pipos_exec(plc_sThread* tp, pwr_sClass_pipos* object)
-{
+void pipos_exec(plc_sThread *tp, pwr_sClass_pipos *object) {
   float pdiff; /* Position difference from Kal1 */
-  int idiff; /* Raw value difference from Kal1 */
+  int idiff;   /* Raw value difference from Kal1 */
 
   /* Read Input */
   object->PulsIn = *object->PulsInP;
@@ -103,8 +102,7 @@ void pipos_exec(plc_sThread* tp, pwr_sClass_pipos* object)
   @aref count Count
 */
 
-void count_exec(plc_sThread* tp, pwr_sClass_count* object)
-{
+void count_exec(plc_sThread *tp, pwr_sClass_count *object) {
   float old; /* For flank detect */
 
   /* Count up */
@@ -158,18 +156,17 @@ void count_exec(plc_sThread* tp, pwr_sClass_count* object)
   @aref bcddo BCDDO
 */
 
-void bcddo_exec(plc_sThread* tp, pwr_sClass_bcddo* object)
-{
+void bcddo_exec(plc_sThread *tp, pwr_sClass_bcddo *object) {
   int val; /* One digit */
   int i;
   int j;
   int tal;
   int oldtal;
-  float rest; /* Overflow */
-  pwr_tBoolean* dopoint; /* Points to output */
+  float rest;            /* Overflow */
+  pwr_tBoolean *dopoint; /* Points to output */
 
   rest = object->In = *object->InP; /* Get Input */
-  dopoint = &object->BCD0; /* Initialize pointer */
+  dopoint = &object->BCD0;          /* Initialize pointer */
 
   if (rest < 0)
     rest = 0;
@@ -197,29 +194,28 @@ void bcddo_exec(plc_sThread* tp, pwr_sClass_bcddo* object)
 
 #define DIBCDSIZE 16
 
-void dibcd_exec(plc_sThread* tp, pwr_sClass_dibcd* object)
-{
-  int val; /* One digit */
-  int i; /* Loop index*/
-  int j; /* Loop index*/
-  int res; /* Result */
-  char* ptr; /* Pointer to pointer */
-  pwr_tBoolean* p2; /* Pointer to digin */
+void dibcd_exec(plc_sThread *tp, pwr_sClass_dibcd *object) {
+  int val;          /* One digit */
+  int i;            /* Loop index*/
+  int j;            /* Loop index*/
+  int res;          /* Result */
+  char *ptr;        /* Pointer to pointer */
+  pwr_tBoolean *p2; /* Pointer to digin */
   pwr_tBoolean err; /* Error flag */
 
   /* Initialize */
   res = 0;
   err = FALSE;
-  ptr = (char*)&object->BCD0P + (DIBCDSIZE - 1) * pwr_cInputOffset;
+  ptr = (char *)&object->BCD0P + (DIBCDSIZE - 1) * pwr_cInputOffset;
 
   /* Double loop for convert */
   for (i = 0; i < (DIBCDSIZE / 4); i++) {
     val = 0;
     for (j = 0; j < 4; j++) {
-      val += val; /* Mult 2 */
-      p2 = *(pwr_tBoolean**)ptr; /* Pointer to input */
+      val += val;                 /* Mult 2 */
+      p2 = *(pwr_tBoolean **)ptr; /* Pointer to input */
       if (*p2 != object->Inv)
-        val++; /* Signal till ? */
+        val++;                 /* Signal till ? */
       ptr -= pwr_cInputOffset; /* Pointer to next pointer */
     }
     if (val > 9)
@@ -279,27 +275,26 @@ Signal  0 1 2 3  4 5 6 7  8 9 A B  C D E F      ActVal
 
 #define GRAYSIZE 16
 
-void gray_exec(plc_sThread* tp, pwr_sClass_gray* object)
-{
-  int i; /* Loopcounter */
-  pwr_tBoolean in; /* Digital in after invert */
+void gray_exec(plc_sThread *tp, pwr_sClass_gray *object) {
+  int i;            /* Loopcounter */
+  pwr_tBoolean in;  /* Digital in after invert */
   pwr_tBoolean odd; /* Convert flag */
-  int sum; /* Convert sum */
-  char* ptr; /* Pointer to ptr to digin */
-  pwr_tBoolean* p2; /* Pointer to digin */
+  int sum;          /* Convert sum */
+  char *ptr;        /* Pointer to ptr to digin */
+  pwr_tBoolean *p2; /* Pointer to digin */
 
   /* Init */
   odd = 0;
   sum = 0;
-  ptr = (char*)&object->Din0P + (GRAYSIZE - 1) * pwr_cInputOffset;
+  ptr = (char *)&object->Din0P + (GRAYSIZE - 1) * pwr_cInputOffset;
 
   /* Graycode convert loop */
   for (i = 0; i < GRAYSIZE; i++) {
-    sum += sum; /* Mult 2 */
-    p2 = *(pwr_tBoolean**)ptr; /* Pointer to next dig in */
-    in = (*p2 != object->Inv); /* Invert ? */
-    odd = in ? !odd : odd; /* Odd up to now ? */
-    sum += odd; /* Inc if odd input */
+    sum += sum;                 /* Mult 2 */
+    p2 = *(pwr_tBoolean **)ptr; /* Pointer to next dig in */
+    in = (*p2 != object->Inv);  /* Invert ? */
+    odd = in ? !odd : odd;      /* Odd up to now ? */
+    sum += odd;                 /* Inc if odd input */
     ptr -= pwr_cInputOffset;
   }
 
@@ -312,8 +307,7 @@ void gray_exec(plc_sThread* tp, pwr_sClass_gray* object)
   @aref getdpptr GETDPPTR
 */
 
-void GetDpPtr_init(pwr_sClass_GetDpPtr* o)
-{
+void GetDpPtr_init(pwr_sClass_GetDpPtr *o) {
   pwr_tUInt32 p;
   pwr_tAttrRef aref = o->DpPtrObject;
 
@@ -324,8 +318,7 @@ void GetDpPtr_init(pwr_sClass_GetDpPtr* o)
     o->Ptr = gdh_TranslateRtdbPointer(p);
 }
 
-void GetDpPtr_exec(plc_sThread* tp, pwr_sClass_GetDpPtr* o)
-{
+void GetDpPtr_exec(plc_sThread *tp, pwr_sClass_GetDpPtr *o) {
   if (o->Ptr)
     o->Value = *o->Ptr;
 }
@@ -335,8 +328,7 @@ void GetDpPtr_exec(plc_sThread* tp, pwr_sClass_GetDpPtr* o)
   @aref getapptr GETAPPTR
 */
 
-void GetApPtr_init(pwr_sClass_GetApPtr* o)
-{
+void GetApPtr_init(pwr_sClass_GetApPtr *o) {
   pwr_tUInt32 p;
   pwr_tAttrRef aref = o->ApPtrObject;
 
@@ -347,8 +339,7 @@ void GetApPtr_init(pwr_sClass_GetApPtr* o)
     o->Ptr = gdh_TranslateRtdbPointer(p);
 }
 
-void GetApPtr_exec(plc_sThread* tp, pwr_sClass_GetApPtr* o)
-{
+void GetApPtr_exec(plc_sThread *tp, pwr_sClass_GetApPtr *o) {
   if (o->Ptr)
     o->Value = *o->Ptr;
 }
@@ -358,8 +349,7 @@ void GetApPtr_exec(plc_sThread* tp, pwr_sClass_GetApPtr* o)
   @aref getipptr GETIPPTR
 */
 
-void GetIpPtr_init(pwr_sClass_GetIpPtr* o)
-{
+void GetIpPtr_init(pwr_sClass_GetIpPtr *o) {
   pwr_tUInt32 p;
   pwr_tAttrRef aref = o->IpPtrObject;
 
@@ -370,8 +360,7 @@ void GetIpPtr_init(pwr_sClass_GetIpPtr* o)
     o->Ptr = gdh_TranslateRtdbPointer(p);
 }
 
-void GetIpPtr_exec(plc_sThread* tp, pwr_sClass_GetIpPtr* o)
-{
+void GetIpPtr_exec(plc_sThread *tp, pwr_sClass_GetIpPtr *o) {
   if (o->Ptr)
     o->Value = *o->Ptr;
 }
@@ -381,8 +370,7 @@ void GetIpPtr_exec(plc_sThread* tp, pwr_sClass_GetIpPtr* o)
   @aref stodpptr STODPPTR
 */
 
-void StoDpPtr_init(pwr_sClass_StoDpPtr* o)
-{
+void StoDpPtr_init(pwr_sClass_StoDpPtr *o) {
   pwr_tUInt32 p;
   pwr_tAttrRef aref = o->DpPtrObject;
 
@@ -393,8 +381,7 @@ void StoDpPtr_init(pwr_sClass_StoDpPtr* o)
     o->Ptr = gdh_TranslateRtdbPointer(p);
 }
 
-void StoDpPtr_exec(plc_sThread* tp, pwr_sClass_StoDpPtr* o)
-{
+void StoDpPtr_exec(plc_sThread *tp, pwr_sClass_StoDpPtr *o) {
   if (o->Ptr)
     *o->Ptr = *o->InP;
 }
@@ -404,8 +391,7 @@ void StoDpPtr_exec(plc_sThread* tp, pwr_sClass_StoDpPtr* o)
   @aref stoapptr STOAPPTR
 */
 
-void StoApPtr_init(pwr_sClass_StoApPtr* o)
-{
+void StoApPtr_init(pwr_sClass_StoApPtr *o) {
   pwr_tUInt32 p;
   pwr_tAttrRef aref = o->ApPtrObject;
 
@@ -416,8 +402,7 @@ void StoApPtr_init(pwr_sClass_StoApPtr* o)
     o->Ptr = gdh_TranslateRtdbPointer(p);
 }
 
-void StoApPtr_exec(plc_sThread* tp, pwr_sClass_StoApPtr* o)
-{
+void StoApPtr_exec(plc_sThread *tp, pwr_sClass_StoApPtr *o) {
   if (o->Ptr)
     *o->Ptr = *o->InP;
 }
@@ -427,8 +412,7 @@ void StoApPtr_exec(plc_sThread* tp, pwr_sClass_StoApPtr* o)
   @aref stoipptr STOIPPTR
 */
 
-void StoIpPtr_init(pwr_sClass_StoIpPtr* o)
-{
+void StoIpPtr_init(pwr_sClass_StoIpPtr *o) {
   pwr_tUInt32 p;
   pwr_tAttrRef aref = o->IpPtrObject;
 
@@ -439,8 +423,7 @@ void StoIpPtr_init(pwr_sClass_StoIpPtr* o)
     o->Ptr = gdh_TranslateRtdbPointer(p);
 }
 
-void StoIpPtr_exec(plc_sThread* tp, pwr_sClass_StoIpPtr* o)
-{
+void StoIpPtr_exec(plc_sThread *tp, pwr_sClass_StoIpPtr *o) {
   if (o->Ptr)
     *o->Ptr = *o->InP;
 }
@@ -450,15 +433,13 @@ void StoIpPtr_exec(plc_sThread* tp, pwr_sClass_StoIpPtr* o)
   @aref enumtostr ENUMTOSTR
 */
 
-void EnumToStr_init(pwr_sClass_EnumToStr* o)
-{
-  if (EVEN(gdh_GetEnumValueDef(
-          o->TypeId, (gdh_sValueDef**)&o->EnumDefP, (int*)&o->EnumDefRows)))
+void EnumToStr_init(pwr_sClass_EnumToStr *o) {
+  if (EVEN(gdh_GetEnumValueDef(o->TypeId, (gdh_sValueDef **)&o->EnumDefP,
+                               (int *)&o->EnumDefRows)))
     o->EnumDefP = 0;
 }
 
-void EnumToStr_exec(plc_sThread* tp, pwr_sClass_EnumToStr* o)
-{
+void EnumToStr_exec(plc_sThread *tp, pwr_sClass_EnumToStr *o) {
   int i;
   int found = 0;
 
@@ -466,9 +447,9 @@ void EnumToStr_exec(plc_sThread* tp, pwr_sClass_EnumToStr* o)
     return;
 
   for (i = 0; i < o->EnumDefRows; i++) {
-    if (((gdh_sValueDef*)o->EnumDefP)[i].Value->Value == *o->InP) {
-      strncpy(o->ActVal, ((gdh_sValueDef*)o->EnumDefP)[i].Value->Text,
-          sizeof(o->ActVal));
+    if (((gdh_sValueDef *)o->EnumDefP)[i].Value->Value == *o->InP) {
+      strncpy(o->ActVal, ((gdh_sValueDef *)o->EnumDefP)[i].Value->Text,
+              sizeof(o->ActVal));
       found = 1;
       break;
     }
@@ -482,15 +463,13 @@ void EnumToStr_exec(plc_sThread* tp, pwr_sClass_EnumToStr* o)
   @aref strtoenum STRTOENUM
 */
 
-void StrToEnum_init(pwr_sClass_StrToEnum* o)
-{
-  if (EVEN(gdh_GetEnumValueDef(
-          o->TypeId, (gdh_sValueDef**)&o->EnumDefP, (int*)&o->EnumDefRows)))
+void StrToEnum_init(pwr_sClass_StrToEnum *o) {
+  if (EVEN(gdh_GetEnumValueDef(o->TypeId, (gdh_sValueDef **)&o->EnumDefP,
+                               (int *)&o->EnumDefRows)))
     o->EnumDefP = 0;
 }
 
-void StrToEnum_exec(plc_sThread* tp, pwr_sClass_StrToEnum* o)
-{
+void StrToEnum_exec(plc_sThread *tp, pwr_sClass_StrToEnum *o) {
   int i;
   int found = 0;
 
@@ -498,9 +477,9 @@ void StrToEnum_exec(plc_sThread* tp, pwr_sClass_StrToEnum* o)
     return;
 
   for (i = 0; i < o->EnumDefRows; i++) {
-    if (strcmp((char*)o->StrP, ((gdh_sValueDef*)o->EnumDefP)[i].Value->Text)
-        == 0) {
-      o->ActVal = ((gdh_sValueDef*)o->EnumDefP)[i].Value->Value;
+    if (strcmp((char *)o->StrP,
+               ((gdh_sValueDef *)o->EnumDefP)[i].Value->Text) == 0) {
+      o->ActVal = ((gdh_sValueDef *)o->EnumDefP)[i].Value->Value;
       found = 1;
       break;
     }

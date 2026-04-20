@@ -45,105 +45,103 @@
 */
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
+  /** @addtogroup NMpsAppl */
+  /** @{*/
 
-/** @addtogroup NMpsAppl */
-/** @{*/
-
-#define NMPSAPPL_CELLIST_MAX                                                   \
-  32 /* Max number of cells in a                                               \
+#define NMPSAPPL_CELLIST_MAX                                                                                 \
+  32 /* Max number of cells in a                                                                             \
         appl_init call */
-#define NMPSAPPL_APPLSESS_MAX                                                  \
-  32 /* Max number of application                                              \
+#define NMPSAPPL_APPLSESS_MAX                                                                                \
+  32 /* Max number of application                                                                            \
         sessions */
 
 #define nmpsappl_mOption_Remove (1 << 0)
 #define nmpsappl_mOption_NamePath (1 << 1)
 #define nmpsappl_mOption_ReverseOrder (1 << 2)
 
-/** \defgroup NMPS_DS NMpsAppl Data Structures
- *  @{
- */
+  /** \defgroup NMPS_DS NMpsAppl Data Structures
+   *  @{
+   */
 
-/** Cell list */
-typedef struct nmpsappl_s_cellist {
-  pwr_tString80 name;
-  pwr_tObjid objid;
-  pwr_tAddress object_ptr;
-  gdh_tDlid subid;
-  pwr_tClassId classid;
-  unsigned long index_mask[NMPSAPPL_APPLSESS_MAX];
-  int tmp_size;
-  void* tmp_cell;
-  struct nmpsappl_s_cellist* next;
-} nmpsappl_t_cellist;
+  /** Cell list */
+  typedef struct nmpsappl_s_cellist
+  {
+    pwr_tString80 name;
+    pwr_tObjid objid;
+    pwr_tAddress object_ptr;
+    gdh_tDlid subid;
+    pwr_tClassId classid;
+    unsigned long index_mask[NMPSAPPL_APPLSESS_MAX];
+    int tmp_size;
+    void* tmp_cell;
+    struct nmpsappl_s_cellist* next;
+  } nmpsappl_t_cellist;
 
-/** Data info */
-typedef struct {
-  pwr_tObjid objid; /**< Dataobject objid */
-  pwr_tString80 name; /**< Dataobject name (last segment) */
-  pwr_tAddress object_ptr; /**< Pointer to data object */
-  pwr_tBoolean select; /**< The select attribute for the dataobject in the
-                          cell object. If the dataobject is present in several
-                          cells, select is set if the dataobject is selected
-                          in at least one of the cells. */
-  pwr_tBoolean front; /**< The Front attribute for the dataobject in the cell
-                         object. If the dataobject is present in several
-                         cells, front is set if the Front flag is set in one
-                         of the cells. */
-  pwr_tBoolean back; /**< The Back attribute for the dataobject in the cell
-                         object. If the dataobject is present in several
-                         cells, back is set if the Back flag is set in one
-                         of the cells. */
-  pwr_tBoolean newdata; /**< Marks that a data object is new since the last
-                           mirror. */
-  pwr_tBoolean removed; /**< Marks that the dataobject has disappeard since
-                           the last mirror. Requires the the option
-                           nmpsappl_mOption_Remove is selected. */
-  unsigned long cell_mask; /**< Mask that specifies in which cell or which
-                              cells the dataobject resides. The first bit
-                              corresponds to the first cell, i.e. the first
-                              cell in cell list supplied to nmpsappl_MirrorInit,
-                              etc. */
-} nmpsappl_t_datainfo;
+  /** Data info */
+  typedef struct
+  {
+    pwr_tObjid objid;        /**< Dataobject objid */
+    pwr_tString80 name;      /**< Dataobject name (last segment) */
+    pwr_tAddress object_ptr; /**< Pointer to data object */
+    pwr_tBoolean select;     /**< The select attribute for the dataobject in the
+                                cell object. If the dataobject is present in several
+                                cells, select is set if the dataobject is selected
+                                in at least one of the cells. */
+    pwr_tBoolean front;      /**< The Front attribute for the dataobject in the cell
+                                object. If the dataobject is present in several
+                                cells, front is set if the Front flag is set in one
+                                of the cells. */
+    pwr_tBoolean back;       /**< The Back attribute for the dataobject in the cell
+                                 object. If the dataobject is present in several
+                                 cells, back is set if the Back flag is set in one
+                                 of the cells. */
+    pwr_tBoolean newdata;    /**< Marks that a data object is new since the last
+                                mirror. */
+    pwr_tBoolean removed;    /**< Marks that the dataobject has disappeard since
+                                the last mirror. Requires the the option
+                                nmpsappl_mOption_Remove is selected. */
+    unsigned long cell_mask; /**< Mask that specifies in which cell or which
+                                cells the dataobject resides. The first bit
+                                corresponds to the first cell, i.e. the first
+                                cell in cell list supplied to nmpsappl_MirrorInit,
+                                etc. */
+  } nmpsappl_t_datainfo;
 
-/** NMpsAppl context */
-typedef struct nmpsappl_s_ctx {
-  nmpsappl_t_cellist* cellist[NMPSAPPL_CELLIST_MAX];
-  unsigned long options;
-  int index;
-  unsigned long index_mask;
-  int cellist_count;
-  int total_cellsize;
-  int data_count;
-  nmpsappl_t_datainfo* datainfo;
-  struct nmpsappl_s_ctx* next;
-} * nmpsappl_t_ctx;
+  /** NMpsAppl context */
+  typedef struct nmpsappl_s_ctx
+  {
+    nmpsappl_t_cellist* cellist[NMPSAPPL_CELLIST_MAX];
+    unsigned long options;
+    int index;
+    unsigned long index_mask;
+    int cellist_count;
+    int total_cellsize;
+    int data_count;
+    nmpsappl_t_datainfo* datainfo;
+    struct nmpsappl_s_ctx* next;
+  }* nmpsappl_t_ctx;
 
-/** @} */
-/**
- * \defgroup NMPS_FC NMpsAppl Functions
- * \ingroup NMps
- * @{
- */
+  /** @} */
+  /**
+   * \defgroup NMPS_FC NMpsAppl Functions
+   * \ingroup NMps
+   * @{
+   */
 
-pwr_tStatus nmpsappl_MirrorInit(
-    pwr_tString80* cell_array, unsigned long options, nmpsappl_t_ctx* ctx);
+  pwr_tStatus nmpsappl_MirrorInit(pwr_tString80* cell_array, unsigned long options, nmpsappl_t_ctx* ctx);
 
-pwr_tStatus nmpsappl_Mirror(
-    nmpsappl_t_ctx applctx, int* data_count, nmpsappl_t_datainfo** datainfo);
-pwr_tStatus nmpsappl_RemoveData(nmpsappl_t_ctx applctx, pwr_tObjid objid);
-pwr_tStatus nmpsappl_RemoveAndDeleteData(
-    nmpsappl_t_ctx applctx, pwr_tObjid objid);
-pwr_tStatus nmpsappl_SelectData(nmpsappl_t_ctx applctx, pwr_tObjid objid);
-pwr_tStatus nmpsappl_TransportData(nmpsappl_t_ctx applctx, pwr_tObjid objid,
-    unsigned int from_cell_mask, unsigned int to_cell_mask);
-pwr_tStatus nmpsappl_InsertData(
-    nmpsappl_t_ctx applctx, pwr_tObjid objid, unsigned int cell_mask);
-pwr_tStatus nmpsappl_RemoveAndKeepData(
-    nmpsappl_t_ctx applctx, pwr_tObjid objid, unsigned int cell_mask);
+  pwr_tStatus nmpsappl_Mirror(nmpsappl_t_ctx applctx, int* data_count, nmpsappl_t_datainfo** datainfo);
+  pwr_tStatus nmpsappl_RemoveData(nmpsappl_t_ctx applctx, pwr_tObjid objid);
+  pwr_tStatus nmpsappl_RemoveAndDeleteData(nmpsappl_t_ctx applctx, pwr_tObjid objid);
+  pwr_tStatus nmpsappl_SelectData(nmpsappl_t_ctx applctx, pwr_tObjid objid);
+  pwr_tStatus nmpsappl_TransportData(nmpsappl_t_ctx applctx, pwr_tObjid objid, unsigned int from_cell_mask,
+                                     unsigned int to_cell_mask);
+  pwr_tStatus nmpsappl_InsertData(nmpsappl_t_ctx applctx, pwr_tObjid objid, unsigned int cell_mask);
+  pwr_tStatus nmpsappl_RemoveAndKeepData(nmpsappl_t_ctx applctx, pwr_tObjid objid, unsigned int cell_mask);
 
 #if defined __cplusplus
 }

@@ -49,14 +49,15 @@ class XttHotkey;
 
 class XttQtWidget;
 
-class XttQt : public Xtt {
+class XttQt : public Xtt
+{
 public:
   XttQtWidget* toplevel;
   QWidget* brow_widget;
   QWidget* form_widget;
   QLabel* msg_label;
   QLabel* cmd_prompt;
-  //QWidget* xnav_form;
+  // QWidget* xnav_form;
   CoWowFocusTimerQt focustimer;
   CoWowRecall* cmd_recall;
   CoWowRecall* value_recall;
@@ -67,8 +68,8 @@ public:
   ~XttQt();
 
   void message(char severity, const char* msg);
-  void open_input_dialog(const char* text, const char* title,
-      const char* init_text, void (*ok_cb)(Xtt*, char*));
+  void open_input_dialog(const char* text, const char* title, const char* init_text,
+                         void (*ok_cb)(Xtt*, char*));
   void set_prompt(const char* prompt);
   void open_change_value();
   void print();
@@ -83,7 +84,8 @@ public:
   static void hotkey_ResetDig(char* arg, void* userdata);
 };
 
-class XttQtWidget : public QWidget {
+class XttQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

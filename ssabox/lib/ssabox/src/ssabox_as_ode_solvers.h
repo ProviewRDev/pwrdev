@@ -62,12 +62,12 @@
 #include "ssabox_as_phasor_methods.h"
 
 /*prototype declarations*/
-void AS_thetaIntegrator(double*, double*, double, double, double, double dt);
-void AS_xIntegrator(double*, double*, double, double dt);
-void AS_xIntegratorUA(double*, double*, double, double, double dt);
-void AS_xcIntegratorU(double*, double, double dt);
-void AS_xIntegrator2U(double* xm, double* xc, double um, double dt);
-void AS_uIntegratorFwd(double*, double, double dt);
-void AS_LIntegratorFwd(double*, double, double dt);
+void AS_thetaIntegrator(double *, double *, double, double, double, double dt);
+void AS_xIntegrator(double *, double *, double, double dt);
+void AS_xIntegratorUA(double *, double *, double, double, double dt);
+void AS_xcIntegratorU(double *, double, double dt);
+void AS_xIntegrator2U(double *xm, double *xc, double um, double dt);
+void AS_uIntegratorFwd(double *, double, double dt);
+void AS_LIntegratorFwd(double *, double, double dt);
 
 #endif

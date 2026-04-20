@@ -39,9 +39,10 @@
 
 #include "flow_ctx.h"
 
-class FlowPoint : public FlowArrayElem {
+class FlowPoint : public FlowArrayElem
+{
 public:
-  FlowPoint(){}
+  FlowPoint() {}
   FlowPoint(FlowCtx* flow_ctx, double x1 = 0, double y1 = 0);
   const FlowPoint& operator+=(const FlowPoint p);
   FlowPoint operator+(const FlowPoint p);

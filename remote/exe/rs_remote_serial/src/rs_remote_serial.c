@@ -35,48 +35,46 @@
  */
 
 /*************************************************************************
-*
-*                       S E R I A L
-*                       ===========
-**************************************************************************
-*
-* Filename:             remote_serial.c unified serial driver for lynx/linux
-*
-*                       Date    Pgm.    Read.   Remark
-* Modified              980610	CJu	-	-
-* Modified              010426	ulflj	-	for lynx
-*			010814  ulflj	-	fixed for pwr 3.3a
-*			020530	ulflj	-	modified serial parameter read
-*						in lynx version
-*			021219	ulflj	-	fixed tv_timeout in recive()
-*			040528	CJu	-	v4.0.0
-*
-* Description:          Implements remote transport process for a general
-*			serial communications able to read and write ASCII
-*			messages. Termination sequence for read is
-*			configured in Remnode object.
-*
-*
-**************************************************************************
-**************************************************************************/
+ *
+ *                       S E R I A L
+ *                       ===========
+ **************************************************************************
+ *
+ * Filename:             remote_serial.c unified serial driver for lynx/linux
+ *
+ *                       Date    Pgm.    Read.   Remark
+ * Modified              980610	CJu	-	-
+ * Modified              010426	ulflj	-	for lynx
+ *			010814  ulflj	-	fixed for pwr 3.3a
+ *			020530	ulflj	-	modified serial parameter read
+ *						in lynx version
+ *			021219	ulflj	-	fixed tv_timeout in recive()
+ *			040528	CJu	-	v4.0.0
+ *
+ * Description:          Implements remote transport process for a general
+ *			serial communications able to read and write ASCII
+ *			messages. Termination sequence for read is
+ *			configured in Remnode object.
+ *
+ *
+ **************************************************************************
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 
 /*LynxOS system includes*/
 
-#include <time.h>
-#include <stdio.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <math.h>
-#include <stdlib.h>
 #include <signal.h>
 #include <stdarg.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/types.h>
-//#include <uio.h>
+// #include <uio.h>
 #include <termios.h>
 #if defined OS_LINUX
 #include <termio.h>
@@ -85,7 +83,7 @@
 #include <sgtty.h>
 #endif
 #include <sys/ioctl.h>
-//#include <ioctl.h>
+// #include <ioctl.h>
 
 /*PWR includes*/
 
@@ -111,15 +109,14 @@
 /*_variables_______________________________________________________________*/
 
 remnode_item rn;
-pwr_sClass_RemnodeSerial* rn_serial;
-int ser_fd; /* file domininator for serial port */
+pwr_sClass_RemnodeSerial *rn_serial;
+int ser_fd;              /* file domininator for serial port */
 unsigned char debug = 0; /* 1 if debug mode activated */
 
 float time_since_scan;
 float time_since_rcv;
 
-void load_timeval(struct timeval* tv, float t)
-{
+void load_timeval(struct timeval *tv, float t) {
   tv->tv_sec = t;
   tv->tv_usec = (t - (float)tv->tv_sec) * 1000000;
 }
@@ -138,9 +135,9 @@ void load_timeval(struct timeval* tv, float t)
 **************************************************************************
 **************************************************************************/
 
-static unsigned int remnode_send(remnode_item* remnode,
-    pwr_sClass_RemTrans* remtrans, char* buf, int buffer_size)
-{
+static unsigned int remnode_send(remnode_item *remnode,
+                                 pwr_sClass_RemTrans *remtrans, char *buf,
+                                 int buffer_size) {
   int sts;
 
   /*************************************************************************/
@@ -149,8 +146,8 @@ static unsigned int remnode_send(remnode_item* remnode,
   // printf("sending\n");
   // printf("telegram:%s,%i\n",buf,buffer_size);
 
-  sts = write(
-      ser_fd, buf, buffer_size); // write returnerar antalet skrivna tecken
+  sts = write(ser_fd, buf,
+              buffer_size); // write returnerar antalet skrivna tecken
   if (sts != buffer_size) {
     errh_Error("Sändfel, %d", sts);
     return (STATUS_FELSEND); // jämna returns vvisar på fel i VMS
@@ -172,13 +169,12 @@ static unsigned int remnode_send(remnode_item* remnode,
 **************************************************************************
 **************************************************************************/
 
-static unsigned int Receive()
-{
+static unsigned int Receive() {
   int sts;
   int nbr_of_bytes_read = 0;
   unsigned char telegram[512];
   char search_remtrans = false;
-  remtrans_item* remtrans;
+  remtrans_item *remtrans;
 
   fd_set read_fd;
   struct timeval tv;
@@ -200,14 +196,14 @@ static unsigned int Receive()
       sts = read(ser_fd, &telegram[nbr_of_bytes_read], 1);
       if (sts > 0) {
         nbr_of_bytes_read++;
-        if (telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[0]
-            || telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[1]
-            || telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[2]
-            || telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[3]
-            || telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[4]
-            || telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[5]
-            || telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[6]
-            || telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[7])
+        if (telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[0] ||
+            telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[1] ||
+            telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[2] ||
+            telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[3] ||
+            telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[4] ||
+            telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[5] ||
+            telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[6] ||
+            telegram[nbr_of_bytes_read - 1] == rn_serial->TermChar[7])
           break;
       } else { // Läsfel
         rn_serial->ErrCount++;
@@ -223,7 +219,7 @@ static unsigned int Receive()
     telegram[nbr_of_bytes_read] = 0;
     if (debug) {
       printf("Vi tog emot en trans med terminering 0x%x\n",
-          telegram[nbr_of_bytes_read - 1]);
+             telegram[nbr_of_bytes_read - 1]);
       printf("Telegramet var:%s\n", telegram);
     }
 
@@ -234,11 +230,11 @@ static unsigned int Receive()
       if (remtrans->objp->Direction == REMTRANS_IN)
         search_remtrans = false;
       if (search_remtrans)
-        remtrans = (remtrans_item*)remtrans->next;
+        remtrans = (remtrans_item *)remtrans->next;
     } /* endwhile */
 
     if (!search_remtrans) {
-      sts = RemTrans_Receive(remtrans, (char*)telegram, nbr_of_bytes_read);
+      sts = RemTrans_Receive(remtrans, (char *)telegram, nbr_of_bytes_read);
       if (EVEN(sts)) {
         remtrans->objp->ErrCount++;
         return false;
@@ -259,12 +255,11 @@ static unsigned int Receive()
  *****************   Main routine   ****************
  ***************************************************/
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
   unsigned int sts; /* Status from function calls etc. */
   char id[32];
   char pname[45];
-  remtrans_item* remtrans;
+  remtrans_item *remtrans;
   int i;
 
   /* Read arg number 2, should be id for this instance */
@@ -317,7 +312,7 @@ int main(int argc, char* argv[])
 
   /* Get pointer to RemnodeSerial object and store locally */
 
-  sts = gdh_ObjidToPointer(rn.objid, (pwr_tAddress*)&rn_serial);
+  sts = gdh_ObjidToPointer(rn.objid, (pwr_tAddress *)&rn_serial);
   if (EVEN(sts)) {
     errh_Error("cdh_ObjidToPointer, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
@@ -347,16 +342,17 @@ int main(int argc, char* argv[])
   i = 0;
   while (remtrans) {
     rn_serial->RemTransObjects[i++] = remtrans->objid;
-    if (i >= (int)(sizeof(rn_serial->RemTransObjects)
-                 / sizeof(rn_serial->RemTransObjects[0])))
+    if (i >= (int)(sizeof(rn_serial->RemTransObjects) /
+                   sizeof(rn_serial->RemTransObjects[0])))
       break;
-    remtrans = (remtrans_item*)remtrans->next;
+    remtrans = (remtrans_item *)remtrans->next;
   }
 
   /* Initialize device */
 
   ser_fd = RemUtils_InitSerialDev(rn_serial->DevName, rn_serial->Speed,
-      rn_serial->DataBits, rn_serial->StopBits, rn_serial->Parity);
+                                  rn_serial->DataBits, rn_serial->StopBits,
+                                  rn_serial->Parity);
 
   if (!ser_fd) {
     errh_Error("InitDev, %d", ser_fd);

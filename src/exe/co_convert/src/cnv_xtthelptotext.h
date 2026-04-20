@@ -42,22 +42,16 @@
 
 class CnvCtx;
 
-class CnvXtthelpToText : public CnvXtthelpTo {
-  public:
-  CnvXtthelpToText(CnvCtx* cnv_ctx)
-      : ctx(cnv_ctx), first_topic(1), in_topic(0), print_disable(0)
-  {
-  }
+class CnvXtthelpToText : public CnvXtthelpTo
+{
+public:
+  CnvXtthelpToText(CnvCtx* cnv_ctx) : ctx(cnv_ctx), first_topic(1), in_topic(0), print_disable(0) {}
   virtual ~CnvXtthelpToText();
 
-  Cnv_eXtthelpToType type()
-  {
-    return Cnv_eXtthelpToType_Text;
-  }
-  void* insert(navh_eItemType item_type, const char* text1, const char* text2,
-      const char* text3, const char* link, const char* link_bookmark,
-      const char* file_name, navh_eHelpFile file_type, int help_index,
-      const char* bookmark, int coding);
+  Cnv_eXtthelpToType type() { return Cnv_eXtthelpToType_Text; }
+  void* insert(navh_eItemType item_type, const char* text1, const char* text2, const char* text3,
+               const char* link, const char* link_bookmark, const char* file_name, navh_eHelpFile file_type,
+               int help_index, const char* bookmark, int coding);
   void subject_to_fname(char* fname, const char* subject, int path);
 
   CnvCtx* ctx;

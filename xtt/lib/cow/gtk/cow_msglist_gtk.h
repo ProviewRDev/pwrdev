@@ -43,7 +43,8 @@
 
 #include "cow_msglist.h"
 
-class MsgListGtk : public MsgList {
+class MsgListGtk : public MsgList
+{
 public:
   MsgListGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, GtkWidget** w);
   ~MsgListGtk();

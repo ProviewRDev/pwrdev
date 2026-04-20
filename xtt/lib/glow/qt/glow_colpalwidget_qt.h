@@ -38,6 +38,5 @@
 
 #include <QWidget>
 
-QWidget* scrolledcolpalwidgetqt_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
-    QWidget** growwidget);
+QWidget* scrolledcolpalwidgetqt_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
+                                    QWidget** growwidget);

@@ -65,15 +65,16 @@
 #include "wb_wpkg.h"
 #include "wb_wtt.h"
 
-int Wtt::format_selection(void* ctx, pwr_sAttrRef attrref, char** value_return,
-    int is_class, int is_attr, wnav_eSelectionFormat format)
+int Wtt::format_selection(void* ctx, pwr_sAttrRef attrref, char** value_return, int is_class, int is_attr,
+                          wnav_eSelectionFormat format)
 {
   static char buff[256];
   Wtt* wtt = (Wtt*)ctx;
-  int select_syntax;
-  int select_volume, select_attr, select_type;
+  int select_syntax = 0;
+  int select_volume = 0, select_attr = 0, select_type = 0;
 
-  switch (format) {
+  switch (format)
+  {
   case wnav_eSelectionFormat_User:
     select_syntax = wtt->select_syntax;
     select_volume = wtt->select_volume;
@@ -99,8 +100,9 @@ int Wtt::format_selection(void* ctx, pwr_sAttrRef attrref, char** value_return,
     select_type = 0;
     break;
   }
-  if (wnav_format_selection(wtt->ldhses, attrref, is_class, is_attr,
-          select_syntax, select_volume, select_attr, select_type, buff)) {
+  if (wnav_format_selection(wtt->ldhses, attrref, is_class, is_attr, select_syntax, select_volume,
+                            select_attr, select_type, buff))
+  {
     *value_return = buff;
 
     return 1;
@@ -112,7 +114,8 @@ int Wtt::start_wizard(Wtt* wtt, pwr_tCid vcid)
 {
   pwr_tCmd cmd;
 
-  switch (vcid) {
+  switch (vcid)
+  {
   case pwr_eClass_DirectoryVolume:
     strcpy(cmd, "@$pwr_exe/wb_wiz_directoryvolume");
     break;
@@ -135,7 +138,8 @@ pwr_tStatus Wtt::ldh_this_session_cb(void* ctx, ldh_sEvent* event)
 {
   Wtt* wtt = (Wtt*)ctx;
 
-  if (wtt->input_open) {
+  if (wtt->input_open)
+  {
     if (wtt->keep_input_open)
       wtt->keep_input_open = 0;
     else
@@ -150,7 +154,8 @@ pwr_tStatus Wtt::ldh_other_session_cb(void* ctx, ldh_sEvent* event)
 {
   Wtt* wtt = (Wtt*)ctx;
 
-  switch (event->Event) {
+  switch (event->Event)
+  {
   case ldh_eEvent_SessionSaved:
     if (wtt->input_open)
       wtt->close_change_value();
@@ -162,10 +167,7 @@ pwr_tStatus Wtt::ldh_other_session_cb(void* ctx, ldh_sEvent* event)
   return 1;
 }
 
-void Wtt::uted_quit_cb(void* ctx)
-{
-  ((Wtt*)ctx)->utedctx = NULL;
-}
+void Wtt::uted_quit_cb(void* ctx) { ((Wtt*)ctx)->utedctx = NULL; }
 
 void Wtt::wpkg_quit_cb(void* ctx)
 {
@@ -173,8 +175,7 @@ void Wtt::wpkg_quit_cb(void* ctx)
   ((Wtt*)ctx)->wpkg = 0;
 }
 
-void Wtt::open_vsel_cb(
-    void* ctx, wb_eType type, char* filename, wow_eFileSelType file_type)
+void Wtt::open_vsel_cb(void* ctx, wb_eType type, char* filename, wow_eFileSelType file_type)
 {
   Wtt* wtt = (Wtt*)ctx;
 
@@ -206,10 +207,7 @@ int Wtt::restore_settings()
   return 1;
 }
 
-char* Wtt::script_filename_cb(void* ctx)
-{
-  return ((Wtt*)ctx)->script_filename();
-}
+char* Wtt::script_filename_cb(void* ctx) { return ((Wtt*)ctx)->script_filename(); }
 
 char* Wtt::script_filename()
 {
@@ -234,8 +232,7 @@ int Wtt::save_settings()
 
   fp << wnav_cScriptDescKey ": Wtt initialization file\n"
      << "!   This file is generated at 'Set settings'\n"
-     << "!   Dont make any changes, use the symbolfile for application setup"
-     << '\n'
+     << "!   Dont make any changes, use the symbolfile for application setup" << '\n'
      << '\n'
      << "if ( IsW1())\n";
   if (editmode)
@@ -262,28 +259,33 @@ int Wtt::traverse_focus(void* ctx, void* component)
 {
   Wtt* wtt = (Wtt*)ctx;
 
-  if (component == (void*)wtt->wnav) {
+  if (component == (void*)wtt->wnav)
+  {
     if (wtt->wnavnode_mapped)
       wtt->set_focus(wtt->wnavnode);
     else if (wtt->editmode)
       wtt->set_focus(wtt->palette);
-  } else if (component == (void*)wtt->wnavnode) {
+  }
+  else if (component == (void*)wtt->wnavnode)
+  {
     if (wtt->editmode)
       wtt->set_focus(wtt->palette);
     else if (wtt->wnav_mapped)
       wtt->set_focus(wtt->wnav);
-  } else if (component == (void*)wtt->palette) {
+  }
+  else if (component == (void*)wtt->palette)
+  {
     if (wtt->wnav_mapped)
       wtt->set_focus(wtt->wnav);
     else if (wtt->wnavnode_mapped)
       wtt->set_focus(wtt->wnavnode);
-  } else
+  }
+  else
     return 0;
   return 1;
 }
 
-int Wtt::get_global_select_cb(
-    void* ctx, pwr_sAttrRef** sel_list, int** sel_is_attr, int* sel_cnt)
+int Wtt::get_global_select_cb(void* ctx, pwr_sAttrRef** sel_list, int** sel_is_attr, int* sel_cnt)
 {
   Wtt* wtt = (Wtt*)ctx;
   int sts = 0;
@@ -304,26 +306,28 @@ int Wtt::global_unselect_objid_cb(void* ctx, pwr_tObjid objid)
   return 1;
 }
 
-int Wtt::set_focus_cb(void* ctx, void* component)
-{
-  return ((Wtt*)ctx)->set_focus(component);
-}
+int Wtt::set_focus_cb(void* ctx, void* component) { return ((Wtt*)ctx)->set_focus(component); }
 
 int Wtt::set_focus(void* component)
 {
-  if (component == (void*)wnav) {
+  if (component == (void*)wnav)
+  {
     wnav->set_inputfocus(1);
     wnavnode->set_inputfocus(0);
     palette->set_inputfocus(0);
     focused_wnav = (WNav*)component;
     set_selection_owner();
-  } else if (component == (void*)wnavnode) {
+  }
+  else if (component == (void*)wnavnode)
+  {
     wnav->set_inputfocus(0);
     wnavnode->set_inputfocus(1);
     palette->set_inputfocus(0);
     focused_wnav = (WNav*)component;
     set_selection_owner();
-  } else if (component == (void*)palette) {
+  }
+  else if (component == (void*)palette)
+  {
     wnav->set_inputfocus(0);
     wnavnode->set_inputfocus(0);
     palette->set_inputfocus(1);
@@ -361,16 +365,16 @@ void Wtt::configure_cb(void* ctx, int edit)
 
   if (edit)
     wtt->set_edit();
-  else {
+  else
+  {
     if (wtt->is_saved())
       sts = wtt->set_noedit(wtt_eNoEdit_Save, wtt_eNoEdit_KeepVolume);
     else
-      wtt->open_confirm("Do you want to save changes", "Confirm revert",
-          &Wtt::save_ok, &Wtt::save_no);
+      wtt->open_confirm("Do you want to save changes", "Confirm revert", &Wtt::save_ok, &Wtt::save_no);
   }
 }
 
-void Wtt::update_color_theme_cb(void *ctx, int ct)
+void Wtt::update_color_theme_cb(void* ctx, int ct)
 {
   Wtt* wtt = (Wtt*)ctx;
   wtt->wnav->update_color_theme(ct);
@@ -400,8 +404,7 @@ void Wtt::find_ok(Wtt* wtt, char* search_str)
     wtt->message('E', wnav_get_message(sts));
 }
 
-void Wtt::file_selected_cb(
-    void* ctx, char* filename, wow_eFileSelType file_type)
+void Wtt::file_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type)
 {
   Wtt* wtt = (Wtt*)ctx;
 
@@ -414,12 +417,14 @@ void Wtt::save_cb(void* ctx, int quiet)
   Wtt* wtt = (Wtt*)ctx;
   int sts;
 
-  if (!wtt->ldhses) {
+  if (!wtt->ldhses)
+  {
     wtt->message('E', "Wtt is not attached to a volume");
     return;
   }
   sts = ldh_SaveSession(wtt->ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     wtt->message('E', wnav_get_message(sts));
 
     if (!wtt->focused_wnav)
@@ -436,12 +441,13 @@ void Wtt::save_cb(void* ctx, int quiet)
     opt = log_mOption_Comment;
   else
     opt = 0;
-  wb_log::log((wb_session*)wtt->ldhses, wlog_eCategory_ConfiguratorSave,
-      wtt->volid, opt);
+  wb_log::log((wb_session*)wtt->ldhses, wlog_eCategory_ConfiguratorSave, wtt->volid, opt);
 
-  if (wtt->wb_type == wb_eType_Directory) {
+  if (wtt->wb_type == wb_eType_Directory)
+  {
     sts = lfu_SaveDirectoryVolume(wtt->ldhses, wtt->wnav->wow, quiet);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       wtt->message('E', "Syntax error");
       return;
     }
@@ -457,7 +463,8 @@ void Wtt::revert_ok(Wtt* wtt)
   sts = ldh_RevertSession(wtt->ldhses);
   if (EVEN(sts))
     wtt->message('E', wnav_get_message(sts));
-  else {
+  else
+  {
     if (wtt->input_open)
       wtt->close_change_value();
     wtt->wnav->ldh_refresh(pwr_cNObjid);
@@ -470,15 +477,15 @@ void Wtt::revert_cb(void* ctx, int confirm)
 {
   Wtt* wtt = (Wtt*)ctx;
 
-  if (!wtt->ldhses) {
+  if (!wtt->ldhses)
+  {
     wtt->message('E', "Wtt is not attached to a volume");
     return;
   }
   if (!confirm)
     revert_ok(wtt);
   else
-    wtt->open_confirm("Do you really want to revert", "Confirm revert",
-        &Wtt::revert_ok, NULL);
+    wtt->open_confirm("Do you really want to revert", "Confirm revert", &Wtt::revert_ok, NULL);
 }
 
 int Wtt::attach_volume_cb(void* ctx, pwr_tVolumeId volid, int pop)
@@ -488,21 +495,25 @@ int Wtt::attach_volume_cb(void* ctx, pwr_tVolumeId volid, int pop)
   pwr_tVolumeId vid;
   pwr_tClassId classid;
 
-  if (wtt->ldhses) {
+  if (wtt->ldhses)
+  {
     wtt->message('E', "Other volume is already attached");
     return WNAV__VOLATTACHED;
   }
 
-  if (!wtt->wbctx) {
+  if (!wtt->wbctx)
+  {
     sts = get_wbctx((void*)wtt, &wtt->wbctx);
     if (EVEN(sts))
       return sts;
   }
 
-  if (volid == 0) {
+  if (volid == 0)
+  {
     // Attach first rootvolume, or if no rootvolume exist some other volume
     sts = ldh_GetVolumeList(wtt->wbctx, &vid);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       volid = vid;
       sts = ldh_GetVolumeClass(wtt->wbctx, vid, &classid);
       if (EVEN(sts))
@@ -523,12 +534,10 @@ int Wtt::attach_volume_cb(void* ctx, pwr_tVolumeId volid, int pop)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_OpenSession(
-      &wtt->ldhses, wtt->volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Navigator);
+  sts = ldh_OpenSession(&wtt->ldhses, wtt->volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Navigator);
   if (EVEN(sts))
     return sts;
-  ldh_AddOtherSessionCallback(
-      wtt->ldhses, (void*)wtt, Wtt::ldh_other_session_cb);
+  ldh_AddOtherSessionCallback(wtt->ldhses, (void*)wtt, Wtt::ldh_other_session_cb);
 
   wtt->wnav->volume_attached(wtt->wbctx, wtt->ldhses, pop);
   wtt->wnavnode->volume_attached(wtt->wbctx, wtt->ldhses, pop);
@@ -575,7 +584,8 @@ void Wtt::close_ok(Wtt* wtt)
 
   // Save and close ldh session
   sts = wtt->set_noedit(wtt_eNoEdit_Save, wtt_eNoEdit_DetachVolume);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     wtt->message('E', wnav_get_message(sts));
 
     if (!wtt->focused_wnav)
@@ -596,25 +606,27 @@ void Wtt::close_no(Wtt* wtt)
   delete wtt;
 }
 
-void Wtt::close_now_ok(Wtt* wtt)
-{
-  delete wtt;
-}
+void Wtt::close_now_ok(Wtt* wtt) { delete wtt; }
 
 int Wtt::detach_volume_cb(void* ctx)
 {
   Wtt* wtt = (Wtt*)ctx;
   int sts;
 
-  if (wtt->editmode == 0) {
+  if (wtt->editmode == 0)
+  {
     wtt->detach_volume();
-  } else {
-    if (wtt->is_saved()) {
+  }
+  else
+  {
+    if (wtt->is_saved())
+    {
       // Set noedit and detach
       sts = wtt->set_noedit(wtt_eNoEdit_Save, wtt_eNoEdit_DetachVolume);
-    } else {
-      wtt->open_confirm("Do you want to save changes", "Save",
-          &Wtt::detach_save_ok, &Wtt::detach_save_no);
+    }
+    else
+    {
+      wtt->open_confirm("Do you want to save changes", "Save", &Wtt::detach_save_ok, &Wtt::detach_save_no);
       return WNAV__WAITCONFIRM;
     }
   }
@@ -650,7 +662,8 @@ int Wtt::detach_volume()
     return WNAV__NOVOLATTACHED;
 
   sts = ldh_CloseSession(ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', wnav_get_message(sts));
     return 0;
   }
@@ -661,7 +674,8 @@ int Wtt::detach_volume()
     erep->removeExtern(&sts, (wb_vrep*)*v);
 
   sts = ldh_DetachVolume(wbctx, volctx);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', wnav_get_message(sts));
     return 0;
   }
@@ -685,8 +699,10 @@ int Wtt::set_noedit(wtt_eNoEditMode save, wtt_eNoEditVolMode detach)
 
   set_noedit_show();
 
-  if (!is_saved()) {
-    if (save == wtt_eNoEdit_Save) {
+  if (!is_saved())
+  {
+    if (save == wtt_eNoEdit_Save)
+    {
       sts = ldh_SaveSession(ldhses);
       // TODO
       if (ODD(sts) && wb_type == wb_eType_Directory)
@@ -699,24 +715,26 @@ int Wtt::set_noedit(wtt_eNoEditMode save, wtt_eNoEditVolMode detach)
         opt = log_mOption_Comment;
       else
         opt = 0;
-      wb_log::log(
-          (wb_session*)ldhses, wlog_eCategory_ConfiguratorSave, volid, opt);
-    } else
+      wb_log::log((wb_session*)ldhses, wlog_eCategory_ConfiguratorSave, volid, opt);
+    }
+    else
       sts = ldh_RevertSession(ldhses);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', wnav_get_message(sts));
       return sts;
     }
   }
-  if (detach == wtt_eNoEdit_KeepVolume) {
+  if (detach == wtt_eNoEdit_KeepVolume)
+  {
     sts = ldh_CloseSession(ldhses);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', wnav_get_message(sts));
       return sts;
     }
 
-    sts = ldh_OpenSession(
-        &ldhses, volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Navigator);
+    sts = ldh_OpenSession(&ldhses, volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Navigator);
     ldh_AddOtherSessionCallback(ldhses, (void*)this, Wtt::ldh_other_session_cb);
     wnav->ldhses = ldhses;
     wnavnode->ldhses = ldhses;
@@ -729,7 +747,9 @@ int Wtt::set_noedit(wtt_eNoEditMode save, wtt_eNoEditVolMode detach)
     appl.set_editmode(editmode, ldhses);
     if (utedctx)
       utedctx->set_editmode(editmode, ldhses);
-  } else {
+  }
+  else
+  {
     sts = detach_volume();
     if (EVEN(sts))
       return sts;
@@ -750,17 +770,20 @@ int Wtt::set_edit()
   if (editmode == 1)
     return 1;
 
-  if (!wbctx || !ldhses) {
+  if (!wbctx || !ldhses)
+  {
     message('E', "Wtt is not attached to a volume");
     return 1;
   }
 
-  switch (volid) {
+  switch (volid)
+  {
   case ldh_cProjectListVolume:
   case ldh_cGlobalVolumeListVolume:
   case ldh_cUserDatabaseVolume:
     // Privilege Administrator required
-    if (!(CoLogin::privilege() & pwr_mPrv_Administrator)) {
+    if (!(CoLogin::privilege() & pwr_mPrv_Administrator))
+    {
       message('E', "User is not authorized to administrate. Login with command "
                    "\"login/adm\"");
       return 1;
@@ -768,19 +791,19 @@ int Wtt::set_edit()
     break;
   default:
     // Privilege DevConfig required
-    if (!(CoLogin::privilege() & pwr_mPrv_DevConfig)) {
+    if (!(CoLogin::privilege() & pwr_mPrv_DevConfig))
+    {
       message('E', "User is not authorized to configure");
       return 1;
     }
   }
 
   sts = ldh_CloseSession(ldhses);
-  sts = ldh_OpenSession(
-      &ldhses, volctx, ldh_eAccess_ReadWrite, ldh_eUtility_Configurator);
-  if (EVEN(sts)) {
+  sts = ldh_OpenSession(&ldhses, volctx, ldh_eAccess_ReadWrite, ldh_eUtility_Configurator);
+  if (EVEN(sts))
+  {
     // Access denied, open readsession again
-    ldh_OpenSession(
-        &ldhses, volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Navigator);
+    ldh_OpenSession(&ldhses, volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Navigator);
     ldh_AddOtherSessionCallback(ldhses, (void*)this, Wtt::ldh_other_session_cb);
     message('E', wnav_get_message(sts));
     wnav->ldhses = ldhses;
@@ -803,7 +826,8 @@ int Wtt::set_edit()
   if (utedctx)
     utedctx->set_editmode(editmode, ldhses);
 
-  if (first_edit_session) {
+  if (first_edit_session)
+  {
     // Check configuration status
     pwr_tObjid oid;
     oid.vid = volid;
@@ -812,10 +836,11 @@ int Wtt::set_edit()
     int size;
 
     first_edit_session = 0;
-    sts = ldh_GetObjectPar(ldhses, oid, "SysBody", "ConfigurationStatus",
-        (char**)&config_status, &size);
-    if (ODD(sts)) {
-      if (*config_status != 0) {
+    sts = ldh_GetObjectPar(ldhses, oid, "SysBody", "ConfigurationStatus", (char**)&config_status, &size);
+    if (ODD(sts))
+    {
+      if (*config_status != 0)
+      {
         ldh_sParDef adef;
         ldh_sValueDef* vd;
         int rows;
@@ -825,8 +850,7 @@ int Wtt::set_edit()
         if (EVEN(sts))
           return 1;
 
-        sts = ldh_GetAttrDef(
-            ldhses, cid, "SysBody", "ConfigurationStatus", &adef);
+        sts = ldh_GetAttrDef(ldhses, cid, "SysBody", "ConfigurationStatus", &adef);
         if (EVEN(sts))
           return 1;
 
@@ -836,23 +860,23 @@ int Wtt::set_edit()
 
         bool found = false;
         int i;
-        for (i = 0; i < rows; i++) {
-          if (vd[i].Value.Value == *config_status) {
+        for (i = 0; i < rows; i++)
+        {
+          if (vd[i].Value.Value == *config_status)
+          {
             found = true;
             break;
           }
         }
 
-        if (found) {
+        if (found)
+        {
           if (*config_status < 100)
-            MsgWindow::message(
-                'E', "Volume Configuration status: ", vd[i].Value.Text);
+            MsgWindow::message('E', "Volume Configuration status: ", vd[i].Value.Text);
           else if (*config_status < 200)
-            MsgWindow::message(
-                'W', "Volume Configuration status: ", vd[i].Value.Text);
+            MsgWindow::message('W', "Volume Configuration status: ", vd[i].Value.Text);
           else
-            MsgWindow::message(
-                'I', "Volume Configuration status: ", vd[i].Value.Text);
+            MsgWindow::message('I', "Volume Configuration status: ", vd[i].Value.Text);
         }
         free((char*)vd);
       }
@@ -876,43 +900,47 @@ void Wtt::close(void* ctx)
 {
   Wtt* wtt = (Wtt*)ctx;
 
-  if (!wtt->editmode) {
+  if (!wtt->editmode)
+  {
     if ((wtt->time_to_exit_cb) && (wtt->time_to_exit_cb)(wtt))
-      wtt->open_confirm(
-          "Do you really want to exit", "Close", &Wtt::close_now_ok, NULL);
-    else {
+      wtt->open_confirm("Do you really want to exit", "Close", &Wtt::close_now_ok, NULL);
+    else
+    {
       wtt->detach_volume();
       delete wtt;
     }
-  } else {
-    if (wtt->is_saved()) {
+  }
+  else
+  {
+    if (wtt->is_saved())
+    {
       if ((wtt->time_to_exit_cb) && (wtt->time_to_exit_cb)(wtt))
-        wtt->open_confirm(
-            "Do you really want to exit", "Close", &Wtt::close_now_ok, NULL);
-      else {
+        wtt->open_confirm("Do you really want to exit", "Close", &Wtt::close_now_ok, NULL);
+      else
+      {
         wtt->detach_volume();
         delete wtt;
       }
-    } else
-      wtt->open_confirm("Do you want to save changes", "Save", &Wtt::close_ok,
-          &Wtt::close_no);
+    }
+    else
+      wtt->open_confirm("Do you want to save changes", "Save", &Wtt::close_ok, &Wtt::close_no);
   }
 }
 
-void Wtt::change_value(void* ctx)
-{
-  ((Wtt*)ctx)->open_change_value();
-}
+void Wtt::change_value(void* ctx) { ((Wtt*)ctx)->open_change_value(); }
 
 int Wtt::get_wbctx(void* ctx, ldh_tWBContext* wbctx)
 {
   Wtt* wtt = (Wtt*)ctx;
   int sts;
 
-  if (wtt->wbctx) {
+  if (wtt->wbctx)
+  {
     *wbctx = wtt->wbctx;
     sts = 1;
-  } else {
+  }
+  else
+  {
     wtt->set_clock_cursor();
     sts = ldh_OpenWB(&wtt->wbctx, 0, 0);
     if (ODD(sts))
@@ -942,8 +970,7 @@ void Wtt::activate_print()
     return;
 
   strcpy(title, "PwR ");
-  sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses), info.Volume, &title[4],
-      sizeof(title) - 4, &size);
+  sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses), info.Volume, &title[4], sizeof(title) - 4, &size);
   if (EVEN(sts))
     return;
 
@@ -970,17 +997,17 @@ void Wtt::activate_save()
 
 void Wtt::activate_revert()
 {
-  open_confirm(
-      "Do you really want to revert", "Confirm revert", &Wtt::revert_ok, NULL);
+  open_confirm("Do you really want to revert", "Confirm revert", &Wtt::revert_ok, NULL);
 }
 
 void Wtt::activate_revisions()
 {
   if (!focused_wnav)
     set_focus_default();
-  if (!focused_wnav->gbl.enable_revisions) {
+  if (!focused_wnav->gbl.enable_revisions)
+  {
     focused_wnav->wow->DisplayError("Revisions",
-        "Revision is not enabled.\nEnable revisions in Options/Settings.");
+                                    "Revision is not enabled.\nEnable revisions in Options/Settings.");
     return;
   }
 
@@ -1002,31 +1029,31 @@ void Wtt::activate_syntax()
 
   sts = ldh_SyntaxCheck(ldhses, &errorcount, &warningcount);
   reset_cursor();
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', wnav_get_message(sts));
     return;
   }
 
-  if (errorcount) {
-    sprintf(
-        msg, "Syntax errors: %d errors, %d warnings", errorcount, warningcount);
+  if (errorcount)
+  {
+    sprintf(msg, "Syntax errors: %d errors, %d warnings", errorcount, warningcount);
     message('E', msg);
-  } else if (warningcount) {
+  }
+  else if (warningcount)
+  {
     sprintf(msg, "Syntax warnings: %d warnings", warningcount);
     message('W', msg);
-  } else
+  }
+  else
     message('I', "Syntax check successful");
 }
 
-void Wtt::activate_find()
-{
-  open_input_dialog("Search string", "Find object", "", &Wtt::find_ok);
-}
+void Wtt::activate_find() { open_input_dialog("Search string", "Find object", "", &Wtt::find_ok); }
 
 void Wtt::activate_findregex()
 {
-  open_input_dialog(
-      "Search string", "Find regular expression", "", &Wtt::findregex_ok);
+  open_input_dialog("Search string", "Find regular expression", "", &Wtt::findregex_ok);
 }
 
 void Wtt::activate_findnext()
@@ -1055,23 +1082,28 @@ void Wtt::activate_copy()
     sts = wnav->get_select(&sel_list, &is_attr, &sel_cnt);
   if (EVEN(sts) && wnavnode_mapped)
     sts = wnavnode->get_select(&sel_list, &is_attr, &sel_cnt);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('I', "No object is selected");
     return;
   }
 
   sts = ldh_Copy(ldhses, sel_list, 0, 0, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', wnav_get_message(sts));
     return;
   }
 
-  if (sel_cnt == 1) {
+  if (sel_cnt == 1)
+  {
     message('I', "Object copied");
-  } else
+  }
+  else
     message('I', "Objects copied");
 
-  if (sel_cnt > 0) {
+  if (sel_cnt > 0)
+  {
     free((char*)sel_list);
     free((char*)is_attr);
   }
@@ -1091,25 +1123,30 @@ void Wtt::activate_cut()
     sts = wnav->get_select(&sel_list, &is_attr, &sel_cnt);
   if (EVEN(sts) && wnavnode_mapped)
     sts = wnavnode->get_select(&sel_list, &is_attr, &sel_cnt);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('I', "No object is selected");
     return;
   }
 
-  for (int i = 0; i < sel_cnt; i++) {
-    if (is_attr[i]) {
+  for (int i = 0; i < sel_cnt; i++)
+  {
+    if (is_attr[i])
+    {
       message('E', "Selected item is not an object");
       return;
     }
   }
 
   sts = ldh_Cut(ldhses, sel_list, false);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', wnav_get_message(sts));
     return;
   }
 
-  if (sel_cnt > 0) {
+  if (sel_cnt > 0)
+  {
     free((char*)sel_list);
     free((char*)is_attr);
   }
@@ -1125,9 +1162,11 @@ void Wtt::activate_paste()
   message(' ', "");
 
   // I window is empty, paste on root level
-  if (wnav->is_empty() && wnavnode->is_empty()) {
+  if (wnav->is_empty() && wnavnode->is_empty())
+  {
     sts = ldh_Paste(ldhses, pwr_cNObjid, ldh_eDest_After, 0, 0, 0);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', wnav_get_message(sts));
       return;
     }
@@ -1137,17 +1176,21 @@ void Wtt::activate_paste()
   // Get selections in w1 or w2
   sts = wnav->get_select(&sel_list1, &sel_is_attr1, &sel_cnt1);
   sts = wnavnode->get_select(&sel_list2, &sel_is_attr2, &sel_cnt2);
-  if (!sel_cnt1 && !sel_cnt2) {
+  if (!sel_cnt1 && !sel_cnt2)
+  {
     message('I', "Select destination object");
     return;
   }
-  if ((sel_cnt1 + sel_cnt2) != 1) {
+  if ((sel_cnt1 + sel_cnt2) != 1)
+  {
     message('I', "Select one destination object");
-    if (sel_cnt1 > 0) {
+    if (sel_cnt1 > 0)
+    {
       free((char*)sel_list1);
       free((char*)sel_is_attr1);
     }
-    if (sel_cnt2 > 0) {
+    if (sel_cnt2 > 0)
+    {
       free((char*)sel_list2);
       free((char*)sel_is_attr2);
     }
@@ -1161,13 +1204,14 @@ void Wtt::activate_paste()
     sts = ldh_Paste(ldhses, sel_list2->Objid, ldh_eDest_After, 0, 0, 0);
   reset_cursor();
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', wnav_get_message(sts));
     return;
   }
 
-  if ((sel_cnt1 == 1 && sel_is_attr1[0] == 0)
-      || (sel_cnt2 == 1 && sel_is_attr2[0] == 0)) {
+  if ((sel_cnt1 == 1 && sel_is_attr1[0] == 0) || (sel_cnt2 == 1 && sel_is_attr2[0] == 0))
+  {
     pwr_tOid oid;
     pwr_tOid prev;
     pwr_tCid prev_cid;
@@ -1182,9 +1226,11 @@ void Wtt::activate_paste()
       return;
 
     // Get name from previous sibling
-    if (prev_cid != pwr_eClass_ClassDef) {
+    if (prev_cid != pwr_eClass_ClassDef)
+    {
       sts = ldh_GetNextSibling(wnav->ldhses, prev, &oid);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         pwr_tObjName name;
         pwr_tCid cid;
         int size;
@@ -1194,9 +1240,9 @@ void Wtt::activate_paste()
         if (EVEN(sts))
           return;
 
-        if (prev_cid == cid) {
-          sts = ldh_ObjidToName(
-              wnav->ldhses, prev, ldh_eName_Object, name, sizeof(name), &size);
+        if (prev_cid == cid)
+        {
+          sts = ldh_ObjidToName(wnav->ldhses, prev, ldh_eName_Object, name, sizeof(name), &size);
           if (EVEN(sts))
             return;
 
@@ -1226,7 +1272,8 @@ void Wtt::activate_pasteinto()
   message(' ', "");
 
   // I window is empty, paste on root level
-  if (wnav->is_empty() && wnavnode->is_empty()) {
+  if (wnav->is_empty() && wnavnode->is_empty())
+  {
     sts = ldh_Paste(ldhses, pwr_cNObjid, ldh_eDest_After, 0, 0, 0);
     if (EVEN(sts))
       message('E', wnav_get_message(sts));
@@ -1236,17 +1283,21 @@ void Wtt::activate_pasteinto()
   // Get selections in w1 or w2
   sts = wnav->get_select(&sel_list1, &sel_is_attr1, &sel_cnt1);
   sts = wnavnode->get_select(&sel_list2, &sel_is_attr2, &sel_cnt2);
-  if (!sel_cnt1 && !sel_cnt2) {
+  if (!sel_cnt1 && !sel_cnt2)
+  {
     message('I', "Select destination object");
     return;
   }
-  if ((sel_cnt1 + sel_cnt2) != 1) {
+  if ((sel_cnt1 + sel_cnt2) != 1)
+  {
     message('I', "Select one destination object");
-    if (sel_cnt1 > 0) {
+    if (sel_cnt1 > 0)
+    {
       free((char*)sel_list1);
       free((char*)sel_is_attr1);
     }
-    if (sel_cnt2 > 0) {
+    if (sel_cnt2 > 0)
+    {
       free((char*)sel_list2);
       free((char*)sel_is_attr2);
     }
@@ -1281,13 +1332,15 @@ void Wtt::activate_copykeep()
     sts = wnav->get_select(&sel_list, &is_attr, &sel_cnt);
   if (EVEN(sts) && wnavnode_mapped)
     sts = wnavnode->get_select(&sel_list, &is_attr, &sel_cnt);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('I', "No object is selected");
     return;
   }
 
   sts = ldh_Copy(ldhses, sel_list, 1, 1, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', wnav_get_message(sts));
     return;
   }
@@ -1296,7 +1349,8 @@ void Wtt::activate_copykeep()
   else
     message('I', "Objects copied");
 
-  if (sel_cnt > 0) {
+  if (sel_cnt > 0)
+  {
     free((char*)sel_list);
     free((char*)is_attr);
   }
@@ -1308,12 +1362,12 @@ void Wtt::activate_configure()
 
   if (!editmode)
     set_edit();
-  else {
+  else
+  {
     if (is_saved())
       sts = set_noedit(wtt_eNoEdit_Save, wtt_eNoEdit_KeepVolume);
     else
-      open_confirm(
-          "Do you want to save changes", "Save", &Wtt::save_ok, &Wtt::save_no);
+      open_confirm("Do you want to save changes", "Save", &Wtt::save_ok, &Wtt::save_no);
   }
 }
 
@@ -1327,38 +1381,42 @@ void Wtt::activate_utilities()
   char systemname[80];
   char systemgroup[80];
 
-  if (!ldhses) {
+  if (!ldhses)
+  {
     message('E', "No volume is attached");
     return;
   }
   message(' ', "");
 
-  if (utedctx == NULL) {
+  if (utedctx == NULL)
+  {
     sts = ldh_GetVolumeInfo(ldh_SessionToVol(ldhses), &info);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', wnav_get_message(sts));
       return;
     }
 
-    sts = ldh_VolumeIdToName(
-        ldh_SessionToWB(ldhses), info.Volume, volname, sizeof(volname), &size);
-    if (EVEN(sts)) {
+    sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses), info.Volume, volname, sizeof(volname), &size);
+    if (EVEN(sts))
+    {
       message('E', wnav_get_message(sts));
       return;
     }
 
     utl_get_systemname(systemname, systemgroup);
-    sprintf(title, "PwR Utilites Volume %s, %s on %s", volname,
-        CoLogin::username(), systemname);
+    snprintf(title, sizeof(title), "PwR Utilites Volume %s, %s on %s", volname, CoLogin::username(), systemname);
     set_clock_cursor();
     ute_new(title);
     reset_cursor();
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       utedctx = NULL;
       message('E', wnav_get_message(sts));
       return;
     }
-  } else
+  }
+  else
     utedctx->raise_window();
 }
 
@@ -1375,7 +1433,8 @@ void Wtt::activate_openobject()
   // Get selections in w1
   sts = wnav->get_select(&sel_list, &sel_is_attr, &sel_cnt1);
   set_clock_cursor();
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     for (i = 0; i < sel_cnt1; i++)
       watt_new(sel_list[i]);
     free((char*)sel_list);
@@ -1383,7 +1442,8 @@ void Wtt::activate_openobject()
   }
 
   sts = wnavnode->get_select(&sel_list, &sel_is_attr, &sel_cnt2);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     for (i = 0; i < sel_cnt2; i++)
       watt_new(sel_list[i]);
     free((char*)sel_list);
@@ -1392,7 +1452,8 @@ void Wtt::activate_openobject()
   reset_cursor();
 
   // No selection given, return with error
-  if (sel_cnt1 == 0 && sel_cnt2 == 0) {
+  if (sel_cnt1 == 0 && sel_cnt2 == 0)
+  {
     message('E', "No object is selected");
     return;
   }
@@ -1411,30 +1472,35 @@ void Wtt::activate_creaobj(ldh_eDest dest)
   message(' ', "");
 
   sts = palette->get_select(&cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Select a class in the palette");
     return;
   }
 
   // Get selections in w1
   sts = wnav->get_select(&sel_list, &sel_is_attr, &sel_cnt);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     sts = wnavnode->get_select(&sel_list, &sel_is_attr, &sel_cnt);
     navnode = 1;
   }
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "No object is selected");
     return;
   }
 
-  if (sel_cnt > 1) {
+  if (sel_cnt > 1)
+  {
     message('E', "Select one object");
     return;
   }
 
   sts = ldh_CreateObject(ldhses, &oid, 0, cid, sel_list[0].Objid, dest);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', wnav_get_message(sts));
     return;
   }
@@ -1447,7 +1513,8 @@ void Wtt::activate_creaobj(ldh_eDest dest)
   pwr_tOid prev;
 
   sts = ldh_GetPreviousSibling(wnav->ldhses, oid, &prev);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     pwr_tObjName name;
     pwr_tCid prev_cid;
     int size;
@@ -1456,9 +1523,9 @@ void Wtt::activate_creaobj(ldh_eDest dest)
     if (EVEN(sts))
       return;
 
-    if (prev_cid == cid) {
-      sts = ldh_ObjidToName(
-          wnav->ldhses, prev, ldh_eName_Object, name, sizeof(name), &size);
+    if (prev_cid == cid)
+    {
+      sts = ldh_ObjidToName(wnav->ldhses, prev, ldh_eName_Object, name, sizeof(name), &size);
       if (EVEN(sts))
         return;
 
@@ -1488,24 +1555,28 @@ void Wtt::activate_moveobj(wnav_eDestCode dest)
 
   // Get selections in w1
   sts = wnav->get_select(&sel_list, &sel_is_attr, &sel_cnt);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     sts = wnavnode->get_select(&sel_list, &sel_is_attr, &sel_cnt);
     navnode = 1;
   }
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "No object is selected");
     return;
   }
 
-  if (sel_cnt > 1) {
+  if (sel_cnt > 1)
+  {
     message('E', "Select one object");
     free((char*)sel_list);
     free((char*)sel_is_attr);
     return;
   }
 
-  if (sel_is_attr[0]) {
+  if (sel_is_attr[0])
+  {
     message('E', "Unable to move attributes");
     free((char*)sel_list);
     free((char*)sel_is_attr);
@@ -1516,7 +1587,8 @@ void Wtt::activate_moveobj(wnav_eDestCode dest)
     sts = wnavnode->get_next(sel_list[0].Objid, dest, &next_oid, &d);
   else
     sts = wnav->get_next(sel_list[0].Objid, dest, &next_oid, &d);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', wnav_get_message(sts));
     free((char*)sel_list);
     free((char*)sel_is_attr);
@@ -1525,9 +1597,11 @@ void Wtt::activate_moveobj(wnav_eDestCode dest)
 
   // No plc objects can be moved
   sts = ldh_GetParent(ldhses, sel_list[0].Objid, &parent);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetObjectClass(ldhses, parent, &cid);
-    if (cid == pwr_cClass_plc || cid == pwr_cClass_PlcTemplate) {
+    if (cid == pwr_cClass_plc || cid == pwr_cClass_PlcTemplate)
+    {
       message('E', "Unable to move plc objects");
       free((char*)sel_list);
       free((char*)sel_is_attr);
@@ -1537,9 +1611,11 @@ void Wtt::activate_moveobj(wnav_eDestCode dest)
   }
 
   sts = ldh_GetParent(ldhses, next_oid, &parent);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetObjectClass(ldhses, parent, &cid);
-    if (cid == pwr_cClass_plc || cid == pwr_cClass_PlcTemplate) {
+    if (cid == pwr_cClass_plc || cid == pwr_cClass_PlcTemplate)
+    {
       message('E', "Unable to move plc objects");
       free((char*)sel_list);
       free((char*)sel_is_attr);
@@ -1548,12 +1624,14 @@ void Wtt::activate_moveobj(wnav_eDestCode dest)
     sts = ldh_GetParent(ldhses, parent, &parent);
   }
 
-  if (d == wnav_eDestCode_FirstChild) {
+  if (d == wnav_eDestCode_FirstChild)
+  {
     sts = ldh_GetObjectClass(ldhses, next_oid, &cid);
     if (EVEN(sts))
       return;
 
-    if (cid == pwr_cClass_plc || cid == pwr_cClass_PlcTemplate) {
+    if (cid == pwr_cClass_plc || cid == pwr_cClass_PlcTemplate)
+    {
       message('E', "Unable to move into plcpgm");
       free((char*)sel_list);
       free((char*)sel_is_attr);
@@ -1561,7 +1639,8 @@ void Wtt::activate_moveobj(wnav_eDestCode dest)
     }
   }
 
-  switch (d) {
+  switch (d)
+  {
   case wnav_eDestCode_Before:
     sts = ldh_MoveObject(ldhses, sel_list[0].Objid, next_oid, ldh_eDest_Before);
     break;
@@ -1569,15 +1648,14 @@ void Wtt::activate_moveobj(wnav_eDestCode dest)
     sts = ldh_MoveObject(ldhses, sel_list[0].Objid, next_oid, ldh_eDest_After);
     break;
   case wnav_eDestCode_FirstChild:
-    sts = ldh_MoveObject(
-        ldhses, sel_list[0].Objid, next_oid, ldh_eDest_IntoFirst);
+    sts = ldh_MoveObject(ldhses, sel_list[0].Objid, next_oid, ldh_eDest_IntoFirst);
     break;
   case wnav_eDestCode_LastChild:
-    sts = ldh_MoveObject(
-        ldhses, sel_list[0].Objid, next_oid, ldh_eDest_IntoLast);
+    sts = ldh_MoveObject(ldhses, sel_list[0].Objid, next_oid, ldh_eDest_IntoLast);
     break;
   }
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', wnav_get_message(sts));
     free((char*)sel_list);
     free((char*)sel_is_attr);
@@ -1610,33 +1688,41 @@ void Wtt::activate_deleteobj()
   if (EVEN(sts))
     sts = wnavnode->get_select(&sel_list, &sel_is_attr, &sel_cnt);
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "No object is selected");
     return;
   }
 
-  for (int i = 0; i < sel_cnt; i++) {
-    if (sel_is_attr[i]) {
+  for (int i = 0; i < sel_cnt; i++)
+  {
+    if (sel_is_attr[i])
+    {
       message('E', "Selected item is not an object");
       return;
     }
   }
 
-  for (int i = 0; i < sel_cnt; i++) {
+  for (int i = 0; i < sel_cnt; i++)
+  {
     sts = ldh_GetChild(ldhses, sel_list[i].Objid, &child);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       has_child = 1;
       break;
     }
   }
 
-  if (sel_cnt == 1) {
+  if (sel_cnt == 1)
+  {
     if (has_child)
       strcpy(msg, "Selected object has children !\nDo you want to delete the "
                   "object tree");
     else
       strcpy(msg, "Do you want to delete the selected object");
-  } else {
+  }
+  else
+  {
     if (has_child)
       strcpy(msg, "Selected objects have children !\nDo you want to delete the "
                   "object trees");
@@ -1665,23 +1751,30 @@ void Wtt::delete_ok(Wtt* wtt)
   if (EVEN(sts))
     return;
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     wtt->message('E', "No object is selected");
     return;
   }
 
-  for (int i = 0; i < sel_cnt; i++) {
-    if (sel_is_attr[i]) {
+  for (int i = 0; i < sel_cnt; i++)
+  {
+    if (sel_is_attr[i])
+    {
       wtt->message('E', "Selected item is not an object");
       return;
     }
   }
 
-  for (int i = 0; i < sel_cnt; i++) {
+  for (int i = 0; i < sel_cnt; i++)
+  {
     sts = ldh_GetChild(wtt->ldhses, sel_list[i].Objid, &child);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = ldh_DeleteObjectTree(wtt->ldhses, sel_list[i].Objid, 0);
-    } else {
+    }
+    else
+    {
       sts = ldh_DeleteObject(wtt->ldhses, sel_list[i].Objid);
     }
   }
@@ -1701,7 +1794,8 @@ void Wtt::activate_openvolobject()
 
   // Open volume object
   sts = ldh_GetVolumeInfo(ldh_SessionToVol(ldhses), &info);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', wnav_get_message(sts));
     return;
   }
@@ -1753,10 +1847,13 @@ void Wtt::activate_buildobject()
 
   // Check that something is selected
   sts = focused_wnav->get_select(&sel_list, &sel_is_attr, &sel_cnt);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     free((char*)sel_list);
     free((char*)sel_is_attr);
-  } else {
+  }
+  else
+  {
     message('E', "No object is selected");
     return;
   }
@@ -1794,8 +1891,7 @@ void Wtt::activate_openpl()
 {
   set_clock_cursor();
   if (open_volume_cb)
-    (open_volume_cb)(
-        this, wb_eType_ExternVolume, "ProjectList", wow_eFileSelType_);
+    (open_volume_cb)(this, wb_eType_ExternVolume, "ProjectList", wow_eFileSelType_);
   reset_cursor();
 }
 
@@ -1803,8 +1899,7 @@ void Wtt::activate_opengvl()
 {
   set_clock_cursor();
   if (open_volume_cb)
-    (open_volume_cb)(
-        this, wb_eType_ExternVolume, "GlobalVolumeList", wow_eFileSelType_);
+    (open_volume_cb)(this, wb_eType_ExternVolume, "GlobalVolumeList", wow_eFileSelType_);
   reset_cursor();
 }
 
@@ -1812,15 +1907,11 @@ void Wtt::activate_openudb()
 {
   set_clock_cursor();
   if (open_volume_cb)
-    (open_volume_cb)(
-        this, wb_eType_ExternVolume, "UserDatabase", wow_eFileSelType_);
+    (open_volume_cb)(this, wb_eType_ExternVolume, "UserDatabase", wow_eFileSelType_);
   reset_cursor();
 }
 
-void Wtt::activate_spreadsheet()
-{
-  wda_new(pwr_cNObjid);
-}
+void Wtt::activate_spreadsheet() { wda_new(pwr_cNObjid); }
 
 void Wtt::activate_openge()
 {
@@ -1834,13 +1925,15 @@ void Wtt::activate_openge()
   char graph_name[80];
   Ge* gectx;
 
-  if (!ldhses) {
+  if (!ldhses)
+  {
     message('E', "No volume is attached");
     return;
   }
   message(' ', "");
 
-  while (1) {
+  while (1)
+  {
     sts = get_select_first(&attrref, &is_attr);
     if (EVEN(sts))
       break;
@@ -1849,17 +1942,18 @@ void Wtt::activate_openge()
     if (EVEN(sts))
       break;
 
-    if (classid == pwr_cClass_XttGraph) {
-      sts = ldh_GetObjectPar(
-          ldhses, attrref.Objid, "RtBody", "Action", &action, &size);
+    if (classid == pwr_cClass_XttGraph)
+    {
+      sts = ldh_GetObjectPar(ldhses, attrref.Objid, "RtBody", "Action", &action, &size);
       if (EVEN(sts))
         break;
 
       str_ToLower(graph_name, action);
       free((char*)action);
-    } else if (classid == pwr_cClass_WebGraph) {
-      sts = ldh_GetObjectPar(
-          ldhses, attrref.Objid, "RtBody", "Name", &action, &size);
+    }
+    else if (classid == pwr_cClass_WebGraph)
+    {
+      sts = ldh_GetObjectPar(ldhses, attrref.Objid, "RtBody", "Name", &action, &size);
       if (EVEN(sts))
         break;
 
@@ -1867,11 +1961,13 @@ void Wtt::activate_openge()
       if (!streq(graph_name, "") && strstr(graph_name, ".pwg") == 0)
         strcat(graph_name, ".pwg");
       free((char*)action);
-    } else
+    }
+    else
       break;
     if (strstr(graph_name, ".pwg"))
       graph_found = 1;
-    else {
+    else
+    {
       message('E', "No graph defined in selected object");
       return;
     }
@@ -1899,14 +1995,16 @@ void Wtt::activate_openclasseditor()
   pwr_eClassVolumeDatabaseEnum* dbenum;
   char cmd[430];
 
-  if (!ldhses) {
+  if (!ldhses)
+  {
     message('E', "No volume is attached");
     return;
   }
   message(' ', "");
 
   sts = get_select_first(&attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Select a ClassVolumeConfig object");
     return;
   }
@@ -1915,21 +2013,19 @@ void Wtt::activate_openclasseditor()
   if (EVEN(sts))
     return;
 
-  if (classid == pwr_cClass_ClassVolumeConfig
-      || classid == pwr_cClass_ClassVolumeLoad
-      || classid == pwr_cClass_DetachedClassVolumeConfig
-      || classid == pwr_cClass_DetachedClassVolumeLoad) {
-    sts = ldh_ObjidToName(
-        ldhses, attrref.Objid, ldh_eName_Object, name, sizeof(name), &size);
+  if (classid == pwr_cClass_ClassVolumeConfig || classid == pwr_cClass_ClassVolumeLoad ||
+      classid == pwr_cClass_DetachedClassVolumeConfig || classid == pwr_cClass_DetachedClassVolumeLoad)
+  {
+    sts = ldh_ObjidToName(ldhses, attrref.Objid, ldh_eName_Object, name, sizeof(name), &size);
     if (EVEN(sts))
       return;
 
-    sts = ldh_GetObjectPar(
-        ldhses, attrref.Objid, "RtBody", "Database", (char**)&dbenum, &size);
+    sts = ldh_GetObjectPar(ldhses, attrref.Objid, "RtBody", "Database", (char**)&dbenum, &size);
     if (EVEN(sts))
       return;
 
-    switch (*dbenum) {
+    switch (*dbenum)
+    {
     case pwr_eClassVolumeDatabaseEnum_WbLoad:
       str_ToLower(name, name);
       sprintf(fname, "$pwrp_db/%s.wb_load", name);
@@ -1944,18 +2040,20 @@ void Wtt::activate_openclasseditor()
       reset_cursor();
       break;
     case pwr_eClassVolumeDatabaseEnum_BerkeleyDb:
-    case pwr_eClassVolumeDatabaseEnum_MySql: {
+    case pwr_eClassVolumeDatabaseEnum_MySql:
+    {
       pwr_tFileName filename;
 
       str_ToLower(name, name);
       dcli_translate_filename(filename, "$pwr_exe/wb_open_db.sh");
-      sprintf(cmd, "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename,
-          CoLogin::username(), CoLogin::ucpassword(), name, name);
+      snprintf(cmd, sizeof(cmd), "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename, CoLogin::username(), CoLogin::ucpassword(),
+              name, name);
 
       set_clock_cursor();
       sts = system(cmd);
       reset_cursor();
-      if (sts == -1 || sts == 127) {
+      if (sts == -1 || sts == 127)
+      {
         printf("-- Error when creating process.\n");
         return;
       }
@@ -1966,7 +2064,9 @@ void Wtt::activate_openclasseditor()
     }
 
     free(dbenum);
-  } else {
+  }
+  else
+  {
     message('E', "Select a ClassVolumeConfig object");
     return;
   }
@@ -1987,7 +2087,8 @@ void Wtt::activate_buildvolume()
   build->volume();
 
   reset_cursor();
-  if (build->evenSts()) {
+  if (build->evenSts())
+  {
     message('E', wnav_get_message(build->sts()));
     return;
   }
@@ -2004,10 +2105,12 @@ void Wtt::activate_buildnode()
 
   message(' ', "");
 
-  if (focused_wnav->gbl.build.force) {
-    int res = focused_wnav->wow->CreateModalDialog("Force selected",
-        "Do you want to build with force", "Yes", "Cancel", 0, 0);
-    switch (res) {
+  if (focused_wnav->gbl.build.force)
+  {
+    int res = focused_wnav->wow->CreateModalDialog("Force selected", "Do you want to build with force", "Yes",
+                                                   "Cancel", 0, 0);
+    switch (res)
+    {
     case wow_eModalDialogReturn_Button1:
       break;
     default:
@@ -2016,17 +2119,20 @@ void Wtt::activate_buildnode()
   }
 
   // Check if there is only one node configured for the current volume
-  sts = lfu_volumelist_load(pwr_cNameBootList,
-      (lfu_t_volumelist**)&boot_volumelist, &boot_volumecount);
-  if (sts == FOE__NOFILE) {
+  sts = lfu_volumelist_load(pwr_cNameBootList, (lfu_t_volumelist**)&boot_volumelist, &boot_volumecount);
+  if (sts == FOE__NOFILE)
+  {
     message('E', "Project is not configured");
     return;
   }
   int found = 0;
   vp = (lfu_t_volumelist*)boot_volumelist;
-  for (int i = 0; i < boot_volumecount; i++) {
-    if (vp->volume_id == volid) {
-      if (found) {
+  for (int i = 0; i < boot_volumecount; i++)
+  {
+    if (vp->volume_id == volid)
+    {
+      if (found)
+      {
         found = 0;
         break;
       }
@@ -2035,7 +2141,8 @@ void Wtt::activate_buildnode()
     }
     vp++;
   }
-  if (found) {
+  if (found)
+  {
     wb_build* build = build_new();
     if (!focused_wnav)
       set_focus_default();
@@ -2045,17 +2152,22 @@ void Wtt::activate_buildnode()
     set_clock_cursor();
     build->node(volp->p1, node_type, boot_volumelist, boot_volumecount);
     reset_cursor();
-    if (build->evenSts()) {
+    if (build->evenSts())
+    {
       char msg[80];
       sprintf(msg, "Error building node %s", volp->p1);
       delete build;
       message('E', msg);
       return;
-    } else if (build->sts() == PWRB__NOBUILT) {
+    }
+    else if (build->sts() == PWRB__NOBUILT)
+    {
       message('I', "Nothing to build");
       delete build;
       return;
-    } else {
+    }
+    else
+    {
       char msg[80];
       sprintf(msg, "Node %s built", volp->p1);
       delete build;
@@ -2097,11 +2209,13 @@ void Wtt::activate_distribute()
 {
   message(' ', "");
 
-  if (wpkg == 0) {
+  if (wpkg == 0)
+  {
     set_clock_cursor();
     wpkg_new();
     reset_cursor();
-  } else
+  }
+  else
     wpkg->pop();
 }
 
@@ -2185,15 +2299,9 @@ void Wtt::activate_zoom_reset()
   palette->unzoom();
 }
 
-void Wtt::activate_twowindows()
-{
-  set_twowindows(!twowindows, 0, 0);
-}
+void Wtt::activate_twowindows() { set_twowindows(!twowindows, 0, 0); }
 
-void Wtt::activate_messages()
-{
-  MsgWindow::map_default();
-}
+void Wtt::activate_messages() { MsgWindow::map_default(); }
 
 void Wtt::activate_scriptproj()
 {
@@ -2262,13 +2370,16 @@ int Wtt::get_select_first(pwr_sAttrRef* attrref, int* is_attr)
   sts = wnav->get_select(&sellist, &sel_is_attr, &sel_cnt);
   if (EVEN(sts))
     sts = wnavnode->get_select(&sellist, &sel_is_attr, &sel_cnt);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     *attrref = sellist[0];
     *is_attr = sel_is_attr[0];
-  } else
+  }
+  else
     return sts;
 
-  if (sel_cnt > 0) {
+  if (sel_cnt > 0)
+  {
     free((char*)sellist);
     free((char*)sel_is_attr);
   }
@@ -2309,7 +2420,8 @@ void wtt_ge_close_cb(void* ge)
 
 void Wtt::register_utility(void* ctx, wb_eUtility utility)
 {
-  switch (utility) {
+  switch (utility)
+  {
   case wb_eUtility_AttributeEditor:
     appl.insert(utility, ctx, pwr_cNObjid, "");
     ((WAtt*)ctx)->close_cb = wtt_watt_close_cb;
@@ -2330,38 +2442,37 @@ void Wtt::register_utility(void* ctx, wb_eUtility utility)
   }
 }
 
-Wtt::Wtt(void* wt_parent_ctx, const char* wt_name, const char* iconname,
-    void* wt_wbctx, pwr_tVolumeId wt_volid, ldh_tVolume wt_volctx,
-    wnav_sStartMenu* root_menu, pwr_tStatus* status)
-    : WUtility(wb_eUtility_Wtt), parent_ctx(wt_parent_ctx),
-      wb_type(wb_eType_Volume), root_item(0), input_open(0), command_open(0),
-      wbctx(wt_wbctx), volctx(wt_volctx), volid(wt_volid), ldhses(0),
-      editmode(0), twowindows(0), confirm_open(0), select_volume(0),
-      select_attr(0), select_type(0), wnav_mapped(0), wnavnode_mapped(0),
-      utedctx(0), wpkg(0), close_cb(0), open_volume_cb(0),
-      open_project_volume_cb(0), time_to_exit_cb(0), mcp(0), disable_w2(0),
-      keep_input_open(0), first_edit_session(1)
+Wtt::Wtt(void* wt_parent_ctx, const char* wt_name, const char* iconname, void* wt_wbctx,
+         pwr_tVolumeId wt_volid, ldh_tVolume wt_volctx, wnav_sStartMenu* root_menu, pwr_tStatus* status)
+    : WUtility(wb_eUtility_Wtt), parent_ctx(wt_parent_ctx), wb_type(wb_eType_Volume), root_item(0),
+      input_open(0), command_open(0), wbctx(wt_wbctx), volctx(wt_volctx), volid(wt_volid), ldhses(0),
+      editmode(0), twowindows(0), confirm_open(0), select_volume(0), select_attr(0), select_type(0),
+      wnav_mapped(0), wnavnode_mapped(0), utedctx(0), wpkg(0), close_cb(0), open_volume_cb(0),
+      open_project_volume_cb(0), time_to_exit_cb(0), mcp(0), disable_w2(0), keep_input_open(0),
+      first_edit_session(1)
 {
   strcpy(name, wt_name);
   *status = 1;
 }
 
-Wtt::~Wtt()
-{
-}
+Wtt::~Wtt() {}
 
 int Wtt::find(pwr_tOid oid)
 {
   pwr_tStatus sts;
 
   sts = wnav->display_object(oid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     if (!wnav_mapped)
       set_twowindows(1, 0, 0);
     return WNAV__SUCCESS;
-  } else {
+  }
+  else
+  {
     sts = wnavnode->display_object(oid);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       if (!wnavnode_mapped)
         set_twowindows(1, 0, 0);
       return WNAV__SUCCESS;
@@ -2393,7 +2504,8 @@ int Wtt::get_popup_menu_items(pwr_sAttrRef aref, pwr_tCid cid)
 
   mcp->message_cb = message_cb;
 
-  if (cid != pwr_cNCid) {
+  if (cid != pwr_cNCid)
+  {
     // Popup in palette
 
     mcp->wnav = wnav;
@@ -2408,7 +2520,9 @@ int Wtt::get_popup_menu_items(pwr_sAttrRef aref, pwr_tCid cid)
     mcp->Pointed.Flags.m = 0;
     mcp->SelectedSet = ldh_eMenuSet_None;
     mcp->SelectedSession = ldhses;
-  } else {
+  }
+  else
+  {
     // Popup in wnav
     if (!focused_wnav)
       set_focus_default();
@@ -2441,18 +2555,18 @@ int Wtt::get_popup_menu_items(pwr_sAttrRef aref, pwr_tCid cid)
     else
       sel2_cnt = 0;
 
-    mcp->Selected
-        = (pwr_sAttrRef*)calloc(sel1_cnt + sel2_cnt + 1, sizeof(pwr_sAttrRef));
+    mcp->Selected = (pwr_sAttrRef*)calloc(sel1_cnt + sel2_cnt + 1, sizeof(pwr_sAttrRef));
     if (sel1_cnt)
       memcpy(mcp->Selected, sel1_list, sel1_cnt * sizeof(pwr_sAttrRef));
     if (sel2_cnt)
-      memcpy(
-          &mcp->Selected[sel1_cnt], sel2_list, sel2_cnt * sizeof(pwr_sAttrRef));
-    if (sel1_cnt) {
+      memcpy(&mcp->Selected[sel1_cnt], sel2_list, sel2_cnt * sizeof(pwr_sAttrRef));
+    if (sel1_cnt)
+    {
       free(sel1_list);
       free(sel1_is_attr);
     }
-    if (sel2_cnt) {
+    if (sel2_cnt)
+    {
       free(sel2_list);
       free(sel2_is_attr);
     }
@@ -2464,7 +2578,8 @@ int Wtt::get_popup_menu_items(pwr_sAttrRef aref, pwr_tCid cid)
       mcp->SelectedSet = ldh_eMenuSet_None;
     else if (mcp->SelectCount > 1)
       mcp->SelectedSet = ldh_eMenuSet_Many;
-    else {
+    else
+    {
       if (mcp->Selected[0].Flags.b.Object)
         mcp->SelectedSet = ldh_eMenuSet_Object;
       else if (mcp->Selected[0].Flags.b.ObjectAttr)
@@ -2475,25 +2590,31 @@ int Wtt::get_popup_menu_items(pwr_sAttrRef aref, pwr_tCid cid)
         mcp->SelectedSet = ldh_eMenuSet_Attribute;
     }
 
-    if (sel1_cnt + sel2_cnt == 0) {
+    if (sel1_cnt + sel2_cnt == 0)
+    {
       pwr_tCid cid;
 
       sts = palette->get_select(&cid);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         free((char*)mcp->Selected);
         mcp->Selected = (pwr_sAttrRef*)calloc(2, sizeof(pwr_sAttrRef));
         mcp->SelectedSet = ldh_eMenuSet_Class;
         mcp->Selected[0].Objid = cdh_ClassIdToObjid(cid);
         mcp->Selected[1].Objid = pwr_cNObjid;
         mcp->SelectCount = 1;
-      } else {
+      }
+      else
+      {
         // Get primary selection
         char str[200];
 
         sts = 0; // wnav->get_selection( str, sizeof(str));
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           sts = ldh_NameToAttrRef(mcp->PointedSession, str, &aref);
-          if (ODD(sts)) {
+          if (ODD(sts))
+          {
             free((char*)mcp->Selected);
             mcp->Selected = (pwr_sAttrRef*)calloc(2, sizeof(pwr_sAttrRef));
             mcp->Selected[0] = aref;
@@ -2514,14 +2635,14 @@ int Wtt::get_popup_menu_items(pwr_sAttrRef aref, pwr_tCid cid)
   }
 
   sts = ldh_GetMenu(ldhses, mcp);
-  if (EVEN(sts) || mcp->ItemList[0].Level == 0) {
+  if (EVEN(sts) || mcp->ItemList[0].Level == 0)
+  {
     return 0;
   }
   return 1;
 }
 
-WttApplListElem::WttApplListElem(
-    wb_eUtility al_type, void* al_ctx, pwr_tObjid al_objid, const char* al_name)
+WttApplListElem::WttApplListElem(wb_eUtility al_type, void* al_ctx, pwr_tObjid al_objid, const char* al_name)
     : type(al_type), ctx(al_ctx), objid(al_objid), next(NULL)
 {
   strcpy(name, al_name);
@@ -2531,8 +2652,10 @@ WttApplList::~WttApplList()
 {
   WttApplListElem* elem;
 
-  for (elem = root; elem; elem = elem->next) {
-    switch (elem->type) {
+  for (elem = root; elem; elem = elem->next)
+  {
+    switch (elem->type)
+    {
     case wb_eUtility_AttributeEditor:
       delete (WAtt*)elem->ctx;
       break;
@@ -2544,8 +2667,7 @@ WttApplList::~WttApplList()
   }
 }
 
-void WttApplList::insert(
-    wb_eUtility type, void* ctx, pwr_tObjid objid, const char* name)
+void WttApplList::insert(wb_eUtility type, void* ctx, pwr_tObjid objid, const char* name)
 {
   WttApplListElem* elem = new WttApplListElem(type, ctx, objid, name);
   elem->next = root;
@@ -2557,8 +2679,10 @@ void WttApplList::remove(void* ctx)
   WttApplListElem* elem;
   WttApplListElem* prev = NULL;
 
-  for (elem = root; elem; elem = elem->next) {
-    if (elem->ctx == ctx) {
+  for (elem = root; elem; elem = elem->next)
+  {
+    if (elem->ctx == ctx)
+    {
       if (elem == root)
         root = elem->next;
       else
@@ -2574,8 +2698,10 @@ int WttApplList::find(wb_eUtility type, pwr_tObjid objid, void** ctx)
 {
   WttApplListElem* elem;
 
-  for (elem = root; elem; elem = elem->next) {
-    if (elem->type == type && cdh_ObjidIsEqual(elem->objid, objid)) {
+  for (elem = root; elem; elem = elem->next)
+  {
+    if (elem->type == type && cdh_ObjidIsEqual(elem->objid, objid))
+    {
       *ctx = elem->ctx;
       return 1;
     }
@@ -2587,7 +2713,8 @@ int WttApplList::find(wb_eUtility type, void* ctx)
 {
   WttApplListElem* elem;
 
-  for (elem = root; elem; elem = elem->next) {
+  for (elem = root; elem; elem = elem->next)
+  {
     if (elem->type == type && elem->ctx == ctx)
       return 1;
   }
@@ -2598,8 +2725,10 @@ void WttApplList::set_editmode(int editmode, ldh_tSesContext ldhses)
 {
   WttApplListElem *elem, *next_elem;
 
-  for (elem = root; elem;) {
-    switch (elem->type) {
+  for (elem = root; elem;)
+  {
+    switch (elem->type)
+    {
     case wb_eUtility_AttributeEditor:
       // Delete the attribute editor
       delete (WAtt*)elem->ctx;
@@ -2629,8 +2758,10 @@ int WttApplList::find(wb_eUtility type, const char* name, void** ctx)
 {
   WttApplListElem* elem;
 
-  for (elem = root; elem; elem = elem->next) {
-    if (elem->type == type && streq(name, elem->name)) {
+  for (elem = root; elem; elem = elem->next)
+  {
+    if (elem->type == type && streq(name, elem->name))
+    {
       *ctx = elem->ctx;
       return 1;
     }

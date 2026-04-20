@@ -48,11 +48,9 @@
 #include "xtt_xnav.h"
 #include "xtt_fast.h"
 
-XttFast::XttFast(void* parent_ctx, char* name, pwr_sAttrRef* fast_arp,
-    int xn_color_theme, int* sts)
-    : xnav(parent_ctx), fast_cnt(0), gcd(0), curve(0), timerid(0), close_cb(0),
-      help_cb(0), first_scan(1), axis_configured(false),
-      color_theme(xn_color_theme)
+XttFast::XttFast(void* parent_ctx, char* name, pwr_sAttrRef* fast_arp, int xn_color_theme, int* sts)
+    : xnav(parent_ctx), fast_cnt(0), gcd(0), curve(0), timerid(0), close_cb(0), help_cb(0), first_scan(1),
+      axis_configured(false), color_theme(xn_color_theme)
 {
   pwr_sAttrRef aref = pwr_cNAttrRef;
   pwr_tAName fast_name;
@@ -65,7 +63,8 @@ XttFast::XttFast(void* parent_ctx, char* name, pwr_sAttrRef* fast_arp,
   // Get current status of the fast objects
   i = 0;
   aref = *fast_arp;
-  if (cdh_ObjidIsNull(aref.Objid)) {
+  if (cdh_ObjidIsNull(aref.Objid))
+  {
     *sts = XNAV__FASTCONFIG;
     return;
   }
@@ -85,7 +84,8 @@ XttFast::XttFast(void* parent_ctx, char* name, pwr_sAttrRef* fast_arp,
   strcat(attr_name, ".TriggTime");
   gdh_NameToAttrref(pwr_cNObjid, attr_name, &trigg_time_attr);
 
-  if (fast_function & fast_mFunction_BeforeTrigg) {
+  if (fast_function & fast_mFunction_BeforeTrigg)
+  {
     strcpy(attr_name, fast_name);
     strcat(attr_name, ".TriggIndex");
     gdh_NameToAttrref(pwr_cNObjid, attr_name, &trigg_index_attr);
@@ -107,8 +107,10 @@ XttFast::XttFast(void* parent_ctx, char* name, pwr_sAttrRef* fast_arp,
   memcpy(&time_buff, &fp.TimeBuffer, sizeof(time_buff));
 
   fast_cnt = 0;
-  for (i = 0; i < FAST_CURVES; i++) {
-    if (fp.CurveValid[i]) {
+  for (i = 0; i < FAST_CURVES; i++)
+  {
+    if (fp.CurveValid[i])
+    {
       gcd->y_data[fast_cnt] = (double*)calloc(1, 8 * max_points);
       gcd->y_axis_type[fast_cnt] = curve_eAxis_y;
       memcpy(&buff[fast_cnt], &fp.Buffers[i], sizeof(buff[0]));
@@ -116,8 +118,7 @@ XttFast::XttFast(void* parent_ctx, char* name, pwr_sAttrRef* fast_arp,
       fast_idx[i] = fast_cnt;
       curve_idx[fast_cnt] = i;
 
-      *sts = gdh_AttrrefToName(
-          &fp.Attribute[i], attr_name, sizeof(attr_name), cdh_mNName);
+      *sts = gdh_AttrrefToName(&fp.Attribute[i], attr_name, sizeof(attr_name), cdh_mNName);
       if (EVEN(*sts))
         continue;
       strcpy(gcd->y_name[fast_cnt], attr_name);
@@ -125,7 +126,8 @@ XttFast::XttFast(void* parent_ctx, char* name, pwr_sAttrRef* fast_arp,
     }
   }
 
-  if (!fast_cnt) {
+  if (!fast_cnt)
+  {
     *sts = XNAV__NOVALIDCURVE;
     free(gcd);
     gcd = 0;
@@ -135,13 +137,14 @@ XttFast::XttFast(void* parent_ctx, char* name, pwr_sAttrRef* fast_arp,
   // Subscribe to object
   strcpy(attr_name, fast_name);
   strcat(attr_name, ".New");
-  *sts = gdh_RefObjectInfo(
-      attr_name, (pwr_tAddress*)&new_p, &new_subid, sizeof(pwr_tBoolean));
+  *sts = gdh_RefObjectInfo(attr_name, (pwr_tAddress*)&new_p, &new_subid, sizeof(pwr_tBoolean));
   if (EVEN(*sts))
     return;
 
-  for (i = 0; i < fast_cnt; i++) {
-    switch (type[i]) {
+  for (i = 0; i < fast_cnt; i++)
+  {
+    switch (type[i])
+    {
     case pwr_eType_Float32:
     case pwr_eType_Int32:
     case pwr_eType_UInt32:
@@ -170,17 +173,18 @@ XttFast::XttFast(void* parent_ctx, char* name, pwr_sAttrRef* fast_arp,
   gcd->cols = fast_cnt;
 
   axis_configured = true;
-  for (i = 0; i < FAST_CURVES; i++) {
-    if (fp.CurveValid[i]) {
+  for (i = 0; i < FAST_CURVES; i++)
+  {
+    if (fp.CurveValid[i])
+    {
       j = fast_idx[i];
-      if (!feqf(fp.YMinValue[i], fp.YMaxValue[i])) {
-        gcd->scale(gcd->y_axis_type[j], gcd->y_value_type[j], fp.YMinValue[i],
-            fp.YMaxValue[i], &gcd->y_min_value_axis[j],
-            &gcd->y_max_value_axis[j], &gcd->y_trend_lines[j],
-            &gcd->y_axis_lines[j], &gcd->y_axis_linelongq[j],
-            &gcd->y_axis_valueq[j], gcd->y_format[j], &gcd->y_axis_width[j], 1,
-	    1, 1);
-	gcd->y_axis_fix_scale[i] = 1;
+      if (!feqf(fp.YMinValue[i], fp.YMaxValue[i]))
+      {
+        gcd->scale(gcd->y_axis_type[j], gcd->y_value_type[j], fp.YMinValue[i], fp.YMaxValue[i],
+                   &gcd->y_min_value_axis[j], &gcd->y_max_value_axis[j], &gcd->y_trend_lines[j],
+                   &gcd->y_axis_lines[j], &gcd->y_axis_linelongq[j], &gcd->y_axis_valueq[j], gcd->y_format[j],
+                   &gcd->y_axis_width[j], 1, 1, 1);
+        gcd->y_axis_fix_scale[i] = 1;
       }
       else
         axis_configured = false;
@@ -202,28 +206,21 @@ XttFast::XttFast(void* parent_ctx, char* name, pwr_sAttrRef* fast_arp,
   //	(XtTimerCallbackProc)fast_scan, this);
 }
 
-XttFast::XttFast(void* parent_ctx, const char* name, char* filename,
-    int xn_color_theme, int* sts)
-    : xnav(parent_ctx), fast_cnt(0), timerid(0), close_cb(0), help_cb(0),
-      first_scan(1), axis_configured(false), color_theme(xn_color_theme)
+XttFast::XttFast(void* parent_ctx, const char* name, char* filename, int xn_color_theme, int* sts)
+    : xnav(parent_ctx), fast_cnt(0), timerid(0), close_cb(0), help_cb(0), first_scan(1),
+      axis_configured(false), color_theme(xn_color_theme)
 
 {
   *sts = read_export(filename);
 }
 
-XttFast::~XttFast()
-{
-}
+XttFast::~XttFast() {}
 
-void XttFast::pop()
-{
-  curve->pop();
-}
+void XttFast::pop() { curve->pop(); }
 
 void XttFast::setup()
 {
-  curve->setup(
-      curve_mEnable_Export | curve_mEnable_CurveType | curve_mEnable_FillCurve);
+  curve->setup(curve_mEnable_Export | curve_mEnable_CurveType | curve_mEnable_FillCurve);
 }
 
 void XttFast::fast_close_cb(void* ctx)
@@ -252,32 +249,31 @@ void XttFast::fast_scan(void* data)
   int trigg_index, first_index = 0, last_index = 0;
 
   // Check if any new value
-  if ((*fast->new_p && !fast->old_new) || fast->first_scan) {
+  if ((*fast->new_p && !fast->old_new) || fast->first_scan)
+  {
     // Update curves
-    if (fast->fast_function & fast_mFunction_BeforeTrigg) {
+    if (fast->fast_function & fast_mFunction_BeforeTrigg)
+    {
       // Get first, last and trigg index
-      sts = gdh_GetObjectInfoAttrref(
-          &fast->trigg_index_attr, &trigg_index, sizeof(trigg_index));
+      sts = gdh_GetObjectInfoAttrref(&fast->trigg_index_attr, &trigg_index, sizeof(trigg_index));
       if (EVEN(sts))
         return;
-      sts = gdh_GetObjectInfoAttrref(
-          &fast->first_index_attr, &first_index, sizeof(first_index));
+      sts = gdh_GetObjectInfoAttrref(&fast->first_index_attr, &first_index, sizeof(first_index));
       if (EVEN(sts))
         return;
-      sts = gdh_GetObjectInfoAttrref(
-          &fast->last_index_attr, &last_index, sizeof(last_index));
+      sts = gdh_GetObjectInfoAttrref(&fast->last_index_attr, &last_index, sizeof(last_index));
       if (EVEN(sts))
         return;
 
       // Read into temporary buffer
       pwr_tFloat32* tmp = (pwr_tFloat32*)calloc(fast->max_points, 4);
-      sts = gdh_GetObjectInfoAttrref(
-          &fast->time_buff, tmp, fast->max_points * 4);
+      sts = gdh_GetObjectInfoAttrref(&fast->time_buff, tmp, fast->max_points * 4);
       if (EVEN(sts))
         return;
 
       k = first_index;
-      for (j = 0; j < fast->max_points; j++) {
+      for (j = 0; j < fast->max_points; j++)
+      {
         if (k >= fast->max_points)
           k = 0;
         fast->gcd->x_data[0][j] = tmp[k] - tmp[trigg_index];
@@ -286,14 +282,16 @@ void XttFast::fast_scan(void* data)
         k++;
       }
       // If to few points, fill with dummy data
-      for (; j < fast->max_points; j++) {
+      for (; j < fast->max_points; j++)
+      {
         fast->gcd->x_data[0][j] = tmp[k] - tmp[trigg_index];
       }
       free(tmp);
-    } else {
+    }
+    else
+    {
       pwr_tFloat32* tmp = (pwr_tFloat32*)calloc(fast->max_points, 4);
-      sts = gdh_GetObjectInfoAttrref(
-          &fast->time_buff, tmp, fast->max_points * 4);
+      sts = gdh_GetObjectInfoAttrref(&fast->time_buff, tmp, fast->max_points * 4);
       if (EVEN(sts))
         return;
 
@@ -301,20 +299,23 @@ void XttFast::fast_scan(void* data)
         fast->gcd->x_data[0][j] = tmp[j];
       free(tmp);
     }
-    for (i = 0; i < fast->fast_cnt; i++) {
-      if (fast->fast_function & fast_mFunction_BeforeTrigg) {
+    for (i = 0; i < fast->fast_cnt; i++)
+    {
+      if (fast->fast_function & fast_mFunction_BeforeTrigg)
+      {
         // Read into temporary buffer
         void* tmp = calloc(fast->max_points, fast->element_size[i]);
-        sts = gdh_GetObjectInfoAttrref(
-            &fast->buff[i], tmp, fast->max_points * fast->element_size[i]);
+        sts = gdh_GetObjectInfoAttrref(&fast->buff[i], tmp, fast->max_points * fast->element_size[i]);
         if (EVEN(sts))
           return;
 
         k = first_index;
-        for (j = 0; j < fast->max_points; j++) {
+        for (j = 0; j < fast->max_points; j++)
+        {
           if (k >= fast->max_points)
             k = 0;
-          switch (fast->type[i]) {
+          switch (fast->type[i])
+          {
           case pwr_eType_Float32:
             fast->gcd->y_data[i][j] = ((pwr_tFloat32*)tmp)[k];
             break;
@@ -355,8 +356,10 @@ void XttFast::fast_scan(void* data)
           k++;
         }
         // If to few points, fill with 0
-        for (; j < fast->max_points; j++) {
-          switch (fast->type[i]) {
+        for (; j < fast->max_points; j++)
+        {
+          switch (fast->type[i])
+          {
           case pwr_eType_Float32:
             fast->gcd->y_data[i][j] = ((pwr_tFloat32*)tmp)[k];
             break;
@@ -394,15 +397,18 @@ void XttFast::fast_scan(void* data)
           }
         }
         free(tmp);
-      } else {
+      }
+      else
+      {
         void* tmp = calloc(fast->max_points, fast->element_size[i]);
-        sts = gdh_GetObjectInfoAttrref(
-            &fast->buff[i], tmp, fast->max_points * fast->element_size[i]);
+        sts = gdh_GetObjectInfoAttrref(&fast->buff[i], tmp, fast->max_points * fast->element_size[i]);
         if (EVEN(sts))
           return;
 
-        for (j = 0; j < fast->max_points; j++) {
-          switch (fast->type[i]) {
+        for (j = 0; j < fast->max_points; j++)
+        {
+          switch (fast->type[i])
+          {
           case pwr_eType_Float32:
             fast->gcd->y_data[i][j] = ((pwr_tFloat32*)tmp)[j];
             break;
@@ -445,31 +451,34 @@ void XttFast::fast_scan(void* data)
 
     // Get trigg time
     pwr_tTime trigg_time;
-    sts = gdh_GetObjectInfoAttrref(
-        &fast->trigg_time_attr, &trigg_time, sizeof(trigg_time));
+    sts = gdh_GetObjectInfoAttrref(&fast->trigg_time_attr, &trigg_time, sizeof(trigg_time));
     if (EVEN(sts))
       return;
 
-    if (!fast->axis_configured) {
+    if (!fast->axis_configured)
+    {
       fast->gcd->get_borders();
       fast->gcd->get_default_axis();
-      if (!fast->first_scan) {
+      if (!fast->first_scan)
+      {
         fast->curve->configure_curves();
         fast->curve->configure_axes();
         fast->curve->set_time(trigg_time);
       }
-    } else {
+    }
+    else
+    {
       double axis_width;
 
       fast->gcd->get_borders();
       // fast->gcd->get_default_axis();
-      fast->gcd->scale(fast->gcd->x_axis_type[0], fast->gcd->x_value_type[0],
-          fast->gcd->x_min_value[0], fast->gcd->x_max_value[0],
-          &fast->gcd->x_min_value_axis[0], &fast->gcd->x_max_value_axis[0],
-          &fast->gcd->x_trend_lines[0], &fast->gcd->x_axis_lines[0],
-          &fast->gcd->x_axis_linelongq[0], &fast->gcd->x_axis_valueq[0],
-	  fast->gcd->x_format[0], &axis_width, 1, 1, 0);
-      if (!fast->first_scan) {
+      fast->gcd->scale(fast->gcd->x_axis_type[0], fast->gcd->x_value_type[0], fast->gcd->x_min_value[0],
+                       fast->gcd->x_max_value[0], &fast->gcd->x_min_value_axis[0],
+                       &fast->gcd->x_max_value_axis[0], &fast->gcd->x_trend_lines[0],
+                       &fast->gcd->x_axis_lines[0], &fast->gcd->x_axis_linelongq[0],
+                       &fast->gcd->x_axis_valueq[0], fast->gcd->x_format[0], &axis_width, 1, 1, 0);
+      if (!fast->first_scan)
+      {
         fast->curve->configure_curves();
         // fast->curve->configure_axes();
         fast->curve->set_time(trigg_time);
@@ -483,8 +492,7 @@ void XttFast::fast_scan(void* data)
     fast->timerid->add(1000, fast_scan, fast);
 }
 
-int XttFast::fast_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to, int rows,
-    int idx, char* filename)
+int XttFast::fast_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to, int rows, int idx, char* filename)
 {
   XttFast* fast = (XttFast*)ctx;
   pwr_tFileName fname;
@@ -494,12 +502,12 @@ int XttFast::fast_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to, int rows,
   // Replace $date with date
   strncpy(fname, filename, sizeof(fname));
   char* s1 = strstr(fname, "$date");
-  if (s1) {
+  if (s1)
+  {
     char timstr[40];
     pwr_tFileName str;
 
-    sts = time_AtoAscii(
-        0, time_eFormat_FileDateAndTime, timstr, sizeof(timstr));
+    sts = time_AtoAscii(0, time_eFormat_FileDateAndTime, timstr, sizeof(timstr));
 
     strncpy(str, s1 + strlen("$date"), sizeof(str));
     *s1 = 0;
@@ -509,7 +517,8 @@ int XttFast::fast_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to, int rows,
 
   dcli_translate_filename(fname, fname);
 
-  if (idx == -1) {
+  if (idx == -1)
+  {
     // Export all attributes
     fp = fopen(fname, "w");
     if (!fp)
@@ -520,15 +529,19 @@ int XttFast::fast_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to, int rows,
     for (int i = 0; i < fast->fast_cnt; i++)
       fprintf(fp, "# Attribute %s\n", fast->gcd->y_name[i]);
 
-    for (int j = 0; j < fast->max_points; j++) {
+    for (int j = 0; j < fast->max_points; j++)
+    {
       fprintf(fp, "%f ", fast->gcd->x_data[0][j]);
-      for (int i = 0; i < fast->fast_cnt; i++) {
+      for (int i = 0; i < fast->fast_cnt; i++)
+      {
         fprintf(fp, "%f ", fast->gcd->y_data[i][j]);
       }
       fprintf(fp, "\n");
     }
     fclose(fp);
-  } else {
+  }
+  else
+  {
     fp = fopen(fname, "w");
     if (!fp)
       return XNAV__NOFILE;
@@ -537,7 +550,8 @@ int XttFast::fast_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to, int rows,
     fprintf(fp, "# Rows %d\n", fast->max_points);
     fprintf(fp, "# Attribute %s\n", fast->gcd->y_name[idx]);
 
-    for (int j = 0; j < fast->max_points; j++) {
+    for (int j = 0; j < fast->max_points; j++)
+    {
       fprintf(fp, "%f ", fast->gcd->x_data[0][j]);
       fprintf(fp, "%f ", fast->gcd->y_data[idx][j]);
       fprintf(fp, "\n");
@@ -566,34 +580,43 @@ int XttFast::read_export(char* filename)
 
   gcd = new GeCurveData(curve_eDataType_DsTrend);
 
-  while (1) {
+  while (1)
+  {
     sts = dcli_read_line(line, sizeof(line), fp);
     if (!sts)
       break;
 
-    if (line[0] == '#') {
-      if (str_StartsWith(&line[2], "Attribute")) {
+    if (line[0] == '#')
+    {
+      if (str_StartsWith(&line[2], "Attribute"))
+      {
         // New attribute
         idx++;
         strncpy(gcd->y_name[idx], &line[12], sizeof(gcd->y_name[idx]));
         gcd->y_data[idx] = (double*)calloc(1, 8 * max_points);
         gcd->y_axis_type[idx] = curve_eAxis_y;
-      } else if (str_StartsWith(&line[2], "Rows")) {
+      }
+      else if (str_StartsWith(&line[2], "Rows"))
+      {
         sscanf(&line[7], "%d", &max_points);
         gcd->rows[0] = max_points;
         gcd->x_data[0] = (double*)calloc(1, 8 * max_points);
-      } else if (str_StartsWith(&line[2], "Columns")) {
+      }
+      else if (str_StartsWith(&line[2], "Columns"))
+      {
         sscanf(&line[10], "%d", &fast_cnt);
       }
-    } else {
+    }
+    else
+    {
       if (idx < 0 || fast_cnt != idx + 1)
         continue;
 
       if (rowcnt >= max_points)
         continue;
 
-      int nr = dcli_parse(line, " 	", "", (char*)line_part,
-          sizeof(line_part) / sizeof(line_part[0]), sizeof(line_part[0]), 0);
+      int nr = dcli_parse(line, " 	", "", (char*)line_part, sizeof(line_part) / sizeof(line_part[0]),
+                          sizeof(line_part[0]), 0);
       if (nr < fast_cnt + 1)
         return 0;
 

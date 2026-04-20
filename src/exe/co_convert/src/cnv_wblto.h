@@ -41,15 +41,17 @@
 
 class CnvReadWbl;
 
-typedef enum {
+typedef enum
+{
   Cnv_eWblToType_Html,
   Cnv_eWblToType_H,
   Cnv_eWblToType_Xtthelp,
   Cnv_eWblToType_Ps
 } Cnv_eWblToType;
 
-class CnvWblTo {
-  public:
+class CnvWblTo
+{
+public:
   // CnvWblTo() {}
   virtual ~CnvWblTo();
 

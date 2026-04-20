@@ -44,11 +44,11 @@
 #include "../src/xtt_lognav.h"
 
 //! The navigation area of the attribute editor.
-class LogNavGtk : public LogNav {
+class LogNavGtk : public LogNav
+{
 public:
-  LogNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-      LogNav_hier *tree, GtkWidget** w,
-      pwr_tStatus* status);
+  LogNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, LogNav_hier* tree, GtkWidget** w,
+            pwr_tStatus* status);
   ~LogNavGtk();
 
   GtkWidget* parent_wid;

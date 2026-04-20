@@ -35,7 +35,7 @@
  */
 
 /* rt_ndc.c -- Network data conversion.
-*/
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,9 +43,11 @@
 
 /* Vax f-float.  */
 
-union vax_f {
+union vax_f
+{
   int i;
-  struct {
+  struct
+  {
     unsigned int f22_16 : 7;
     unsigned int exp : 8;
     unsigned int sign : 1;
@@ -55,14 +57,17 @@ union vax_f {
 
 /* IEEE single.  */
 
-union i3e_s {
+union i3e_s
+{
   int i;
-  struct {
+  struct
+  {
     unsigned int f22_0 : 23;
     unsigned int exp : 8;
     unsigned int sign : 1;
   } b;
-  struct {
+  struct
+  {
     unsigned int f22_7 : 16;
     unsigned int f6_0 : 7;
     unsigned int exp : 8;
@@ -72,9 +77,11 @@ union i3e_s {
 
 /* Vax f-float.  */
 
-union vax_f_be {
+union vax_f_be
+{
   int i;
-  struct {
+  struct
+  {
     unsigned int f15_0 : 16;
     unsigned int sign : 1;
     unsigned int exp : 8;
@@ -84,14 +91,17 @@ union vax_f_be {
 
 /* IEEE single.  */
 
-union i3e_s_be {
+union i3e_s_be
+{
   int i;
-  struct {
+  struct
+  {
     unsigned int sign : 1;
     unsigned int exp : 8;
     unsigned int f22_0 : 23;
   } b;
-  struct {
+  struct
+  {
     unsigned int sign : 1;
     unsigned int exp : 8;
     unsigned int f6_0 : 7;
@@ -110,8 +120,7 @@ union i3e_s_be {
 #define IBYTE2(s) (((*(int*)s) << 0x08) & 0x00ff0000)
 #define IBYTE3(s) (((*(int*)s) << 0x18) & 0xff000000)
 
-#define CONVERT_INT(t, s)                                                      \
-  (*(int*)t = (IBYTE0(s) | IBYTE1(s) | IBYTE2(s) | IBYTE3(s)))
+#define CONVERT_INT(t, s) (*(int*)t = (IBYTE0(s) | IBYTE1(s) | IBYTE2(s) | IBYTE3(s)))
 
 #define SBYTE0(s) (((*(short*)s) >> 0x08) & 0x00ff)
 #define SBYTE1(s) (((*(short*)s) << 0x08) & 0xff00)
@@ -127,7 +136,8 @@ static char* print_bin(int* i)
 
   buff[0] = '\0';
 
-  for (b = 0; b < 32; b++) {
+  for (b = 0; b < 32; b++)
+  {
     strcat(buff, ((*i & (1 << b)) ? "1" : "0"));
     if ((b + 1) % 8 == 0)
       strcat(buff, " ");
@@ -144,16 +154,20 @@ static int encode_sfloat(int count, char* tp, char* sp, int* size)
   union vax_f* vp;
   union i3e_s i3e;
 
-  for (i = count; i > 0; i--) {
+  for (i = count; i > 0; i--)
+  {
     vp = ((union vax_f*)sp);
 
-    if (vp->b.f22_16 == 0x7f && vp->b.exp == 0xff
-        && vp->b.f15_0 == 0xffff) { /* High value.  */
+    if (vp->b.f22_16 == 0x7f && vp->b.exp == 0xff && vp->b.f15_0 == 0xffff)
+    { /* High value.  */
       i3e.i = 0, i3e.b.exp = 0xff;
-    } else if (vp->b.f22_16 == 0 && vp->b.exp == 0
-        && vp->b.f15_0 == 0) { /* Low value.  */
+    }
+    else if (vp->b.f22_16 == 0 && vp->b.exp == 0 && vp->b.f15_0 == 0)
+    { /* Low value.  */
       i3e.i = 0;
-    } else {
+    }
+    else
+    {
       i3e.b.exp = vp->b.exp - VAX_F_BIAS + I3E_S_BIAS;
       i3e.v.f22_7 = vp->b.f15_0;
       i3e.v.f6_0 = vp->b.f22_16;
@@ -178,17 +192,21 @@ static int decode_vaxfloat(int count, char* tp, char* sp, int* size)
   union vax_f_be v;
   union i3e_s_be* i3ep;
 
-  for (i = count; i > 0; i--) {
+  for (i = count; i > 0; i--)
+  {
     i3ep = ((union i3e_s_be*)tp);
     CONVERT_INT(&v, sp);
 
-    if (v.b.f22_16 == 0x7f && v.b.exp == 0xff
-        && v.b.f15_0 == 0xffff) { /* High value.  */
+    if (v.b.f22_16 == 0x7f && v.b.exp == 0xff && v.b.f15_0 == 0xffff)
+    { /* High value.  */
       i3ep->i = 0, i3ep->b.exp = 0xff;
-    } else if (v.b.f22_16 == 0 && v.b.exp == 0
-        && v.b.f15_0 == 0) { /* Low value.  */
+    }
+    else if (v.b.f22_16 == 0 && v.b.exp == 0 && v.b.f15_0 == 0)
+    { /* Low value.  */
       i3ep->i = 0;
-    } else {
+    }
+    else
+    {
       i3ep->b.exp = v.b.exp - VAX_F_BIAS + I3E_S_BIAS;
       i3ep->v.f22_7 = v.b.f15_0;
       i3ep->v.f6_0 = v.b.f22_16;
@@ -212,17 +230,23 @@ static int decode_sfloat(int count, char* tp, char* sp, int* size)
   union vax_f* vp;
   union i3e_s i3e;
 
-  for (i = count; i > 0; i--) {
+  for (i = count; i > 0; i--)
+  {
     vp = ((union vax_f*)tp);
     CONVERT_INT(&i3e.i, sp);
 
-    if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0xff) { /* High value.  */
+    if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0xff)
+    { /* High value.  */
       vp->b.f22_16 = 0x7f;
       vp->b.exp = 0xff;
       vp->b.f15_0 = 0xffff;
-    } else if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0x00) { /* Low value.  */
+    }
+    else if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0x00)
+    { /* Low value.  */
       vp->i = 0;
-    } else {
+    }
+    else
+    {
       vp->b.exp = i3e.b.exp - I3E_S_BIAS + VAX_F_BIAS;
       vp->b.f22_16 = i3e.v.f6_0;
       vp->b.f15_0 = i3e.v.f22_7;
@@ -238,7 +262,8 @@ static int decode_sfloat(int count, char* tp, char* sp, int* size)
   return 1;
 }
 
-typedef struct {
+typedef struct
+{
   int b_int_v[10];
   float a_float_v[100];
   int a_int;
@@ -270,24 +295,15 @@ main()
   av[7] = 1955071.5;
   av[8] = 19550715.;
 
-  printf("a1 ..............:% 22.10f %12e %s\n", av[0], av[0],
-      print_bin((int*)&av[0]));
-  printf("a2 ..............:% 22.10f %12e %s\n", av[1], av[1],
-      print_bin((int*)&av[1]));
-  printf("a3 ..............:% 22.10f %12e %s\n", av[2], av[2],
-      print_bin((int*)&av[2]));
-  printf("a4 ..............:% 22.10f %12e %s\n", av[3], av[3],
-      print_bin((int*)&av[3]));
-  printf("a5 ..............:% 22.10f %12e %s\n", av[4], av[4],
-      print_bin((int*)&av[4]));
-  printf("a6 ..............:% 22.10f %12e %s\n", av[5], av[5],
-      print_bin((int*)&av[5]));
-  printf("a7 ..............:% 22.10f %12e %s\n", av[6], av[6],
-      print_bin((int*)&av[6]));
-  printf("a8 ..............:% 22.10f %12e %s\n", av[7], av[7],
-      print_bin((int*)&av[7]));
-  printf("a9 ..............:% 22.10f %12e %s\n", av[8], av[8],
-      print_bin((int*)&av[8]));
+  printf("a1 ..............:% 22.10f %12e %s\n", av[0], av[0], print_bin((int*)&av[0]));
+  printf("a2 ..............:% 22.10f %12e %s\n", av[1], av[1], print_bin((int*)&av[1]));
+  printf("a3 ..............:% 22.10f %12e %s\n", av[2], av[2], print_bin((int*)&av[2]));
+  printf("a4 ..............:% 22.10f %12e %s\n", av[3], av[3], print_bin((int*)&av[3]));
+  printf("a5 ..............:% 22.10f %12e %s\n", av[4], av[4], print_bin((int*)&av[4]));
+  printf("a6 ..............:% 22.10f %12e %s\n", av[5], av[5], print_bin((int*)&av[5]));
+  printf("a7 ..............:% 22.10f %12e %s\n", av[6], av[6], print_bin((int*)&av[6]));
+  printf("a8 ..............:% 22.10f %12e %s\n", av[7], av[7], print_bin((int*)&av[7]));
+  printf("a9 ..............:% 22.10f %12e %s\n", av[8], av[8], print_bin((int*)&av[8]));
 
   fp = fopen("/view/pwr_x2_3_1/vobs/pwr_src/src/lib/rt/tst/test_vax.dat", "rb");
   if (fp == NULL)
@@ -296,47 +312,29 @@ main()
   size = fread(av, sizeof(av), 1, fp);
   printf("\nRead %d objects\n\n", size);
 
-  printf("a1 ..............:% 22.10f %12e %s\n", av[0], av[0],
-      print_bin((int*)&av[0]));
-  printf("a2 ..............:% 22.10f %12e %s\n", av[1], av[1],
-      print_bin((int*)&av[1]));
-  printf("a3 ..............:% 22.10f %12e %s\n", av[2], av[2],
-      print_bin((int*)&av[2]));
-  printf("a4 ..............:% 22.10f %12e %s\n", av[3], av[3],
-      print_bin((int*)&av[3]));
-  printf("a5 ..............:% 22.10f %12e %s\n", av[4], av[4],
-      print_bin((int*)&av[4]));
-  printf("a6 ..............:% 22.10f %12e %s\n", av[5], av[5],
-      print_bin((int*)&av[5]));
-  printf("a7 ..............:% 22.10f %12e %s\n", av[6], av[6],
-      print_bin((int*)&av[6]));
-  printf("a8 ..............:% 22.10f %12e %s\n", av[7], av[7],
-      print_bin((int*)&av[7]));
-  printf("a9 ..............:% 22.10f %12e %s\n", av[8], av[8],
-      print_bin((int*)&av[8]));
+  printf("a1 ..............:% 22.10f %12e %s\n", av[0], av[0], print_bin((int*)&av[0]));
+  printf("a2 ..............:% 22.10f %12e %s\n", av[1], av[1], print_bin((int*)&av[1]));
+  printf("a3 ..............:% 22.10f %12e %s\n", av[2], av[2], print_bin((int*)&av[2]));
+  printf("a4 ..............:% 22.10f %12e %s\n", av[3], av[3], print_bin((int*)&av[3]));
+  printf("a5 ..............:% 22.10f %12e %s\n", av[4], av[4], print_bin((int*)&av[4]));
+  printf("a6 ..............:% 22.10f %12e %s\n", av[5], av[5], print_bin((int*)&av[5]));
+  printf("a7 ..............:% 22.10f %12e %s\n", av[6], av[6], print_bin((int*)&av[6]));
+  printf("a8 ..............:% 22.10f %12e %s\n", av[7], av[7], print_bin((int*)&av[7]));
+  printf("a9 ..............:% 22.10f %12e %s\n", av[8], av[8], print_bin((int*)&av[8]));
 
   size = 9 * sizeof(float);
   decode_vaxfloat(9, (char*)bv, (char*)&av, &size);
   printf("\ndeocde\n\n", size);
 
-  printf("a1 ..............:% 22.10f %12e %s\n", bv[0], bv[0],
-      print_bin((int*)&bv[0]));
-  printf("a2 ..............:% 22.10f %12e %s\n", bv[1], bv[1],
-      print_bin((int*)&bv[1]));
-  printf("a3 ..............:% 22.10f %12e %s\n", bv[2], bv[2],
-      print_bin((int*)&bv[2]));
-  printf("a4 ..............:% 22.10f %12e %s\n", bv[3], bv[3],
-      print_bin((int*)&bv[3]));
-  printf("a5 ..............:% 22.10f %12e %s\n", bv[4], bv[4],
-      print_bin((int*)&bv[4]));
-  printf("a6 ..............:% 22.10f %12e %s\n", bv[5], bv[5],
-      print_bin((int*)&bv[5]));
-  printf("a7 ..............:% 22.10f %12e %s\n", bv[6], bv[6],
-      print_bin((int*)&bv[6]));
-  printf("a8 ..............:% 22.10f %12e %s\n", bv[7], bv[7],
-      print_bin((int*)&bv[7]));
-  printf("a9 ..............:% 22.10f %12e %s\n", bv[8], bv[8],
-      print_bin((int*)&bv[8]));
+  printf("a1 ..............:% 22.10f %12e %s\n", bv[0], bv[0], print_bin((int*)&bv[0]));
+  printf("a2 ..............:% 22.10f %12e %s\n", bv[1], bv[1], print_bin((int*)&bv[1]));
+  printf("a3 ..............:% 22.10f %12e %s\n", bv[2], bv[2], print_bin((int*)&bv[2]));
+  printf("a4 ..............:% 22.10f %12e %s\n", bv[3], bv[3], print_bin((int*)&bv[3]));
+  printf("a5 ..............:% 22.10f %12e %s\n", bv[4], bv[4], print_bin((int*)&bv[4]));
+  printf("a6 ..............:% 22.10f %12e %s\n", bv[5], bv[5], print_bin((int*)&bv[5]));
+  printf("a7 ..............:% 22.10f %12e %s\n", bv[6], bv[6], print_bin((int*)&bv[6]));
+  printf("a8 ..............:% 22.10f %12e %s\n", bv[7], bv[7], print_bin((int*)&bv[7]));
+  printf("a9 ..............:% 22.10f %12e %s\n", bv[8], bv[8], print_bin((int*)&bv[8]));
 
   size = fread(&src, sizeof(src), 1, fp);
   printf("\nRead %d objects\n\n", size);
@@ -360,31 +358,32 @@ main()
   size = sizeof(trg.a_float);
   decode_vaxfloat(1, (char*)&trg.a_float, (char*)&src.a_float, &size);
 
-  for (i = 0; i < 10; i++) {
-    printf("b_int_v[%3.3d] ..:% 12.12d %s\n", i, trg.b_int_v[i],
-        print_bin(&trg.b_int_v[i]));
+  for (i = 0; i < 10; i++)
+  {
+    printf("b_int_v[%3.3d] ..:% 12.12d %s\n", i, trg.b_int_v[i], print_bin(&trg.b_int_v[i]));
   }
 
-  for (i = 0; i < 100; i++) {
-    printf("a_float_v[%3.3d] :% 22.10f %15e %s\n", i, trg.a_float_v[i],
-        trg.a_float_v[i], print_bin((int*)&trg.a_float_v[i]));
+  for (i = 0; i < 100; i++)
+  {
+    printf("a_float_v[%3.3d] :% 22.10f %15e %s\n", i, trg.a_float_v[i], trg.a_float_v[i],
+           print_bin((int*)&trg.a_float_v[i]));
   }
 
   printf("a_int .........:% 12.12d %s\n", trg.a_int, print_bin(&trg.a_int));
 
-  for (i = 0; i < 5; i++) {
+  for (i = 0; i < 5; i++)
+  {
     printf("a_short_v[%3.3d] :% 12.12d\n", i, trg.a_short_v[i]);
   }
 
-  for (i = 0; i < 5; i++) {
-    printf("a_int_v[%3.3d] ..:% 12.12d %s\n", i, trg.a_int_v[i],
-        print_bin(&trg.a_int_v[i]));
+  for (i = 0; i < 5; i++)
+  {
+    printf("a_int_v[%3.3d] ..:% 12.12d %s\n", i, trg.a_int_v[i], print_bin(&trg.a_int_v[i]));
   }
 
   printf("a_char ........: %c\n", trg.a_char);
 
-  printf("a_float .......:% 22.10f %15e %s\n", trg.a_float, trg.a_float,
-      print_bin((int*)&trg.a_float));
+  printf("a_float .......:% 22.10f %15e %s\n", trg.a_float, trg.a_float, print_bin((int*)&trg.a_float));
 
   fclose(fp);
 

@@ -50,18 +50,15 @@
 //  Syntax check.
 //
 
-static pwr_tStatus SyntaxCheck(
-    ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
-    int* ErrorCount, /* accumulated error count */
-    int* WarningCount /* accumulated waring count */
-    )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated waring count */
+)
 {
-  return wsx_CheckIoDevice(
-      Session, Object, ErrorCount, WarningCount, wsx_mCardOption_ErrorLimits);
+  return wsx_CheckIoDevice(Session, Object, ErrorCount, WarningCount, wsx_mCardOption_ErrorLimits);
 }
 
-static pwr_tStatus PostCreate(
-    ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
 {
   return dbcb_InsertPlcThreadObject(Session, Object);
 }
@@ -69,5 +66,5 @@ static pwr_tStatus PostCreate(
 //  Every method to be exported to the workbench should be registred here.
 //
 
-pwr_dExport pwr_BindMethods(BaseIOCard) = { pwr_BindMethod(SyntaxCheck),
-  pwr_BindMethod(PostCreate), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(BaseIOCard) = {pwr_BindMethod(SyntaxCheck), pwr_BindMethod(PostCreate),
+                                           pwr_NullMethod};

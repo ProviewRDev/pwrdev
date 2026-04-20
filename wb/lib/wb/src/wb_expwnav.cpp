@@ -82,12 +82,9 @@ void WbExpWNavBrow::create_nodeclasses()
 
   brow_CreateNodeClass(ctx, "LogDefault", flow_eNodeGroup_Common, &nc_exp);
   brow_AddAnnotPixmap(nc_exp, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_exp, 2.8, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_exp, 35, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_exp, 45, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_exp, 2.8, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_exp, 35, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_exp, 45, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_exp, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create common-class with radiobutton
@@ -95,12 +92,9 @@ void WbExpWNavBrow::create_nodeclasses()
   brow_CreateNodeClass(ctx, "LogDefault", flow_eNodeGroup_Common, &nc_eexp);
   brow_AddAnnotPixmap(nc_eexp, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddRadiobutton(nc_eexp, 1.4, 0.03, 0.7, 0.7, 0, flow_eDrawType_Line, 1);
-  brow_AddAnnot(nc_eexp, 2.8, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_eexp, 35, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_eexp, 45, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_eexp, 2.8, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_eexp, 35, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_eexp, 45, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_eexp, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 
@@ -117,40 +111,23 @@ void WbExpWNavBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, expwnav);
 
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, WbExpWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-      WbExpWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, WbExpWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, WbExpWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack,
-      WbExpWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack,
-      WbExpWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, WbExpWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, WbExpWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, WbExpWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, WbExpWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_ShiftRight, flow_eEventType_CallBack,
-      WbExpWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, WbExpWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack,
-      WbExpWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack,
-      WbExpWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, WbExpWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack,
-      WbExpWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack,
-      WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_ShiftRight, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, WbExpWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, WbExpWNav::brow_cb);
 }
 
 //
@@ -170,41 +147,27 @@ int WbExpWNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   return 1;
 }
 
-WbExpWNav::WbExpWNav(
-    void* l_parent_ctx, ldh_tSesContext l_ldhses, int l_type, int l_editmode)
-    : parent_ctx(l_parent_ctx), ldhses(l_ldhses), type(l_type),
-      editmode(l_editmode), show_all(0), dirlist(0)
+WbExpWNav::WbExpWNav(void* l_parent_ctx, ldh_tSesContext l_ldhses, int l_type, int l_editmode)
+    : parent_ctx(l_parent_ctx), ldhses(l_ldhses), type(l_type), editmode(l_editmode), show_all(0), dirlist(0)
 {
 }
 
 //
 //  Delete ev
 //
-WbExpWNav::~WbExpWNav()
-{
-  list_free();
-}
+WbExpWNav::~WbExpWNav() { list_free(); }
 
-WbExpWNavBrow::~WbExpWNavBrow()
-{
-  free_pixmaps();
-}
+WbExpWNavBrow::~WbExpWNavBrow() { free_pixmaps(); }
 
 //
 //  Zoom
 //
-void WbExpWNav::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void WbExpWNav::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void WbExpWNav::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void WbExpWNav::unzoom() { brow_UnZoom(brow->ctx); }
 
 //
 // Callbacks from brow
@@ -215,15 +178,18 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   ItemExp* item;
   int sts;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
   }
 
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&expwnav);
-  switch (event->event) {
-  case flow_eEvent_Key_Right: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     int node_count;
     int value;
@@ -232,7 +198,8 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (!node_count)
       break;
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case expwitem_eItemType_Dir:
       brow_GetRadiobutton(node_list[0], 0, &value);
       ((ItemDir*)item)->set(!value);
@@ -247,7 +214,8 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_ShiftRight: {
+  case flow_eEvent_Key_ShiftRight:
+  {
     brow_tNode* node_list;
     int node_count;
 
@@ -255,7 +223,8 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (!node_count)
       break;
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case expwitem_eItemType_Dir:
       sts = ((ItemDir*)item)->open_children();
       break;
@@ -264,7 +233,8 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
@@ -277,16 +247,19 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (brow_IsOpen(node_list[0]))
       // Close this node
       object = node_list[0];
-    else {
+    else
+    {
       // Close parent
       sts = brow_GetParent(expwnav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(node_list);
         return 1;
       }
     }
     brow_GetUserData(object, (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case expwitem_eItemType_Dir:
       ((ItemDir*)item)->close();
       break;
@@ -300,26 +273,33 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_Up: {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(expwnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLastVisible(expwnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              expwnav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(expwnav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetLastVisible(expwnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(expwnav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -335,26 +315,33 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(expwnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirstVisible(expwnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              expwnav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(expwnav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetFirstVisible(expwnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(expwnav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -378,10 +365,12 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -393,9 +382,12 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(expwnav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(expwnav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(expwnav->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(expwnav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(expwnav->brow->ctx, event->object.object);
@@ -405,27 +397,34 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       brow_SelectClear(expwnav->brow->ctx);
     }
     break;
-  case flow_eEvent_Key_PageDown: {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(expwnav->brow->ctx, 0.95);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(expwnav->brow->ctx, -0.95);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(expwnav->brow->ctx, 0.10);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(expwnav->brow->ctx, -0.10);
     break;
   }
-  case flow_eEvent_MB1DoubleClick: {
-    switch (event->object.object_type) {
+  case flow_eEvent_MB1DoubleClick:
+  {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case expwitem_eItemType_Dir:
         sts = ((ItemDir*)item)->open_children();
         break;
@@ -435,11 +434,15 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
   }
-  case flow_eEvent_Radiobutton: {
-    switch (event->object.object_type) {
+  /* fall through */
+  case flow_eEvent_Radiobutton:
+  {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case expwitem_eItemType_Exp:
         ((ItemExp*)item)->set(!event->radiobutton.value);
         break;
@@ -460,7 +463,8 @@ int WbExpWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
 
 void WbExpWNav::show()
 {
-  switch (type) {
+  switch (type)
+  {
   case expw_eType_Import:
   case expw_eType_Export:
     show_export_import();
@@ -488,12 +492,14 @@ void WbExpWNav::update()
 
   // Store selected node
   brow_GetSelectedNodes(brow->ctx, &node_list, &node_count);
-  if (node_count) {
+  if (node_count)
+  {
     select_exist = 1;
     brow_GetUserData(node_list[0], (void**)&item);
     select_type = item->type;
 
-    switch (item->type) {
+    switch (item->type)
+    {
     case expwitem_eItemType_Dir:
       strcpy(select_name, item->name);
       break;
@@ -507,8 +513,8 @@ void WbExpWNav::update()
 
   // Store all open nodes.
   int cnt = 0;
-  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts);
-       sts = brow_GetNextSibling(brow->ctx, node, &node)) {
+  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts); sts = brow_GetNextSibling(brow->ctx, node, &node))
+  {
     if (brow_IsOpen(node))
       cnt++;
   }
@@ -516,12 +522,14 @@ void WbExpWNav::update()
   open_nodes = (pwr_tString80*)calloc(cnt, sizeof(pwr_tString80));
 
   cnt = 0;
-  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts);
-       sts = brow_GetNextSibling(brow->ctx, node, &node)) {
-    if (brow_IsOpen(node)) {
+  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts); sts = brow_GetNextSibling(brow->ctx, node, &node))
+  {
+    if (brow_IsOpen(node))
+    {
       brow_GetUserData(node, (void**)&item);
 
-      switch (item->type) {
+      switch (item->type)
+      {
       case expwitem_eItemType_Exp:
         break;
       case expwitem_eItemType_Dir:
@@ -536,17 +544,21 @@ void WbExpWNav::update()
 
   show();
 
-  if (cnt) {
-    for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts);
-         sts = brow_GetNextSibling(brow->ctx, node, &node)) {
+  if (cnt)
+  {
+    for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts); sts = brow_GetNextSibling(brow->ctx, node, &node))
+    {
       brow_GetUserData(node, (void**)&item);
 
-      switch (item->type) {
+      switch (item->type)
+      {
       case expwitem_eItemType_Exp:
         break;
       case expwitem_eItemType_Dir:
-        for (int i = 0; i < cnt; i++) {
-          if (streq(open_nodes[i], item->name)) {
+        for (int i = 0; i < cnt; i++)
+        {
+          if (streq(open_nodes[i], item->name))
+          {
             item->open_children();
           }
         }
@@ -556,16 +568,17 @@ void WbExpWNav::update()
   }
 
   // Select previously selected node
-  if (select_exist) {
+  if (select_exist)
+  {
     brow_GetObjectList(brow->ctx, &node_list, &node_count);
-    for (int i = 0; i < node_count; i++) {
+    for (int i = 0; i < node_count; i++)
+    {
       brow_GetUserData(node_list[i], (void**)&item);
-      if (select_type == item->type
-          && ((item->type == expwitem_eItemType_Exp
-                  && streq(select_source, ((ItemExp*)item)->source)
-                  && streq(select_target, ((ItemExp*)item)->target))
-                 || (item->type == expwitem_eItemType_Dir
-                        && streq(select_name, item->name)))) {
+      if (select_type == item->type &&
+          ((item->type == expwitem_eItemType_Exp && streq(select_source, ((ItemExp*)item)->source) &&
+            streq(select_target, ((ItemExp*)item)->target)) ||
+           (item->type == expwitem_eItemType_Dir && streq(select_name, item->name))))
+      {
         brow_SelectInsert(brow->ctx, node_list[i]);
         brow_SetInverse(node_list[i], 1);
       }
@@ -595,14 +608,15 @@ void WbExpWNav::show_export_import()
   dcli_translate_filename(fname, pwr_cNameDistribute);
   std::ifstream is(fname);
 
-  while (is.getline(line, sizeof(line))) {
+  while (is.getline(line, sizeof(line)))
+  {
     line_cnt++;
     str_trim(line, line);
     if (line[0] == '#' || line[0] == '!')
       continue;
 
-    num = dcli_parse(line, " 	", "", (char*)line_item,
-        sizeof(line_item) / sizeof(line_item[0]), sizeof(line_item[0]), 0);
+    num = dcli_parse(line, " 	", "", (char*)line_item, sizeof(line_item) / sizeof(line_item[0]),
+                     sizeof(line_item[0]), 0);
     if (!num)
       continue;
 
@@ -611,16 +625,17 @@ void WbExpWNav::show_export_import()
     else
       strcpy(tag, "import");
 
-    if (streq(cdh_Low(line_item[0]), tag)) {
-      if (num != 4) {
+    if (streq(cdh_Low(line_item[0]), tag))
+    {
+      if (num != 4)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
-      for (sts
-           = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_INIT);
-           ODD(sts); sts
-           = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_NEXT)) {
+      for (sts = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_INIT); ODD(sts);
+           sts = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_NEXT))
+      {
         // Check if file should be updated
         int update = 0;
         pwr_tFileName source, target;
@@ -631,7 +646,8 @@ void WbExpWNav::show_export_import()
 
         sts = dcli_file_time(source, &source_time);
 
-        if (target[strlen(target) - 1] == '/') {
+        if (target[strlen(target) - 1] == '/')
+        {
           // Target is a directory, add file name
           char* s = strrchr(source, '/');
           if (!s)
@@ -651,8 +667,7 @@ void WbExpWNav::show_export_import()
         if (!show_all && !update)
           continue;
 
-        ItemExp* item = new ItemExp(
-            this, found_file, line_item[3], 0, 0, flow_eDest_IntoLast);
+        ItemExp* item = new ItemExp(this, found_file, line_item[3], 0, 0, flow_eDest_IntoLast);
         if (update)
           brow_SetRadiobutton(item->node, 0, 1);
         if (!first_item)
@@ -686,19 +701,22 @@ void WbExpWNav::show_builddir()
   dcli_translate_filename(fname, pwr_cNameDistribute);
   std::ifstream is(fname);
 
-  while (is.getline(line, sizeof(line))) {
+  while (is.getline(line, sizeof(line)))
+  {
     line_cnt++;
     str_trim(line, line);
     if (line[0] == '#' || line[0] == '!')
       continue;
 
-    num = dcli_parse(line, " 	", "", (char*)line_item,
-        sizeof(line_item) / sizeof(line_item[0]), sizeof(line_item[0]), 0);
+    num = dcli_parse(line, " 	", "", (char*)line_item, sizeof(line_item) / sizeof(line_item[0]),
+                     sizeof(line_item[0]), 0);
     if (!num)
       continue;
 
-    if (streq(cdh_Low(line_item[0]), "builddir")) {
-      if (num != 4) {
+    if (streq(cdh_Low(line_item[0]), "builddir"))
+    {
+      if (num != 4)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
@@ -708,17 +726,18 @@ void WbExpWNav::show_builddir()
         dir = dir_insert(line_item[1], line_item[2], line_item[3]);
     }
 
-    else if (streq(cdh_Low(line_item[0]), "buildcopy")) {
+    else if (streq(cdh_Low(line_item[0]), "buildcopy"))
+    {
       int dir_update = 0;
-      if (num != 4) {
+      if (num != 4)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
-      for (sts
-           = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_INIT);
-           ODD(sts); sts
-           = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_NEXT)) {
+      for (sts = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_INIT); ODD(sts);
+           sts = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_NEXT))
+      {
         // Check if file should be updated
         int update = 0;
         pwr_tFileName source, target;
@@ -729,7 +748,8 @@ void WbExpWNav::show_builddir()
 
         sts = dcli_file_time(source, &source_time);
 
-        if (target[strlen(target) - 1] == '/') {
+        if (target[strlen(target) - 1] == '/')
+        {
           // Target is a directory, add file name
           char* s = strrchr(source, '/');
           if (!s)
@@ -747,7 +767,8 @@ void WbExpWNav::show_builddir()
           update = 1;
 
         ExpWDir* dir = dir_find(line_item[1]);
-        if (!dir) {
+        if (!dir)
+        {
           printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
           continue;
         }
@@ -759,29 +780,30 @@ void WbExpWNav::show_builddir()
 
       dcli_search_file(line_item[1], found_file, DCLI_DIR_SEARCH_END);
 
-      ItemExp* item = new ItemExp(
-          this, found_file, line_item[1], 0, 0, flow_eDest_IntoLast);
+      ItemExp* item = new ItemExp(this, found_file, line_item[1], 0, 0, flow_eDest_IntoLast);
       if (dir_update)
         brow_SetRadiobutton(item->node, 0, 1);
     }
-    else if (streq(cdh_Low(line_item[0]), "buildconvert")) {
+    else if (streq(cdh_Low(line_item[0]), "buildconvert"))
+    {
       int dir_update = 0;
       pwr_tFileConvertEnum conversion;
 
-      if (num != 5) {
+      if (num != 5)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
-      if (sscanf(line_item[2], "%d", &conversion) != 1) {
-	printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
-	continue;
+      if (sscanf(line_item[2], "%d", &conversion) != 1)
+      {
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
+        continue;
       }
 
-      for (sts
-           = dcli_search_file(line_item[3], found_file, DCLI_DIR_SEARCH_INIT);
-           ODD(sts); sts
-           = dcli_search_file(line_item[3], found_file, DCLI_DIR_SEARCH_NEXT)) {
+      for (sts = dcli_search_file(line_item[3], found_file, DCLI_DIR_SEARCH_INIT); ODD(sts);
+           sts = dcli_search_file(line_item[3], found_file, DCLI_DIR_SEARCH_NEXT))
+      {
         // Check if file should be updated
         int update = 0;
         pwr_tFileName source, target;
@@ -792,7 +814,8 @@ void WbExpWNav::show_builddir()
 
         sts = dcli_file_time(source, &source_time);
 
-        if (target[strlen(target) - 1] == '/') {
+        if (target[strlen(target) - 1] == '/')
+        {
           // Target is a directory, add file name
           char* s = strrchr(source, '/');
           if (!s)
@@ -810,7 +833,8 @@ void WbExpWNav::show_builddir()
           update = 1;
 
         ExpWDir* dir = dir_find(line_item[1]);
-        if (!dir) {
+        if (!dir)
+        {
           printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
           continue;
         }
@@ -822,33 +846,39 @@ void WbExpWNav::show_builddir()
 
       dcli_search_file(line_item[1], found_file, DCLI_DIR_SEARCH_END);
 
-      ItemExp* item = new ItemExp(
-          this, found_file, line_item[1], 0, 0, flow_eDest_IntoLast);
+      ItemExp* item = new ItemExp(this, found_file, line_item[1], 0, 0, flow_eDest_IntoLast);
       if (dir_update)
         brow_SetRadiobutton(item->node, 0, 1);
-
-    } else if (streq(cdh_Low(line_item[0]), "buildmake")) {
-      if (num != 4) {
+    }
+    else if (streq(cdh_Low(line_item[0]), "buildmake"))
+    {
+      if (num != 4)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
       ExpWDir* dir = dir_find(line_item[1]);
-      if (!dir) {
+      if (!dir)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
       dir->make_insert(line_item[2], line_item[3], 1);
       dir->update = 1;
-    } else if (streq(cdh_Low(line_item[0]), "buildexec")) {
-      if (num != 4) {
+    }
+    else if (streq(cdh_Low(line_item[0]), "buildexec"))
+    {
+      if (num != 4)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
       ExpWDir* dir = dir_find(line_item[1]);
-      if (!dir) {
+      if (!dir)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
@@ -866,7 +896,8 @@ void WbExpWNav::show_builddir()
 void WbExpWNav::set_show_all(int set)
 {
   show_all = set;
-  switch (type) {
+  switch (type)
+  {
   case expw_eType_Export:
   case expw_eType_Import:
     show();
@@ -884,9 +915,9 @@ void WbExpWNav::redraw(int posit_top)
   brow_SetNodraw(brow->ctx);
   brow_DeleteAll(brow->ctx);
 
-  for (ExpWDir* dir = dirlist; dir; dir = dir->next) {
-    ItemDir* item = new ItemDir(
-        this, dir, dir->name, dir->description, 0, flow_eDest_IntoLast);
+  for (ExpWDir* dir = dirlist; dir; dir = dir->next)
+  {
+    ItemDir* item = new ItemDir(this, dir, dir->name, dir->description, 0, flow_eDest_IntoLast);
     if (dir->update)
       brow_SetRadiobutton(item->node, 0, 1);
     if (dir->open)
@@ -904,7 +935,8 @@ void WbExpWNav::redraw(int posit_top)
 
 ExpWDir* WbExpWNav::dir_find(char* name)
 {
-  for (ExpWDir* dir = dirlist; dir; dir = dir->next) {
+  for (ExpWDir* dir = dirlist; dir; dir = dir->next)
+  {
     if (streq(dir->name, name))
       return dir;
   }
@@ -914,19 +946,23 @@ ExpWDir* WbExpWNav::dir_find(char* name)
 void WbExpWNav::list_free()
 {
   ExpWDir* dp_next;
-  for (ExpWDir* dp = dirlist; dp; dp = dp_next) {
+  for (ExpWDir* dp = dirlist; dp; dp = dp_next)
+  {
     ExpWCopy* cp_next;
-    for (ExpWCopy* cp = dp->copylist; cp; cp = cp_next) {
+    for (ExpWCopy* cp = dp->copylist; cp; cp = cp_next)
+    {
       cp_next = cp->next;
       delete cp;
     }
     ExpWMake* mp_next;
-    for (ExpWMake* mp = dp->makelist; mp; mp = mp_next) {
+    for (ExpWMake* mp = dp->makelist; mp; mp = mp_next)
+    {
       mp_next = mp->next;
       delete mp;
     }
     ExpWExec* ep_next;
-    for (ExpWExec* ep = dp->execlist; ep; ep = ep_next) {
+    for (ExpWExec* ep = dp->execlist; ep; ep = ep_next)
+    {
       ep_next = ep->next;
       delete ep;
     }
@@ -943,7 +979,8 @@ ExpWDir* WbExpWNav::dir_insert(char* name, char* options_str, char* description)
   ExpWDir* dir = new ExpWDir();
   strncpy(dir->name, name, sizeof(dir->name));
   num = sscanf(options_str, "%d", &dir->options);
-  if (num != 1) {
+  if (num != 1)
+  {
     printf("** BuildDirectory.Options syntax error\n");
     dir->options = 0;
   }
@@ -951,7 +988,8 @@ ExpWDir* WbExpWNav::dir_insert(char* name, char* options_str, char* description)
 
   if (!dirlist)
     dirlist = dir;
-  else {
+  else
+  {
     ExpWDir* dp;
     for (dp = dirlist; dp->next; dp = dp->next)
       ;
@@ -960,8 +998,7 @@ ExpWDir* WbExpWNav::dir_insert(char* name, char* options_str, char* description)
   return dir;
 }
 
-ExpWCopy* ExpWDir::copy_insert(char* source, char* target, pwr_tFileConvertEnum conversion, 
-			       int update)
+ExpWCopy* ExpWDir::copy_insert(char* source, char* target, pwr_tFileConvertEnum conversion, int update)
 {
   ExpWCopy* copy = new ExpWCopy();
   strncpy(copy->source, source, sizeof(copy->source));
@@ -971,7 +1008,8 @@ ExpWCopy* ExpWDir::copy_insert(char* source, char* target, pwr_tFileConvertEnum 
 
   if (!copylist)
     copylist = copy;
-  else {
+  else
+  {
     ExpWCopy* cp;
     for (cp = copylist; cp->next; cp = cp->next)
       ;
@@ -989,7 +1027,8 @@ ExpWMake* ExpWDir::make_insert(char* dir, char* makefile, int update)
 
   if (!makelist)
     makelist = make;
-  else {
+  else
+  {
     ExpWMake* ep;
     for (ep = makelist; ep->next; ep = ep->next)
       ;
@@ -1007,7 +1046,8 @@ ExpWExec* ExpWDir::exec_insert(char* dir, char* command, int update)
 
   if (!execlist)
     execlist = exec;
-  else {
+  else
+  {
     ExpWExec* ep;
     for (ep = execlist; ep->next; ep = ep->next)
       ;
@@ -1016,10 +1056,7 @@ ExpWExec* ExpWDir::exec_insert(char* dir, char* command, int update)
   return exec;
 }
 
-void WbExpWNav::clear()
-{
-  brow_DeleteAll(brow->ctx);
-}
+void WbExpWNav::clear() { brow_DeleteAll(brow->ctx); }
 
 pwr_tStatus WbExpWNav::exp()
 {
@@ -1029,23 +1066,26 @@ pwr_tStatus WbExpWNav::exp()
   brow_tNode node;
   int rval;
 
-  switch (type) {
+  switch (type)
+  {
   case expw_eType_Import:
-  case expw_eType_Export: {
-    for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts);
-         sts = brow_GetNext(brow->ctx, node, &node)) {
+  case expw_eType_Export:
+  {
+    for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts); sts = brow_GetNext(brow->ctx, node, &node))
+    {
       brow_GetRadiobutton(node, 0, &rval);
 
-      if (rval) {
+      if (rval)
+      {
         brow_GetUserData(node, (void**)&item);
 
         sprintf(cmd, "cp %s %s", item->source, item->target);
         printf("%s\n", cmd);
         sts = system(cmd);
-        if (sts != 0) {
+        if (sts != 0)
+        {
           char msg[690];
-          snprintf(
-              msg, sizeof(msg), "Export error %d, %s", WEXITSTATUS(sts), cmd);
+          snprintf(msg, sizeof(msg), "Export error %d, %s", WEXITSTATUS(sts), cmd);
           MsgWindow::message('E', msg, msgw_ePop_Default);
         }
       }
@@ -1054,37 +1094,44 @@ pwr_tStatus WbExpWNav::exp()
     show();
     break;
   }
-  case expw_eType_BuildDirectories: {
-    for (ExpWDir* dp = dirlist; dp; dp = dp->next) {
+  case expw_eType_BuildDirectories:
+  {
+    for (ExpWDir* dp = dirlist; dp; dp = dp->next)
+    {
       if (!dp->update)
         continue;
 
-      for (ExpWCopy* cp = dp->copylist; cp; cp = cp->next) {
+      for (ExpWCopy* cp = dp->copylist; cp; cp = cp->next)
+      {
         if (!cp->update)
           continue;
 
-	switch (cp->conversion) {
-	case pwr_eFileConvertEnum_No:
-	  sprintf(cmd, "cp %s %s", cp->source, cp->target);
-	  printf("%s\n", cmd);
-	  break;
-	case pwr_eFileConvertEnum_ISO88591_UTF8:
-	  sprintf(cmd, "iconv -f ISO-8859-1 -t UTF8 < %s > %s", cp->source, cp->target);
-	  printf("%s\n", cmd);
-	  break;
-	}
+        switch (cp->conversion)
+        {
+        case pwr_eFileConvertEnum_No:
+          sprintf(cmd, "cp %s %s", cp->source, cp->target);
+          printf("%s\n", cmd);
+          break;
+        case pwr_eFileConvertEnum_ISO88591_UTF8:
+          sprintf(cmd, "iconv -f ISO-8859-1 -t UTF8 < %s > %s", cp->source, cp->target);
+          printf("%s\n", cmd);
+          break;
+        }
         sts = system(cmd);
-        if (sts != 0) {
+        if (sts != 0)
+        {
           // Check that directory exist, create if it doesn't
           pwr_tFileName target_dir;
           pwr_tTime target_time;
           char* s;
 
           strcpy(target_dir, cp->target);
-          if ((s = strrchr(target_dir, '/'))) {
+          if ((s = strrchr(target_dir, '/')))
+          {
             *s = 0;
             sts = dcli_file_time(target_dir, &target_time);
-            if (EVEN(sts)) {
+            if (EVEN(sts))
+            {
               sprintf(cmd, "mkdir -p %s", target_dir);
               system(cmd);
 
@@ -1093,21 +1140,23 @@ pwr_tStatus WbExpWNav::exp()
               sts = system(cmd);
             }
           }
-          if (sts != 0) {
+          if (sts != 0)
+          {
             char msg[690];
-            snprintf(
-                msg, sizeof(msg), "Build error %d, %s", WEXITSTATUS(sts), cmd);
+            snprintf(msg, sizeof(msg), "Build error %d, %s", WEXITSTATUS(sts), cmd);
             MsgWindow::message('E', msg, msgw_ePop_Default);
           }
         }
       }
     }
 
-    for (ExpWDir* dp = dirlist; dp; dp = dp->next) {
+    for (ExpWDir* dp = dirlist; dp; dp = dp->next)
+    {
       if (!dp->update)
         continue;
 
-      for (ExpWMake* mp = dp->makelist; mp; mp = mp->next) {
+      for (ExpWMake* mp = dp->makelist; mp; mp = mp->next)
+      {
         if (!mp->update)
           continue;
 
@@ -1117,24 +1166,25 @@ pwr_tStatus WbExpWNav::exp()
           sprintf(cmd, "cd %s;make -f %s", mp->dir, mp->makefile);
         printf("%s\n", cmd);
         sts = system(cmd);
-        if (sts != 0) {
+        if (sts != 0)
+        {
           char msg[690];
-          snprintf(
-              msg, sizeof(msg), "Build error %d, %s", WEXITSTATUS(sts), cmd);
+          snprintf(msg, sizeof(msg), "Build error %d, %s", WEXITSTATUS(sts), cmd);
           MsgWindow::message('E', msg, msgw_ePop_Default);
         }
       }
-      for (ExpWExec* ep = dp->execlist; ep; ep = ep->next) {
+      for (ExpWExec* ep = dp->execlist; ep; ep = ep->next)
+      {
         if (!ep->update)
           continue;
 
         sprintf(cmd, "cd %s;%s", ep->dir, ep->command);
         printf("%s\n", cmd);
         sts = system(cmd);
-        if (sts != 0) {
+        if (sts != 0)
+        {
           char msg[690];
-          snprintf(
-              msg, sizeof(msg), "Build error %d, %s", WEXITSTATUS(sts), cmd);
+          snprintf(msg, sizeof(msg), "Build error %d, %s", WEXITSTATUS(sts), cmd);
           MsgWindow::message('E', msg, msgw_ePop_Default);
         }
       }
@@ -1151,19 +1201,22 @@ pwr_tStatus WbExpWNav::exp()
 
 void WbExpWNav::check_all()
 {
-  switch (type) {
+  switch (type)
+  {
   case expw_eType_Import:
-  case expw_eType_Export: {
+  case expw_eType_Export:
+  {
     int sts;
     brow_tNode node;
 
-    for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts);
-         sts = brow_GetNext(brow->ctx, node, &node))
+    for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts); sts = brow_GetNext(brow->ctx, node, &node))
       brow_SetRadiobutton(node, 0, 1);
     break;
   }
-  case expw_eType_BuildDirectories: {
-    for (ExpWDir* dir = dirlist; dir; dir = dir->next) {
+  case expw_eType_BuildDirectories:
+  {
+    for (ExpWDir* dir = dirlist; dir; dir = dir->next)
+    {
       dir->update = 1;
       for (ExpWCopy* cp = dir->copylist; cp; cp = cp->next)
         cp->update = 1;
@@ -1181,19 +1234,22 @@ void WbExpWNav::check_all()
 
 void WbExpWNav::check_clear()
 {
-  switch (type) {
+  switch (type)
+  {
   case expw_eType_Import:
-  case expw_eType_Export: {
+  case expw_eType_Export:
+  {
     int sts;
     brow_tNode node;
 
-    for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts);
-         sts = brow_GetNext(brow->ctx, node, &node))
+    for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts); sts = brow_GetNext(brow->ctx, node, &node))
       brow_SetRadiobutton(node, 0, 0);
     break;
   }
-  case expw_eType_BuildDirectories: {
-    for (ExpWDir* dir = dirlist; dir; dir = dir->next) {
+  case expw_eType_BuildDirectories:
+  {
+    for (ExpWDir* dir = dirlist; dir; dir = dir->next)
+    {
       dir->update = 0;
       for (ExpWCopy* cp = dir->copylist; cp; cp = cp->next)
         cp->update = 0;
@@ -1209,13 +1265,10 @@ void WbExpWNav::check_clear()
   }
 }
 
-void WbExpWNav::check_reset()
-{
-  show();
-}
+void WbExpWNav::check_reset() { show(); }
 
-ItemExp::ItemExp(WbExpWNav* item_expwnav, char* item_source, char* item_target,
-    ExpWList* item_listp, brow_tNode dest, flow_eDest dest_code)
+ItemExp::ItemExp(WbExpWNav* item_expwnav, char* item_source, char* item_target, ExpWList* item_listp,
+                 brow_tNode dest, flow_eDest dest_code)
     : expwnav(item_expwnav), button_value(0), listp(item_listp)
 {
   type = expwitem_eItemType_Exp;
@@ -1223,11 +1276,11 @@ ItemExp::ItemExp(WbExpWNav* item_expwnav, char* item_source, char* item_target,
   strncpy(target, item_target, sizeof(target));
 
   if (expwnav->editmode)
-    brow_CreateNode(expwnav->brow->ctx, (char*)"Exp", expwnav->brow->nc_eexp,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(expwnav->brow->ctx, (char*)"Exp", expwnav->brow->nc_eexp, dest, dest_code, (void*)this, 1,
+                    &node);
   else
-    brow_CreateNode(expwnav->brow->ctx, (char*)"Exp", expwnav->brow->nc_exp,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(expwnav->brow->ctx, (char*)"Exp", expwnav->brow->nc_exp, dest, dest_code, (void*)this, 1,
+                    &node);
 
   int annot = 0;
   brow_SetAnnotation(node, annot++, source, strlen(source));
@@ -1236,9 +1289,7 @@ ItemExp::ItemExp(WbExpWNav* item_expwnav, char* item_source, char* item_target,
   brow_SetAnnotPixmap(node, 0, expwnav->brow->pixmap_export);
 }
 
-ItemExp::~ItemExp()
-{
-}
+ItemExp::~ItemExp() {}
 
 void ItemExp::update()
 {
@@ -1256,8 +1307,8 @@ void ItemExp::set(int value)
     listp->update = value;
 }
 
-ItemDir::ItemDir(WbExpWNav* item_expwnav, ExpWDir* item_dir, char* item_name,
-    char* item_description, brow_tNode dest, flow_eDest dest_code)
+ItemDir::ItemDir(WbExpWNav* item_expwnav, ExpWDir* item_dir, char* item_name, char* item_description,
+                 brow_tNode dest, flow_eDest dest_code)
     : expwnav(item_expwnav), dir(item_dir), button_value(0)
 {
   type = expwitem_eItemType_Dir;
@@ -1265,11 +1316,11 @@ ItemDir::ItemDir(WbExpWNav* item_expwnav, ExpWDir* item_dir, char* item_name,
   strncpy(description, item_description, sizeof(description));
 
   if (expwnav->editmode)
-    brow_CreateNode(expwnav->brow->ctx, (char*)"Dir", expwnav->brow->nc_eexp,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(expwnav->brow->ctx, (char*)"Dir", expwnav->brow->nc_eexp, dest, dest_code, (void*)this, 1,
+                    &node);
   else
-    brow_CreateNode(expwnav->brow->ctx, (char*)"Dir", expwnav->brow->nc_exp,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(expwnav->brow->ctx, (char*)"Dir", expwnav->brow->nc_exp, dest, dest_code, (void*)this, 1,
+                    &node);
 
   int annot = 0;
   brow_SetAnnotation(node, annot++, name, strlen(name));
@@ -1277,15 +1328,21 @@ ItemDir::ItemDir(WbExpWNav* item_expwnav, ExpWDir* item_dir, char* item_name,
 
   // Check if map or leaf
   int child_exist = 0;
-  if (expwnav->show_all) {
+  if (expwnav->show_all)
+  {
     if (dir->copylist || dir->execlist || dir->makelist)
       child_exist = 1;
-  } else {
+  }
+  else
+  {
     if (dir->execlist || dir->makelist)
       child_exist = 1;
-    else {
-      for (ExpWCopy* cp = dir->copylist; cp; cp = cp->next) {
-        if (cp->update) {
+    else
+    {
+      for (ExpWCopy* cp = dir->copylist; cp; cp = cp->next)
+      {
+        if (cp->update)
+        {
           child_exist = 1;
           break;
         }
@@ -1298,9 +1355,7 @@ ItemDir::ItemDir(WbExpWNav* item_expwnav, ExpWDir* item_dir, char* item_name,
     brow_SetAnnotPixmap(node, 0, expwnav->brow->pixmap_leaf);
 }
 
-ItemDir::~ItemDir()
-{
-}
+ItemDir::~ItemDir() {}
 
 void ItemDir::update()
 {
@@ -1321,7 +1376,8 @@ int ItemDir::open_children()
 {
   int child_exist = 0;
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(expwnav->brow->ctx);
     brow_CloseNode(expwnav->brow->ctx, node);
@@ -1331,38 +1387,41 @@ int ItemDir::open_children()
     brow_ResetNodraw(expwnav->brow->ctx);
     brow_Redraw(expwnav->brow->ctx, 0);
     dir->open = 0;
-  } else {
+  }
+  else
+  {
     // Create some children
     brow_SetNodraw(expwnav->brow->ctx);
 
-    for (ExpWMake* mp = dir->makelist; mp; mp = mp->next) {
+    for (ExpWMake* mp = dir->makelist; mp; mp = mp->next)
+    {
       pwr_tCmd cmd;
       sprintf(cmd, "make %s", mp->makefile);
-      ItemExp* item
-          = new ItemExp(expwnav, mp->dir, cmd, mp, node, flow_eDest_IntoLast);
+      ItemExp* item = new ItemExp(expwnav, mp->dir, cmd, mp, node, flow_eDest_IntoLast);
       if (mp->update)
         brow_SetRadiobutton(item->node, 0, 1);
       child_exist = 1;
     }
-    for (ExpWExec* ep = dir->execlist; ep; ep = ep->next) {
-      ItemExp* item = new ItemExp(
-          expwnav, ep->dir, ep->command, ep, node, flow_eDest_IntoLast);
+    for (ExpWExec* ep = dir->execlist; ep; ep = ep->next)
+    {
+      ItemExp* item = new ItemExp(expwnav, ep->dir, ep->command, ep, node, flow_eDest_IntoLast);
       if (ep->update)
         brow_SetRadiobutton(item->node, 0, 1);
       child_exist = 1;
     }
-    for (ExpWCopy* cp = dir->copylist; cp; cp = cp->next) {
+    for (ExpWCopy* cp = dir->copylist; cp; cp = cp->next)
+    {
       if (!expwnav->show_all && !cp->update)
         continue;
 
-      ItemExp* item = new ItemExp(
-          expwnav, cp->source, cp->target, cp, node, flow_eDest_IntoLast);
+      ItemExp* item = new ItemExp(expwnav, cp->source, cp->target, cp, node, flow_eDest_IntoLast);
       if (cp->update)
         brow_SetRadiobutton(item->node, 0, 1);
       child_exist = 1;
     }
 
-    if (child_exist) {
+    if (child_exist)
+    {
       brow_SetOpen(node, expw_mOpen_Children);
       brow_SetAnnotPixmap(node, 0, expwnav->brow->pixmap_openmap);
       dir->open = 1;
@@ -1378,7 +1437,8 @@ int ItemDir::open_children()
 
 int ItemDir::close()
 {
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(expwnav->brow->ctx);
     brow_CloseNode(expwnav->brow->ctx, node);

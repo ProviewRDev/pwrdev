@@ -48,10 +48,10 @@
 
 class XAttOneQtWidget;
 
-class XAttOneQt : public XAttOne {
+class XAttOneQt : public XAttOne
+{
 public:
-  XAttOneQt(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, char* xa_title,
-      unsigned int xa_priv, int* xa_sts);
+  XAttOneQt(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, char* xa_title, unsigned int xa_priv, int* xa_sts);
   ~XAttOneQt();
 
   QWidget* form_widget;
@@ -74,7 +74,8 @@ private:
   XAttOneQtWidget* toplevel;
 };
 
-class XAttOneQtWidget : public QWidget {
+class XAttOneQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

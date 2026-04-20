@@ -39,11 +39,10 @@
 
 #include "sev_db.h"
 
-class sev_repair {
+class sev_repair
+{
 public:
-  sev_repair()
-  {
-  }
+  sev_repair() {}
 
   pwr_tStatus m_sts;
   sev_db* m_db;

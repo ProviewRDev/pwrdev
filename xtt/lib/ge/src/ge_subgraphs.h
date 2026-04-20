@@ -46,23 +46,29 @@
 
 #define subgraphs_cVersion "X3.0b"
 
-typedef enum { subgraphs_eItemType_SubGraph } subgraphs_eItemType;
+typedef enum
+{
+  subgraphs_eItemType_SubGraph
+} subgraphs_eItemType;
 
-typedef enum {
+typedef enum
+{
   subgraphs_mOpen_All = ~0,
   subgraphs_mOpen_Children = 1 << 0,
   subgraphs_mOpen_Attributes = 1 << 1,
   subgraphs_mOpen_Crossref = 1 << 2
 } subgraphs_mOpen;
 
-typedef struct subgraph_sAttr {
+typedef struct subgraph_sAttr
+{
   Attr* attrctx;
   subgraph_sAttr* next;
-} * subgraphs_tAttr;
+}* subgraphs_tAttr;
 
-class SubGraphsBrow {
+class SubGraphsBrow
+{
 public:
-  SubGraphsBrow(BrowCtx* brow_ctx, void* xn) : ctx(brow_ctx), subgraphs(xn){}
+  SubGraphsBrow(BrowCtx* brow_ctx, void* xn) : ctx(brow_ctx), subgraphs(xn) {}
   ~SubGraphsBrow();
 
   BrowCtx* ctx;
@@ -84,10 +90,10 @@ public:
 };
 
 //! Display loaded subgraphs.
-class SubGraphs {
+class SubGraphs
+{
 public:
-  SubGraphs(void* xn_parent_ctx, const char* xn_name, void* grow_ctx,
-      pwr_tStatus* status);
+  SubGraphs(void* xn_parent_ctx, const char* xn_name, void* grow_ctx, pwr_tStatus* status);
 
   void* parent_ctx;
   char name[80];
@@ -105,13 +111,8 @@ public:
   int object_attr();
   int get_select(void** subgraph_item);
   int edit_attributes(void* object);
-  virtual void trace_start()
-  {
-  }
-  virtual Attr* new_attr(void* object, attr_sItem* items, int num)
-  {
-    return 0;
-  }
+  virtual void trace_start() {}
+  virtual Attr* new_attr(void* object, attr_sItem* items, int num) { return 0; }
 
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
 
@@ -119,18 +120,19 @@ public:
 };
 
 //! Base item class.
-class SubGraphBaseItem {
+class SubGraphBaseItem
+{
 public:
-  SubGraphBaseItem(subgraphs_eItemType item_type) : type(item_type){}
+  SubGraphBaseItem(subgraphs_eItemType item_type) : type(item_type) {}
   subgraphs_eItemType type;
 };
 
 //! Item for a subgraph.
-class ItemSubGraph : public SubGraphBaseItem {
+class ItemSubGraph : public SubGraphBaseItem
+{
 public:
-  ItemSubGraph(SubGraphs* subgraphs, char* item_name, int* item_extern_p,
-      void* item_nodeclass, void* item_grow_ctx, brow_tNode dest,
-      flow_eDest dest_code);
+  ItemSubGraph(SubGraphs* subgraphs, char* item_name, int* item_extern_p, void* item_nodeclass,
+               void* item_grow_ctx, brow_tNode dest, flow_eDest dest_code);
   brow_tNode node;
   void* grow_ctx;
   char name[120];

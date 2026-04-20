@@ -54,12 +54,12 @@
 **********************************************************************/
 
 #include <stddef.h>
-#include <time.h>
 #include <sys/time.h>
+#include <time.h>
 
-#include "rt_plc.h"
 #include "co_time.h"
+#include "rt_plc.h"
 
 #include "ssabox_sr_regulator_methods.h"
 
-void Ssab_ServoReg_exec(plc_sThread* tp, pwr_sClass_Ssab_ServoReg* object);
+void Ssab_ServoReg_exec(plc_sThread *tp, pwr_sClass_Ssab_ServoReg *object);

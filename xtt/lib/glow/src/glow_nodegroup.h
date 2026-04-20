@@ -37,20 +37,20 @@
 #ifndef glow_nodegroup_h
 #define glow_nodegroup_h
 
+#include <iosfwd>
+
 #include "glow_nodeclass.h"
 
-class GlowNodeGroup : public GlowNodeClass {
+class GlowNodeGroup : public GlowNodeClass
+{
 public:
   GlowNodeGroup(GrowCtx* glow_ctx, const char* name, GlowArray& array);
   GlowNodeGroup(GrowCtx* glow_ctx, const char* name);
   GlowNodeGroup(const GlowNodeGroup& nc);
   ~GlowNodeGroup();
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_NodeGroup;
-  }
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(std::ifstream& fp);
+  glow_eObjectType type() { return glow_eObjectType_NodeGroup; }
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(std::istream& fp);
   void ungroup(GlowTransform* t);
 };
 

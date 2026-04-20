@@ -45,14 +45,15 @@
 
 #include "rt_mvol.h"
 
-typedef struct {
-  pwr_tDlid dlid; /* pwr_tDlid, must be at same offset as
-                     pwr_tSubid in subscription clients and servers */
+typedef struct
+{
+  pwr_tDlid dlid;       /* pwr_tDlid, must be at same offset as
+                           pwr_tSubid in subscription clients and servers */
   pool_sQlink subc_htl; /* Subscription client hash table link.  */
-  pool_sQlink dl_ll; /* Link to next/previous.  */
-  pool_tRef opr; /* Pool reference to object.  */
-  pid_t user; /* Who requested the direct link.  */
-  pwr_sAttrRef aref; /* Object data referred.  */
+  pool_sQlink dl_ll;    /* Link to next/previous.  */
+  pool_tRef opr;        /* Pool reference to object.  */
+  pid_t user;           /* Who requested the direct link.  */
+  pwr_sAttrRef aref;    /* Object data referred.  */
 } dl_sLink;
 
 void dl_Cancel(pwr_tStatus* sts, pwr_tDlid dlid);

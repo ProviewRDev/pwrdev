@@ -44,13 +44,15 @@
 /*! \addtogroup Glow */
 /*@{*/
 
-typedef enum {
+typedef enum
+{
   keyboard_eType_Standard,
   keyboard_eType_Numeric,
   keyboard_eType_Alphabetic
 } keyboard_eType;
 
-typedef enum {
+typedef enum
+{
   keyboard_eKeymap_,
   keyboard_eKeymap_Low_en_us,
   keyboard_eKeymap_High_en_us,
@@ -58,7 +60,8 @@ typedef enum {
   keyboard_eKeymap_High_sv_se
 } keyboard_eKeymap;
 
-typedef enum {
+typedef enum
+{
   keyboard_mAction_Open = 1 << 0,
   keyboard_mAction_Close = 1 << 1,
   keyboard_mAction_ResetInput = 1 << 2
@@ -66,7 +69,8 @@ typedef enum {
 
 //! Context for the virtual keyboard.
 
-class KeyboardCtx : public GrowCtx {
+class KeyboardCtx : public GrowCtx
+{
 public:
   //! Constructor.
   /*!
@@ -74,15 +78,14 @@ public:
     \param zoom_fact	Initial zoomfactor.
   */
   KeyboardCtx(const char* ctx_name, double zoom_fact = 100)
-      : GrowCtx(ctx_name, zoom_fact), type(default_type),
-        current_keymap(default_keymap)
+      : GrowCtx(ctx_name, zoom_fact), type(default_type), current_keymap(default_keymap)
   {
     ctx_type = glow_eCtxType_Keyboard;
     grid_on = 0;
   }
 
   //! Destructor
-  ~KeyboardCtx(){}
+  ~KeyboardCtx() {}
 
   //! Set keymap
   void set_keymap(keyboard_eKeymap keymap);
@@ -102,10 +105,7 @@ public:
   void zoom(double factor);
 
   //! Reset to base zoomfactor.
-  void unzoom()
-  {
-    zoom(mw.base_zoom_factor / mw.zoom_factor_y);
-  }
+  void unzoom() { zoom(mw.base_zoom_factor / mw.zoom_factor_y); }
 
   //! Event handler
   /*!
@@ -126,7 +126,7 @@ public:
   void set_shift(int shift);
 
   keyboard_eType type;
-  GlowArrayElem* keys[60]; //!< Rect for keys.
+  GlowArrayElem* keys[60];      //!< Rect for keys.
   GlowArrayElem* text_keys[60]; //!< Text for keys.
   keyboard_eKeymap current_keymap;
 

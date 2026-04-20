@@ -5,15 +5,15 @@
 #include "co_time.h"
 #include "co_tst_log.h"
 
-class ra_timetest {
+class ra_timetest
+{
   pwr_tStatus m_sts;
-  tst_log *m_log;
+  tst_log* m_log;
 
-
- public:
+public:
   ra_timetest();
   ~ra_timetest();
-  tst_log *log() {return m_log;}
+  tst_log* log() { return m_log; }
 
   void IsNull();
   void Aadd();

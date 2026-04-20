@@ -41,13 +41,11 @@
 #include "co_ccm.h"
 #include "ge_graph.h"
 
-int graph_layout(Graph* graph, int mod_size, float wind_width, float wind_height, 
-    ccm_tInt* prio, 
-    ccm_tInt* top_neighbour, ccm_tInt* down_neighbour, ccm_tInt* left_neighbour,
-    ccm_tInt* right_neighbour, ccm_tFloat* pref_width, ccm_tFloat* pref_height, 
-    ccm_tInt* fix_width, ccm_tInt* fix_height, ccm_tFloat *calc_x, ccm_tFloat* calc_y, 
-    ccm_tFloat* calc_width, ccm_tFloat* calc_height,
-    float* calc_wind_width, float* calc_wind_height);
-
+int graph_layout(Graph* graph, int mod_size, float wind_width, float wind_height, ccm_tInt* prio,
+                 ccm_tInt* top_neighbour, ccm_tInt* down_neighbour, ccm_tInt* left_neighbour,
+                 ccm_tInt* right_neighbour, ccm_tFloat* pref_width, ccm_tFloat* pref_height,
+                 ccm_tInt* fix_width, ccm_tInt* fix_height, ccm_tFloat* calc_x, ccm_tFloat* calc_y,
+                 ccm_tFloat* calc_width, ccm_tFloat* calc_height, float* calc_wind_width,
+                 float* calc_wind_height);
 
 #endif

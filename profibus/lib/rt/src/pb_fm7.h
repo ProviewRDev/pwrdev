@@ -130,8 +130,8 @@
 
 typedef struct _T_FM7_INIT_REQ
 {
-  USIGN8 snd_len_low; /* max FM7 PDU size to send with low priority    */
-  USIGN8 rcv_len_low; /* max FM7 PDU size to receive with low priority */
+  USIGN8 snd_len_low;                       /* max FM7 PDU size to send with low priority    */
+  USIGN8 rcv_len_low;                       /* max FM7 PDU size to receive with low priority */
   USIGN8 supported_services[FEAT_SUPP_LEN]; /* supported FM7 services */
 } T_FM7_INIT_REQ;
 
@@ -141,9 +141,9 @@ typedef T_FM7_INIT_REQ T_FMA_INIT_REQ;
 
 typedef struct _T_FM7_INIT_ERR_CNF
 {
-  USIGN16 class_code; /* error code and class                           */
-  USIGN8 snd_len_low; /* max FM7 PDU size to send with low priority    */
-  USIGN8 rcv_len_low; /* max FM7 PDU size to receive with low priority */
+  USIGN16 class_code;                       /* error code and class                           */
+  USIGN8 snd_len_low;                       /* max FM7 PDU size to send with low priority    */
+  USIGN8 rcv_len_low;                       /* max FM7 PDU size to receive with low priority */
   USIGN8 supported_services[FEAT_SUPP_LEN]; /* supported FM7 services */
 } T_FM7_INIT_ERR_CNF;
 
@@ -253,26 +253,26 @@ typedef T_CRL_HDR T_KBL_HDR;
  * -----------------------------------------------------------*/
 typedef struct _T_CRL_STATIC
 {
-  USIGN8 loc_lsap;                       /* local LSAP                        */
-  USIGN8 rem_add;                        /* remote address                    */
-  USIGN8 rem_segm;                       /* remote segment                    */
-  USIGN8 rem_lsap;                       /* remote LSAP                       */
-  USIGN8 conn_type;                      /* connection type                   */
-  USIGN8 lli_sap;                        /* LLI-SAP                           */
-  USIGN8 multiplier;                     /* multiplier in cyclic connections  */
-  USIGN8 conn_attr;                      /* connection attribute              */
-  USIGN8 max_scc;                        /* max. of send confirmed counter    */
-  USIGN8 max_rcc;                        /* max. of receive confirmed counter */
-  USIGN8 max_sac;                        /* max. of send acknowledged counter */
-  USIGN8 max_rac;                        /* max. of receive acknowledged ctr  */
-  USIGN32 ci;                            /* controll intervall                */
-  USIGN8 max_pdu_snd_high;               /* max. length of FMS-PDU send high  */
-  USIGN8 max_pdu_snd_low;                /* max. length of FMS-PDU send low   */
-  USIGN8 max_pdu_rcv_high;               /* max. length of FMS-PDU rcv high   */
-  USIGN8 max_pdu_rcv_low;                /* max. length of FMS-PDU rcv low    */
-  USIGN8 feature_supp[FEAT_SUPP_LEN];    /* FMS features supported            */
-  STRINGV symbol[MAX_CRL_SYMBOL_LENGTH]; /* symbolic name                     */
-  USIGN32 vfd_pointer;                   /* vfd number                        */
+  USIGN8 loc_lsap;                            /* local LSAP                        */
+  USIGN8 rem_add;                             /* remote address                    */
+  USIGN8 rem_segm;                            /* remote segment                    */
+  USIGN8 rem_lsap;                            /* remote LSAP                       */
+  USIGN8 conn_type;                           /* connection type                   */
+  USIGN8 lli_sap;                             /* LLI-SAP                           */
+  USIGN8 multiplier;                          /* multiplier in cyclic connections  */
+  USIGN8 conn_attr;                           /* connection attribute              */
+  USIGN8 max_scc;                             /* max. of send confirmed counter    */
+  USIGN8 max_rcc;                             /* max. of receive confirmed counter */
+  USIGN8 max_sac;                             /* max. of send acknowledged counter */
+  USIGN8 max_rac;                             /* max. of receive acknowledged ctr  */
+  USIGN32 ci;                                 /* controll intervall                */
+  USIGN8 max_pdu_snd_high;                    /* max. length of FMS-PDU send high  */
+  USIGN8 max_pdu_snd_low;                     /* max. length of FMS-PDU send low   */
+  USIGN8 max_pdu_rcv_high;                    /* max. length of FMS-PDU rcv high   */
+  USIGN8 max_pdu_rcv_low;                     /* max. length of FMS-PDU rcv low    */
+  USIGN8 feature_supp[FEAT_SUPP_LEN];         /* FMS features supported            */
+  STRINGV symbol[MAX_CRL_SYMBOL_LENGTH];      /* symbolic name                     */
+  USIGN32 vfd_pointer;                        /* vfd number                        */
   USIGN8 extension[MAX_CRL_EXTENSION_LENGTH]; /* CRL-Extension                */
 } T_CRL_STATIC;
 
@@ -307,7 +307,8 @@ typedef T_CRL_DYNAMIC T_KBL_DYNAMIC;
 typedef struct _T_LOAD_CRL_REQ
 {
   USIGN16 desired_cr; /* desired communication reference */
-  union {
+  union
+  {
     T_CRL_HDR crl_hdr;       /* CRL-Header-Entry                */
     T_CRL_STATIC crl_static; /* CRL-Static-Entry                */
   } id;
@@ -317,7 +318,8 @@ typedef struct _T_LOAD_CRL_REQ
 typedef struct _T_LOAD_KBL_REQ
 {
   USIGN16 desired_cr; /* desired communication reference */
-  union {
+  union
+  {
     T_KBL_HDR kbl_hdr;       /* CRL-Header-Entry                */
     T_KBL_STATIC kbl_static; /* CRL-Static-Entry                */
   } id;
@@ -452,7 +454,8 @@ typedef struct _T_KBL_ENTRY
 typedef struct _T_READ_CRL_CNF
 {
   USIGN16 desired_cr; /* desired communication reference */
-  union {
+  union
+  {
     T_CRL_HDR crl_hdr;     /* CRL-header                      */
     T_CRL_ENTRY crl_entry; /* CRL-Entry                       */
   } id;
@@ -462,7 +465,8 @@ typedef struct _T_READ_CRL_CNF
 typedef struct _T_READ_KBL_CNF
 {
   USIGN16 desired_cr; /* desired communication reference */
-  union {
+  union
+  {
     T_KBL_HDR kbl_hdr;     /* CRL-header                      */
     T_KBL_ENTRY kbl_entry; /* CRL-Entry                       */
   } id;
@@ -819,19 +823,19 @@ typedef T_FM7_EVENT_IND T_FMA7_EVENT_IND;
 
 typedef struct T_SET_CONFIGURATION_REQ
 {
-  USIGN16 max_nr_of_fal_msg_buffers; /* max # of Layer7-Message-Buffers
-                                        (all CR)   */
-  USIGN16 max_nr_of_fdl_msg_buffers; /* max # of Layer2-Message-Buffers
-                                        (all CR)   */
-  USIGN16 max_nr_of_data_buffers; /* max # of PDU-Buffers                 (all
-                                     CR)   */
+  USIGN16 max_nr_of_fal_msg_buffers;  /* max # of Layer7-Message-Buffers
+                                         (all CR)   */
+  USIGN16 max_nr_of_fdl_msg_buffers;  /* max # of Layer2-Message-Buffers
+                                         (all CR)   */
+  USIGN16 max_nr_of_data_buffers;     /* max # of PDU-Buffers                 (all
+                                         CR)   */
   USIGN16 max_nr_of_api_data_buffers; /* max # of abort/poll/idle PDU-Buffers
                                          (all CR)   */
   USIGN16
-      max_nr_of_sap_buffers; /* max # of SAP-Buffers                 (all CR) */
+  max_nr_of_sap_buffers;               /* max # of SAP-Buffers                 (all CR) */
   USIGN16 max_nr_of_poll_list_entries; /* max # of Poll-List-Entries
                                           (all CR)   */
-  USIGN16 max_data_buffer_size; /* max size of FMS-/FMA7-PDU-Buffer */
+  USIGN16 max_data_buffer_size;        /* max size of FMS-/FMA7-PDU-Buffer */
 } T_SET_CONFIGURATION_REQ;
 #endif
 

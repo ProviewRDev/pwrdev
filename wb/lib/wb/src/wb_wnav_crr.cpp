@@ -48,26 +48,24 @@
 #include "wb_wnav_item.h"
 #include "wb_wnav_msg.h"
 
-class CrrCtx {
+class CrrCtx
+{
 public:
-  CrrCtx(WNavBrow* a_brow, ldh_tSesContext a_ldhses)
-      : brow(a_brow), ldhses(a_ldhses)
-  {
-  }
+  CrrCtx(WNavBrow* a_brow, ldh_tSesContext a_ldhses) : brow(a_brow), ldhses(a_ldhses) {}
   WNavBrow* brow;
   ldh_tSesContext ldhses;
 };
 
-static void wnav_crr_insert_cb(void* ctx, void* parent_node,
-    navc_eItemType item_type, char* text1, char* text2, int write)
+static void wnav_crr_insert_cb(void* ctx, void* parent_node, navc_eItemType item_type, char* text1,
+                               char* text2, int write)
 {
   // if (1) {
   CrrCtx* cctx = (CrrCtx*)ctx;
 
-  switch (item_type) {
+  switch (item_type)
+  {
   case navc_eItemType_Crossref:
-    new WItemCrossref(cctx->brow, cctx->ldhses, text1, text2, write,
-        parent_node, flow_eDest_IntoLast);
+    new WItemCrossref(cctx->brow, cctx->ldhses, text1, text2, write, parent_node, flow_eDest_IntoLast);
     break;
   case navc_eItemType_Header:
     new WItemHeader(cctx->brow, "crr", text1, parent_node, flow_eDest_IntoLast);
@@ -122,8 +120,8 @@ int wnav_crr_get_volume_cb(void* ctx, pwr_tVid* vid, pwr_tVid prev_vid)
   return WNAV__SUCCESS;
 }
 
-int WNav::crr_signal(WNavBrow* brow, ldh_tSesContext ldhses, char* filename,
-    char* signalname, brow_tNode parent_node)
+int WNav::crr_signal(WNavBrow* brow, ldh_tSesContext ldhses, char* filename, char* signalname,
+                     brow_tNode parent_node)
 {
   int sts;
   CrrCtx* ctx = new CrrCtx(brow, ldhses);
@@ -139,8 +137,8 @@ int WNav::crr_signal(WNavBrow* brow, ldh_tSesContext ldhses, char* filename,
   return sts;
 }
 
-int WNav::crr_object(WNavBrow* brow, ldh_tSesContext ldhses, char* filename,
-    char* objectname, brow_tNode parent_node)
+int WNav::crr_object(WNavBrow* brow, ldh_tSesContext ldhses, char* filename, char* objectname,
+                     brow_tNode parent_node)
 {
   int sts;
   CrrCtx* ctx = new CrrCtx(brow, ldhses);
@@ -156,8 +154,8 @@ int WNav::crr_object(WNavBrow* brow, ldh_tSesContext ldhses, char* filename,
   return sts;
 }
 
-int WNav::crr_code(WNavBrow* brow, ldh_tSesContext ldhses, char* filename,
-    char* str, int brief, int func, int case_sensitive)
+int WNav::crr_code(WNavBrow* brow, ldh_tSesContext ldhses, char* filename, char* str, int brief, int func,
+                   int case_sensitive)
 {
   int sts;
   CrrCtx* ctx = new CrrCtx(brow, ldhses);

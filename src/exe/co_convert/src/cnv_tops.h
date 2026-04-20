@@ -54,7 +54,8 @@
 #define ps_cCellSize 110
 #define ps_cTmpFile "/tmp/ptmp.ps"
 
-typedef enum {
+typedef enum
+{
   ps_mPrintMode_Pos = 1 << 0,
   ps_mPrintMode_Start = 1 << 1,
   ps_mPrintMode_Continue = 1 << 2,
@@ -63,9 +64,15 @@ typedef enum {
   ps_mPrintMode_FixX = 1 << 5
 } ps_mPrintMode;
 
-typedef enum { ps_eFile_Info, ps_eFile_Body, ps_eFile__ } ps_eFile;
+typedef enum
+{
+  ps_eFile_Info,
+  ps_eFile_Body,
+  ps_eFile__
+} ps_eFile;
 
-typedef enum {
+typedef enum
+{
   ps_eId_TitlePage,
   ps_eId_InfoPage,
   ps_eId_Content,
@@ -79,8 +86,9 @@ typedef enum {
   ps_eId__
 } ps_eId;
 
-class CnvToPs {
-  public:
+class CnvToPs
+{
+public:
   CnvToPs() : cf(0), ci(0), conf_pass(false)
   {
     for (int i = 0; i < ps_cMaxLevel; i++)
@@ -90,52 +98,50 @@ class CnvToPs {
     strcpy(previous_chapter, "");
     strcpy(current_chapter, "");
 
-    style[ps_eId_TitlePage].h1 = CnvStyle("Helvetica-Bold-ISOLatin1", 35, 0,
-        100, 20, cnv_eAlignment_Center, 0, 0, 0);
-    style[ps_eId_TitlePage].h2 = CnvStyle("Helvetica-Bold-ISOLatin1", 25, 0, 50,
-        20, cnv_eAlignment_Center, 0, 0, 0);
-    style[ps_eId_TitlePage].h3 = CnvStyle("Helvetica-Bold-ISOLatin1", 15, 0, 25,
-        10, cnv_eAlignment_Center, 0, 0, 0);
-    style[ps_eId_TitlePage].text = CnvStyle(
-        "Helvetica-ISOLatin1", 8, 0, 9, 1, cnv_eAlignment_Center, 0, 0, 0);
-    style[ps_eId_TitlePage].boldtext = CnvStyle(
-        "Helvetica-Bold-ISOLatin1", 8, 0, 9, 1, cnv_eAlignment_Center, 0, 0, 0);
-    style[ps_eId_Chapter].h1 = CnvStyle("Helvetica-Bold-ISOLatin1", 24, 0, 24,
-        40, cnv_eAlignment_Left, 0, 1, 1);
-    style[ps_eId_TopicL2].h1 = CnvStyle("Helvetica-Bold-ISOLatin1", 12, 0, 20,
-        10, cnv_eAlignment_Left, 0, 0, 1);
-    style[ps_eId_TopicL2].h2 = CnvStyle(
-        "Helvetica-Bold-ISOLatin1", 10, 0, 16, 8, cnv_eAlignment_Left, 0, 0, 0);
-    style[ps_eId_TopicL3].h1 = CnvStyle(
-        "Helvetica-Bold-ISOLatin1", 10, 0, 16, 8, cnv_eAlignment_Left, 0, 0, 1);
-    style[ps_eId_TopicL3].h2 = CnvStyle(
-        "Helvetica-Bold-ISOLatin1", 8, 0, 16, 5, cnv_eAlignment_Left, 0, 0, 0);
-    style[ps_eId_Function].h1 = CnvStyle("Helvetica-Bold-ISOLatin1", 24, 0, 24,
-        20, cnv_eAlignment_Left, 1, 0, 1);
-    style[ps_eId_Class].h1 = CnvStyle("Helvetica-Bold-ISOLatin1", 24, 0, 24, 20,
-        cnv_eAlignment_Left, 1, 0, 1);
-    style[ps_eId_Class].h2 = CnvStyle(
-        "Helvetica-Bold-ISOLatin1", 20, 0, 24, 8, cnv_eAlignment_Left, 0, 0, 0);
-    style[ps_eId_Class].h3 = CnvStyle("Helvetica-Bold-ISOLatin1", 16, -40, 24,
-        6, cnv_eAlignment_Left, 0, 0, 0);
-    style[ps_eId_Content].boldtext = CnvStyle(
-        "Helvetica-Bold-ISOLatin1", 10, 0, 11, 1, cnv_eAlignment_Left, 0, 0, 0);
-    style[ps_eId_Chapter].text = CnvStyle(
-        "Times-Roman-ISOLatin1", 10, 0, 11, 1, cnv_eAlignment_Left, 0, 0, 0);
-    style[ps_eId_TopicL1].text = CnvStyle(
-        "Times-Roman-ISOLatin1", 10, 0, 11, 1, cnv_eAlignment_Left, 0, 0, 0);
-    style[ps_eId_TopicL2].text = CnvStyle(
-        "Times-Roman-ISOLatin1", 10, 0, 11, 1, cnv_eAlignment_Left, 0, 0, 0);
-    style[ps_eId_TopicL3].text = CnvStyle(
-        "Times-Roman-ISOLatin1", 10, 0, 11, 1, cnv_eAlignment_Left, 0, 0, 0);
-    style[ps_eId_Report].h1 = CnvStyle("Helvetica-Bold-ISOLatin1", 24, 0, 24,
-        20, cnv_eAlignment_Left, 0, 0, 0);
+    style[ps_eId_TitlePage].h1 =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 35, 0, 100, 20, cnv_eAlignment_Center, 0, 0, 0);
+    style[ps_eId_TitlePage].h2 =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 25, 0, 50, 20, cnv_eAlignment_Center, 0, 0, 0);
+    style[ps_eId_TitlePage].h3 =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 15, 0, 25, 10, cnv_eAlignment_Center, 0, 0, 0);
+    style[ps_eId_TitlePage].text =
+        CnvStyle("Helvetica-ISOLatin1", 8, 0, 9, 1, cnv_eAlignment_Center, 0, 0, 0);
+    style[ps_eId_TitlePage].boldtext =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 8, 0, 9, 1, cnv_eAlignment_Center, 0, 0, 0);
+    style[ps_eId_Chapter].h1 =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 24, 0, 24, 40, cnv_eAlignment_Left, 0, 1, 1);
+    style[ps_eId_TopicL2].h1 =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 12, 0, 20, 10, cnv_eAlignment_Left, 0, 0, 1);
+    style[ps_eId_TopicL2].h2 =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 10, 0, 16, 8, cnv_eAlignment_Left, 0, 0, 0);
+    style[ps_eId_TopicL3].h1 =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 10, 0, 16, 8, cnv_eAlignment_Left, 0, 0, 1);
+    style[ps_eId_TopicL3].h2 =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 8, 0, 16, 5, cnv_eAlignment_Left, 0, 0, 0);
+    style[ps_eId_Function].h1 =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 24, 0, 24, 20, cnv_eAlignment_Left, 1, 0, 1);
+    style[ps_eId_Class].h1 =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 24, 0, 24, 20, cnv_eAlignment_Left, 1, 0, 1);
+    style[ps_eId_Class].h2 = CnvStyle("Helvetica-Bold-ISOLatin1", 20, 0, 24, 8, cnv_eAlignment_Left, 0, 0, 0);
+    style[ps_eId_Class].h3 =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 16, -40, 24, 6, cnv_eAlignment_Left, 0, 0, 0);
+    style[ps_eId_Content].boldtext =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 10, 0, 11, 1, cnv_eAlignment_Left, 0, 0, 0);
+    style[ps_eId_Chapter].text =
+        CnvStyle("Times-Roman-ISOLatin1", 10, 0, 11, 1, cnv_eAlignment_Left, 0, 0, 0);
+    style[ps_eId_TopicL1].text =
+        CnvStyle("Times-Roman-ISOLatin1", 10, 0, 11, 1, cnv_eAlignment_Left, 0, 0, 0);
+    style[ps_eId_TopicL2].text =
+        CnvStyle("Times-Roman-ISOLatin1", 10, 0, 11, 1, cnv_eAlignment_Left, 0, 0, 0);
+    style[ps_eId_TopicL3].text =
+        CnvStyle("Times-Roman-ISOLatin1", 10, 0, 11, 1, cnv_eAlignment_Left, 0, 0, 0);
+    style[ps_eId_Report].h1 =
+        CnvStyle("Helvetica-Bold-ISOLatin1", 24, 0, 24, 20, cnv_eAlignment_Left, 0, 0, 0);
   }
   virtual ~CnvToPs();
 
   virtual void close();
-  virtual void print_text(
-      const char* text, CnvStyle& style, int mode = ps_mPrintMode_Pos);
+  virtual void print_text(const char* text, CnvStyle& style, int mode = ps_mPrintMode_Pos);
   virtual void print_pagebreak(int print_num);
   virtual void print_content();
   void print_h1(const char* text, int hlevel, char* subject);
@@ -147,7 +153,8 @@ class CnvToPs {
   void set_confpass(bool conf)
   {
     conf_pass = conf;
-    if (!conf) {
+    if (!conf)
+    {
       // Reset
       for (int i = 0; i < ps_cMaxLevel; i++)
         header_number[i] = 0;
@@ -157,18 +164,9 @@ class CnvToPs {
       ci = 0;
     }
   }
-  virtual void set_ci(int val)
-  {
-    ci = val;
-  }
-  virtual void set_cf(int val)
-  {
-    cf = val;
-  }
-  void set_filename(int idx, const char* name)
-  {
-    strcpy(filename[idx], name);
-  }
+  virtual void set_ci(int val) { ci = val; }
+  virtual void set_cf(int val) { cf = val; }
+  void set_filename(int idx, const char* name) { strcpy(filename[idx], name); }
   virtual void open();
   void incr_headerlevel();
   void decr_headerlevel();

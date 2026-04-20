@@ -41,7 +41,8 @@
 #include "rt_net.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #define sev_eProcSevClient 121
@@ -52,328 +53,357 @@ extern "C" {
 
 #define sev_eEvent_ClearAlarmList 2147483647
 
-typedef enum {
-  sev_eMsgType_NodeUp,
-  sev_eMsgType_HistItemsRequest,
-  sev_eMsgType_HistItems,
-  sev_eMsgType_HistDataStore,
-  sev_eMsgType_HistDataGetRequest,
-  sev_eMsgType_HistDataGet,
-  sev_eMsgType_HistItemDelete,
-  sev_eMsgType_HistItemStatus,
-  sev_eMsgType_ServerStatusRequest,
-  sev_eMsgType_ServerStatus,
-  sev_eMsgType_HistObjectDataGetRequest,
-  sev_eMsgType_HistObjectDataGet,
-  sev_eMsgType_EventsStore,
-  sev_eMsgType_ExportNodeUp,
-  sev_eMsgType_ExportItemsRequest,
-  sev_eMsgType_ExportItems,
-  sev_eMsgType_ExportData,
-  sev_eMsgType_EventsItemsRequest,
-  sev_eMsgType_EventsItems,
-  sev_eMsgType_EventsGetRequest,
-  sev_eMsgType_EventsGet
-} sev_eMsgType;
+  typedef enum
+  {
+    sev_eMsgType_NodeUp,
+    sev_eMsgType_HistItemsRequest,
+    sev_eMsgType_HistItems,
+    sev_eMsgType_HistDataStore,
+    sev_eMsgType_HistDataGetRequest,
+    sev_eMsgType_HistDataGet,
+    sev_eMsgType_HistItemDelete,
+    sev_eMsgType_HistItemStatus,
+    sev_eMsgType_ServerStatusRequest,
+    sev_eMsgType_ServerStatus,
+    sev_eMsgType_HistObjectDataGetRequest,
+    sev_eMsgType_HistObjectDataGet,
+    sev_eMsgType_EventsStore,
+    sev_eMsgType_ExportNodeUp,
+    sev_eMsgType_ExportItemsRequest,
+    sev_eMsgType_ExportItems,
+    sev_eMsgType_ExportData,
+    sev_eMsgType_EventsItemsRequest,
+    sev_eMsgType_EventsItems,
+    sev_eMsgType_EventsGetRequest,
+    sev_eMsgType_EventsGet
+  } sev_eMsgType;
 
-typedef enum {
-  sev_eEventType_Info,
-  sev_eEventType_Return,
-  sev_eEventType_Ack,
-  sev_eEventType_Alarm,
-  sev_eEventType_Block,
-  sev_eEventType_Cancel
-} sev_eEventType;
+  typedef enum
+  {
+    sev_eEventType_Info,
+    sev_eEventType_Return,
+    sev_eEventType_Ack,
+    sev_eEventType_Alarm,
+    sev_eEventType_Block,
+    sev_eEventType_Cancel
+  } sev_eEventType;
 
-typedef enum {
-  sev_mEventType_Ack		= 1,
-  sev_mEventType_Block		= 2,
-  sev_mEventType_Cancel		= 4,
-  sev_mEventType_CancelBlock	= 8,
-  sev_mEventType_Missing	= 16,
-  sev_mEventType_Reblock	= 32,
-  sev_mEventType_Return		= 64,
-  sev_mEventType_Unblock	= 128,
-  sev_mEventType_InfoSuccess	= 256,
-  sev_mEventType_Alarm		= 512,
-  sev_mEventType_MaintenanceAlarm = 1024,
-  sev_mEventType_SystemAlarm	= 2048,
-  sev_mEventType_UserAlarm1	= 4096,
-  sev_mEventType_UserAlarm2	= 8192,
-  sev_mEventType_UserAlarm3	= 16384,
-  sev_mEventType_UserAlarm4	= 32768,
-  sev_mEventType_Info		= 65536
-} sev_mEventType;
+  typedef enum
+  {
+    sev_mEventType_Ack = 1,
+    sev_mEventType_Block = 2,
+    sev_mEventType_Cancel = 4,
+    sev_mEventType_CancelBlock = 8,
+    sev_mEventType_Missing = 16,
+    sev_mEventType_Reblock = 32,
+    sev_mEventType_Return = 64,
+    sev_mEventType_Unblock = 128,
+    sev_mEventType_InfoSuccess = 256,
+    sev_mEventType_Alarm = 512,
+    sev_mEventType_MaintenanceAlarm = 1024,
+    sev_mEventType_SystemAlarm = 2048,
+    sev_mEventType_UserAlarm1 = 4096,
+    sev_mEventType_UserAlarm2 = 8192,
+    sev_mEventType_UserAlarm3 = 16384,
+    sev_mEventType_UserAlarm4 = 32768,
+    sev_mEventType_Info = 65536
+  } sev_mEventType;
 
-typedef enum {
-  sev_mEventPrio_A = 1,
-  sev_mEventPrio_B = 2,
-  sev_mEventPrio_C = 4,
-  sev_mEventPrio_D = 8
-} sev_mEventPrio;
+  typedef enum
+  {
+    sev_mEventPrio_A = 1,
+    sev_mEventPrio_B = 2,
+    sev_mEventPrio_C = 4,
+    sev_mEventPrio_D = 8
+  } sev_mEventPrio;
 
-typedef struct {
-  unsigned int type;
-  unsigned int eventprio;
-  unsigned int eventid_nix;
-  unsigned int eventid_birthtime;
-  unsigned int eventid_idx;
-  net_sTime time;
-  char eventtext[80];
-  char eventname[80];
-  unsigned int sup_aref_vid;
-  unsigned int sup_aref_oix;
-  unsigned int sup_aref_offset;
-  unsigned int sup_aref_size;
-  unsigned int eventstatus;
-} sev_sEvent;
+  typedef struct
+  {
+    unsigned int type;
+    unsigned int eventprio;
+    unsigned int eventid_nix;
+    unsigned int eventid_birthtime;
+    unsigned int eventid_idx;
+    net_sTime time;
+    char eventtext[80];
+    char eventname[80];
+    unsigned int sup_aref_vid;
+    unsigned int sup_aref_oix;
+    unsigned int sup_aref_offset;
+    unsigned int sup_aref_size;
+    unsigned int eventstatus;
+  } sev_sEvent;
 
-typedef struct {
-  unsigned int type;
-  unsigned int eventprio;
-  unsigned int eventid_nix;
-  unsigned int eventid_birthtime;
-  unsigned int eventid_idx;
-  net_sTime time;
-  char eventtext[80];
-  char eventname[80];
-  unsigned int sup_aref_vid;
-  unsigned int sup_aref_oix;
-  unsigned int sup_aref_offset;
-  unsigned int sup_aref_size;
-} sev_sEventV1;
+  typedef struct
+  {
+    unsigned int type;
+    unsigned int eventprio;
+    unsigned int eventid_nix;
+    unsigned int eventid_birthtime;
+    unsigned int eventid_idx;
+    net_sTime time;
+    char eventtext[80];
+    char eventname[80];
+    unsigned int sup_aref_vid;
+    unsigned int sup_aref_oix;
+    unsigned int sup_aref_offset;
+    unsigned int sup_aref_size;
+  } sev_sEventV1;
 
-typedef struct {
-  sev_eEventType type;
-  unsigned int eventprio;
-  unsigned int eventid_nix;
-  unsigned int eventid_birthtime;
-  unsigned int eventid_idx;
-  net_sTime time;
-  char eventtext[80];
-  char eventname[80];
-  unsigned int sup_aref_vid;
-  unsigned int sup_aref_oix;
-  unsigned int sup_aref_offset;
-  unsigned int sup_aref_size;
-} sev_sEventV0;
+  typedef struct
+  {
+    sev_eEventType type;
+    unsigned int eventprio;
+    unsigned int eventid_nix;
+    unsigned int eventid_birthtime;
+    unsigned int eventid_idx;
+    net_sTime time;
+    char eventtext[80];
+    char eventname[80];
+    unsigned int sup_aref_vid;
+    unsigned int sup_aref_oix;
+    unsigned int sup_aref_offset;
+    unsigned int sup_aref_size;
+  } sev_sEventV0;
 
-typedef struct {
-  pwr_tOName aname;
-  pwr_eType type;
-  unsigned int size;
-  unsigned int elem;
-  pwr_tString16 unit;
-} sev_sHistAttr;
+  typedef struct
+  {
+    pwr_tOName aname;
+    pwr_eType type;
+    unsigned int size;
+    unsigned int elem;
+    pwr_tString16 unit;
+  } sev_sHistAttr;
 
-typedef struct {
-  pwr_tOid oid;
-  pwr_tOName oname;
-  net_sTime storagetime;
-  net_sTime creatime;
-  net_sTime modtime;
-  pwr_tRefId sevid;
-  pwr_tString80 description;
-  pwr_tFloat32 scantime;
-  pwr_tFloat32 deadband;
-  pwr_tMask options;
-  unsigned int attrnum;
-  sev_sHistAttr attr[1];
-} sev_sHistItem;
+  typedef struct
+  {
+    pwr_tOid oid;
+    pwr_tOName oname;
+    net_sTime storagetime;
+    net_sTime creatime;
+    net_sTime modtime;
+    pwr_tRefId sevid;
+    pwr_tString80 description;
+    pwr_tFloat32 scantime;
+    pwr_tFloat32 deadband;
+    pwr_tMask options;
+    unsigned int attrnum;
+    sev_sHistAttr attr[1];
+  } sev_sHistItem;
 
-typedef struct {
-  pwr_tRefId sevid;
-  pwr_eType type;
-  unsigned int size;
-  int data[1];
-} sev_sHistData;
+  typedef struct
+  {
+    pwr_tRefId sevid;
+    pwr_eType type;
+    unsigned int size;
+    int data[1];
+  } sev_sHistData;
 
-// Message types
+  // Message types
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-} sev_sMsgAny;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+  } sev_sMsgAny;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tStatus Status;
-  unsigned int NumItems;
-  unsigned int NumAttributes;
-  sev_sHistItem Items[1];
-} sev_sMsgHistItems;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tStatus Status;
+    unsigned int NumItems;
+    unsigned int NumAttributes;
+    sev_sHistItem Items[1];
+  } sev_sMsgHistItems;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  net_sTime Time;
-  pwr_tUInt32 ServerThread;
-  int Data[1];
-} sev_sMsgHistDataStore;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    net_sTime Time;
+    pwr_tUInt32 ServerThread;
+    int Data[1];
+  } sev_sMsgHistDataStore;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  net_sTime Time;
-  int Data[1];
-} sev_sMsgHistDataStoreV0;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    net_sTime Time;
+    int Data[1];
+  } sev_sMsgHistDataStoreV0;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  net_sTime Time;
-  pwr_tUInt32 ServerThread;
-  int Data[1];
-} sev_sMsgExportData;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    net_sTime Time;
+    pwr_tUInt32 ServerThread;
+    int Data[1];
+  } sev_sMsgExportData;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tOid Oid;
-  unsigned int NumEvents;
-  pwr_tUInt32 ServerThread;
-  sev_sEvent Events[1];
-} sev_sMsgEventsStore;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tOid Oid;
+    unsigned int NumEvents;
+    pwr_tUInt32 ServerThread;
+    sev_sEvent Events[1];
+  } sev_sMsgEventsStore;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tOid Oid;
-  unsigned int NumEvents;
-  sev_sEvent Events[1];
-} sev_sMsgEventsStoreV0;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tOid Oid;
+    unsigned int NumEvents;
+    sev_sEvent Events[1];
+  } sev_sMsgEventsStoreV0;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tOid Oid;
-  pwr_tOName AName;
-  net_sTime StartTime;
-  net_sTime EndTime;
-  int NumPoints;
-} sev_sMsgHistDataGetRequest;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tOid Oid;
+    pwr_tOName AName;
+    net_sTime StartTime;
+    net_sTime EndTime;
+    int NumPoints;
+  } sev_sMsgHistDataGetRequest;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tOid Oid;
-  pwr_tOName AName;
-  pwr_tStatus Status;
-  int NumPoints;
-  pwr_eType VType;
-  unsigned int VSize;
-  int Data[1];
-} sev_sMsgHistDataGet;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tOid Oid;
+    pwr_tOName AName;
+    pwr_tStatus Status;
+    int NumPoints;
+    pwr_eType VType;
+    unsigned int VSize;
+    int Data[1];
+  } sev_sMsgHistDataGet;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tOid Oid;
-  pwr_tOName AName;
-  pwr_tStatus Status;
-  int NumPoints;
-  int NumAttributes;
-  unsigned int TotalDataSize;
-  sev_sHistAttr Attr[1];
-  int Data[1];
-} sev_sMsgHistObjectDataGet;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tOid Oid;
+    pwr_tOName AName;
+    pwr_tStatus Status;
+    int NumPoints;
+    int NumAttributes;
+    unsigned int TotalDataSize;
+    sev_sHistAttr Attr[1];
+    int Data[1];
+  } sev_sMsgHistObjectDataGet;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tOid Oid;
-  pwr_tOName AName;
-} sev_sMsgHistItemDelete;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tOid Oid;
+    pwr_tOName AName;
+  } sev_sMsgHistItemDelete;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tOid Oid;
-  pwr_tOName AName;
-  pwr_tStatus Status;
-} sev_sMsgHistItemStatus;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tOid Oid;
+    pwr_tOName AName;
+    pwr_tStatus Status;
+  } sev_sMsgHistItemStatus;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tStatus Status;
-} sev_sMsgServerStatus;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tStatus Status;
+  } sev_sMsgServerStatus;
 
-typedef struct {
-  pwr_tOid oid;
-  pwr_tOName oname;
-  pwr_tRefId sevid;
-  pwr_tString80 description;
-  pwr_tFloat32 scantime;
-  pwr_tMask options;
-  pwr_tOName aname;
-  pwr_eType type;
-  unsigned int size;
-  unsigned int elem;
-} sev_sExportItem;
+  typedef struct
+  {
+    pwr_tOid oid;
+    pwr_tOName oname;
+    pwr_tRefId sevid;
+    pwr_tString80 description;
+    pwr_tFloat32 scantime;
+    pwr_tMask options;
+    pwr_tOName aname;
+    pwr_eType type;
+    unsigned int size;
+    unsigned int elem;
+  } sev_sExportItem;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tStatus Status;
-  unsigned int NumItems;
-  unsigned int NumAttributes;
-  sev_sExportItem Items[1];
-} sev_sMsgExportItems;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tStatus Status;
+    unsigned int NumItems;
+    unsigned int NumAttributes;
+    sev_sExportItem Items[1];
+  } sev_sMsgExportItems;
 
-typedef struct {
-  pwr_tOid oid;
-  pwr_tOName oname;
-  net_sTime storagetime;
-  net_sTime creatime;
-  pwr_tString80 description;
-  pwr_tMask options;
-} sev_sEventsItem;
+  typedef struct
+  {
+    pwr_tOid oid;
+    pwr_tOName oname;
+    net_sTime storagetime;
+    net_sTime creatime;
+    pwr_tString80 description;
+    pwr_tMask options;
+  } sev_sEventsItem;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tStatus Status;
-  unsigned int NumItems;
-  sev_sEventsItem Items[1];
-} sev_sMsgEventsItems;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tStatus Status;
+    unsigned int NumItems;
+    sev_sEventsItem Items[1];
+  } sev_sMsgEventsItems;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tOid Oid;
-  net_sTime StartTime;
-  net_sTime EndTime;
-  pwr_tUInt32 EventTypeMask;
-  pwr_tUInt32 EventPrioMask;
-  pwr_tString80 EventText;
-  pwr_tOName EventName;
-  pwr_tUInt32 MaxEvents;
-} sev_sMsgEventsGetRequest;
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tOid Oid;
+    net_sTime StartTime;
+    net_sTime EndTime;
+    pwr_tUInt32 EventTypeMask;
+    pwr_tUInt32 EventPrioMask;
+    pwr_tString80 EventText;
+    pwr_tOName EventName;
+    pwr_tUInt32 MaxEvents;
+  } sev_sMsgEventsGetRequest;
 
-typedef struct {
-  net_sTime Time;
-  pwr_tUInt32 EventType;
-  pwr_tUInt32 EventPrio;
-  pwr_tOid SupObjectOid;
-  pwr_tUInt32 SupObjectOffset;
-  pwr_tUInt32 SupObjectSize;
-  pwr_tString80 EventText;
-  pwr_tOName EventName;
-  mh_sEventId EventId;
-  pwr_tUInt32 EventStatus;
-} sev_sEvents;
+  typedef struct
+  {
+    net_sTime Time;
+    pwr_tUInt32 EventType;
+    pwr_tUInt32 EventPrio;
+    pwr_tOid SupObjectOid;
+    pwr_tUInt32 SupObjectOffset;
+    pwr_tUInt32 SupObjectSize;
+    pwr_tString80 EventText;
+    pwr_tOName EventName;
+    mh_sEventId EventId;
+    pwr_tUInt32 EventStatus;
+  } sev_sEvents;
 
-typedef struct {
-  pwr_tUInt16 Type;
-  pwr_tUInt16 Version;
-  pwr_tOid Oid;
-  pwr_tStatus Status;
-  int NumEvents;
-  sev_sEvents Events[1];
-} sev_sMsgEventsGet;
-
+  typedef struct
+  {
+    pwr_tUInt16 Type;
+    pwr_tUInt16 Version;
+    pwr_tOid Oid;
+    pwr_tStatus Status;
+    int NumEvents;
+    sev_sEvents Events[1];
+  } sev_sMsgEventsGet;
 
 #ifdef __cplusplus
 }

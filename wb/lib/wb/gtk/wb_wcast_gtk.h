@@ -41,12 +41,13 @@
 
 #include "wb_wcast.h"
 
-class WCastGtk : public WCast {
+class WCastGtk : public WCast
+{
 public:
   GtkWidget* parent_wid;
 
-  WCastGtk(void* wc_parent_ctx, GtkWidget* wc_parent_wid, const char* wc_name,
-      ldh_tSesContext wc_ldhses, pwr_sAttrRef wc_aref, pwr_tStatus* status);
+  WCastGtk(void* wc_parent_ctx, GtkWidget* wc_parent_wid, const char* wc_name, ldh_tSesContext wc_ldhses,
+           pwr_sAttrRef wc_aref, pwr_tStatus* status);
   ~WCastGtk();
 };
 

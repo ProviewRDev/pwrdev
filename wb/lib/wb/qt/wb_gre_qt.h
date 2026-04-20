@@ -43,7 +43,8 @@
 
 class WGreQtTraceObject;
 
-class WGreQt : public WGre {
+class WGreQt : public WGre
+{
 public:
   QWidget* flow_widget;
   QWidget* form_widget;
@@ -66,7 +67,8 @@ private:
   WGreQtTraceObject* trace_obj;
 };
 
-class WGreQtTraceObject : public QObject {
+class WGreQtTraceObject : public QObject
+{
   Q_OBJECT
 
 public:

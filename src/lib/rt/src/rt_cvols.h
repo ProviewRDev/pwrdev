@@ -41,8 +41,7 @@
 
 #include "rt_cvol.h"
 
-cvol_sNotify* cvols_InitNotify(
-    gdb_sObject* op, cvol_sNotify* nmp, net_eMsg type);
+cvol_sNotify* cvols_InitNotify(gdb_sObject* op, cvol_sNotify* nmp, net_eMsg type);
 
 void cvols_Notify(cvol_sNotify* nmp);
 

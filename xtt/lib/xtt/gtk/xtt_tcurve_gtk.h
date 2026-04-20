@@ -41,14 +41,14 @@
 
 #include "xtt_tcurve.h"
 
-class XttTCurveGtk : public XttTCurve {
+class XttTCurveGtk : public XttTCurve
+{
 public:
   GtkWidget* parent_widget; //!< Parent widget.
 
-  XttTCurveGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-      const char* xn_name, GtkWidget** w, pwr_tAttrRef* xn_arefv, int xn_width,
-      int xn_height, unsigned int xn_options, int xn_color_theme,
-      void* basewidget, int* sts);
+  XttTCurveGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name, GtkWidget** w,
+               pwr_tAttrRef* xn_arefv, int xn_width, int xn_height, unsigned int xn_options,
+               int xn_color_theme, void* basewidget, int* sts);
   ~XttTCurveGtk();
 };
 

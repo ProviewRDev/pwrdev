@@ -46,7 +46,8 @@
 
 #include "pwr_class.h"
 
-typedef enum {
+typedef enum
+{
   conv_eIdx_invalid,
   conv_eIdx_copy,
   conv_eIdx_zero,
@@ -126,16 +127,15 @@ typedef enum {
 } conv_eIdx;
 
 typedef pwr_tBoolean (*convFunction)(
-    int tcount, /**< Number of target elements */
-    int tasize, /**< Size of one target element */
-    char* tp, /**< Target address */
-    int* tsize, /**< Size of target buffer */
-    int scount, /**< Number of source elements */
-    int sasize, /**< Size of one source element */
+    int tcount,     /**< Number of target elements */
+    int tasize,     /**< Size of one target element */
+    char* tp,       /**< Target address */
+    int* tsize,     /**< Size of target buffer */
+    int scount,     /**< Number of source elements */
+    int sasize,     /**< Size of one source element */
     const char* sp, /**< Source address */
-    pwr_mAdef
-        sadef /**< Source flags, prevents conversion of private pointers */
-    );
+    pwr_mAdef sadef /**< Source flags, prevents conversion of private pointers */
+);
 
 extern const convFunction conv_Fctn[];
 

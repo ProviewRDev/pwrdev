@@ -1700,8 +1700,8 @@ static int get_node_state(AppData* app, GtkTreeIter* iter)
 {
   gboolean selectable, enabled, inconsistent, visible;
 
-  gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), iter, COL_SELECTABLE, &selectable, COL_ENABLED, &enabled,
-                     COL_INCONSISTENT, &inconsistent, COL_VISIBLE, &visible, -1);
+  gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), iter, COL_SELECTABLE, &selectable, COL_ENABLED,
+                     &enabled, COL_INCONSISTENT, &inconsistent, COL_VISIBLE, &visible, -1);
 
   if (!visible)
     return -1;
@@ -2121,8 +2121,8 @@ static void on_select_all_signals(GtkButton* button, gpointer user_data)
     gboolean is_signal, visible;
     gchar* aref_str;
 
-    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_IS_SIGNAL, &is_signal, COL_VISIBLE, &visible,
-                       COL_AREF_STR, &aref_str, -1);
+    gtk_tree_model_get(GTK_TREE_MODEL(app->source_store), it, COL_IS_SIGNAL, &is_signal, COL_VISIBLE,
+                       &visible, COL_AREF_STR, &aref_str, -1);
 
     if (visible && is_signal && aref_str && aref_str[0] != '\0')
     {

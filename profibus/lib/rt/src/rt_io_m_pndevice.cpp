@@ -48,7 +48,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   short output_counter;
   pwr_sClass_PnDevice* op;
   pwr_sClass_PnModule* mp;
-  char name[196];  
+  char name[196];
   pwr_tCid cid;
 
   io_sChannel* chanp;

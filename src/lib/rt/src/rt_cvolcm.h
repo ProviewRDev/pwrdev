@@ -42,11 +42,9 @@
 
 #include "rt_gdb.h"
 
-void cvolcm_AddClassVolume(
-    pwr_tStatus* sts, gdb_sNode* np, const net_sGvolume* vp);
+void cvolcm_AddClassVolume(pwr_tStatus* sts, gdb_sNode* np, const net_sGvolume* vp);
 
-gdb_sVolume* cvolcm_ConnectVolume(
-    pwr_tStatus* sts, gdb_sVolume* vp, net_sGvolume* gvp, gdb_sNode* np);
+gdb_sVolume* cvolcm_ConnectVolume(pwr_tStatus* sts, gdb_sVolume* vp, net_sGvolume* gvp, gdb_sNode* np);
 
 void cvolcm_CreateObject(qcom_sGet* get);
 

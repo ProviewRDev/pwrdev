@@ -36,9 +36,9 @@
 
 /* rt_eventprinter.c -- Runtime Environment - Event printer */
 
+#include <descrip.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <descrip.h>
 
 #include "pwr_baseclasses.h"
 
@@ -93,26 +93,25 @@
 
 #define ACTUALVALUENAME "ActualValue"
 
-static FILE* Printer = NULL;
+static FILE *Printer = NULL;
 static pwr_tString80 EventPrinter;
 static pwr_sClass_EventPrinter EventPrinterObj;
 
-static void FormatEventMsg(mh_sMsgInfo* ip, char* EventMsg, int RowSize);
-static char* FormatHighLow(mh_eSupType SupType, mh_uSupInfo* SupInfo);
-static void FormatMsgInfo(char* EventStr, mh_sMsgInfo* ip, char* HighLow);
-static char* FormatOperator(pwr_tObjid Outunit);
-static char* FormatPrio(mh_sMsgInfo* ip);
-static char* FormatSupInfo(mh_eSupType SupType, mh_uSupInfo* sip);
-static void FormatValue(pwr_tFloat32 Value, char* ValString);
-static void PrintEvent(mh_sMsgInfo* MsgP);
-static char* StripActualValue(char* FullName);
+static void FormatEventMsg(mh_sMsgInfo *ip, char *EventMsg, int RowSize);
+static char *FormatHighLow(mh_eSupType SupType, mh_uSupInfo *SupInfo);
+static void FormatMsgInfo(char *EventStr, mh_sMsgInfo *ip, char *HighLow);
+static char *FormatOperator(pwr_tObjid Outunit);
+static char *FormatPrio(mh_sMsgInfo *ip);
+static char *FormatSupInfo(mh_eSupType SupType, mh_uSupInfo *sip);
+static void FormatValue(pwr_tFloat32 Value, char *ValString);
+static void PrintEvent(mh_sMsgInfo *MsgP);
+static char *StripActualValue(char *FullName);
 static pwr_tStatus Timer(pwr_tInt32 TimerId);
 
 /*------------------------------------------------------------------------------
-*/
-static char* StripActualValue(char* FullName)
-{
-  char* sp;
+ */
+static char *StripActualValue(char *FullName) {
+  char *sp;
   static pwr_tString80 Text;
 
   strncpy(Text, FullName, sizeof(Text));
@@ -125,74 +124,73 @@ static char* StripActualValue(char* FullName)
   return Text;
 }
 
-static void FormatEventMsg(mh_sMsgInfo* ip, char* EventMsg, int RowSize)
-{
+static void FormatEventMsg(mh_sMsgInfo *ip, char *EventMsg, int RowSize) {
   pwr_tInt32 Idx;
-  mh_sAck* ap;
-  mh_sMessage* mp;
-  mh_sReturn* rp;
-  mh_sBlock* bp;
+  mh_sAck *ap;
+  mh_sMessage *mp;
+  mh_sReturn *rp;
+  mh_sBlock *bp;
   char EventStr[300];
 
   switch (ip->EventType) {
   case mh_eEvent_Alarm:
     strcpy(EventStr, _ALA);
-    mp = (mh_sMessage*)ip;
-    FormatMsgInfo(
-        EventStr, ip, FormatHighLow(mp->SupInfo.SupType, &mp->SupInfo));
+    mp = (mh_sMessage *)ip;
+    FormatMsgInfo(EventStr, ip,
+                  FormatHighLow(mp->SupInfo.SupType, &mp->SupInfo));
     strcat(EventStr, mp->EventText);
     strcat(EventStr, "  ");
     strcat(EventStr, FormatSupInfo(mp->SupInfo.SupType, &mp->SupInfo));
     break;
   case mh_eEvent_Ack:
     strcpy(EventStr, _ACK);
-    ap = (mh_sAck*)ip;
-    FormatMsgInfo(
-        EventStr, ip, FormatHighLow(ap->SupInfo.SupType, &ap->SupInfo));
+    ap = (mh_sAck *)ip;
+    FormatMsgInfo(EventStr, ip,
+                  FormatHighLow(ap->SupInfo.SupType, &ap->SupInfo));
     strcat(EventStr, FormatOperator(ap->Outunit));
     break;
   case mh_eEvent_Block:
     strcpy(EventStr, _BLC);
-    bp = (mh_sBlock*)ip;
+    bp = (mh_sBlock *)ip;
     FormatMsgInfo(EventStr, ip, " ");
     strcat(EventStr, FormatOperator(bp->Outunit));
     break;
   case mh_eEvent_Unblock:
     strcpy(EventStr, _UBLC);
-    bp = (mh_sBlock*)ip;
+    bp = (mh_sBlock *)ip;
     FormatMsgInfo(EventStr, ip, " ");
     strcat(EventStr, FormatOperator(bp->Outunit));
     break;
   case mh_eEvent_Reblock:
     strcpy(EventStr, _RBLC);
-    bp = (mh_sBlock*)ip;
+    bp = (mh_sBlock *)ip;
     FormatMsgInfo(EventStr, ip, " ");
     strcat(EventStr, FormatOperator(bp->Outunit));
     break;
   case mh_eEvent_CancelBlock:
     strcpy(EventStr, _CBLC);
-    bp = (mh_sBlock*)ip;
+    bp = (mh_sBlock *)ip;
     FormatMsgInfo(EventStr, ip, " ");
     break;
   case mh_eEvent_Return:
     strcpy(EventStr, _RET);
-    rp = (mh_sReturn*)ip;
-    FormatMsgInfo(
-        EventStr, ip, FormatHighLow(rp->SupInfo.SupType, &rp->SupInfo));
+    rp = (mh_sReturn *)ip;
+    FormatMsgInfo(EventStr, ip,
+                  FormatHighLow(rp->SupInfo.SupType, &rp->SupInfo));
     strcat(EventStr, rp->EventText);
     break;
   case mh_eEvent_Cancel:
     strcpy(EventStr, _CANC);
-    rp = (mh_sReturn*)ip;
-    FormatMsgInfo(
-        EventStr, ip, FormatHighLow(rp->SupInfo.SupType, &rp->SupInfo));
+    rp = (mh_sReturn *)ip;
+    FormatMsgInfo(EventStr, ip,
+                  FormatHighLow(rp->SupInfo.SupType, &rp->SupInfo));
     strcat(EventStr, rp->EventText);
     break;
   case mh_eEvent_Info:
     strcpy(EventStr, _MSG);
-    mp = (mh_sMessage*)ip;
-    FormatMsgInfo(
-        EventStr, ip, FormatHighLow(mp->SupInfo.SupType, &mp->SupInfo));
+    mp = (mh_sMessage *)ip;
+    FormatMsgInfo(EventStr, ip,
+                  FormatHighLow(mp->SupInfo.SupType, &mp->SupInfo));
     strcat(EventStr, mp->EventText);
     strcat(EventStr, "  ");
     strcat(EventStr, FormatSupInfo(mp->SupInfo.SupType, &mp->SupInfo));
@@ -219,9 +217,8 @@ static void FormatEventMsg(mh_sMsgInfo* ip, char* EventMsg, int RowSize)
 }
 
 /*------------------------------------------------------------------------------
-*/
-static void FormatMsgInfo(char* EventStr, mh_sMsgInfo* ip, char* HighLow)
-{
+ */
+static void FormatMsgInfo(char *EventStr, mh_sMsgInfo *ip, char *HighLow) {
   char Time[80];
 
   strcat(EventStr, FormatPrio(ip));
@@ -235,9 +232,8 @@ static void FormatMsgInfo(char* EventStr, mh_sMsgInfo* ip, char* HighLow)
 }
 
 /*------------------------------------------------------------------------------
-*/
-static char* FormatHighLow(mh_eSupType SupType, mh_uSupInfo* SupInfo)
-{
+ */
+static char *FormatHighLow(mh_eSupType SupType, mh_uSupInfo *SupInfo) {
   static char Text[5];
 
   if (SupType == mh_eSupType_Analog)
@@ -252,9 +248,8 @@ static char* FormatHighLow(mh_eSupType SupType, mh_uSupInfo* SupInfo)
 }
 
 /*------------------------------------------------------------------------------
-*/
-static char* FormatSupInfo(mh_eSupType SupType, mh_uSupInfo* sip)
-{
+ */
+static char *FormatSupInfo(mh_eSupType SupType, mh_uSupInfo *sip) {
   static char Text[100];
   pwr_tString40 ActValue, LimitValue;
 
@@ -264,17 +259,16 @@ static char* FormatSupInfo(mh_eSupType SupType, mh_uSupInfo* sip)
     FormatValue(sip->mh_uSupInfo_u.A.ActualValue, ActValue);
     FormatValue(sip->mh_uSupInfo_u.A.CtrlLimit, LimitValue);
     sprintf(Text, " %s%s %s,  %s%s %s", _VALUE, ActValue,
-        sip->mh_uSupInfo_u.A.Unit, _LIMIT, LimitValue,
-        sip->mh_uSupInfo_u.A.Unit);
+            sip->mh_uSupInfo_u.A.Unit, _LIMIT, LimitValue,
+            sip->mh_uSupInfo_u.A.Unit);
   }
 
   return Text;
 }
 
 /*------------------------------------------------------------------------------
-*/
-static char* FormatPrio(mh_sMsgInfo* ip)
-{
+ */
+static char *FormatPrio(mh_sMsgInfo *ip) {
   static char Text[5];
 
   switch (ip->EventPrio) {
@@ -298,9 +292,8 @@ static char* FormatPrio(mh_sMsgInfo* ip)
 }
 
 /*------------------------------------------------------------------------------
-*/
-static char* FormatOperator(pwr_tObjid Outunit)
-{
+ */
+static char *FormatOperator(pwr_tObjid Outunit) {
   pwr_tStatus sts;
   static char Text[100];
   pwr_tClassId Class;
@@ -316,7 +309,7 @@ static char* FormatOperator(pwr_tObjid Outunit)
         sts = gdh_GetObjectInfo(FullName, &Operator, sizeof(pwr_sClass_User));
         if (ODD(sts)) {
           sprintf(Text, "%s %d %s %s", _OPPLACE, Operator.OpNumber, _OPERATOR,
-              Operator.UserName);
+                  Operator.UserName);
         }
       }
     }
@@ -326,11 +319,10 @@ static char* FormatOperator(pwr_tObjid Outunit)
 }
 
 /*------------------------------------------------------------------------------
-* Prints value to a string with number of decimals depending on the size
-* of the value.
-*/
-static void FormatValue(pwr_tFloat32 Value, char* ValString)
-{
+ * Prints value to a string with number of decimals depending on the size
+ * of the value.
+ */
+static void FormatValue(pwr_tFloat32 Value, char *ValString) {
   pwr_tFloat32 AbsValue;
   int Dec;
 
@@ -357,16 +349,14 @@ static void FormatValue(pwr_tFloat32 Value, char* ValString)
   sprintf(ValString, "%.*f", Dec, Value);
 }
 
-static void PrintEvent(mh_sMsgInfo* ip)
-{
+static void PrintEvent(mh_sMsgInfo *ip) {
   char EventMsg[512];
 
   FormatEventMsg(ip, EventMsg, EventPrinterObj.RowSize);
   fprintf(Printer, EventMsg);
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
   pwr_tStatus sts;
   pwr_tObjid Object;
   pwr_tClassId Class;
@@ -407,7 +397,8 @@ int main(int argc, char* argv[])
     exit(2);
   }
 
-  sts = mh_OutunitConnect(Object, Type, Flags, (mh_cbOutunitAck)PrintEvent,
+  sts = mh_OutunitConnect(
+      Object, Type, Flags, (mh_cbOutunitAck)PrintEvent,
       (mh_cbOutunitAlarm)PrintEvent, (mh_cbOutunitBlock)PrintEvent,
       (mh_cbOutunitCancel)PrintEvent, NULL, NULL, (mh_cbOutunitInfo)PrintEvent,
       (mh_cbOutunitReturn)PrintEvent, NULL);
@@ -418,8 +409,8 @@ int main(int argc, char* argv[])
   }
 
   if (Type == mh_eOutunitType_Printer) {
-    sts = gdh_GetObjectInfo(
-        EventPrinter, &EventPrinterObj, sizeof(EventPrinterObj));
+    sts = gdh_GetObjectInfo(EventPrinter, &EventPrinterObj,
+                            sizeof(EventPrinterObj));
     if (EVEN(sts)) {
       printf("%%PRI-E-EVENTPRINT Cannot get EventPrinter object\n");
       exit(sts);

@@ -52,8 +52,7 @@
 /*----------------------------------------------------------------------------*\
    Init method for the Pb module Do
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                              io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   pwr_sClass_Pb_Do* op;
@@ -62,8 +61,7 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
   local = (io_sCardLocal*)cp->Local;
   (void)local; // Do nothing
 
-  if (op->NumberOfChannels != 8 && op->NumberOfChannels != 16 &&
-      op->NumberOfChannels != 32)
+  if (op->NumberOfChannels != 8 && op->NumberOfChannels != 16 && op->NumberOfChannels != 32)
     op->Status = PB_MODULE_STATE_NOTINIT;
 
   if (op->Orientation > op->NumberOfChannels)
@@ -78,8 +76,7 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 /*----------------------------------------------------------------------------*\
    Write method for the Pb module Do
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                               io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   pwr_sClass_Pb_Do* op;
@@ -143,8 +140,7 @@ static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                               io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   local = cp->Local;
@@ -158,6 +154,5 @@ static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Pb_Do) = {
-    pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardWrite),
-    pwr_BindIoMethod(IoCardClose), pwr_NullMethod};
+pwr_dExport pwr_BindIoMethods(Pb_Do) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardWrite),
+                                        pwr_BindIoMethod(IoCardClose), pwr_NullMethod};

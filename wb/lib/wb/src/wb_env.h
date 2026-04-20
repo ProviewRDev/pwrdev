@@ -42,7 +42,8 @@
 
 class wb_volume;
 
-class wb_env : public wb_status {
+class wb_env : public wb_status
+{
 protected:
   wb_erep* m_erep;
 
@@ -60,10 +61,7 @@ public:
   operator wb_erep*() const;
   bool operator==(wb_env&);
 
-  void load(char* db)
-  {
-    m_erep->load(&m_sts, db);
-  }
+  void load(char* db) { m_erep->load(&m_sts, db); }
   bool open();
   bool close();
 
@@ -78,13 +76,10 @@ public:
 
   wb_volume snapshot(pwr_tVid);
 
-  wb_volume createVolume(pwr_tVid vid, pwr_tCid cid, const char* name,
-      ldh_eVolRep type, char* server, bool add = true);
+  wb_volume createVolume(pwr_tVid vid, pwr_tCid cid, const char* name, ldh_eVolRep type, char* server,
+                         bool add = true);
 
-  int nextVolatileVid(char* name)
-  {
-    return m_erep->nextVolatileVid(&m_sts, name);
-  }
+  int nextVolatileVid(char* name) { return m_erep->nextVolatileVid(&m_sts, name); }
 };
 
 #endif

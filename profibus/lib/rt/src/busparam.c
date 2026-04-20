@@ -71,8 +71,8 @@ LOCAL_DATA
 #pragma check_stack(off)
 #endif
 
-FUNCTION LOCAL PB_BOOL pbt_get_bus_param_for_dp(
-    IN USIGN8 baud_rate, OUT T_FMB_SET_BUSPARAMETER_REQ* bus_param_ptr)
+FUNCTION LOCAL PB_BOOL pbt_get_bus_param_for_dp(IN USIGN8 baud_rate,
+                                                OUT T_FMB_SET_BUSPARAMETER_REQ* bus_param_ptr)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -176,8 +176,8 @@ possible return values:
   }
 }
 
-FUNCTION LOCAL PB_BOOL pbt_get_bus_param_for_fms(
-    IN USIGN8 baud_rate, OUT T_FMB_SET_BUSPARAMETER_REQ* bus_param_ptr)
+FUNCTION LOCAL PB_BOOL pbt_get_bus_param_for_fms(IN USIGN8 baud_rate,
+                                                 OUT T_FMB_SET_BUSPARAMETER_REQ* bus_param_ptr)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -300,8 +300,8 @@ possible return values:
   }
 }
 
-FUNCTION LOCAL PB_BOOL pbt_get_bus_param_for_dpfms(
-    IN USIGN8 baud_rate, OUT T_FMB_SET_BUSPARAMETER_REQ* bus_param_ptr)
+FUNCTION LOCAL PB_BOOL pbt_get_bus_param_for_dpfms(IN USIGN8 baud_rate,
+                                                   OUT T_FMB_SET_BUSPARAMETER_REQ* bus_param_ptr)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -435,9 +435,9 @@ possible return values:
   }
 }
 
-FUNCTION GLOBAL PB_BOOL CALL_CONV pbt_get_dp_def_bus_param(
-    IN USIGN8 baud_rate, IN USIGN8 station_addr, IN USIGN16 mode,
-    OUT T_DP_BUS_PARA_SET FAR* bus_param_ptr)
+FUNCTION GLOBAL PB_BOOL CALL_CONV pbt_get_dp_def_bus_param(IN USIGN8 baud_rate, IN USIGN8 station_addr,
+                                                           IN USIGN16 mode,
+                                                           OUT T_DP_BUS_PARA_SET FAR* bus_param_ptr)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -501,17 +501,17 @@ possible return values:
     bus_param_ptr->poll_timeout = 1000;      /* [  1ms] */
     bus_param_ptr->data_control_time = 100;  /* [ 10ms] */
     bus_param_ptr->master_user_data_len = 34;
-    memcpy((USIGN8 FAR*)bus_param_ptr->master_class2_name,
-           (USIGN8 FAR*)"SOFTING PROFIBUS DP MASTER      ", 32);
+    memcpy((USIGN8 FAR*)bus_param_ptr->master_class2_name, (USIGN8 FAR*)"SOFTING PROFIBUS DP MASTER      ",
+           32);
 
     bus_param_ptr->bus_para_len += bus_param_ptr->master_user_data_len;
   }
   return ret_val;
 }
 
-FUNCTION GLOBAL PB_BOOL CALL_CONV pbt_get_fms_fm7_def_bus_param(
-    IN USIGN8 baud_rate, IN USIGN8 station_addr, IN PB_BOOL in_ring_desired,
-    IN USIGN16 mode, OUT T_SET_BUSPARAMETER_REQ FAR* bus_param_ptr)
+FUNCTION GLOBAL PB_BOOL CALL_CONV pbt_get_fms_fm7_def_bus_param(IN USIGN8 baud_rate, IN USIGN8 station_addr,
+                                                                IN PB_BOOL in_ring_desired, IN USIGN16 mode,
+                                                                OUT T_SET_BUSPARAMETER_REQ FAR* bus_param_ptr)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -571,9 +571,9 @@ possible return values:
   }
 }
 
-FUNCTION GLOBAL PB_BOOL CALL_CONV pbt_get_fdlif_def_bus_param(
-    IN USIGN8 baud_rate, IN USIGN8 station_addr, IN PB_BOOL in_ring_desired,
-    IN USIGN16 mode, OUT T_FDLIF_SET_BUSPARAMETER_REQ FAR* bus_param_ptr)
+FUNCTION GLOBAL PB_BOOL CALL_CONV
+pbt_get_fdlif_def_bus_param(IN USIGN8 baud_rate, IN USIGN8 station_addr, IN PB_BOOL in_ring_desired,
+                            IN USIGN16 mode, OUT T_FDLIF_SET_BUSPARAMETER_REQ FAR* bus_param_ptr)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -650,9 +650,9 @@ possible return values:
   return (ret_val);
 }
 
-FUNCTION GLOBAL PB_BOOL CALL_CONV pbt_get_fmb_def_bus_param(
-    IN USIGN8 baud_rate, IN USIGN8 station_addr, IN PB_BOOL in_ring_desired,
-    IN USIGN16 mode, OUT T_FMB_SET_BUSPARAMETER_REQ FAR* bus_param_ptr)
+FUNCTION GLOBAL PB_BOOL CALL_CONV pbt_get_fmb_def_bus_param(IN USIGN8 baud_rate, IN USIGN8 station_addr,
+                                                            IN PB_BOOL in_ring_desired, IN USIGN16 mode,
+                                                            OUT T_FMB_SET_BUSPARAMETER_REQ FAR* bus_param_ptr)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION

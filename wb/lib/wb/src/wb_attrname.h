@@ -39,7 +39,8 @@
 
 #include "wb_name.h"
 
-class wb_attrname : public wb_name {
+class wb_attrname : public wb_name
+{
 public:
   wb_attrname();
   wb_attrname(const char*);

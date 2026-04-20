@@ -41,23 +41,16 @@
 #include "glow_growctx.h"
 
 #define COLPALWIDGETGTK_TYPE (colpalwidgetgtk_get_type())
-#define COLPALWIDGETGTK(obj)                                                   \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), COLPALWIDGETGTK_TYPE, ColPalWidgetGtk))
-#define COLPALWIDGETGTK_CLASS(obj)                                             \
-  (G_TYPE_CHECK_CLASS_CAST((obj), COLPALWIDGETGTK, ColPalWidgetGtkClass))
-#define IS_COLPALWIDGETGTK(obj)                                                \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), COLPALWIDGETGTK_TYPE))
-#define IS_COLPALWIDGETGTK_CLASS(obj)                                          \
-  (G_TYPE_CHECK_CLASS_TYPE((obj), COLPALWIDGETGTK_TYPE))
-#define COLPALWIDGETGTK_GET_CLASS                                              \
-  (G_TYPE_INSTANCE_GET_CLASS((obj), COLPALWIDGETGTK, ColPalWidgetGtkClass))
+#define COLPALWIDGETGTK(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), COLPALWIDGETGTK_TYPE, ColPalWidgetGtk))
+#define COLPALWIDGETGTK_CLASS(obj) (G_TYPE_CHECK_CLASS_CAST((obj), COLPALWIDGETGTK, ColPalWidgetGtkClass))
+#define IS_COLPALWIDGETGTK(obj) (G_TYPE_CHECK_INSTANCE_TYPE((obj), COLPALWIDGETGTK_TYPE))
+#define IS_COLPALWIDGETGTK_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE((obj), COLPALWIDGETGTK_TYPE))
+#define COLPALWIDGETGTK_GET_CLASS (G_TYPE_INSTANCE_GET_CLASS((obj), COLPALWIDGETGTK, ColPalWidgetGtkClass))
 
 GType colpalwidgetgtk_get_type(void);
 
-GtkWidget* colpalwidgetgtk_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data);
-GtkWidget* scrolledcolpalwidgetgtk_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
-    GtkWidget** growwidget);
+GtkWidget* colpalwidgetgtk_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data);
+GtkWidget* scrolledcolpalwidgetgtk_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
+                                       GtkWidget** growwidget);
 
 GtkWidget* colpalnavwidgetgtk_new(GtkWidget* main_grow);

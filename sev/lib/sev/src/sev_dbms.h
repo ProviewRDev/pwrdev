@@ -43,7 +43,8 @@
 
 class sev_dbms_env;
 
-class sev_dbms_env {
+class sev_dbms_env
+{
 public:
   MYSQL* m_con;
 
@@ -60,16 +61,15 @@ public:
 
   sev_dbms_env();
   sev_dbms_env(const char* fileName);
-  sev_dbms_env(const char* host, const char* user, const char* passwd,
-      const char* dbName, unsigned int port, const char* socket);
+  sev_dbms_env(const char* host, const char* user, const char* passwd, const char* dbName, unsigned int port,
+               const char* socket);
 
   sev_dbms_env(const sev_dbms_env&);
   void operator=(const sev_dbms_env&);
   virtual ~sev_dbms_env();
 
-  int create(const char* fileName, const char* host, const char* user,
-      const char* passwd, const char* dbName, unsigned int port,
-      const char* socket);
+  int create(const char* fileName, const char* host, const char* user, const char* passwd, const char* dbName,
+             unsigned int port, const char* socket);
 
   int open(void);
   int open(const char* fileName);
@@ -114,7 +114,8 @@ private:
   int create();
 };
 
-class sev_dbms : public sev_db {
+class sev_dbms : public sev_db
+{
 public:
   static const unsigned int constMaxColNameLength = 64;
 
@@ -123,94 +124,75 @@ public:
   sev_dbms(sev_dbms_env* env);
   ~sev_dbms();
 
-  int check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname,
-      pwr_tDeltaTime storagetime, pwr_eType type, unsigned int size,
-      char* description, char* unit, pwr_tFloat32 scantime,
-      pwr_tFloat32 deadband, pwr_tMask options, unsigned int* idx);
-  int add_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname,
-      pwr_tDeltaTime storagetime, pwr_eType type, unsigned int size,
-      char* description, char* unit, pwr_tFloat32 scantime,
-      pwr_tFloat32 deadband, pwr_tMask options, unsigned int* idx);
-  int store_value(pwr_tStatus* sts, void* thread, int item_idx, int attr_idx,
-      pwr_tTime time, void* buf, unsigned int size);
-  int write_value(pwr_tStatus* sts, int item_idx, int attr_idx, pwr_tTime time,
-      void* buf, unsigned int size, void* thread);
-  int get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
-      pwr_tMask options, float deadband, char* aname, pwr_eType type,
-      unsigned int size, pwr_tFloat32 scantime, pwr_tTime* creatime,
-      pwr_tTime* starttime, pwr_tTime* endtime, int maxsize, pwr_tTime** tbuf,
-      void** vbuf, unsigned int* bsize);
-  int delete_old_data(pwr_tStatus* sts, void* thread, char* tablename,
-      pwr_tMask options, pwr_tTime limit, pwr_tFloat32 scantime,
-      pwr_tFloat32 garbagecycle);
+  int check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname, pwr_tDeltaTime storagetime,
+                 pwr_eType type, unsigned int size, char* description, char* unit, pwr_tFloat32 scantime,
+                 pwr_tFloat32 deadband, pwr_tMask options, unsigned int* idx);
+  int add_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname, pwr_tDeltaTime storagetime,
+               pwr_eType type, unsigned int size, char* description, char* unit, pwr_tFloat32 scantime,
+               pwr_tFloat32 deadband, pwr_tMask options, unsigned int* idx);
+  int store_value(pwr_tStatus* sts, void* thread, int item_idx, int attr_idx, pwr_tTime time, void* buf,
+                  unsigned int size);
+  int write_value(pwr_tStatus* sts, int item_idx, int attr_idx, pwr_tTime time, void* buf, unsigned int size,
+                  void* thread);
+  int get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid, pwr_tMask options, float deadband, char* aname,
+                 pwr_eType type, unsigned int size, pwr_tFloat32 scantime, pwr_tTime* creatime,
+                 pwr_tTime* starttime, pwr_tTime* endtime, int maxsize, pwr_tTime** tbuf, void** vbuf,
+                 unsigned int* bsize);
+  int delete_old_data(pwr_tStatus* sts, void* thread, char* tablename, pwr_tMask options, pwr_tTime limit,
+                      pwr_tFloat32 scantime, pwr_tFloat32 garbagecycle);
   int delete_item(pwr_tStatus* sts, pwr_tOid oid, char* aname);
 
   int get_items(pwr_tStatus* sts);
-  int create_table(pwr_tStatus* sts, char* tablename, pwr_eType type,
-      unsigned int size, pwr_tMask options, float deadband);
+  int create_table(pwr_tStatus* sts, char* tablename, pwr_eType type, unsigned int size, pwr_tMask options,
+                   float deadband);
   int delete_table(pwr_tStatus* sts, char* tablename);
-  int store_item(pwr_tStatus* sts, char* tabelname, pwr_tOid oid, char* oname,
-      char* aname, pwr_tDeltaTime storagetime, pwr_eType vtype,
-      unsigned int vsize, char* description, char* unit, pwr_tFloat32 scantime,
-      pwr_tFloat32 deadband, pwr_tMask options);
+  int store_item(pwr_tStatus* sts, char* tabelname, pwr_tOid oid, char* oname, char* aname,
+                 pwr_tDeltaTime storagetime, pwr_eType vtype, unsigned int vsize, char* description,
+                 char* unit, pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options);
   int remove_item(pwr_tStatus* sts, pwr_tOid oid, char* aname);
   static sev_db* open_database();
   static char* oid_to_table(pwr_tOid oid, char* aname);
   char* dbName();
   char* pwrtype_to_type(pwr_eType type, unsigned int size);
   static int timestr_to_time(char* tstr, pwr_tTime* ts);
-  static void write_db_cb(
-      void* data, int idx, void* value, pwr_tTime* time, void* thread);
-  int check_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
-      char* oname, char* aname, pwr_tDeltaTime storagetime, char* description,
-      pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options,
-      unsigned int attrnum, sev_sHistAttr* attr, unsigned int* idx);
-  int add_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
-      char* oname, char* aname, pwr_tDeltaTime storagetime, char* description,
-      pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options,
-      unsigned int attrnum, sev_sHistAttr* attr, unsigned int* idx);
-  int store_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
-      char* oname, char* aname, pwr_tDeltaTime storagetime, char* description,
-      pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options);
-  int create_objecttable(
-      pwr_tStatus* sts, char* tablename, pwr_tMask options, float deadband);
-  int store_objectvalue(pwr_tStatus* sts, void* thread, int item_idx,
-      int attr_idx, pwr_tTime time, void* buf, void* oldbuf, unsigned int size);
-  int get_item(pwr_tStatus* sts, void* thread, sev_item* item, pwr_tOid oid,
-      char* attributename);
-  int get_objectitem(pwr_tStatus* sts, void* thread, sev_item* item,
-      pwr_tOid oid, char* attributename);
+  static void write_db_cb(void* data, int idx, void* value, pwr_tTime* time, void* thread);
+  int check_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                       pwr_tDeltaTime storagetime, char* description, pwr_tFloat32 scantime,
+                       pwr_tFloat32 deadband, pwr_tMask options, unsigned int attrnum, sev_sHistAttr* attr,
+                       unsigned int* idx);
+  int add_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                     pwr_tDeltaTime storagetime, char* description, pwr_tFloat32 scantime,
+                     pwr_tFloat32 deadband, pwr_tMask options, unsigned int attrnum, sev_sHistAttr* attr,
+                     unsigned int* idx);
+  int store_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                       pwr_tDeltaTime storagetime, char* description, pwr_tFloat32 scantime,
+                       pwr_tFloat32 deadband, pwr_tMask options);
+  int create_objecttable(pwr_tStatus* sts, char* tablename, pwr_tMask options, float deadband);
+  int store_objectvalue(pwr_tStatus* sts, void* thread, int item_idx, int attr_idx, pwr_tTime time, void* buf,
+                        void* oldbuf, unsigned int size);
+  int get_item(pwr_tStatus* sts, void* thread, sev_item* item, pwr_tOid oid, char* attributename);
+  int get_objectitem(pwr_tStatus* sts, void* thread, sev_item* item, pwr_tOid oid, char* attributename);
   int get_objectitems(pwr_tStatus* sts);
-  int get_objectitemattributes(
-      pwr_tStatus* sts, sev_item* item, char* tablename);
-  int check_objectitemattr(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
-      char* aname, char* oname, pwr_eType type, unsigned int size,
-      unsigned int* idx);
-  int delete_old_objectdata(pwr_tStatus* sts, void* thread, char* tablename,
-      pwr_tMask options, pwr_tTime limit, pwr_tFloat32 scantime,
-      pwr_tFloat32 garbagecycle);
-  int check_deadband(pwr_eType type, unsigned int size, pwr_tFloat32 deadband,
-      void* value, void* oldvalue);
-  int get_objectvalues(pwr_tStatus* sts, void* thread, sev_item* item,
-      unsigned int size, pwr_tTime* starttime, pwr_tTime* endtime, int maxsize,
-      pwr_tTime** tbuf, void** vbuf, unsigned int* bsize);
+  int get_objectitemattributes(pwr_tStatus* sts, sev_item* item, char* tablename);
+  int check_objectitemattr(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* aname, char* oname,
+                           pwr_eType type, unsigned int size, unsigned int* idx);
+  int delete_old_objectdata(pwr_tStatus* sts, void* thread, char* tablename, pwr_tMask options,
+                            pwr_tTime limit, pwr_tFloat32 scantime, pwr_tFloat32 garbagecycle);
+  int check_deadband(pwr_eType type, unsigned int size, pwr_tFloat32 deadband, void* value, void* oldvalue);
+  int get_objectvalues(pwr_tStatus* sts, void* thread, sev_item* item, unsigned int size,
+                       pwr_tTime* starttime, pwr_tTime* endtime, int maxsize, pwr_tTime** tbuf, void** vbuf,
+                       unsigned int* bsize);
   int delete_event_table(pwr_tStatus* sts, char* tablename);
   int create_event_table(pwr_tStatus* sts, char* tablename, pwr_tMask options);
   int store_event(pwr_tStatus* sts, void* thread, int item_idx, sev_event* ep);
-  pwr_tUInt64 get_minFromIntegerColumn(
-      void* thread, char* tablename, char* colname);
-  pwr_tUInt64 get_maxFromIntegerColumn(
-      void* thread, char* tablename, char* colname);
+  pwr_tUInt64 get_minFromIntegerColumn(void* thread, char* tablename, char* colname);
+  pwr_tUInt64 get_maxFromIntegerColumn(void* thread, char* tablename, char* colname);
   pwr_tUInt64 get_nextAutoIncrement(char* tablename);
-  int handle_itemchange(
-      pwr_tStatus* sts, char* tablename, unsigned int item_idx);
-  int handle_objectchange(
-      pwr_tStatus* sts, char* tablename, unsigned int item_idx, bool newObject);
-  int get_events(pwr_tStatus *sts, void *thread, pwr_tOid,
-		 pwr_tMask options, pwr_tMask eventtypemask, 
-		 pwr_tMask eventpriomask, char *eventtext, char *eventname,
-		 pwr_tTime *starttime, pwr_tTime *endtime, unsigned int numpoints, 
-		 std::vector<sev_event> &list);
+  int handle_itemchange(pwr_tStatus* sts, char* tablename, unsigned int item_idx);
+  int handle_objectchange(pwr_tStatus* sts, char* tablename, unsigned int item_idx, bool newObject);
+  int get_events(pwr_tStatus* sts, void* thread, pwr_tOid, pwr_tMask options, pwr_tMask eventtypemask,
+                 pwr_tMask eventpriomask, char* eventtext, char* eventname, pwr_tTime* starttime,
+                 pwr_tTime* endtime, unsigned int numpoints, std::vector<sev_event>& list);
   int repair_table(pwr_tStatus* sts, char* tablename);
   int alter_engine(pwr_tStatus* sts, char* tablename);
   int optimize(pwr_tStatus* sts, char* tablename);
@@ -220,17 +202,14 @@ public:
   int commit_transaction(void* thread);
   void* new_thread();
   void delete_thread(void* thread);
-  int get_closest_time(void* thread, char* tablename, unsigned int options,
-      pwr_tTime* time, int before, unsigned int* id);
-  int get_id_value(void* thread, char* tablename,
-		   unsigned int id, pwr_eType type, int size, 
-		   void *value);
+  int get_closest_time(void* thread, char* tablename, unsigned int options, pwr_tTime* time, int before,
+                       unsigned int* id);
+  int get_id_value(void* thread, char* tablename, unsigned int id, pwr_eType type, int size, void* value);
   void string_to_mysqlstring(char* in, char* out, int size);
   void mysqlstring_to_string(char* in, char* out, int size);
-  int get_id_range(pwr_tStatus* sts, void* thread, sev_item* item,
-      pwr_tMask options, unsigned int* first, unsigned int* last);
-  int get_time_range(pwr_tStatus* sts, sev_item* item, pwr_tMask options,
-      pwr_tTime* first, pwr_tTime* last);
+  int get_id_range(pwr_tStatus* sts, void* thread, sev_item* item, pwr_tMask options, unsigned int* first,
+                   unsigned int* last);
+  int get_time_range(pwr_tStatus* sts, sev_item* item, pwr_tMask options, pwr_tTime* first, pwr_tTime* last);
   char* create_colName(unsigned int index, char* attributename);
 };
 #endif

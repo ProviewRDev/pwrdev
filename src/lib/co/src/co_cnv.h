@@ -37,11 +37,12 @@
 #define co_cnv_h
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-char* cnv_utf8_to_iso8859(const char* utf8, size_t utf8_size);
-char* cnv_iso8859_to_utf8(const char* iso, size_t iso_size);
+  char* cnv_utf8_to_iso8859(const char* utf8, size_t utf8_size);
+  char* cnv_iso8859_to_utf8(const char* iso, size_t iso_size);
 
 #if defined __cplusplus
 }

@@ -41,45 +41,32 @@
 #include "flow_text.h"
 #include "flow_draw.h"
 
-FlowText::FlowText(FlowCtx* flow_ctx, const char* text1, double x, double y,
-    flow_eDrawType d_type, int t_size)
+FlowText::FlowText(FlowCtx* flow_ctx, const char* text1, double x, double y, flow_eDrawType d_type,
+                   int t_size)
     : ctx(flow_ctx), p(flow_ctx, x, y), draw_type(d_type), text_size(t_size)
 {
   strncpy(text, text1, sizeof(text));
 }
 
-void FlowText::zoom()
-{
-  p.zoom();
-}
+void FlowText::zoom() { p.zoom(); }
 
-void FlowText::nav_zoom()
-{
-  p.nav_zoom();
-}
+void FlowText::nav_zoom() { p.nav_zoom(); }
 
-void FlowText::print_zoom()
-{
-  p.print_zoom();
-}
+void FlowText::print_zoom() { p.print_zoom(); }
 
-void FlowText::traverse(int x, int y)
-{
-  p.traverse(x, y);
-}
+void FlowText::traverse(int x, int y) { p.traverse(x, y); }
 
 void FlowText::print(void* pos, void* node, int highlight)
 {
-  double idx
-      = (ctx->print_zoom_factor / ctx->base_zoom_factor * (text_size + 4) - 4);
+  double idx = (ctx->print_zoom_factor / ctx->base_zoom_factor * (text_size + 4) - 4);
   double size = 8.0 + 6.0 / 3 * idx;
 
   if (size <= 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   ctx->current_print->text(p.print_z_x + ((FlowPoint*)pos)->print_z_x,
-      p.print_z_y + ((FlowPoint*)pos)->print_z_y, text, strlen(text), draw_type,
-      size, 0);
+                           p.print_z_y + ((FlowPoint*)pos)->print_z_y, text, strlen(text), draw_type, size,
+                           0);
 }
 
 void FlowText::save(std::ofstream& fp, flow_eSaveMode mode)
@@ -100,9 +87,11 @@ void FlowText::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
+  for (;;)
+  {
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case flow_eSave_Text:
       break;
     case flow_eSave_Text_text_size:
@@ -138,9 +127,8 @@ void FlowText::draw(void* pos, int highlight, int dimmed, int hot, void* node)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   ctx->fdraw->text(ctx, p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-      p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, text, strlen(text),
-      draw_type, idx, highlight, dimmed, 0,
-      ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
+                   p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, text, strlen(text), draw_type, idx,
+                   highlight, dimmed, 0, ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
 }
 
 void FlowText::draw_inverse(void* pos, int hot, void* node)
@@ -150,9 +138,8 @@ void FlowText::draw_inverse(void* pos, int hot, void* node)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   ctx->fdraw->text_inverse(ctx, p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-      p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, text, strlen(text),
-      draw_type, idx, 0,
-      ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
+                           p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, text, strlen(text), draw_type, idx,
+                           0, ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
 }
 
 void FlowText::erase(void* pos, int hot, void* node)
@@ -162,41 +149,35 @@ void FlowText::erase(void* pos, int hot, void* node)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   ctx->fdraw->text_erase(ctx, p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-      p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, text, strlen(text),
-      draw_type, idx, 0,
-      ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
+                         p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, text, strlen(text), draw_type, idx,
+                         0, ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
 }
 
 void FlowText::nav_draw(void* pos, int highlight, void* node)
 {
-  int idx
-      = int(ctx->nav_zoom_factor / ctx->base_zoom_factor * (text_size + 4) - 4);
+  int idx = int(ctx->nav_zoom_factor / ctx->base_zoom_factor * (text_size + 4) - 4);
   if (idx < 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  ctx->fdraw->nav_text(ctx,
-      p.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
-      p.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y, text,
-      strlen(text), draw_type, idx, highlight, 0,
-      ctx->nav_zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
+  ctx->fdraw->nav_text(ctx, p.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
+                       p.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y, text, strlen(text),
+                       draw_type, idx, highlight, 0,
+                       ctx->nav_zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
 }
 
 void FlowText::nav_erase(void* pos, void* node)
 {
-  int idx
-      = int(ctx->nav_zoom_factor / ctx->base_zoom_factor * (text_size + 4) - 4);
+  int idx = int(ctx->nav_zoom_factor / ctx->base_zoom_factor * (text_size + 4) - 4);
   if (idx < 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  ctx->fdraw->nav_text_erase(ctx,
-      p.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
-      p.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y, text,
-      strlen(text), draw_type, idx, 0,
-      ctx->nav_zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
+  ctx->fdraw->nav_text_erase(ctx, p.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
+                             p.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y, text, strlen(text),
+                             draw_type, idx, 0,
+                             ctx->nav_zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
 }
 
-int FlowText::event_handler(
-    void* pos, flow_eEvent event, int x, int y, void* node)
+int FlowText::event_handler(void* pos, flow_eEvent event, int x, int y, void* node)
 {
   FlowPoint* p;
 
@@ -215,8 +196,8 @@ int FlowText::event_handler(
   return 0;
 }
 
-void FlowText::get_borders(double pos_x, double pos_y, double* x_right,
-    double* x_left, double* y_high, double* y_low, void* node)
+void FlowText::get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                           double* y_low, void* node)
 {
   /*
     if ( pos_x + p1.x < *x_left)
@@ -238,8 +219,7 @@ void FlowText::get_borders(double pos_x, double pos_y, double* x_right,
   */
 }
 
-void FlowText::move(
-    void* pos, double x, double y, int highlight, int dimmed, int hot)
+void FlowText::move(void* pos, double x, double y, int highlight, int dimmed, int hot)
 {
   p.x = x;
   p.y = y;
@@ -247,8 +227,7 @@ void FlowText::move(
   nav_zoom();
 }
 
-void FlowText::shift(void* pos, double delta_x, double delta_y, int highlight,
-    int dimmed, int hot)
+void FlowText::shift(void* pos, double delta_x, double delta_y, int highlight, int dimmed, int hot)
 {
   p.x += delta_x;
   p.y += delta_y;

@@ -51,18 +51,18 @@
 #include <vector>
 
 #include "co_cdh.h"
+#include "co_dcli.h"
 #include "co_time.h"
 #include "cow_wow.h"
+#include "rt_elog.h"
 #include "rt_gdh.h"
 #include "rt_mh.h"
 #include "rt_mh_outunit.h"
 #include "rt_mh_util.h"
-#include "rt_elog.h"
-#include "co_dcli.h"
 
 #include "co_lng.h"
-#include "xtt_hist.h"
 #include "rt_xnav_msg.h"
+#include "xtt_hist.h"
 #include "xtt_methodtoolbar.h"
 
 #define SENS 1
@@ -73,8 +73,8 @@
 pwr_tStatus mh_clear_alarmlist_bc(pwr_tNodeIndex nix);
 bool compDate(sEvent ev1, sEvent ev2);
 
-Hist::Hist(void* hist_parent_ctx, char* hist_name, pwr_tAttrRef* arp,
-    pwr_tStatus* status)
+Hist::Hist(void *hist_parent_ctx, char *hist_name, pwr_tAttrRef *arp,
+           pwr_tStatus *status)
     : parent_ctx(hist_parent_ctx), start_trace_cb(NULL),
       display_in_xnav_cb(NULL), update_info_cb(NULL), help_cb(NULL), hist(NULL),
       minTime_str(NULL), maxTime_str(NULL), eventName_str(NULL),
@@ -83,8 +83,7 @@ Hist::Hist(void* hist_parent_ctx, char* hist_name, pwr_tAttrRef* arp,
       eventType_Alarm(false), eventType_Info(false),
       eventType_InfoSuccess(false), eventType_Return(false),
       eventType_Cancel(false), eventType_Block(false), eventType_Unblock(false),
-      eventType_Reblock(false), eventType_CancelBlock(false)
-{
+      eventType_Reblock(false), eventType_CancelBlock(false) {
   if (arp)
     aref = *arp;
   else
@@ -94,51 +93,44 @@ Hist::Hist(void* hist_parent_ctx, char* hist_name, pwr_tAttrRef* arp,
 //
 //  Delete hist
 //
-Hist::~Hist()
-{
+Hist::~Hist() {}
+
+void Hist::hist_start_trace_cb(void *ctx, pwr_tObjid objid, char *name) {
+  if (((Hist *)ctx)->start_trace_cb)
+    ((Hist *)ctx)->start_trace_cb(((Hist *)ctx)->parent_ctx, objid, name);
 }
 
-void Hist::hist_start_trace_cb(void* ctx, pwr_tObjid objid, char* name)
-{
-  if (((Hist*)ctx)->start_trace_cb)
-    ((Hist*)ctx)->start_trace_cb(((Hist*)ctx)->parent_ctx, objid, name);
+void Hist::hist_popup_menu_cb(void *ctx, pwr_sAttrRef attrref,
+                              unsigned long item_type, unsigned long utility,
+                              char *arg, int x, int y) {
+  if (((Hist *)ctx)->popup_menu_cb)
+    (((Hist *)ctx)->popup_menu_cb)(((Hist *)ctx)->parent_ctx, attrref,
+                                   item_type, utility, arg, x, y);
 }
 
-void Hist::hist_popup_menu_cb(void* ctx, pwr_sAttrRef attrref,
-    unsigned long item_type, unsigned long utility, char* arg, int x, int y)
-{
-  if (((Hist*)ctx)->popup_menu_cb)
-    (((Hist*)ctx)->popup_menu_cb)(
-        ((Hist*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
-}
-
-void Hist::help_event_cb(void* ctx, void* item)
-{
-  ItemAlarm* aitem = (ItemAlarm*)item;
+void Hist::help_event_cb(void *ctx, void *item) {
+  ItemAlarm *aitem = (ItemAlarm *)item;
 
   switch (aitem->type) {
   case evlist_eItemType_Alarm:
-    ((Hist*)ctx)->wow->DisplayText("Event MoreText", aitem->eventmoretext);
+    ((Hist *)ctx)->wow->DisplayText("Event MoreText", aitem->eventmoretext);
     break;
   default:
     return;
   }
 }
 
-void Hist::selection_changed_cb(void* ctx)
-{
-  ((Hist*)ctx)->methodtoolbar->set_sensitive();
-  ((Hist*)ctx)->sup_methodtoolbar->set_sensitive();
+void Hist::selection_changed_cb(void *ctx) {
+  ((Hist *)ctx)->methodtoolbar->set_sensitive();
+  ((Hist *)ctx)->sup_methodtoolbar->set_sensitive();
 }
 
-void Hist::hist_display_in_xnav_cb(void* ctx, pwr_sAttrRef* arp)
-{
-  if (((Hist*)ctx)->display_in_xnav_cb)
-    ((Hist*)ctx)->display_in_xnav_cb(((Hist*)ctx)->parent_ctx, arp);
+void Hist::hist_display_in_xnav_cb(void *ctx, pwr_sAttrRef *arp) {
+  if (((Hist *)ctx)->display_in_xnav_cb)
+    ((Hist *)ctx)->display_in_xnav_cb(((Hist *)ctx)->parent_ctx, arp);
 }
 
-void Hist::activate_print()
-{
+void Hist::activate_print() {
   if (CoWow::PrintDialogIsDisabled()) {
     char filename[200];
     dcli_translate_filename(filename, "$pwrp_tmp/xnav.ps");
@@ -148,25 +140,22 @@ void Hist::activate_print()
     hist->print(Lng::translate("Eventlog"));
 }
 
-void Hist::activate_export()
-{
-  wow->CreateFileSelDia("Export", (void*)this,
-      export_file_selected_cb, wow_eFileSelType_Tmp, wow_eFileSelAction_Save);
+void Hist::activate_export() {
+  wow->CreateFileSelDia("Export", (void *)this, export_file_selected_cb,
+                        wow_eFileSelType_Tmp, wow_eFileSelAction_Save);
 }
 
-void Hist::activate_analyse()
-{
+void Hist::activate_analyse() {
   export_events("$pwrp_tmp/pwr_eventlog.dat");
   system("sev_eva.py -f $pwrp_tmp/pwr_eventlog.dat &");
 }
 
-void Hist::export_file_selected_cb(void *ctx, char *filename, wow_eFileSelType file_type)
-{
-  ((Hist *)ctx)->export_events(filename);  
+void Hist::export_file_selected_cb(void *ctx, char *filename,
+                                   wow_eFileSelType file_type) {
+  ((Hist *)ctx)->export_events(filename);
 }
 
-int Hist::export_events(const char *filename)
-{
+int Hist::export_events(const char *filename) {
   brow_tObject *list;
   int list_cnt;
   ItemAlarm *item;
@@ -183,30 +172,29 @@ int Hist::export_events(const char *filename)
   brow_GetObjectList(hist->brow->ctx, &list, &list_cnt);
   for (int i = list_cnt - 1; i >= 0; i--) {
     brow_GetUserData(list[i], (void **)&item);
-    time_AtoAscii(&item->time, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
+    time_AtoAscii(&item->time, time_eFormat_NumDateAndTime, timstr,
+                  sizeof(timstr));
     strcpy(supobjectstr, cdh_ObjidToString(item->supobject.Objid, 1));
     if (item->supobject.Flags.b.ObjectAttr)
-      sprintf(&supobjectstr[strlen(supobjectstr)], "#%u:%u", item->supobject.Offset,
-	      item->supobject.Size);
-    fprintf(fp, "%s,%u,%lu,\"%s\",\"%s\",%s,\"(%u,%u)\",%u\n",
-	   timstr, item->eventtype, item->eventprio, item->eventtext, item->eventname, 
-	   supobjectstr, item->eventid.Nix, item->eventid.Idx, item->status);
+      sprintf(&supobjectstr[strlen(supobjectstr)], "#%u:%u",
+              item->supobject.Offset, item->supobject.Size);
+    fprintf(fp, "%s,%u,%lu,\"%s\",\"%s\",%s,\"(%u,%u)\",%u\n", timstr,
+            item->eventtype, item->eventprio, item->eventtext, item->eventname,
+            supobjectstr, item->eventid.Nix, item->eventid.Idx, item->status);
   }
   fclose(fp);
   return 1;
 }
 
-void Hist::activate_help()
-{
+void Hist::activate_help() {
   if (help_cb)
     (help_cb)(parent_ctx, "opg_eventlog");
 }
 
-void Hist::activate_helpevent()
-{
+void Hist::activate_helpevent() {
   char eventname[80];
   int sts;
-  ItemAlarm* item;
+  ItemAlarm *item;
 
   if (help_cb) {
     sts = hist->get_selected_event(eventname, &item);
@@ -216,55 +204,52 @@ void Hist::activate_helpevent()
   }
 }
 
-void Hist::time_cb(time_ePeriod period)
-{
+void Hist::time_cb(time_ePeriod period) {
   pwr_tTime StartTime;
   pwr_tTime StopTime;
 
   int daybreak = 0;
-  if (period == time_ePeriod_Today || period == time_ePeriod_ThisWeek || period == time_ePeriod_ThisMonth || period == time_ePeriod_AllTime)
+  if (period == time_ePeriod_Today || period == time_ePeriod_ThisWeek ||
+      period == time_ePeriod_ThisMonth || period == time_ePeriod_AllTime)
     daybreak = 1;
 
-  time_Period(period == time_ePeriod_UserDefined ? time_ePeriod_AllTime : period, &StartTime, &StopTime, 0, daybreak);
+  time_Period(period == time_ePeriod_UserDefined ? time_ePeriod_AllTime
+                                                 : period,
+              &StartTime, &StopTime, 0, daybreak);
 
-  SetListTime(StartTime, StopTime, period == time_ePeriod_UserDefined ? SENS : INSENS);
+  SetListTime(StartTime, StopTime,
+              period == time_ePeriod_UserDefined ? SENS : INSENS);
 }
 
-pwr_tStatus Hist::hist_add_ack_mess(mh_sAck* MsgP)
-{
+pwr_tStatus Hist::hist_add_ack_mess(mh_sAck *MsgP) {
   // Insert in hist
   hist->event_ack(MsgP);
   return 1;
 }
 
-pwr_tStatus Hist::hist_add_return_mess(mh_sReturn* MsgP)
-{
+pwr_tStatus Hist::hist_add_return_mess(mh_sReturn *MsgP) {
   // Insert in hist
   hist->event_return(MsgP);
   return 1;
 }
 
-pwr_tStatus Hist::hist_add_alarm_mess(mh_sMessage* MsgP)
-{
+pwr_tStatus Hist::hist_add_alarm_mess(mh_sMessage *MsgP) {
   hist->event_alarm(MsgP);
   return 1;
 }
 
-pwr_tStatus Hist::hist_add_info_mess(mh_sMessage* MsgP)
-{
+pwr_tStatus Hist::hist_add_info_mess(mh_sMessage *MsgP) {
   hist->event_info(MsgP);
   return 1;
 }
 
-pwr_tStatus Hist::hist_clear_histlist()
-{
+pwr_tStatus Hist::hist_clear_histlist() {
   //  hist->event_clear_list();
   return 1;
 }
 
-void Hist::get_hist_list()
-{
-  DB* dataBaseP = NULL;
+void Hist::get_hist_list() {
+  DB *dataBaseP = NULL;
   pwr_tInt32 ret, sts;
   char dbName[200];
 
@@ -286,8 +271,8 @@ void Hist::get_hist_list()
   //        int  (*open) __P((DB *, DB_TXN *,
   //              const char *, const char *, DBTYPE, u_int32_t, int));
 
-  ret = dataBaseP->open(
-      dataBaseP, NULL, dbName, NULL, DATABASETYPE, DB_RDONLY, 0);
+  ret = dataBaseP->open(dataBaseP, NULL, dbName, NULL, DATABASETYPE, DB_RDONLY,
+                        0);
 #else
   ret = dataBaseP->open(dataBaseP, dbName, NULL, DATABASETYPE, DB_RDONLY, 0);
 #endif
@@ -298,9 +283,9 @@ void Hist::get_hist_list()
   }
 
   pwr_tUInt32 nrOfEvents = 0;
-  sEvent* eventp;
+  sEvent *eventp;
   DBT data, key;
-  DBC* dbcp;
+  DBC *dbcp;
   std::deque<sEvent> evDeq;
 
   /* Acquire a cursor for the database. */
@@ -314,7 +299,7 @@ void Hist::get_hist_list()
   memset(&data, 0, sizeof(data));
 
   if ((ret = dbcp->c_get(dbcp, &key, &data, DB_FIRST)) == 0) {
-    eventp = (sEvent*)data.data;
+    eventp = (sEvent *)data.data;
     sts = check_conditions(eventp);
     if (sts == ERROR_TIME_CONVERT) {
       printf("Error trying to convert userinput in time-field\n");
@@ -326,7 +311,7 @@ void Hist::get_hist_list()
   }
 
   while ((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0) {
-    eventp = (sEvent*)data.data;
+    eventp = (sEvent *)data.data;
     sts = check_conditions(eventp);
     if (ODD(sts)) {
       nrOfEvents++;
@@ -409,15 +394,13 @@ typedef struct {
 } sStat;
 
 struct evv_greater_than {
-  inline bool operator()(const sStat& struct1, const sStat& struct2)
-  {
+  inline bool operator()(const sStat &struct1, const sStat &struct2) {
     return (struct1.cnt > struct2.cnt);
   }
 };
 
-void Hist::stat()
-{
-  DB* dataBaseP = NULL;
+void Hist::stat() {
+  DB *dataBaseP = NULL;
   pwr_tInt32 ret;
   char dbName[200];
   int event_cnt = 0;
@@ -440,8 +423,8 @@ void Hist::stat()
   //        int  (*open) __P((DB *, DB_TXN *,
   //              const char *, const char *, DBTYPE, u_int32_t, int));
 
-  ret = dataBaseP->open(
-      dataBaseP, NULL, dbName, NULL, DATABASETYPE, DB_RDONLY, 0);
+  ret = dataBaseP->open(dataBaseP, NULL, dbName, NULL, DATABASETYPE, DB_RDONLY,
+                        0);
 #else
   ret = dataBaseP->open(dataBaseP, dbName, NULL, DATABASETYPE, DB_RDONLY, 0);
 #endif
@@ -451,9 +434,9 @@ void Hist::stat()
     // goto err;
   }
 
-  sEvent* eventp;
+  sEvent *eventp;
   DBT data, key;
-  DBC* dbcp;
+  DBC *dbcp;
   std::vector<sStat> evv;
   int found;
 
@@ -469,7 +452,7 @@ void Hist::stat()
 
   for (ret = dbcp->c_get(dbcp, &key, &data, DB_FIRST); ret == 0;
        ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) {
-    eventp = (sEvent*)data.data;
+    eventp = (sEvent *)data.data;
 
     switch (eventp->EventType) {
     case mh_eEvent_Alarm:
@@ -478,11 +461,9 @@ void Hist::stat()
       found = 0;
       for (unsigned int i = 0; i < evv.size(); i++) {
         if (strcmp(eventp->Mess.message.EventText,
-                evv[i].event.Mess.message.EventText)
-                == 0
-            && strcmp(eventp->Mess.message.EventName,
-                   evv[i].event.Mess.message.EventName)
-                == 0) {
+                   evv[i].event.Mess.message.EventText) == 0 &&
+            strcmp(eventp->Mess.message.EventName,
+                   evv[i].event.Mess.message.EventName) == 0) {
           evv[i].cnt++;
           found = 1;
         }
@@ -513,18 +494,17 @@ void Hist::stat()
     char tmp[80];
 
     memset(&evv[i].event.Mess.message.Info.EventTime, 0,
-        sizeof(evv[i].event.Mess.message.Info.EventTime));
+           sizeof(evv[i].event.Mess.message.Info.EventTime));
     evv[i].event.Mess.message.Status = 0;
 
     // Print count in beginning of event text
     strncpy(tmp, evv[i].event.Mess.message.EventText, sizeof(tmp));
     sprintf(evv[i].event.Mess.message.EventText, "%-5d ", evv[i].cnt);
     strncpy(&evv[i].event.Mess.message.EventText[6], tmp,
-        sizeof(evv[i].event.Mess.message.EventText) - 6);
+            sizeof(evv[i].event.Mess.message.EventText) - 6);
     evv[i]
         .event.Mess.message
-        .EventText[sizeof(evv[i].event.Mess.message.EventText) - 1]
-        = 0;
+        .EventText[sizeof(evv[i].event.Mess.message.EventText) - 1] = 0;
 
     switch (evv[i].event.EventType) {
     case mh_eEvent_Alarm:
@@ -551,13 +531,11 @@ void Hist::stat()
 // sorting function that might be more complicated in the future
 // we might want to sort the display of the events with more conditions than
 // just the time
-bool compDate(sEvent ev1, sEvent ev2)
-{
+bool compDate(sEvent ev1, sEvent ev2) {
   return (time_Acomp(&(ev1.EventTime), &(ev2.EventTime)) > 0);
 }
 
-int Hist::check_conditions(sEvent* evp)
-{
+int Hist::check_conditions(sEvent *evp) {
   pwr_tTime minTime;
   pwr_tTime maxTime;
   int sts;
@@ -581,12 +559,12 @@ int Hist::check_conditions(sEvent* evp)
   }
   bool ret = false;
   // then we compare the EventType if nothing is selected everything is selected
-  if (eventType_Ack || eventType_Alarm || eventType_MaintenanceAlarm
-      || eventType_SystemAlarm || eventType_UserAlarm1 || eventType_UserAlarm2
-      || eventType_UserAlarm3 || eventType_UserAlarm4 || eventType_Info
-      || eventType_InfoSuccess || eventType_Return || eventType_Cancel
-      || eventType_Block || eventType_Unblock || eventType_Reblock
-      || eventType_CancelBlock) {
+  if (eventType_Ack || eventType_Alarm || eventType_MaintenanceAlarm ||
+      eventType_SystemAlarm || eventType_UserAlarm1 || eventType_UserAlarm2 ||
+      eventType_UserAlarm3 || eventType_UserAlarm4 || eventType_Info ||
+      eventType_InfoSuccess || eventType_Return || eventType_Cancel ||
+      eventType_Block || eventType_Unblock || eventType_Reblock ||
+      eventType_CancelBlock) {
     switch (evp->EventType) {
     case mh_eEvent_Alarm:
       if (!eventType_Alarm)
@@ -659,10 +637,10 @@ int Hist::check_conditions(sEvent* evp)
   if (ret)
     return 2;
 
-  mh_sMsgInfo* msgInfop = NULL;
-  mh_sMessage* mp = NULL;
-  mh_sReturn* rp = NULL;
-  char* eventNamep;
+  mh_sMsgInfo *msgInfop = NULL;
+  mh_sMessage *mp = NULL;
+  mh_sReturn *rp = NULL;
+  char *eventNamep;
 
   switch (evp->EventType) {
   case mh_eEvent_Alarm:
@@ -700,8 +678,8 @@ int Hist::check_conditions(sEvent* evp)
   }
 
   // compare the prio, if nothing is selected everything is selected
-  if (this->eventPrio_A || this->eventPrio_B || this->eventPrio_C
-      || this->eventPrio_D) {
+  if (this->eventPrio_A || this->eventPrio_B || this->eventPrio_C ||
+      this->eventPrio_D) {
     // compare the EventPrio
     switch (msgInfop->EventPrio) {
     case mh_eEventPrio_A:
@@ -745,12 +723,11 @@ int Hist::check_conditions(sEvent* evp)
   return 1;
 }
 
-int Hist::compareStr(char* ev, char* usr)
-{
+int Hist::compareStr(char *ev, char *usr) {
   int sts;
   int startPos = 0;
   unsigned long endPos = 0;
-  char* str1;
+  char *str1;
   sts = dcli_toupper(usr, usr);
   if (ODD(sts)) {
     sts = dcli_wildcard(usr, ev);
@@ -761,7 +738,7 @@ int Hist::compareStr(char* ev, char* usr)
     std::string s = usr;
     endPos = s.find_first_of(';', startPos);
     while (endPos != std::string::npos) {
-      str1 = (char*)(s.substr(startPos, endPos - startPos)).c_str();
+      str1 = (char *)(s.substr(startPos, endPos - startPos)).c_str();
       sts = dcli_wildcard(str1, ev);
       sts += 1;
       startPos = endPos + 1;
@@ -769,15 +746,14 @@ int Hist::compareStr(char* ev, char* usr)
         return sts;
       endPos = s.find_first_of(';', startPos);
     }
-    str1 = (char*)(s.substr(startPos)).c_str();
+    str1 = (char *)(s.substr(startPos)).c_str();
     sts = dcli_wildcard(str1, ev);
     sts += 1;
   }
   return sts;
 }
 
-void Hist::printSearchStr()
-{
+void Hist::printSearchStr() {
   // return;
   bool addAnd = false;
   bool prioPrinted = false;
@@ -814,8 +790,8 @@ void Hist::printSearchStr()
       searchStr[i] += "D";
     addAnd = true;
   }
-  if (eventType_Ack || eventType_Alarm || eventType_Info
-      || eventType_InfoSuccess || eventType_Return) {
+  if (eventType_Ack || eventType_Alarm || eventType_Info ||
+      eventType_InfoSuccess || eventType_Return) {
     if (addAnd)
       searchStr[i] += Lng::translate(" and");
     if (!prioPrinted)
@@ -862,27 +838,27 @@ void Hist::printSearchStr()
   }
 
   set_search_string(searchStr[0].c_str(), searchStr[1].c_str(),
-      searchStr[2].c_str(), searchStr[3].c_str());
+                    searchStr[2].c_str(), searchStr[3].c_str());
 }
 
 /************************************************************************
-*
-* Name:	GoBackMonth (TimeIn, FromTime, ToTime)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* pwr_tTime	TimeIn		I	Start time
-* pwr_tTime	*FromTime	O	The first day of the month
-* pwr_tTime     *ToTime		O	The last day of the month
-*
-* Description:	This function computes dates for the first to the last day
-*		of the previous month, from the time TimeIn.
-*		Output times are only date, e g 1-MAY-1992 00:00:00.00.
-*************************************************************************/
-int Hist::GoBackMonth(pwr_tTime TimeIn, pwr_tTime* FromTime, pwr_tTime* ToTime)
-{
-  struct tm* Tm;
+ *
+ * Name:	GoBackMonth (TimeIn, FromTime, ToTime)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * pwr_tTime	TimeIn		I	Start time
+ * pwr_tTime	*FromTime	O	The first day of the month
+ * pwr_tTime     *ToTime		O	The last day of the month
+ *
+ * Description:	This function computes dates for the first to the last day
+ *		of the previous month, from the time TimeIn.
+ *		Output times are only date, e g 1-MAY-1992 00:00:00.00.
+ *************************************************************************/
+int Hist::GoBackMonth(pwr_tTime TimeIn, pwr_tTime *FromTime,
+                      pwr_tTime *ToTime) {
+  struct tm *Tm;
   int DaysOfMonth = 0, Month, TmYear, Year;
 
   /* Get the time in and blank time values. */
@@ -946,23 +922,22 @@ int Hist::GoBackMonth(pwr_tTime TimeIn, pwr_tTime* FromTime, pwr_tTime* ToTime)
 } /* END GoBackMonth */
 
 /************************************************************************
-*
-* Name:	GoBackWeek( TimeIn, FromTime, ToTime)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* pwr_tTime	TimeIn		I	Start time
-* pwr_tTime	*FromTime	O	The first day of the month
-* pwr_tTime     *ToTime		O	The last day of the month
-*
-* Description:	This function computes dates for monday to sunday in the
-*		previous week from the time now.
-*		Output times are only date, e g 1-MAY-1992 00:00:00.00.
-*************************************************************************/
-int Hist::GoBackWeek(pwr_tTime TimeIn, pwr_tTime* FromTime, pwr_tTime* ToTime)
-{
-  struct tm* Tm;
+ *
+ * Name:	GoBackWeek( TimeIn, FromTime, ToTime)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * pwr_tTime	TimeIn		I	Start time
+ * pwr_tTime	*FromTime	O	The first day of the month
+ * pwr_tTime     *ToTime		O	The last day of the month
+ *
+ * Description:	This function computes dates for monday to sunday in the
+ *		previous week from the time now.
+ *		Output times are only date, e g 1-MAY-1992 00:00:00.00.
+ *************************************************************************/
+int Hist::GoBackWeek(pwr_tTime TimeIn, pwr_tTime *FromTime, pwr_tTime *ToTime) {
+  struct tm *Tm;
   int Days;
   pwr_tTime Time;
 
@@ -988,23 +963,22 @@ int Hist::GoBackWeek(pwr_tTime TimeIn, pwr_tTime* FromTime, pwr_tTime* ToTime)
 } /* END GoBackWeek */
 
 /************************************************************************
-*
-* Name: AdjustForDayBreak
-*
-* Type: void
-*
-* Type          Parameter       IOGF    Description
-* pwr_tTime     *Time           I       The time
-* pwr_tTime	*NewTime  	 O	The adjusted time
-*
-* Description:
-*
-*
-*************************************************************************/
-pwr_tStatus Hist::AdjustForDayBreak(
-    Hist* histOP, pwr_tTime* Time, pwr_tTime* NewTime)
-{
-  struct tm* Tm;
+ *
+ * Name: AdjustForDayBreak
+ *
+ * Type: void
+ *
+ * Type          Parameter       IOGF    Description
+ * pwr_tTime     *Time           I       The time
+ * pwr_tTime	*NewTime  	 O	The adjusted time
+ *
+ * Description:
+ *
+ *
+ *************************************************************************/
+pwr_tStatus Hist::AdjustForDayBreak(Hist *histOP, pwr_tTime *Time,
+                                    pwr_tTime *NewTime) {
+  struct tm *Tm;
 
   time_t sec = Time->tv_sec;
   Tm = localtime(&sec);
@@ -1019,16 +993,15 @@ pwr_tStatus Hist::AdjustForDayBreak(
   return 1;
 } /* AdjustForDayBreak */
 
-void Hist::hist_init_cb(void* ctx)
-{
-  Hist* hist = (Hist*)ctx;
+void Hist::hist_init_cb(void *ctx) {
+  Hist *hist = (Hist *)ctx;
   pwr_tAName name_str;
   pwr_tStatus sts;
 
   // If objid is applied, search for this object
   if (cdh_ObjidIsNotNull(hist->aref.Objid)) {
-    sts = gdh_AttrrefToName(
-        &hist->aref, name_str, sizeof(name_str), cdh_mName_pathStrict);
+    sts = gdh_AttrrefToName(&hist->aref, name_str, sizeof(name_str),
+                            cdh_mName_pathStrict);
     if (ODD(sts)) {
       hist->insert_eventname(name_str);
       hist->eventName_str = name_str;

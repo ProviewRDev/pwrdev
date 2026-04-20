@@ -64,20 +64,16 @@
 
 static char rcv_buffer[65536];
 static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp);
-static void mb_shift_write(
-    unsigned char* in, unsigned char* out, int sh, int quant);
-static void mb_shift_read(
-    unsigned char* in, unsigned char* out, int sh, int quant);
+static void mb_shift_write(unsigned char* in, unsigned char* out, int sh, int quant);
+static void mb_shift_read(unsigned char* in, unsigned char* out, int sh, int quant);
 
-typedef struct {
+typedef struct
+{
   io_sRack* rp;
   int idx;
 } mb_sCondata;
 
-static void signal_callback_handler(int signum)
-{
-  printf("Caught signal SIGPIPE %d\n", signum);
-}
+static void signal_callback_handler(int signum) { printf("Caught signal SIGPIPE %d\n", signum); }
 
 static void mb_close_connection(io_sRack* rp, int l_idx)
 {
@@ -108,27 +104,30 @@ static void* mb_receive(void* data)
   free(data);
   op->Connections++;
 
-  while (1) {
+  while (1)
+  {
     size_of_msg = 0;
 
     data_size = recv(c_socket, rcv_buffer, sizeof(rec_buf), 0);
-    if (data_size < 0) {
+    if (data_size < 0)
+    {
       op->ErrorCount++;
       continue;
     }
-    if (data_size == 0) {
+    if (data_size == 0)
+    {
       /* Disconnected */
       op->Connections--;
       close(c_socket);
       local->connections[l_idx].occupied = 0;
-      errh_Error("Connection lost for IO modbus tcp server %s, %d", rp->Name,
-          c_socket);
+      errh_Error("Connection lost for IO modbus tcp server %s, %d", rp->Name, c_socket);
       return 0;
     }
     if (op->DisableServer)
       continue;
 
-    while (data_size > 0) {
+    while (data_size > 0)
+    {
       if (data_size < sizeof(mbap_header))
         break;
 
@@ -147,9 +146,11 @@ static void* mb_receive(void* data)
       time_GetTime(&local->connections[l_idx].last_req_time);
       exception_code = 0;
 
-      switch (fc) {
+      switch (fc)
+      {
       case pwr_eModbus_FCEnum_ReadInputRegisters:
-      case pwr_eModbus_FCEnum_ReadHoldingRegisters: {
+      case pwr_eModbus_FCEnum_ReadHoldingRegisters:
+      {
         io_sCard* cardp;
         io_sServerModuleLocal* local_card = NULL;
         pwr_sClass_Modbus_TCP_ServerModule* mp = NULL;
@@ -161,30 +162,35 @@ static void* mb_receive(void* data)
         short quant = ntohs(rmsg->quant);
         unsigned char unit_id = rmsg->head.unit_id;
 
-        if (quant < 1 || quant >= 0x07d0) {
+        if (quant < 1 || quant >= 0x07d0)
+        {
           exception_code = 3;
           break;
         }
 
         /* Check the address */
         found = 0;
-        for (cardp = rp->cardlist; cardp; cardp = cardp->next) {
+        for (cardp = rp->cardlist; cardp; cardp = cardp->next)
+        {
           mp = (pwr_sClass_Modbus_TCP_ServerModule*)cardp->op;
-          if (mp->UnitId == unit_id) {
+          if (mp->UnitId == unit_id)
+          {
             local_card = cardp->Local;
             found = 1;
             break;
           }
         }
 
-        if (!found) {
+        if (!found)
+        {
           exception_code = 2;
           break;
         }
 
         addr -= mp->ReadRegAddress;
 
-        if (addr < 0 || addr + quant * 2 > local_card->output_size) {
+        if (addr < 0 || addr + quant * 2 > local_card->output_size)
+        {
           exception_code = 2;
           break;
         }
@@ -202,12 +208,12 @@ static void* mb_receive(void* data)
         thread_MutexUnlock(&local->mutex);
 
         ssts = send(c_socket, &msg, ntohs(msg.head.length) + 6, MSG_DONTWAIT);
-        if (ssts < 0) {
+        if (ssts < 0)
+        {
           op->Connections--;
           close(c_socket);
           local->connections[l_idx].occupied = 0;
-          errh_Error("Connection lost for IO modbus tcp server %s, %d",
-              rp->Name, c_socket);
+          errh_Error("Connection lost for IO modbus tcp server %s, %d", rp->Name, c_socket);
           return 0;
         }
         op->TX_packets++;
@@ -215,7 +221,8 @@ static void* mb_receive(void* data)
         break;
       }
       case pwr_eModbus_FCEnum_ReadCoils:
-      case pwr_eModbus_FCEnum_ReadDiscreteInputs: {
+      case pwr_eModbus_FCEnum_ReadDiscreteInputs:
+      {
         io_sCard* cardp;
         io_sServerModuleLocal* local_card = NULL;
         pwr_sClass_Modbus_TCP_ServerModule* mp;
@@ -231,23 +238,27 @@ static void* mb_receive(void* data)
         short quant = ntohs(rmsg->quant);
         unsigned char unit_id = rmsg->head.unit_id;
 
-        if (quant < 1 || quant >= 0x07d0) {
+        if (quant < 1 || quant >= 0x07d0)
+        {
           exception_code = 3;
           break;
         }
 
         /* Check the address */
         found = 0;
-        for (cardp = rp->cardlist; cardp; cardp = cardp->next) {
+        for (cardp = rp->cardlist; cardp; cardp = cardp->next)
+        {
           mp = (pwr_sClass_Modbus_TCP_ServerModule*)cardp->op;
-          if (mp->UnitId == unit_id) {
+          if (mp->UnitId == unit_id)
+          {
             local_card = cardp->Local;
             found = 1;
             break;
           }
         }
 
-        if (!found) {
+        if (!found)
+        {
           exception_code = 2;
           break;
         }
@@ -257,9 +268,9 @@ static void* mb_receive(void* data)
         offs = addr / 8;
         bytes = (addr + quant) / 8 + (((addr + quant) % 8 == 0) ? 0 : 1) - offs;
 
-        if (addr < 0
-            || offs + bytes + local_card->do_offset > local_card->output_size
-            || offs + bytes > local_card->do_size) {
+        if (addr < 0 || offs + bytes + local_card->do_offset > local_card->output_size ||
+            offs + bytes > local_card->do_size)
+        {
           exception_code = 2;
           break;
         }
@@ -274,40 +285,42 @@ static void* mb_receive(void* data)
         msg.head.proto_id = rmsg->head.proto_id;
 
         thread_MutexLock(&local->mutex);
-        if (addr % 8 == 0) {
-          memcpy(msg.buf,
-              (char*)local_card->output_area + local_card->do_offset + addr / 8,
-              bytes);
+        if (addr % 8 == 0)
+        {
+          memcpy(msg.buf, (char*)local_card->output_area + local_card->do_offset + addr / 8, bytes);
 
           mask = 0;
           for (i = 0; i < quant % 8; i++)
             mask |= 1 << i;
 
-          if (quant % 8 != 0) {
+          if (quant % 8 != 0)
+          {
             unsigned char* b = (unsigned char*)msg.buf;
             b[bytes - 1] &= mask;
           }
-        } else {
-          mb_shift_read((unsigned char*)local_card->output_area
-                  + local_card->do_offset + addr / 8,
-              (unsigned char*)msg.buf, addr % 8, quant);
+        }
+        else
+        {
+          mb_shift_read((unsigned char*)local_card->output_area + local_card->do_offset + addr / 8,
+                        (unsigned char*)msg.buf, addr % 8, quant);
         }
         thread_MutexUnlock(&local->mutex);
 
         ssts = send(c_socket, &msg, ntohs(msg.head.length) + 6, MSG_DONTWAIT);
-        if (ssts < 0) {
+        if (ssts < 0)
+        {
           op->Connections--;
           close(c_socket);
           local->connections[l_idx].occupied = 0;
-          errh_Error("Connection lost for IO modbus tcp server %s, %d",
-              rp->Name, c_socket);
+          errh_Error("Connection lost for IO modbus tcp server %s, %d", rp->Name, c_socket);
           return 0;
         }
         op->TX_packets++;
 
         break;
       }
-      case pwr_eModbus_FCEnum_WriteSingleRegister: {
+      case pwr_eModbus_FCEnum_WriteSingleRegister:
+      {
         io_sCard* cardp;
         io_sServerModuleLocal* local_card = NULL;
         pwr_sClass_Modbus_TCP_ServerModule* mp = NULL;
@@ -320,23 +333,27 @@ static void* mb_receive(void* data)
 
         /* Check the address */
         found = 0;
-        for (cardp = rp->cardlist; cardp; cardp = cardp->next) {
+        for (cardp = rp->cardlist; cardp; cardp = cardp->next)
+        {
           mp = (pwr_sClass_Modbus_TCP_ServerModule*)cardp->op;
-          if (mp->UnitId == unit_id) {
+          if (mp->UnitId == unit_id)
+          {
             local_card = cardp->Local;
             found = 1;
             break;
           }
         }
 
-        if (!found) {
+        if (!found)
+        {
           exception_code = 2;
           break;
         }
 
         addr -= mp->WriteRegAddress;
 
-        if (addr < 0 || addr + 2 > local_card->input_size) {
+        if (addr < 0 || addr + 2 > local_card->input_size)
+        {
           exception_code = 2;
           break;
         }
@@ -354,19 +371,20 @@ static void* mb_receive(void* data)
         msg.head.proto_id = rmsg->head.proto_id;
 
         ssts = send(c_socket, &msg, sizeof(msg), MSG_DONTWAIT);
-        if (ssts < 0) {
+        if (ssts < 0)
+        {
           op->Connections--;
           close(c_socket);
           local->connections[l_idx].occupied = 0;
-          errh_Error("Connection lost for IO modbus tcp server %s, %d",
-              rp->Name, c_socket);
+          errh_Error("Connection lost for IO modbus tcp server %s, %d", rp->Name, c_socket);
           return 0;
         }
         op->TX_packets++;
 
         break;
       }
-      case pwr_eModbus_FCEnum_WriteMultipleRegisters: {
+      case pwr_eModbus_FCEnum_WriteMultipleRegisters:
+      {
         io_sCard* cardp;
         io_sServerModuleLocal* local_card = NULL;
         pwr_sClass_Modbus_TCP_ServerModule* mp = NULL;
@@ -378,30 +396,35 @@ static void* mb_receive(void* data)
         short quant = ntohs(rmsg->quant);
         unsigned char unit_id = rmsg->head.unit_id;
 
-        if (quant < 1 || quant >= 0x07d0) {
+        if (quant < 1 || quant >= 0x07d0)
+        {
           exception_code = 3;
           break;
         }
 
         /* Check the address */
         found = 0;
-        for (cardp = rp->cardlist; cardp; cardp = cardp->next) {
+        for (cardp = rp->cardlist; cardp; cardp = cardp->next)
+        {
           mp = (pwr_sClass_Modbus_TCP_ServerModule*)cardp->op;
-          if (mp->UnitId == unit_id) {
+          if (mp->UnitId == unit_id)
+          {
             local_card = cardp->Local;
             found = 1;
             break;
           }
         }
 
-        if (!found) {
+        if (!found)
+        {
           exception_code = 2;
           break;
         }
 
         addr -= mp->WriteRegAddress;
 
-        if (addr < 0 || addr + quant * 2 > local_card->input_size) {
+        if (addr < 0 || addr + quant * 2 > local_card->input_size)
+        {
           exception_code = 2;
           break;
         }
@@ -419,19 +442,20 @@ static void* mb_receive(void* data)
         msg.head.proto_id = rmsg->head.proto_id;
 
         ssts = send(c_socket, &msg, sizeof(msg), MSG_DONTWAIT);
-        if (ssts < 0) {
+        if (ssts < 0)
+        {
           op->Connections--;
           close(c_socket);
           local->connections[l_idx].occupied = 0;
-          errh_Error("Connection lost for IO modbus tcp server %s, %d",
-              rp->Name, c_socket);
+          errh_Error("Connection lost for IO modbus tcp server %s, %d", rp->Name, c_socket);
           return 0;
         }
         op->TX_packets++;
 
         break;
       }
-      case pwr_eModbus_FCEnum_WriteSingleCoil: {
+      case pwr_eModbus_FCEnum_WriteSingleCoil:
+      {
         io_sCard* cardp;
         io_sServerModuleLocal* local_card = NULL;
         pwr_sClass_Modbus_TCP_ServerModule* mp;
@@ -447,16 +471,19 @@ static void* mb_receive(void* data)
 
         /* Check the address */
         found = 0;
-        for (cardp = rp->cardlist; cardp; cardp = cardp->next) {
+        for (cardp = rp->cardlist; cardp; cardp = cardp->next)
+        {
           mp = (pwr_sClass_Modbus_TCP_ServerModule*)cardp->op;
-          if (mp->UnitId == unit_id) {
+          if (mp->UnitId == unit_id)
+          {
             local_card = cardp->Local;
             found = 1;
             break;
           }
         }
 
-        if (!found) {
+        if (!found)
+        {
           exception_code = 2;
           break;
         }
@@ -465,21 +492,20 @@ static void* mb_receive(void* data)
 
         offs = addr / 8;
 
-        if (addr < 0 || offs + local_card->di_offset >= local_card->input_size
-            || offs >= local_card->di_size) {
+        if (addr < 0 || offs + local_card->di_offset >= local_card->input_size || offs >= local_card->di_size)
+        {
           exception_code = 2;
           break;
         }
 
         mask = 1 << (addr % 8);
-        if (value == 0xFF00 || value == 0) {
+        if (value == 0xFF00 || value == 0)
+        {
           thread_MutexLock(&local->mutex);
           if (value == 0xFF00)
-            *((char*)local_card->input_area + local_card->di_offset + offs)
-                |= mask;
+            *((char*)local_card->input_area + local_card->di_offset + offs) |= mask;
           else
-            *((char*)local_card->input_area + local_card->di_offset + offs)
-                &= ~mask;
+            *((char*)local_card->input_area + local_card->di_offset + offs) &= ~mask;
           thread_MutexUnlock(&local->mutex);
         }
         msg.fc = fc;
@@ -491,19 +517,20 @@ static void* mb_receive(void* data)
         msg.head.proto_id = rmsg->head.proto_id;
 
         ssts = send(c_socket, &msg, sizeof(msg), MSG_DONTWAIT);
-        if (ssts < 0) {
+        if (ssts < 0)
+        {
           op->Connections--;
           close(c_socket);
           local->connections[l_idx].occupied = 0;
-          errh_Error("Connection lost for IO modbus tcp server %s, %d",
-              rp->Name, c_socket);
+          errh_Error("Connection lost for IO modbus tcp server %s, %d", rp->Name, c_socket);
           return 0;
         }
         op->TX_packets++;
 
         break;
       }
-      case pwr_eModbus_FCEnum_WriteMultipleCoils: {
+      case pwr_eModbus_FCEnum_WriteMultipleCoils:
+      {
         io_sCard* cardp;
         io_sServerModuleLocal* local_card = NULL;
         pwr_sClass_Modbus_TCP_ServerModule* mp;
@@ -519,23 +546,27 @@ static void* mb_receive(void* data)
         short quant = ntohs(rmsg->quant);
         unsigned char unit_id = rmsg->head.unit_id;
 
-        if (quant < 1 || quant >= 0x07d0) {
+        if (quant < 1 || quant >= 0x07d0)
+        {
           exception_code = 3;
           break;
         }
 
         /* Check the address */
         found = 0;
-        for (cardp = rp->cardlist; cardp; cardp = cardp->next) {
+        for (cardp = rp->cardlist; cardp; cardp = cardp->next)
+        {
           mp = (pwr_sClass_Modbus_TCP_ServerModule*)cardp->op;
-          if (mp->UnitId == unit_id) {
+          if (mp->UnitId == unit_id)
+          {
             local_card = cardp->Local;
             found = 1;
             break;
           }
         }
 
-        if (!found) {
+        if (!found)
+        {
           exception_code = 2;
           break;
         }
@@ -544,38 +575,35 @@ static void* mb_receive(void* data)
         offs = addr / 8;
         bytes = (addr + quant) / 8 + (((addr + quant) % 8 == 0) ? 0 : 1) - offs;
 
-        if (addr < 0
-            || offs + bytes + local_card->di_offset > local_card->input_size
-            || offs + bytes > local_card->di_size) {
+        if (addr < 0 || offs + bytes + local_card->di_offset > local_card->input_size ||
+            offs + bytes > local_card->di_size)
+        {
           exception_code = 2;
           break;
         }
 
         thread_MutexLock(&local->mutex);
-        if (addr % 8 == 0) {
-          if (quant % 8 != 0) {
+        if (addr % 8 == 0)
+        {
+          if (quant % 8 != 0)
+          {
             mask = 0;
             for (i = 0; i < quant % 8; i++)
               mask |= 1 << i;
 
-            memcpy((char*)local_card->input_area + local_card->di_offset
-                    + addr / 8,
-                rmsg->reg, bytes - 1);
-            *((char*)local_card->input_area + local_card->di_offset + addr / 8
-                + bytes - 1)
-                &= ~mask;
-            *((char*)local_card->input_area + local_card->di_offset + addr / 8
-                + bytes - 1)
-                |= *((char*)rmsg->reg + bytes - 1) & mask;
-          } else
-            memcpy((char*)local_card->input_area + local_card->di_offset
-                    + addr / 8,
-                rmsg->reg, bytes);
-        } else {
+            memcpy((char*)local_card->input_area + local_card->di_offset + addr / 8, rmsg->reg, bytes - 1);
+            *((char*)local_card->input_area + local_card->di_offset + addr / 8 + bytes - 1) &= ~mask;
+            *((char*)local_card->input_area + local_card->di_offset + addr / 8 + bytes - 1) |=
+                *((char*)rmsg->reg + bytes - 1) & mask;
+          }
+          else
+            memcpy((char*)local_card->input_area + local_card->di_offset + addr / 8, rmsg->reg, bytes);
+        }
+        else
+        {
           mb_shift_write((unsigned char*)rmsg->reg,
-              (unsigned char*)local_card->input_area + local_card->di_offset
-                  + addr / 8,
-              addr % 8, quant);
+                         (unsigned char*)local_card->input_area + local_card->di_offset + addr / 8, addr % 8,
+                         quant);
         }
         thread_MutexUnlock(&local->mutex);
 
@@ -588,36 +616,40 @@ static void* mb_receive(void* data)
         msg.head.proto_id = rmsg->head.proto_id;
 
         ssts = send(c_socket, &msg, sizeof(msg), MSG_DONTWAIT);
-        if (ssts < 0) {
+        if (ssts < 0)
+        {
           op->Connections--;
           close(c_socket);
           local->connections[l_idx].occupied = 0;
-          errh_Error("Connection lost for IO modbus tcp server %s, %d",
-              rp->Name, c_socket);
+          errh_Error("Connection lost for IO modbus tcp server %s, %d", rp->Name, c_socket);
           return 0;
         }
         op->TX_packets++;
 
         break;
       }
-      case 43: {
+      case 43:
+      {
         /* Encapsulated Interface Transport, Read Device Identification */
         read_dev_id_req* rmsg = (read_dev_id_req*)rb;
         rsp_dev_id msg;
         int i;
         int len;
 
-        if (rmsg->mei_type != 0x2b) {
+        if (rmsg->mei_type != 0x2b)
+        {
           exception_code = 1;
           break;
         }
 
-        if (rmsg->id_code != 1) {
+        if (rmsg->id_code != 1)
+        {
           exception_code = 1;
           break;
         }
 
-        if (rmsg->object_id != 0) {
+        if (rmsg->object_id != 0)
+        {
           exception_code = 1;
           break;
         }
@@ -659,12 +691,12 @@ static void* mb_receive(void* data)
         msg.head.proto_id = rmsg->head.proto_id;
 
         ssts = send(c_socket, &msg, ntohs(msg.head.length) + 6, MSG_DONTWAIT);
-        if (ssts < 0) {
+        if (ssts < 0)
+        {
           op->Connections--;
           close(c_socket);
           local->connections[l_idx].occupied = 0;
-          errh_Error("Connection lost for IO modbus tcp server %s, %d",
-              rp->Name, c_socket);
+          errh_Error("Connection lost for IO modbus tcp server %s, %d", rp->Name, c_socket);
           return 0;
         }
         op->TX_packets++;
@@ -675,7 +707,8 @@ static void* mb_receive(void* data)
         exception_code = 1;
       }
 
-      if (exception_code) {
+      if (exception_code)
+      {
         rsp_fault rsp_f;
 
         rsp_f.fc = fc + 0x80;
@@ -685,12 +718,12 @@ static void* mb_receive(void* data)
         rsp_f.head.unit_id = rb->head.unit_id;
 
         ssts = send(c_socket, &rsp_f, sizeof(rsp_f), MSG_DONTWAIT);
-        if (ssts < 0) {
+        if (ssts < 0)
+        {
           op->Connections--;
           close(c_socket);
           local->connections[l_idx].occupied = 0;
-          errh_Error("Connection lost for IO modbus tcp server %s, %d",
-              rp->Name, c_socket);
+          errh_Error("Connection lost for IO modbus tcp server %s, %d", rp->Name, c_socket);
           return 0;
         }
         op->TX_packets++;
@@ -715,57 +748,58 @@ static void* mb_connect(void* arg)
 
   op = (pwr_sClass_Modbus_TCP_Server*)rp->op;
 
-  while (1) {
+  while (1)
+  {
     /* Wait for client connect request */
     r_addr_len = sizeof(r_addr);
 
     c_socket = accept(local->s, (struct sockaddr*)&r_addr, &r_addr_len);
-    if (c_socket < 0) {
-      errh_Error(
-          "Error accept IO modbus tcp server %s, %d", rp->Name, local->s);
+    if (c_socket < 0)
+    {
+      errh_Error("Error accept IO modbus tcp server %s, %d", rp->Name, local->s);
       continue;
     }
     if (op->DisableServer)
       continue;
 
-    errh_Info("Connection accepted for IO modbus tcp server %s, %d", rp->Name,
-        c_socket);
+    errh_Info("Connection accepted for IO modbus tcp server %s, %d", rp->Name, c_socket);
 
     /* Close other connections to this address */
-    for (i = 0; i < MB_MAX_CONNECTIONS; i++) {
-      if (local->connections[i].occupied
-          && r_addr_len == local->connections[i].addrlen
-          && r_addr.sin_family == local->connections[i].addr.sin_family
-          && memcmp(&r_addr.sin_addr, &local->connections[i].addr.sin_addr,
-                 sizeof(r_addr.sin_addr))
-              == 0) {
+    for (i = 0; i < MB_MAX_CONNECTIONS; i++)
+    {
+      if (local->connections[i].occupied && r_addr_len == local->connections[i].addrlen &&
+          r_addr.sin_family == local->connections[i].addr.sin_family &&
+          memcmp(&r_addr.sin_addr, &local->connections[i].addr.sin_addr, sizeof(r_addr.sin_addr)) == 0)
+      {
         mb_close_connection(rp, i);
       }
     }
 
     /* Find next empty in connection list */
     found = 0;
-    for (i = 0; i < MB_MAX_CONNECTIONS; i++) {
-      if (!local->connections[i].occupied) {
+    for (i = 0; i < MB_MAX_CONNECTIONS; i++)
+    {
+      if (!local->connections[i].occupied)
+      {
         found = 1;
         idx = i;
         break;
       }
     }
 
-    if (!found) {
+    if (!found)
+    {
       /* Remove the oldest connection */
       int oldest_idx = 0;
 
-      for (i = 1; i < MB_MAX_CONNECTIONS; i++) {
-        if (time_Acomp(&local->connections[i].last_req_time,
-                &local->connections[oldest_idx].last_req_time)
-            < 0)
+      for (i = 1; i < MB_MAX_CONNECTIONS; i++)
+      {
+        if (time_Acomp(&local->connections[i].last_req_time, &local->connections[oldest_idx].last_req_time) <
+            0)
           oldest_idx = i;
       }
       mb_close_connection(rp, oldest_idx);
-      errh_Info(
-          "Connection closed, IO modbus tcp server %s, %d", rp->Name, local->s);
+      errh_Info("Connection closed, IO modbus tcp server %s, %d", rp->Name, local->s);
       idx = oldest_idx;
     }
 
@@ -780,12 +814,11 @@ static void* mb_connect(void* arg)
     condata->rp = rp;
     condata->idx = idx;
 
-    sts = thread_Create(
-        &local->connections[idx].t, 0, mb_receive, (void*)condata);
-    if (EVEN(sts)) {
+    sts = thread_Create(&local->connections[idx].t, 0, mb_receive, (void*)condata);
+    if (EVEN(sts))
+    {
       local->connections[idx].occupied = 0;
-      errh_Error("Error creating thread IO modbus tcp server %s, %d", rp->Name,
-          local->s);
+      errh_Error("Error creating thread IO modbus tcp server %s, %d", rp->Name, local->s);
       free(condata);
       continue;
     }
@@ -806,7 +839,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   pwr_sClass_Modbus_TCP_Server* op;
   int i;
   unsigned short port;
-  io_sCard 	*cardp;
+  io_sCard* cardp;
 
   // Ignore SIGPIPE signal
   signal(SIGPIPE, signal_callback_handler);
@@ -825,8 +858,8 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   if (op->DisableServer)
     return IO__SUCCESS;
 
-  for ( cardp = rp->cardlist; cardp; cardp = cardp->next)
-    io_bus_card_area_size( ctx, cardp, &local->inputs_size, &local->outputs_size);
+  for (cardp = rp->cardlist; cardp; cardp = cardp->next)
+    io_bus_card_area_size(ctx, cardp, &local->inputs_size, &local->outputs_size);
 
   local->inputs = calloc(1, local->inputs_size);
   local->outputs = calloc(1, local->output_size);
@@ -834,29 +867,29 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   /* Create socket, store in local struct */
   uid_t ruid;
   ruid = getuid();
-  //printf("ruid: %d\n", ruid);
+  // printf("ruid: %d\n", ruid);
 
   local->s = socket(AF_INET, SOCK_STREAM, 0);
-  if (local->s < 0) {
-    errh_Error("Error creating socket for IO modbus tcp server %s, %d",
-        rp->Name, local->s);
+  if (local->s < 0)
+  {
+    errh_Error("Error creating socket for IO modbus tcp server %s, %d", rp->Name, local->s);
     return 0;
   }
 
   local->loc_addr.sin_family = AF_INET;
   local->loc_addr.sin_port = htons(port);
-  for (i = 0; i < 10; i++) {
-    sts = bind(
-        local->s, (struct sockaddr*)&local->loc_addr, sizeof(local->loc_addr));
+  for (i = 0; i < 10; i++)
+  {
+    sts = bind(local->s, (struct sockaddr*)&local->loc_addr, sizeof(local->loc_addr));
     if (sts == 0)
       break;
     perror("Modbus TCP Bind socket failure, retrying... ");
     sleep(10);
   }
-  if (sts != 0) {
+  if (sts != 0)
+  {
     printf("Modbus TCP Bind socket failure, exiting");
-    errh_Error("Error bind socket to port for IO modbus tcp server %s, %d",
-        rp->Name, local->s);
+    errh_Error("Error bind socket to port for IO modbus tcp server %s, %d", rp->Name, local->s);
     return 0;
   }
 
@@ -912,7 +945,8 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   unsigned int card_input_area_offset = 0;
   unsigned int card_output_area_offset = 0;
 
-  while(cardp) {
+  while (cardp)
+  {
     local_card = calloc(1, sizeof(*local_card));
     cardp->Local = local_card;
 
@@ -923,52 +957,57 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     input_area_chansize = 0;
     output_area_chansize = 0;
 
-    local_card->input_area = (char *)local->inputs + card_input_area_offset;
-    local_card->output_area = (char *)local->outputs + card_output_area_offset;
+    local_card->input_area = (char*)local->inputs + card_input_area_offset;
+    local_card->output_area = (char*)local->outputs + card_output_area_offset;
 
+    io_bus_card_init(ctx, cardp, &input_area_offset, &input_area_chansize, &output_area_offset,
+                     &output_area_chansize, pwr_eByteOrderingEnum_BigEndian, io_eAlignment_Packed);
 
-    io_bus_card_init( ctx, cardp, &input_area_offset, &input_area_chansize,
-		      &output_area_offset, &output_area_chansize,
-		      pwr_eByteOrderingEnum_BigEndian, io_eAlignment_Packed);
-
-    for (i = 0; i < cardp->ChanListSize; i++) {
+    for (i = 0; i < cardp->ChanListSize; i++)
+    {
       chanp = &cardp->chanlist[i];
-      switch (chanp->ChanClass) {
-      case pwr_cClass_ChanDi: {
-	pwr_sClass_ChanDi *chan_di = (pwr_sClass_ChanDi *) chanp->cop;
+      switch (chanp->ChanClass)
+      {
+      case pwr_cClass_ChanDi:
+      {
+        pwr_sClass_ChanDi* chan_di = (pwr_sClass_ChanDi*)chanp->cop;
 
-	if (local_card->di_size == 0)
-	  local_card->di_offset = chanp->offset;
-	if (chan_di->Number == 0 || local_card->di_size == 0)
-	  local_card->di_size += GetChanSize(chan_di->Representation);
+        if (local_card->di_size == 0)
+          local_card->di_offset = chanp->offset;
+        if (chan_di->Number == 0 || local_card->di_size == 0)
+          local_card->di_size += GetChanSize(chan_di->Representation);
 
-	break;
+        break;
       }
-      case pwr_cClass_ChanDo: {
-	pwr_sClass_ChanDo *chan_do = (pwr_sClass_ChanDo *) chanp->cop;
+      case pwr_cClass_ChanDo:
+      {
+        pwr_sClass_ChanDo* chan_do = (pwr_sClass_ChanDo*)chanp->cop;
 
-	if (local_card->do_size == 0)
-	  local_card->do_offset = chanp->offset;
-	if (chan_do->Number == 0 || local_card->do_size == 0)
-	  local_card->do_size += GetChanSize(chan_do->Representation);
+        if (local_card->do_size == 0)
+          local_card->do_offset = chanp->offset;
+        if (chan_do->Number == 0 || local_card->do_size == 0)
+          local_card->do_size += GetChanSize(chan_do->Representation);
 
-	break;
+        break;
       }
-      case pwr_cClass_ChanD: {
-	pwr_sClass_ChanD *chan_d = (pwr_sClass_ChanD *) chanp->cop;
-	if ( chan_d->Type == pwr_eDChanTypeEnum_Di) {
-	  if (local_card->di_size == 0)
-	    local_card->di_offset = chanp->offset;
-	  if (chan_d->Number == 0 || local_card->di_size == 0)
-	    local_card->di_size += GetChanSize(chan_d->Representation);
-	}
-	else {
-	  if (local_card->do_size == 0)
-	    local_card->do_offset = chanp->offset;
-	  if (chan_d->Number == 0 || local_card->do_size == 0)
-	    local_card->do_size += GetChanSize(chan_d->Representation);
-	}
-	break;
+      case pwr_cClass_ChanD:
+      {
+        pwr_sClass_ChanD* chan_d = (pwr_sClass_ChanD*)chanp->cop;
+        if (chan_d->Type == pwr_eDChanTypeEnum_Di)
+        {
+          if (local_card->di_size == 0)
+            local_card->di_offset = chanp->offset;
+          if (chan_d->Number == 0 || local_card->di_size == 0)
+            local_card->di_size += GetChanSize(chan_d->Representation);
+        }
+        else
+        {
+          if (local_card->do_size == 0)
+            local_card->do_offset = chanp->offset;
+          if (chan_d->Number == 0 || local_card->do_size == 0)
+            local_card->do_size += GetChanSize(chan_d->Representation);
+        }
+        break;
       }
       }
     }
@@ -982,16 +1021,15 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   local->input_size = card_input_area_offset + input_area_offset + input_area_chansize;
   local->output_size = card_output_area_offset + output_area_offset + output_area_chansize;
 
-
   return IO__SUCCESS;
 }
 
-static void mb_shift_write(
-    unsigned char* in, unsigned char* out, int sh, int quant)
+static void mb_shift_write(unsigned char* in, unsigned char* out, int sh, int quant)
 {
   int i;
 
-  if (sh + quant <= 8) {
+  if (sh + quant <= 8)
+  {
     unsigned char mask = 0;
     for (i = sh; i < sh + quant; i++)
       mask |= 1 << i;
@@ -1000,19 +1038,24 @@ static void mb_shift_write(
     return;
   }
 
-  for (i = 0; i < (quant + sh) / 8; i++) {
-    if (i == 0) {
+  for (i = 0; i < (quant + sh) / 8; i++)
+  {
+    if (i == 0)
+    {
       unsigned char mask = ~0;
       mask = mask << sh;
 
       out[0] &= ~mask;
       out[0] |= mask & (in[0] << sh);
-    } else {
+    }
+    else
+    {
       out[i] = in[i] << sh;
       out[i] |= in[i - 1] >> (8 - sh);
     }
   }
-  if ((quant + sh) % 8 != 0) {
+  if ((quant + sh) % 8 != 0)
+  {
     unsigned char mask = ~0;
     mask = mask << ((quant + sh) % 8);
     mask = ~mask;
@@ -1027,7 +1070,8 @@ void mb_shift_read(unsigned char* in, unsigned char* out, int sh, int quant)
 {
   int i;
 
-  if (sh + quant <= 8) {
+  if (sh + quant <= 8)
+  {
     unsigned char mask = ~0;
     mask = mask >> (8 - quant);
 
@@ -1035,7 +1079,8 @@ void mb_shift_read(unsigned char* in, unsigned char* out, int sh, int quant)
     return;
   }
 
-  for (i = 0; i < quant / 8; i++) {
+  for (i = 0; i < quant / 8; i++)
+  {
     out[i] = in[i] >> sh;
     out[i] |= in[i + 1] << (8 - sh);
   }
@@ -1044,7 +1089,8 @@ void mb_shift_read(unsigned char* in, unsigned char* out, int sh, int quant)
   if ((quant + sh) / 8 > quant / 8)
     out[i] |= in[i + 1] << (8 - sh);
 
-  if (quant % 8 != 0) {
+  if (quant % 8 != 0)
+  {
     unsigned char mask = ~0;
     mask = mask >> (8 - (quant % 8));
     out[i] &= mask;
@@ -1056,11 +1102,11 @@ void mb_shift_read(unsigned char* in, unsigned char* out, int sh, int quant)
 \*----------------------------------------------------------------------------*/
 static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 {
-  io_sServerLocal *local = rp->Local;
-  pwr_sClass_Modbus_TCP_Server *op = (pwr_sClass_Modbus_TCP_Server *) rp->op;
+  io_sServerLocal* local = rp->Local;
+  pwr_sClass_Modbus_TCP_Server* op = (pwr_sClass_Modbus_TCP_Server*)rp->op;
 
   /* For display */
-  memcpy( op->Inputs, local->inputs, MIN(sizeof(op->Inputs), local->inputs_size));
+  memcpy(op->Inputs, local->inputs, MIN(sizeof(op->Inputs), local->inputs_size));
   return IO__SUCCESS;
 }
 
@@ -1069,11 +1115,11 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 \*----------------------------------------------------------------------------*/
 static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 {
-  io_sServerLocal *local = rp->Local;
-  pwr_sClass_Modbus_TCP_Server *op = (pwr_sClass_Modbus_TCP_Server *) rp->op;
+  io_sServerLocal* local = rp->Local;
+  pwr_sClass_Modbus_TCP_Server* op = (pwr_sClass_Modbus_TCP_Server*)rp->op;
 
   /* For display */
-  memcpy( op->Outputs, local->outputs, MIN(sizeof(op->Outputs), local->outputs_size));
+  memcpy(op->Outputs, local->outputs, MIN(sizeof(op->Outputs), local->outputs_size));
   return IO__SUCCESS;
 }
 
@@ -1085,7 +1131,8 @@ static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   io_sServerLocal* local = rp->Local;
   int i;
 
-  for (i = 1; i < MB_MAX_CONNECTIONS; i++) {
+  for (i = 1; i < MB_MAX_CONNECTIONS; i++)
+  {
     if (local->connections[i].occupied)
       mb_close_connection(rp, i);
   }
@@ -1099,7 +1146,6 @@ static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Modbus_TCP_Server)
-    = { pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackRead),
-        pwr_BindIoMethod(IoRackWrite), pwr_BindIoMethod(IoRackClose),
-        pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Modbus_TCP_Server) = {
+    pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackRead), pwr_BindIoMethod(IoRackWrite),
+    pwr_BindIoMethod(IoRackClose), pwr_NullMethod};

@@ -41,22 +41,19 @@
 
 #include "wb_main.h"
 
-class WbGtk : public Wb {
+class WbGtk : public Wb
+{
 public:
   GtkWidget* toplevel;
   GtkWidget* mainwindow;
 
   WbGtk(int argc, char* argv[]);
-  ~WbGtk()
-  {
-  }
-  Wtt* wtt_new(const char* name, const char* iconname, ldh_tWBContext wbctx,
-      pwr_tVolumeId volid, ldh_tVolume volctx, wnav_sStartMenu* root_menu,
-      pwr_tStatus* status);
-  WVsel* vsel_new(pwr_tStatus* status, const char* name, ldh_tWBContext wbctx,
-      char* volumename, int (*bc_success)(void*, pwr_tVolumeId*, int),
-      void (*bc_cancel)(), int (*bc_time_to_exit)(void*), int show_volumes,
-      wb_eType wb_type);
+  ~WbGtk() {}
+  Wtt* wtt_new(const char* name, const char* iconname, ldh_tWBContext wbctx, pwr_tVolumeId volid,
+               ldh_tVolume volctx, wnav_sStartMenu* root_menu, pwr_tStatus* status);
+  WVsel* vsel_new(pwr_tStatus* status, const char* name, ldh_tWBContext wbctx, char* volumename,
+                  int (*bc_success)(void*, pwr_tVolumeId*, int), void (*bc_cancel)(),
+                  int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wb_type);
 };
 
 #endif

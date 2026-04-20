@@ -37,16 +37,17 @@
 #ifndef rt_ini_alias_h
 #define rt_ini_alias_h
 
-typedef struct s_alias {
+typedef struct s_alias
+{
   char nodename[80];
   char alias[80];
   char addr[80];
-  struct s_alias *next;
+  struct s_alias* next;
 } ini_sAlias;
 
 pwr_tStatus ini_LoadAlias(char* filename);
 void ini_FreeAlias(void);
-pwr_tStatus ini_GetAlias(char* nodename, char* alias, char *addr);
+pwr_tStatus ini_GetAlias(char* nodename, char* alias, char* addr);
 pwr_tStatus ini_SetAttributeAfterPlc(char* filename, char* nodename, int output);
 pwr_tStatus ini_SetAttribute(char* filename, char* nodename, int output);
 

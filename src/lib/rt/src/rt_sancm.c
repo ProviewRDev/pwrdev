@@ -68,9 +68,9 @@ void sancm_Add(pwr_tStatus* status, gdb_sNode* np)
   tgt.nid = np->nid;
   tgt.qix = net_cProcHandler;
 
-  for (i = 0, ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAdd_lh);
-       ol != &np->sancAdd_lh;
-       ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAdd_lh)) {
+  for (i = 0, ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAdd_lh); ol != &np->sancAdd_lh;
+       ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAdd_lh))
+  {
     op = pool_Qitem(ol, gdb_sObject, u.c.sanc_ll);
 
     ap->sane[i].oid = op->g.oid;
@@ -86,7 +86,8 @@ void sancm_Add(pwr_tStatus* status, gdb_sNode* np)
     pool_QinsertPred(NULL, gdbroot->pool, &op->u.c.sanc_ll, &np->sancAct_lh);
     op->u.c.flags.b.sancAct = 1;
     np->sancAct_lc++;
-    if (i >= count) {
+    if (i >= count)
+    {
       ap->count = count;
       gdb_Unlock;
       net_Put(NULL, &tgt, ap, net_eMsg_sanAdd, 0, pwr_Offset(ap, sane[i]), 0);
@@ -99,7 +100,8 @@ void sancm_Add(pwr_tStatus* status, gdb_sNode* np)
 
   /* Send remaining san entries.  */
 
-  if (i > 0) {
+  if (i > 0)
+  {
     ap->count = i;
     gdb_Unlock;
     net_Put(NULL, &tgt, ap, net_eMsg_sanAdd, 0, pwr_Offset(ap, sane[i]), 0);
@@ -119,9 +121,9 @@ void sancm_FlushNode(pwr_tStatus* status, gdb_sNode* np)
 
   gdb_AssumeLocked;
 
-  for (ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAdd_lh);
-       ol != &np->sancAdd_lh;
-       ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAdd_lh)) {
+  for (ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAdd_lh); ol != &np->sancAdd_lh;
+       ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAdd_lh))
+  {
     op = pool_Qitem(ol, gdb_sObject, u.c.sanc_ll);
 
     pwr_Assert(op->u.c.flags.b.sancAdd);
@@ -133,9 +135,9 @@ void sancm_FlushNode(pwr_tStatus* status, gdb_sNode* np)
   }
   pwr_Assert(np->sancAdd_lc == 0);
 
-  for (ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAct_lh);
-       ol != &np->sancAct_lh;
-       ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAct_lh)) {
+  for (ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAct_lh); ol != &np->sancAct_lh;
+       ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAct_lh))
+  {
     op = pool_Qitem(ol, gdb_sObject, u.c.sanc_ll);
 
     pwr_Assert(op->u.c.flags.b.sancAct);
@@ -147,9 +149,9 @@ void sancm_FlushNode(pwr_tStatus* status, gdb_sNode* np)
   }
   pwr_Assert(np->sancAct_lc == 0);
 
-  for (ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancRem_lh);
-       ol != &np->sancRem_lh;
-       ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancRem_lh)) {
+  for (ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancRem_lh); ol != &np->sancRem_lh;
+       ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancRem_lh))
+  {
     op = pool_Qitem(ol, gdb_sObject, u.c.sanc_ll);
 
     pwr_Assert(op->u.c.flags.b.sancRem);
@@ -177,14 +179,15 @@ void sancm_MoveExpired(pwr_tStatus* status, gdb_sNode* np)
   if (np->sancAct_lc == 0)
     return;
 
-  for (ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAct_lh);
-       ol != &np->sancAct_lh;) {
+  for (ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancAct_lh); ol != &np->sancAct_lh;)
+  {
     op = pool_Qitem(ol, gdb_sObject, u.c.sanc_ll);
     ol = pool_Qsucc(NULL, gdbroot->pool, ol);
 
     pwr_Assert(op->u.c.flags.b.sancAct);
 
-    if (op->u.c.sanexp) {
+    if (op->u.c.sanexp)
+    {
       pool_Qremove(NULL, gdbroot->pool, &op->u.c.sanc_ll);
       op->u.c.flags.b.sancAct = 0;
       pwr_Assert((op->u.c.flags.m & gdb_mCo_inSancList) == 0);
@@ -195,7 +198,8 @@ void sancm_MoveExpired(pwr_tStatus* status, gdb_sNode* np)
       op->u.c.flags.b.sancRem = 1;
       np->sancRem_lc++;
       op->u.c.sanexp = 0;
-    } else if (!op->l.flags.b.isMountServer)
+    }
+    else if (!op->l.flags.b.isMountServer)
       op->u.c.sanexp = 1;
   }
 }
@@ -225,9 +229,9 @@ void sancm_Remove(pwr_tStatus* status, gdb_sNode* np)
   tgt.nid = np->nid;
   tgt.qix = net_cProcHandler;
 
-  for (i = 0, ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancRem_lh);
-       ol != &np->sancRem_lh;
-       ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancRem_lh)) {
+  for (i = 0, ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancRem_lh); ol != &np->sancRem_lh;
+       ol = pool_Qsucc(NULL, gdbroot->pool, &np->sancRem_lh))
+  {
     op = pool_Qitem(ol, gdb_sObject, u.c.sanc_ll);
 
     rp->sid[i] = op->u.c.sanid;
@@ -238,7 +242,8 @@ void sancm_Remove(pwr_tStatus* status, gdb_sNode* np)
     pwr_Assert((op->u.c.flags.m & gdb_mCo_inSancList) == 0);
     pwr_Assert(np->sancRem_lc != 0);
     np->sancRem_lc--;
-    if (i >= count) {
+    if (i >= count)
+    {
       rp->count = count;
       gdb_Unlock;
       net_Put(NULL, &tgt, rp, net_eMsg_sanRemove, 0, pwr_Offset(rp, sid[i]), 0);
@@ -251,7 +256,8 @@ void sancm_Remove(pwr_tStatus* status, gdb_sNode* np)
 
   /* Send remaining san removes.  */
 
-  if (i > 0) {
+  if (i > 0)
+  {
     rp->count = count;
     gdb_Unlock;
     net_Put(NULL, &tgt, rp, net_eMsg_sanRemove, 0, pwr_Offset(rp, sid[i]), 0);
@@ -273,10 +279,11 @@ void sancm_Update(qcom_sGet* get)
   gdb_ScopeLock
   {
     error = 0;
-    for (i = 0; i < up->count; i++) {
+    for (i = 0; i < up->count; i++)
+    {
       op = hash_Search(NULL, gdbroot->oid_ht, &up->data[i].sane.oid);
-      if (op == NULL
-          || cdh_RefIdIsNotEqual(op->u.c.sanid, up->data[i].sane.sid)) {
+      if (op == NULL || cdh_RefIdIsNotEqual(op->u.c.sanid, up->data[i].sane.sid))
+      {
         error++;
         continue;
       }
@@ -287,7 +294,8 @@ void sancm_Update(qcom_sGet* get)
 
     /* Send remove for errors.  */
 
-    if (error > 0) {
+    if (error > 0)
+    {
       net_sSanRemove* rp;
       int size = sizeof(net_sSanRemove) + (error - 1) * sizeof(rp->sid[0]);
       int i;
@@ -298,9 +306,11 @@ void sancm_Update(qcom_sGet* get)
       tgt.qix = net_cProcHandler;
 
       rp = calloc(1, size);
-      if (rp != NULL) {
+      if (rp != NULL)
+      {
         rp->count = error;
-        for (i = 0; i < up->count; i++) {
+        for (i = 0; i < up->count; i++)
+        {
           if (up->data[i].sane.sid.rix == 0)
             continue;
           rp->sid[--error] = up->data[i].sane.sid;

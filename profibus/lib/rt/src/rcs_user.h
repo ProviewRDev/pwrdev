@@ -185,14 +185,14 @@ typedef struct RCS_MESSAGEHEADERtag
 
 typedef struct RCS_MESSAGEtag
 {
-  unsigned char rx; /* receiver                         */
-  unsigned char tx; /* transmitter                      */
-  unsigned char ln; /* lenght                           */
-  unsigned char nr; /* number                           */
-  unsigned char a;  /* answer                           */
-  unsigned char f;  /* fault                            */
-  unsigned char b;  /* command                          */
-  unsigned char e;  /* extension                        */
+  unsigned char rx;                                         /* receiver                         */
+  unsigned char tx;                                         /* transmitter                      */
+  unsigned char ln;                                         /* lenght                           */
+  unsigned char nr;                                         /* number                           */
+  unsigned char a;                                          /* answer                           */
+  unsigned char f;                                          /* fault                            */
+  unsigned char b;                                          /* command                          */
+  unsigned char e;                                          /* extension                        */
   unsigned char d[RCS_SEGMENT_LEN - RCS_MESSAGEHEADER_LEN]; /* data */
 } RCS_MESSAGE;
 
@@ -238,8 +238,7 @@ typedef struct RCS_TELEGRAMHEADERDATA_10tag
   unsigned char data_cnt;
   unsigned char data_type;
   unsigned char function;
-  unsigned char
-      d[RCS_SEGMENT_LEN - RCS_MESSAGEHEADER_LEN - RCS_TELEGRAMHEADER_LEN];
+  unsigned char d[RCS_SEGMENT_LEN - RCS_MESSAGEHEADER_LEN - RCS_TELEGRAMHEADER_LEN];
 } RCS_TELEGRAMHEADERDATA_10;
 
 typedef struct RCS_MESSAGETELEGRAM_10tag
@@ -259,8 +258,7 @@ typedef struct RCS_MESSAGETELEGRAM_10tag
   unsigned char data_cnt;   /* data count                       */
   unsigned char data_type;  /* data type                        */
   unsigned char function;   /* function                         */
-  unsigned char
-      d[RCS_SEGMENT_LEN - RCS_MESSAGEHEADER_LEN - RCS_TELEGRAMHEADER_LEN];
+  unsigned char d[RCS_SEGMENT_LEN - RCS_MESSAGEHEADER_LEN - RCS_TELEGRAMHEADER_LEN];
 } RCS_MESSAGETELEGRAM_10;
 
 #if defined(_MSC_VER) /* Microsoft C */

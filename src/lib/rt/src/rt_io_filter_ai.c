@@ -53,21 +53,22 @@ typedef struct s_FilterData_1 sFilterData_1;
 
 /* The structure of filter data used in filter type = 1  */
 
-struct s_FilterData_1 {
+struct s_FilterData_1
+{
   pwr_tFloat32 ScanTime;
   pwr_tFloat32* ActualValue;
 };
 
 /* Filtration of one Ai-object.  */
 
-pwr_tStatus io_AiFilter(
-    pwr_sClass_Ai* SignalObj, pwr_tFloat32* Value, void* FilterData)
+pwr_tStatus io_AiFilter(pwr_sClass_Ai* SignalObj, pwr_tFloat32* Value, void* FilterData)
 {
   sFilterData_1* Data_1;
 
   if (SignalObj == NULL)
     return IO__SUCCESS;
-  switch (SignalObj->FilterType) {
+  switch (SignalObj->FilterType)
+  {
   case _FilterType_0:
     break;
 
@@ -75,11 +76,10 @@ pwr_tStatus io_AiFilter(
     if (FilterData == NULL)
       return IO__SUCCESS;
     Data_1 = (sFilterData_1*)FilterData;
-    if (SignalObj->FilterAttribute[0] > 0
-        && SignalObj->FilterAttribute[0] > Data_1->ScanTime) {
-      *Value = *Data_1->ActualValue
-          + Data_1->ScanTime / SignalObj->FilterAttribute[0]
-              * (*Value - *Data_1->ActualValue);
+    if (SignalObj->FilterAttribute[0] > 0 && SignalObj->FilterAttribute[0] > Data_1->ScanTime)
+    {
+      *Value = *Data_1->ActualValue +
+               Data_1->ScanTime / SignalObj->FilterAttribute[0] * (*Value - *Data_1->ActualValue);
     }
     break;
 
@@ -91,32 +91,31 @@ pwr_tStatus io_AiFilter(
 } /* END io_FilterAi */
 
 /*
-* Name:
-*   io_InitFilterAi
-*
-*
-* Function:
-*   Initialize filter for one Ai-object.
-* Description:
-*
-*/
-pwr_tStatus io_InitAiFilter(pwr_sClass_ChanAi* ChanObj,
-    pwr_sClass_Ai* SignalObj, void** FilterData, pwr_tFloat32 ScanTime)
+ * Name:
+ *   io_InitFilterAi
+ *
+ *
+ * Function:
+ *   Initialize filter for one Ai-object.
+ * Description:
+ *
+ */
+pwr_tStatus io_InitAiFilter(pwr_sClass_ChanAi* ChanObj, pwr_sClass_Ai* SignalObj, void** FilterData,
+                            pwr_tFloat32 ScanTime)
 {
   sFilterData_1* Data_1;
 
   if (SignalObj == NULL)
     return IO__SUCCESS;
-  switch (SignalObj->FilterType) {
+  switch (SignalObj->FilterType)
+  {
   case _FilterType_0:
     break;
 
   case _FilterType_1:
     Data_1 = (sFilterData_1*)malloc(sizeof(sFilterData_1));
-    Data_1->ActualValue
-        = gdh_TranslateRtdbPointer((unsigned long)SignalObj->ActualValue);
-    Data_1->ScanTime = (pwr_tFloat32)(
-        ScanTime * ChanObj->ScanInterval); /* Scan time (seconds) */
+    Data_1->ActualValue = gdh_TranslateRtdbPointer((unsigned long)SignalObj->ActualValue);
+    Data_1->ScanTime = (pwr_tFloat32)(ScanTime * ChanObj->ScanInterval); /* Scan time (seconds) */
     *FilterData = Data_1;
     break;
 

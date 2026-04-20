@@ -51,12 +51,11 @@
 */
 class GlowCustomColors;
 
-class GlowColor {
+class GlowColor
+{
 public:
   //! Constructor
-  GlowColor()
-  {
-  }
+  GlowColor() {}
 
   //! Conversion from HIS to RGB
   /*! Uses the tranformation matrix:
@@ -65,12 +64,10 @@ public:
                            [ 1/sqrt(3) 1/sqrt(3)  1/sqrt(3)  ]
     where M1 = S * sin(H); M2 = s * cos(H); I1 = I/sqrt(3)
   */
-  static void his_to_rgb(
-      double* r, double* g, double* b, double h, double i, double s);
+  static void his_to_rgb(double* r, double* g, double* b, double h, double i, double s);
 
   //! Calculates the rgb values for a drawtype index
-  static void rgb_color(
-      int idx, double* r, double* g, double* b, GlowCustomColors* customcolors);
+  static void rgb_color(int idx, double* r, double* g, double* b, GlowCustomColors* customcolors);
 
   //! Conversion from base drawtype to drawtype dependent on tone, brightness,
   //! highlight etc
@@ -79,9 +76,8 @@ public:
     tone, brightness, intensity, colorshift and inverse, controls the drawtype
     of the object.
   */
-  static glow_eDrawType get_drawtype(glow_eDrawType local_drawtype,
-      glow_eDrawType highlight_drawtype, int highlight, void* node, int fill,
-      int highlight_disabled);
+  static glow_eDrawType get_drawtype(glow_eDrawType local_drawtype, glow_eDrawType highlight_drawtype,
+                                     int highlight, void* node, int fill, int highlight_disabled);
 
   //! Calculation of light and shadow drawtype for 3D effects
   /*!
@@ -90,8 +86,7 @@ public:
     lighter
     \param node	The node that controls the colors of the object. Can be zero.
   */
-  static glow_eDrawType shift_drawtype(
-      glow_eDrawType dt, int shift, void* node);
+  static glow_eDrawType shift_drawtype(glow_eDrawType dt, int shift, void* node);
 
   //! Conversion of colors between different Glow versions
   static glow_eDrawType convert(glow_eConvert version, glow_eDrawType color);
@@ -110,14 +105,10 @@ public:
   */
   static char* colortone_to_name(glow_eDrawType drawtype);
 
-  static int is_shiftable(glow_eDrawType dt)
-  {
-    return (dt >= 20 && dt <= glow_eDrawType_Color300);
-  }
+  static int is_shiftable(glow_eDrawType dt) { return (dt >= 20 && dt <= glow_eDrawType_Color300); }
   static int is_custom(glow_eDrawType dt)
   {
-    return (
-        dt >= glow_eDrawType_CustomColor1 && dt < glow_eDrawType_CustomColor__);
+    return (dt >= glow_eDrawType_CustomColor1 && dt < glow_eDrawType_CustomColor__);
   }
 
   static void print_rgb_colors(GlowCustomColors* cc);

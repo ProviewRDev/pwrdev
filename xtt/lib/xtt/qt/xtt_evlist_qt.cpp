@@ -48,8 +48,8 @@
 
 #include <QApplication>
 
-EvListQt::EvListQt(void* ev_parent_ctx, ev_eType ev_type, int ev_size,
-    int ev_eventname_seg, QWidget** w, void (*ev_init_cb)(void*))
+EvListQt::EvListQt(void* ev_parent_ctx, ev_eType ev_type, int ev_size, int ev_eventname_seg, QWidget** w,
+                   void (*ev_init_cb)(void*))
     : EvList(ev_parent_ctx, ev_type, ev_size, ev_eventname_seg, ev_init_cb)
 {
   form_widget = scrolledbrowwidgetqt_new(init_brow_cb, this, &brow_widget);
@@ -61,13 +61,16 @@ EvListQt::EvListQt(void* ev_parent_ctx, ev_eType ev_type, int ev_size,
 
 EvListQt::~EvListQt()
 {
-  if (browtree) {
+  if (browtree)
+  {
     delete browtree->ctx;
   }
-  if (browtree && browtree != brow) {
+  if (browtree && browtree != brow)
+  {
     delete browtree;
   }
-  if (browbase && browbase != brow) {
+  if (browbase && browbase != brow)
+  {
     delete browbase;
   }
   delete brow;
@@ -75,15 +78,9 @@ EvListQt::~EvListQt()
   form_widget->close();
 }
 
-void EvListQt::set_input_focus()
-{
-  brow_widget->setFocus();
-}
+void EvListQt::set_input_focus() { brow_widget->setFocus(); }
 
-void EvListQt::bell()
-{
-  QApplication::beep();
-}
+void EvListQt::bell() { QApplication::beep(); }
 
 void EvListQt::popup_position(int x_event, int y_event, int* x, int* y)
 {
@@ -98,13 +95,15 @@ void EvListQt::print(const char* title)
 
   strcpy(print_title, title);
   syi_NodeName(&sts, nodename, sizeof(nodename));
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     strcat(print_title, " ");
     strcat(print_title, nodename);
   }
 
   sts = CoWowQt::CreateBrowPrintDialogQt(print_title, brow->ctx, brow_widget);
-  if (sts == WOW__PRINTDIALOGDISABLED) {
+  if (sts == WOW__PRINTDIALOGDISABLED)
+  {
     pwr_tFileName filename;
     pwr_tCmd cmd;
 

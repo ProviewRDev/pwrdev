@@ -37,6 +37,8 @@
 #ifndef glow_node_h
 #define glow_node_h
 
+#include <iosfwd>
+
 #include "glow_point.h"
 #include "glow_nodeclass.h"
 
@@ -57,7 +59,8 @@ class GrowCtx;
 
 class GlowNodeClass;
 
-class GlowNode : public GlowArrayElem {
+class GlowNode : public GlowArrayElem
+{
 public:
   //! Constuctor
   /*!
@@ -69,11 +72,11 @@ public:
     \param nodraw	Don't draw the object now.
     \param rel_annot_pos Not used.
   */
-  GlowNode(GrowCtx* glow_ctx, const char* name, GlowNodeClass* node_class,
-      double x1, double y1, int nodraw = 0, int rel_annot_pos = 0);
+  GlowNode(GrowCtx* glow_ctx, const char* name, GlowNodeClass* node_class, double x1, double y1,
+           int nodraw = 0, int rel_annot_pos = 0);
 
   // Noargs constructor.
-  GlowNode(){}
+  GlowNode() {}
 
   // Destructor.
   ~GlowNode();
@@ -88,8 +91,7 @@ public:
     nc->nav_zoom();
     pos.nav_zoom();
   }
-  void get_borders(
-      double* x1_right, double* x1_left, double* y1_high, double* y1_low)
+  void get_borders(double* x1_right, double* x1_left, double* y1_high, double* y1_low)
   {
     if (x_left < *x1_left)
       *x1_left = x_left;
@@ -100,15 +102,11 @@ public:
     if (y_low < *y1_low)
       *y1_low = y_low;
   }
-  void get_node_borders()
-  {
-    nc->get_borders(
-        pos.x, pos.y, &x_right, &x_left, &y_high, &y_low, (void*)this);
-  }
+  void get_node_borders() { nc->get_borders(pos.x, pos.y, &x_right, &x_left, &y_high, &y_low, (void*)this); }
   void get_node_obstacle_borders()
   {
-    nc->get_obstacle_borders(pos.x, pos.y, &obst_x_right, &obst_x_left,
-        &obst_y_high, &obst_y_low, (void*)this);
+    nc->get_obstacle_borders(pos.x, pos.y, &obst_x_right, &obst_x_left, &obst_y_high, &obst_y_low,
+                             (void*)this);
   }
   void store_borders()
   {
@@ -123,34 +121,22 @@ public:
     \param fp	Ouput file.
     \param mode	Save as graph or subgraph.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
-  void store_position()
-  {
-    stored_pos = pos;
-  }
-  void restore_position()
-  {
-    pos = stored_pos;
-  }
+  void store_position() { stored_pos = pos; }
+  void restore_position() { pos = stored_pos; }
   int get_conpoint(int num, double* x, double* y, glow_eDirection* dir);
-  void redraw_node_cons(void* node){}
-  int delete_node_cons(void* node)
-  {
-    return 0;
-  }
+  void redraw_node_cons(void* node) {}
+  int delete_node_cons(void* node) { return 0; }
   void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
-      glow_eSelectPolicy select_policy);
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_Node;
-  }
+                            glow_eSelectPolicy select_policy);
+  glow_eObjectType type() { return glow_eObjectType_Node; }
   void set_annotation(int num, char* text, int size, int nodraw, int brief = 0);
   void get_annotation(int num, char* text, int size);
 
@@ -165,36 +151,32 @@ public:
 
   void measure(double* ll_x, double* ll_y, double* ur_x, double* ur_y);
 
-  double x_right; //!< Right border of object.
-  double x_left; //!< Left border of object.
-  double y_high; //!< High border of object.
-  double y_low; //!< Low border of object.
-  double s_x_right; //!< Stored right border of object.
-  double s_x_left; //!< Stored left border of object.
-  double s_y_high; //!< Stored high border of object.
-  double s_y_low; //!< Stored low border of object.
-  double
-      obst_x_right; //!< Right border of object used for routing of connections.
-  double
-      obst_x_left; //!< Left border of object used for routing of connections.
-  double
-      obst_y_high; //!< High border of object used for routing of connections.
-  double obst_y_low; //!< Low border of object used for routing of connections.
-  int hot; //!< Object is hot.
-  GlowNodeClass* nc; //!< Pointer to nodeclass.
-  GlowNodeClass*
-      nc_root; //!< Root nodeclass, i.e. the nodeclass of the first page.
+  double x_right;         //!< Right border of object.
+  double x_left;          //!< Left border of object.
+  double y_high;          //!< High border of object.
+  double y_low;           //!< Low border of object.
+  double s_x_right;       //!< Stored right border of object.
+  double s_x_left;        //!< Stored left border of object.
+  double s_y_high;        //!< Stored high border of object.
+  double s_y_low;         //!< Stored low border of object.
+  double obst_x_right;    //!< Right border of object used for routing of connections.
+  double obst_x_left;     //!< Left border of object used for routing of connections.
+  double obst_y_high;     //!< High border of object used for routing of connections.
+  double obst_y_low;      //!< Low border of object used for routing of connections.
+  int hot;                //!< Object is hot.
+  GlowNodeClass* nc;      //!< Pointer to nodeclass.
+  GlowNodeClass* nc_root; //!< Root nodeclass, i.e. the nodeclass of the first page.
   GlowPoint pos;
   GlowPoint stored_pos;
   int highlight; //!< The object is drawn with highlight color.
   int inverse;
-  char* annotv[10]; //!< Array with pointers to annotation texts.
-  int annotsize[10]; //!< The size of the annotation text.
+  char* annotv[10];              //!< Array with pointers to annotation texts.
+  int annotsize[10];             //!< The size of the annotation text.
   int refcon_cnt[MAX_CONPOINTS]; //!< Number of reference connections for each
   //! connection point.
   GlowTraceData trace;
   GlowNode* link; //!< Link in list used for routing of connections.
-  int local_nc; //!< Local nodeclass instance.
+  int local_nc;   //!< Local nodeclass instance.
 
   //! Insert in list used for routing of connections.
   /*!
@@ -226,8 +208,7 @@ public:
   */
   int in_area_exact(double ll_x, double ll_y, double ur_x, double ur_y)
   {
-    return (obst_x_left < ur_x && obst_x_right > ll_x && obst_y_low < ur_y
-        && obst_y_high > ll_y);
+    return (obst_x_left < ur_x && obst_x_right > ll_x && obst_y_low < ur_y && obst_y_high > ll_y);
   }
 
   //! Check if object crosses a vertical line.
@@ -254,8 +235,8 @@ public:
   */
   void conpoint_refcon_reconfig(int conpoint);
 
-  void conpoint_refcon_redraw(void* node, int conpoint){}
-  void conpoint_refcon_erase(void* node, int conpoint){}
+  void conpoint_refcon_redraw(void* node, int conpoint) {}
+  void conpoint_refcon_erase(void* node, int conpoint) {}
   void remove_notify();
 
   void* user_data; //!< User data.
@@ -264,26 +245,17 @@ public:
   /*!
     \param data User data.
   */
-  void set_user_data(void* data)
-  {
-    user_data = data;
-  }
+  void set_user_data(void* data) { user_data = data; }
 
   //! Get user data.
   /*!
     \param data User data.
   */
-  void get_user_data(void** data)
-  {
-    *data = user_data;
-  }
+  void get_user_data(void** data) { *data = user_data; }
 
   void set_trace_attr(GlowTraceData* attr);
   void get_trace_attr(GlowTraceData** attr);
-  void set_trace_data(void* data)
-  {
-    trace.p = data;
-  }
+  void set_trace_data(void* data) { trace.p = data; }
 
   //! Scan trace
   /*! Calls the trace scan callback.
@@ -301,47 +273,23 @@ public:
   /*!
     \return The context.
   */
-  void* get_ctx()
-  {
-    return this->ctx;
-  }
+  void* get_ctx() { return this->ctx; }
 
   void get_node_position(double* x, double* y)
   {
     *x = pos.x;
     *y = pos.y;
   }
-  glow_eNodeGroup get_group()
-  {
-    return nc->group;
-  }
+  glow_eNodeGroup get_group() { return nc->group; }
 
   //  brow stuff
-  void set_level(int lev)
-  {
-    level = lev;
-  }
-  int get_level()
-  {
-    return level;
-  }
-  int is_open()
-  {
-    return node_open;
-  }
-  void set_open(int mask)
-  {
-    node_open |= mask;
-  }
-  void reset_open(int mask)
-  {
-    node_open &= ~mask;
-  }
+  void set_level(int lev) { level = lev; }
+  int get_level() { return level; }
+  int is_open() { return node_open; }
+  void set_open(int mask) { node_open |= mask; }
+  void reset_open(int mask) { node_open &= ~mask; }
   void open_annotation_input(int num);
-  int annotation_input_is_open(int num)
-  {
-    return annotv_inputmode[num];
-  }
+  int annotation_input_is_open(int num) { return annotv_inputmode[num]; }
   void close_annotation_input(int num);
   int level;
   int node_open;

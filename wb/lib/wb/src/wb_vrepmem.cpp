@@ -59,9 +59,8 @@
 #include "wb_vrepwbl.h"
 
 mem_object::mem_object()
-    : rbody_size(0), dbody_size(0), docblock_size(0), rbody(0), dbody(0),
-      docblock(0), m_cid(0), m_tid(0), fth(0), bws(0), fws(0), fch(0),
-      is_built(0), m_created(0)
+    : rbody_size(0), dbody_size(0), docblock_size(0), rbody(0), dbody(0), docblock(0), m_cid(0), m_tid(0),
+      fth(0), bws(0), fws(0), fch(0), is_built(0), m_created(0)
 {
   strcpy(m_name, "");
   strcpy(cname, "");
@@ -81,7 +80,8 @@ char* mem_object::longName()
   static pwr_tOName n;
   pwr_tOName tmp;
   strcpy(n, m_name);
-  for (mem_object* f = fth; f; f = f->fth) {
+  for (mem_object* f = fth; f; f = f->fth)
+  {
     strcpy(tmp, n);
     strcpy(n, f->m_name);
     strcat(n, "-");
@@ -103,7 +103,8 @@ bool mem_object::exportHead(wb_import& i)
 {
   mem_object* lch = get_lch();
   pwr_tOid fthoid;
-  if (!fth) {
+  if (!fth)
+  {
     fthoid.oix = 0;
     if (m_oid.oix != 0)
       // Root object
@@ -111,7 +112,8 @@ bool mem_object::exportHead(wb_import& i)
     else
       // Volume object
       fthoid.vid = 0;
-  } else
+  }
+  else
     fthoid = fth->m_oid;
   pwr_tOid fwsoid = fws ? fws->m_oid : pwr_cNOid;
   pwr_tOid bwsoid = bws ? bws->m_oid : pwr_cNOid;
@@ -119,9 +121,8 @@ bool mem_object::exportHead(wb_import& i)
   pwr_tOid lchoid = lch ? lch->m_oid : pwr_cNOid;
   wb_name n = wb_name(name());
 
-  i.importHead(m_oid, m_cid, fthoid, bwsoid, fwsoid, fchoid, lchoid, name(),
-      n.normName(cdh_mName_object), m_flags, m_ohtime, m_rbtime, m_dbtime,
-      rbody_size, dbody_size);
+  i.importHead(m_oid, m_cid, fthoid, bwsoid, fwsoid, fchoid, lchoid, name(), n.normName(cdh_mName_object),
+               m_flags, m_ohtime, m_rbtime, m_dbtime, rbody_size, dbody_size);
 
   if (fch)
     fch->exportHead(i);
@@ -163,7 +164,8 @@ bool mem_object::exportDocBlock(wb_import& i)
   char* block;
   int size;
 
-  if (docblock && docBlock(&block, &size)) {
+  if (docblock && docBlock(&block, &size))
+  {
     i.importDocBlock(m_oid, size, block);
     free(block);
   }
@@ -182,8 +184,7 @@ bool mem_object::exportTree(wb_treeimport& i, bool isRoot)
   pwr_tOid fthoid = (fth && !isRoot) ? fth->m_oid : pwr_cNOid;
   pwr_tOid bwsoid = (bws && !isRoot) ? bws->m_oid : pwr_cNOid;
 
-  i.importTreeObject(0, m_oid, m_cid, fthoid, bwsoid, name(), m_flags,
-      rbody_size, dbody_size, rbody, dbody);
+  i.importTreeObject(0, m_oid, m_cid, fthoid, bwsoid, name(), m_flags, rbody_size, dbody_size, rbody, dbody);
 
   if (fch)
     fch->exportTree(i, false);
@@ -194,26 +195,26 @@ bool mem_object::exportTree(wb_treeimport& i, bool isRoot)
   return true;
 }
 
-bool mem_object::exportPaste(wb_treeimport& i, pwr_tOid destination,
-    bool isRoot, ldh_eDest destcode, bool keepoid, wb_recix* recix,
-    pwr_tOid* rootlist)
+bool mem_object::exportPaste(wb_treeimport& i, pwr_tOid destination, bool isRoot, ldh_eDest destcode,
+                             bool keepoid, wb_recix* recix, pwr_tOid* rootlist)
 {
   pwr_tOid fthoid = (fth && !isRoot) ? fth->m_oid : pwr_cNOid;
   pwr_tOid bwsoid = (bws && !isRoot) ? bws->m_oid : pwr_cNOid;
   pwr_tOid oid;
   pwr_tOid woid = pwr_cNOid;
 
-  if (recix) {
+  if (recix)
+  {
     pwr_tOix ix;
 
-    if (recix->get(longName(), &ix)) {
+    if (recix->get(longName(), &ix))
+    {
       woid.oix = ix;
       woid.vid = m_oid.vid;
     }
   }
-  i.importPasteObject(destination, destcode, keepoid, m_oid, m_cid, fthoid,
-      bwsoid, name(), m_flags, rbody_size, dbody_size, rbody, dbody, woid,
-      &oid);
+  i.importPasteObject(destination, destcode, keepoid, m_oid, m_cid, fthoid, bwsoid, name(), m_flags,
+                      rbody_size, dbody_size, rbody, dbody, woid, &oid);
 
   if (rootlist)
     *rootlist++ = oid;
@@ -233,19 +234,23 @@ mem_object* mem_object::next(pwr_tCid cid, pwr_tOix* oix)
   if (*oix == m_oid.oix)
     *oix = 0;
   mem_object* n;
-  if (fch) {
+  if (fch)
+  {
     if (!*oix && fch->m_cid == cid)
       return fch;
-    else {
+    else
+    {
       n = fch->next(cid, oix);
       if (n)
         return n;
     }
   }
-  if (fws) {
+  if (fws)
+  {
     if (!*oix && fws->m_cid == cid)
       return fws;
-    else {
+    else
+    {
       n = fws->next(cid, oix);
       if (n)
         return n;
@@ -255,17 +260,15 @@ mem_object* mem_object::next(pwr_tCid cid, pwr_tOix* oix)
 }
 
 wb_vrepmem::wb_vrepmem(wb_erep* erep)
-    : m_erep(erep), m_merep(erep->merep()), m_nRef(0), root_object(0),
-      volume_object(0), m_cloned(0), m_nextOix(0), m_source_vid(0),
-      m_classeditor(false), m_ignore(false)
+    : m_erep(erep), m_merep(erep->merep()), m_nRef(0), root_object(0), volume_object(0), m_cloned(0),
+      m_nextOix(0), m_source_vid(0), m_classeditor(false), m_ignore(false)
 {
   strcpy(m_filename, "");
 }
 
 wb_vrepmem::wb_vrepmem(wb_erep* erep, pwr_tVid vid)
-    : wb_vrep(vid), m_erep(erep), m_merep(erep->merep()), m_nRef(0),
-      root_object(0), volume_object(0), m_cloned(0), m_nextOix(0),
-      m_source_vid(0), m_classeditor(false), m_ignore(false)
+    : wb_vrep(vid), m_erep(erep), m_merep(erep->merep()), m_nRef(0), root_object(0), volume_object(0),
+      m_cloned(0), m_nextOix(0), m_source_vid(0), m_classeditor(false), m_ignore(false)
 {
   strcpy(m_filename, "");
 
@@ -288,19 +291,21 @@ void wb_vrepmem::reloadWbl(pwr_tStatus* sts)
 
 void wb_vrepmem::loadWbl(const char* filename, pwr_tStatus* sts, bool reload)
 {
-  if (!reload && m_erep->refMerepOccupied()) {
+  if (!reload && m_erep->refMerepOccupied())
+  {
     *sts = LDH__OTHERSESS;
     return;
   }
   wb_vrepwbl* vrep = new wb_vrepwbl(m_erep);
   *sts = vrep->load(filename);
-  if (vrep->vid() == 0) {
+  if (vrep->vid() == 0)
+  {
     delete vrep;
     return;
   }
 
-  if (vrep->cid() == pwr_eClass_ClassVolume
-      || vrep->cid() == pwr_eClass_DetachedClassVolume) {
+  if (vrep->cid() == pwr_eClass_ClassVolume || vrep->cid() == pwr_eClass_DetachedClassVolume)
+  {
     // Start the class editor
 
     // Insert vrepwbl in local merep to interprete the Template objects
@@ -348,18 +353,21 @@ int wb_vrepmem::nextOix()
 
 wb_orep* wb_vrepmem::object(pwr_tStatus* sts, pwr_tOid oid)
 {
-  if (oid.vid != m_vid) {
+  if (oid.vid != m_vid)
+  {
     *sts = LDH__BADOBJID;
     return 0;
   }
 
-  if (oid.oix == 0 && !volume_object) {
+  if (oid.oix == 0 && !volume_object)
+  {
     // Volume object is not created yet...
     createVolumeObject(volume_name);
   }
 
   mem_object* n = findObject(oid.oix);
-  if (!n) {
+  if (!n)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -369,15 +377,18 @@ wb_orep* wb_vrepmem::object(pwr_tStatus* sts, pwr_tOid oid)
 
 wb_orep* wb_vrepmem::object(pwr_tStatus* sts, pwr_tCid cid)
 {
-  if (root_object) {
+  if (root_object)
+  {
     mem_object* n;
     if (root_object->m_cid == cid)
       n = root_object;
-    else {
+    else
+    {
       pwr_tOix oix = 0;
       n = root_object->next(cid, &oix);
     }
-    if (n) {
+    if (n)
+    {
       *sts = LDH__SUCCESS;
       return new wb_orepmem(this, n);
     }
@@ -389,7 +400,8 @@ wb_orep* wb_vrepmem::object(pwr_tStatus* sts, pwr_tCid cid)
 wb_orep* wb_vrepmem::object(pwr_tStatus* sts, wb_name& name)
 {
   mem_object* n = find(name.name());
-  if (!n) {
+  if (!n)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -406,14 +418,13 @@ wb_vrep* wb_vrepmem::next()
 
 void wb_vrepmem::info()
 {
-  std::cout << "Volume : " << volume_name << " " << volume_class << " " << m_vid
-            << '\n';
+  std::cout << "Volume : " << volume_name << " " << volume_class << " " << m_vid << '\n';
 }
 
-bool wb_vrepmem::createSnapshot(
-    const char* fileName, const pwr_tTime* time, const int rtonly)
+bool wb_vrepmem::createSnapshot(const char* fileName, const pwr_tTime* time, const int rtonly)
 {
-  try {
+  try
+  {
     pwr_tCid vcid = m_cid;
     if (m_cloned && volume_object)
       m_cid = volume_object->m_cid;
@@ -431,18 +442,23 @@ bool wb_vrepmem::createSnapshot(
       m_cid = vcid;
 
     return true;
-  } catch (wb_error&) {
+  }
+  catch (wb_error&)
+  {
     return false;
   }
 }
 
 bool wb_vrepmem::exportVolume(wb_import& i)
 {
-  try {
+  try
+  {
     i.importVolume(*this);
 
     return true;
-  } catch (wb_error&) {
+  }
+  catch (wb_error&)
+  {
     return false;
   }
 }
@@ -486,15 +502,9 @@ bool wb_vrepmem::exportRbody(wb_import& i)
     return false;
 }
 
-bool wb_vrepmem::exportDocBlock(wb_import& i)
-{
-  return false;
-}
+bool wb_vrepmem::exportDocBlock(wb_import& i) { return false; }
 
-bool wb_vrepmem::exportMeta(wb_import& i)
-{
-  return false;
-}
+bool wb_vrepmem::exportMeta(wb_import& i) { return false; }
 
 mem_object* wb_vrepmem::findObject(pwr_tOix oix)
 {
@@ -506,13 +516,15 @@ mem_object* wb_vrepmem::findObject(pwr_tOix oix)
 
 int wb_vrepmem::nameToOid(const char* name, pwr_tOid* oid)
 {
-  if (str_StartsWith(name, "_O")) {
+  if (str_StartsWith(name, "_O"))
+  {
     cdh_StringToObjid(name, oid);
     return 1;
   }
 
   mem_object* n = find(name);
-  if (n) {
+  if (n)
+  {
     *oid = n->m_oid;
     return 1;
   }
@@ -525,7 +537,8 @@ int wb_vrepmem::nameToOid(const char* name, pwr_tOid* oid)
   wb_orep* orep = m_erep->object(&sts, na);
   if (EVEN(sts))
     return 0;
-  else {
+  else
+  {
     *oid = orep->oid();
     // Delete
     orep->ref();
@@ -538,8 +551,7 @@ int wb_vrepmem::nameToOid(const char* name, pwr_tOid* oid)
 bool wb_vrepmem::registerObject(pwr_tOix oix, mem_object* node)
 {
   std::pair<pwr_tOix, mem_object*> p(oix, node);
-  std::pair<std::map<pwr_tOix, mem_object*>::iterator, bool> result
-      = m_oix_list.insert(p);
+  std::pair<std::map<pwr_tOix, mem_object*>::iterator, bool> result = m_oix_list.insert(p);
 
   return result.second;
 }
@@ -553,8 +565,7 @@ bool wb_vrepmem::unregisterObject(pwr_tOix oix)
   return true;
 }
 
-void wb_vrepmem::registerVolume(
-    const char* name, pwr_tCid cid, pwr_tVid vid, mem_object* node)
+void wb_vrepmem::registerVolume(const char* name, pwr_tCid cid, pwr_tVid vid, mem_object* node)
 {
   m_vid = vid;
   strcpy(volume_name, name);
@@ -567,8 +578,7 @@ mem_object* wb_vrepmem::find(const char* name)
 {
   wb_name oname = wb_name(name);
 
-  if (oname.evenSts()
-      || (oname.hasVolume() && !oname.volumeIsEqual(this->name())))
+  if (oname.evenSts() || (oname.hasVolume() && !oname.volumeIsEqual(this->name())))
     return 0;
 
   if (root_object)
@@ -578,7 +588,8 @@ mem_object* wb_vrepmem::find(const char* name)
 
 void wb_vrepmem::unref()
 {
-  if (--m_nRef == 0) {
+  if (--m_nRef == 0)
+  {
     if (!streq(m_filename, ""))
       wb_dblock::dbunlock(m_filename);
     delete this;
@@ -595,10 +606,12 @@ wb_orep* wb_vrepmem::object(pwr_tStatus* sts)
 {
   wb_orepmem* orep = 0;
 
-  if (root_object) {
+  if (root_object)
+  {
     orep = new wb_orepmem((wb_vrepmem*)this, root_object);
     *sts = LDH__SUCCESS;
-  } else
+  }
+  else
     *sts = LDH__NOSUCHOBJ;
 
   return orep;
@@ -622,11 +635,12 @@ wb_orep* wb_vrepmem::parent(pwr_tStatus* sts, const wb_orep* o)
 {
   wb_orepmem* orep = 0;
 
-  if (((wb_orepmem*)o)->memobject()->fth) {
-    orep
-        = new wb_orepmem((wb_vrepmem*)this, ((wb_orepmem*)o)->memobject()->fth);
+  if (((wb_orepmem*)o)->memobject()->fth)
+  {
+    orep = new wb_orepmem((wb_vrepmem*)this, ((wb_orepmem*)o)->memobject()->fth);
     *sts = LDH__SUCCESS;
-  } else
+  }
+  else
     *sts = LDH__NO_PARENT;
 
   return orep;
@@ -636,11 +650,12 @@ wb_orep* wb_vrepmem::after(pwr_tStatus* sts, const wb_orep* o)
 {
   wb_orepmem* orep = 0;
 
-  if (((wb_orepmem*)o)->memobject()->fws) {
-    orep
-        = new wb_orepmem((wb_vrepmem*)this, ((wb_orepmem*)o)->memobject()->fws);
+  if (((wb_orepmem*)o)->memobject()->fws)
+  {
+    orep = new wb_orepmem((wb_vrepmem*)this, ((wb_orepmem*)o)->memobject()->fws);
     *sts = LDH__SUCCESS;
-  } else
+  }
+  else
     *sts = LDH__NO_SIBLING;
   return orep;
 }
@@ -649,11 +664,12 @@ wb_orep* wb_vrepmem::before(pwr_tStatus* sts, const wb_orep* o)
 {
   wb_orepmem* orep = 0;
 
-  if (((wb_orepmem*)o)->memobject()->bws) {
-    orep
-        = new wb_orepmem((wb_vrepmem*)this, ((wb_orepmem*)o)->memobject()->bws);
+  if (((wb_orepmem*)o)->memobject()->bws)
+  {
+    orep = new wb_orepmem((wb_vrepmem*)this, ((wb_orepmem*)o)->memobject()->bws);
     *sts = LDH__SUCCESS;
-  } else
+  }
+  else
     *sts = LDH__NO_SIBLING;
 
   return orep;
@@ -663,11 +679,12 @@ wb_orep* wb_vrepmem::first(pwr_tStatus* sts, const wb_orep* o)
 {
   wb_orepmem* orep = 0;
 
-  if (((wb_orepmem*)o)->memobject()->fch) {
-    orep
-        = new wb_orepmem((wb_vrepmem*)this, ((wb_orepmem*)o)->memobject()->fch);
+  if (((wb_orepmem*)o)->memobject()->fch)
+  {
+    orep = new wb_orepmem((wb_vrepmem*)this, ((wb_orepmem*)o)->memobject()->fch);
     *sts = LDH__SUCCESS;
-  } else
+  }
+  else
     *sts = LDH__NO_CHILD;
 
   return orep;
@@ -678,8 +695,10 @@ wb_orep* wb_vrepmem::child(pwr_tStatus* sts, const wb_orep* o, wb_name& name)
   wb_orepmem* orep = 0;
 
   mem_object* m = ((wb_orepmem*)o)->memobject()->fch;
-  while (m) {
-    if (name.segmentIsEqual(m->name())) {
+  while (m)
+  {
+    if (name.segmentIsEqual(m->name()))
+    {
       orep = new wb_orepmem((wb_vrepmem*)this, m);
       *sts = LDH__SUCCESS;
       break;
@@ -698,10 +717,12 @@ wb_orep* wb_vrepmem::last(pwr_tStatus* sts, const wb_orep* o)
 
   mem_object* n = ((wb_orepmem*)o)->memobject()->get_lch();
 
-  if (n) {
+  if (n)
+  {
     orep = new wb_orepmem((wb_vrepmem*)this, n);
     *sts = LDH__SUCCESS;
-  } else
+  }
+  else
     *sts = LDH__NO_CHILD;
 
   return orep;
@@ -710,10 +731,12 @@ wb_orep* wb_vrepmem::last(pwr_tStatus* sts, const wb_orep* o)
 wb_orep* wb_vrepmem::next(pwr_tStatus* sts, const wb_orep* o)
 {
   mem_object* mem = findObject(o->oid().oix);
-  if (mem) {
+  if (mem)
+  {
     pwr_tOix oix = mem->m_oid.oix;
     mem_object* next = root_object->next(mem->m_cid, &oix);
-    if (next) {
+    if (next)
+    {
       wb_orepmem* orep = new wb_orepmem(this, next);
       *sts = LDH__SUCCESS;
       return orep;
@@ -723,10 +746,7 @@ wb_orep* wb_vrepmem::next(pwr_tStatus* sts, const wb_orep* o)
   return 0;
 }
 
-wb_orep* wb_vrepmem::previous(pwr_tStatus* sts, const wb_orep* o)
-{
-  return 0;
-}
+wb_orep* wb_vrepmem::previous(pwr_tStatus* sts, const wb_orep* o) { return 0; }
 
 void wb_vrepmem::objectName(const wb_orep* o, char* str)
 {
@@ -735,7 +755,8 @@ void wb_vrepmem::objectName(const wb_orep* o, char* str)
   // Count ancestors
   int cnt = 0;
   mem_object* n = ((wb_orepmem*)o)->memobject();
-  while (n) {
+  while (n)
+  {
     cnt++;
     n = n->fth;
   }
@@ -743,14 +764,16 @@ void wb_vrepmem::objectName(const wb_orep* o, char* str)
   mem_object** vect = (mem_object**)calloc(cnt, sizeof(vect));
 
   n = ((wb_orepmem*)o)->memobject();
-  for (int i = 0; i < cnt; i++) {
+  for (int i = 0; i < cnt; i++)
+  {
     vect[i] = n;
     n = n->fth;
   }
 
   strcat(str, name());
   strcat(str, ":");
-  for (int i = cnt - 1; i >= 0; i--) {
+  for (int i = cnt - 1; i >= 0; i--)
+  {
     strcat(str, vect[i]->name());
     if (i != 0)
       strcat(str, "-");
@@ -758,8 +781,8 @@ void wb_vrepmem::objectName(const wb_orep* o, char* str)
   free(vect);
 }
 
-bool wb_vrepmem::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix,
-    size_t offset, size_t size, void* p)
+bool wb_vrepmem::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, size_t offset, size_t size,
+                                void* p)
 {
   pwr_tTime time;
 
@@ -768,9 +791,11 @@ bool wb_vrepmem::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix,
 
   mem_object* n = ((wb_orepmem*)o)->memobject();
 
-  switch (bix) {
+  switch (bix)
+  {
   case pwr_eBix_rt:
-    if (n->rbody_size == 0) {
+    if (n->rbody_size == 0)
+    {
       *sts = LDH__NOSUCHBODY;
       return false;
     }
@@ -778,7 +803,8 @@ bool wb_vrepmem::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix,
     n->m_rbtime = time;
     return true;
   case pwr_eBix_dev:
-    if (n->dbody_size == 0) {
+    if (n->dbody_size == 0)
+    {
       *sts = LDH__NOSUCHBODY;
       return false;
     }
@@ -791,30 +817,35 @@ bool wb_vrepmem::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix,
   }
 }
 
-void* wb_vrepmem::readAttribute(pwr_tStatus* sts, const wb_orep* o,
-    pwr_eBix bix, size_t offset, size_t size, void* p)
+void* wb_vrepmem::readAttribute(pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, size_t offset, size_t size,
+                                void* p)
 {
   *sts = LDH__SUCCESS;
 
   mem_object* n = ((wb_orepmem*)o)->memobject();
 
-  switch (bix) {
+  switch (bix)
+  {
   case pwr_eBix_rt:
-    if (n->rbody_size == 0) {
+    if (n->rbody_size == 0)
+    {
       *sts = LDH__NOSUCHBODY;
       return 0;
     }
-    if (p) {
+    if (p)
+    {
       memcpy(p, (char*)n->rbody + offset, MIN(n->rbody_size - offset, size));
       return p;
     }
     return (void*)((char*)n->rbody + offset);
   case pwr_eBix_dev:
-    if (n->dbody_size == 0) {
+    if (n->dbody_size == 0)
+    {
       *sts = LDH__NOSUCHBODY;
       return 0;
     }
-    if (p) {
+    if (p)
+    {
       memcpy(p, (char*)n->dbody + offset, MIN(n->dbody_size - offset, size));
       return p;
     }
@@ -834,9 +865,11 @@ bool wb_vrepmem::writeBody(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, void* p)
 
   mem_object* n = ((wb_orepmem*)o)->memobject();
 
-  switch (bix) {
+  switch (bix)
+  {
   case pwr_eBix_rt:
-    if (n->rbody_size == 0) {
+    if (n->rbody_size == 0)
+    {
       *sts = LDH__NOSUCHBODY;
       return false;
     }
@@ -845,7 +878,8 @@ bool wb_vrepmem::writeBody(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, void* p)
     n->m_rbtime = time;
     return true;
   case pwr_eBix_dev:
-    if (n->dbody_size == 0) {
+    if (n->dbody_size == 0)
+    {
       *sts = LDH__NOSUCHBODY;
       return false;
     }
@@ -858,30 +892,34 @@ bool wb_vrepmem::writeBody(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, void* p)
   }
 }
 
-void* wb_vrepmem::readBody(
-    pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, void* p)
+void* wb_vrepmem::readBody(pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, void* p)
 {
   *sts = LDH__SUCCESS;
 
   mem_object* n = ((wb_orepmem*)o)->memobject();
 
-  switch (bix) {
+  switch (bix)
+  {
   case pwr_eBix_rt:
-    if (n->rbody_size == 0) {
+    if (n->rbody_size == 0)
+    {
       *sts = LDH__NOSUCHBODY;
       return 0;
     }
-    if (p) {
+    if (p)
+    {
       memcpy(p, n->rbody, n->rbody_size);
       return p;
     }
     return n->rbody;
   case pwr_eBix_dev:
-    if (n->dbody_size == 0) {
+    if (n->dbody_size == 0)
+    {
       *sts = LDH__NOSUCHBODY;
       return 0;
     }
-    if (p) {
+    if (p)
+    {
       memcpy(p, n->dbody, n->dbody_size);
       return p;
     }
@@ -894,14 +932,16 @@ void* wb_vrepmem::readBody(
 
 mem_object* mem_object::find(wb_name* oname, int level)
 {
-  if (oname->segmentIsEqual(m_name, level)) {
+  if (oname->segmentIsEqual(m_name, level))
+  {
     if (!oname->hasSegment(level + 1))
       return this;
     else if (fch)
       return fch->find(oname, level + 1);
     else
       return 0;
-  } else if (fws)
+  }
+  else if (fws)
     return fws->find(oname, level);
   else
     return 0;
@@ -909,7 +949,8 @@ mem_object* mem_object::find(wb_name* oname, int level)
 
 bool mem_object::docBlock(char** block, int* size) const
 {
-  switch (m_cid) {
+  switch (m_cid)
+  {
   case pwr_eClass_ClassDef:
   case pwr_eClass_Param:
   case pwr_eClass_Intern:
@@ -922,11 +963,14 @@ bool mem_object::docBlock(char** block, int* size) const
   default:
     return false;
   }
-  if (docblock) {
+  if (docblock)
+  {
     *block = (char*)malloc(docblock_size);
     memcpy(*block, docblock, docblock_size);
     *size = docblock_size;
-  } else {
+  }
+  else
+  {
     // Return nullstring
     *block = (char*)calloc(1, 1);
     *size = 1;
@@ -956,7 +1000,8 @@ void wb_vrepmem::clear()
 
 void wb_vrepmem::freeObject(mem_object* memo)
 {
-  if (memo != volume_object) {
+  if (memo != volume_object)
+  {
     // Free all children and siblings
     if (memo->fch)
       freeObject(memo->fch);
@@ -967,8 +1012,8 @@ void wb_vrepmem::freeObject(mem_object* memo)
   delete memo;
 }
 
-wb_orep* wb_vrepmem::createObject(pwr_tStatus* sts, wb_cdef cdef,
-    wb_destination& d, wb_name& name, pwr_tOix oix)
+wb_orep* wb_vrepmem::createObject(pwr_tStatus* sts, wb_cdef cdef, wb_destination& d, wb_name& name,
+                                  pwr_tOix oix)
 {
   mem_object* dest;
   ldh_eDest code = d.code();
@@ -978,39 +1023,50 @@ wb_orep* wb_vrepmem::createObject(pwr_tStatus* sts, wb_cdef cdef,
 
   time_GetTime(&time);
 
-  if (d.oid().oix == 0) {
+  if (d.oid().oix == 0)
+  {
     dest = root_object;
-    if (!root_object) {
+    if (!root_object)
+    {
       if (code == ldh_eDest_After)
         code = ldh_eDest_IntoLast;
       if (code == ldh_eDest_Before)
         code = ldh_eDest_IntoFirst;
-    } else {
+    }
+    else
+    {
       if (code == ldh_eDest_IntoLast)
         code = ldh_eDest_After;
       if (code == ldh_eDest_IntoFirst)
         code = ldh_eDest_Before;
     }
-  } else {
+  }
+  else
+  {
     dest = findObject(d.oid().oix);
-    if (!dest) {
+    if (!dest)
+    {
       *sts = LDH__BADDEST;
       return 0;
     }
     // Check that name is unique
-    if (name && !nameCheck(dest, name.segment(), code)) {
+    if (name && !nameCheck(dest, name.segment(), code))
+    {
       *sts = LDH__NAMALREXI;
       return 0;
     }
   }
 
-  if (!m_classeditor) {
+  if (!m_classeditor)
+  {
     soix = nextOix();
     if (name.evenSts())
       sprintf(name_str, "O%u", soix);
     else
       strcpy(name_str, name.object());
-  } else {
+  }
+  else
+  {
     if (!classeditorCheck(code, dest, cdef.cid(), &soix, name_str, sizeof(name_str), sts, false))
       return 0;
 
@@ -1027,7 +1083,8 @@ wb_orep* wb_vrepmem::createObject(pwr_tStatus* sts, wb_cdef cdef,
   memo->m_ohtime = time;
   memo->m_created = 1;
   memo->rbody_size = cdef.size(pwr_eBix_rt);
-  if (memo->rbody_size) {
+  if (memo->rbody_size)
+  {
     memo->m_rbtime = time;
     memo->rbody = malloc(memo->rbody_size);
     cdef.templateBody(sts, pwr_eBix_rt, memo->rbody, memo->m_oid);
@@ -1035,7 +1092,8 @@ wb_orep* wb_vrepmem::createObject(pwr_tStatus* sts, wb_cdef cdef,
       return 0;
   }
   memo->dbody_size = cdef.size(pwr_eBix_dev);
-  if (memo->dbody_size) {
+  if (memo->dbody_size)
+  {
     memo->m_dbtime = time;
     memo->dbody = malloc(memo->dbody_size);
     cdef.templateBody(sts, pwr_eBix_dev, memo->dbody, memo->m_oid);
@@ -1043,11 +1101,15 @@ wb_orep* wb_vrepmem::createObject(pwr_tStatus* sts, wb_cdef cdef,
       return 0;
   }
 
-  if (!root_object) {
+  if (!root_object)
+  {
     // This is the root object
     root_object = memo;
-  } else {
-    switch (code) {
+  }
+  else
+  {
+    switch (code)
+    {
     case ldh_eDest_IntoFirst:
       memo->fws = dest->fch;
       if (dest->fch)
@@ -1055,7 +1117,8 @@ wb_orep* wb_vrepmem::createObject(pwr_tStatus* sts, wb_cdef cdef,
       dest->fch = memo;
       memo->fth = dest;
       break;
-    case ldh_eDest_IntoLast: {
+    case ldh_eDest_IntoLast:
+    {
       mem_object* lch = dest->get_lch();
       if (lch)
         lch->fws = memo;
@@ -1111,14 +1174,16 @@ bool wb_vrepmem::createVolumeObject(char* name)
   memo->m_cid = m_cid;
   memo->m_flags = cdef.flags();
   memo->rbody_size = cdef.size(pwr_eBix_rt);
-  if (memo->rbody_size) {
+  if (memo->rbody_size)
+  {
     memo->rbody = malloc(memo->rbody_size);
     cdef.templateBody(&sts, pwr_eBix_rt, memo->rbody, memo->m_oid);
     if (EVEN(sts))
       return false;
   }
   memo->dbody_size = cdef.size(pwr_eBix_dev);
-  if (memo->dbody_size) {
+  if (memo->dbody_size)
+  {
     memo->dbody = malloc(memo->dbody_size);
     cdef.templateBody(&sts, pwr_eBix_dev, memo->dbody, memo->m_oid);
     if (EVEN(sts))
@@ -1146,7 +1211,8 @@ bool wb_vrepmem::createClonedVolumeObject(wb_object vo, const char* vname)
   memo->m_flags = vo.flags();
   memo->m_ohtime = vo.ohTime();
   memo->rbody_size = vo.rbSize();
-  if (memo->rbody_size) {
+  if (memo->rbody_size)
+  {
     wb_attribute a(sts, (wb_orep*)vo, "SysBody");
     if (!a)
       return false;
@@ -1158,7 +1224,8 @@ bool wb_vrepmem::createClonedVolumeObject(wb_object vo, const char* vname)
   }
   memo->dbody_size = 0;
 
-  if (root_object) {
+  if (root_object)
+  {
     memo->fch = root_object;
     memo->fchoid = root_object->m_oid;
   }
@@ -1169,8 +1236,8 @@ bool wb_vrepmem::createClonedVolumeObject(wb_object vo, const char* vname)
   return true;
 }
 
-wb_orep* wb_vrepmem::copyObject(pwr_tStatus* sts, const wb_orep* orep,
-    wb_destination& d, wb_name& name, pwr_tOix ix)
+wb_orep* wb_vrepmem::copyObject(pwr_tStatus* sts, const wb_orep* orep, wb_destination& d, wb_name& name,
+                                pwr_tOix ix)
 {
   mem_object* dest;
   ldh_eDest code = d.code();
@@ -1179,29 +1246,37 @@ wb_orep* wb_vrepmem::copyObject(pwr_tStatus* sts, const wb_orep* orep,
 
   time_GetTime(&time);
 
-  if (cdh_ObjidIsNull(d.oid())) {
+  if (cdh_ObjidIsNull(d.oid()))
+  {
     dest = root_object;
     if (code == ldh_eDest_After)
       code = ldh_eDest_IntoLast;
     if (code == ldh_eDest_Before)
       code = ldh_eDest_IntoFirst;
-  } else {
+  }
+  else
+  {
     dest = findObject(d.oid().oix);
-    if (!dest) {
+    if (!dest)
+    {
       *sts = LDH__BADDEST;
       return 0;
     }
   }
 
   pwr_tOix oix;
-  if (!m_classeditor) {
+  if (!m_classeditor)
+  {
     oix = nextOix();
     if (name.evenSts())
       strcpy(name_str, orep->name());
     else
       strcpy(name_str, name.object());
-  } else {
-    if (streq(orep->name(), "Template")) {
+  }
+  else
+  {
+    if (streq(orep->name(), "Template"))
+    {
       *sts = LDH__CLASSMISPLACED;
       return 0;
     }
@@ -1224,7 +1299,8 @@ wb_orep* wb_vrepmem::copyObject(pwr_tStatus* sts, const wb_orep* orep,
   rbody = wb_attribute(LDH__SUCCESS, (wb_orep*)orep, "RtBody");
   if (!rbody)
     rbody = wb_attribute(LDH__SUCCESS, (wb_orep*)orep, "SysBody");
-  if (rbody) {
+  if (rbody)
+  {
     memo->m_rbtime = time;
     memo->rbody_size = rbody.size();
     memo->rbody = malloc(memo->rbody_size);
@@ -1233,18 +1309,23 @@ wb_orep* wb_vrepmem::copyObject(pwr_tStatus* sts, const wb_orep* orep,
 
   wb_attribute dbody;
   dbody = wb_attribute(LDH__SUCCESS, (wb_orep*)orep, "DevBody");
-  if (dbody) {
+  if (dbody)
+  {
     memo->m_dbtime = time;
     memo->dbody_size = dbody.size();
     memo->dbody = malloc(memo->dbody_size);
     dbody.value(memo->dbody);
   }
 
-  if (!root_object) {
+  if (!root_object)
+  {
     // This is the root object
     root_object = memo;
-  } else {
-    switch (code) {
+  }
+  else
+  {
+    switch (code)
+    {
     case ldh_eDest_IntoFirst:
       memo->fws = dest->fch;
       if (dest->fch)
@@ -1252,7 +1333,8 @@ wb_orep* wb_vrepmem::copyObject(pwr_tStatus* sts, const wb_orep* orep,
       dest->fch = memo;
       memo->fth = dest;
       break;
-    case ldh_eDest_IntoLast: {
+    case ldh_eDest_IntoLast:
+    {
       mem_object* lch = dest->get_lch();
       if (lch)
         lch->fws = memo;
@@ -1288,7 +1370,8 @@ wb_orep* wb_vrepmem::copyObject(pwr_tStatus* sts, const wb_orep* orep,
       return 0;
     }
   }
-  if (!nameCheck(memo)) {
+  if (!nameCheck(memo))
+  {
     char str[80];
     sprintf(str, "O%u_%s", memo->m_oid.oix, memo->m_name);
     strncpy(memo->m_name, str, sizeof(memo->m_name));
@@ -1312,15 +1395,19 @@ bool wb_vrepmem::moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d)
   if (cdh_ObjidIsEqual(d.oid(), orep->oid()))
     return false;
 
-  if (cdh_ObjidIsNull(d.oid())) {
+  if (cdh_ObjidIsNull(d.oid()))
+  {
     dest = root_object;
     if (code == ldh_eDest_After)
       code = ldh_eDest_IntoLast;
     if (code == ldh_eDest_Before)
       code = ldh_eDest_IntoFirst;
-  } else {
+  }
+  else
+  {
     dest = findObject(d.oid().oix);
-    if (!dest) {
+    if (!dest)
+    {
       *sts = LDH__BADDEST;
       return false;
     }
@@ -1329,11 +1416,14 @@ bool wb_vrepmem::moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d)
   mem_object* memo = ((wb_orepmem*)orep)->memobject();
 
   // Check that name is unique
-  switch (code) {
+  switch (code)
+  {
   case ldh_eDest_After:
   case ldh_eDest_Before:
-    if (memo->fth != dest->fth) {
-      if (!nameCheck(dest, memo->name(), code)) {
+    if (memo->fth != dest->fth)
+    {
+      if (!nameCheck(dest, memo->name(), code))
+      {
         *sts = LDH__NAMALREXI;
         return false;
       }
@@ -1341,8 +1431,10 @@ bool wb_vrepmem::moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d)
     break;
   case ldh_eDest_IntoLast:
   case ldh_eDest_IntoFirst:
-    if (memo->fth != dest) {
-      if (!nameCheck(dest, memo->name(), code)) {
+    if (memo->fth != dest)
+    {
+      if (!nameCheck(dest, memo->name(), code))
+      {
         *sts = LDH__NAMALREXI;
         return false;
       }
@@ -1355,7 +1447,8 @@ bool wb_vrepmem::moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d)
     return false;
 
   // Remove from current position
-  if (memo == root_object) {
+  if (memo == root_object)
+  {
     if (!memo->fws)
       return LDH__NODEST;
     root_object = memo->fws;
@@ -1369,7 +1462,8 @@ bool wb_vrepmem::moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d)
   memo->fth = memo->bws = memo->fws = 0;
 
   // Insert in new position
-  switch (code) {
+  switch (code)
+  {
   case ldh_eDest_IntoFirst:
     memo->fws = dest->fch;
     if (dest->fch)
@@ -1377,7 +1471,8 @@ bool wb_vrepmem::moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d)
     dest->fch = memo;
     memo->fth = dest;
     break;
-  case ldh_eDest_IntoLast: {
+  case ldh_eDest_IntoLast:
+  {
     mem_object* lch = dest->get_lch();
     if (lch)
       lch->fws = memo;
@@ -1424,7 +1519,8 @@ bool wb_vrepmem::deleteObject(pwr_tStatus* sts, wb_orep* orep)
   if (!memo)
     return false;
 
-  if (memo->fch) {
+  if (memo->fch)
+  {
     *sts = LDH__HAS_CHILD;
     return false;
   }
@@ -1476,7 +1572,8 @@ void wb_vrepmem::deleteChildren(mem_object* memo)
 {
   mem_object* o;
   mem_object* ch = memo->fch;
-  while (ch) {
+  while (ch)
+  {
     o = ch;
     ch = ch->fws;
     deleteChildren(o);
@@ -1498,19 +1595,22 @@ bool wb_vrepmem::renameObject(pwr_tStatus* sts, wb_orep* orep, wb_name& name)
   char old_name[80];
   strcpy(old_name, memo->m_name);
 
-  if (m_classeditor && name.segmentIsEqual("Template")) {
+  if (m_classeditor && name.segmentIsEqual("Template"))
+  {
     // Name "Template" is reserved
     *sts = LDH__BADNAME;
     return false;
   }
 
-  if (strlen(name.segment()) >= sizeof(memo->m_name)) {
+  if (strlen(name.segment()) >= sizeof(memo->m_name))
+  {
     *sts = LDH__BADNAME;
     return false;
   }
 
   strcpy(memo->m_name, name.segment());
-  if (!nameCheck(memo)) {
+  if (!nameCheck(memo))
+  {
     // Change back
     strcpy(memo->m_name, old_name);
     return LDH__NAMALREXI;
@@ -1536,13 +1636,15 @@ bool wb_vrepmem::importTree(bool keepref, bool keepsym)
   pwr_tStatus sts;
 
   wb_orep* o = object(&sts);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     if (o)
       delete o;
     return false;
   }
 
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     o->ref();
     updateObject(o, keepref, keepsym);
 
@@ -1553,8 +1655,7 @@ bool wb_vrepmem::importTree(bool keepref, bool keepsym)
   return true;
 }
 
-bool wb_vrepmem::updateSubClass(
-    wb_adrep* subattr, char* body, bool keepref, bool keepsym)
+bool wb_vrepmem::updateSubClass(wb_adrep* subattr, char* body, bool keepref, bool keepsym)
 {
   pwr_tStatus sts;
   pwr_tCid cid = subattr->subClass();
@@ -1567,20 +1668,26 @@ bool wb_vrepmem::updateSubClass(
 
   int subattr_elements = subattr->isArray() ? subattr->nElement() : 1;
 
-  for (int i = 0; i < subattr_elements; i++) {
+  for (int i = 0; i < subattr_elements; i++)
+  {
     wb_adrep* adrep = bdrep->adrep(&sts);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       int elements = adrep->isArray() ? adrep->nElement() : 1;
-      if (adrep->isClass()) {
-        updateSubClass(adrep,
-            body + i * subattr->size() / subattr_elements + adrep->offset(),
-            keepref, keepsym);
-      } else {
-        switch (adrep->type()) {
-        case pwr_eType_Objid: {
-          pwr_tOid* oidp = (pwr_tOid*)(body
-              + i * subattr->size() / subattr_elements + adrep->offset());
-          for (int j = 0; j < elements; j++) {
+      if (adrep->isClass())
+      {
+        updateSubClass(adrep, body + i * subattr->size() / subattr_elements + adrep->offset(), keepref,
+                       keepsym);
+      }
+      else
+      {
+        switch (adrep->type())
+        {
+        case pwr_eType_Objid:
+        {
+          pwr_tOid* oidp = (pwr_tOid*)(body + i * subattr->size() / subattr_elements + adrep->offset());
+          for (int j = 0; j < elements; j++)
+          {
             if (oidp->vid == m_source_vid && findObject(oidp->oix))
               oidp->vid = m_vid;
             else if (!keepsym && ldh_isSymbolicVid(oidp->vid))
@@ -1591,27 +1698,29 @@ bool wb_vrepmem::updateSubClass(
           }
           break;
         }
-        case pwr_eType_AttrRef: {
-          pwr_sAttrRef* arp = (pwr_sAttrRef*)(body
-              + i * subattr->size() / subattr_elements + adrep->offset());
-          for (int j = 0; j < elements; j++) {
+        case pwr_eType_AttrRef:
+        {
+          pwr_sAttrRef* arp =
+              (pwr_sAttrRef*)(body + i * subattr->size() / subattr_elements + adrep->offset());
+          for (int j = 0; j < elements; j++)
+          {
             if (arp->Objid.vid == m_source_vid && findObject(arp->Objid.oix))
               arp->Objid.vid = m_vid;
             else if (!keepsym && ldh_isSymbolicVid(arp->Objid.vid))
-              arp->Objid.oix
-                  = cdh_cixToCid(m_vid, cdh_cidToCix(arp->Objid.oix));
+              arp->Objid.oix = cdh_cixToCid(m_vid, cdh_cidToCix(arp->Objid.oix));
             else if (!keepref && !ldh_isSymbolicVid(arp->Objid.vid))
               arp->Objid = pwr_cNOid;
             arp++;
           }
           break;
         }
-        case pwr_eType_DataRef: {
-          pwr_tDataRef* drp = (pwr_tDataRef*)(body
-              + i * subattr->size() / subattr_elements + adrep->offset());
-          for (int j = 0; j < elements; j++) {
-            if (drp->Aref.Objid.vid == m_source_vid
-                && findObject(drp->Aref.Objid.oix))
+        case pwr_eType_DataRef:
+        {
+          pwr_tDataRef* drp =
+              (pwr_tDataRef*)(body + i * subattr->size() / subattr_elements + adrep->offset());
+          for (int j = 0; j < elements; j++)
+          {
+            if (drp->Aref.Objid.vid == m_source_vid && findObject(drp->Aref.Objid.oix))
               drp->Aref.Objid.vid = m_vid;
             else if (!keepref && !ldh_isSymbolicVid(drp->Aref.Objid.vid))
               drp->Aref.Objid = pwr_cNOid;
@@ -1640,7 +1749,8 @@ bool wb_vrepmem::updateObject(wb_orep* o, bool keepref, bool keepsym)
   if (EVEN(sts))
     return false;
 
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 2; i++)
+  {
     pwr_eBix bix = i ? pwr_eBix_rt : pwr_eBix_dev;
 
     wb_bdrep* bdrep = cdrep->bdrep(&sts, bix);
@@ -1650,15 +1760,22 @@ bool wb_vrepmem::updateObject(wb_orep* o, bool keepref, bool keepsym)
     char* body = (char*)readBody(&sts, o, bix, 0);
 
     wb_adrep* adrep = bdrep->adrep(&sts);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       int elements = adrep->isArray() ? adrep->nElement() : 1;
-      if (adrep->isClass()) {
+      if (adrep->isClass())
+      {
         updateSubClass(adrep, body + adrep->offset(), keepref, keepsym);
-      } else {
-        switch (adrep->type()) {
-        case pwr_eType_Objid: {
+      }
+      else
+      {
+        switch (adrep->type())
+        {
+        case pwr_eType_Objid:
+        {
           pwr_tOid* oidp = (pwr_tOid*)(body + adrep->offset());
-          for (int j = 0; j < elements; j++) {
+          for (int j = 0; j < elements; j++)
+          {
             if (oidp->vid == m_source_vid && findObject(oidp->oix))
               // Intern reference
               oidp->vid = m_vid;
@@ -1670,25 +1787,27 @@ bool wb_vrepmem::updateObject(wb_orep* o, bool keepref, bool keepsym)
           }
           break;
         }
-        case pwr_eType_AttrRef: {
+        case pwr_eType_AttrRef:
+        {
           pwr_sAttrRef* arp = (pwr_sAttrRef*)(body + adrep->offset());
-          for (int j = 0; j < elements; j++) {
+          for (int j = 0; j < elements; j++)
+          {
             if (arp->Objid.vid == m_source_vid && findObject(arp->Objid.oix))
               arp->Objid.vid = m_vid;
             else if (!keepsym && ldh_isSymbolicVid(arp->Objid.vid))
-              arp->Objid.oix
-                  = cdh_cixToCid(m_vid, cdh_cidToCix(arp->Objid.oix));
+              arp->Objid.oix = cdh_cixToCid(m_vid, cdh_cidToCix(arp->Objid.oix));
             else if (!keepref && !ldh_isSymbolicVid(arp->Objid.vid))
               arp->Objid = pwr_cNOid;
             arp++;
           }
           break;
         }
-        case pwr_eType_DataRef: {
+        case pwr_eType_DataRef:
+        {
           pwr_tDataRef* drp = (pwr_tDataRef*)(body + adrep->offset());
-          for (int j = 0; j < elements; j++) {
-            if (drp->Aref.Objid.vid == m_source_vid
-                && findObject(drp->Aref.Objid.oix))
+          for (int j = 0; j < elements; j++)
+          {
+            if (drp->Aref.Objid.vid == m_source_vid && findObject(drp->Aref.Objid.oix))
               drp->Aref.Objid.vid = m_vid;
             else if (!keepref && !ldh_isSymbolicVid(drp->Aref.Objid.vid))
               drp->Aref.Objid = pwr_cNOid;
@@ -1709,7 +1828,8 @@ bool wb_vrepmem::updateObject(wb_orep* o, bool keepref, bool keepsym)
   delete cdrep;
 
   wb_orep* child = o->first(&sts);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     child->ref();
     updateObject(child, keepref, keepsym);
 
@@ -1720,9 +1840,9 @@ bool wb_vrepmem::updateObject(wb_orep* o, bool keepref, bool keepsym)
   return true;
 }
 
-bool wb_vrepmem::importTreeObject(wb_merep* merep, pwr_tOid oid, pwr_tCid cid,
-    pwr_tOid poid, pwr_tOid boid, const char* name, pwr_mClassDef flags,
-    size_t rbSize, size_t dbSize, void* rbody, void* dbody)
+bool wb_vrepmem::importTreeObject(wb_merep* merep, pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid,
+                                  const char* name, pwr_mClassDef flags, size_t rbSize, size_t dbSize,
+                                  void* rbody, void* dbody)
 {
   pwr_tStatus sts;
   mem_object* memo = new mem_object();
@@ -1734,54 +1854,68 @@ bool wb_vrepmem::importTreeObject(wb_merep* merep, pwr_tOid oid, pwr_tCid cid,
 
   bool class_error = false;
   bool convert = false;
-  if (merep && merep != m_merep) {
+  if (merep && merep != m_merep)
+  {
     // Check if class version differs
     wb_cdrep* cdrep_import = m_merep->cdrep(&sts, cid);
-    if (EVEN(sts)) {
-      if (m_ignore) {
+    if (EVEN(sts))
+    {
+      if (m_ignore)
+      {
         memo->m_cid = pwr_eClass_ClassLost;
         class_error = true;
-      } else
+      }
+      else
         throw wb_error(sts);
     }
 
     wb_cdrep* cdrep_export = merep->cdrep(&sts, memo->m_cid);
-    if (EVEN(sts)) {
-      if (m_ignore) {
+    if (EVEN(sts))
+    {
+      if (m_ignore)
+      {
         memo->m_cid = pwr_eClass_ClassLost;
         class_error = true;
-      } else
+      }
+      else
         throw wb_error(sts);
     }
 
-    if (!class_error
-        && cdrep_import->ohTime().tv_sec != cdrep_export->ohTime().tv_sec) {
+    if (!class_error && cdrep_import->ohTime().tv_sec != cdrep_export->ohTime().tv_sec)
+    {
       convert = true;
 
-      cdrep_import->convertObject(merep, rbody, dbody, &memo->rbody_size,
-          &memo->dbody_size, &memo->rbody, &memo->dbody);
+      cdrep_import->convertObject(merep, rbody, dbody, &memo->rbody_size, &memo->dbody_size, &memo->rbody,
+                                  &memo->dbody);
     }
     delete cdrep_import;
     delete cdrep_export;
   }
-  if (!convert) {
+  if (!convert)
+  {
     memo->rbody_size = rbSize;
-    if (memo->rbody_size) {
+    if (memo->rbody_size)
+    {
       memo->rbody = malloc(memo->rbody_size);
       memcpy(memo->rbody, rbody, memo->rbody_size);
     }
     memo->dbody_size = dbSize;
-    if (memo->dbody_size) {
+    if (memo->dbody_size)
+    {
       memo->dbody = malloc(memo->dbody_size);
       memcpy(memo->dbody, dbody, memo->dbody_size);
     }
   }
-  if (cdh_ObjidIsNull(poid) && cdh_ObjidIsNull(boid)) {
+  if (cdh_ObjidIsNull(poid) && cdh_ObjidIsNull(boid))
+  {
     // This is a top object
-    if (!root_object) {
+    if (!root_object)
+    {
       root_object = memo;
       m_source_vid = oid.vid;
-    } else {
+    }
+    else
+    {
       // Insert as last sibling to rootobject
       mem_object* next = root_object;
       while (next->fws)
@@ -1790,17 +1924,21 @@ bool wb_vrepmem::importTreeObject(wb_merep* merep, pwr_tOid oid, pwr_tCid cid,
       next->fws = memo;
       memo->bws = next;
 
-      if (!nameCheck(memo)) {
+      if (!nameCheck(memo))
+      {
         char str[80];
         sprintf(str, "O%u_%s", memo->m_oid.oix, memo->m_name);
         strncpy(memo->m_name, str, sizeof(memo->m_name));
         memo->m_name[sizeof(memo->m_name) - 1] = 0;
       }
     }
-  } else if (cdh_ObjidIsNotNull(boid)) {
+  }
+  else if (cdh_ObjidIsNotNull(boid))
+  {
     // Insert as next sibling to boid
     mem_object* bws = findObject(boid.oix);
-    if (!bws) {
+    if (!bws)
+    {
       delete memo;
       throw wb_error(LDH__MEMINCON);
     }
@@ -1810,10 +1948,13 @@ bool wb_vrepmem::importTreeObject(wb_merep* merep, pwr_tOid oid, pwr_tCid cid,
     if (bws->fws)
       bws->fws->bws = memo;
     bws->fws = memo;
-  } else {
+  }
+  else
+  {
     // Insert as first child to poid
     mem_object* fth = findObject(poid.oix);
-    if (!fth) {
+    if (!fth)
+    {
       delete memo;
       throw wb_error(LDH__MEMINCON);
     }
@@ -1828,10 +1969,10 @@ bool wb_vrepmem::importTreeObject(wb_merep* merep, pwr_tOid oid, pwr_tCid cid,
   return true;
 }
 
-bool wb_vrepmem::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
-    bool keepoid, pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid,
-    const char* name, pwr_mClassDef flags, size_t rbSize, size_t dbSize,
-    void* rbody, void* dbody, pwr_tOid woid, pwr_tOid* roid)
+bool wb_vrepmem::importPasteObject(pwr_tOid destination, ldh_eDest destcode, bool keepoid, pwr_tOid oid,
+                                   pwr_tCid cid, pwr_tOid poid, pwr_tOid boid, const char* name,
+                                   pwr_mClassDef flags, size_t rbSize, size_t dbSize, void* rbody,
+                                   void* dbody, pwr_tOid woid, pwr_tOid* roid)
 {
   pwr_tStatus sts;
   pwr_tTime time;
@@ -1841,25 +1982,33 @@ bool wb_vrepmem::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
   mem_object* memo = new mem_object();
   strcpy(memo->m_name, name);
 
-  if (keepoid) {
+  if (keepoid)
+  {
     mem_object* o = findObject(oid.oix);
     if (!o)
       memo->m_oid.oix = oid.oix;
     else
       memo->m_oid.oix = nextOix();
-  } else {
-    if (!m_classeditor) {
+  }
+  else
+  {
+    if (!m_classeditor)
+    {
       memo->m_oid.oix = nextOix();
-    } else {
+    }
+    else
+    {
       mem_object* pmemo;
 
-      if (cdh_ObjidIsNull(poid) && cdh_ObjidIsNull(boid)) {
+      if (cdh_ObjidIsNull(poid) && cdh_ObjidIsNull(boid))
+      {
         // Root object
         mem_object* dest = findObject(destination.oix);
         if (!dest)
           throw wb_error(LDH__BADDEST);
 
-        switch (destcode) {
+        switch (destcode)
+        {
         case ldh_eDest_After:
           pmemo = dest->fth;
           break;
@@ -1869,31 +2018,37 @@ bool wb_vrepmem::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
         default:
           throw wb_error(LDH__NYI);
         }
-      } else if (cdh_ObjidIsNull(poid)) {
+      }
+      else if (cdh_ObjidIsNull(poid))
+      {
         pwr_tOix boix = importTranslate(boid.oix);
         pmemo = findObject(boix);
         if (pmemo)
           pmemo = pmemo->fth;
-      } else {
+      }
+      else
+      {
         pwr_tOix poix = importTranslate(poid.oix);
         pmemo = findObject(poix);
-        if (streq(name, "Template") && pmemo->m_cid == pwr_eClass_ClassDef
-            && !cdh_ObjidIsNull(boid)) {
+        if (streq(name, "Template") && pmemo->m_cid == pwr_eClass_ClassDef && !cdh_ObjidIsNull(boid))
+        {
         }
       }
       memo->fth = pmemo;
-      if (!classeditorCheck(ldh_eDest_IntoLast, pmemo, cid, &memo->m_oid.oix,
-              memo->m_name, sizeof(memo->m_name), &sts, true))
+      if (!classeditorCheck(ldh_eDest_IntoLast, pmemo, cid, &memo->m_oid.oix, memo->m_name,
+                            sizeof(memo->m_name), &sts, true))
         return 0;
     }
   }
 
-  if (cdh_ObjidIsNotNull(boid)) {
+  if (cdh_ObjidIsNotNull(boid))
+  {
     boid.oix = importTranslate(boid.oix);
     if (!boid.oix)
       throw wb_error(LDH__PASTEINCON);
   }
-  if (cdh_ObjidIsNotNull(poid)) {
+  if (cdh_ObjidIsNotNull(poid))
+  {
     poid.oix = importTranslate(poid.oix);
     if (!poid.oix)
       throw wb_error(LDH__PASTEINCON);
@@ -1905,35 +2060,42 @@ bool wb_vrepmem::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
   // memo->m_created = 1;
   memo->m_ohtime = time;
   memo->rbody_size = rbSize;
-  if (memo->rbody_size) {
+  if (memo->rbody_size)
+  {
     memo->m_rbtime = time;
     memo->rbody = malloc(memo->rbody_size);
     memcpy(memo->rbody, rbody, memo->rbody_size);
   }
   memo->dbody_size = dbSize;
-  if (memo->dbody_size) {
+  if (memo->dbody_size)
+  {
     memo->m_dbtime = time;
     memo->dbody = malloc(memo->dbody_size);
     memcpy(memo->dbody, dbody, memo->dbody_size);
   }
 
-  if (cdh_ObjidIsNull(poid) && cdh_ObjidIsNull(boid)) {
+  if (cdh_ObjidIsNull(poid) && cdh_ObjidIsNull(boid))
+  {
     // This is the top object
     importTranslationTableClear();
     importSetSourceVid(oid.vid);
 
-    if (!root_object) {
+    if (!root_object)
+    {
       if (cdh_ObjidIsNull(destination))
         root_object = memo;
       else
         throw wb_error(LDH__PASTEINCON);
-    } else {
+    }
+    else
+    {
       // Insert as next sibling or first child to destination object
       mem_object* dest = findObject(destination.oix);
       if (!dest)
         throw wb_error(LDH__BADDEST);
 
-      switch (destcode) {
+      switch (destcode)
+      {
       case ldh_eDest_After:
         memo->bws = dest;
         memo->fws = dest->fws;
@@ -1953,10 +2115,13 @@ bool wb_vrepmem::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
         throw wb_error(LDH__NYI);
       }
     }
-  } else if (cdh_ObjidIsNotNull(boid)) {
+  }
+  else if (cdh_ObjidIsNotNull(boid))
+  {
     // Insert as next sibling to boid
     mem_object* bws = findObject(boid.oix);
-    if (!bws) {
+    if (!bws)
+    {
       delete memo;
       throw wb_error(LDH__PASTEINCON);
     }
@@ -1966,10 +2131,13 @@ bool wb_vrepmem::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
     if (bws->fws)
       bws->fws->bws = memo;
     bws->fws = memo;
-  } else {
+  }
+  else
+  {
     // Insert as first child to poid
     mem_object* fth = findObject(poid.oix);
-    if (!fth) {
+    if (!fth)
+    {
       delete memo;
       throw wb_error(LDH__PASTEINCON);
     }
@@ -1980,7 +2148,8 @@ bool wb_vrepmem::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
     fth->fch = memo;
   }
 
-  if (!nameCheck(memo)) {
+  if (!nameCheck(memo))
+  {
     char str[80];
     sprintf(str, "O%u_%s", memo->m_oid.oix, memo->m_name);
     strncpy(memo->m_name, str, sizeof(memo->m_name));
@@ -1990,8 +2159,7 @@ bool wb_vrepmem::importPasteObject(pwr_tOid destination, ldh_eDest destcode,
   registerObject(memo->m_oid.oix, memo);
   importTranslationTableInsert(oid.oix, memo->m_oid.oix);
   if (cid == pwr_eClass_ClassDef)
-    importTranslationTableCidInsert(
-        cdh_ClassObjidToId(oid), cdh_ClassObjidToId(memo->m_oid));
+    importTranslationTableCidInsert(cdh_ClassObjidToId(oid), cdh_ClassObjidToId(memo->m_oid));
 
   *roid = memo->m_oid;
   return true;
@@ -2014,8 +2182,8 @@ bool wb_vrepmem::exportTree(wb_treeimport& i, pwr_tOid oid)
   return true;
 }
 
-bool wb_vrepmem::exportPaste(wb_treeimport& i, pwr_tOid destination,
-    ldh_eDest destcode, bool keepoid, wb_recix* recix, pwr_tOid** rootlist)
+bool wb_vrepmem::exportPaste(wb_treeimport& i, pwr_tOid destination, ldh_eDest destcode, bool keepoid,
+                             wb_recix* recix, pwr_tOid** rootlist)
 {
   // Count number of topobjects
   int top_cnt = 0;
@@ -2024,9 +2192,9 @@ bool wb_vrepmem::exportPaste(wb_treeimport& i, pwr_tOid destination,
 
   *rootlist = (pwr_tOid*)calloc(top_cnt + 1, sizeof(pwr_tOid));
 
-  if (root_object) {
-    root_object->exportPaste(
-        i, destination, true, destcode, keepoid, recix, *rootlist);
+  if (root_object)
+  {
+    root_object->exportPaste(i, destination, true, destcode, keepoid, recix, *rootlist);
     i.importPaste();
   }
   return true;
@@ -2042,7 +2210,8 @@ bool wb_vrepmem::nameCheck(mem_object* memo)
   while (o->bws)
     o = o->bws;
 
-  while (o) {
+  while (o)
+  {
     if (o != memo && str_NoCaseStrcmp(memo->name(), o->name()) == 0)
       return false;
     o = o->fws;
@@ -2053,7 +2222,8 @@ bool wb_vrepmem::nameCheck(mem_object* memo)
 bool wb_vrepmem::nameCheck(mem_object* dest, char* name, ldh_eDest code)
 {
   mem_object* o;
-  switch (code) {
+  switch (code)
+  {
   case ldh_eDest_After:
   case ldh_eDest_Before:
     o = dest;
@@ -2070,7 +2240,8 @@ bool wb_vrepmem::nameCheck(mem_object* dest, char* name, ldh_eDest code)
   default:
     return false;
   }
-  while (o) {
+  while (o)
+  {
     if (str_NoCaseStrcmp(name, o->name()) == 0)
       return false;
     o = o->fws;
@@ -2094,9 +2265,11 @@ bool wb_vrepmem::importVolume(wb_export& e)
   if (root_object)
     importBuildObject(root_object);
 
-  switch (cid()) {
+  switch (cid())
+  {
   case pwr_eClass_ClassVolume:
-  case pwr_eClass_DetachedClassVolume: {
+  case pwr_eClass_DetachedClassVolume:
+  {
     m_nextOix = ((pwr_sClassVolume*)volume_object->rbody)->NextOix;
     break;
   }
@@ -2136,11 +2309,10 @@ bool wb_vrepmem::importBuildObject(mem_object* memo)
   return true;
 }
 
-bool wb_vrepmem::importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid,
-    pwr_tOid boid, pwr_tOid aoid, pwr_tOid foid, pwr_tOid loid,
-    const char* name, const char* normname, pwr_mClassDef flags,
-    pwr_tTime ohTime, pwr_tTime rbTime, pwr_tTime dbTime, size_t rbSize,
-    size_t dbSize)
+bool wb_vrepmem::importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid, pwr_tOid aoid,
+                            pwr_tOid foid, pwr_tOid loid, const char* name, const char* normname,
+                            pwr_mClassDef flags, pwr_tTime ohTime, pwr_tTime rbTime, pwr_tTime dbTime,
+                            size_t rbSize, size_t dbSize)
 {
   if (cdh_ObjidIsNull(oid))
     printf("** Error: object is null!\n");
@@ -2158,7 +2330,8 @@ bool wb_vrepmem::importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid,
   memo->m_rbtime = rbTime;
   memo->m_dbtime = dbTime;
 
-  if (oid.oix == pwr_cNOix) {
+  if (oid.oix == pwr_cNOix)
+  {
     // this is the volume object
     volume_object = memo;
     strcpy(volume_name, name);
@@ -2176,7 +2349,8 @@ bool wb_vrepmem::importDbody(pwr_tOid oid, size_t size, void* body)
     return false;
 
   memo->dbody_size = size;
-  if (memo->dbody_size) {
+  if (memo->dbody_size)
+  {
     memo->dbody = malloc(memo->dbody_size);
     memcpy(memo->dbody, body, size);
   }
@@ -2190,7 +2364,8 @@ bool wb_vrepmem::importRbody(pwr_tOid oid, size_t size, void* body)
     return false;
 
   memo->rbody_size = size;
-  if (memo->rbody_size) {
+  if (memo->rbody_size)
+  {
     memo->rbody = malloc(memo->rbody_size);
     memcpy(memo->rbody, body, size);
   }
@@ -2204,7 +2379,8 @@ bool wb_vrepmem::importDocBlock(pwr_tOid oid, size_t size, char* block)
     return false;
 
   memo->docblock_size = size;
-  if (memo->docblock_size) {
+  if (memo->docblock_size)
+  {
     memo->docblock = (char*)malloc(memo->docblock_size);
     memcpy(memo->docblock, block, size);
   }
@@ -2215,12 +2391,14 @@ bool wb_vrepmem::commit(pwr_tStatus* sts)
 {
   pwr_tCmd cmd;
 
-  if (m_cloned) {
+  if (m_cloned)
+  {
     *sts = LDH__SUCCESS;
     return true;
   }
 
-  if (m_classeditor) {
+  if (m_classeditor)
+  {
     printf("Check commit\n");
     classeditorCheckCommit();
     printf("Commit\n");
@@ -2232,29 +2410,35 @@ bool wb_vrepmem::commit(pwr_tStatus* sts)
   system(cmd);
 
   std::ofstream fp(m_filename);
-  if (!fp) {
+  if (!fp)
+  {
     *sts = LDH__FILEOPEN;
     return false;
   }
 
-  try {
+  try
+  {
     wb_volume vol(this);
 
     wb_print_wbl wprint(fp);
     wprint.printVolume(vol);
-    if (wprint.getErrCnt() != 0) {
+    if (wprint.getErrCnt() != 0)
+    {
       char str[400];
-      sprintf(str, "Errors when saving volume: %d error%s found, see %s",
-	  wprint.getErrCnt(), (wprint.getErrCnt() == 1) ? "" : "s", m_filename);
+      sprintf(str, "Errors when saving volume: %d error%s found, see %s", wprint.getErrCnt(),
+              (wprint.getErrCnt() == 1) ? "" : "s", m_filename);
       MsgWindow::message('E', str);
     }
     fp.close();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     *sts = e.sts();
     return false;
   }
 
-  if (m_classeditor) {
+  if (m_classeditor)
+  {
     printPaletteFile();
 
     // Reload to get new template objects
@@ -2268,7 +2452,8 @@ bool wb_vrepmem::abort(pwr_tStatus* sts)
 {
   // Reload
 
-  if (m_classeditor || cid() == pwr_eClass_DirectoryVolume) {
+  if (m_classeditor || cid() == pwr_eClass_DirectoryVolume)
+  {
     clear();
     loadWbl(m_filename, sts, true);
   }
@@ -2276,22 +2461,27 @@ bool wb_vrepmem::abort(pwr_tStatus* sts)
   return true;
 }
 
-void wb_vrepmem::classeditorRenameObject(
-    mem_object* memo, char* oldname, wb_name& name)
+void wb_vrepmem::classeditorRenameObject(mem_object* memo, char* oldname, wb_name& name)
 {
   pwr_tStatus sts;
 
-  switch (memo->m_cid) {
-  case pwr_eClass_ClassDef: {
+  switch (memo->m_cid)
+  {
+  case pwr_eClass_ClassDef:
+  {
     pwr_tCid cid = cdh_ClassObjidToId(memo->m_oid);
 
-    try {
+    try
+    {
       wb_cdrep* cdrep = m_merep->cdrep(&sts, cid);
-      if (cdrep) {
+      if (cdrep)
+      {
         cdrep->renameClass(&sts, name);
         delete cdrep;
       }
-    } catch (wb_error&) {
+    }
+    catch (wb_error&)
+    {
     }
     break;
   }
@@ -2302,12 +2492,14 @@ void wb_vrepmem::classeditorRenameObject(
   case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
-  case pwr_eClass_Buffer: {
+  case pwr_eClass_Buffer:
+  {
     if (!memo->fth || !memo->fth->fth)
       break;
     pwr_tCid cid = cdh_ClassObjidToId(memo->fth->fth->m_oid);
 
-    try {
+    try
+    {
       wb_cdrep* cdrep = m_merep->cdrep(&sts, cid);
       if (!cdrep)
         break;
@@ -2324,20 +2516,27 @@ void wb_vrepmem::classeditorRenameObject(
 
       adrep->renameAttribute(&sts, name);
       delete adrep;
-    } catch (wb_error&) {
+    }
+    catch (wb_error&)
+    {
     }
     break;
   }
-  case pwr_eClass_TypeDef: {
+  case pwr_eClass_TypeDef:
+  {
     pwr_tTid tid = cdh_TypeObjidToId(memo->m_oid);
 
-    try {
+    try
+    {
       wb_tdrep* tdrep = m_merep->tdrep(&sts, tid);
-      if (tdrep) {
+      if (tdrep)
+      {
         tdrep->renameType(&sts, name);
         delete tdrep;
       }
-    } catch (wb_error&) {
+    }
+    catch (wb_error&)
+    {
     }
     break;
   }
@@ -2347,7 +2546,8 @@ void wb_vrepmem::classeditorRenameObject(
 
 void wb_vrepmem::classeditorDeleteObject(mem_object* memo)
 {
-  switch (memo->m_cid) {
+  switch (memo->m_cid)
+  {
   case pwr_eClass_ObjBodyDef:
   case pwr_eClass_Param:
   case pwr_eClass_Intern:
@@ -2356,7 +2556,8 @@ void wb_vrepmem::classeditorDeleteObject(mem_object* memo)
   case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
-  case pwr_eClass_Buffer: {
+  case pwr_eClass_Buffer:
+  {
     // Change ohtime in parent to get new class version
     if (!memo->fth)
       break;
@@ -2378,56 +2579,63 @@ void wb_vrepmem::classeditorCheckCommit()
 
   mem_object* class_hier;
 
-  for (class_hier = root_object;
-       class_hier && class_hier->m_cid != pwr_eClass_ClassHier;
+  for (class_hier = root_object; class_hier && class_hier->m_cid != pwr_eClass_ClassHier;
        class_hier = class_hier->fws)
     ;
   if (!class_hier || class_hier->m_cid != pwr_eClass_ClassHier)
     return;
 
   // Check that RtBody.StructName is unique
-  for (mem_object* o1 = class_hier->fch; o1; o1 = o1->fws) {
-    for (mem_object* o2 = o1->fch; o2; o2 = o2->fws) {
-      switch (o2->m_cid) {
+  for (mem_object* o1 = class_hier->fch; o1; o1 = o1->fws)
+  {
+    for (mem_object* o2 = o1->fch; o2; o2 = o2->fws)
+    {
+      switch (o2->m_cid)
+      {
       case pwr_eClass_ObjBodyDef:
-        if (streq(o2->name(), "RtBody")) {
-          if (!streq(((pwr_sObjBodyDef*)o2->rbody)->StructName, "")) {
+        if (streq(o2->name(), "RtBody"))
+        {
+          if (!streq(((pwr_sObjBodyDef*)o2->rbody)->StructName, ""))
+          {
             int found = 0;
-            for (unsigned int i = 0; i < rtbody_vect.size(); i++) {
-              if (strcmp(rtbody_vect[i].c_str(),
-                      ((pwr_sObjBodyDef*)o2->rbody)->StructName)
-                  == 0) {
+            for (unsigned int i = 0; i < rtbody_vect.size(); i++)
+            {
+              if (strcmp(rtbody_vect[i].c_str(), ((pwr_sObjBodyDef*)o2->rbody)->StructName) == 0)
+              {
                 found = 1;
                 char str[400];
-                sprintf(str,
-                    "%s.RtBody.StructName \"%s\" already used in this volume",
-                    o1->name(), rtbody_vect[i].c_str());
+                sprintf(str, "%s.RtBody.StructName \"%s\" already used in this volume", o1->name(),
+                        rtbody_vect[i].c_str());
                 MsgWindow::message('E', str, msgw_ePop_Yes);
                 break;
               }
             }
-            if (!found) {
+            if (!found)
+            {
               std::string str(((pwr_sObjBodyDef*)o2->rbody)->StructName);
               rtbody_vect.push_back(str);
             }
           }
-        } else if (streq(o2->name(), "DevBody")) {
-          if (!streq(((pwr_sObjBodyDef*)o2->rbody)->StructName, "")) {
+        }
+        else if (streq(o2->name(), "DevBody"))
+        {
+          if (!streq(((pwr_sObjBodyDef*)o2->rbody)->StructName, ""))
+          {
             int found = 0;
-            for (unsigned int i = 0; i < devbody_vect.size(); i++) {
-              if (strcmp(devbody_vect[i].c_str(),
-                      ((pwr_sObjBodyDef*)o2->rbody)->StructName)
-                  == 0) {
+            for (unsigned int i = 0; i < devbody_vect.size(); i++)
+            {
+              if (strcmp(devbody_vect[i].c_str(), ((pwr_sObjBodyDef*)o2->rbody)->StructName) == 0)
+              {
                 found = 1;
                 char str[400];
-                sprintf(str,
-                    "%s.DevBody.StructName \"%s\" already used in this volume",
-                    o1->name(), devbody_vect[i].c_str());
+                sprintf(str, "%s.DevBody.StructName \"%s\" already used in this volume", o1->name(),
+                        devbody_vect[i].c_str());
                 MsgWindow::message('E', str, msgw_ePop_Yes);
                 break;
               }
             }
-            if (!found) {
+            if (!found)
+            {
               std::string str(((pwr_sObjBodyDef*)o2->rbody)->StructName);
               devbody_vect.push_back(str);
             }
@@ -2439,38 +2647,44 @@ void wb_vrepmem::classeditorCheckCommit()
   }
 
   // Check that Attribute.PgmName is unique within one class
-  for (mem_object* o1 = class_hier->fch; o1; o1 = o1->fws) {
+  for (mem_object* o1 = class_hier->fch; o1; o1 = o1->fws)
+  {
     std::vector<std::string> pgmname_vect;
-    for (mem_object* o2 = o1->fch; o2; o2 = o2->fws) {
-      switch (o2->m_cid) {
+    for (mem_object* o2 = o1->fch; o2; o2 = o2->fws)
+    {
+      switch (o2->m_cid)
+      {
       case pwr_eClass_ObjBodyDef:
-        for (mem_object* o3 = o2->fch; o3; o3 = o3->fws) {
-          switch (o3->m_cid) {
+        for (mem_object* o3 = o2->fch; o3; o3 = o3->fws)
+        {
+          switch (o3->m_cid)
+          {
           case pwr_eClass_Param:
           case pwr_eClass_Input:
           case pwr_eClass_Output:
           case pwr_eClass_Intern:
-	  case pwr_eClass_TargetAttribute:
+          case pwr_eClass_TargetAttribute:
           case pwr_eClass_Buffer:
           case pwr_eClass_ObjXRef:
-          case pwr_eClass_AttrXRef: {
-            if (!streq(((pwr_sParam*)o3->rbody)->Info.PgmName, "")) {
+          case pwr_eClass_AttrXRef:
+          {
+            if (!streq(((pwr_sParam*)o3->rbody)->Info.PgmName, ""))
+            {
               int found = 0;
-              for (unsigned int i = 0; i < pgmname_vect.size(); i++) {
-                if (strcmp(pgmname_vect[i].c_str(),
-                        ((pwr_sParam*)o3->rbody)->Info.PgmName)
-                    == 0) {
+              for (unsigned int i = 0; i < pgmname_vect.size(); i++)
+              {
+                if (strcmp(pgmname_vect[i].c_str(), ((pwr_sParam*)o3->rbody)->Info.PgmName) == 0)
+                {
                   found = 1;
                   char str[400];
-                  sprintf(str,
-                      "%s-%s-%s.PgmName \"%s\" already used in this class",
-                      o1->name(), o2->name(), o3->name(),
-                      pgmname_vect[i].c_str());
+                  sprintf(str, "%s-%s-%s.PgmName \"%s\" already used in this class", o1->name(), o2->name(),
+                          o3->name(), pgmname_vect[i].c_str());
                   MsgWindow::message('E', str, msgw_ePop_Yes);
                   break;
                 }
               }
-              if (!found) {
+              if (!found)
+              {
                 std::string str(((pwr_sParam*)o3->rbody)->Info.PgmName);
                 pgmname_vect.push_back(str);
               }
@@ -2486,14 +2700,14 @@ void wb_vrepmem::classeditorCheckCommit()
   }
 }
 
-bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
-    pwr_tCid cid, pwr_tOix* oix, char* name, int name_size, pwr_tStatus* sts,
-    bool import_paste)
+bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest, pwr_tCid cid, pwr_tOix* oix,
+                                  char* name, int name_size, pwr_tStatus* sts, bool import_paste)
 {
   mem_object* fth;
 
   // Get father
-  switch (dest_code) {
+  switch (dest_code)
+  {
   case ldh_eDest_After:
   case ldh_eDest_Before:
     fth = dest->fth;
@@ -2506,15 +2720,18 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
     return false;
   }
 
-  if (fth) {
-    switch (fth->m_cid) {
+  if (fth)
+  {
+    switch (fth->m_cid)
+    {
     case pwr_eClass_ObjBodyDef:
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_eClass_Param:
       case pwr_eClass_Intern:
       case pwr_eClass_Input:
       case pwr_eClass_Output:
-  case pwr_eClass_TargetAttribute:
+      case pwr_eClass_TargetAttribute:
       case pwr_eClass_ObjXRef:
       case pwr_eClass_AttrXRef:
       case pwr_eClass_Buffer:
@@ -2525,7 +2742,8 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
       }
       break;
     case pwr_eClass_ClassDef:
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_eClass_ObjBodyDef:
       case pwr_eClass_GraphPlcNode:
       case pwr_eClass_GraphPlcConnection:
@@ -2550,7 +2768,8 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
       }
       break;
     case pwr_eClass_ClassHier:
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_eClass_ClassDef:
       case pwr_eClass_ClassHier:
         break;
@@ -2560,7 +2779,8 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
       }
       break;
     case pwr_eClass_TypeHier:
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_eClass_Type:
       case pwr_eClass_TypeDef:
         break;
@@ -2570,7 +2790,8 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
       }
       break;
     case pwr_eClass_TypeDef:
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_eClass_Bit:
       case pwr_eClass_Value:
         break;
@@ -2583,19 +2804,27 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
     }
   }
 
-  switch (cid) {
-  case pwr_eClass_ClassHier: {
+  switch (cid)
+  {
+  case pwr_eClass_ClassHier:
+  {
     // Top object, named Class
-    if (!fth) {
-      if (!import_paste) {
+    if (!fth)
+    {
+      if (!import_paste)
+      {
         strcpy(name, "Class");
-        if (!nameCheck(dest, name, dest_code)) {
+        if (!nameCheck(dest, name, dest_code))
+        {
           *sts = LDH__CLASSMISPLACED;
           return false;
         }
       }
-    } else {
-      if (!streq(fth->name(), "Class")) {
+    }
+    else
+    {
+      if (!streq(fth->name(), "Class"))
+      {
         *sts = LDH__CLASSMISPLACED;
         return false;
       }
@@ -2604,15 +2833,19 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
     *oix = nextOix();
     break;
   }
-  case pwr_eClass_TypeHier: {
+  case pwr_eClass_TypeHier:
+  {
     // Top object, named Type
-    if (fth) {
+    if (fth)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
-    if (!import_paste) {
+    if (!import_paste)
+    {
       strcpy(name, "Type");
-      if (!nameCheck(dest, name, dest_code)) {
+      if (!nameCheck(dest, name, dest_code))
+      {
         *sts = LDH__CLASSMISPLACED;
         return false;
       }
@@ -2622,48 +2855,52 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
   }
   case pwr_eClass_ClassDef:
     // Child to ClassHier, oix from cix
-    if (!fth || fth->m_cid != pwr_eClass_ClassHier) {
+    if (!fth || fth->m_cid != pwr_eClass_ClassHier)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
 
     // Get next cix
-    if (volume_object && volume_object->rbody) {
+    if (volume_object && volume_object->rbody)
+    {
       if (((pwr_sClassVolume*)volume_object->rbody)->NextCix == 0)
         ((pwr_sClassVolume*)volume_object->rbody)->NextCix++;
-      while (1) {
-        *oix = cdh_cixToOix(
-            ((pwr_sClassVolume*)volume_object->rbody)->NextCix++, 0, 0);
+      while (1)
+      {
+        *oix = cdh_cixToOix(((pwr_sClassVolume*)volume_object->rbody)->NextCix++, 0, 0);
         if (!findObject(*oix))
           break;
       }
     }
     if (!import_paste)
       sprintf(name, "O%u", *oix);
-    else {
+    else
+    {
       pwr_tObjName n;
 
       strncpy(n, name, sizeof(n));
-      snprintf(name, name_size, "C%u_%s",
-          ((pwr_sClassVolume*)volume_object->rbody)->NextCix, n);
+      snprintf(name, name_size, "C%u_%s", ((pwr_sClassVolume*)volume_object->rbody)->NextCix, n);
       name[name_size - 1] = 0;
     }
     break;
 
   case pwr_eClass_TypeDef:
     // Child to TypeHier, oix from tix
-    if (!fth || fth->m_cid != pwr_eClass_TypeHier) {
+    if (!fth || fth->m_cid != pwr_eClass_TypeHier)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
 
     // Get next tix
-    if (volume_object && volume_object->rbody) {
+    if (volume_object && volume_object->rbody)
+    {
       if (((pwr_sClassVolume*)volume_object->rbody)->NextTix[0] == 0)
         ((pwr_sClassVolume*)volume_object->rbody)->NextTix[0]++;
-      while (1) {
-        *oix = cdh_tixToOix(
-            1, ((pwr_sClassVolume*)volume_object->rbody)->NextTix[0]++);
+      while (1)
+      {
+        *oix = cdh_tixToOix(1, ((pwr_sClassVolume*)volume_object->rbody)->NextTix[0]++);
         if (!findObject(*oix))
           break;
       }
@@ -2672,49 +2909,64 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
       sprintf(name, "O%u", *oix);
     break;
 
-  case pwr_eClass_ObjBodyDef: {
+  case pwr_eClass_ObjBodyDef:
+  {
     // Child to ClassDef, oix from bix, named RtBody or DevBody
-    if (!fth || fth->m_cid != pwr_eClass_ClassDef) {
+    if (!fth || fth->m_cid != pwr_eClass_ClassDef)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
 
-    if (!import_paste) {
+    if (!import_paste)
+    {
       bool rtbody_found = false;
       bool devbody_found = false;
-      for (mem_object* memo = fth->fch; memo; memo = memo->fws) {
-        if (memo->m_cid == pwr_eClass_ObjBodyDef) {
+      for (mem_object* memo = fth->fch; memo; memo = memo->fws)
+      {
+        if (memo->m_cid == pwr_eClass_ObjBodyDef)
+        {
           if (cdh_oixToBix(memo->m_oid.oix) == pwr_eBix_rt)
             rtbody_found = true;
           else if (cdh_oixToBix(memo->m_oid.oix) == pwr_eBix_dev)
             devbody_found = true;
         }
       }
-      if (!rtbody_found) {
+      if (!rtbody_found)
+      {
         *oix = cdh_cixToOix(cdh_oixToCix(fth->m_oid.oix), pwr_eBix_rt, 0);
-        if (findObject(*oix)) {
+        if (findObject(*oix))
+        {
           *sts = LDH__CLASSMISPLACED;
           return false;
         }
         strcpy(name, "RtBody");
-      } else if (!devbody_found) {
+      }
+      else if (!devbody_found)
+      {
         *oix = cdh_cixToOix(cdh_oixToCix(fth->m_oid.oix), pwr_eBix_dev, 0);
-        if (findObject(*oix)) {
+        if (findObject(*oix))
+        {
           *sts = LDH__CLASSMISPLACED;
           return false;
         }
         strcpy(name, "DevBody");
-      } else {
+      }
+      else
+      {
         *sts = LDH__CLASSMISPLACED;
         return false;
       }
-    } else {
+    }
+    else
+    {
       // Use the name to choose oix
       if (streq(name, "DevBody"))
         *oix = cdh_cixToOix(cdh_oixToCix(fth->m_oid.oix), pwr_eBix_dev, 0);
       else
         *oix = cdh_cixToOix(cdh_oixToCix(fth->m_oid.oix), pwr_eBix_rt, 0);
-      if (findObject(*oix)) {
+      if (findObject(*oix))
+      {
         *sts = LDH__CLASSMISPLACED;
         return false;
       }
@@ -2728,9 +2980,11 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
   case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
-  case pwr_eClass_Buffer: {
+  case pwr_eClass_Buffer:
+  {
     // Child to ObjBodyDef, oix from aix
-    if (!fth || fth->m_cid != pwr_eClass_ObjBodyDef) {
+    if (!fth || fth->m_cid != pwr_eClass_ObjBodyDef)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
@@ -2738,10 +2992,10 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
     if (((pwr_sObjBodyDef*)fth->rbody)->NextAix == 0)
       ((pwr_sObjBodyDef*)fth->rbody)->NextAix++;
 
-    while (1) {
-      *oix = cdh_cixToOix(cdh_oixToCix(fth->fth->m_oid.oix),
-          cdh_oixToBix(fth->m_oid.oix),
-          ((pwr_sObjBodyDef*)fth->rbody)->NextAix++);
+    while (1)
+    {
+      *oix = cdh_cixToOix(cdh_oixToCix(fth->fth->m_oid.oix), cdh_oixToBix(fth->m_oid.oix),
+                          ((pwr_sObjBodyDef*)fth->rbody)->NextAix++);
       if (!findObject(*oix))
         break;
     }
@@ -2749,16 +3003,20 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
       sprintf(name, "O%u", *oix);
     break;
   }
-  case pwr_cClass_PlcTemplate: {
+  case pwr_cClass_PlcTemplate:
+  {
     // Child to ClassDef, named Code
-    if (!fth || fth->m_cid != pwr_eClass_ClassDef) {
+    if (!fth || fth->m_cid != pwr_eClass_ClassDef)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
 
-    if (!import_paste) {
+    if (!import_paste)
+    {
       strcpy(name, "Code");
-      if (!nameCheck(dest, name, dest_code)) {
+      if (!nameCheck(dest, name, dest_code))
+      {
         *sts = LDH__CLASSMISPLACED;
         return false;
       }
@@ -2766,16 +3024,20 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
     *oix = nextOix();
     break;
   }
-  case pwr_eClass_GraphPlcNode: {
+  case pwr_eClass_GraphPlcNode:
+  {
     // Child to ClassDef, named GraphPlcNode
-    if (!fth || fth->m_cid != pwr_eClass_ClassDef) {
+    if (!fth || fth->m_cid != pwr_eClass_ClassDef)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
 
-    if (!import_paste) {
+    if (!import_paste)
+    {
       strcpy(name, "GraphPlcNode");
-      if (!nameCheck(dest, name, dest_code)) {
+      if (!nameCheck(dest, name, dest_code))
+      {
         *sts = LDH__CLASSMISPLACED;
         return false;
       }
@@ -2783,7 +3045,8 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
     *oix = nextOix();
     break;
   }
-  default: {
+  default:
+  {
     *oix = nextOix();
     if (!import_paste)
       sprintf(name, "O%u", *oix);
@@ -2793,13 +3056,14 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
   return true;
 }
 
-bool wb_vrepmem::classeditorCheckMove(
-    mem_object* memo, ldh_eDest dest_code, mem_object* dest, pwr_tStatus* sts)
+bool wb_vrepmem::classeditorCheckMove(mem_object* memo, ldh_eDest dest_code, mem_object* dest,
+                                      pwr_tStatus* sts)
 {
   mem_object* fth;
 
   // Get father
-  switch (dest_code) {
+  switch (dest_code)
+  {
   case ldh_eDest_After:
   case ldh_eDest_Before:
     fth = dest->fth;
@@ -2812,10 +3076,13 @@ bool wb_vrepmem::classeditorCheckMove(
     return false;
   }
 
-  if (fth) {
-    switch (fth->m_cid) {
+  if (fth)
+  {
+    switch (fth->m_cid)
+    {
     case pwr_eClass_ObjBodyDef:
-      switch (memo->m_cid) {
+      switch (memo->m_cid)
+      {
       case pwr_eClass_Param:
       case pwr_eClass_Intern:
       case pwr_eClass_Input:
@@ -2831,7 +3098,8 @@ bool wb_vrepmem::classeditorCheckMove(
       }
       break;
     case pwr_eClass_ClassDef:
-      switch (memo->m_cid) {
+      switch (memo->m_cid)
+      {
       case pwr_eClass_ObjBodyDef:
       case pwr_eClass_GraphPlcNode:
       case pwr_eClass_GraphPlcConnection:
@@ -2852,7 +3120,8 @@ bool wb_vrepmem::classeditorCheckMove(
       }
       break;
     case pwr_eClass_ClassHier:
-      switch (memo->m_cid) {
+      switch (memo->m_cid)
+      {
       case pwr_eClass_ClassDef:
       case pwr_eClass_ClassHier:
         break;
@@ -2862,7 +3131,8 @@ bool wb_vrepmem::classeditorCheckMove(
       }
       break;
     case pwr_eClass_TypeHier:
-      switch (memo->m_cid) {
+      switch (memo->m_cid)
+      {
       case pwr_eClass_Type:
       case pwr_eClass_TypeDef:
         break;
@@ -2872,7 +3142,8 @@ bool wb_vrepmem::classeditorCheckMove(
       }
       break;
     case pwr_eClass_TypeDef:
-      switch (memo->m_cid) {
+      switch (memo->m_cid)
+      {
       case pwr_eClass_Bit:
       case pwr_eClass_Value:
         break;
@@ -2885,38 +3156,48 @@ bool wb_vrepmem::classeditorCheckMove(
     }
   }
 
-  switch (memo->m_cid) {
-  case pwr_eClass_ClassHier: {
+  switch (memo->m_cid)
+  {
+  case pwr_eClass_ClassHier:
+  {
     // Top object
     if (!fth)
       break;
-    if (fth->m_cid != pwr_eClass_ClassHier) {
+    if (fth->m_cid != pwr_eClass_ClassHier)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
-    if (fth->fth) {
+    if (fth->fth)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
     break;
   }
-  case pwr_eClass_TypeHier: {
+  case pwr_eClass_TypeHier:
+  {
     // Top object
-    if (fth) {
+    if (fth)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
     break;
   }
-  case pwr_eClass_ClassDef: {
-    if (fth->m_cid != pwr_eClass_ClassHier) {
+  case pwr_eClass_ClassDef:
+  {
+    if (fth->m_cid != pwr_eClass_ClassHier)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
     break;
   }
-  case pwr_eClass_TypeDef: {
-    if (fth != memo->fth) {
+  case pwr_eClass_TypeDef:
+  {
+    if (fth != memo->fth)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
@@ -2932,8 +3213,10 @@ bool wb_vrepmem::classeditorCheckMove(
   case pwr_eClass_AttrXRef:
   case pwr_eClass_Buffer:
   case pwr_cClass_PlcTemplate:
-  case pwr_eClass_GraphPlcNode: {
-    if (!fth || fth != memo->fth) {
+  case pwr_eClass_GraphPlcNode:
+  {
+    if (!fth || fth != memo->fth)
+    {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
@@ -2955,17 +3238,20 @@ void wb_vrepmem::classeditorCommit()
 
   mem_object* class_hier;
 
-  for (class_hier = root_object;
-       class_hier && class_hier->m_cid != pwr_eClass_ClassHier;
+  for (class_hier = root_object; class_hier && class_hier->m_cid != pwr_eClass_ClassHier;
        class_hier = class_hier->fws)
     ;
   if (!class_hier || class_hier->m_cid != pwr_eClass_ClassHier)
     return;
 
-  for (mem_object* o1 = class_hier->fch; o1; o1 = o1->fws) {
-    for (mem_object* o2 = o1->fch; o2; o2 = o2->fws) {
-      for (mem_object* o3 = o2->fch; o3; o3 = o3->fws) {
-        switch (o3->m_cid) {
+  for (mem_object* o1 = class_hier->fch; o1; o1 = o1->fws)
+  {
+    for (mem_object* o2 = o1->fch; o2; o2 = o2->fws)
+    {
+      for (mem_object* o3 = o2->fch; o3; o3 = o3->fws)
+      {
+        switch (o3->m_cid)
+        {
         case pwr_eClass_Param:
         case pwr_eClass_TargetAttribute:
           if (o3->m_created)
@@ -3000,22 +3286,24 @@ void wb_vrepmem::printPaletteFile()
   int menu_found = 0;
   int allclasses_found = 0;
   int palette_found = 0;
-  PalFileMenu* menu = PalFile::config_tree_build(
-      0, pal_cLocalPaletteFile, pal_eNameType_All, "", 0);
+  PalFileMenu* menu = PalFile::config_tree_build(0, pal_cLocalPaletteFile, pal_eNameType_All, "", 0);
   PalFileMenu *mp, *mp2 = NULL, *mp3 = NULL, *mp4 = NULL, *mp5;
   mem_object *memch, *memch2, *memcd, *memcd2, *memgn;
   int hier_inserted;
 
   // Add menu "NavigatorPalette-AllClasses-'volumename' if not found
-  for (mp = menu; mp; mp = mp->next) {
-    if (mp->item_type == pal_eMenuType_Palette
-        && str_NoCaseStrcmp(mp->title, "NavigatorPalette") == 0) {
-      for (mp2 = mp->child_list; mp2; mp2 = mp2->next) {
-        if (mp2->item_type == pal_eMenuType_Menu
-            && str_NoCaseStrcmp(mp2->title, "AllClasses") == 0) {
-          for (mp3 = mp2->child_list; mp3; mp3 = mp3->next) {
-            if (mp3->item_type == pal_eMenuType_ClassVolume
-                && str_NoCaseStrcmp(mp3->title, volume_name) == 0) {
+  for (mp = menu; mp; mp = mp->next)
+  {
+    if (mp->item_type == pal_eMenuType_Palette && str_NoCaseStrcmp(mp->title, "NavigatorPalette") == 0)
+    {
+      for (mp2 = mp->child_list; mp2; mp2 = mp2->next)
+      {
+        if (mp2->item_type == pal_eMenuType_Menu && str_NoCaseStrcmp(mp2->title, "AllClasses") == 0)
+        {
+          for (mp3 = mp2->child_list; mp3; mp3 = mp3->next)
+          {
+            if (mp3->item_type == pal_eMenuType_ClassVolume && str_NoCaseStrcmp(mp3->title, volume_name) == 0)
+            {
               menu_found = 1;
               break;
             }
@@ -3029,19 +3317,22 @@ void wb_vrepmem::printPaletteFile()
     }
   }
 
-  if (!palette_found) {
+  if (!palette_found)
+  {
     // Create palette
     mp = new PalFileMenu("NavigatorPalette", pal_eMenuType_Palette, 0);
     mp->next = menu;
     menu = mp;
   }
-  if (!allclasses_found) {
+  if (!allclasses_found)
+  {
     // Create volume menu
     mp2 = new PalFileMenu("AllClasses", pal_eMenuType_Menu, mp);
     mp2->next = mp->child_list;
     mp->child_list = mp2;
   }
-  if (!menu_found) {
+  if (!menu_found)
+  {
     // Create volume menu
     mp3 = new PalFileMenu(volume_name, pal_eMenuType_ClassVolume, mp2);
     mp3->next = mp2->child_list;
@@ -3051,12 +3342,14 @@ void wb_vrepmem::printPaletteFile()
   // Replace menu "PlcEditorPalette-'volumename'-* with function object classes
   menu_found = 0;
   palette_found = 0;
-  for (mp = menu; mp; mp = mp->next) {
-    if (mp->item_type == pal_eMenuType_Palette
-        && str_NoCaseStrcmp(mp->title, "PlcEditorPalette") == 0) {
-      for (mp2 = mp->child_list; mp2; mp2 = mp2->next) {
-        if (mp2->item_type == pal_eMenuType_Menu
-            && str_NoCaseStrcmp(mp2->title, volume_name) == 0) {
+  for (mp = menu; mp; mp = mp->next)
+  {
+    if (mp->item_type == pal_eMenuType_Palette && str_NoCaseStrcmp(mp->title, "PlcEditorPalette") == 0)
+    {
+      for (mp2 = mp->child_list; mp2; mp2 = mp2->next)
+      {
+        if (mp2->item_type == pal_eMenuType_Menu && str_NoCaseStrcmp(mp2->title, volume_name) == 0)
+        {
           // Remove
           PalFile::config_tree_free(mp2->child_list);
           mp2->child_list = 0;
@@ -3069,26 +3362,34 @@ void wb_vrepmem::printPaletteFile()
     }
   }
 
-  if (!palette_found) {
+  if (!palette_found)
+  {
     // Create palette
     mp = new PalFileMenu("PlcEditorPalette", pal_eMenuType_Palette, 0);
     mp->next = menu;
     menu = mp;
   }
-  if (!menu_found) {
+  if (!menu_found)
+  {
     // Create volume menu
     mp2 = new PalFileMenu(volume_name, pal_eMenuType_Menu, mp);
     mp2->next = mp->child_list;
     mp->child_list = mp2;
   }
 
-  for (memch = root_object; memch; memch = memch->fws) {
-    if (memch->m_cid == pwr_eClass_ClassHier) {
-      for (memcd = memch->fch; memcd; memcd = memcd->fws) {
-        switch (memcd->m_cid) {
+  for (memch = root_object; memch; memch = memch->fws)
+  {
+    if (memch->m_cid == pwr_eClass_ClassHier)
+    {
+      for (memcd = memch->fch; memcd; memcd = memcd->fws)
+      {
+        switch (memcd->m_cid)
+        {
         case pwr_eClass_ClassDef:
-          for (memgn = memcd->fch; memgn; memgn = memgn->fws) {
-            if (memgn->m_cid == pwr_eClass_GraphPlcNode) {
+          for (memgn = memcd->fch; memgn; memgn = memgn->fws)
+          {
+            if (memgn->m_cid == pwr_eClass_GraphPlcNode)
+            {
               // Add to menu
               mp4 = mp3;
               mp3 = new PalFileMenu(memcd->m_name, pal_eMenuType_Class, mp2);
@@ -3103,16 +3404,19 @@ void wb_vrepmem::printPaletteFile()
         case pwr_eClass_ClassHier:
           memch2 = memcd;
           hier_inserted = 0;
-          for (memcd2 = memch2->fch; memcd2; memcd2 = memcd2->fws) {
-            for (memgn = memcd2->fch; memgn; memgn = memgn->fws) {
-              if (memgn->m_cid == pwr_eClass_GraphPlcNode) {
-                if (!hier_inserted) {
+          for (memcd2 = memch2->fch; memcd2; memcd2 = memcd2->fws)
+          {
+            for (memgn = memcd2->fch; memgn; memgn = memgn->fws)
+            {
+              if (memgn->m_cid == pwr_eClass_GraphPlcNode)
+              {
+                if (!hier_inserted)
+                {
                   hier_inserted = 1;
 
                   // Add ClassHier to menu
                   mp4 = mp3;
-                  mp3 = new PalFileMenu(
-                      memch2->m_name, pal_eMenuType_Menu, mp2);
+                  mp3 = new PalFileMenu(memch2->m_name, pal_eMenuType_Menu, mp2);
                   if (!mp2->child_list)
                     mp2->child_list = mp3;
                   else

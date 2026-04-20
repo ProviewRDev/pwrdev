@@ -34,7 +34,8 @@
  * General Public License plus this exception.
  */
 
-extern "C" {
+extern "C"
+{
 #include "co_dcli.h"
 #include "pwr_names.h"
 }
@@ -47,7 +48,8 @@ int ge_get_systemname(char* systemname)
 
   dcli_translate_filename(fname, pwr_cNameSysObject);
   file = fopen(fname, "r");
-  if (file == 0) {
+  if (file == 0)
+  {
     printf("** Warning, systemname not found\n");
     return 0;
   }

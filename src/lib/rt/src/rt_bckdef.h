@@ -61,12 +61,13 @@
 
 #define BCK_FILE_VERSION 7
 
-typedef struct {
+typedef struct
+{
   pwr_tInt32 version; /* File layout version */
   pwr_tInt32 fill;
-  pwr_tTime creationtime; /* Time when file was created */
+  pwr_tTime creationtime;  /* Time when file was created */
   pwr_tTime updatetime[2]; /* Time when header was last updated */
-  pwr_tInt32 curdata[2]; /* backup data 0 for fast cycle, and */
+  pwr_tInt32 curdata[2];   /* backup data 0 for fast cycle, and */
   /* 1 for slow. Contains file address */
   pwr_tInt32 cursize[2]; /* size in bytes of curdata areas */
 
@@ -77,11 +78,12 @@ typedef struct {
 } BCK_FILEHEAD_STRUCT;
 
 /* File header for Version 6 and previous */
-typedef struct {
-  pwr_tInt32 version; /* File layout version */
-  net_sTime creationtime; /* Time when file was created */
+typedef struct
+{
+  pwr_tInt32 version;      /* File layout version */
+  net_sTime creationtime;  /* Time when file was created */
   net_sTime updatetime[2]; /* Time when header was last updated */
-  pwr_tInt32 curdata[2]; /* backup data 0 for fast cycle, and */
+  pwr_tInt32 curdata[2];   /* backup data 0 for fast cycle, and */
   /* 1 for slow. Contains file address */
   pwr_tInt32 cursize[2]; /* size in bytes of curdata areas */
 
@@ -93,24 +95,27 @@ typedef struct {
 
 /* Each data section starts with a cycle header.  */
 
-typedef struct {
-  net_sTime objtime; /* Time up to which new objects are included */
-  pwr_tUInt32 length; /* Length of section including this header */
-  pwr_tUInt16 cycle; /* 0=fast, 1=slow */
+typedef struct
+{
+  net_sTime objtime;    /* Time up to which new objects are included */
+  pwr_tUInt32 length;   /* Length of section including this header */
+  pwr_tUInt16 cycle;    /* 0=fast, 1=slow */
   pwr_tUInt16 segments; /* # of segments in section */
 } BCK_CYCLEHEAD_STRUCT;
 
-typedef struct {
-  net_sTime objtime; /* Time up to which new objects are included */
-  pwr_tUInt32 length; /* Length of section including this header */
-  pwr_tUInt16 cycle; /* 0=fast, 1=slow */
+typedef struct
+{
+  net_sTime objtime;    /* Time up to which new objects are included */
+  pwr_tUInt32 length;   /* Length of section including this header */
+  pwr_tUInt16 cycle;    /* 0=fast, 1=slow */
   pwr_tUInt32 segments; /* # of segments in section */
 } BCK_CYCLEHEAD_STRUCT_V6;
 
-typedef struct {
-  pwr_tTime objtime; /* Time up to which new objects are included */
-  pwr_tUInt32 length; /* Length of section including this header */
-  pwr_tUInt16 cycle; /* 0=fast, 1=slow */
+typedef struct
+{
+  pwr_tTime objtime;    /* Time up to which new objects are included */
+  pwr_tUInt32 length;   /* Length of section including this header */
+  pwr_tUInt16 cycle;    /* 0=fast, 1=slow */
   pwr_tUInt32 segments; /* # of segments in section */
 } bck_t_cycleheader;
 
@@ -121,30 +126,33 @@ typedef struct {
    up from. It also contains the size of the following data part.
    This header is fixed size and defined as BCK_DATAHEAD_STRUCT  */
 
-typedef struct {
-  pwr_sAttrRef attrref; /* Objid for the object */
-  pwr_tClassId cid; /* Class of object */
-  pwr_tBoolean valid; /* Validity flag */
-  pwr_tBoolean dynamic; /* Dynamic object */
+typedef struct
+{
+  pwr_sAttrRef attrref;   /* Objid for the object */
+  pwr_tClassId cid;       /* Class of object */
+  pwr_tBoolean valid;     /* Validity flag */
+  pwr_tBoolean dynamic;   /* Dynamic object */
   pwr_tString80 dataname; /* Name of object[.attribute] */
 } BCK_DATAHEAD_STRUCT;
 
-typedef struct {
+typedef struct
+{
   pwr_sAttrRef attrref; /* Objid for the object */
-  pwr_tClassId cid; /* Class of object */
-  pwr_tBoolean valid; /* Validity flag */
+  pwr_tClassId cid;     /* Class of object */
+  pwr_tBoolean valid;   /* Validity flag */
   pwr_tBoolean dynamic; /* Dynamic object */
-  pwr_tInt16 namesize; /* Name of attribute [.attribute] */
+  pwr_tInt16 namesize;  /* Name of attribute [.attribute] */
 } bck_t_dataheader;
 
-typedef struct {
-  pwr_tObjid objid; /* Objid for the object */
-  pwr_tClassId cid; /* Class of object */
-  pwr_tBoolean valid; /* Validity flag */
+typedef struct
+{
+  pwr_tObjid objid;     /* Objid for the object */
+  pwr_tClassId cid;     /* Class of object */
+  pwr_tBoolean valid;   /* Validity flag */
   pwr_tBoolean dynamic; /* Dynamic object */
-  pwr_tInt16 namesize; /* Size of name of attribute [.attribute] */
-  pwr_tUInt32 size; /* Size of data */
+  pwr_tInt16 namesize;  /* Size of name of attribute [.attribute] */
+  pwr_tUInt32 size;     /* Size of data */
 } bck_t_writeheader;
 
-#define SIG_BCK_FORCE (SIGRTMIN + 1) /* forced activation sig  */
+#define SIG_BCK_FORCE (SIGRTMIN + 1)      /* forced activation sig  */
 #define SIG_BCK_WRITE_DONE (SIGRTMIN + 2) /* backup done            */

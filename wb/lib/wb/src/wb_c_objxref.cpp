@@ -56,8 +56,7 @@ static int IsOkConnect(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
   pwr_sObjXRef PobjXDef;
   pwr_sObjXRef SobjXDef;
 
-  sts = ldh_GetAttrRef(ip->PointedSession, ip->Pointed.Objid,
-      mbp->MethodArguments[0], &PattrRef);
+  sts = ldh_GetAttrRef(ip->PointedSession, ip->Pointed.Objid, mbp->MethodArguments[0], &PattrRef);
   if (EVEN(sts))
     return 0;
 
@@ -65,8 +64,7 @@ static int IsOkConnect(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
   if (EVEN(sts))
     return 0;
 
-  sts = ldh_GetAttrRef(ip->PointedSession, ip->Selected[0].Objid,
-      PobjXDef.TargetAttribute, &SattrRef);
+  sts = ldh_GetAttrRef(ip->PointedSession, ip->Selected[0].Objid, PobjXDef.TargetAttribute, &SattrRef);
   if (EVEN(sts))
     return 0;
 
@@ -101,14 +99,12 @@ static pwr_tStatus Connect(ldh_sMenuCall* ip)
   pwr_sObjXRef PobjXDef;
   pwr_sObjXRef SobjXDef;
 
-  sts = ldh_ReadObjectBody(ip->PointedSession,
-      ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
-      sizeof(pwr_sMenuButton));
+  sts = ldh_ReadObjectBody(ip->PointedSession, ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
+                           sizeof(pwr_sMenuButton));
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetAttrRef(
-      ip->PointedSession, ip->Pointed.Objid, mb.MethodArguments[0], &PattrRef);
+  sts = ldh_GetAttrRef(ip->PointedSession, ip->Pointed.Objid, mb.MethodArguments[0], &PattrRef);
   if (EVEN(sts))
     return sts;
 
@@ -116,8 +112,7 @@ static pwr_tStatus Connect(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetAttrRef(ip->PointedSession, ip->Selected[0].Objid,
-      PobjXDef.TargetAttribute, &SattrRef);
+  sts = ldh_GetAttrRef(ip->PointedSession, ip->Selected[0].Objid, PobjXDef.TargetAttribute, &SattrRef);
   if (EVEN(sts))
     return sts;
 
@@ -134,35 +129,39 @@ static pwr_tStatus Connect(ldh_sMenuCall* ip)
   if (!str_StartsWith(PobjXDef.Target, SobjXDef.Source))
     return PWRS__STXREF;
 
-  sts = ldh_ReadAttribute(
-      ip->PointedSession, &PattrRef, &Pobjid, sizeof(pwr_tObjid));
+  sts = ldh_ReadAttribute(ip->PointedSession, &PattrRef, &Pobjid, sizeof(pwr_tObjid));
   if (EVEN(sts))
     return sts;
-  sts = ldh_ReadAttribute(
-      ip->PointedSession, &SattrRef, &Sobjid, sizeof(pwr_tObjid));
+  sts = ldh_ReadAttribute(ip->PointedSession, &SattrRef, &Sobjid, sizeof(pwr_tObjid));
   if (EVEN(sts))
     return sts;
 
-  if (cdh_ObjidIsEqual(Pobjid, ip->Selected[0].Objid)
-      && cdh_ObjidIsEqual(Sobjid, ip->Pointed.Objid)) {
+  if (cdh_ObjidIsEqual(Pobjid, ip->Selected[0].Objid) && cdh_ObjidIsEqual(Sobjid, ip->Pointed.Objid))
+  {
     return PWRS__ALRCONN;
-  } else if (cdh_ObjidIsEqual(Pobjid, ip->Selected[0].Objid)) {
+  }
+  else if (cdh_ObjidIsEqual(Pobjid, ip->Selected[0].Objid))
+  {
     return PWRS__PERRCONN;
-  } else if (cdh_ObjidIsEqual(Sobjid, ip->Pointed.Objid)) {
+  }
+  else if (cdh_ObjidIsEqual(Sobjid, ip->Pointed.Objid))
+  {
     return PWRS__SERRCONN;
-  } else if (!cdh_ObjidIsNull(Pobjid)) {
+  }
+  else if (!cdh_ObjidIsNull(Pobjid))
+  {
     return PWRS__PALRCONN;
-  } else if (!cdh_ObjidIsNull(Sobjid)) {
+  }
+  else if (!cdh_ObjidIsNull(Sobjid))
+  {
     return PWRS__SALRCONN;
   }
 
   Pobjid = ip->Pointed.Objid;
   Sobjid = ip->Selected[0].Objid;
 
-  sts = ldh_WriteAttribute(
-      ip->PointedSession, &SattrRef, &Pobjid, sizeof(pwr_tObjid));
-  sts = ldh_WriteAttribute(
-      ip->PointedSession, &PattrRef, &Sobjid, sizeof(pwr_tObjid));
+  sts = ldh_WriteAttribute(ip->PointedSession, &SattrRef, &Pobjid, sizeof(pwr_tObjid));
+  sts = ldh_WriteAttribute(ip->PointedSession, &PattrRef, &Sobjid, sizeof(pwr_tObjid));
   return PWRS__SUCCESS;
 }
 
@@ -170,10 +169,7 @@ static pwr_tStatus Connect(ldh_sMenuCall* ip)
   Is it OK to disconnect two attributes via an ObjXRef
 \*----------------------------------------------------------------------------*/
 
-static int IsOkDisconnect(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
-{
-  return IsOkConnect(ip, mbp);
-}
+static int IsOkDisconnect(ldh_sMenuCall* ip, pwr_sMenuButton* mbp) { return IsOkConnect(ip, mbp); }
 
 /*----------------------------------------------------------------------------*\
   To disconnect two attributes via an ObjXRef
@@ -193,14 +189,12 @@ static pwr_tStatus Disconnect(ldh_sMenuCall* ip)
   pwr_sObjXRef PobjXDef;
   pwr_sObjXRef SobjXDef;
 
-  sts = ldh_ReadObjectBody(ip->PointedSession,
-      ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
-      sizeof(pwr_sMenuButton));
+  sts = ldh_ReadObjectBody(ip->PointedSession, ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
+                           sizeof(pwr_sMenuButton));
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetAttrRef(
-      ip->PointedSession, ip->Pointed.Objid, mb.MethodArguments[0], &PattrRef);
+  sts = ldh_GetAttrRef(ip->PointedSession, ip->Pointed.Objid, mb.MethodArguments[0], &PattrRef);
   if (EVEN(sts))
     return sts;
 
@@ -208,8 +202,7 @@ static pwr_tStatus Disconnect(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetAttrRef(ip->PointedSession, ip->Selected[0].Objid,
-      PobjXDef.TargetAttribute, &SattrRef);
+  sts = ldh_GetAttrRef(ip->PointedSession, ip->Selected[0].Objid, PobjXDef.TargetAttribute, &SattrRef);
   if (EVEN(sts))
     return sts;
 
@@ -226,43 +219,52 @@ static pwr_tStatus Disconnect(ldh_sMenuCall* ip)
   if (!str_StartsWith(PobjXDef.Target, SobjXDef.Source))
     return PWRS__STXREF;
 
-  sts = ldh_ReadAttribute(
-      ip->PointedSession, &PattrRef, &Pobjid, sizeof(pwr_tObjid));
+  sts = ldh_ReadAttribute(ip->PointedSession, &PattrRef, &Pobjid, sizeof(pwr_tObjid));
   if (EVEN(sts))
     return sts;
-  sts = ldh_ReadAttribute(
-      ip->PointedSession, &SattrRef, &Sobjid, sizeof(pwr_tObjid));
+  sts = ldh_ReadAttribute(ip->PointedSession, &SattrRef, &Sobjid, sizeof(pwr_tObjid));
   if (EVEN(sts))
     return sts;
 
-  if (cdh_ObjidIsEqual(Pobjid, ip->Selected[0].Objid)) {
-    psts = ldh_WriteAttribute(
-        ip->PointedSession, &PattrRef, &Nobjid, sizeof(pwr_tObjid));
+  if (cdh_ObjidIsEqual(Pobjid, ip->Selected[0].Objid))
+  {
+    psts = ldh_WriteAttribute(ip->PointedSession, &PattrRef, &Nobjid, sizeof(pwr_tObjid));
     if (EVEN(psts))
       return psts;
     else
       psts = PWRS__PWASCONN;
-  } else {
+  }
+  else
+  {
     psts = PWRS__PNOTCONN;
   }
-  if (cdh_ObjidIsEqual(Sobjid, ip->Pointed.Objid)) {
-    ssts = ldh_WriteAttribute(
-        ip->PointedSession, &SattrRef, &Nobjid, sizeof(pwr_tObjid));
+  if (cdh_ObjidIsEqual(Sobjid, ip->Pointed.Objid))
+  {
+    ssts = ldh_WriteAttribute(ip->PointedSession, &SattrRef, &Nobjid, sizeof(pwr_tObjid));
     if (EVEN(ssts))
       return ssts;
     else
       ssts = PWRS__SWASCONN;
-  } else {
+  }
+  else
+  {
     ssts = PWRS__SNOTCONN;
   }
 
-  if (psts == PWRS__PWASCONN && ssts == PWRS__SWASCONN) {
+  if (psts == PWRS__PWASCONN && ssts == PWRS__SWASCONN)
+  {
     return PWRS__SUCCESS;
-  } else if (psts == PWRS__PNOTCONN && ssts == PWRS__SNOTCONN) {
+  }
+  else if (psts == PWRS__PNOTCONN && ssts == PWRS__SNOTCONN)
+  {
     return PWRS__NOTCONN;
-  } else if (psts == PWRS__PWASCONN) {
+  }
+  else if (psts == PWRS__PWASCONN)
+  {
     return PWRS__PWERRCONN;
-  } else if (ssts == PWRS__SWASCONN) {
+  }
+  else if (ssts == PWRS__SWASCONN)
+  {
     return PWRS__SWERRCONN;
   }
 
@@ -277,8 +279,7 @@ static int IsOkDisconnectSingle(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
 {
   pwr_tStatus sts;
 
-  sts = ldh_CheckObjXRef(
-      ip->PointedSession, ip->Pointed.Objid, mbp->MethodArguments[0]);
+  sts = ldh_CheckObjXRef(ip->PointedSession, ip->Pointed.Objid, mbp->MethodArguments[0]);
 
   return sts != LDH__UNCONN;
 }
@@ -301,14 +302,12 @@ static pwr_tStatus DisconnectSingle(ldh_sMenuCall* ip)
   pwr_sObjXRef SobjXDef;
   pwr_tBoolean DiscSobject;
 
-  sts = ldh_ReadObjectBody(ip->PointedSession,
-      ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
-      sizeof(pwr_sMenuButton));
+  sts = ldh_ReadObjectBody(ip->PointedSession, ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
+                           sizeof(pwr_sMenuButton));
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetAttrRef(
-      ip->PointedSession, Pobject, mb.MethodArguments[0], &PattrRef);
+  sts = ldh_GetAttrRef(ip->PointedSession, Pobject, mb.MethodArguments[0], &PattrRef);
   if (EVEN(sts))
     return sts;
 
@@ -316,19 +315,18 @@ static pwr_tStatus DisconnectSingle(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_ReadAttribute(
-      ip->PointedSession, &PattrRef, &Sobject, sizeof(pwr_tObjid));
+  sts = ldh_ReadAttribute(ip->PointedSession, &PattrRef, &Sobject, sizeof(pwr_tObjid));
   if (EVEN(sts))
     return sts;
 
   if (cdh_ObjidIsNull(Sobject))
     return PWRS__PNOTCONN;
 
-  while (1) {
+  while (1)
+  {
     DiscSobject = 0;
 
-    sts = ldh_GetAttrRef(
-        ip->PointedSession, Sobject, PobjXDef.TargetAttribute, &SattrRef);
+    sts = ldh_GetAttrRef(ip->PointedSession, Sobject, PobjXDef.TargetAttribute, &SattrRef);
     if (EVEN(sts))
       break;
 
@@ -345,8 +343,7 @@ static pwr_tStatus DisconnectSingle(ldh_sMenuCall* ip)
     if (!str_StartsWith(PobjXDef.Target, SobjXDef.Source))
       break;
 
-    sts = ldh_ReadAttribute(
-        ip->PointedSession, &SattrRef, &Sobjid, sizeof(pwr_tObjid));
+    sts = ldh_ReadAttribute(ip->PointedSession, &SattrRef, &Sobjid, sizeof(pwr_tObjid));
     if (EVEN(sts))
       break;
 
@@ -354,20 +351,22 @@ static pwr_tStatus DisconnectSingle(ldh_sMenuCall* ip)
     break;
   }
 
-  sts = ldh_WriteAttribute(
-      ip->PointedSession, &PattrRef, &Nobjid, sizeof(pwr_tObjid));
+  sts = ldh_WriteAttribute(ip->PointedSession, &PattrRef, &Nobjid, sizeof(pwr_tObjid));
   if (EVEN(sts))
     return sts;
 
-  if (DiscSobject) {
-    sts = ldh_WriteAttribute(
-        ip->PointedSession, &SattrRef, &Nobjid, sizeof(pwr_tObjid));
+  if (DiscSobject)
+  {
+    sts = ldh_WriteAttribute(ip->PointedSession, &SattrRef, &Nobjid, sizeof(pwr_tObjid));
   }
 
   return PWRS__SUCCESS;
 }
 
-pwr_dExport pwr_BindMethods($ObjXRef) = { pwr_BindMethod(Connect),
-  pwr_BindMethod(IsOkConnect), pwr_BindMethod(Disconnect),
-  pwr_BindMethod(IsOkDisconnect), pwr_BindMethod(DisconnectSingle),
-  pwr_BindMethod(IsOkDisconnectSingle), pwr_NullMethod };
+pwr_dExport pwr_BindMethods($ObjXRef) = {pwr_BindMethod(Connect),
+                                         pwr_BindMethod(IsOkConnect),
+                                         pwr_BindMethod(Disconnect),
+                                         pwr_BindMethod(IsOkDisconnect),
+                                         pwr_BindMethod(DisconnectSingle),
+                                         pwr_BindMethod(IsOkDisconnectSingle),
+                                         pwr_NullMethod};

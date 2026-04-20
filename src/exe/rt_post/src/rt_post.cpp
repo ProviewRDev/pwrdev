@@ -59,7 +59,8 @@ static rt_post* post = 0;
 std::map<pid_t, pwr_ePostType> rt_post::dispatchProcesses;
 
 typedef union alau_Event ala_uEvent;
-union alau_Event {
+union alau_Event
+{
   mh_sMsgInfo Info;
   mh_sAck Ack;
   mh_sMessage Msg;
@@ -68,8 +69,8 @@ union alau_Event {
 };
 
 rt_post::rt_post()
-    : scan_time(1), conf(0), udb(0), sent_sms_startidx(0), sent_sms_endidx(0),
-      sent_email_startidx(0), sent_email_endidx(0)
+    : scan_time(1), conf(0), udb(0), sent_sms_startidx(0), sent_sms_endidx(0), sent_email_startidx(0),
+      sent_email_endidx(0)
 {
   pwr_tStatus sts;
 
@@ -85,13 +86,16 @@ void rt_post::open()
 
   // Open server configuration object PostConfig
   sts = gdh_GetClassList(pwr_cClass_PostConfig, &oid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(oid, (void**)&conf);
     if (EVEN(sts))
       throw co_error(sts);
 
     aproc_RegisterObject(oid);
-  } else {
+  }
+  else
+  {
     errh_Info("No Post configuration");
     errh_SetStatus(0);
     exit(0);
@@ -102,10 +106,10 @@ void rt_post::open()
   // Connect to mh
   mh_UtilWaitForMh();
 
-  sts = mh_OutunitConnect(oid, mh_eOutunitType_Post, 0, mh_ack_bc, mh_alarm_bc,
-      mh_block_bc, mh_cancel_bc, mh_clear_alarmlist_bc, mh_clear_blocklist_bc,
-      mh_info_bc, mh_return_bc, NULL);
-  if (EVEN(sts)) {
+  sts = mh_OutunitConnect(oid, mh_eOutunitType_Post, 0, mh_ack_bc, mh_alarm_bc, mh_block_bc, mh_cancel_bc,
+                          mh_clear_alarmlist_bc, mh_clear_blocklist_bc, mh_info_bc, mh_return_bc, NULL);
+  if (EVEN(sts))
+  {
     errh_Error("Post terminated: %m", sts);
     conf->Status = sts;
     exit(0);
@@ -113,9 +117,9 @@ void rt_post::open()
 
   // Load user database
 
-  sts = gdh_GetObjectInfo(
-      "pwrNode-System.SystemGroup", &systemgroup, sizeof(systemgroup));
-  if (EVEN(sts)) {
+  sts = gdh_GetObjectInfo("pwrNode-System.SystemGroup", &systemgroup, sizeof(systemgroup));
+  if (EVEN(sts))
+  {
     errh_Error("Post terminated: %m", sts);
     conf->Status = sts;
     exit(0);
@@ -141,8 +145,7 @@ int rt_post::check_dispatch()
     {
       if (WEXITSTATUS(wstatus))
       {
-        errh_Error(
-            "Unable to send mail/sms to recipient. Check configuration!");
+        errh_Error("Unable to send mail/sms to recipient. Check configuration!");
       }
       else
       {
@@ -222,7 +225,8 @@ void rt_post::init(qcom_sQid* qid)
   pwr_tStatus sts;
 
   sts = gdh_Init("rt_post");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     exit(sts);
   }
@@ -230,7 +234,8 @@ void rt_post::init(qcom_sQid* qid)
   errh_Init("pwr_post", errh_eAnix_post);
   errh_SetStatus(PWR__SRVSTARTUP);
 
-  if (!qcom_Init(&sts, 0, "pwr_post")) {
+  if (!qcom_Init(&sts, 0, "pwr_post"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -238,28 +243,24 @@ void rt_post::init(qcom_sQid* qid)
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, qid, &qini)) {
+  if (!qcom_Bind(&sts, qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
   }
 }
 
-pwr_tStatus rt_post::mh_ack_bc(mh_sAck* MsgP)
-{
-  return 1;
-}
-pwr_tStatus rt_post::mh_return_bc(mh_sReturn* MsgP)
-{
-  return 1;
-}
+pwr_tStatus rt_post::mh_ack_bc(mh_sAck* MsgP) { return 1; }
+pwr_tStatus rt_post::mh_return_bc(mh_sReturn* MsgP) { return 1; }
 pwr_tStatus rt_post::mh_alarm_bc(mh_sMessage* MsgP)
 {
 
@@ -292,7 +293,8 @@ pwr_tStatus rt_post::mh_alarm_bc(mh_sMessage* MsgP)
     return 1;
 
   // Check if already handled
-  if (event->Info.EventFlags & pwr_mEventFlagsMask_Email) {
+  if (event->Info.EventFlags & pwr_mEventFlagsMask_Email)
+  {
     if (post->email_check(&event->Info.Id))
       return 1;
     else
@@ -308,27 +310,32 @@ pwr_tStatus rt_post::mh_alarm_bc(mh_sMessage* MsgP)
 
   post->replace_symbol(str, event->Msg.Receiver);
 
-  rcvnum = dcli_parse(str, ",", "", (char*)rcv_array,
-      sizeof(rcv_array) / sizeof(rcv_array[0]), sizeof(rcv_array[0]), 0);
+  rcvnum = dcli_parse(str, ",", "", (char*)rcv_array, sizeof(rcv_array) / sizeof(rcv_array[0]),
+                      sizeof(rcv_array[0]), 0);
 
-  for (int i = 0; i < rcvnum; i++) {
+  for (int i = 0; i < rcvnum; i++)
+  {
     str_trim(str, rcv_array[i]);
 
     s = strrchr(str, '.');
-    if (s) {
+    if (s)
+    {
       *s = 0;
       strncpy(group, post->systemgroup, sizeof(group));
       strncat(group, ".", sizeof(group) - strlen(group) - 1);
       strncat(group, str, sizeof(group) - strlen(group) - 1);
       strncpy(user, s + 1, sizeof(user));
-    } else {
+    }
+    else
+    {
       strncpy(group, post->systemgroup, sizeof(group));
       strncpy(user, str, sizeof(user));
     }
 
     SystemName* sn = new SystemName(group);
     sts = sn->parse();
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       delete sn;
       errh_Error("Post systemgroup parse error, %m", sts);
       continue;
@@ -336,19 +343,21 @@ pwr_tStatus rt_post::mh_alarm_bc(mh_sMessage* MsgP)
 
     SystemList* sl = post->udb->find_system(sn);
     delete sn;
-    if (!sl) {
+    if (!sl)
+    {
       errh_Error("No such system group, %s", group);
       continue;
     }
 
     UserList* ul = (UserList*)sl->find_user(user);
-    if (!ul) {
+    if (!ul)
+    {
       errh_Error("No such user, %s", user);
       continue;
     }
 
-    if (event->Info.EventFlags & pwr_mEventFlagsMask_Email
-        && !streq(post->conf->EmailCmd, "")) {
+    if (event->Info.EventFlags & pwr_mEventFlagsMask_Email && !streq(post->conf->EmailCmd, ""))
+    {
       char address[40];
       pwr_tCmd cmd;
 
@@ -375,8 +384,8 @@ pwr_tStatus rt_post::mh_alarm_bc(mh_sMessage* MsgP)
         dispatchProcesses.insert(std::make_pair(cpid, pwr_ePostType_Mail));
       }
     }
-    if (event->Info.EventFlags & pwr_mEventFlagsMask_SMS
-        && !streq(post->conf->SMS_Cmd, "")) {
+    if (event->Info.EventFlags & pwr_mEventFlagsMask_SMS && !streq(post->conf->SMS_Cmd, ""))
+    {
       char sms[40];
       pwr_tCmd cmd;
 
@@ -406,33 +415,19 @@ pwr_tStatus rt_post::mh_alarm_bc(mh_sMessage* MsgP)
   }
   return 1;
 }
-pwr_tStatus rt_post::mh_block_bc(mh_sBlock* MsgP)
-{
-  return 1;
-}
-pwr_tStatus rt_post::mh_cancel_bc(mh_sReturn* MsgP)
-{
-  return 1;
-}
-pwr_tStatus rt_post::mh_info_bc(mh_sMessage* MsgP)
-{
-  return mh_alarm_bc(MsgP);
-}
-pwr_tStatus rt_post::mh_clear_alarmlist_bc(pwr_tNodeIndex nix)
-{
-  return 1;
-}
-pwr_tStatus rt_post::mh_clear_blocklist_bc(pwr_tNodeIndex nix)
-{
-  return 1;
-}
+pwr_tStatus rt_post::mh_block_bc(mh_sBlock* MsgP) { return 1; }
+pwr_tStatus rt_post::mh_cancel_bc(mh_sReturn* MsgP) { return 1; }
+pwr_tStatus rt_post::mh_info_bc(mh_sMessage* MsgP) { return mh_alarm_bc(MsgP); }
+pwr_tStatus rt_post::mh_clear_alarmlist_bc(pwr_tNodeIndex nix) { return 1; }
+pwr_tStatus rt_post::mh_clear_blocklist_bc(pwr_tNodeIndex nix) { return 1; }
 
 void rt_post::format_sms_text(mh_sMessage* MsgP, char* text, unsigned int size)
 {
   ala_uEvent* event = (ala_uEvent*)MsgP;
   char prio[2];
 
-  switch (event->Info.EventPrio) {
+  switch (event->Info.EventPrio)
+  {
   case mh_eEventPrio_A:
     strcpy(prio, "A");
     break;
@@ -450,22 +445,22 @@ void rt_post::format_sms_text(mh_sMessage* MsgP, char* text, unsigned int size)
   }
 
   if (conf->Options & pwr_mPostOptionsMask_SingleLineSMS)
-    snprintf(text, size, "Proview %s Prio %s, %s, %s", nodename, prio,
-        event->Msg.EventText, event->Msg.EventName);
+    snprintf(text, size, "Proview %s Prio %s, %s, %s", nodename, prio, event->Msg.EventText,
+             event->Msg.EventName);
   else
-    snprintf(text, size, "Proview %s Prio %s,\n%s,\n%s", nodename, prio,
-        event->Msg.EventText, event->Msg.EventName);
+    snprintf(text, size, "Proview %s Prio %s,\n%s,\n%s", nodename, prio, event->Msg.EventText,
+             event->Msg.EventName);
 }
 
-void rt_post::format_email_text(
-    mh_sMessage* MsgP, char* text, unsigned int size)
+void rt_post::format_email_text(mh_sMessage* MsgP, char* text, unsigned int size)
 {
   ala_uEvent* event = (ala_uEvent*)MsgP;
   char prio[2];
   pwr_tTime etime;
   char timstr[40];
 
-  switch (event->Info.EventPrio) {
+  switch (event->Info.EventPrio)
+  {
   case mh_eEventPrio_A:
     strcpy(prio, "A");
     break;
@@ -485,9 +480,10 @@ void rt_post::format_email_text(
   etime = net_NetTimeToTime(&event->Info.EventTime);
   time_AtoAscii(&etime, time_eFormat_DateAndTime, timstr, sizeof(timstr));
 
-  snprintf(text, size, "Proview alarm from node %s\nPriority %s\nEvent time "
-                       "%s\n\nEvent text:  %s\nEvent name:  %s",
-      nodename, prio, timstr, event->Msg.EventText, event->Msg.EventName);
+  snprintf(text, size,
+           "Proview alarm from node %s\nPriority %s\nEvent time "
+           "%s\n\nEvent text:  %s\nEvent name:  %s",
+           nodename, prio, timstr, event->Msg.EventText, event->Msg.EventName);
 }
 
 void rt_post::format_cmd(char* cmd, char* format, char* address, char* text)
@@ -499,7 +495,8 @@ void rt_post::format_cmd(char* cmd, char* format, char* address, char* text)
 
   // Replace $address with address
   s1 = strstr(cmd, "$address");
-  if (s1) {
+  if (s1)
+  {
     strncpy(str, s1 + strlen("$address"), sizeof(str));
     *s1 = 0;
     strncat(cmd, address, sizeof(pwr_tCmd));
@@ -508,7 +505,8 @@ void rt_post::format_cmd(char* cmd, char* format, char* address, char* text)
 
   // Replace $text with text
   s1 = strstr(cmd, "$text");
-  if (s1) {
+  if (s1)
+  {
     strncpy(str, s1 + strlen("$text"), sizeof(str));
     *s1 = 0;
     strncat(cmd, text, sizeof(pwr_tCmd));
@@ -528,9 +526,12 @@ void rt_post::replace_symbol(char* outstr, char* instr)
   s = instr;
   t = outstr;
 
-  while (1) {
-    if (symbolmode) {
-      if (*s == ',' || *s == ' ' || *s == '	' || *s == 0) {
+  while (1)
+  {
+    if (symbolmode)
+    {
+      if (*s == ',' || *s == ' ' || *s == '	' || *s == 0)
+      {
         // End of symbol
         size = (long int)s - (long int)(u + 1);
         strncpy(symbol, u + 1, size);
@@ -538,10 +539,11 @@ void rt_post::replace_symbol(char* outstr, char* instr)
 
         // Find the symbol
         found = 0;
-        for (unsigned int j = 0;
-             j < sizeof(conf->Symbols) / sizeof(conf->Symbols[0]); j++) {
+        for (unsigned int j = 0; j < sizeof(conf->Symbols) / sizeof(conf->Symbols[0]); j++)
+        {
           str_trim(csymbol, conf->Symbols[j].Name);
-          if (streq(symbol, csymbol)) {
+          if (streq(symbol, csymbol))
+          {
             // Found, insert the value
             strcpy(t, conf->Symbols[j].Value);
             t += strlen(conf->Symbols[j].Value);
@@ -549,7 +551,8 @@ void rt_post::replace_symbol(char* outstr, char* instr)
             break;
           }
         }
-        if (!found) {
+        if (!found)
+        {
           // Not found
           strcpy(t, "$");
           t++;
@@ -560,11 +563,16 @@ void rt_post::replace_symbol(char* outstr, char* instr)
         *t = *s;
         t++;
       }
-    } else {
-      if (*s == '$') {
+    }
+    else
+    {
+      if (*s == '$')
+      {
         symbolmode = 1;
         u = s;
-      } else {
+      }
+      else
+      {
         *t = *s;
         t++;
       }
@@ -591,7 +599,8 @@ int rt_post::email_check(mh_sEventId* id)
 {
   unsigned int i;
 
-  for (i = sent_email_startidx;; i++) {
+  for (i = sent_email_startidx;; i++)
+  {
     if (i >= sizeof(sent_email) / sizeof(sent_email[0]))
       i = 0;
 
@@ -620,7 +629,8 @@ int rt_post::sms_check(mh_sEventId* id)
 {
   unsigned int i;
 
-  for (i = sent_sms_startidx;; i++) {
+  for (i = sent_sms_startidx;; i++)
+  {
     if (i >= sizeof(sent_sms) / sizeof(sent_sms[0]))
       i = 0;
 
@@ -646,9 +656,12 @@ int main()
   post = new rt_post();
   post->init(&qid);
 
-  try {
+  try
+  {
     post->open();
-  } catch (co_error& e) {
+  }
+  catch (co_error& e)
+  {
     errh_Error((char*)e.what().c_str());
     errh_Fatal("rt_post aborting");
     errh_SetStatus(PWR__SRVTERM);
@@ -659,33 +672,43 @@ int main()
   errh_SetStatus(PWR__SRUN);
 
   first_scan = true;
-  for (;;) {
-    if (first_scan) {
+  for (;;)
+  {
+    if (first_scan)
+    {
       tmo = (int)(post->scantime() * 1000 - 1);
     }
 
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &qid, &get, tmo);
-    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+    {
       if (!swap)
         post->scan();
-    } else {
+    }
+    else
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop && !swap) {
+      if (new_event.b.oldPlcStop && !swap)
+      {
         errh_SetStatus(PWR__SRVRESTART);
         post->conf->Status = PWR__SRVRESTART;
         swap = 1;
         post->close();
-      } else if (new_event.b.swapDone && swap) {
+      }
+      else if (new_event.b.swapDone && swap)
+      {
         swap = 0;
         post->open();
         errh_SetStatus(PWR__SRUN);
         post->conf->Status = PWR__SRUN;
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         exit(0);
       }
     }

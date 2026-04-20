@@ -84,8 +84,10 @@ static char* UTF8toISO8859(char* text)
   char* out_buf = output;
   size_t out_left = len;
 
-  do {
-    if (iconv(cd, &in_buf, &in_left, &out_buf, &out_left) == (size_t)-1) {
+  do
+  {
+    if (iconv(cd, &in_buf, &in_left, &out_buf, &out_left) == (size_t)-1)
+    {
       perror("iconv failed!");
       *output = 0;
       return output;
@@ -99,7 +101,7 @@ static char* UTF8toISO8859(char* text)
 int XttVideoMgmAimetis::check_session()
 {
   pwr_tTime current;
-  pwr_tDeltaTime timeout = { 300, 0 };
+  pwr_tDeltaTime timeout = {300, 0};
   pwr_tDeltaTime dt;
   int sts = 1;
 
@@ -120,18 +122,18 @@ int XttVideoMgmAimetis::authorize(char* user, char* password)
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd,
-      "curl -k -s -S \"%s/Session\" -X POST -H \"Content-type: application/json\" \
+  sprintf(cmd, "curl -k -s -S \"%s/Session\" -X POST -H \"Content-type: application/json\" \
 -d \"{'user':'%s','pwd':'%s'}\" > %s",
-      m_addr, user, password, fname);
+          m_addr, user, password, fname);
 
   if (log)
     printf("Authorize\n%s\n", cmd);
   system(cmd);
 
   std::ifstream fp;
-  for (int i = 0; i < 100; i++) {
-    struct timespec t = { 0, 10000000 };
+  for (int i = 0; i < 100; i++)
+  {
+    struct timespec t = {0, 10000000};
     nanosleep(&t, 0);
 
     fp.open(fname);
@@ -139,14 +141,14 @@ int XttVideoMgmAimetis::authorize(char* user, char* password)
       break;
   }
 
-  if (!fp) {
+  if (!fp)
+  {
     errh_Error("Authorization message failed");
     m_op->Status = VMGM__NOREPLY;
     return 0;
   }
 
-  sts = Json::get_attribute_value(
-      fp, "Data/Token", m_auth_token, sizeof(m_auth_token));
+  sts = Json::get_attribute_value(fp, "Data/Token", m_auth_token, sizeof(m_auth_token));
   fp.close();
 
   // Remove file
@@ -169,16 +171,16 @@ int XttVideoMgmAimetis::get_panels()
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd, "curl -k -s -S \"%s/Panel\" -H \"authtoken:%s\" > %s", m_addr,
-      m_auth_token, fname);
+  sprintf(cmd, "curl -k -s -S \"%s/Panel\" -H \"authtoken:%s\" > %s", m_addr, m_auth_token, fname);
 
   if (log)
     printf("Get panel\n%s\n", cmd);
   system(cmd);
 
   std::ifstream fp;
-  for (int i = 0; i < 100; i++) {
-    struct timespec t = { 0, 10000000 };
+  for (int i = 0; i < 100; i++)
+  {
+    struct timespec t = {0, 10000000};
     nanosleep(&t, 0);
 
     fp.open(fname);
@@ -186,7 +188,8 @@ int XttVideoMgmAimetis::get_panels()
       break;
   }
 
-  if (!fp) {
+  if (!fp)
+  {
     errh_Error("Get panels message failed");
     m_op->Status = VMGM__NOREPLY;
     return 0;
@@ -198,15 +201,15 @@ int XttVideoMgmAimetis::get_panels()
 
   // sts = Json::get_attribute_value( fp, "xxxx", value, sizeof(value) );
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 10; i++)
+  {
     VideoMgmPanel panel;
     sprintf(attr_name, "Data[%d]/PanelGuid", i);
     sts = Json::get_attribute_value(fp, attr_name, panel.id, sizeof(panel.id));
     if (EVEN(sts))
       break;
     sprintf(attr_name, "Data[%d]/PanelName", i);
-    sts = Json::get_attribute_value(
-        fp, attr_name, panel_name, sizeof(panel_name));
+    sts = Json::get_attribute_value(fp, attr_name, panel_name, sizeof(panel_name));
     if (EVEN(sts))
       break;
 
@@ -227,15 +230,15 @@ int XttVideoMgmAimetis::get_panels()
 
     m_panel.push_back(panel);
 
-    for (int j = 0; j < 25; j++) {
+    for (int j = 0; j < 25; j++)
+    {
       VideoMgmCell cell;
       sprintf(attr_name, "Data[%d]/Cells[%d]/PanelCellId", i, j);
       sts = Json::get_attribute_value(fp, attr_name, cell.id, sizeof(cell.id));
       if (EVEN(sts))
         break;
       sprintf(attr_name, "Data[%d]/Cells[%d]/CameraId", i, j);
-      sts = Json::get_attribute_value(
-          fp, attr_name, cell.cameraid, sizeof(cell.cameraid));
+      sts = Json::get_attribute_value(fp, attr_name, cell.cameraid, sizeof(cell.cameraid));
       if (EVEN(sts))
         break;
 
@@ -250,13 +253,15 @@ int XttVideoMgmAimetis::get_panels()
   sprintf(cmd, "rm %s", fname);
   system(cmd);
 
-  if (log) {
-    for (unsigned int i = 0; i < m_panel.size(); i++) {
-      printf("%d Name %s, id %s width %d height %d\n", i, m_panel[i].name,
-          m_panel[i].id, m_panel[i].width, m_panel[i].height);
-      for (unsigned int j = 0; j < m_panel[i].cell.size(); j++) {
-        printf("%d Id %s CameraId %s\n", j, m_panel[i].cell[j].id,
-            m_panel[i].cell[j].cameraid);
+  if (log)
+  {
+    for (unsigned int i = 0; i < m_panel.size(); i++)
+    {
+      printf("%d Name %s, id %s width %d height %d\n", i, m_panel[i].name, m_panel[i].id, m_panel[i].width,
+             m_panel[i].height);
+      for (unsigned int j = 0; j < m_panel[i].cell.size(); j++)
+      {
+        printf("%d Id %s CameraId %s\n", j, m_panel[i].cell[j].id, m_panel[i].cell[j].cameraid);
       }
     }
   }
@@ -275,16 +280,16 @@ int XttVideoMgmAimetis::get_cameras()
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd, "curl -k -s -S \"%s/Camera\" -H \"authtoken:%s\" > %s", m_addr,
-      m_auth_token, fname);
+  sprintf(cmd, "curl -k -s -S \"%s/Camera\" -H \"authtoken:%s\" > %s", m_addr, m_auth_token, fname);
 
   if (log)
     printf("Get camera\n%s\n", cmd);
   system(cmd);
 
   std::ifstream fp;
-  for (int i = 0; i < 100; i++) {
-    struct timespec t = { 0, 10000000 };
+  for (int i = 0; i < 100; i++)
+  {
+    struct timespec t = {0, 10000000};
     nanosleep(&t, 0);
 
     fp.open(fname);
@@ -292,7 +297,8 @@ int XttVideoMgmAimetis::get_cameras()
       break;
   }
 
-  if (!fp) {
+  if (!fp)
+  {
     errh_Error("Get cameras message failed");
     m_op->Status = VMGM__NOREPLY;
     return 0;
@@ -301,16 +307,15 @@ int XttVideoMgmAimetis::get_cameras()
   char attr_name[80];
   char camera_name[80];
 
-  for (int i = 0; i < 25; i++) {
+  for (int i = 0; i < 25; i++)
+  {
     VideoMgmCamera camera;
     sprintf(attr_name, "Data[%d]/Id", i);
-    sts = Json::get_attribute_value(
-        fp, attr_name, camera.id, sizeof(camera.id));
+    sts = Json::get_attribute_value(fp, attr_name, camera.id, sizeof(camera.id));
     if (EVEN(sts))
       break;
     sprintf(attr_name, "Data[%d]/Name", i);
-    sts = Json::get_attribute_value(
-        fp, attr_name, camera_name, sizeof(camera_name));
+    sts = Json::get_attribute_value(fp, attr_name, camera_name, sizeof(camera_name));
     if (EVEN(sts))
       break;
 
@@ -319,18 +324,15 @@ int XttVideoMgmAimetis::get_cameras()
     free(textiso);
 
     sprintf(attr_name, "Data[%d]/Model", i);
-    sts = Json::get_attribute_value(
-        fp, attr_name, camera.model, sizeof(camera.model));
+    sts = Json::get_attribute_value(fp, attr_name, camera.model, sizeof(camera.model));
     if (EVEN(sts))
       break;
     sprintf(attr_name, "Data[%d]/Username", i);
-    sts = Json::get_attribute_value(
-        fp, attr_name, camera.username, sizeof(camera.username));
+    sts = Json::get_attribute_value(fp, attr_name, camera.username, sizeof(camera.username));
     if (EVEN(sts))
       break;
     sprintf(attr_name, "Data[%d]/Password", i);
-    sts = Json::get_attribute_value(
-        fp, attr_name, camera.password, sizeof(camera.password));
+    sts = Json::get_attribute_value(fp, attr_name, camera.password, sizeof(camera.password));
     if (EVEN(sts))
       break;
 
@@ -343,11 +345,11 @@ int XttVideoMgmAimetis::get_cameras()
   sprintf(cmd, "rm %s", fname);
   system(cmd);
 
-  if (log) {
+  if (log)
+  {
     for (unsigned int i = 0; i < m_camera.size(); i++)
-      printf("%d Name %s, id %s model %s username %s passw %s\n", i,
-          m_camera[i].name, m_camera[i].id, m_camera[i].model,
-          m_camera[i].username, m_camera[i].password);
+      printf("%d Name %s, id %s model %s username %s passw %s\n", i, m_camera[i].name, m_camera[i].id,
+             m_camera[i].model, m_camera[i].username, m_camera[i].password);
   }
   m_op->Status = VMGM__SUCCESS;
   return 1;
@@ -358,26 +360,27 @@ int XttVideoMgmAimetis::get_camera_image(int idx, const char* jpgfile)
   char cmd[550];
   pwr_tFileName fname;
   char* decoding_table;
-  static char encoding_table[] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
-    'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-    'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1',
-    '2', '3', '4', '5', '6', '7', '8', '9', '+', '/' };
+  static char encoding_table[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                                  'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                                  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                                  'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+                                  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
 
   check_session();
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd, "curl -k -s -S \"%s/Camera/%s/Jpeg\" -H \"authtoken:%s\" > %s",
-      m_addr, m_camera[idx].id, m_auth_token, fname);
+  sprintf(cmd, "curl -k -s -S \"%s/Camera/%s/Jpeg\" -H \"authtoken:%s\" > %s", m_addr, m_camera[idx].id,
+          m_auth_token, fname);
 
   if (log)
     printf("Get camera jpeg\n%s\n", cmd);
   system(cmd);
 
   std::ifstream fp;
-  for (int i = 0; i < 100; i++) {
-    struct timespec t = { 0, 10000000 };
+  for (int i = 0; i < 100; i++)
+  {
+    struct timespec t = {0, 10000000};
     nanosleep(&t, 0);
 
     fp.open(fname);
@@ -385,7 +388,8 @@ int XttVideoMgmAimetis::get_camera_image(int idx, const char* jpgfile)
       break;
   }
 
-  if (!fp) {
+  if (!fp)
+  {
     errh_Error("Get camera image message failed");
     m_op->Status = VMGM__NOREPLY;
     return 0;
@@ -397,7 +401,8 @@ int XttVideoMgmAimetis::get_camera_image(int idx, const char* jpgfile)
     decoding_table[(unsigned char)encoding_table[i]] = i;
 
   std::ofstream fpo(jpgfile);
-  if (!fpo) {
+  if (!fpo)
+  {
     printf("** Unable to open jpg-file %s\n", jpgfile);
   }
 
@@ -407,14 +412,17 @@ int XttVideoMgmAimetis::get_camera_image(int idx, const char* jpgfile)
   char prevc;
   int store = 0;
 
-  while (fp.good()) {
+  while (fp.good())
+  {
     prevc = c1;
     c1 = fp.get();
-    if (c1 == '"' && prevc == ':') {
+    if (c1 == '"' && prevc == ':')
+    {
       store = 1;
       continue;
     }
-    if (store) {
+    if (store)
+    {
       if (c1 == '"')
         break;
 
@@ -429,8 +437,7 @@ int XttVideoMgmAimetis::get_camera_image(int idx, const char* jpgfile)
       uint32_t sextet_c = c3 == '=' ? 0 : decoding_table[(int)c3];
       uint32_t sextet_d = c4 == '=' ? 0 : decoding_table[(int)c4];
 
-      uint32_t triple = (sextet_a << 3 * 6) + (sextet_b << 2 * 6)
-          + (sextet_c << 1 * 6) + (sextet_d << 0 * 6);
+      uint32_t triple = (sextet_a << 3 * 6) + (sextet_b << 2 * 6) + (sextet_c << 1 * 6) + (sextet_d << 0 * 6);
 
       unsigned char oc1 = (triple >> 2 * 8) & 0xFF;
       unsigned char oc2 = (triple >> 1 * 8) & 0xFF;
@@ -455,8 +462,7 @@ int XttVideoMgmAimetis::get_camera_image(int idx, const char* jpgfile)
   return 1;
 }
 
-int XttVideoMgmAimetis::assign_camera(
-    int panel_idx, int cell_idx, int camera_idx)
+int XttVideoMgmAimetis::assign_camera(int panel_idx, int cell_idx, int camera_idx)
 {
   char cmd[640];
   pwr_tFileName fname;
@@ -465,18 +471,17 @@ int XttVideoMgmAimetis::assign_camera(
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd,
-      "curl -k -s -S \"%s/Panel/%s/Cell/%d/Camera/%s\" -H \"authtoken:%s\" > %s",
-      m_addr, m_panel[panel_idx].id, cell_idx, m_camera[camera_idx].id,
-      m_auth_token, fname);
+  sprintf(cmd, "curl -k -s -S \"%s/Panel/%s/Cell/%d/Camera/%s\" -H \"authtoken:%s\" > %s", m_addr,
+          m_panel[panel_idx].id, cell_idx, m_camera[camera_idx].id, m_auth_token, fname);
 
   if (log)
     printf("Assign camera\n%s\n", cmd);
   system(cmd);
 
   std::ifstream fp;
-  for (int i = 0; i < 100; i++) {
-    struct timespec t = { 0, 10000000 };
+  for (int i = 0; i < 100; i++)
+  {
+    struct timespec t = {0, 10000000};
     nanosleep(&t, 0);
 
     fp.open(fname);
@@ -484,7 +489,8 @@ int XttVideoMgmAimetis::assign_camera(
       break;
   }
 
-  if (!fp) {
+  if (!fp)
+  {
     errh_Error("Assign camera message failed");
     m_op->Status = VMGM__NOREPLY;
     return 0;
@@ -510,7 +516,8 @@ int XttVideoMgmAimetis::set_camera_fullscreen(int camera_idx)
   char cmd[550];
   pwr_tFileName fname;
 
-  if (m_op->CurrentPanel == -1) {
+  if (m_op->CurrentPanel == -1)
+  {
     // Return to current last panel first
     display_panel(m_op->LastPanel);
   }
@@ -519,17 +526,17 @@ int XttVideoMgmAimetis::set_camera_fullscreen(int camera_idx)
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd,
-      "curl -k -s -S \"%s/Camera/%s/Fullscreen\" -H \"authtoken:%s\" > %s",
-      m_addr, m_camera[camera_idx].id, m_auth_token, fname);
+  sprintf(cmd, "curl -k -s -S \"%s/Camera/%s/Fullscreen\" -H \"authtoken:%s\" > %s", m_addr,
+          m_camera[camera_idx].id, m_auth_token, fname);
 
   if (log)
     printf("Set camera fullscreen: \n%s\n", cmd);
   system(cmd);
 
   std::ifstream fp;
-  for (int i = 0; i < 100; i++) {
-    struct timespec t = { 0, 10000000 };
+  for (int i = 0; i < 100; i++)
+  {
+    struct timespec t = {0, 10000000};
     nanosleep(&t, 0);
 
     fp.open(fname);
@@ -537,7 +544,8 @@ int XttVideoMgmAimetis::set_camera_fullscreen(int camera_idx)
       break;
   }
 
-  if (!fp) {
+  if (!fp)
+  {
     errh_Error("Set camera fullscreen message failed");
     m_op->Status = VMGM__NOREPLY;
     return 0;
@@ -574,17 +582,17 @@ int XttVideoMgmAimetis::display_panel(int panel_idx)
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd,
-      "curl -k -s -S \"%s/Panel/%s/Show\" -X GET -H \"authtoken:%s\" > %s",
-      m_addr, m_panel[panel_idx].id, m_auth_token, fname);
+  sprintf(cmd, "curl -k -s -S \"%s/Panel/%s/Show\" -X GET -H \"authtoken:%s\" > %s", m_addr,
+          m_panel[panel_idx].id, m_auth_token, fname);
 
   if (log)
     printf("Display panel: \n%s\n", cmd);
   system(cmd);
 
   std::ifstream fp;
-  for (int i = 0; i < 100; i++) {
-    struct timespec t = { 0, 10000000 };
+  for (int i = 0; i < 100; i++)
+  {
+    struct timespec t = {0, 10000000};
     nanosleep(&t, 0);
 
     fp.open(fname);
@@ -592,7 +600,8 @@ int XttVideoMgmAimetis::display_panel(int panel_idx)
       break;
   }
 
-  if (!fp) {
+  if (!fp)
+  {
     errh_Error("Display panel message failed");
     m_op->Status = VMGM__NOREPLY;
     return 0;
@@ -604,7 +613,8 @@ int XttVideoMgmAimetis::display_panel(int panel_idx)
   sprintf(cmd, "rm %s", fname);
   system(cmd);
 
-  if (panel_idx != m_op->LastPanel) {
+  if (panel_idx != m_op->LastPanel)
+  {
     // Reload panel configuration
     m_panel.clear();
     get_panels();
@@ -622,32 +632,34 @@ int XttVideoMgmAimetis::display_panel(int panel_idx)
 
   // Fill in current cell camera idx
   int idx = 0;
-  for (int i = 0; i < m_op->Rows; i++) {
-    for (int j = 0; j < m_op->Columns; j++) {
+  for (int i = 0; i < m_op->Rows; i++)
+  {
+    for (int j = 0; j < m_op->Columns; j++)
+    {
       idx = i * m_op->Columns + j;
-      if (idx
-          > int(sizeof(m_op->CellCameraIdx) / sizeof(m_op->CellCameraIdx[0])))
+      if (idx > int(sizeof(m_op->CellCameraIdx) / sizeof(m_op->CellCameraIdx[0])))
         break;
 
       int found = 0;
-      for (unsigned int k = 0; k < m_camera.size(); k++) {
-        if (strcmp(m_camera[k].id, m_panel[panel_idx].cell[idx].cameraid)
-            == 0) {
+      for (unsigned int k = 0; k < m_camera.size(); k++)
+      {
+        if (strcmp(m_camera[k].id, m_panel[panel_idx].cell[idx].cameraid) == 0)
+        {
           m_op->CellCameraIdx[idx] = k;
           m_cell_camera_idx_old[idx] = k;
           found = 1;
           break;
         }
       }
-      if (!found) {
+      if (!found)
+      {
         m_op->CellCameraIdx[idx] = -1;
         m_cell_camera_idx_old[idx] = -1;
       }
     }
   }
-  for (int i = idx + 1;
-       i < int(sizeof(m_op->CellCameraIdx) / sizeof(m_op->CellCameraIdx[0]));
-       i++) {
+  for (int i = idx + 1; i < int(sizeof(m_op->CellCameraIdx) / sizeof(m_op->CellCameraIdx[0])); i++)
+  {
     m_op->CellCameraIdx[i] = -1;
     m_cell_camera_idx_old[i] = -1;
   }
@@ -670,23 +682,26 @@ int XttVideoMgmAimetis::create_panel(char* name)
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd, "curl -k -s -S \"%s/Panel\" -X POST -H \"authtoken:%s\" "
-               "-H \"Content-Type:application/json\" -d "
-               "\"{'PanelName':'%s','PanelWidth':%d,'PanelHeight':%d,'Cells':[",
-      m_addr, m_auth_token, name, m_panel[pix].width, m_panel[pix].height);
+  sprintf(cmd,
+          "curl -k -s -S \"%s/Panel\" -X POST -H \"authtoken:%s\" "
+          "-H \"Content-Type:application/json\" -d "
+          "\"{'PanelName':'%s','PanelWidth':%d,'PanelHeight':%d,'Cells':[",
+          m_addr, m_auth_token, name, m_panel[pix].width, m_panel[pix].height);
 
-  for (unsigned int i = 0; i < m_panel[pix].cell.size(); i++) {
+  for (unsigned int i = 0; i < m_panel[pix].cell.size(); i++)
+  {
     // Find camera name for this cell
     cix = 0;
-    for (unsigned int j = 0; j < m_camera.size(); j++) {
-      if (streq(m_panel[pix].cell[i].cameraid, m_camera[j].id)) {
+    for (unsigned int j = 0; j < m_camera.size(); j++)
+    {
+      if (streq(m_panel[pix].cell[i].cameraid, m_camera[j].id))
+      {
         cix = j;
         break;
       }
     }
-    sprintf(&cmd[strlen(cmd)],
-        "{'CoordX':0,'CoordY':0,'CameraId':'%s','CameraName':'%s'}",
-        m_camera[cix].id, m_camera[cix].name);
+    sprintf(&cmd[strlen(cmd)], "{'CoordX':0,'CoordY':0,'CameraId':'%s','CameraName':'%s'}", m_camera[cix].id,
+            m_camera[cix].name);
     if (i != m_panel[pix].cell.size() - 1)
       sprintf(&cmd[strlen(cmd)], ",");
   }
@@ -698,8 +713,9 @@ int XttVideoMgmAimetis::create_panel(char* name)
   system(cmd);
 
   std::ifstream fp;
-  for (int i = 0; i < 100; i++) {
-    struct timespec t = { 0, 10000000 };
+  for (int i = 0; i < 100; i++)
+  {
+    struct timespec t = {0, 10000000};
     nanosleep(&t, 0);
 
     fp.open(fname);
@@ -707,7 +723,8 @@ int XttVideoMgmAimetis::create_panel(char* name)
       break;
   }
 
-  if (!fp) {
+  if (!fp)
+  {
     errh_Error("Create panel message failed");
     m_op->Status = VMGM__NOREPLY;
     return 0;
@@ -741,8 +758,10 @@ int XttVideoMgmAimetis::delete_panel(char* name)
   int pix = -1;
 
   // Get panel index
-  for (unsigned int i = 0; i < m_panel.size(); i++) {
-    if (streq(name, m_panel[i].name)) {
+  for (unsigned int i = 0; i < m_panel.size(); i++)
+  {
+    if (streq(name, m_panel[i].name))
+    {
       pix = i;
       break;
     }
@@ -755,16 +774,17 @@ int XttVideoMgmAimetis::delete_panel(char* name)
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd, "curl -k -s -S \"%s/Panel/%s\" -X DELETE -H \"authtoken:%s\" > %s",
-      m_addr, m_panel[pix].id, m_auth_token, fname);
+  sprintf(cmd, "curl -k -s -S \"%s/Panel/%s\" -X DELETE -H \"authtoken:%s\" > %s", m_addr, m_panel[pix].id,
+          m_auth_token, fname);
 
   if (log)
     printf("Delete panel: \n%s\n", cmd);
   system(cmd);
 
   std::ifstream fp;
-  for (int i = 0; i < 100; i++) {
-    struct timespec t = { 0, 10000000 };
+  for (int i = 0; i < 100; i++)
+  {
+    struct timespec t = {0, 10000000};
     nanosleep(&t, 0);
 
     fp.open(fname);
@@ -772,7 +792,8 @@ int XttVideoMgmAimetis::delete_panel(char* name)
       break;
   }
 
-  if (!fp) {
+  if (!fp)
+  {
     errh_Error("Delete panel message failed");
     m_op->Status = VMGM__NOREPLY;
     return 0;
@@ -799,7 +820,8 @@ int XttVideoMgmAimetis::delete_panel(char* name)
   return 1;
 }
 
-typedef enum {
+typedef enum
+{
   json_eState_Start,
   json_eState_ExpectAttr,
   json_eState_Attr,
@@ -812,8 +834,7 @@ typedef enum {
   json_eState_End
 } json_eState;
 
-int Json::get_attribute_value(
-    std::ifstream& fp, const char* attribute, char* value, int value_size)
+int Json::get_attribute_value(std::ifstream& fp, const char* attribute, char* value, int value_size)
 {
   char c = 0;
   char prevc;
@@ -839,56 +860,71 @@ int Json::get_attribute_value(
     current_attr_idx[i] = -1;
 
   input_attr_num = dcli_parse(attribute, "/", "", (char*)input_attr,
-      sizeof(input_attr) / sizeof(input_attr[0]), sizeof(input_attr[0]), 0);
-  for (int i = 0; i < input_attr_num; i++) {
-    if ((s = strchr(input_attr[i], '[')) != 0) {
+                              sizeof(input_attr) / sizeof(input_attr[0]), sizeof(input_attr[0]), 0);
+  for (int i = 0; i < input_attr_num; i++)
+  {
+    if ((s = strchr(input_attr[i], '[')) != 0)
+    {
       sscanf(s + 1, "%d", &input_attr_idx[i]);
       *s = 0;
-    } else
+    }
+    else
       input_attr_idx[i] = -1;
   }
 
   fp.seekg(0);
-  while (fp.good()) {
+  while (fp.good())
+  {
     prevc = c;
     c = fp.get();
     char_cnt++;
 
-    switch (state[state_level]) {
+    switch (state[state_level])
+    {
     case json_eState_Start:
-      if (c == '{') {
+      if (c == '{')
+      {
         state[state_level] = json_eState_ExpectEndPar;
         state_level++;
         state[state_level] = json_eState_ExpectAttr;
       }
       break;
     case json_eState_ExpectAttr:
-      if (c == '{') {
+      if (c == '{')
+      {
         if (current_attr_invect[attr_level])
           current_attr_idx[attr_level]++;
         state[state_level] = json_eState_ExpectEndPar;
         state_level++;
         attr_level++;
         state[state_level] = json_eState_ExpectAttr;
-      } else if (c == '}') {
+      }
+      else if (c == '}')
+      {
         state_level--;
-        if (state[state_level] != json_eState_ExpectEndPar) {
+        if (state[state_level] != json_eState_ExpectEndPar)
+        {
           printf("json: Parenthesis mismatch, char %d\n", char_cnt);
           return 0;
         }
-        if (attr_level == 0) {
+        if (attr_level == 0)
+        {
           state[state_level] = json_eState_End;
           break;
         }
         attr_level--;
-      } else if (c == ']') {
+      }
+      else if (c == ']')
+      {
         state_level--;
-        if (state[state_level] != json_eState_ExpectEndVector) {
+        if (state[state_level] != json_eState_ExpectEndVector)
+        {
           printf("json: std::vector mismatch, char %d\n", char_cnt);
           return 0;
         }
         vector_level--;
-        if (!current_attr_invect[attr_level]) {
+        if (!current_attr_invect[attr_level])
+        {
           printf("json: std::vector attribute mismatch, char %d\n", char_cnt);
           current_attr_invect[attr_level] = 0;
         }
@@ -896,34 +932,43 @@ int Json::get_attribute_value(
         current_attr_idx[attr_level] = -1;
         state[state_level] = json_eState_ExpectAttr;
         strcpy(current_attr[attr_level], "");
-      } else if (c == '"') {
+      }
+      else if (c == '"')
+      {
         state[state_level] = json_eState_Attr;
         strcpy(current_attr[attr_level], "");
       }
       break;
     case json_eState_Attr:
-      if (c == '"') {
+      if (c == '"')
+      {
         state[state_level] = json_eState_ExpectValue;
-      } else {
+      }
+      else
+      {
         len = strlen(current_attr[attr_level]);
         current_attr[attr_level][len] = c;
         current_attr[attr_level][len + 1] = 0;
       }
       break;
     case json_eState_ExpectValue:
-      if (c == ':') {
+      if (c == ':')
+      {
         state[state_level] = json_eState_Value;
         strcpy(current_value, "");
       }
       break;
     case json_eState_Value:
-      if (c == '{' && streq(current_value, "")) {
+      if (c == '{' && streq(current_value, ""))
+      {
         state[state_level] = json_eState_ExpectEndPar;
         state_level++;
         attr_level++;
         state[state_level] = json_eState_ExpectAttr;
         strcpy(current_attr[attr_level], "");
-      } else if (c == '[' && streq(current_value, "")) {
+      }
+      else if (c == '[' && streq(current_value, ""))
+      {
         state[state_level] = json_eState_ExpectEndVector;
         state_level++;
         vector_level++;
@@ -931,17 +976,22 @@ int Json::get_attribute_value(
         state[state_level] = json_eState_ExpectAttr;
         strcpy(current_attr[attr_level + 1], "");
         current_attr_invect[attr_level] = 1;
-      } else if (c == ',' || c == '}') {
-        if (c == '}') {
+      }
+      else if (c == ',' || c == '}')
+      {
+        if (c == '}')
+        {
           state_level--;
-          if (state[state_level] != json_eState_ExpectEndPar) {
+          if (state[state_level] != json_eState_ExpectEndPar)
+          {
             printf("json: Parenthesis mismatch, char %d\n", char_cnt);
             return 0;
           }
           attr_level--;
         }
         state[state_level] = json_eState_ExpectAttr;
-        if (current_value[0] == '"') {
+        if (current_value[0] == '"')
+        {
           char tmp[200];
           strncpy(tmp, &current_value[1], sizeof(tmp));
           strncpy(current_value, tmp, sizeof(current_value));
@@ -950,24 +1000,31 @@ int Json::get_attribute_value(
           current_value[strlen(current_value) - 1] = 0;
 
         // printf( "Value found \"%s\"\n", current_value);
-        if (input_attr_num == attr_level + 1) {
+        if (input_attr_num == attr_level + 1)
+        {
           int match = 1;
-          for (int j = 0; j < input_attr_num; j++) {
-            if (!streq(current_attr[j], input_attr[j])) {
+          for (int j = 0; j < input_attr_num; j++)
+          {
+            if (!streq(current_attr[j], input_attr[j]))
+            {
               match = 0;
               break;
             }
-            if (current_attr_idx[j] != input_attr_idx[j]) {
+            if (current_attr_idx[j] != input_attr_idx[j])
+            {
               match = 0;
               break;
             }
           }
-          if (match) {
+          if (match)
+          {
             strncpy(value, current_value, value_size);
             return 1;
           }
         }
-      } else {
+      }
+      else
+      {
         len = strlen(current_value);
         current_value[len] = c;
         current_value[len + 1] = 0;
@@ -979,13 +1036,9 @@ int Json::get_attribute_value(
   return 0;
 }
 
-XttVideoMgm::XttVideoMgm() : m_camera_cnt(0), m_scantime(0.5), m_op(0)
-{
-}
+XttVideoMgm::XttVideoMgm() : m_camera_cnt(0), m_scantime(0.5), m_op(0) {}
 
-XttVideoMgm::~XttVideoMgm()
-{
-}
+XttVideoMgm::~XttVideoMgm() {}
 
 int XttVideoMgm::cinit()
 {
@@ -1002,19 +1055,16 @@ int XttVideoMgm::cinit()
     strcpy(m_op->PanelArray[i], "");
 
   for (i = 0; i < m_camera.size(); i++)
-    strncpy(
-        m_op->CameraArray[i], m_camera[i].name, sizeof(m_op->CameraArray[0]));
+    strncpy(m_op->CameraArray[i], m_camera[i].name, sizeof(m_op->CameraArray[0]));
   for (; i < sizeof(m_op->CameraArray) / sizeof(m_op->CameraArray[0]); i++)
     strcpy(m_op->CameraArray[i], "");
 
   m_op->NoOfCameras = m_camera.size();
 
-  for (i = 0; i < sizeof(m_panel_select_old) / sizeof(m_panel_select_old[0]);
-       i++)
+  for (i = 0; i < sizeof(m_panel_select_old) / sizeof(m_panel_select_old[0]); i++)
     m_panel_select_old[i] = m_op->PanelArraySelect[i];
 
-  for (i = 0; i < sizeof(m_camera_select_old) / sizeof(m_camera_select_old[0]);
-       i++)
+  for (i = 0; i < sizeof(m_camera_select_old) / sizeof(m_camera_select_old[0]); i++)
     m_camera_select_old[i] = m_op->CameraArraySelect[i];
 
   return 1;
@@ -1023,17 +1073,18 @@ int XttVideoMgm::cinit()
 void XttVideoMgm::cscan()
 {
   // Detect any new panel selection
-  for (unsigned int i = 0;
-       i < sizeof(m_panel_select_old) / sizeof(m_panel_select_old[0]); i++) {
-    if (m_panel_select_old[i] != m_op->PanelArraySelect[i]) {
-      if (m_op->PanelArraySelect[i]) {
+  for (unsigned int i = 0; i < sizeof(m_panel_select_old) / sizeof(m_panel_select_old[0]); i++)
+  {
+    if (m_panel_select_old[i] != m_op->PanelArraySelect[i])
+    {
+      if (m_op->PanelArraySelect[i])
+      {
         // Panel selected
         display_panel(i);
 
         // Reset camera select
-        for (unsigned int j = 0;
-             j < sizeof(m_camera_select_old) / sizeof(m_camera_select_old[0]);
-             j++) {
+        for (unsigned int j = 0; j < sizeof(m_camera_select_old) / sizeof(m_camera_select_old[0]); j++)
+        {
           m_camera_select_old[j] = 0;
           m_op->CameraArraySelect[j] = 0;
         }
@@ -1043,17 +1094,18 @@ void XttVideoMgm::cscan()
   }
 
   // Detect any new camera selection
-  for (unsigned int i = 0;
-       i < sizeof(m_camera_select_old) / sizeof(m_camera_select_old[0]); i++) {
-    if (m_camera_select_old[i] != m_op->CameraArraySelect[i]) {
-      if (m_op->CameraArraySelect[i]) {
+  for (unsigned int i = 0; i < sizeof(m_camera_select_old) / sizeof(m_camera_select_old[0]); i++)
+  {
+    if (m_camera_select_old[i] != m_op->CameraArraySelect[i])
+    {
+      if (m_op->CameraArraySelect[i])
+      {
         // Camera selected
         set_camera_fullscreen(i);
 
         // Reset panel select
-        for (unsigned int j = 0;
-             j < sizeof(m_panel_select_old) / sizeof(m_panel_select_old[0]);
-             j++) {
+        for (unsigned int j = 0; j < sizeof(m_panel_select_old) / sizeof(m_panel_select_old[0]); j++)
+        {
           m_panel_select_old[j] = 0;
           m_op->PanelArraySelect[j] = 0;
         }
@@ -1063,30 +1115,35 @@ void XttVideoMgm::cscan()
   }
 
   // Check request to display last displayed panel
-  if (m_op->DisplayLastPanel) {
+  if (m_op->DisplayLastPanel)
+  {
     display_panel(m_op->LastPanel);
     m_op->DisplayLastPanel = 0;
   }
 
   // Check request to display camera fullscreen
-  for (unsigned int i = 0;
-       i < sizeof(m_op->CellExpand) / sizeof(m_op->CellExpand[0]); i++) {
-    if (m_op->CellExpand[i]) {
+  for (unsigned int i = 0; i < sizeof(m_op->CellExpand) / sizeof(m_op->CellExpand[0]); i++)
+  {
+    if (m_op->CellExpand[i])
+    {
       set_camera_fullscreen(m_op->CellCameraIdx[i]);
       m_op->CellExpand[i] = 0;
     }
   }
 
   // Check request to change camera in cell
-  if (m_op->CurrentPanel >= 0 && m_op->CurrentPanel < (int)m_panel.size()) {
+  if (m_op->CurrentPanel >= 0 && m_op->CurrentPanel < (int)m_panel.size())
+  {
     int camera_assigned = 0;
-    for (int i = 0; i < m_op->Rows; i++) {
-      for (int j = 0; j < m_op->Columns; j++) {
+    for (int i = 0; i < m_op->Rows; i++)
+    {
+      for (int j = 0; j < m_op->Columns; j++)
+      {
         int idx = i * m_op->Columns + j;
-        if (idx
-            > int(sizeof(m_op->CellCameraIdx) / sizeof(m_op->CellCameraIdx[0])))
+        if (idx > int(sizeof(m_op->CellCameraIdx) / sizeof(m_op->CellCameraIdx[0])))
           break;
-        if (m_op->CellCameraIdx[idx] != m_cell_camera_idx_old[idx]) {
+        if (m_op->CellCameraIdx[idx] != m_cell_camera_idx_old[idx])
+        {
           assign_camera(m_op->CurrentPanel, idx, m_op->CellCameraIdx[idx]);
           m_cell_camera_idx_old[idx] = m_op->CellCameraIdx[idx];
           camera_assigned = 1;
@@ -1099,43 +1156,48 @@ void XttVideoMgm::cscan()
   }
 
   // Request to set panel by changing current panel
-  if (m_op->CurrentPanel != m_current_panel_old) {
-    if (m_op->CurrentPanel >= 0 && m_op->CurrentPanel < (int)m_panel.size()) {
+  if (m_op->CurrentPanel != m_current_panel_old)
+  {
+    if (m_op->CurrentPanel >= 0 && m_op->CurrentPanel < (int)m_panel.size())
+    {
       display_panel(m_op->CurrentPanel);
       // Reset any selected panel
-      for (unsigned int i = 0; i
-           < sizeof(m_op->PanelArraySelect) / sizeof(m_op->PanelArraySelect[0]);
-           i++)
+      for (unsigned int i = 0; i < sizeof(m_op->PanelArraySelect) / sizeof(m_op->PanelArraySelect[0]); i++)
         m_op->PanelArraySelect[i] = m_panel_select_old[i] = 0;
       m_op->PanelArraySelect[m_op->CurrentPanel] = 1;
       m_panel_select_old[m_op->CurrentPanel] = 1;
-    } else
+    }
+    else
       m_op->CurrentPanel = m_current_panel_old;
   }
 
   // Request to set camera by changing current camera
-  if (m_op->CurrentCamera != m_current_camera_old) {
-    if (m_op->CurrentCamera >= 0
-        && m_op->CurrentCamera < (int)m_camera.size()) {
+  if (m_op->CurrentCamera != m_current_camera_old)
+  {
+    if (m_op->CurrentCamera >= 0 && m_op->CurrentCamera < (int)m_camera.size())
+    {
       set_camera_fullscreen(m_op->CurrentCamera);
       // Reset selected camera
-      for (unsigned int i = 0; i < sizeof(m_op->CameraArraySelect)
-               / sizeof(m_op->CameraArraySelect[0]);
-           i++)
+      for (unsigned int i = 0; i < sizeof(m_op->CameraArraySelect) / sizeof(m_op->CameraArraySelect[0]); i++)
         m_op->CameraArraySelect[i] = m_camera_select_old[i] = 0;
-    } else
+    }
+    else
       m_op->CurrentCamera = m_current_camera_old;
   }
 
-  if (m_op->CreatePanel) {
-    if (!streq(m_op->PanelName, "")) {
+  if (m_op->CreatePanel)
+  {
+    if (!streq(m_op->PanelName, ""))
+    {
       create_panel(m_op->PanelName);
       strcpy(m_op->PanelName, "");
       m_op->CreatePanel = 0;
     }
   }
-  if (m_op->DeletePanel) {
-    if (!streq(m_op->PanelName, "")) {
+  if (m_op->DeletePanel)
+  {
+    if (!streq(m_op->PanelName, ""))
+    {
       delete_panel(m_op->PanelName);
       strcpy(m_op->PanelName, "");
       m_op->DeletePanel = 0;
@@ -1154,7 +1216,8 @@ void XttVideoMgm::configure_layout()
   int cols = m_op->Columns;
   int idx;
 
-  if (m_op->CameraFullscreen) {
+  if (m_op->CameraFullscreen)
+  {
     // Hide lines and cells
     for (i = 0; i < 4; i++)
       m_op->VertLineX[i] = 0;
@@ -1162,11 +1225,14 @@ void XttVideoMgm::configure_layout()
     for (i = 0; i < 4; i++)
       m_op->HorizLineY[i] = 0;
 
-    for (i = 0; i < 20; i++) {
+    for (i = 0; i < 20; i++)
+    {
       m_op->CellY[i] = 0;
       m_op->CellX[i] = MGM_WIDTH + 5;
     }
-  } else {
+  }
+  else
+  {
     if (rows < 1)
       rows = 1;
     if (rows > 4)
@@ -1179,82 +1245,53 @@ void XttVideoMgm::configure_layout()
 
     // Horizontal lines
     for (i = 0; i < rows - 1; i++)
-      m_op->HorizLineY[i]
-          = MGM_HEIGHT / rows * (i + 1) - MGM_LINEWIDTH / 2 + MGM_LINEWIDTH / 2;
+      m_op->HorizLineY[i] = MGM_HEIGHT / rows * (i + 1) - MGM_LINEWIDTH / 2 + MGM_LINEWIDTH / 2;
     for (; i < 4; i++)
       m_op->HorizLineY[i] = 0;
 
     // Vertical lines
     for (i = 0; i < cols - 1; i++)
-      m_op->VertLineX[i]
-          = MGM_WIDTH / cols * (i + 1) - MGM_LINEWIDTH / 2 + MGM_LINEWIDTH / 2;
+      m_op->VertLineX[i] = MGM_WIDTH / cols * (i + 1) - MGM_LINEWIDTH / 2 + MGM_LINEWIDTH / 2;
     for (; i < 4; i++)
       m_op->VertLineX[i] = 0;
 
     // Cells
-    for (i = 0; i < rows; i++) {
-      for (j = 0; j < cols; j++) {
+    for (i = 0; i < rows; i++)
+    {
+      for (j = 0; j < cols; j++)
+      {
         idx = i * cols + j;
         m_op->CellY[idx] = MGM_HEIGHT / rows * i;
         m_op->CellX[idx] = MGM_WIDTH / cols * j;
       }
     }
-    for (i = rows * cols; i < 20; i++) {
+    for (i = rows * cols; i < 20; i++)
+    {
       m_op->CellY[i] = 0;
       m_op->CellX[i] = MGM_WIDTH + 5;
     }
   }
 }
 
-int XttVideoMgm::init()
-{
-  return 0;
-}
+int XttVideoMgm::init() { return 0; }
 
-int XttVideoMgm::authorize(char* user, char* password)
-{
-  return 0;
-}
+int XttVideoMgm::authorize(char* user, char* password) { return 0; }
 
-int XttVideoMgm::get_panels()
-{
-  return 0;
-}
+int XttVideoMgm::get_panels() { return 0; }
 
-int XttVideoMgm::get_cameras()
-{
-  return 0;
-}
+int XttVideoMgm::get_cameras() { return 0; }
 
-int XttVideoMgm::get_camera_image(int idx, const char* jpgfile)
-{
-  return 0;
-}
+int XttVideoMgm::get_camera_image(int idx, const char* jpgfile) { return 0; }
 
-int XttVideoMgm::assign_camera(int panel_idx, int cell_idx, int camera_idx)
-{
-  return 0;
-}
+int XttVideoMgm::assign_camera(int panel_idx, int cell_idx, int camera_idx) { return 0; }
 
-int XttVideoMgm::set_camera_fullscreen(int camera_idx)
-{
-  return 0;
-}
+int XttVideoMgm::set_camera_fullscreen(int camera_idx) { return 0; }
 
-int XttVideoMgm::display_panel(int panel_idx)
-{
-  return 0;
-}
+int XttVideoMgm::display_panel(int panel_idx) { return 0; }
 
-int XttVideoMgm::create_panel(char* name)
-{
-  return 0;
-}
+int XttVideoMgm::create_panel(char* name) { return 0; }
 
-int XttVideoMgm::delete_panel(char* name)
-{
-  return 0;
-}
+int XttVideoMgm::delete_panel(char* name) { return 0; }
 
 void init(qcom_sQid* qid)
 {
@@ -1263,7 +1300,8 @@ void init(qcom_sQid* qid)
   pwr_tStatus sts;
 
   sts = gdh_Init("pwr_videomgm");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     exit(sts);
   }
@@ -1271,7 +1309,8 @@ void init(qcom_sQid* qid)
   errh_Init("pwr_fast", errh_eAnix_videomgm);
   errh_SetStatus(PWR__SRVSTARTUP);
 
-  if (!qcom_Init(&sts, 0, "pwr_videomgm")) {
+  if (!qcom_Init(&sts, 0, "pwr_videomgm"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -1279,14 +1318,16 @@ void init(qcom_sQid* qid)
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, qid, &qini)) {
+  if (!qcom_Bind(&sts, qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
@@ -1306,9 +1347,12 @@ int main(int argc, char* argv[])
 
   init(&qid);
 
-  try {
+  try
+  {
     srv.open();
-  } catch (co_error& e) {
+  }
+  catch (co_error& e)
+  {
     errh_Error((char*)e.what().c_str());
     errh_Fatal("xtt_videomgm aborting");
     errh_SetStatus(PWR__SRVTERM);
@@ -1319,31 +1363,41 @@ int main(int argc, char* argv[])
   errh_SetStatus(PWR__SRUN);
 
   first_scan = true;
-  for (;;) {
-    if (first_scan) {
+  for (;;)
+  {
+    if (first_scan)
+    {
       tmo = (int)(srv.scantime() * 1000 - 1);
     }
 
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &qid, &get, tmo);
-    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+    {
       if (!swap)
         srv.scan();
-    } else {
+    }
+    else
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop && !swap) {
+      if (new_event.b.oldPlcStop && !swap)
+      {
         errh_SetStatus(PWR__SRVRESTART);
         swap = 1;
         srv.close();
-      } else if (new_event.b.swapDone && swap) {
+      }
+      else if (new_event.b.swapDone && swap)
+      {
         swap = 0;
         srv.open();
         errh_SetStatus(PWR__SRUN);
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         exit(0);
       }
     }
@@ -1353,7 +1407,8 @@ int main(int argc, char* argv[])
 
 void VideoMgmServer::close()
 {
-  for (unsigned int i = 0; i < m_mgmvect.size(); i++) {
+  for (unsigned int i = 0; i < m_mgmvect.size(); i++)
+  {
     gdh_DLUnrefObjectInfo(m_mgmvect[i]->m_dlid);
     delete m_mgmvect[i];
   }
@@ -1372,14 +1427,16 @@ void VideoMgmServer::open()
 
   // Get server object
   sts = gdh_GetClassList(pwr_cClass_VideoMgmServer, &oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("No configuration, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   sts = gdh_ObjidToPointer(oid, (void**)&serverp);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
@@ -1390,13 +1447,16 @@ void VideoMgmServer::open()
 
   // Get all XttVideoMgm objects
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_XttVideoMgm, &aref); ODD(sts);
-       sts = gdh_GetNextAttrRef(pwr_cClass_XttVideoMgm, &aref, &aref)) {
+       sts = gdh_GetNextAttrRef(pwr_cClass_XttVideoMgm, &aref, &aref))
+  {
     sts = gdh_DLRefObjectInfoAttrref(&aref, (void**)&op, &dlid);
     if (EVEN(sts))
       exit(sts);
 
-    switch (op->Type) {
-    case 0: {
+    switch (op->Type)
+    {
+    case 0:
+    {
       // Type is Aimetis Thin Client
       XttVideoMgmAimetis* mgm;
 

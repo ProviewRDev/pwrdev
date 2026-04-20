@@ -59,20 +59,21 @@ public:
   std::string what() const;
 };
 
-
-
 // Struct to represent error_reason (the innermost map)
-struct ErrorReason {
-    std::map<std::string, int> reason_map; // Error reason: string line and error code
+struct ErrorReason
+{
+  std::map<std::string, int> reason_map; // Error reason: string line and error code
 };
 
 // Struct to represent error_place (the middle map)
-struct ErrorPlace {
-    std::map<int, ErrorReason> place_map; // Error reason mapped by int keys, line number
+struct ErrorPlace
+{
+  std::map<int, ErrorReason> place_map; // Error reason mapped by int keys, line number
 };
 
 // Struct to represent error_log (the outermost map)
-struct ErrorLog {
-    std::map<std::string, ErrorPlace> log_map; // Error places mapped by string keys, FileName
+struct ErrorLog
+{
+  std::map<std::string, ErrorPlace> log_map; // Error places mapped by string keys, FileName
 };
 #endif

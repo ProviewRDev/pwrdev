@@ -53,9 +53,7 @@
 
 #include "sev_dbsqlite.h"
 
-sev_dbsqlite::sev_dbsqlite() : m_con(0)
-{
-}
+sev_dbsqlite::sev_dbsqlite() : m_con(0) {}
 
 #if 0
 int sev_dbsqlite::get_systemname()
@@ -138,11 +136,12 @@ int sev_dbsqlite::open_db()
   dcli_translate_filename(dbname, dbname);
 
   rc = sqlite3_open_v2(dbname, &m_con, SQLITE_OPEN_READWRITE, 0);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     // Not yet created
-    rc = sqlite3_open_v2(
-        dbname, &m_con, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 0);
-    if (rc != SQLITE_OK) {
+    rc = sqlite3_open_v2(dbname, &m_con, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 0);
+    if (rc != SQLITE_OK)
+    {
       printf("Open database error\n");
       exit(0);
     }
@@ -166,7 +165,8 @@ int sev_dbsqlite::open_db()
                    "unit varchar(16));");
 
     rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
       printf("Create items table, %s\n", errmsg);
       sqlite3_free(errmsg);
     }
@@ -179,10 +179,7 @@ int sev_dbsqlite::open_db()
   return 1;
 }
 
-int sev_dbsqlite::checkAndUpdateVersion(unsigned int version)
-{
-  return 1;
-}
+int sev_dbsqlite::checkAndUpdateVersion(unsigned int version) { return 1; }
 
 int sev_dbsqlite::createSevVersion2Tables(void)
 {
@@ -192,7 +189,8 @@ int sev_dbsqlite::createSevVersion2Tables(void)
   sprintf(query, "create table sev_version ("
                  "version int unsigned not null primary key);");
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Create sev_version table: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -200,7 +198,8 @@ int sev_dbsqlite::createSevVersion2Tables(void)
 
   sprintf(query, "insert into sev_version (version) values(%d)", sev_cVersion);
   rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Insert into table sev_version: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -222,7 +221,8 @@ int sev_dbsqlite::createSevVersion2Tables(void)
                  "description varchar(80));");
 
   rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Create objectitems table: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -237,7 +237,8 @@ int sev_dbsqlite::createSevVersion2Tables(void)
                  "PRIMARY KEY(tablename, attributename));");
 
   rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Create objectitemattributes table: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -251,21 +252,21 @@ int sev_dbsqlite::createSevVersion3Tables(void)
   char query[400];
   char* errmsg;
 
-  sprintf(query,
-      "create table sev_stat (current_load float,medium_load float,"
-      "storage_rate float,medium_storage_rate float,"
-      "datastore_msg_cnt int unsigned,dataget_msg_cnt int unsigned,"
-      "items_msg_cnt int unsigned,eventstore_msg_cnt int unsigned);");
+  sprintf(query, "create table sev_stat (current_load float,medium_load float,"
+                 "storage_rate float,medium_storage_rate float,"
+                 "datastore_msg_cnt int unsigned,dataget_msg_cnt int unsigned,"
+                 "items_msg_cnt int unsigned,eventstore_msg_cnt int unsigned);");
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Create sev_stat table: %s\n", errmsg);
     sqlite3_free(errmsg);
   }
-  sprintf(
-      query, "insert into sev_stat (current_load, medium_load) values(0,0)");
+  sprintf(query, "insert into sev_stat (current_load, medium_load) values(0,0)");
   rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Insert into table sev_stat: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -273,8 +274,8 @@ int sev_dbsqlite::createSevVersion3Tables(void)
   return 1;
 }
 
-int sev_dbsqlite::create_table(pwr_tStatus* sts, char* tablename,
-    pwr_eType type, unsigned int size, pwr_tMask options, float deadband)
+int sev_dbsqlite::create_table(pwr_tStatus* sts, char* tablename, pwr_eType type, unsigned int size,
+                               pwr_tMask options, float deadband)
 {
   char query[400];
   char* errmsg;
@@ -284,22 +285,31 @@ int sev_dbsqlite::create_table(pwr_tStatus* sts, char* tablename,
   char readoptstr[80];
   char enginestr[100] = "";
 
-  if (options & pwr_mSevOptionsMask_PosixTime) {
-    if (options & pwr_mSevOptionsMask_HighTimeResolution) {
+  if (options & pwr_mSevOptionsMask_PosixTime)
+  {
+    if (options & pwr_mSevOptionsMask_HighTimeResolution)
+    {
       // Posix time, high resolution
       strcpy(timeformatstr, "time int unsigned, ntime int unsigned");
       strcpy(idtypestr, "integer");
-    } else {
+    }
+    else
+    {
       // Posix time, low resolution
       strcpy(timeformatstr, "time int unsigned");
       strcpy(idtypestr, "integer");
     }
-  } else {
-    if (options & pwr_mSevOptionsMask_HighTimeResolution) {
+  }
+  else
+  {
+    if (options & pwr_mSevOptionsMask_HighTimeResolution)
+    {
       // Sql time, high resolution
       strcpy(timeformatstr, "time datetime not null, ntime int unsigned");
       strcpy(idtypestr, "integer");
-    } else {
+    }
+    else
+    {
       // Sql time, low resolution
       strcpy(timeformatstr, "time datetime not null");
       strcpy(idtypestr, "integer");
@@ -316,13 +326,14 @@ int sev_dbsqlite::create_table(pwr_tStatus* sts, char* tablename,
   else
     strcpy(jumpstr, "");
 
-  sprintf(query, "create table %s ( %s"
-                 "%s, value %s %s)%s;",
-      tablename, readoptstr, timeformatstr, pwrtype_to_type(type, size),
-      jumpstr, enginestr);
+  sprintf(query,
+          "create table %s ( %s"
+          "%s, value %s %s)%s;",
+          tablename, readoptstr, timeformatstr, pwrtype_to_type(type, size), jumpstr, enginestr);
 
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Create table: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -333,7 +344,8 @@ int sev_dbsqlite::create_table(pwr_tStatus* sts, char* tablename,
   sprintf(query, "create index %s_time_idx on %s (time)", tablename, tablename);
 
   rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Create table: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -352,7 +364,8 @@ int sev_dbsqlite::delete_table(pwr_tStatus* sts, char* tablename)
   sprintf(query, "drop table %s;", tablename);
 
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Delete table: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -362,8 +375,7 @@ int sev_dbsqlite::delete_table(pwr_tStatus* sts, char* tablename)
   return 1;
 }
 
-int sev_dbsqlite::create_event_table(
-    pwr_tStatus* sts, char* tablename, pwr_tMask options)
+int sev_dbsqlite::create_event_table(pwr_tStatus* sts, char* tablename, pwr_tMask options)
 {
   char query[530];
   char* errmsg;
@@ -373,22 +385,31 @@ int sev_dbsqlite::create_event_table(
   char readoptstr[80];
   char enginestr[100] = "";
 
-  if (options & pwr_mSevOptionsMask_PosixTime) {
-    if (options & pwr_mSevOptionsMask_HighTimeResolution) {
+  if (options & pwr_mSevOptionsMask_PosixTime)
+  {
+    if (options & pwr_mSevOptionsMask_HighTimeResolution)
+    {
       // Posix time, high resolution
       strcpy(timeformatstr, "time int unsigned, ntime int unsigned");
       strcpy(idtypestr, "bigint");
-    } else {
+    }
+    else
+    {
       // Posix time, low resolution
       strcpy(timeformatstr, "time int unsigned");
       strcpy(idtypestr, "int");
     }
-  } else {
-    if (options & pwr_mSevOptionsMask_HighTimeResolution) {
+  }
+  else
+  {
+    if (options & pwr_mSevOptionsMask_HighTimeResolution)
+    {
       // Sql time, high resolution
       strcpy(timeformatstr, "time datetime not null, ntime int unsigned");
       strcpy(idtypestr, "bigint");
-    } else {
+    }
+    else
+    {
       // Sql time, low resolution
       strcpy(timeformatstr, "time datetime not null");
       strcpy(idtypestr, "int");
@@ -396,24 +417,25 @@ int sev_dbsqlite::create_event_table(
   }
 
   if (options & pwr_mSevOptionsMask_ReadOptimized)
-    sprintf(readoptstr, "id %s unsigned not null primary key auto_increment,",
-        idtypestr);
+    sprintf(readoptstr, "id %s unsigned not null primary key auto_increment,", idtypestr);
   else
     strcpy(readoptstr, "");
 
   strcpy(jumpstr, "");
 
-  sprintf(query, "create table %s ( %s"
-                 "%s, eventtype int, eventprio int, eventid_nix int, "
-                 "eventid_birthtime int, eventid_idx int,"
-                 "supobject_vid int unsigned, supobject_oix int unsigned, "
-                 "supobject_offset int unsigned,"
-                 "supobject_size int unsigned,"
-                 "eventtext varchar(80), eventname varchar(80))%s;",
-      tablename, readoptstr, timeformatstr, enginestr);
+  sprintf(query,
+          "create table %s ( %s"
+          "%s, eventtype int, eventprio int, eventid_nix int, "
+          "eventid_birthtime int, eventid_idx int,"
+          "supobject_vid int unsigned, supobject_oix int unsigned, "
+          "supobject_offset int unsigned,"
+          "supobject_size int unsigned,"
+          "eventtext varchar(80), eventname varchar(80))%s;",
+          tablename, readoptstr, timeformatstr, enginestr);
 
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Create table: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -423,7 +445,8 @@ int sev_dbsqlite::create_event_table(
 
   sprintf(query, "create index %s_time_idx on %s (time)", tablename, tablename);
   rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Create table: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -442,7 +465,8 @@ int sev_dbsqlite::delete_event_table(pwr_tStatus* sts, char* tablename)
   sprintf(query, "drop table %s;", tablename);
 
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Delete table: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -452,10 +476,10 @@ int sev_dbsqlite::delete_event_table(pwr_tStatus* sts, char* tablename)
   return 1;
 }
 
-int sev_dbsqlite::store_item(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
-    char* oname, char* aname, pwr_tDeltaTime storagetime, pwr_eType vtype,
-    unsigned int vsize, char* description, char* unit, pwr_tFloat32 scantime,
-    pwr_tFloat32 deadband, pwr_tMask options)
+int sev_dbsqlite::store_item(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                             pwr_tDeltaTime storagetime, pwr_eType vtype, unsigned int vsize,
+                             char* description, char* unit, pwr_tFloat32 scantime, pwr_tFloat32 deadband,
+                             pwr_tMask options)
 {
   char query[800];
   char* errmsg;
@@ -463,8 +487,7 @@ int sev_dbsqlite::store_item(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
   pwr_tTime creatime;
 
   time_GetTime(&creatime);
-  time_AtoAscii(
-      &creatime, time_eFormat_NumDateAndTime, timestr, sizeof(timestr));
+  time_AtoAscii(&creatime, time_eFormat_NumDateAndTime, timestr, sizeof(timestr));
   timestr[19] = 0;
 
   unsigned int next_id = get_nextAutoIncrement((char*)"items");
@@ -483,15 +506,15 @@ int sev_dbsqlite::store_item(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
   sprintf(tablename, "%s_%d", oid_to_table(oid, (char*)""), next_id);
 
   sprintf(query,
-      "insert into items "
-      "(tablename,vid,oix,oname,aname,uptime,cretime,storagetime,vtype,vsize,"
-      "description,unit,scantime,deadband,options) "
-      "values ('%s',%d,%d,'%s','%s','%s','%s',%ld,%d,%d,'%s','%s',%f,%f,%d);",
-      tablename, oid.vid, oid.oix, oname, aname, timestr, timestr,
-      (long int)storagetime.tv_sec, vtype, vsize, description, unit, scantime,
-      deadband, options);
+          "insert into items "
+          "(tablename,vid,oix,oname,aname,uptime,cretime,storagetime,vtype,vsize,"
+          "description,unit,scantime,deadband,options) "
+          "values ('%s',%d,%d,'%s','%s','%s','%s',%ld,%d,%d,'%s','%s',%f,%f,%d);",
+          tablename, oid.vid, oid.oix, oname, aname, timestr, timestr, (long int)storagetime.tv_sec, vtype,
+          vsize, description, unit, scantime, deadband, options);
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Store item: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -508,11 +531,10 @@ int sev_dbsqlite::remove_item(pwr_tStatus* sts, pwr_tOid oid, char* aname)
   char query[800];
   char* errmsg;
 
-  sprintf(query,
-      "delete from items where vid = %u and oix = %u and aname = '%s';",
-      oid.vid, oid.oix, aname);
+  sprintf(query, "delete from items where vid = %u and oix = %u and aname = '%s';", oid.vid, oid.oix, aname);
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Remove item: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -536,13 +558,15 @@ int sev_dbsqlite::get_items(pwr_tStatus* sts)
                  "from items");
 
   int rc = sqlite3_prepare_v2(m_con, query, -1, &stmt, 0);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s\n", __FUNCTION__);
     return 0;
   }
 
-  for (int i = 0;; i++) {
+  for (int i = 0;; i++)
+  {
     int col = 0;
     char* text;
 
@@ -601,20 +625,21 @@ int sev_dbsqlite::get_items(pwr_tStatus* sts)
   return 1;
 }
 
-int sev_dbsqlite::store_value(pwr_tStatus* sts, void* thread, int item_idx,
-    int attr_idx, pwr_tTime time, void* buf, unsigned int size)
+int sev_dbsqlite::store_value(pwr_tStatus* sts, void* thread, int item_idx, int attr_idx, pwr_tTime time,
+                              void* buf, unsigned int size)
 {
-  if (size != m_items[item_idx].value_size) {
+  if (size != m_items[item_idx].value_size)
+  {
     // Something is seriously wrong
     printf("In %s row %d:\n", __FILE__, __LINE__);
-    printf("%s expected size:%d recevied size:%d ERROR!!\n", __FUNCTION__,
-        m_items[item_idx].value_size, size);
+    printf("%s expected size:%d recevied size:%d ERROR!!\n", __FUNCTION__, m_items[item_idx].value_size,
+           size);
     *sts = SEV__DBERROR;
     return 0;
   }
-  if (m_items[item_idx].attrnum > 1) {
-    return store_objectvalue(
-        sts, item_idx, attr_idx, time, buf, m_items[item_idx].old_value, size);
+  if (m_items[item_idx].attrnum > 1)
+  {
+    return store_objectvalue(sts, item_idx, attr_idx, time, buf, m_items[item_idx].old_value, size);
   }
   char query[1150];
   char* errmsg;
@@ -623,225 +648,237 @@ int sev_dbsqlite::store_value(pwr_tStatus* sts, void* thread, int item_idx,
   int update_time_only = 0;
   int set_jump = 0;
 
-  if (!m_items[item_idx].first_storage) {
-    if (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand) {
-      if (m_items[item_idx].deadband_active) {
+  if (!m_items[item_idx].first_storage)
+  {
+    if (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand)
+    {
+      if (m_items[item_idx].deadband_active)
+      {
         // Compare current value to old value
-        switch (m_items[item_idx].attr[attr_idx].type) {
-        case pwr_eType_Float32: {
-	  pwr_tFloat32 f;
-	  memcpy(&f, buf, sizeof(f));
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(&buf, m_items[item_idx].old_value,
-                         sizeof(pwr_tFloat32)))
-              || (ABS(f
-                      - *(pwr_tFloat32*)m_items[item_idx].old_value)
-                     < m_items[item_idx].deadband)) {
+        switch (m_items[item_idx].attr[attr_idx].type)
+        {
+        case pwr_eType_Float32:
+        {
+          pwr_tFloat32 f;
+          memcpy(&f, buf, sizeof(f));
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(&buf, m_items[item_idx].old_value, sizeof(pwr_tFloat32))) ||
+              (ABS(f - *(pwr_tFloat32*)m_items[item_idx].old_value) < m_items[item_idx].deadband))
+          {
             update_time_only = 1;
-          } else {
+          }
+          else
+          {
             m_items[item_idx].deadband_active = 0;
             *(pwr_tFloat32*)m_items[item_idx].old_value = f;
           }
           break;
-	}
-	case pwr_eType_Float64: {
-	  pwr_tFloat64 f;
-	  memcpy(&f, buf, sizeof(f));
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(&f, m_items[item_idx].old_value,
-                         sizeof(pwr_tFloat64)))
-              || (ABS(f
-                      - *(pwr_tFloat64*)m_items[item_idx].old_value)
-                     < m_items[item_idx].deadband)) {
+        }
+        case pwr_eType_Float64:
+        {
+          pwr_tFloat64 f;
+          memcpy(&f, buf, sizeof(f));
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(&f, m_items[item_idx].old_value, sizeof(pwr_tFloat64))) ||
+              (ABS(f - *(pwr_tFloat64*)m_items[item_idx].old_value) < m_items[item_idx].deadband))
+          {
             update_time_only = 1;
-          } else {
+          }
+          else
+          {
             m_items[item_idx].deadband_active = 0;
             *(pwr_tFloat64*)m_items[item_idx].old_value = f;
           }
           break;
-	}
+        }
         case pwr_eType_Int64:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tInt64)))
-              || (ABS(*(pwr_tInt64*)buf
-                      - *(pwr_tInt64*)m_items[item_idx].old_value)
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tInt64))) ||
+              (ABS(*(pwr_tInt64*)buf - *(pwr_tInt64*)m_items[item_idx].old_value) <
+               m_items[item_idx].deadband))
+          {
             update_time_only = 1;
-          } else {
+          }
+          else
+          {
             m_items[item_idx].deadband_active = 0;
             *(pwr_tInt64*)m_items[item_idx].old_value = *(pwr_tInt64*)buf;
           }
           break;
         case pwr_eType_Int32:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tInt32)))
-              || (ABS(*(pwr_tInt32*)buf
-                      - *(pwr_tInt32*)m_items[item_idx].old_value)
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tInt32))) ||
+              (ABS(*(pwr_tInt32*)buf - *(pwr_tInt32*)m_items[item_idx].old_value) <
+               m_items[item_idx].deadband))
+          {
             update_time_only = 1;
-          } else {
+          }
+          else
+          {
             m_items[item_idx].deadband_active = 0;
             *(pwr_tInt32*)m_items[item_idx].old_value = *(pwr_tInt32*)buf;
           }
           break;
         case pwr_eType_Int16:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tInt16)))
-              || (ABS(*(pwr_tInt16*)buf
-                      - *(pwr_tInt16*)m_items[item_idx].old_value)
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tInt16))) ||
+              (ABS(*(pwr_tInt16*)buf - *(pwr_tInt16*)m_items[item_idx].old_value) <
+               m_items[item_idx].deadband))
+          {
             update_time_only = 1;
-          } else {
+          }
+          else
+          {
             m_items[item_idx].deadband_active = 0;
             *(pwr_tInt16*)m_items[item_idx].old_value = *(pwr_tInt16*)buf;
           }
           break;
         case pwr_eType_Int8:
         case pwr_eType_Char:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tInt8)))
-              || (ABS(*(pwr_tInt8*)buf
-                      - *(pwr_tInt8*)m_items[item_idx].old_value)
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tInt8))) ||
+              (ABS(*(pwr_tInt8*)buf - *(pwr_tInt8*)m_items[item_idx].old_value) < m_items[item_idx].deadband))
+          {
             update_time_only = 1;
-          } else {
+          }
+          else
+          {
             m_items[item_idx].deadband_active = 0;
             *(pwr_tInt8*)m_items[item_idx].old_value = *(pwr_tInt8*)buf;
           }
           break;
         case pwr_eType_UInt64:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tUInt64)))
-              || (ABS(((pwr_tInt64)(*(pwr_tUInt64*)buf
-                      - *(pwr_tUInt64*)m_items[item_idx].old_value)))
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tUInt64))) ||
+              (ABS(((pwr_tInt64)(*(pwr_tUInt64*)buf - *(pwr_tUInt64*)m_items[item_idx].old_value))) <
+               m_items[item_idx].deadband))
+          {
             update_time_only = 1;
-          } else {
+          }
+          else
+          {
             m_items[item_idx].deadband_active = 0;
             *(pwr_tUInt64*)m_items[item_idx].old_value = *(pwr_tUInt64*)buf;
           }
           break;
         case pwr_eType_UInt32:
         case pwr_eType_Boolean:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tUInt32)))
-              || (ABS(((pwr_tInt32)(*(pwr_tUInt32*)buf
-                      - *(pwr_tUInt32*)m_items[item_idx].old_value)))
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tUInt32))) ||
+              (ABS(((pwr_tInt32)(*(pwr_tUInt32*)buf - *(pwr_tUInt32*)m_items[item_idx].old_value))) <
+               m_items[item_idx].deadband))
+          {
             update_time_only = 1;
-          } else {
+          }
+          else
+          {
             m_items[item_idx].deadband_active = 0;
             *(pwr_tUInt32*)m_items[item_idx].old_value = *(pwr_tUInt32*)buf;
           }
           break;
         case pwr_eType_UInt16:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tUInt16)))
-              || (ABS(((pwr_tInt16)(*(pwr_tUInt16*)buf
-                      - *(pwr_tUInt16*)m_items[item_idx].old_value)))
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tUInt16))) ||
+              (ABS(((pwr_tInt16)(*(pwr_tUInt16*)buf - *(pwr_tUInt16*)m_items[item_idx].old_value))) <
+               m_items[item_idx].deadband))
+          {
             update_time_only = 1;
-          } else {
+          }
+          else
+          {
             m_items[item_idx].deadband_active = 0;
             *(pwr_tUInt16*)m_items[item_idx].old_value = *(pwr_tUInt16*)buf;
           }
           break;
         case pwr_eType_UInt8:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tUInt8)))
-              || (ABS(((pwr_tInt8)(*(pwr_tUInt8*)buf
-                      - *(pwr_tUInt8*)m_items[item_idx].old_value)))
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tUInt8))) ||
+              (ABS(((pwr_tInt8)(*(pwr_tUInt8*)buf - *(pwr_tUInt8*)m_items[item_idx].old_value))) <
+               m_items[item_idx].deadband))
+          {
             update_time_only = 1;
-          } else {
+          }
+          else
+          {
             m_items[item_idx].deadband_active = 0;
             *(pwr_tUInt8*)m_items[item_idx].old_value = *(pwr_tUInt8*)buf;
           }
           break;
         case pwr_eType_String:
-          if (!strncmp((char*)buf, (char*)m_items[item_idx].old_value,
-                  m_items[item_idx].value_size)) {
+          if (!strncmp((char*)buf, (char*)m_items[item_idx].old_value, m_items[item_idx].value_size))
+          {
             update_time_only = 1;
-          } else {
+          }
+          else
+          {
             m_items[item_idx].deadband_active = 0;
-            strncpy((char*)m_items[item_idx].old_value, (char*)buf,
-                m_items[item_idx].value_size);
+            strncpy((char*)m_items[item_idx].old_value, (char*)buf, m_items[item_idx].value_size);
           }
           break;
         default:;
         }
-      } else {
+      }
+      else
+      {
         // Compare current value to old value
-        switch (m_items[item_idx].attr[attr_idx].type) {
-        case pwr_eType_Float32: {
-	  pwr_tFloat32 f;
-	  memcpy(&f, buf, sizeof(f));
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(&f, m_items[item_idx].old_value,
-                         sizeof(pwr_tFloat32)))
-              || (ABS(f
-                      - *(pwr_tFloat32*)m_items[item_idx].old_value)
-                     < m_items[item_idx].deadband)) {
+        switch (m_items[item_idx].attr[attr_idx].type)
+        {
+        case pwr_eType_Float32:
+        {
+          pwr_tFloat32 f;
+          memcpy(&f, buf, sizeof(f));
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(&f, m_items[item_idx].old_value, sizeof(pwr_tFloat32))) ||
+              (ABS(f - *(pwr_tFloat32*)m_items[item_idx].old_value) < m_items[item_idx].deadband))
+          {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
           *(pwr_tFloat32*)m_items[item_idx].old_value = f;
           break;
-	}
-	case pwr_eType_Float64: {
-	  pwr_tFloat64 f;
-	  memcpy(&f, buf, sizeof(f));
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(&f, m_items[item_idx].old_value,
-                         sizeof(pwr_tFloat64)))
-              || (ABS(f
-                      - *(pwr_tFloat64*)m_items[item_idx].old_value)
-                     < m_items[item_idx].deadband)) {
+        }
+        case pwr_eType_Float64:
+        {
+          pwr_tFloat64 f;
+          memcpy(&f, buf, sizeof(f));
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(&f, m_items[item_idx].old_value, sizeof(pwr_tFloat64))) ||
+              (ABS(f - *(pwr_tFloat64*)m_items[item_idx].old_value) < m_items[item_idx].deadband))
+          {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
           *(pwr_tFloat64*)m_items[item_idx].old_value = f;
           break;
-	}
+        }
         case pwr_eType_Int64:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tInt64)))
-              || (ABS(*(pwr_tInt64*)buf
-                      - *(pwr_tInt64*)m_items[item_idx].old_value)
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tInt64))) ||
+              (ABS(*(pwr_tInt64*)buf - *(pwr_tInt64*)m_items[item_idx].old_value) <
+               m_items[item_idx].deadband))
+          {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
           *(pwr_tInt64*)m_items[item_idx].old_value = *(pwr_tInt64*)buf;
           break;
         case pwr_eType_Int32:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tInt32)))
-              || (ABS(*(pwr_tInt32*)buf
-                      - *(pwr_tInt32*)m_items[item_idx].old_value)
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tInt32))) ||
+              (ABS(*(pwr_tInt32*)buf - *(pwr_tInt32*)m_items[item_idx].old_value) <
+               m_items[item_idx].deadband))
+          {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
           *(pwr_tInt32*)m_items[item_idx].old_value = *(pwr_tInt32*)buf;
           break;
         case pwr_eType_Int16:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tInt16)))
-              || (ABS(*(pwr_tInt16*)buf
-                      - *(pwr_tInt16*)m_items[item_idx].old_value)
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tInt16))) ||
+              (ABS(*(pwr_tInt16*)buf - *(pwr_tInt16*)m_items[item_idx].old_value) <
+               m_items[item_idx].deadband))
+          {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
@@ -849,24 +886,21 @@ int sev_dbsqlite::store_value(pwr_tStatus* sts, void* thread, int item_idx,
           break;
         case pwr_eType_Int8:
         case pwr_eType_Char:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tInt8)))
-              || (ABS(*(pwr_tInt8*)buf
-                      - *(pwr_tInt8*)m_items[item_idx].old_value)
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tInt8))) ||
+              (ABS(*(pwr_tInt8*)buf - *(pwr_tInt8*)m_items[item_idx].old_value) < m_items[item_idx].deadband))
+          {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
           *(pwr_tInt8*)m_items[item_idx].old_value = *(pwr_tInt8*)buf;
           break;
         case pwr_eType_UInt64:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tUInt64)))
-              || (ABS(((pwr_tInt64)(*(pwr_tUInt64*)buf
-                      - *(pwr_tUInt64*)m_items[item_idx].old_value)))
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tUInt64))) ||
+              (ABS(((pwr_tInt64)(*(pwr_tUInt64*)buf - *(pwr_tUInt64*)m_items[item_idx].old_value))) <
+               m_items[item_idx].deadband))
+          {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
@@ -874,226 +908,238 @@ int sev_dbsqlite::store_value(pwr_tStatus* sts, void* thread, int item_idx,
           break;
         case pwr_eType_UInt32:
         case pwr_eType_Boolean:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tUInt32)))
-              || (ABS(((pwr_tInt32)(*(pwr_tUInt32*)buf
-                      - *(pwr_tUInt32*)m_items[item_idx].old_value)))
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tUInt32))) ||
+              (ABS(((pwr_tInt32)(*(pwr_tUInt32*)buf - *(pwr_tUInt32*)m_items[item_idx].old_value))) <
+               m_items[item_idx].deadband))
+          {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
           *(pwr_tUInt32*)m_items[item_idx].old_value = *(pwr_tUInt32*)buf;
           break;
         case pwr_eType_UInt16:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tUInt16)))
-              || (ABS(((pwr_tInt16)(*(pwr_tUInt16*)buf
-                      - *(pwr_tUInt16*)m_items[item_idx].old_value)))
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tUInt16))) ||
+              (ABS(((pwr_tInt16)(*(pwr_tUInt16*)buf - *(pwr_tUInt16*)m_items[item_idx].old_value))) <
+               m_items[item_idx].deadband))
+          {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
           *(pwr_tUInt16*)m_items[item_idx].old_value = *(pwr_tUInt16*)buf;
           break;
         case pwr_eType_UInt8:
-          if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(
-                         buf, m_items[item_idx].old_value, sizeof(pwr_tUInt8)))
-              || (ABS(((pwr_tInt8)(*(pwr_tUInt8*)buf
-                      - *(pwr_tUInt8*)m_items[item_idx].old_value)))
-                     < m_items[item_idx].deadband)) {
+          if ((feqf(m_items[item_idx].deadband, 0.0f) &&
+               !memcmp(buf, m_items[item_idx].old_value, sizeof(pwr_tUInt8))) ||
+              (ABS(((pwr_tInt8)(*(pwr_tUInt8*)buf - *(pwr_tUInt8*)m_items[item_idx].old_value))) <
+               m_items[item_idx].deadband))
+          {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
           *(pwr_tUInt8*)m_items[item_idx].old_value = *(pwr_tUInt8*)buf;
           break;
         case pwr_eType_String:
-          if (!strncmp((char*)buf, (char*)m_items[item_idx].old_value,
-                  m_items[item_idx].value_size)) {
+          if (!strncmp((char*)buf, (char*)m_items[item_idx].old_value, m_items[item_idx].value_size))
+          {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
-          strncpy((char*)m_items[item_idx].old_value, (char*)buf,
-              m_items[item_idx].value_size);
+          strncpy((char*)m_items[item_idx].old_value, (char*)buf, m_items[item_idx].value_size);
           break;
         default:;
         }
       }
     }
-    if (set_jump
-        && (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand)) {
-      sprintf(query, "update %s set jump = 1 where id = %d",
-          m_items[item_idx].tablename, m_items[item_idx].last_id);
+    if (set_jump && (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand))
+    {
+      sprintf(query, "update %s set jump = 1 where id = %d", m_items[item_idx].tablename,
+              m_items[item_idx].last_id);
       int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-      if (rc != SQLITE_OK) {
+      if (rc != SQLITE_OK)
+      {
         printf("In %s row %d:\n", __FILE__, __LINE__);
         printf("Update jump: %s\n", errmsg);
         sqlite3_free(errmsg);
       }
     }
-  } else {
+  }
+  else
+  {
     m_items[item_idx].first_storage = 0;
     memcpy(m_items[item_idx].old_value, buf, size);
   }
 
-  *sts = time_AtoAscii(
-      &time, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
+  *sts = time_AtoAscii(&time, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
   if (EVEN(*sts))
     return 0;
   timstr[19] = 0;
 
-  switch (m_items[item_idx].attr[attr_idx].type) {
+  switch (m_items[item_idx].attr[attr_idx].type)
+  {
   case pwr_eType_Time:
-    *sts = time_AtoAscii(
-        (pwr_tTime*)buf, time_eFormat_NumDateAndTime, bufstr, sizeof(bufstr));
+    *sts = time_AtoAscii((pwr_tTime*)buf, time_eFormat_NumDateAndTime, bufstr, sizeof(bufstr));
     if (EVEN(*sts))
       return 0;
     break;
   default:
-    *sts = cdh_AttrValueToString(
-        m_items[item_idx].attr[attr_idx].type, buf, bufstr, sizeof(bufstr));
+    *sts = cdh_AttrValueToString(m_items[item_idx].attr[attr_idx].type, buf, bufstr, sizeof(bufstr));
     if (EVEN(*sts))
       return 0;
   }
 
   char colname[255];
   strcpy(colname, "value");
-  if (!update_time_only) {
-    if (m_items[item_idx].options & pwr_mSevOptionsMask_PosixTime) {
-      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution) {
+  if (!update_time_only)
+  {
+    if (m_items[item_idx].options & pwr_mSevOptionsMask_PosixTime)
+    {
+      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution)
+      {
         // Posix time, high resolution
-        switch (m_items[item_idx].attr[attr_idx].type) {
+        switch (m_items[item_idx].attr[attr_idx].type)
+        {
         case pwr_eType_String:
         case pwr_eType_Time:
-          sprintf(query,
-              "insert into %s (time, ntime, %s) values (%ld,%ld,'%s')",
-              m_items[item_idx].tablename, colname, (long int)time.tv_sec,
-              (long int)time.tv_nsec, bufstr);
+          sprintf(query, "insert into %s (time, ntime, %s) values (%ld,%ld,'%s')",
+                  m_items[item_idx].tablename, colname, (long int)time.tv_sec, (long int)time.tv_nsec,
+                  bufstr);
           break;
         default:
           if (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand)
-            sprintf(query,
-                "insert into %s (time, ntime, %s, jump) values (%ld,%ld,%s,%d)",
-                m_items[item_idx].tablename, colname, (long int)time.tv_sec,
-                (long int)time.tv_nsec, bufstr, set_jump);
+            sprintf(query, "insert into %s (time, ntime, %s, jump) values (%ld,%ld,%s,%d)",
+                    m_items[item_idx].tablename, colname, (long int)time.tv_sec, (long int)time.tv_nsec,
+                    bufstr, set_jump);
           else
-            sprintf(query,
-                "insert into %s (time, ntime, %s) values (%ld,%ld,%s)",
-                m_items[item_idx].tablename, colname, (long int)time.tv_sec,
-                (long int)time.tv_nsec, bufstr);
-        }
-      } else {
-        // Posix time, low resolution
-        switch (m_items[item_idx].attr[attr_idx].type) {
-        case pwr_eType_String:
-        case pwr_eType_Time:
-          sprintf(query, "insert into %s (time, %s) values (%ld,'%s')",
-              m_items[item_idx].tablename, colname, (long int)time.tv_sec,
-              bufstr);
-          break;
-        default:
-          if (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand)
-            sprintf(query, "insert into %s (time, %s, jump) values (%ld,%s,%d)",
-                m_items[item_idx].tablename, colname, (long int)time.tv_sec,
-                bufstr, set_jump);
-          else
-            sprintf(query, "insert into %s (time, %s) values (%ld,%s)",
-                m_items[item_idx].tablename, colname, (long int)time.tv_sec,
-                bufstr);
+            sprintf(query, "insert into %s (time, ntime, %s) values (%ld,%ld,%s)",
+                    m_items[item_idx].tablename, colname, (long int)time.tv_sec, (long int)time.tv_nsec,
+                    bufstr);
         }
       }
-    } else {
-      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution) {
-        // Sql time, high resolution
-        switch (m_items[item_idx].attr[attr_idx].type) {
+      else
+      {
+        // Posix time, low resolution
+        switch (m_items[item_idx].attr[attr_idx].type)
+        {
         case pwr_eType_String:
         case pwr_eType_Time:
-          sprintf(query,
-              "insert into %s (time, ntime, %s) values ('%s',%ld,'%s')",
-              m_items[item_idx].tablename, colname, timstr,
-              (long int)time.tv_nsec, bufstr);
+          sprintf(query, "insert into %s (time, %s) values (%ld,'%s')", m_items[item_idx].tablename, colname,
+                  (long int)time.tv_sec, bufstr);
           break;
         default:
           if (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand)
-            sprintf(query, "insert into %s (time, ntime, %s, jump) values "
-                           "('%s',%ld,%s,%d)",
-                m_items[item_idx].tablename, colname, timstr,
-                (long int)time.tv_nsec, bufstr, set_jump);
+            sprintf(query, "insert into %s (time, %s, jump) values (%ld,%s,%d)", m_items[item_idx].tablename,
+                    colname, (long int)time.tv_sec, bufstr, set_jump);
           else
-            sprintf(query,
-                "insert into %s (time, ntime, %s) values ('%s',%ld,%s)",
-                m_items[item_idx].tablename, colname, timstr,
-                (long int)time.tv_nsec, bufstr);
+            sprintf(query, "insert into %s (time, %s) values (%ld,%s)", m_items[item_idx].tablename, colname,
+                    (long int)time.tv_sec, bufstr);
         }
-      } else {
-        // Sql time, low resolution
-        switch (m_items[item_idx].attr[attr_idx].type) {
+      }
+    }
+    else
+    {
+      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution)
+      {
+        // Sql time, high resolution
+        switch (m_items[item_idx].attr[attr_idx].type)
+        {
         case pwr_eType_String:
         case pwr_eType_Time:
-          sprintf(query, "insert into %s (time, %s) values ('%s','%s')",
-              m_items[item_idx].tablename, colname, timstr, bufstr);
+          sprintf(query, "insert into %s (time, ntime, %s) values ('%s',%ld,'%s')",
+                  m_items[item_idx].tablename, colname, timstr, (long int)time.tv_nsec, bufstr);
           break;
         default:
           if (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand)
             sprintf(query,
-                "insert into %s (time, %s, jump) values ('%s',%s,%d)",
-                m_items[item_idx].tablename, colname, timstr, bufstr, set_jump);
+                    "insert into %s (time, ntime, %s, jump) values "
+                    "('%s',%ld,%s,%d)",
+                    m_items[item_idx].tablename, colname, timstr, (long int)time.tv_nsec, bufstr, set_jump);
           else
-            sprintf(query, "insert into %s (time, %s) values ('%s',%s)",
-                m_items[item_idx].tablename, colname, timstr, bufstr);
+            sprintf(query, "insert into %s (time, ntime, %s) values ('%s',%ld,%s)",
+                    m_items[item_idx].tablename, colname, timstr, (long int)time.tv_nsec, bufstr);
+        }
+      }
+      else
+      {
+        // Sql time, low resolution
+        switch (m_items[item_idx].attr[attr_idx].type)
+        {
+        case pwr_eType_String:
+        case pwr_eType_Time:
+          sprintf(query, "insert into %s (time, %s) values ('%s','%s')", m_items[item_idx].tablename, colname,
+                  timstr, bufstr);
+          break;
+        default:
+          if (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand)
+            sprintf(query, "insert into %s (time, %s, jump) values ('%s',%s,%d)", m_items[item_idx].tablename,
+                    colname, timstr, bufstr, set_jump);
+          else
+            sprintf(query, "insert into %s (time, %s) values ('%s',%s)", m_items[item_idx].tablename, colname,
+                    timstr, bufstr);
         }
       }
     }
     int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
       // printf( "Store value: %s \"%s\"\n", errmsg, query);
       *sts = SEV__DBERROR;
       m_items[item_idx].status = *sts;
-      if (m_items[item_idx].status != m_items[item_idx].logged_status) {
+      if (m_items[item_idx].status != m_items[item_idx].logged_status)
+      {
         m_items[item_idx].logged_status = m_items[item_idx].status;
-        errh_Error("Database store error: %s, table: %s object: %s", errmsg,
-            m_items[item_idx].tablename, m_items[item_idx].oname);
+        errh_Error("Database store error: %s, table: %s object: %s", errmsg, m_items[item_idx].tablename,
+                   m_items[item_idx].oname);
       }
       sqlite3_free(errmsg);
       return 0;
     }
-  } else {
-    if (m_items[item_idx].options & pwr_mSevOptionsMask_PosixTime) {
-      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution) {
+  }
+  else
+  {
+    if (m_items[item_idx].options & pwr_mSevOptionsMask_PosixTime)
+    {
+      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution)
+      {
         // Posix time, high resolution
-        sprintf(query, "update %s set time = %ld, ntime = %ld where id = %d",
-            m_items[item_idx].tablename, (long int)time.tv_sec,
-            (long int)time.tv_nsec, m_items[item_idx].last_id);
-      } else {
-        // Posix time, low resolution
-        sprintf(query, "update %s set time = %ld where id = %d",
-            m_items[item_idx].tablename, (long int)time.tv_sec,
-            m_items[item_idx].last_id);
+        sprintf(query, "update %s set time = %ld, ntime = %ld where id = %d", m_items[item_idx].tablename,
+                (long int)time.tv_sec, (long int)time.tv_nsec, m_items[item_idx].last_id);
       }
-    } else {
-      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution) {
+      else
+      {
+        // Posix time, low resolution
+        sprintf(query, "update %s set time = %ld where id = %d", m_items[item_idx].tablename,
+                (long int)time.tv_sec, m_items[item_idx].last_id);
+      }
+    }
+    else
+    {
+      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution)
+      {
         // Sql time, high resolution
-        sprintf(query, "update %s set time = '%s', ntime = %ld where id = %d",
-            m_items[item_idx].tablename, timstr, (long int)time.tv_nsec,
-            m_items[item_idx].last_id);
-      } else {
+        sprintf(query, "update %s set time = '%s', ntime = %ld where id = %d", m_items[item_idx].tablename,
+                timstr, (long int)time.tv_nsec, m_items[item_idx].last_id);
+      }
+      else
+      {
         // Sql time, low resolution
-        sprintf(query, "update %s set time = '%s' where id = %d",
-            m_items[item_idx].tablename, timstr, m_items[item_idx].last_id);
+        sprintf(query, "update %s set time = '%s' where id = %d", m_items[item_idx].tablename, timstr,
+                m_items[item_idx].last_id);
       }
     }
 
     int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
       // printf( "Update value: %s\n", errmsg);
       *sts = SEV__DBERROR;
       m_items[item_idx].status = *sts;
-      if (m_items[item_idx].status != m_items[item_idx].logged_status) {
+      if (m_items[item_idx].status != m_items[item_idx].logged_status)
+      {
         m_items[item_idx].logged_status = m_items[item_idx].status;
-        errh_Error("Database update error: %s, table: %s object: %s", errmsg,
-            m_items[item_idx].tablename, m_items[item_idx].oname);
+        errh_Error("Database update error: %s, table: %s object: %s", errmsg, m_items[item_idx].tablename,
+                   m_items[item_idx].oname);
       }
       sqlite3_free(errmsg);
       return 0;
@@ -1106,15 +1152,15 @@ int sev_dbsqlite::store_value(pwr_tStatus* sts, void* thread, int item_idx,
   return 1;
 }
 
-int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
-    pwr_tMask options, float deadband, char* aname, pwr_eType type,
-    unsigned int size, pwr_tFloat32 scantime, pwr_tTime* creatime,
-    pwr_tTime* starttime, pwr_tTime* endtime, int maxsize, pwr_tTime** tbuf,
-    void** vbuf, unsigned int* bsize)
+int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid, pwr_tMask options, float deadband,
+                             char* aname, pwr_eType type, unsigned int size, pwr_tFloat32 scantime,
+                             pwr_tTime* creatime, pwr_tTime* starttime, pwr_tTime* endtime, int maxsize,
+                             pwr_tTime** tbuf, void** vbuf, unsigned int* bsize)
 {
   sev_item item;
   get_item(sts, thread, &item, oid, aname);
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     return 0;
   }
 
@@ -1146,10 +1192,12 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
     etime = *endtime;
 
   // Get number of rows
-  if (item.options & pwr_mSevOptionsMask_ReadOptimized) {
+  if (item.options & pwr_mSevOptionsMask_ReadOptimized)
+  {
     sprintf(query, "select coalesce(max(id)+1,0) from %s", item.tablename);
     int rc = sqlite3_prepare_v2(m_con, query, -1, &stmt, 0);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
       printf("In %s row %d:\n", __FILE__, __LINE__);
       printf("GetValues Query Error\n");
       *sts = SEV__DBERROR;
@@ -1157,7 +1205,8 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
     }
 
     rc = sqlite3_step(stmt);
-    if (rc != SQLITE_ROW) {
+    if (rc != SQLITE_ROW)
+    {
       printf("In %s row %d:\n", __FILE__, __LINE__);
       *sts = SEV__DBERROR;
       return 0;
@@ -1165,13 +1214,16 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
 
     max_id = sqlite3_column_int(stmt, 0);
     sqlite3_finalize(stmt);
-  } else {
+  }
+  else
+  {
     // TODO
     *sts = SEV__NYI;
     return 0;
   }
 
-  if (starttime && endtime) {
+  if (starttime && endtime)
+  {
     pwr_tTime update_time;
     if (strcpy(last_update, "") != 0)
       timestr_to_time(last_update, &update_time);
@@ -1188,14 +1240,17 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       total_rows = max_id;
 
     div = total_rows / maxsize + 1;
-  } else if (starttime) {
+  }
+  else if (starttime)
+  {
     pwr_tTime update_time;
     if (!streq(last_update, ""))
       timestr_to_time(last_update, &update_time);
     else
       time_GetTime(&update_time);
 
-    if (time_Acomp(&update_time, starttime) != 1) {
+    if (time_Acomp(&update_time, starttime) != 1)
+    {
       *sts = SEV__NODATATIME;
       return 0;
     }
@@ -1203,11 +1258,14 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
     total_rows = int(time_DToFloat(0, &dt) / scantime);
     if (max_id < total_rows)
       total_rows = max_id;
-  } else if (endtime) {
+  }
+  else if (endtime)
+  {
     pwr_tTime create_time;
     timestr_to_time(create_time_str, &create_time);
 
-    if (time_Acomp(endtime, &create_time) != 1) {
+    if (time_Acomp(endtime, &create_time) != 1)
+    {
       *sts = SEV__NODATATIME;
       return 0;
     }
@@ -1215,22 +1273,24 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
     total_rows = int(time_DToFloat(0, &dt) / scantime);
     if (max_id < total_rows)
       total_rows = max_id;
-  } else {
+  }
+  else
+  {
     total_rows = max_id;
   }
 
   div = total_rows / maxsize + 1;
 
-  if (starttime) {
-    *sts = time_AtoAscii(
-        &stime, time_eFormat_NumDateAndTime, starttimstr, sizeof(starttimstr));
+  if (starttime)
+  {
+    *sts = time_AtoAscii(&stime, time_eFormat_NumDateAndTime, starttimstr, sizeof(starttimstr));
     if (EVEN(*sts))
       return 0;
     starttimstr[19] = 0;
   }
-  if (endtime) {
-    *sts = time_AtoAscii(
-        &etime, time_eFormat_NumDateAndTime, endtimstr, sizeof(endtimstr));
+  if (endtime)
+  {
+    *sts = time_AtoAscii(&etime, time_eFormat_NumDateAndTime, endtimstr, sizeof(endtimstr));
     if (EVEN(*sts))
       return 0;
     endtimstr[19] = 0;
@@ -1250,7 +1310,8 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
   // 'order by' part
   if (options & pwr_mSevOptionsMask_ReadOptimized)
     strcpy(orderby_part, "id");
-  else {
+  else
+  {
     if (options & pwr_mSevOptionsMask_HighTimeResolution)
       strcpy(orderby_part, "time,ntime");
     else
@@ -1258,87 +1319,106 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
   }
 
   // 'where' part
-  if (options & pwr_mSevOptionsMask_ReadOptimized) {
-    if (starttime && endtime) {
-      if (div == 1) {
+  if (options & pwr_mSevOptionsMask_ReadOptimized)
+  {
+    if (starttime && endtime)
+    {
+      if (div == 1)
+      {
         if (options & pwr_mSevOptionsMask_PosixTime)
-          sprintf(where_part, "where time >= %ld and time <= %ld",
-              (long int)starttime->tv_sec, (long int)endtime->tv_sec);
+          sprintf(where_part, "where time >= %ld and time <= %ld", (long int)starttime->tv_sec,
+                  (long int)endtime->tv_sec);
         else
-          sprintf(where_part, "where time >= '%s' and time <= '%s'",
-              starttimstr, endtimstr);
-      } else {
-        if (options & pwr_mSevOptionsMask_PosixTime)
-          sprintf(where_part,
-              "where (id %% %d = 0 %s) and time >= %ld and time <= %ld", div,
-              jumpstr, (long int)starttime->tv_sec, (long int)endtime->tv_sec);
-        else
-          sprintf(where_part,
-              "where (id %% %d = 0 %s) and time >= '%s' and time <= '%s'", div,
-              jumpstr, starttimstr, endtimstr);
+          sprintf(where_part, "where time >= '%s' and time <= '%s'", starttimstr, endtimstr);
       }
-    } else if (starttime) {
-      if (div == 1) {
+      else
+      {
+        if (options & pwr_mSevOptionsMask_PosixTime)
+          sprintf(where_part, "where (id %% %d = 0 %s) and time >= %ld and time <= %ld", div, jumpstr,
+                  (long int)starttime->tv_sec, (long int)endtime->tv_sec);
+        else
+          sprintf(where_part, "where (id %% %d = 0 %s) and time >= '%s' and time <= '%s'", div, jumpstr,
+                  starttimstr, endtimstr);
+      }
+    }
+    else if (starttime)
+    {
+      if (div == 1)
+      {
         if (options & pwr_mSevOptionsMask_PosixTime)
           sprintf(where_part, "where time >= %ld", (long int)starttime->tv_sec);
         else
           sprintf(where_part, "where time >= '%s'", starttimstr);
-      } else {
-        if (options & pwr_mSevOptionsMask_PosixTime)
-          sprintf(where_part, "where (id %% %d = 0 %s) and time >= %ld", div,
-              jumpstr, (long int)starttime->tv_sec);
-        else
-          sprintf(where_part, "where (id %% %d = 0 %s) and time >= '%s'", div,
-              jumpstr, starttimstr);
       }
-    } else if (endtime) {
-      if (div == 1) {
+      else
+      {
+        if (options & pwr_mSevOptionsMask_PosixTime)
+          sprintf(where_part, "where (id %% %d = 0 %s) and time >= %ld", div, jumpstr,
+                  (long int)starttime->tv_sec);
+        else
+          sprintf(where_part, "where (id %% %d = 0 %s) and time >= '%s'", div, jumpstr, starttimstr);
+      }
+    }
+    else if (endtime)
+    {
+      if (div == 1)
+      {
         if (options & pwr_mSevOptionsMask_PosixTime)
           sprintf(where_part, "where time <= %ld", (long int)endtime->tv_sec);
         else
           sprintf(where_part, "where time <= '%s'", endtimstr);
-      } else {
-        if (options & pwr_mSevOptionsMask_PosixTime)
-          sprintf(where_part, "where (id %% %d = 0 %s) and time <= %ld", div,
-              jumpstr, (long int)endtime->tv_sec);
-        else
-          sprintf(where_part, "where (id %% %d = 0 %s) and time <= '%s'", div,
-              jumpstr, endtimstr);
       }
-    } else {
+      else
+      {
+        if (options & pwr_mSevOptionsMask_PosixTime)
+          sprintf(where_part, "where (id %% %d = 0 %s) and time <= %ld", div, jumpstr,
+                  (long int)endtime->tv_sec);
+        else
+          sprintf(where_part, "where (id %% %d = 0 %s) and time <= '%s'", div, jumpstr, endtimstr);
+      }
+    }
+    else
+    {
       if (div == 1)
         strcpy(where_part, "");
       else
         sprintf(where_part, "where id %% %d = 0 %s", div, jumpstr);
     }
-  } else {
+  }
+  else
+  {
     // Not read optimized
-    if (starttime && endtime) {
+    if (starttime && endtime)
+    {
       if (options & pwr_mSevOptionsMask_PosixTime)
-        sprintf(where_part, "where time >= %ld and time <= %ld",
-            (long int)starttime->tv_sec, (long int)endtime->tv_sec);
+        sprintf(where_part, "where time >= %ld and time <= %ld", (long int)starttime->tv_sec,
+                (long int)endtime->tv_sec);
       else
-        sprintf(where_part, "where time >= '%s' and time <= '%s'", starttimstr,
-            endtimstr);
-    } else if (starttime) {
+        sprintf(where_part, "where time >= '%s' and time <= '%s'", starttimstr, endtimstr);
+    }
+    else if (starttime)
+    {
       if (options & pwr_mSevOptionsMask_PosixTime)
         sprintf(where_part, "where time >= %ld", (long int)starttime->tv_sec);
       else
         sprintf(where_part, "where time >= '%s'", starttimstr);
-    } else if (endtime) {
+    }
+    else if (endtime)
+    {
       if (options & pwr_mSevOptionsMask_PosixTime)
         sprintf(where_part, "where time <= %ld", (long int)endtime->tv_sec);
       else
         sprintf(where_part, "where time <= '%s'", endtimstr);
-    } else
+    }
+    else
       strcpy(where_part, "");
   }
 
-  sprintf(query, "select %s from %s %s order by %s", column_part,
-      item.tablename, where_part, orderby_part);
+  sprintf(query, "select %s from %s %s order by %s", column_part, item.tablename, where_part, orderby_part);
 
   int rc = sqlite3_prepare_v2(m_con, query, -1, &stmt, 0);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s\n", __FUNCTION__);
     *sts = SEV__DBERROR;
@@ -1348,12 +1428,14 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
   int bufrows = total_rows / div;
   int row_cnt = 0;
 
-  if (options & pwr_mSevOptionsMask_ReadOptimized) {
+  if (options & pwr_mSevOptionsMask_ReadOptimized)
+  {
     *tbuf = (pwr_tTime*)calloc(bufrows, sizeof(pwr_tTime));
     *vbuf = calloc(bufrows, size);
 
     int bcnt = 0;
-    for (int i = 0;; i++) {
+    for (int i = 0;; i++)
+    {
       rc = sqlite3_step(stmt);
       if (rc != SQLITE_ROW)
         break;
@@ -1364,27 +1446,36 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
 
       int j = 0;
 
-      if (options & pwr_mSevOptionsMask_PosixTime) {
-        if (options & pwr_mSevOptionsMask_HighTimeResolution) {
+      if (options & pwr_mSevOptionsMask_PosixTime)
+      {
+        if (options & pwr_mSevOptionsMask_HighTimeResolution)
+        {
           // Posix time, high resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
             timestr_to_time((char*)text, (pwr_tTime*)&(*tbuf)[bcnt].tv_sec);
           (*tbuf)[bcnt].tv_nsec = sqlite3_column_int(stmt, j++);
-        } else {
+        }
+        else
+        {
           // Posix time, low resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
             timestr_to_time((char*)text, (pwr_tTime*)&(*tbuf)[bcnt].tv_sec);
         }
-      } else {
-        if (options & pwr_mSevOptionsMask_HighTimeResolution) {
+      }
+      else
+      {
+        if (options & pwr_mSevOptionsMask_HighTimeResolution)
+        {
           // Sql time, high resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
             timestr_to_time((char*)text, (pwr_tTime*)&(*tbuf)[bcnt].tv_sec);
           (*tbuf)[bcnt].tv_nsec = sqlite3_column_int(stmt, j++);
-        } else {
+        }
+        else
+        {
           // Sql time, low resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
@@ -1393,9 +1484,11 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       }
 
       const char* value_str = (const char*)sqlite3_column_text(stmt, j++);
-      if (!value_str || streq(value_str, "")) {
+      if (!value_str || streq(value_str, ""))
+      {
         // Null value
-        switch (type) {
+        switch (type)
+        {
         case pwr_eType_Float32:
         case pwr_eType_Float64:
         case pwr_eType_Int8:
@@ -1413,15 +1506,15 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
         case pwr_eType_Time:
         case pwr_eType_DeltaTime:
           // TODO deltatime??
-          cdh_StringToAttrValue(
-              type, "1970-01-01 00:00:00", ((char*)*vbuf) + bcnt * size);
+          cdh_StringToAttrValue(type, "1970-01-01 00:00:00", ((char*)*vbuf) + bcnt * size);
           break;
         default:
           cdh_StringToAttrValue(type, " ", ((char*)*vbuf) + bcnt * size);
           break;
         }
         j++;
-      } else
+      }
+      else
         cdh_StringToAttrValue(type, value_str, ((char*)*vbuf) + bcnt * size);
 
       bcnt++;
@@ -1433,18 +1526,25 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
     printf("bcnt %d bufrows %d\n", bcnt, row_cnt);
     *bsize = bcnt;
     sqlite3_finalize(stmt);
-  } else {
+  }
+  else
+  {
     *tbuf = (pwr_tTime*)calloc(bufrows, sizeof(pwr_tTime));
     *vbuf = calloc(bufrows, size);
 
     int bcnt = 0;
-    for (int i = 0;; i++) {
-      if (i == 0) {
+    for (int i = 0;; i++)
+    {
+      if (i == 0)
+      {
         rc = sqlite3_step(stmt);
         if (rc != SQLITE_ROW)
           break;
-      } else {
-        for (int k = 0; k < div; k++) {
+      }
+      else
+      {
+        for (int k = 0; k < div; k++)
+        {
           rc = sqlite3_step(stmt);
           if (rc != SQLITE_ROW)
             break;
@@ -1456,27 +1556,36 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       bufrows++;
       int j = 0;
 
-      if (options & pwr_mSevOptionsMask_PosixTime) {
-        if (options & pwr_mSevOptionsMask_HighTimeResolution) {
+      if (options & pwr_mSevOptionsMask_PosixTime)
+      {
+        if (options & pwr_mSevOptionsMask_HighTimeResolution)
+        {
           // Posix time, high resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
             timestr_to_time((char*)text, (pwr_tTime*)&(*tbuf)[bcnt].tv_sec);
           (*tbuf)[bcnt].tv_nsec = sqlite3_column_int(stmt, j++);
-        } else {
+        }
+        else
+        {
           // Posix time, low resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
             timestr_to_time((char*)text, (pwr_tTime*)&(*tbuf)[bcnt].tv_sec);
         }
-      } else {
-        if (options & pwr_mSevOptionsMask_HighTimeResolution) {
+      }
+      else
+      {
+        if (options & pwr_mSevOptionsMask_HighTimeResolution)
+        {
           // Sql time, high resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
             timestr_to_time((char*)text, (pwr_tTime*)&(*tbuf)[bcnt].tv_sec);
           (*tbuf)[bcnt].tv_nsec = sqlite3_column_int(stmt, j++);
-        } else {
+        }
+        else
+        {
           // Sql time, low resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
@@ -1485,9 +1594,11 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       }
 
       const char* value_str = (const char*)sqlite3_column_text(stmt, j++);
-      if (streq(value_str, "")) {
+      if (streq(value_str, ""))
+      {
         // Null value
-        switch (type) {
+        switch (type)
+        {
         case pwr_eType_Float32:
         case pwr_eType_Float64:
         case pwr_eType_Int8:
@@ -1505,15 +1616,15 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
         case pwr_eType_Time:
         case pwr_eType_DeltaTime:
           // TODO deltatime??
-          cdh_StringToAttrValue(
-              type, "1970-01-01 00:00:00", ((char*)*vbuf) + bcnt * size);
+          cdh_StringToAttrValue(type, "1970-01-01 00:00:00", ((char*)*vbuf) + bcnt * size);
           break;
         default:
           cdh_StringToAttrValue(type, " ", ((char*)*vbuf) + bcnt * size);
           break;
         }
         j++;
-      } else
+      }
+      else
         cdh_StringToAttrValue(type, value_str, ((char*)*vbuf) + bcnt * size);
 
       bcnt++;
@@ -1530,87 +1641,93 @@ int sev_dbsqlite::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
   return 1;
 }
 
-int sev_dbsqlite::store_event(
-    pwr_tStatus* sts, void* thread, int item_idx, sev_event* ep)
+int sev_dbsqlite::store_event(pwr_tStatus* sts, void* thread, int item_idx, sev_event* ep)
 {
   char query[800];
   char* errmsg;
   char timstr[40];
 
-  *sts = time_AtoAscii(
-      &ep->time, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
+  *sts = time_AtoAscii(&ep->time, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
   if (EVEN(*sts))
     return 0;
   timstr[19] = 0;
 
-  if (m_items[item_idx].options & pwr_mSevOptionsMask_PosixTime) {
-    if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution) {
+  if (m_items[item_idx].options & pwr_mSevOptionsMask_PosixTime)
+  {
+    if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution)
+    {
       // Posix time, high resolution
-      sprintf(query, "insert into %s (time, ntime, eventtype, eventprio, "
-                     "eventid_nix, eventid_birthtime,"
-                     "eventid_idx, supobject_vid, supobject_oix, "
-                     "supobject_offset, supobject_size,"
-                     "eventtext, eventname) values "
-                     "(%ld,%ld,%d,%d,%d,%d,%d,%u,%u,%u,%u,'%s','%s')",
-          m_items[item_idx].tablename, (long int)ep->time.tv_sec,
-          (long int)ep->time.tv_nsec, ep->type, ep->eventprio, ep->eventid.Nix,
-          ep->eventid.BirthTime.tv_sec, ep->eventid.Idx,
-          ep->supobject.Objid.vid, ep->supobject.Objid.oix,
-          ep->supobject.Offset, ep->supobject.Size, ep->eventtext,
-          ep->eventname);
-    } else {
-      // Posix time, low resolution
-      sprintf(query, "insert into %s (time, eventtype, eventprio, eventid_nix, "
-                     "eventid_birthtime,"
-                     "eventid_idx, supobject_vid, supobject_oix, "
-                     "supobject_offset, supobject_size,"
-                     "eventtext, eventname) values "
-                     "(%ld,%d,%d,%d,%d,%d,%u,%u,%u,%u,'%s','%s')",
-          m_items[item_idx].tablename, (long int)ep->time.tv_sec, ep->type,
-          ep->eventprio, ep->eventid.Nix, ep->eventid.BirthTime.tv_sec,
-          ep->eventid.Idx, ep->supobject.Objid.vid, ep->supobject.Objid.oix,
-          ep->supobject.Offset, ep->supobject.Size, ep->eventtext,
-          ep->eventname);
+      sprintf(query,
+              "insert into %s (time, ntime, eventtype, eventprio, "
+              "eventid_nix, eventid_birthtime,"
+              "eventid_idx, supobject_vid, supobject_oix, "
+              "supobject_offset, supobject_size,"
+              "eventtext, eventname) values "
+              "(%ld,%ld,%d,%d,%d,%d,%d,%u,%u,%u,%u,'%s','%s')",
+              m_items[item_idx].tablename, (long int)ep->time.tv_sec, (long int)ep->time.tv_nsec, ep->type,
+              ep->eventprio, ep->eventid.Nix, ep->eventid.BirthTime.tv_sec, ep->eventid.Idx,
+              ep->supobject.Objid.vid, ep->supobject.Objid.oix, ep->supobject.Offset, ep->supobject.Size,
+              ep->eventtext, ep->eventname);
     }
-  } else {
-    if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution) {
+    else
+    {
+      // Posix time, low resolution
+      sprintf(query,
+              "insert into %s (time, eventtype, eventprio, eventid_nix, "
+              "eventid_birthtime,"
+              "eventid_idx, supobject_vid, supobject_oix, "
+              "supobject_offset, supobject_size,"
+              "eventtext, eventname) values "
+              "(%ld,%d,%d,%d,%d,%d,%u,%u,%u,%u,'%s','%s')",
+              m_items[item_idx].tablename, (long int)ep->time.tv_sec, ep->type, ep->eventprio,
+              ep->eventid.Nix, ep->eventid.BirthTime.tv_sec, ep->eventid.Idx, ep->supobject.Objid.vid,
+              ep->supobject.Objid.oix, ep->supobject.Offset, ep->supobject.Size, ep->eventtext,
+              ep->eventname);
+    }
+  }
+  else
+  {
+    if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution)
+    {
       // Sql time, high resolution
-      sprintf(query, "insert into %s (time, ntime, eventtype, eventprio, "
-                     "eventid_nix, eventid_birthtime,"
-                     "eventid_idx, supobject_vid, supobject_oix, "
-                     "supobject_offset, supobject_size,"
-                     "eventtext, eventname) values "
-                     "('%s',%ld,%d,%d,%d,%d,%d,%u,%u,%u,%u,'%s','%s')",
-          m_items[item_idx].tablename, timstr, (long int)ep->time.tv_sec,
-          ep->type, ep->eventprio, ep->eventid.Nix,
-          ep->eventid.BirthTime.tv_sec, ep->eventid.Idx,
-          ep->supobject.Objid.vid, ep->supobject.Objid.oix,
-          ep->supobject.Offset, ep->supobject.Size, ep->eventtext,
-          ep->eventname);
-    } else {
+      sprintf(query,
+              "insert into %s (time, ntime, eventtype, eventprio, "
+              "eventid_nix, eventid_birthtime,"
+              "eventid_idx, supobject_vid, supobject_oix, "
+              "supobject_offset, supobject_size,"
+              "eventtext, eventname) values "
+              "('%s',%ld,%d,%d,%d,%d,%d,%u,%u,%u,%u,'%s','%s')",
+              m_items[item_idx].tablename, timstr, (long int)ep->time.tv_sec, ep->type, ep->eventprio,
+              ep->eventid.Nix, ep->eventid.BirthTime.tv_sec, ep->eventid.Idx, ep->supobject.Objid.vid,
+              ep->supobject.Objid.oix, ep->supobject.Offset, ep->supobject.Size, ep->eventtext,
+              ep->eventname);
+    }
+    else
+    {
       // Sql time, low resolution
-      sprintf(query, "insert into %s (time, eventtype, eventprio, eventid_nix, "
-                     "eventid_birthtime,"
-                     "eventid_idx, supobject_vid, supobject_oix, "
-                     "supobject_offset, supobject_size,"
-                     "eventtext, eventname) values "
-                     "('%s',%d,%d,%d,%d,%d,%u,%u,%u,%u,'%s','%s')",
-          m_items[item_idx].tablename, timstr, ep->type, ep->eventprio,
-          ep->eventid.Nix, ep->eventid.BirthTime.tv_sec, ep->eventid.Idx,
-          ep->supobject.Objid.vid, ep->supobject.Objid.oix,
-          ep->supobject.Offset, ep->supobject.Size, ep->eventtext,
-          ep->eventname);
+      sprintf(query,
+              "insert into %s (time, eventtype, eventprio, eventid_nix, "
+              "eventid_birthtime,"
+              "eventid_idx, supobject_vid, supobject_oix, "
+              "supobject_offset, supobject_size,"
+              "eventtext, eventname) values "
+              "('%s',%d,%d,%d,%d,%d,%u,%u,%u,%u,'%s','%s')",
+              m_items[item_idx].tablename, timstr, ep->type, ep->eventprio, ep->eventid.Nix,
+              ep->eventid.BirthTime.tv_sec, ep->eventid.Idx, ep->supobject.Objid.vid, ep->supobject.Objid.oix,
+              ep->supobject.Offset, ep->supobject.Size, ep->eventtext, ep->eventname);
     }
   }
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     // printf( "Store value: %s \"%s\"\n", errmsg, query);
     *sts = SEV__DBERROR;
     m_items[item_idx].status = *sts;
-    if (m_items[item_idx].status != m_items[item_idx].logged_status) {
+    if (m_items[item_idx].status != m_items[item_idx].logged_status)
+    {
       m_items[item_idx].logged_status = m_items[item_idx].status;
-      errh_Error("Database store error: %s, table: %s object: %s", errmsg,
-          m_items[item_idx].tablename, m_items[item_idx].oname);
+      errh_Error("Database store error: %s, table: %s object: %s", errmsg, m_items[item_idx].tablename,
+                 m_items[item_idx].oname);
     }
     sqlite3_free(errmsg);
     return 0;
@@ -1622,10 +1739,10 @@ int sev_dbsqlite::store_event(
   return 1;
 }
 
-int sev_dbsqlite::check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname,
-    char* aname, pwr_tDeltaTime storagetime, pwr_eType type, unsigned int size,
-    char* description, char* unit, pwr_tFloat32 scantime, pwr_tFloat32 deadband,
-    pwr_tMask options, unsigned int* idx)
+int sev_dbsqlite::check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname,
+                             pwr_tDeltaTime storagetime, pwr_eType type, unsigned int size, char* description,
+                             char* unit, pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options,
+                             unsigned int* idx)
 {
   char timestr[40];
   pwr_tTime uptime;
@@ -1634,52 +1751,60 @@ int sev_dbsqlite::check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname,
   time_AtoAscii(&uptime, time_eFormat_NumDateAndTime, timestr, sizeof(timestr));
   timestr[19] = 0;
 
-  for (unsigned int i = 0; i < m_items.size(); i++) {
+  for (unsigned int i = 0; i < m_items.size(); i++)
+  {
     if (m_items[i].deleted)
       continue;
 
-    if (cdh_ObjidIsEqual(oid, m_items[i].oid)
-        && str_NoCaseStrcmp(aname, m_items[i].attr[0].aname) == 0) {
+    if (cdh_ObjidIsEqual(oid, m_items[i].oid) && str_NoCaseStrcmp(aname, m_items[i].attr[0].aname) == 0)
+    {
       char query[600];
       char* errmsg;
 
       bool itemdefchange = false;
-      if (type != m_items[i].attr[0].type || size != m_items[i].attr[0].size) {
+      if (type != m_items[i].attr[0].type || size != m_items[i].attr[0].size)
+      {
         itemdefchange = true;
       }
 
       sprintf(query, "update items set ");
-      if (storagetime.tv_sec != m_items[i].storagetime.tv_sec) {
-        sprintf(&query[strlen(query)], "storagetime=%ld,",
-            (long int)storagetime.tv_sec);
+      if (storagetime.tv_sec != m_items[i].storagetime.tv_sec)
+      {
+        sprintf(&query[strlen(query)], "storagetime=%ld,", (long int)storagetime.tv_sec);
         m_items[i].storagetime = storagetime;
       }
-      if (!streq(oname, m_items[i].oname)) {
+      if (!streq(oname, m_items[i].oname))
+      {
         sprintf(&query[strlen(query)], "oname=\'%s\',", oname);
         strncpy(m_items[i].oname, oname, sizeof(m_items[i].oname));
       }
-      if (type != m_items[i].attr[0].type) {
+      if (type != m_items[i].attr[0].type)
+      {
         sprintf(&query[strlen(query)], "vtype=%d,", type);
         m_items[i].attr[i].type = type;
       }
-      if (size != m_items[i].attr[0].size) {
+      if (size != m_items[i].attr[0].size)
+      {
         sprintf(&query[strlen(query)], "vsize=%d,", size);
         m_items[i].attr[i].size = size;
       }
-      if (!feqf(scantime, m_items[i].scantime)) {
+      if (!feqf(scantime, m_items[i].scantime))
+      {
         sprintf(&query[strlen(query)], "scantime=%.1f,", scantime);
         m_items[i].scantime = scantime;
       }
-      if (!feqf(deadband, m_items[i].deadband)) {
+      if (!feqf(deadband, m_items[i].deadband))
+      {
         sprintf(&query[strlen(query)], "deadband=%.4f,", deadband);
         m_items[i].deadband = deadband;
       }
-      if (!streq(description, m_items[i].description)) {
+      if (!streq(description, m_items[i].description))
+      {
         sprintf(&query[strlen(query)], "description=\'%s\',", description);
-        strncpy(m_items[i].description, description,
-            sizeof(m_items[i].description));
+        strncpy(m_items[i].description, description, sizeof(m_items[i].description));
       }
-      if (!streq(unit, m_items[i].attr[0].unit)) {
+      if (!streq(unit, m_items[i].attr[0].unit))
+      {
         sprintf(&query[strlen(query)], "unit=\'%s\',", unit);
         strncpy(m_items[i].attr[0].unit, unit, sizeof(m_items[i].attr[0].unit));
       }
@@ -1691,7 +1816,8 @@ int sev_dbsqlite::check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname,
       // m_items[i].options = options;
 
       int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-      if (rc != SQLITE_OK) {
+      if (rc != SQLITE_OK)
+      {
         printf("In %s row %d:\n", __FILE__, __LINE__);
         printf("Store item: %s\n", errmsg);
         sqlite3_free(errmsg);
@@ -1699,8 +1825,10 @@ int sev_dbsqlite::check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname,
         return 0;
       }
 
-      if (itemdefchange) {
-        if (!handle_itemchange(sts, m_items[i].tablename, i)) {
+      if (itemdefchange)
+      {
+        if (!handle_itemchange(sts, m_items[i].tablename, i))
+        {
           return 1;
         }
       }
@@ -1713,15 +1841,15 @@ int sev_dbsqlite::check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname,
   return 0;
 }
 
-int sev_dbsqlite::add_item(pwr_tStatus* sts, pwr_tOid oid, char* oname,
-    char* aname, pwr_tDeltaTime storagetime, pwr_eType type, unsigned int size,
-    char* description, char* unit, pwr_tFloat32 scantime, pwr_tFloat32 deadband,
-    pwr_tMask options, unsigned int* idx)
+int sev_dbsqlite::add_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname,
+                           pwr_tDeltaTime storagetime, pwr_eType type, unsigned int size, char* description,
+                           char* unit, pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options,
+                           unsigned int* idx)
 {
   char tablename[256];
 
-  store_item(sts, tablename, oid, oname, aname, storagetime, type, size,
-      description, unit, scantime, deadband, options);
+  store_item(sts, tablename, oid, oname, aname, storagetime, type, size, description, unit, scantime,
+             deadband, options);
   if (EVEN(*sts))
     return 0;
 
@@ -1766,7 +1894,8 @@ int sev_dbsqlite::delete_item(pwr_tStatus* sts, pwr_tOid oid, char* aname)
 {
   sev_item item;
   get_item(sts, 0, &item, oid, aname);
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     return 0;
   }
 
@@ -1775,12 +1904,14 @@ int sev_dbsqlite::delete_item(pwr_tStatus* sts, pwr_tOid oid, char* aname)
   if (ODD(*sts))
     delete_table(sts, item.tablename);
 
-  if (ODD(*sts)) {
-    for (int i = 0; i < (int)m_items.size(); i++) {
+  if (ODD(*sts))
+  {
+    for (int i = 0; i < (int)m_items.size(); i++)
+    {
       if (m_items[i].deleted)
         continue;
-      if (cdh_ObjidIsEqual(m_items[i].oid, oid)
-          && str_NoCaseStrcmp(m_items[i].attr[0].aname, aname) == 0) {
+      if (cdh_ObjidIsEqual(m_items[i].oid, oid) && str_NoCaseStrcmp(m_items[i].attr[0].aname, aname) == 0)
+      {
         m_items[i].deleted = 1;
         break;
       }
@@ -1789,21 +1920,20 @@ int sev_dbsqlite::delete_item(pwr_tStatus* sts, pwr_tOid oid, char* aname)
   return 1;
 }
 
-int sev_dbsqlite::delete_old_data(pwr_tStatus* sts, void* thread,
-    char* tablename, pwr_tMask options, pwr_tTime limit, pwr_tFloat32 scantime,
-    pwr_tFloat32 garbagecycle)
+int sev_dbsqlite::delete_old_data(pwr_tStatus* sts, void* thread, char* tablename, pwr_tMask options,
+                                  pwr_tTime limit, pwr_tFloat32 scantime, pwr_tFloat32 garbagecycle)
 {
   char query[300];
   char* errmsg;
   char timstr[40];
 
-  *sts = time_AtoAscii(
-      &limit, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
+  *sts = time_AtoAscii(&limit, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
   if (EVEN(*sts))
     return 0;
   timstr[19] = 0;
 
-  if (options & pwr_mSevOptionsMask_ReadOptimized) {
+  if (options & pwr_mSevOptionsMask_ReadOptimized)
+  {
     // TODO Change 86400 to sev_cGarbageCycle
     // We scan trough as many rows that we write between two garbage cycles plus
     // some extra rows
@@ -1814,22 +1944,22 @@ int sev_dbsqlite::delete_old_data(pwr_tStatus* sts, void* thread,
 
     nbRowsToClean += get_minFromIntegerColumn(tablename, (char*)"id");
     if (options & pwr_mSevOptionsMask_PosixTime)
-      sprintf(query,
-          "delete from %s where id < " pwr_dFormatUInt64 " and time < %ld;",
-          tablename, nbRowsToClean, (long int)limit.tv_sec);
+      sprintf(query, "delete from %s where id < " pwr_dFormatUInt64 " and time < %ld;", tablename,
+              nbRowsToClean, (long int)limit.tv_sec);
     else
-      sprintf(query,
-          "delete from %s where id < " pwr_dFormatUInt64 " and time < '%s';",
-          tablename, nbRowsToClean, timstr);
-  } else {
+      sprintf(query, "delete from %s where id < " pwr_dFormatUInt64 " and time < '%s';", tablename,
+              nbRowsToClean, timstr);
+  }
+  else
+  {
     if (options & pwr_mSevOptionsMask_PosixTime)
-      sprintf(query, "delete from %s where time < %ld;", tablename,
-          (long int)limit.tv_sec);
+      sprintf(query, "delete from %s where time < %ld;", tablename, (long int)limit.tv_sec);
     else
       sprintf(query, "delete from %s where time < '%s';", tablename, timstr);
   }
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Delete old data: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -1845,8 +1975,8 @@ int sev_dbsqlite::timestr_to_time(char* tstr, pwr_tTime* ts)
 {
   struct tm tt;
 
-  int nr = sscanf(tstr, "%4d-%02d-%20d %02d:%02d:%02d", &tt.tm_year, &tt.tm_mon,
-      &tt.tm_mday, &tt.tm_hour, &tt.tm_min, &tt.tm_sec);
+  int nr = sscanf(tstr, "%4d-%02d-%20d %02d:%02d:%02d", &tt.tm_year, &tt.tm_mon, &tt.tm_mday, &tt.tm_hour,
+                  &tt.tm_min, &tt.tm_sec);
   if (nr != 6)
     return 0;
 
@@ -1869,11 +1999,11 @@ char* sev_dbsqlite::oid_to_table(pwr_tOid oid, char* aname)
   unsigned char vid[4];
 
   memcpy(&vid, &oid.vid, sizeof(vid));
-  sprintf(tbl, "O%3.3u_%3.3u_%3.3u_%3.3u_%8.8x_%s", vid[3], vid[2], vid[1],
-      vid[0], oid.oix, cdh_Low(aname));
+  sprintf(tbl, "O%3.3u_%3.3u_%3.3u_%3.3u_%8.8x_%s", vid[3], vid[2], vid[1], vid[0], oid.oix, cdh_Low(aname));
 
   // Replace '.' in attribute with '_'
-  for (char* s = tbl; *s; s++) {
+  for (char* s = tbl; *s; s++)
+  {
     if (*s == '.')
       *s = '_';
     if (*s == '[')
@@ -1888,7 +2018,8 @@ char* sev_dbsqlite::pwrtype_to_type(pwr_eType type, unsigned int size)
 {
   static char stype[40];
 
-  switch (type) {
+  switch (type)
+  {
   case pwr_eType_Boolean:
     strcpy(stype, "int unsigned");
     break;
@@ -1937,11 +2068,10 @@ char* sev_dbsqlite::pwrtype_to_type(pwr_eType type, unsigned int size)
   return stype;
 }
 
-int sev_dbsqlite::check_objectitem(pwr_tStatus* sts, char* tablename,
-    pwr_tOid oid, char* oname, char* aname, pwr_tDeltaTime storagetime,
-    char* description, pwr_tFloat32 scantime, pwr_tFloat32 deadband,
-    pwr_tMask options, unsigned int attrnum, sev_sHistAttr* attr,
-    unsigned int* idx)
+int sev_dbsqlite::check_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                                   pwr_tDeltaTime storagetime, char* description, pwr_tFloat32 scantime,
+                                   pwr_tFloat32 deadband, pwr_tMask options, unsigned int attrnum,
+                                   sev_sHistAttr* attr, unsigned int* idx)
 {
   char timestr[40];
   pwr_tTime uptime;
@@ -1950,31 +2080,31 @@ int sev_dbsqlite::check_objectitem(pwr_tStatus* sts, char* tablename,
   time_AtoAscii(&uptime, time_eFormat_NumDateAndTime, timestr, sizeof(timestr));
   timestr[19] = 0;
 
-  for (unsigned int i = 0; i < m_items.size(); i++) {
+  for (unsigned int i = 0; i < m_items.size(); i++)
+  {
     if (m_items[i].deleted)
       continue;
 
-    if (cdh_ObjidIsEqual(oid, m_items[i].oid)
-        && str_NoCaseStrcmp(oname, m_items[i].oname) == 0) {
+    if (cdh_ObjidIsEqual(oid, m_items[i].oid) && str_NoCaseStrcmp(oname, m_items[i].oname) == 0)
+    {
       char query[400];
       char* errmsg;
       sprintf(query, "update objectitems set ");
-      sprintf(&query[strlen(query)], "storagetime=%ld,",
-          (long int)storagetime.tv_sec);
+      sprintf(&query[strlen(query)], "storagetime=%ld,", (long int)storagetime.tv_sec);
       sprintf(&query[strlen(query)], "description=\'%s\',", description);
       sprintf(&query[strlen(query)], "scantime=%.3f,", scantime);
       sprintf(&query[strlen(query)], "deadband=%.3f,", deadband);
       // For now we can't change options. sprintf( &query[strlen(query)],
       // "options=%d,", options);
       sprintf(&query[strlen(query)], "uptime=\'%s\' ", timestr);
-      sprintf(&query[strlen(query)],
-          "where vid=%d and oix=%d and tablename='%s';", oid.vid, oid.oix,
-          tablename);
+      sprintf(&query[strlen(query)], "where vid=%d and oix=%d and tablename='%s';", oid.vid, oid.oix,
+              tablename);
 
       // printf("%s query:%s\n", __FUNCTION__, query);
 
       int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-      if (rc != SQLITE_OK) {
+      if (rc != SQLITE_OK)
+      {
         printf("In %s row %d:\n", __FILE__, __LINE__);
         printf("%s : %s\n", __FUNCTION__, errmsg);
         sqlite3_free(errmsg);
@@ -1982,8 +2112,7 @@ int sev_dbsqlite::check_objectitem(pwr_tStatus* sts, char* tablename,
         return 0;
       }
       m_items[i].storagetime = storagetime;
-      strncpy(
-          m_items[i].description, description, sizeof(m_items[i].description));
+      strncpy(m_items[i].description, description, sizeof(m_items[i].description));
       m_items[i].scantime = scantime;
       m_items[i].deadband = deadband;
       // This won't work!! We have to alter the table to be able to change this
@@ -2000,14 +2129,12 @@ int sev_dbsqlite::check_objectitem(pwr_tStatus* sts, char* tablename,
   return 0;
 }
 
-int sev_dbsqlite::add_objectitem(pwr_tStatus* sts, char* tablename,
-    pwr_tOid oid, char* oname, char* aname, pwr_tDeltaTime storagetime,
-    char* description, pwr_tFloat32 scantime, pwr_tFloat32 deadband,
-    pwr_tMask options, unsigned int attrnum, sev_sHistAttr* attr,
-    unsigned int* idx)
+int sev_dbsqlite::add_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                                 pwr_tDeltaTime storagetime, char* description, pwr_tFloat32 scantime,
+                                 pwr_tFloat32 deadband, pwr_tMask options, unsigned int attrnum,
+                                 sev_sHistAttr* attr, unsigned int* idx)
 {
-  store_objectitem(sts, tablename, oid, oname, aname, storagetime, description,
-      scantime, deadband, options);
+  store_objectitem(sts, tablename, oid, oname, aname, storagetime, description, scantime, deadband, options);
   if (EVEN(*sts))
     return 0;
 
@@ -2038,10 +2165,9 @@ int sev_dbsqlite::add_objectitem(pwr_tStatus* sts, char* tablename,
 
   return 1;
 }
-int sev_dbsqlite::store_objectitem(pwr_tStatus* sts, char* tablename,
-    pwr_tOid oid, char* oname, char* aname, pwr_tDeltaTime storagetime,
-    char* description, pwr_tFloat32 scantime, pwr_tFloat32 deadband,
-    pwr_tMask options)
+int sev_dbsqlite::store_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                                   pwr_tDeltaTime storagetime, char* description, pwr_tFloat32 scantime,
+                                   pwr_tFloat32 deadband, pwr_tMask options)
 {
   char query[800];
   char* errmsg;
@@ -2049,8 +2175,7 @@ int sev_dbsqlite::store_objectitem(pwr_tStatus* sts, char* tablename,
   pwr_tTime creatime;
 
   time_GetTime(&creatime);
-  time_AtoAscii(
-      &creatime, time_eFormat_NumDateAndTime, timestr, sizeof(timestr));
+  time_AtoAscii(&creatime, time_eFormat_NumDateAndTime, timestr, sizeof(timestr));
   timestr[19] = 0;
 
   unsigned int next_id = get_nextAutoIncrement((char*)"objectitems");
@@ -2068,14 +2193,16 @@ int sev_dbsqlite::store_objectitem(pwr_tStatus* sts, char* tablename,
   */
   sprintf(tablename, "obj_%s_%d", oid_to_table(oid, (char*)""), next_id);
 
-  sprintf(query, "insert into objectitems "
-                 "(tablename,vid,oix,oname,aname,uptime,cretime,storagetime,"
-                 "description,scantime,deadband,options) "
-                 "values ('%s',%d,%d,'%s','%s','%s','%s',%ld,'%s',%f,%f,%d);",
-      tablename, oid.vid, oid.oix, oname, aname, timestr, timestr,
-      (long int)storagetime.tv_sec, description, scantime, deadband, options);
+  sprintf(query,
+          "insert into objectitems "
+          "(tablename,vid,oix,oname,aname,uptime,cretime,storagetime,"
+          "description,scantime,deadband,options) "
+          "values ('%s',%d,%d,'%s','%s','%s','%s',%ld,'%s',%f,%f,%d);",
+          tablename, oid.vid, oid.oix, oname, aname, timestr, timestr, (long int)storagetime.tv_sec,
+          description, scantime, deadband, options);
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s: %s\n", __FUNCTION__, errmsg);
     sqlite3_free(errmsg);
@@ -2087,8 +2214,7 @@ int sev_dbsqlite::store_objectitem(pwr_tStatus* sts, char* tablename,
   return 1;
 }
 
-int sev_dbsqlite::create_objecttable(
-    pwr_tStatus* sts, char* tablename, pwr_tMask options, float deadband)
+int sev_dbsqlite::create_objecttable(pwr_tStatus* sts, char* tablename, pwr_tMask options, float deadband)
 {
   char query[2000];
   char* errmsg;
@@ -2098,23 +2224,31 @@ int sev_dbsqlite::create_objecttable(
   char readoptstr[80];
   char enginestr[100] = "";
 
-  if (options & pwr_mSevOptionsMask_PosixTime) {
-    if (options & pwr_mSevOptionsMask_HighTimeResolution) {
+  if (options & pwr_mSevOptionsMask_PosixTime)
+  {
+    if (options & pwr_mSevOptionsMask_HighTimeResolution)
+    {
       // Posix time, high resolution
       strcpy(timeformatstr, "sev__time int unsigned, sev__ntime int unsigned");
       strcpy(idtypestr, "integer");
-    } else {
+    }
+    else
+    {
       // Posix time, low resolution
       strcpy(timeformatstr, "sev__time int unsigned");
       strcpy(idtypestr, "integer");
     }
-  } else {
-    if (options & pwr_mSevOptionsMask_HighTimeResolution) {
+  }
+  else
+  {
+    if (options & pwr_mSevOptionsMask_HighTimeResolution)
+    {
       // Sql time, high resolution
-      strcpy(timeformatstr,
-          "sev__time datetime not null, sev__ntime int unsigned");
+      strcpy(timeformatstr, "sev__time datetime not null, sev__ntime int unsigned");
       strcpy(idtypestr, "integer");
-    } else {
+    }
+    else
+    {
       // Sql time, low resolution
       strcpy(timeformatstr, "sev__time datetime not null");
       strcpy(idtypestr, "integer");
@@ -2122,8 +2256,7 @@ int sev_dbsqlite::create_objecttable(
   }
 
   if (options & pwr_mSevOptionsMask_ReadOptimized)
-    sprintf(readoptstr, "sev__id %s not null primary key autoincrement,",
-        idtypestr);
+    sprintf(readoptstr, "sev__id %s not null primary key autoincrement,", idtypestr);
   else
     strcpy(readoptstr, "");
 
@@ -2132,12 +2265,14 @@ int sev_dbsqlite::create_objecttable(
   else
     strcpy(jumpstr, "");
 
-  sprintf(query, "create table %s ( %s"
-                 "%s %s)%s;",
-      tablename, readoptstr, timeformatstr, jumpstr, enginestr);
+  sprintf(query,
+          "create table %s ( %s"
+          "%s %s)%s;",
+          tablename, readoptstr, timeformatstr, jumpstr, enginestr);
 
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s: %s\n", __FUNCTION__, errmsg);
     sqlite3_free(errmsg);
@@ -2145,11 +2280,11 @@ int sev_dbsqlite::create_objecttable(
     return 0;
   }
 
-  sprintf(query, "create index %s_sev__time_idx on %s (sev__time)", tablename,
-      tablename);
+  sprintf(query, "create index %s_sev__time_idx on %s (sev__time)", tablename, tablename);
 
   rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s: %s\n", __FUNCTION__, errmsg);
     sqlite3_free(errmsg);
@@ -2161,14 +2296,16 @@ int sev_dbsqlite::create_objecttable(
   return 1;
 }
 
-int sev_dbsqlite::check_objectitemattr(pwr_tStatus* sts, char* tablename,
-    pwr_tOid oid, char* aname, char* oname, pwr_eType type, unsigned int size,
-    unsigned int* idx)
+int sev_dbsqlite::check_objectitemattr(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* aname,
+                                       char* oname, pwr_eType type, unsigned int size, unsigned int* idx)
 {
   sev_item* item = &m_items[*idx];
-  for (size_t j = 0; j < item->attr.size(); j++) {
-    if (str_NoCaseStrcmp(aname, item->attr[j].aname) == 0) {
-      if (type != item->attr[j].type || size != item->attr[j].size) {
+  for (size_t j = 0; j < item->attr.size(); j++)
+  {
+    if (str_NoCaseStrcmp(aname, item->attr[j].aname) == 0)
+    {
+      if (type != item->attr[j].type || size != item->attr[j].size)
+      {
         *sts = SEV__NOSUCHITEM;
         return 0;
         /*
@@ -2189,8 +2326,7 @@ int sev_dbsqlite::check_objectitemattr(pwr_tStatus* sts, char* tablename,
   return 0;
 }
 
-pwr_tUInt64 sev_dbsqlite::get_minFromIntegerColumn(
-    char* tablename, char* colname)
+pwr_tUInt64 sev_dbsqlite::get_minFromIntegerColumn(char* tablename, char* colname)
 {
   char query[2000];
   pwr_tUInt64 retVal = 0;
@@ -2199,20 +2335,23 @@ pwr_tUInt64 sev_dbsqlite::get_minFromIntegerColumn(
 
   // printf( "%s: %s\n", __FUNCTION__ ,query);
   int rc = sqlite3_prepare_v2(m_con, query, -1, &stmt, 0);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s\n", __FUNCTION__);
     return 0;
   }
 
   rc = sqlite3_step(stmt);
-  if (rc != SQLITE_ROW) {
+  if (rc != SQLITE_ROW)
+  {
     sqlite3_finalize(stmt);
     return 0;
   }
 
   const char* text = (const char*)sqlite3_column_text(stmt, 0);
-  if (!text) {
+  if (!text)
+  {
     sqlite3_finalize(stmt);
     return 0;
   }
@@ -2221,8 +2360,7 @@ pwr_tUInt64 sev_dbsqlite::get_minFromIntegerColumn(
   return retVal;
 }
 
-pwr_tUInt64 sev_dbsqlite::get_maxFromIntegerColumn(
-    char* tablename, char* colname)
+pwr_tUInt64 sev_dbsqlite::get_maxFromIntegerColumn(char* tablename, char* colname)
 {
   char query[2000];
   pwr_tUInt64 retVal = 0;
@@ -2230,14 +2368,16 @@ pwr_tUInt64 sev_dbsqlite::get_maxFromIntegerColumn(
   sprintf(query, "select max(`%s`) from %s", colname, tablename);
 
   int rc = sqlite3_prepare_v2(m_con, query, -1, &stmt, 0);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s\n", __FUNCTION__);
     return 0;
   }
 
   rc = sqlite3_step(stmt);
-  if (rc != SQLITE_ROW) {
+  if (rc != SQLITE_ROW)
+  {
     sqlite3_finalize(stmt);
     return retVal;
   }
@@ -2257,14 +2397,16 @@ pwr_tUInt64 sev_dbsqlite::get_nextAutoIncrement(char* tablename)
   // printf( "%s: %s\n", __FUNCTION__ ,query);
 
   int rc = sqlite3_prepare_v2(m_con, query, -1, &stmt, 0);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s\n", __FUNCTION__);
     return 0;
   }
 
   rc = sqlite3_step(stmt);
-  if (rc != SQLITE_ROW) {
+  if (rc != SQLITE_ROW)
+  {
     sqlite3_finalize(stmt);
     return retVal;
   }
@@ -2275,12 +2417,14 @@ pwr_tUInt64 sev_dbsqlite::get_nextAutoIncrement(char* tablename)
   return ++retVal;
 }
 
-static void real_escape_string(char *out, char *in, int size)
+static void real_escape_string(char* out, char* in, int size)
 {
   char *t, *s;
 
-  for (s = in, t = out; *s; s++, t++) {
-    if (*s == '\'') {
+  for (s = in, t = out; *s; s++, t++)
+  {
+    if (*s == '\'')
+    {
       *t = '\'';
       t++;
     }
@@ -2289,8 +2433,8 @@ static void real_escape_string(char *out, char *in, int size)
   *t = 0;
 }
 
-int sev_dbsqlite::store_objectvalue(pwr_tStatus* sts, int item_idx,
-    int attr_idx, pwr_tTime time, void* buf, void* oldbuf, unsigned int size)
+int sev_dbsqlite::store_objectvalue(pwr_tStatus* sts, int item_idx, int attr_idx, pwr_tTime time, void* buf,
+                                    void* oldbuf, unsigned int size)
 {
   void* data = buf;
   void* olddata = oldbuf;
@@ -2306,40 +2450,42 @@ int sev_dbsqlite::store_objectvalue(pwr_tStatus* sts, int item_idx,
   char bufInclEscCharstr[1025];
   char timstr[40];
 
-  *sts = time_AtoAscii(
-      &time, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
+  *sts = time_AtoAscii(&time, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
   if (EVEN(*sts))
     return 0;
   timstr[19] = 0;
 
   bool updateOnlyTime = false;
   bool setJump = false;
-  if (!m_items[item_idx].first_storage
-      && (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand)) {
-    if (m_items[item_idx].deadband_active) {
+  if (!m_items[item_idx].first_storage && (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand))
+  {
+    if (m_items[item_idx].deadband_active)
+    {
       updateOnlyTime = true;
-      for (size_t i = 0; i < m_items[item_idx].attr.size(); i++) {
-        pwr_tFloat32 deadband
-            = m_items[item_idx].deadband; // TODO should be on attribute
-        m_items[item_idx].deadband_active
-            = check_deadband(m_items[item_idx].attr[i].type,
-                m_items[item_idx].attr[i].size, deadband, buf, oldbuf);
-        if (!m_items[item_idx].deadband_active) {
+      for (size_t i = 0; i < m_items[item_idx].attr.size(); i++)
+      {
+        pwr_tFloat32 deadband = m_items[item_idx].deadband; // TODO should be on attribute
+        m_items[item_idx].deadband_active = check_deadband(
+            m_items[item_idx].attr[i].type, m_items[item_idx].attr[i].size, deadband, buf, oldbuf);
+        if (!m_items[item_idx].deadband_active)
+        {
           updateOnlyTime = false;
           break;
         }
         buf = (char*)buf + m_items[item_idx].attr[i].size;
         oldbuf = (char*)oldbuf + m_items[item_idx].attr[i].size;
       }
-    } else {
+    }
+    else
+    {
       setJump = true;
-      for (size_t i = 0; i < m_items[item_idx].attr.size(); i++) {
-        pwr_tFloat32 deadband
-            = m_items[item_idx].deadband; // TODO should be on attribute
-        m_items[item_idx].deadband_active
-            = check_deadband(m_items[item_idx].attr[i].type,
-                m_items[item_idx].attr[i].size, deadband, buf, oldbuf);
-        if (!m_items[item_idx].deadband_active) {
+      for (size_t i = 0; i < m_items[item_idx].attr.size(); i++)
+      {
+        pwr_tFloat32 deadband = m_items[item_idx].deadband; // TODO should be on attribute
+        m_items[item_idx].deadband_active = check_deadband(
+            m_items[item_idx].attr[i].type, m_items[item_idx].attr[i].size, deadband, buf, oldbuf);
+        if (!m_items[item_idx].deadband_active)
+        {
           setJump = false;
           break;
         }
@@ -2351,34 +2497,35 @@ int sev_dbsqlite::store_objectvalue(pwr_tStatus* sts, int item_idx,
   buf = data;
   oldbuf = olddata;
 
-  if (!updateOnlyTime) {
+  if (!updateOnlyTime)
+  {
     memcpy(oldbuf, buf, size);
 
-    for (size_t i = 0; i < m_items[item_idx].attr.size(); i++) {
+    for (size_t i = 0; i < m_items[item_idx].attr.size(); i++)
+    {
       if (m_items[item_idx].attr[i].type == pwr_eType_Time)
-        *sts = time_AtoAscii((pwr_tTime*)buf, time_eFormat_NumDateAndTime,
-            bufstr, sizeof(bufstr));
+        *sts = time_AtoAscii((pwr_tTime*)buf, time_eFormat_NumDateAndTime, bufstr, sizeof(bufstr));
       else
-        *sts = cdh_AttrValueToString(
-            m_items[item_idx].attr[i].type, buf, bufstr, sizeof(bufstr));
+        *sts = cdh_AttrValueToString(m_items[item_idx].attr[i].type, buf, bufstr, sizeof(bufstr));
       if (EVEN(*sts))
         return 0;
-      if (m_items[item_idx].attr[i].type == pwr_eType_String
-          || m_items[item_idx].attr[i].type == pwr_eType_Text) {
-	
-        real_escape_string(
-            bufInclEscCharstr, bufstr, strlen(bufstr));
+      if (m_items[item_idx].attr[i].type == pwr_eType_String ||
+          m_items[item_idx].attr[i].type == pwr_eType_Text)
+      {
+
+        real_escape_string(bufInclEscCharstr, bufstr, strlen(bufstr));
         valuesStr.append("'");
         valuesStr.append(bufInclEscCharstr);
         valuesStr.append("',");
-      } else {
+      }
+      else
+      {
         valuesStr.append("'");
         valuesStr.append(bufstr);
         valuesStr.append("',");
       }
       char colNameStr[80];
-      sprintf(colNameStr, "`%s`,",
-          create_colName(i, m_items[item_idx].attr[i].aname));
+      sprintf(colNameStr, "`%s`,", create_colName(i, m_items[item_idx].attr[i].aname));
       colsStr.append(colNameStr);
 
       //      colsStr.append("`");
@@ -2391,91 +2538,96 @@ int sev_dbsqlite::store_objectvalue(pwr_tStatus* sts, int item_idx,
     valuesStr.resize(valuesStr.length() - 1);
     colsStr.resize(colsStr.length() - 1);
 
-    if (m_items[item_idx].options & pwr_mSevOptionsMask_PosixTime) {
-      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution) {
+    if (m_items[item_idx].options & pwr_mSevOptionsMask_PosixTime)
+    {
+      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution)
+      {
         // Posix time, high resolution
-        queryOStr << "insert into " << m_items[item_idx].tablename
-                  << " (sev__time, sev__ntime, " << colsStr << ") values ("
-                  << time.tv_sec << "," << time.tv_nsec << "," << valuesStr
-                  << ")";
+        queryOStr << "insert into " << m_items[item_idx].tablename << " (sev__time, sev__ntime, " << colsStr
+                  << ") values (" << time.tv_sec << "," << time.tv_nsec << "," << valuesStr << ")";
 
-        snprintf(query, constQueryLength,
-            "insert into %s (sev__time, sev__ntime, %s) values (%ld,%ld,%s)",
-            m_items[item_idx].tablename, colsStr.c_str(), (long int)time.tv_sec,
-            (long int)time.tv_nsec, valuesStr.c_str());
-      } else {
-        // Posix time, low resolution
-        queryOStr << "insert into " << m_items[item_idx].tablename
-                  << " (sev__time, " << colsStr << ") values (" << time.tv_sec
-                  << "," << valuesStr << ")";
-
-        snprintf(query, constQueryLength,
-            "insert into %s (sev__time, %s) values (%ld,%s)",
-            m_items[item_idx].tablename, colsStr.c_str(), (long int)time.tv_sec,
-            valuesStr.c_str());
+        snprintf(query, constQueryLength, "insert into %s (sev__time, sev__ntime, %s) values (%ld,%ld,%s)",
+                 m_items[item_idx].tablename, colsStr.c_str(), (long int)time.tv_sec, (long int)time.tv_nsec,
+                 valuesStr.c_str());
       }
-    } else {
-      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution) {
+      else
+      {
+        // Posix time, low resolution
+        queryOStr << "insert into " << m_items[item_idx].tablename << " (sev__time, " << colsStr
+                  << ") values (" << time.tv_sec << "," << valuesStr << ")";
+
+        snprintf(query, constQueryLength, "insert into %s (sev__time, %s) values (%ld,%s)",
+                 m_items[item_idx].tablename, colsStr.c_str(), (long int)time.tv_sec, valuesStr.c_str());
+      }
+    }
+    else
+    {
+      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution)
+      {
         // Sql time, high resolution
-        queryOStr << "insert into " << m_items[item_idx].tablename
-                  << " (sev__time, sev__ntime, " << colsStr << ") values ("
+        queryOStr << "insert into " << m_items[item_idx].tablename << " (sev__time, sev__ntime, " << colsStr
+                  << ") values ("
                   << "'" << timstr << "'"
                   << "," << time.tv_nsec << "," << valuesStr << ")";
 
-        snprintf(query, constQueryLength,
-            "insert into %s (sev__time, sev__ntime, %s) values ('%s',%ld,%s)",
-            m_items[item_idx].tablename, colsStr.c_str(), timstr,
-            (long int)time.tv_nsec, valuesStr.c_str());
-
-      } else {
+        snprintf(query, constQueryLength, "insert into %s (sev__time, sev__ntime, %s) values ('%s',%ld,%s)",
+                 m_items[item_idx].tablename, colsStr.c_str(), timstr, (long int)time.tv_nsec,
+                 valuesStr.c_str());
+      }
+      else
+      {
         // Sql time, low resolution
-        queryOStr << "insert into " << m_items[item_idx].tablename
-                  << " (sev__time, " << colsStr << ") values ("
+        queryOStr << "insert into " << m_items[item_idx].tablename << " (sev__time, " << colsStr
+                  << ") values ("
                   << "'" << timstr << "'"
                   << "," << valuesStr << ")";
 
-        snprintf(query, constQueryLength,
-            "insert into %s (sev__time, %s) values ('%s',%s)",
-            m_items[item_idx].tablename, colsStr.c_str(), timstr,
-            valuesStr.c_str());
+        snprintf(query, constQueryLength, "insert into %s (sev__time, %s) values ('%s',%s)",
+                 m_items[item_idx].tablename, colsStr.c_str(), timstr, valuesStr.c_str());
       }
     }
   } // end insert new values
-  else {
-    if (m_items[item_idx].options & pwr_mSevOptionsMask_PosixTime) {
-      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution) {
+  else
+  {
+    if (m_items[item_idx].options & pwr_mSevOptionsMask_PosixTime)
+    {
+      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution)
+      {
         // Posix time, high resolution
-        queryOStr << "update " << m_items[item_idx].tablename
-                  << " set sev__time = " << time.tv_sec
-                  << ", sev__ntime = " << time.tv_nsec
-                  << " where sev__id = " << m_items[item_idx].last_id;
-      } else {
+        queryOStr << "update " << m_items[item_idx].tablename << " set sev__time = " << time.tv_sec
+                  << ", sev__ntime = " << time.tv_nsec << " where sev__id = " << m_items[item_idx].last_id;
+      }
+      else
+      {
         // Posix time, low resolution
-        queryOStr << "update " << m_items[item_idx].tablename
-                  << " set sev__time = " << time.tv_sec
+        queryOStr << "update " << m_items[item_idx].tablename << " set sev__time = " << time.tv_sec
                   << " where sev__id = " << m_items[item_idx].last_id;
       }
-    } else {
-      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution) {
+    }
+    else
+    {
+      if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution)
+      {
         // Sql time, high resolution
-        queryOStr << "update " << m_items[item_idx].tablename
-                  << " set sev__time = '" << timstr
-                  << "', sev__ntime = " << time.tv_nsec
-                  << " where sev__id = " << m_items[item_idx].last_id;
-      } else {
+        queryOStr << "update " << m_items[item_idx].tablename << " set sev__time = '" << timstr
+                  << "', sev__ntime = " << time.tv_nsec << " where sev__id = " << m_items[item_idx].last_id;
+      }
+      else
+      {
         // Sql time, low resolution
-        queryOStr << "update " << m_items[item_idx].tablename
-                  << " set sev__time = '" << timstr
+        queryOStr << "update " << m_items[item_idx].tablename << " set sev__time = '" << timstr
                   << "' where sev__id = " << m_items[item_idx].last_id;
       }
     }
   }
 
-  if (setJump || updateOnlyTime) {
-    sprintf(query, "update %s set sev__jump = 1 where sev__id = %d",
-        m_items[item_idx].tablename, m_items[item_idx].last_id);
+  if (setJump || updateOnlyTime)
+  {
+    sprintf(query, "update %s set sev__jump = 1 where sev__id = %d", m_items[item_idx].tablename,
+            m_items[item_idx].last_id);
     int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
       printf("In %s row %d:\n", __FILE__, __LINE__);
       printf("Update jump: %s\n", errmsg);
       sqlite3_free(errmsg);
@@ -2485,17 +2637,19 @@ int sev_dbsqlite::store_objectvalue(pwr_tStatus* sts, int item_idx,
   // printf( "Store_objectvalue: %s\n", queryOStr.str().c_str());
 
   int rc = sqlite3_exec(m_con, queryOStr.str().c_str(), 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s: %s\n", __FUNCTION__, errmsg);
     printf("Error in: %s\n", queryOStr.str().c_str());
 
     *sts = SEV__DBERROR;
     m_items[item_idx].status = *sts;
-    if (m_items[item_idx].status != m_items[item_idx].logged_status) {
+    if (m_items[item_idx].status != m_items[item_idx].logged_status)
+    {
       m_items[item_idx].logged_status = m_items[item_idx].status;
-      errh_Error("Database update error: %s, table: %s object: %s", errmsg,
-          m_items[item_idx].tablename, m_items[item_idx].oname);
+      errh_Error("Database update error: %s, table: %s object: %s", errmsg, m_items[item_idx].tablename,
+                 m_items[item_idx].oname);
     }
     sqlite3_free(errmsg);
     return 0;
@@ -2510,27 +2664,29 @@ int sev_dbsqlite::store_objectvalue(pwr_tStatus* sts, int item_idx,
   return 1;
 }
 
-int sev_dbsqlite::get_item(pwr_tStatus* sts, void* thread, sev_item* item,
-    pwr_tOid oid, char* attributename)
+int sev_dbsqlite::get_item(pwr_tStatus* sts, void* thread, sev_item* item, pwr_tOid oid, char* attributename)
 {
   char query[300];
   sqlite3_stmt* stmt;
 
-  sprintf(query, "select "
-                 "id,tablename,vid,oix,oname,aname,uptime,cretime,storagetime,"
-                 "vtype,vsize,description,unit,scantime,deadband,options "
-                 "from items where vid=%d and oix=%d and aname='%s'",
-      oid.vid, oid.oix, attributename);
+  sprintf(query,
+          "select "
+          "id,tablename,vid,oix,oname,aname,uptime,cretime,storagetime,"
+          "vtype,vsize,description,unit,scantime,deadband,options "
+          "from items where vid=%d and oix=%d and aname='%s'",
+          oid.vid, oid.oix, attributename);
 
   int rc = sqlite3_prepare_v2(m_con, query, -1, &stmt, 0);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s\n", __FUNCTION__);
     return 0;
   }
 
   rc = sqlite3_step(stmt);
-  if (rc != SQLITE_ROW) {
+  if (rc != SQLITE_ROW)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s Result Error\n", __FUNCTION__);
     sqlite3_finalize(stmt);
@@ -2584,27 +2740,30 @@ int sev_dbsqlite::get_item(pwr_tStatus* sts, void* thread, sev_item* item,
   return 1;
 }
 
-int sev_dbsqlite::get_objectitem(pwr_tStatus* sts, void* thread, sev_item* item,
-    pwr_tOid oid, char* attributename)
+int sev_dbsqlite::get_objectitem(pwr_tStatus* sts, void* thread, sev_item* item, pwr_tOid oid,
+                                 char* attributename)
 {
   char query[300];
   sqlite3_stmt* stmt;
 
-  sprintf(query, "select "
-                 "id,tablename,vid,oix,oname,aname,uptime,cretime,storagetime,"
-                 "description,scantime,deadband,options "
-                 "from objectitems where vid=%d and oix=%d and aname='%s'",
-      oid.vid, oid.oix, attributename);
+  sprintf(query,
+          "select "
+          "id,tablename,vid,oix,oname,aname,uptime,cretime,storagetime,"
+          "description,scantime,deadband,options "
+          "from objectitems where vid=%d and oix=%d and aname='%s'",
+          oid.vid, oid.oix, attributename);
 
   int rc = sqlite3_prepare_v2(m_con, query, -1, &stmt, 0);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s\n", __FUNCTION__);
     return 0;
   }
 
   rc = sqlite3_step(stmt);
-  if (rc != SQLITE_ROW) {
+  if (rc != SQLITE_ROW)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s Result Error\n", __FUNCTION__);
     sqlite3_finalize(stmt);
@@ -2661,14 +2820,16 @@ int sev_dbsqlite::get_objectitems(pwr_tStatus* sts)
                  "from objectitems");
 
   int rc = sqlite3_prepare_v2(m_con, query, -1, &stmt, 0);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s\n", __FUNCTION__);
     return 0;
   }
 
   int col;
-  for (int i = 0;; i++) {
+  for (int i = 0;; i++)
+  {
     char* text;
 
     rc = sqlite3_step(stmt);
@@ -2717,26 +2878,28 @@ int sev_dbsqlite::get_objectitems(pwr_tStatus* sts)
   return 1;
 }
 
-int sev_dbsqlite::get_objectitemattributes(
-    pwr_tStatus* sts, sev_item* item, char* tablename)
+int sev_dbsqlite::get_objectitemattributes(pwr_tStatus* sts, sev_item* item, char* tablename)
 {
   char query[300];
   sqlite3_stmt* stmt;
 
-  sprintf(query, "select attributename, attributetype, attributesize from "
-                 "objectitemattributes where tablename='%s'order by "
-                 "attributeidx asc",
-      tablename);
+  sprintf(query,
+          "select attributename, attributetype, attributesize from "
+          "objectitemattributes where tablename='%s'order by "
+          "attributeidx asc",
+          tablename);
 
   int rc = sqlite3_prepare_v2(m_con, query, -1, &stmt, 0);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s\n", __FUNCTION__);
     return 0;
   }
 
   int col;
-  for (int i = 0;; i++) {
+  for (int i = 0;; i++)
+  {
     char* text;
 
     rc = sqlite3_step(stmt);
@@ -2760,21 +2923,20 @@ int sev_dbsqlite::get_objectitemattributes(
   return 1;
 }
 
-int sev_dbsqlite::delete_old_objectdata(pwr_tStatus* sts, void* thread,
-    char* tablename, pwr_tMask options, pwr_tTime limit, pwr_tFloat32 scantime,
-    pwr_tFloat32 garbagecycle)
+int sev_dbsqlite::delete_old_objectdata(pwr_tStatus* sts, void* thread, char* tablename, pwr_tMask options,
+                                        pwr_tTime limit, pwr_tFloat32 scantime, pwr_tFloat32 garbagecycle)
 {
   char query[300];
   char* errmsg;
   char timstr[40];
 
-  *sts = time_AtoAscii(
-      &limit, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
+  *sts = time_AtoAscii(&limit, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
   if (EVEN(*sts))
     return 0;
   timstr[19] = 0;
 
-  if (options & pwr_mSevOptionsMask_ReadOptimized) {
+  if (options & pwr_mSevOptionsMask_ReadOptimized)
+  {
     // We scan trough as many rows that we write between two garbage cycles plus
     // some extra rows
     // to be sure that the table not grows to much.
@@ -2784,24 +2946,23 @@ int sev_dbsqlite::delete_old_objectdata(pwr_tStatus* sts, void* thread,
 
     nbRowsToClean += get_minFromIntegerColumn(tablename, (char*)"sev__id");
     if (options & pwr_mSevOptionsMask_PosixTime)
-      sprintf(query, "delete from %s where sev__id < " pwr_dFormatUInt64
-                     " and sev__time < %ld;",
-          tablename, nbRowsToClean, (long int)limit.tv_sec);
+      sprintf(query, "delete from %s where sev__id < " pwr_dFormatUInt64 " and sev__time < %ld;", tablename,
+              nbRowsToClean, (long int)limit.tv_sec);
     else
-      sprintf(query, "delete from %s where sev__id < " pwr_dFormatUInt64
-                     " and sev__time < '%s';",
-          tablename, nbRowsToClean, timstr);
-  } else {
+      sprintf(query, "delete from %s where sev__id < " pwr_dFormatUInt64 " and sev__time < '%s';", tablename,
+              nbRowsToClean, timstr);
+  }
+  else
+  {
     if (options & pwr_mSevOptionsMask_PosixTime)
-      sprintf(query, "delete from %s where sev__time < %ld;", tablename,
-          (long int)limit.tv_sec);
+      sprintf(query, "delete from %s where sev__time < %ld;", tablename, (long int)limit.tv_sec);
     else
-      sprintf(
-          query, "delete from %s where sev__time < '%s';", tablename, timstr);
+      sprintf(query, "delete from %s where sev__time < '%s';", tablename, timstr);
   }
 
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s: %s\n", __FUNCTION__, errmsg);
     sqlite3_free(errmsg);
@@ -2813,70 +2974,78 @@ int sev_dbsqlite::delete_old_objectdata(pwr_tStatus* sts, void* thread,
   return 1;
 }
 
-int sev_dbsqlite::check_deadband(pwr_eType type, unsigned int size,
-    pwr_tFloat32 deadband, void* value, void* oldvalue)
+int sev_dbsqlite::check_deadband(pwr_eType type, unsigned int size, pwr_tFloat32 deadband, void* value,
+                                 void* oldvalue)
 {
   int deadband_active = 0;
-  switch (type) {
+  switch (type)
+  {
   case pwr_eType_Float32:
-    if (ABS(*(pwr_tFloat32*)value - *(pwr_tFloat32*)oldvalue) < deadband) {
+    if (ABS(*(pwr_tFloat32*)value - *(pwr_tFloat32*)oldvalue) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_Float64:
-    if (ABS(*(pwr_tFloat64*)value - *(pwr_tFloat64*)oldvalue) < deadband) {
+    if (ABS(*(pwr_tFloat64*)value - *(pwr_tFloat64*)oldvalue) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_Int64:
-    if (ABS(*(pwr_tInt64*)value - *(pwr_tInt64*)oldvalue) < deadband) {
+    if (ABS(*(pwr_tInt64*)value - *(pwr_tInt64*)oldvalue) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_Int32:
-    if (ABS(*(pwr_tInt32*)value - *(pwr_tInt32*)oldvalue) < deadband) {
+    if (ABS(*(pwr_tInt32*)value - *(pwr_tInt32*)oldvalue) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_Int16:
-    if (ABS(*(pwr_tInt16*)value - *(pwr_tInt16*)oldvalue) < deadband) {
+    if (ABS(*(pwr_tInt16*)value - *(pwr_tInt16*)oldvalue) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_Int8:
   case pwr_eType_Char:
-    if (ABS(*(pwr_tInt8*)value - *(pwr_tInt8*)oldvalue) < deadband) {
+    if (ABS(*(pwr_tInt8*)value - *(pwr_tInt8*)oldvalue) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_UInt64:
-    if (ABS(((pwr_tInt64)(*(pwr_tUInt64*)value - *(pwr_tUInt64*)oldvalue)))
-        < deadband) {
+    if (ABS(((pwr_tInt64)(*(pwr_tUInt64*)value - *(pwr_tUInt64*)oldvalue))) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_UInt32:
   case pwr_eType_Boolean:
-    if (ABS(((pwr_tInt32)(*(pwr_tUInt32*)value - *(pwr_tUInt32*)oldvalue)))
-        < deadband) {
+    if (ABS(((pwr_tInt32)(*(pwr_tUInt32*)value - *(pwr_tUInt32*)oldvalue))) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_UInt16:
-    if (ABS(((pwr_tInt16)(*(pwr_tUInt16*)value - *(pwr_tUInt16*)oldvalue)))
-        < deadband) {
+    if (ABS(((pwr_tInt16)(*(pwr_tUInt16*)value - *(pwr_tUInt16*)oldvalue))) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_UInt8:
-    if (ABS(((pwr_tInt8)(*(pwr_tUInt8*)value - *(pwr_tUInt8*)oldvalue)))
-        < deadband) {
+    if (ABS(((pwr_tInt8)(*(pwr_tUInt8*)value - *(pwr_tUInt8*)oldvalue))) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_String:
   case pwr_eType_Text:
-    if (!memcmp(value, oldvalue, size)) {
+    if (!memcmp(value, oldvalue, size))
+    {
       deadband_active = 1;
     }
     break;
@@ -2885,9 +3054,9 @@ int sev_dbsqlite::check_deadband(pwr_eType type, unsigned int size,
   return deadband_active;
 }
 
-int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
-    sev_item* item, unsigned int size, pwr_tTime* starttime, pwr_tTime* endtime,
-    int maxsize, pwr_tTime** tbuf, void** vbuf, unsigned int* bsize)
+int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread, sev_item* item, unsigned int size,
+                                   pwr_tTime* starttime, pwr_tTime* endtime, int maxsize, pwr_tTime** tbuf,
+                                   void** vbuf, unsigned int* bsize)
 {
   char query[300];
   std::string queryStr;
@@ -2918,11 +3087,12 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
     etime = *endtime;
 
   // Get number of rows
-  if (item->options & pwr_mSevOptionsMask_ReadOptimized) {
-    sprintf(
-        query, "select coalesce(max(sev__id)+1,0) from %s", item->tablename);
+  if (item->options & pwr_mSevOptionsMask_ReadOptimized)
+  {
+    sprintf(query, "select coalesce(max(sev__id)+1,0) from %s", item->tablename);
     int rc = sqlite3_prepare_v2(m_con, query, -1, &stmt, 0);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
       printf("In %s row %d:\n", __FILE__, __LINE__);
       printf("GetValues Query Error\n");
       *sts = SEV__DBERROR;
@@ -2930,7 +3100,8 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
     }
 
     rc = sqlite3_step(stmt);
-    if (rc != SQLITE_ROW) {
+    if (rc != SQLITE_ROW)
+    {
       printf("In %s row %d:\n", __FILE__, __LINE__);
       *sts = SEV__DBERROR;
       return 0;
@@ -2938,13 +3109,16 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
 
     max_id = sqlite3_column_int(stmt, 0);
     sqlite3_finalize(stmt);
-  } else {
+  }
+  else
+  {
     // TODO
     *sts = SEV__NYI;
     return 1;
   }
 
-  if (starttime && endtime) {
+  if (starttime && endtime)
+  {
     pwr_tTime update_time;
     if (!streq(last_update, ""))
       timestr_to_time(last_update, &update_time);
@@ -2961,24 +3135,30 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
       total_rows = max_id;
 
     div = total_rows / maxsize + 1;
-  } else if (starttime) {
+  }
+  else if (starttime)
+  {
     pwr_tTime update_time;
     if (!streq(last_update, ""))
       timestr_to_time(last_update, &update_time);
     else
       time_GetTime(&update_time);
 
-    if (time_Acomp(&update_time, starttime) != 1) {
+    if (time_Acomp(&update_time, starttime) != 1)
+    {
       *sts = SEV__NODATATIME;
       return 0;
     }
     time_Adiff(&dt, &update_time, starttime);
     total_rows = int(time_DToFloat(0, &dt) / item->scantime);
-  } else if (endtime) {
+  }
+  else if (endtime)
+  {
     pwr_tTime create_time;
     timestr_to_time(create_time_str, &create_time);
 
-    if (time_Acomp(endtime, &create_time) != 1) {
+    if (time_Acomp(endtime, &create_time) != 1)
+    {
       sqlite3_finalize(stmt);
       *sts = SEV__NODATATIME;
       return 0;
@@ -2987,35 +3167,41 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
     total_rows = int(time_DToFloat(0, &dt) / item->scantime);
     if (max_id < total_rows)
       total_rows = max_id;
-  } else {
+  }
+  else
+  {
     total_rows = max_id;
   }
 
   div = total_rows / maxsize + 1;
 
-  if (starttime) {
-    *sts = time_AtoAscii(
-        &stime, time_eFormat_NumDateAndTime, starttimstr, sizeof(starttimstr));
+  if (starttime)
+  {
+    *sts = time_AtoAscii(&stime, time_eFormat_NumDateAndTime, starttimstr, sizeof(starttimstr));
     if (EVEN(*sts))
       return 0;
     starttimstr[19] = 0;
   }
-  if (endtime) {
-    *sts = time_AtoAscii(
-        &etime, time_eFormat_NumDateAndTime, endtimstr, sizeof(endtimstr));
+  if (endtime)
+  {
+    *sts = time_AtoAscii(&etime, time_eFormat_NumDateAndTime, endtimstr, sizeof(endtimstr));
     if (EVEN(*sts))
       return 0;
     endtimstr[19] = 0;
   }
 
   // Column part
-  if (item->options & pwr_mSevOptionsMask_HighTimeResolution) {
+  if (item->options & pwr_mSevOptionsMask_HighTimeResolution)
+  {
     colsStr.append("sev__time, sev__ntime, ");
-  } else {
+  }
+  else
+  {
     colsStr.append("sev__time, ");
   }
   char colNameStr[80];
-  for (size_t i = 0; i < item->attr.size(); i++) {
+  for (size_t i = 0; i < item->attr.size(); i++)
+  {
     sprintf(colNameStr, "`%s`,", create_colName(i, item->attr[i].aname));
     colsStr.append(colNameStr);
   }
@@ -3030,7 +3216,8 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
   // 'order by' part
   if (item->options & pwr_mSevOptionsMask_ReadOptimized)
     strcpy(orderby_part, "sev__id");
-  else {
+  else
+  {
     if (item->options & pwr_mSevOptionsMask_HighTimeResolution)
       strcpy(orderby_part, "sev__time,sev__ntime");
     else
@@ -3038,88 +3225,103 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
   }
 
   // 'where' part
-  if (item->options & pwr_mSevOptionsMask_ReadOptimized) {
-    if (starttime && endtime) {
-      if (div == 1) {
+  if (item->options & pwr_mSevOptionsMask_ReadOptimized)
+  {
+    if (starttime && endtime)
+    {
+      if (div == 1)
+      {
         if (item->options & pwr_mSevOptionsMask_PosixTime)
-          sprintf(where_part, "where sev__time >= %ld and sev__time <= %ld",
-              (long int)starttime->tv_sec, (long int)endtime->tv_sec);
+          sprintf(where_part, "where sev__time >= %ld and sev__time <= %ld", (long int)starttime->tv_sec,
+                  (long int)endtime->tv_sec);
         else
-          sprintf(where_part, "where sev__time >= '%s' and sev__time <= '%s'",
-              starttimstr, endtimstr);
-      } else {
-        if (item->options & pwr_mSevOptionsMask_PosixTime)
-          sprintf(where_part, "where (sev__id %% %d = 0 %s) and sev__time >= "
-                              "%ld and sev__time <= %ld",
-              div, jumpstr, (long int)starttime->tv_sec,
-              (long int)endtime->tv_sec);
-        else
-          sprintf(where_part, "where (sev__id %% %d = 0 %s) and sev__time >= "
-                              "'%s' and sev__time <= '%s'",
-              div, jumpstr, starttimstr, endtimstr);
+          sprintf(where_part, "where sev__time >= '%s' and sev__time <= '%s'", starttimstr, endtimstr);
       }
-    } else if (starttime) {
-      if (div == 1) {
+      else
+      {
         if (item->options & pwr_mSevOptionsMask_PosixTime)
-          sprintf(where_part, "where sev__time >= %ld",
-              (long int)starttime->tv_sec);
+          sprintf(where_part,
+                  "where (sev__id %% %d = 0 %s) and sev__time >= "
+                  "%ld and sev__time <= %ld",
+                  div, jumpstr, (long int)starttime->tv_sec, (long int)endtime->tv_sec);
+        else
+          sprintf(where_part,
+                  "where (sev__id %% %d = 0 %s) and sev__time >= "
+                  "'%s' and sev__time <= '%s'",
+                  div, jumpstr, starttimstr, endtimstr);
+      }
+    }
+    else if (starttime)
+    {
+      if (div == 1)
+      {
+        if (item->options & pwr_mSevOptionsMask_PosixTime)
+          sprintf(where_part, "where sev__time >= %ld", (long int)starttime->tv_sec);
         else
           sprintf(where_part, "where sev__time >= '%s'", starttimstr);
-      } else {
-        if (item->options & pwr_mSevOptionsMask_PosixTime)
-          sprintf(where_part,
-              "where (sev__id %% %d = 0 %s) and sev__time >= %ld", div, jumpstr,
-              (long int)starttime->tv_sec);
-        else
-          sprintf(where_part,
-              "where (sev__id %% %d = 0 %s) and sev__time >= '%s'", div,
-              jumpstr, starttimstr);
       }
-    } else if (endtime) {
-      if (div == 1) {
+      else
+      {
         if (item->options & pwr_mSevOptionsMask_PosixTime)
-          sprintf(
-              where_part, "where sev__time <= %ld", (long int)endtime->tv_sec);
+          sprintf(where_part, "where (sev__id %% %d = 0 %s) and sev__time >= %ld", div, jumpstr,
+                  (long int)starttime->tv_sec);
+        else
+          sprintf(where_part, "where (sev__id %% %d = 0 %s) and sev__time >= '%s'", div, jumpstr,
+                  starttimstr);
+      }
+    }
+    else if (endtime)
+    {
+      if (div == 1)
+      {
+        if (item->options & pwr_mSevOptionsMask_PosixTime)
+          sprintf(where_part, "where sev__time <= %ld", (long int)endtime->tv_sec);
         else
           sprintf(where_part, "where sev__time <= '%s'", endtimstr);
-      } else {
-        if (item->options & pwr_mSevOptionsMask_PosixTime)
-          sprintf(where_part,
-              "where (sev__id %% %d = 0 %s) and sev__time <= %ld", div, jumpstr,
-              (long int)endtime->tv_sec);
-        else
-          sprintf(where_part,
-              "where (sev__id %% %d = 0 %s) and sev__time <= '%s'", div,
-              jumpstr, endtimstr);
       }
-    } else {
+      else
+      {
+        if (item->options & pwr_mSevOptionsMask_PosixTime)
+          sprintf(where_part, "where (sev__id %% %d = 0 %s) and sev__time <= %ld", div, jumpstr,
+                  (long int)endtime->tv_sec);
+        else
+          sprintf(where_part, "where (sev__id %% %d = 0 %s) and sev__time <= '%s'", div, jumpstr, endtimstr);
+      }
+    }
+    else
+    {
       if (div == 1)
         strcpy(where_part, "");
       else
         sprintf(where_part, "where sev__id %% %d = 0 %s", div, jumpstr);
     }
-  } else {
+  }
+  else
+  {
     // Not read optimized
-    if (starttime && endtime) {
+    if (starttime && endtime)
+    {
       if (item->options & pwr_mSevOptionsMask_PosixTime)
-        sprintf(where_part, "where sev__time >= %ld and sev__time <= %ld",
-            (long int)starttime->tv_sec, (long int)endtime->tv_sec);
+        sprintf(where_part, "where sev__time >= %ld and sev__time <= %ld", (long int)starttime->tv_sec,
+                (long int)endtime->tv_sec);
       else
-        sprintf(where_part, "where sev__time >= '%s' and sev__time <= '%s'",
-            starttimstr, endtimstr);
-    } else if (starttime) {
+        sprintf(where_part, "where sev__time >= '%s' and sev__time <= '%s'", starttimstr, endtimstr);
+    }
+    else if (starttime)
+    {
       if (item->options & pwr_mSevOptionsMask_PosixTime)
-        sprintf(
-            where_part, "where sev__time >= %ld", (long int)starttime->tv_sec);
+        sprintf(where_part, "where sev__time >= %ld", (long int)starttime->tv_sec);
       else
         sprintf(where_part, "where sev__time >= '%s'", starttimstr);
-    } else if (endtime) {
+    }
+    else if (endtime)
+    {
       if (item->options & pwr_mSevOptionsMask_PosixTime)
-        sprintf(
-            where_part, "where sev__time <= %ld", (long int)endtime->tv_sec);
+        sprintf(where_part, "where sev__time <= %ld", (long int)endtime->tv_sec);
       else
         sprintf(where_part, "where sev__time <= '%s'", endtimstr);
-    } else
+    }
+    else
       strcpy(where_part, "");
   }
 
@@ -3136,7 +3338,8 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
   printf("%s: %s\n", __FUNCTION__, queryStr.c_str());
 
   int rc = sqlite3_prepare_v2(m_con, queryStr.c_str(), -1, &stmt, 0);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s\n", __FUNCTION__);
     *sts = SEV__DBERROR;
@@ -3147,12 +3350,14 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
   int bufrows = total_rows / div;
   int row_cnt = 0;
 
-  if (item->options & pwr_mSevOptionsMask_ReadOptimized) {
+  if (item->options & pwr_mSevOptionsMask_ReadOptimized)
+  {
     *tbuf = (pwr_tTime*)calloc(bufrows, sizeof(pwr_tTime));
     *vbuf = calloc(bufrows, item->value_size);
 
     int bcnt = 0;
-    for (int i = 0;; i++) {
+    for (int i = 0;; i++)
+    {
       rc = sqlite3_step(stmt);
       if (rc != SQLITE_ROW)
         break;
@@ -3163,27 +3368,36 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
 
       int j = 0;
 
-      if (item->options & pwr_mSevOptionsMask_PosixTime) {
-        if (item->options & pwr_mSevOptionsMask_HighTimeResolution) {
+      if (item->options & pwr_mSevOptionsMask_PosixTime)
+      {
+        if (item->options & pwr_mSevOptionsMask_HighTimeResolution)
+        {
           // Posix time, high resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
             timestr_to_time((char*)text, (pwr_tTime*)&(*tbuf)[bcnt].tv_sec);
           (*tbuf)[bcnt].tv_nsec = sqlite3_column_int(stmt, j++);
-        } else {
+        }
+        else
+        {
           // Posix time, low resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
             timestr_to_time((char*)text, (pwr_tTime*)&(*tbuf)[bcnt].tv_sec);
         }
-      } else {
-        if (item->options & pwr_mSevOptionsMask_HighTimeResolution) {
+      }
+      else
+      {
+        if (item->options & pwr_mSevOptionsMask_HighTimeResolution)
+        {
           // Sql time, high resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
             timestr_to_time((char*)text, (pwr_tTime*)&(*tbuf)[bcnt].tv_sec);
           (*tbuf)[bcnt].tv_nsec = sqlite3_column_int(stmt, j++);
-        } else {
+        }
+        else
+        {
           // Sql time, low resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
@@ -3191,11 +3405,14 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
         }
       }
       int read_size = 0;
-      for (size_t k = 0; k < item->attr.size(); k++) {
+      for (size_t k = 0; k < item->attr.size(); k++)
+      {
         const char* value_str = (const char*)sqlite3_column_text(stmt, j++);
-        if (!value_str || streq(value_str, "")) {
+        if (!value_str || streq(value_str, ""))
+        {
           // Null value
-          switch (item->attr[k].type) {
+          switch (item->attr[k].type)
+          {
           case pwr_eType_Float32:
           case pwr_eType_Float64:
           case pwr_eType_Int8:
@@ -3209,23 +3426,25 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
           case pwr_eType_Mask:
           case pwr_eType_Enum:
             cdh_StringToAttrValue(item->attr[k].type, "0",
-                ((char*)*vbuf) + bcnt * item->value_size + read_size);
+                                  ((char*)*vbuf) + bcnt * item->value_size + read_size);
             break;
           case pwr_eType_Time:
           case pwr_eType_DeltaTime:
             // TODO deltatime??
             cdh_StringToAttrValue(item->attr[k].type, "1970-01-01 00:00:00",
-                ((char*)*vbuf) + bcnt * item->value_size + read_size);
+                                  ((char*)*vbuf) + bcnt * item->value_size + read_size);
             break;
           default:
             cdh_StringToAttrValue(item->attr[k].type, " ",
-                ((char*)*vbuf) + bcnt * item->value_size + read_size);
+                                  ((char*)*vbuf) + bcnt * item->value_size + read_size);
             break;
           }
           j++;
-        } else {
+        }
+        else
+        {
           cdh_StringToAttrValue(item->attr[k].type, value_str,
-              ((char*)*vbuf) + bcnt * item->value_size + read_size);
+                                ((char*)*vbuf) + bcnt * item->value_size + read_size);
         }
         read_size += item->attr[k].size;
       }
@@ -3238,18 +3457,25 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
     printf("bcnt %d bufrows %d\n", bcnt, bufrows);
     *bsize = bcnt;
     sqlite3_finalize(stmt);
-  } else {
+  }
+  else
+  {
     *tbuf = (pwr_tTime*)calloc(bufrows, sizeof(pwr_tTime));
     *vbuf = calloc(bufrows, size);
 
     int bcnt = 0;
-    for (int i = 0;; i++) {
-      if (i == 0) {
+    for (int i = 0;; i++)
+    {
+      if (i == 0)
+      {
         rc = sqlite3_step(stmt);
         if (rc != SQLITE_ROW)
           break;
-      } else {
-        for (int k = 0; k < div; k++) {
+      }
+      else
+      {
+        for (int k = 0; k < div; k++)
+        {
           rc = sqlite3_step(stmt);
           if (rc != SQLITE_ROW)
             break;
@@ -3261,27 +3487,36 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
       bufrows++;
       int j = 0;
 
-      if (item->options & pwr_mSevOptionsMask_PosixTime) {
-        if (item->options & pwr_mSevOptionsMask_HighTimeResolution) {
+      if (item->options & pwr_mSevOptionsMask_PosixTime)
+      {
+        if (item->options & pwr_mSevOptionsMask_HighTimeResolution)
+        {
           // Posix time, high resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
             timestr_to_time((char*)text, (pwr_tTime*)&(*tbuf)[bcnt].tv_sec);
           (*tbuf)[bcnt].tv_nsec = sqlite3_column_int(stmt, j++);
-        } else {
+        }
+        else
+        {
           // Posix time, low resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
             timestr_to_time((char*)text, (pwr_tTime*)&(*tbuf)[bcnt].tv_sec);
         }
-      } else {
-        if (item->options & pwr_mSevOptionsMask_HighTimeResolution) {
+      }
+      else
+      {
+        if (item->options & pwr_mSevOptionsMask_HighTimeResolution)
+        {
           // Sql time, high resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
             timestr_to_time((char*)text, (pwr_tTime*)&(*tbuf)[bcnt].tv_sec);
           (*tbuf)[bcnt].tv_nsec = sqlite3_column_int(stmt, j++);
-        } else {
+        }
+        else
+        {
           // Sql time, low resolution
           text = (const char*)sqlite3_column_text(stmt, j++);
           if (text)
@@ -3290,11 +3525,14 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
       }
 
       int read_size = 0;
-      for (size_t k = 0; k < item->attr.size(); k++) {
+      for (size_t k = 0; k < item->attr.size(); k++)
+      {
         const char* value_str = (const char*)sqlite3_column_text(stmt, j++);
-        if (streq(value_str, "")) {
+        if (streq(value_str, ""))
+        {
           // Null value
-          switch (item->attr[k].type) {
+          switch (item->attr[k].type)
+          {
           case pwr_eType_Float32:
           case pwr_eType_Float64:
           case pwr_eType_Int8:
@@ -3308,23 +3546,25 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
           case pwr_eType_Mask:
           case pwr_eType_Enum:
             cdh_StringToAttrValue(item->attr[k].type, "0",
-                ((char*)*vbuf) + bcnt * item->value_size + read_size);
+                                  ((char*)*vbuf) + bcnt * item->value_size + read_size);
             break;
           case pwr_eType_Time:
           case pwr_eType_DeltaTime:
             // TODO deltatime??
             cdh_StringToAttrValue(item->attr[k].type, "1970-01-01 00:00:00",
-                ((char*)*vbuf) + bcnt * item->value_size + read_size);
+                                  ((char*)*vbuf) + bcnt * item->value_size + read_size);
             break;
           default:
             cdh_StringToAttrValue(item->attr[k].type, " ",
-                ((char*)*vbuf) + bcnt * item->value_size + read_size);
+                                  ((char*)*vbuf) + bcnt * item->value_size + read_size);
             break;
           }
           j++;
-        } else {
+        }
+        else
+        {
           cdh_StringToAttrValue(item->attr[k].type, value_str,
-              ((char*)*vbuf) + bcnt * item->value_size + read_size);
+                                ((char*)*vbuf) + bcnt * item->value_size + read_size);
         }
         read_size += item->attr[k].size;
       }
@@ -3344,8 +3584,7 @@ int sev_dbsqlite::get_objectvalues(pwr_tStatus* sts, void* thread,
   return 1;
 }
 
-int sev_dbsqlite::handle_itemchange(
-    pwr_tStatus* sts, char* tablename, unsigned int item_idx)
+int sev_dbsqlite::handle_itemchange(pwr_tStatus* sts, char* tablename, unsigned int item_idx)
 {
   char timestr[40];
   pwr_tTime uptime;
@@ -3355,7 +3594,8 @@ int sev_dbsqlite::handle_itemchange(
   timestr[19] = 0;
 
   // Replace ':' '-' and ' ' in timestr with '_'
-  for (char* s = timestr; *s; s++) {
+  for (char* s = timestr; *s; s++)
+  {
     if (*s == ':')
       *s = '_';
     if (*s == ' ')
@@ -3369,16 +3609,17 @@ int sev_dbsqlite::handle_itemchange(
 
   printf("Recreating table %s due to attribute definition changes, old table "
          "saved to %s \n",
-      tablename, newTableName);
+         tablename, newTableName);
   errh_Warning("Recreating table %s due to attribute definition changes, old "
                "table saved to %s",
-      tablename, newTableName);
+               tablename, newTableName);
 
   char query[600];
   char* errmsg;
   sprintf(query, "RENAME TABLE %s to %s", tablename, newTableName);
   int rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("%s: %s\n", __FUNCTION__, errmsg);
     sqlite3_free(errmsg);
@@ -3388,22 +3629,21 @@ int sev_dbsqlite::handle_itemchange(
 
   sev_item* item = &m_items[item_idx];
 
-  create_table(sts, item->tablename, item->attr[0].type, item->attr[0].size,
-      item->options, item->deadband);
+  create_table(sts, item->tablename, item->attr[0].type, item->attr[0].size, item->options, item->deadband);
   if (EVEN(*sts))
     return 0;
 
-  if (item->options & pwr_mSevOptionsMask_ReadOptimized) {
+  if (item->options & pwr_mSevOptionsMask_ReadOptimized)
+  {
     // If we set increment to same value as in the old table we can easily move
     // the data from the old table to the new one
-    pwr_tUInt64 autoIncrValue
-        = get_maxFromIntegerColumn(newTableName, (char*)"id");
+    pwr_tUInt64 autoIncrValue = get_maxFromIntegerColumn(newTableName, (char*)"id");
     if (autoIncrValue)
       autoIncrValue++;
-    sprintf(query, "ALTER TABLE %s AUTO_INCREMENT = " pwr_dFormatUInt64,
-        tablename, autoIncrValue);
+    sprintf(query, "ALTER TABLE %s AUTO_INCREMENT = " pwr_dFormatUInt64, tablename, autoIncrValue);
     rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
       printf("In %s row %d:\n", __FILE__, __LINE__);
       printf("%s: %s\n", __FUNCTION__, errmsg);
       sqlite3_free(errmsg);
@@ -3416,8 +3656,8 @@ int sev_dbsqlite::handle_itemchange(
   return 1;
 }
 
-int sev_dbsqlite::handle_objectchange(
-    pwr_tStatus* sts, char* tablename, unsigned int item_idx, bool newObject)
+int sev_dbsqlite::handle_objectchange(pwr_tStatus* sts, char* tablename, unsigned int item_idx,
+                                      bool newObject)
 {
   char newTableName[64];
   char query[600];
@@ -3426,17 +3666,18 @@ int sev_dbsqlite::handle_objectchange(
 
   sev_item* item = &m_items[item_idx];
 
-  if (!newObject) {
+  if (!newObject)
+  {
     char timestr[40];
     pwr_tTime uptime;
 
     time_GetTime(&uptime);
-    time_AtoAscii(
-        &uptime, time_eFormat_NumDateAndTime, timestr, sizeof(timestr));
+    time_AtoAscii(&uptime, time_eFormat_NumDateAndTime, timestr, sizeof(timestr));
     timestr[19] = 0;
 
     // Replace ':' '-' and ' ' in timestr with '_'
-    for (char* s = timestr; *s; s++) {
+    for (char* s = timestr; *s; s++)
+    {
       if (*s == ':')
         *s = '_';
       if (*s == ' ')
@@ -3449,14 +3690,15 @@ int sev_dbsqlite::handle_objectchange(
 
     printf("Recreating table %s due to attribute definition changes, old table "
            "saved to %s \n",
-        tablename, newTableName);
+           tablename, newTableName);
     errh_Warning("Recreating table %s due to attribute definition changes, old "
                  "table saved to %s",
-        tablename, newTableName);
+                 tablename, newTableName);
 
     sprintf(query, "RENAME TABLE %s to %s", tablename, newTableName);
     rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
       printf("In %s row %d:\n", __FILE__, __LINE__);
       printf("%s: %s\n", __FUNCTION__, errmsg);
       sqlite3_free(errmsg);
@@ -3468,17 +3710,17 @@ int sev_dbsqlite::handle_objectchange(
     if (EVEN(*sts))
       return 0;
 
-    if (item->options & pwr_mSevOptionsMask_ReadOptimized) {
+    if (item->options & pwr_mSevOptionsMask_ReadOptimized)
+    {
       // If we set increment to same value as in the old table we can easily
       // move the data from the old table to the new one
-      pwr_tUInt64 autoIncrValue
-          = get_maxFromIntegerColumn(newTableName, (char*)"sev__id");
+      pwr_tUInt64 autoIncrValue = get_maxFromIntegerColumn(newTableName, (char*)"sev__id");
       if (autoIncrValue)
         autoIncrValue++;
-      sprintf(query, "ALTER TABLE %s AUTO_INCREMENT = " pwr_dFormatUInt64,
-          tablename, autoIncrValue);
+      sprintf(query, "ALTER TABLE %s AUTO_INCREMENT = " pwr_dFormatUInt64, tablename, autoIncrValue);
       rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-      if (rc != SQLITE_OK) {
+      if (rc != SQLITE_OK)
+      {
         printf("In %s row %d:\n", __FILE__, __LINE__);
         printf("%s: %s\n", __FUNCTION__, errmsg);
         sqlite3_free(errmsg);
@@ -3487,10 +3729,10 @@ int sev_dbsqlite::handle_objectchange(
       }
     }
 
-    sprintf(query, "delete from objectitemattributes where tablename = '%s'",
-        tablename);
+    sprintf(query, "delete from objectitemattributes where tablename = '%s'", tablename);
     rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
       printf("In %s row %d:\n", __FILE__, __LINE__);
       printf("%s: %s\n", __FUNCTION__, errmsg);
       sqlite3_free(errmsg);
@@ -3499,14 +3741,16 @@ int sev_dbsqlite::handle_objectchange(
     }
   }
 
-  for (size_t i = 0; i < item->attr.size(); i++) {
+  for (size_t i = 0; i < item->attr.size(); i++)
+  {
     char colName[64];
     strncpy(colName, create_colName(i, item->attr[i].aname), sizeof(colName));
     // sprintf(colName, "col_%d", i);
     sprintf(query, "alter table %s add `%s` %s;", tablename, colName,
-        pwrtype_to_type(item->attr[i].type, item->attr[i].size));
+            pwrtype_to_type(item->attr[i].type, item->attr[i].size));
     rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
       printf("In %s row %d:\n", __FILE__, __LINE__);
       printf("%s: %s\n", __FUNCTION__, errmsg);
       sqlite3_free(errmsg);
@@ -3514,13 +3758,14 @@ int sev_dbsqlite::handle_objectchange(
       return 0;
     }
     int aidx = i;
-    sprintf(query, "insert into objectitemattributes (tablename, "
-                   "attributename, attributeidx, attributetype, attributesize) "
-                   "values('%s', '%s', %d, %d, %d)",
-        tablename, item->attr[i].aname, aidx, item->attr[i].type,
-        item->attr[i].size);
+    sprintf(query,
+            "insert into objectitemattributes (tablename, "
+            "attributename, attributeidx, attributetype, attributesize) "
+            "values('%s', '%s', %d, %d, %d)",
+            tablename, item->attr[i].aname, aidx, item->attr[i].type, item->attr[i].size);
     rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
       printf("In %s row %d:\n", __FILE__, __LINE__);
       printf("%s: %s\n", __FUNCTION__, errmsg);
       sqlite3_free(errmsg);
@@ -3551,14 +3796,15 @@ int sev_dbsqlite::store_stat(sev_sStat* stat)
   char* errmsg;
   int rc;
 
-  sprintf(query, "update sev_stat set current_load = %f,medium_load = %f,"
-                 "storage_rate=%f,medium_storage_rate=%f,datastore_msg_cnt=%d,"
-                 "dataget_msg_cnt=%d,items_msg_cnt=%d,eventstore_msg_cnt=%d",
-      stat->current_load, stat->medium_load, stat->storage_rate,
-      stat->medium_storage_rate, stat->datastore_msg_cnt, stat->dataget_msg_cnt,
-      stat->items_msg_cnt, stat->eventstore_msg_cnt);
+  sprintf(query,
+          "update sev_stat set current_load = %f,medium_load = %f,"
+          "storage_rate=%f,medium_storage_rate=%f,datastore_msg_cnt=%d,"
+          "dataget_msg_cnt=%d,items_msg_cnt=%d,eventstore_msg_cnt=%d",
+          stat->current_load, stat->medium_load, stat->storage_rate, stat->medium_storage_rate,
+          stat->datastore_msg_cnt, stat->dataget_msg_cnt, stat->items_msg_cnt, stat->eventstore_msg_cnt);
   rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Update sev_stat: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -3575,7 +3821,8 @@ int sev_dbsqlite::begin_transaction(void* thread)
 
   strcpy(query, "begin transaction");
   rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Begin transaction: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -3592,7 +3839,8 @@ int sev_dbsqlite::commit_transaction(void* thread)
 
   strcpy(query, "commit transaction");
   rc = sqlite3_exec(m_con, query, 0, 0, &errmsg);
-  if (rc != SQLITE_OK) {
+  if (rc != SQLITE_OK)
+  {
     printf("In %s row %d:\n", __FILE__, __LINE__);
     printf("Begin transaction: %s\n", errmsg);
     sqlite3_free(errmsg);
@@ -3603,8 +3851,10 @@ int sev_dbsqlite::commit_transaction(void* thread)
 
 sev_dbsqlite::~sev_dbsqlite()
 {
-  for (size_t idx = 0; idx < m_items.size(); idx++) {
-    if (m_items[idx].old_value != 0) {
+  for (size_t idx = 0; idx < m_items.size(); idx++)
+  {
+    if (m_items[idx].old_value != 0)
+    {
       free(m_items[idx].old_value);
       m_items[idx].old_value = 0;
     }

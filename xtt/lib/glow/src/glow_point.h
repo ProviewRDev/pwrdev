@@ -37,14 +37,17 @@
 #ifndef glow_point_h
 #define glow_point_h
 
+#include <iosfwd>
+
 #include <ostream>
 #include "glow_array_elem.h"
 
 class GrowCtx;
 
-class GlowPoint : public GlowArrayElem {
+class GlowPoint : public GlowArrayElem
+{
 public:
-  GlowPoint(){}
+  GlowPoint() {}
   GlowPoint(GrowCtx* glow_ctx, double x1 = 0, double y1 = 0);
   const GlowPoint& operator+=(const GlowPoint p);
   GlowPoint operator+(const GlowPoint p);
@@ -57,12 +60,9 @@ public:
   void traverse(int x, int y);
   void posit(double x, double y);
   void posit_z(int x, int y);
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(std::ifstream& fp);
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_Point;
-  }
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(std::istream& fp);
+  glow_eObjectType type() { return glow_eObjectType_Point; }
   double x;
   double y;
   int z_x;

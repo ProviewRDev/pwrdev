@@ -36,10 +36,6 @@
 
 #include "wb_utility.h"
 
-WUtility::WUtility(wb_eUtility type) : utype(type)
-{
-}
+WUtility::WUtility(wb_eUtility type) : utype(type) {}
 
-WUtility::~WUtility()
-{
-}
+WUtility::~WUtility() {}

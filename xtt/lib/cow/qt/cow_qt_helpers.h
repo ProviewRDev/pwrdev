@@ -59,16 +59,16 @@ QString convert_utf8(const char* str);
 QString translate_utf8(const char* str);
 void pop(QWidget* w);
 QIcon get_icon(const char* iconName);
-QAction* addMenuItem(QObject* parent, QMenu* menu, const char* text,
-    const char* callback, const char* shortcut = "", const char* iconName = "");
-QAction* addCheckableMenuItem(QObject* parent, QMenu* menu, const char* text,
-    const char* callback, const char* shortcut = "", const char* iconName = "");
-QAction* addMenuRadioItem(QObject* parent, QMenu* menu, const char* text,
-    const char* callback, QActionGroup* group, const char* shortcut = "");
-QAction* addToolItem(QObject* parent, QToolBar* tools, const char* text,
-    const char* callback, const char* iconName);
-QAction* addCheckableToolItem(QObject* parent, QToolBar* tools,
-    const char* text, const char* callback, const char* iconName);
+QAction* addMenuItem(QObject* parent, QMenu* menu, const char* text, const char* callback,
+                     const char* shortcut = "", const char* iconName = "");
+QAction* addCheckableMenuItem(QObject* parent, QMenu* menu, const char* text, const char* callback,
+                              const char* shortcut = "", const char* iconName = "");
+QAction* addMenuRadioItem(QObject* parent, QMenu* menu, const char* text, const char* callback,
+                          QActionGroup* group, const char* shortcut = "");
+QAction* addToolItem(QObject* parent, QToolBar* tools, const char* text, const char* callback,
+                     const char* iconName);
+QAction* addCheckableToolItem(QObject* parent, QToolBar* tools, const char* text, const char* callback,
+                              const char* iconName);
 QComboBox* addToolMenu(QWidget* parent, QToolBar* tools, const char* callback);
 QWidget* layout_to_widget(QLayout* layout);
 void set_pane_position(QSplitter* pane, int right);

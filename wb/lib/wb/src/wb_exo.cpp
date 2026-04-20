@@ -53,7 +53,8 @@
 
 #define EXO_NOT_YET_EXECUTED 60000
 
-typedef struct {
+typedef struct
+{
   vldh_t_wind wind;
   ldh_tSesContext ldhses;
   unsigned long execute_counter;
@@ -77,8 +78,11 @@ int exo_exec_m8(exo_ctx exoctx, vldh_t_node node);
 int exo_exec_m9(exo_ctx exoctx, vldh_t_node node);
 
 exo_tMethod exo_exec_m[20] = {
-  exo_exec_m0, (exo_tMethod)exo_exec_m1, exo_exec_m2, exo_exec_m3, exo_exec_m4,
-  exo_exec_m5, exo_exec_m6, exo_exec_m7, exo_exec_m8, exo_exec_m9,
+    exo_exec_m0, (exo_tMethod)exo_exec_m1,
+    exo_exec_m2, exo_exec_m3,
+    exo_exec_m4, exo_exec_m5,
+    exo_exec_m6, exo_exec_m7,
+    exo_exec_m8, exo_exec_m9,
 };
 
 //_Methods defined for this module_______________________________________
@@ -94,11 +98,14 @@ int exo_ykoord_order_nodes(unsigned long node_count, vldh_t_node* nodelist)
   vldh_t_node dum;
   int i, j;
 
-  for (i = node_count - 1; i > 0; i--) {
+  for (i = node_count - 1; i > 0; i--)
+  {
     node_ptr1 = nodelist;
     node_ptr2 = node_ptr1 + 1;
-    for (j = 0; j < i; j++) {
-      if ((*node_ptr1)->ln.y > (*node_ptr2)->ln.y) {
+    for (j = 0; j < i; j++)
+    {
+      if ((*node_ptr1)->ln.y > (*node_ptr2)->ln.y)
+      {
         /* Change order */
         dum = *node_ptr2;
         *node_ptr2 = *node_ptr1;
@@ -150,8 +157,10 @@ int exo_objectarray_insert(exo_ctx exoctx, vldh_t_node node)
 
   /* Check if the objdid already is inserted */
   node_ptr = exoctx->objectarray;
-  for (i = 0; i < exoctx->objectarraycount; i++) {
-    if (*node_ptr == node) {
+  for (i = 0; i < exoctx->objectarraycount; i++)
+  {
+    if (*node_ptr == node)
+    {
       return GSX__ALREADY_INSERTED;
     }
     node_ptr++;
@@ -159,9 +168,8 @@ int exo_objectarray_insert(exo_ctx exoctx, vldh_t_node node)
 
   /* The objdid was not found, insert it */
   /* Increase size of the iolist */
-  sts = utl_realloc((char**)&exoctx->objectarray,
-      exoctx->objectarraycount * sizeof(vldh_t_node),
-      (exoctx->objectarraycount + 1) * sizeof(vldh_t_node));
+  sts = utl_realloc((char**)&exoctx->objectarray, exoctx->objectarraycount * sizeof(vldh_t_node),
+                    (exoctx->objectarraycount + 1) * sizeof(vldh_t_node));
   if (EVEN(sts))
     return sts;
 
@@ -184,17 +192,19 @@ int exo_error_msg(unsigned long sts, vldh_t_node node)
 
   logfile = NULL;
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     msg_GetMsg(sts, msg, sizeof(msg));
 
     if (logfile != NULL)
       fprintf(logfile, "%s\n", msg);
     else
       printf("%s\n", msg);
-    if (node != 0) {
+    if (node != 0)
+    {
       /* Get the full hierarchy name for the node */
-      status = ldh_ObjidToName((node->hn.wind)->hw.ldhses, node->ln.oid,
-          ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
+      status = ldh_ObjidToName((node->hn.wind)->hw.ldhses, node->ln.oid, ldh_eName_Hierarchy, hier_name,
+                               sizeof(hier_name), &size);
       if (EVEN(status))
         return status;
       if (logfile != NULL)
@@ -220,8 +230,7 @@ int exo_node_exec(exo_ctx exoctx, vldh_t_node node)
   int executeordermethod;
 
   /* Get executeorder method for this node */
-  sts = ldh_GetClassBody(exoctx->ldhses, node->ln.cid, "GraphPlcNode",
-      &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(exoctx->ldhses, node->ln.cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
@@ -245,8 +254,8 @@ int exo_wind_exec(vldh_t_wind wind)
   int executeordermethod;
 
   /* Get executeorder method for this node */
-  sts = ldh_GetClassBody(wind->hw.ldhses, wind->lw.cid, "GraphPlcWindow",
-      &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(wind->hw.ldhses, wind->lw.cid, "GraphPlcWindow", &bodyclass, (char**)&graphbody,
+                         &size);
   if (EVEN(sts))
     return sts;
 
@@ -274,12 +283,14 @@ int exo_exec_m0(exo_ctx exoctx, vldh_t_node node)
   vldh_t_node* node_ptr;
   unsigned long node_count;
 
-  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED) {
+  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED)
+  {
     return GSX__SUCCESS;
   }
 
   sts = exo_objectarray_insert(exoctx, node);
-  if (sts == GSX__ALREADY_INSERTED) {
+  if (sts == GSX__ALREADY_INSERTED)
+  {
     /* A loop is detected */
     exoctx->errornode = node;
     return GSX__AMBIGOUS_EXECUTEORDER;
@@ -288,22 +299,24 @@ int exo_exec_m0(exo_ctx exoctx, vldh_t_node node)
      connectionpoint of the current node */
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      exoctx->ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
-  if (ODD(sts)) {
+  sts = ldh_GetObjectBodyDef(exoctx->ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  if (ODD(sts))
+  {
     i = 0;
-    while (i < rows && bodydef[i].ParClass == pwr_eClass_Input) {
+    while (i < rows && bodydef[i].ParClass == pwr_eClass_Input)
+    {
       /* Get the point for this parameter if there is one */
       sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         /* Look for an output connected to this point */
-        sts = gcg_get_output(node, point, &output_count, &output_node,
-            &output_point, &output_bodydef,
-            GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
+        sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                             GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
         if (EVEN(sts))
           return sts;
 
-        if (output_count > 0) {
+        if (output_count > 0)
+        {
           sts = exo_node_exec(exoctx, output_node);
           if (EVEN(sts))
             return sts;
@@ -316,13 +329,14 @@ int exo_exec_m0(exo_ctx exoctx, vldh_t_node node)
 
   /* Check the nodes connected with executer order connections */
 
-  sts = vldh_get_nodes_node(node, &node_count, &nodelist,
-      GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ, VLDH_NODE_SOURCE);
+  sts = vldh_get_nodes_node(node, &node_count, &nodelist, GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ,
+                            VLDH_NODE_SOURCE);
   if (EVEN(sts))
     return sts;
 
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     sts = exo_node_exec(exoctx, *node_ptr);
     if (EVEN(sts))
       return sts;
@@ -356,20 +370,24 @@ int exo_exec_m1(exo_ctx dummy, vldh_t_wind wind)
   exo_ykoord_order_nodes(node_count, nodelist);
 
   /* Reset execute_order */
-  for (j = 0; j < (int)node_count; j++) {
+  for (j = 0; j < (int)node_count; j++)
+  {
     node = *(nodelist + j);
     node->hn.executeorder = EXO_NOT_YET_EXECUTED;
   }
 
   /* Call the methods for each node */
-  for (j = 0; j < (int)node_count; j++) {
+  for (j = 0; j < (int)node_count; j++)
+  {
     node = *(nodelist + j);
     exoctx->objectarraycount = 0;
     sts = exo_node_exec(exoctx, node);
-    if (sts == GSX__AMBIGOUS_EXECUTEORDER) {
+    if (sts == GSX__AMBIGOUS_EXECUTEORDER)
+    {
       exo_error_msg(sts, exoctx->errornode);
       goto classerror;
-    } else if (EVEN(sts))
+    }
+    else if (EVEN(sts))
       goto classerror;
   }
   if (node_count > 0)
@@ -406,12 +424,14 @@ int exo_exec_m2(exo_ctx exoctx, vldh_t_node node)
   vldh_t_node* node_ptr;
   unsigned long node_count;
 
-  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED) {
+  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED)
+  {
     return GSX__SUCCESS;
   }
 
   sts = exo_objectarray_insert(exoctx, node);
-  if (sts == GSX__ALREADY_INSERTED) {
+  if (sts == GSX__ALREADY_INSERTED)
+  {
     /* A loop is detected */
     exoctx->errornode = node;
     return GSX__AMBIGOUS_EXECUTEORDER;
@@ -420,24 +440,25 @@ int exo_exec_m2(exo_ctx exoctx, vldh_t_node node)
      connectionpoint of the current node */
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      exoctx->ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(exoctx->ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
-  while (i < rows && bodydef[i].ParClass == pwr_eClass_Input) {
+  while (i < rows && bodydef[i].ParClass == pwr_eClass_Input)
+  {
     /* Get the point for this parameter if there is one */
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         sts = exo_node_exec(exoctx, output_node);
         if (EVEN(sts))
           return sts;
@@ -449,13 +470,14 @@ int exo_exec_m2(exo_ctx exoctx, vldh_t_node node)
 
   /* Check the nodes connected with executer order connections */
 
-  sts = vldh_get_nodes_node(node, &node_count, &nodelist,
-      GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ, VLDH_NODE_SOURCE);
+  sts = vldh_get_nodes_node(node, &node_count, &nodelist, GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ,
+                            VLDH_NODE_SOURCE);
   if (EVEN(sts))
     return sts;
 
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     sts = exo_node_exec(exoctx, *node_ptr);
     if (EVEN(sts))
       return sts;
@@ -487,12 +509,14 @@ int exo_exec_m3(exo_ctx exoctx, vldh_t_node node)
   vldh_t_node* node_ptr;
   unsigned long node_count;
 
-  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED) {
+  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED)
+  {
     return GSX__SUCCESS;
   }
 
   sts = exo_objectarray_insert(exoctx, node);
-  if (sts == GSX__ALREADY_INSERTED) {
+  if (sts == GSX__ALREADY_INSERTED)
+  {
     /* A loop is detected */
     exoctx->errornode = node;
     return GSX__AMBIGOUS_EXECUTEORDER;
@@ -504,15 +528,16 @@ int exo_exec_m3(exo_ctx exoctx, vldh_t_node node)
   {
     /* Get the point for this parameter if there is one */
     sts = gcg_get_inputpoint(node, 2, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         sts = exo_node_exec(exoctx, output_node);
         if (EVEN(sts))
           return sts;
@@ -522,13 +547,14 @@ int exo_exec_m3(exo_ctx exoctx, vldh_t_node node)
 
   /* Check the nodes connected with executer order connections */
 
-  sts = vldh_get_nodes_node(node, &node_count, &nodelist,
-      GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ, VLDH_NODE_SOURCE);
+  sts = vldh_get_nodes_node(node, &node_count, &nodelist, GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ,
+                            VLDH_NODE_SOURCE);
   if (EVEN(sts))
     return sts;
 
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     sts = exo_node_exec(exoctx, *node_ptr);
     if (EVEN(sts))
       return sts;
@@ -560,12 +586,14 @@ int exo_exec_m4(exo_ctx exoctx, vldh_t_node node)
   vldh_t_node next_node;
   pwr_tClassId cid;
 
-  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED) {
+  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED)
+  {
     return GSX__SUCCESS;
   }
 
   sts = exo_objectarray_insert(exoctx, node);
-  if (sts == GSX__ALREADY_INSERTED) {
+  if (sts == GSX__ALREADY_INSERTED)
+  {
     /* A loop is detected */
     exoctx->errornode = node;
     return GSX__AMBIGOUS_EXECUTEORDER;
@@ -574,20 +602,25 @@ int exo_exec_m4(exo_ctx exoctx, vldh_t_node node)
      connectionpoint of the current node */
 
   /* Check only the trans output on par nr 0 and 1 */
-  for (i = 0; i < 2; i++) {
+  for (i = 0; i < 2; i++)
+  {
     /* Get the point for this parameter if there is one */
     sts = gcg_get_point(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       gcg_get_conpoint_nodes(node, point, &point_count, &pointlist,
-          GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
-      if (point_count > 1) {
-        for (k = 1; k < (int)point_count; k++) {
+                             GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
+      if (point_count > 1)
+      {
+        for (k = 1; k < (int)point_count; k++)
+        {
           next_node = (pointlist + k)->node;
           /* Check class of connected nodes */
           sts = ldh_GetObjectClass(exoctx->ldhses, next_node->ln.oid, &cid);
           if (EVEN(sts))
             return sts;
-          if (cid == pwr_cClass_trans) {
+          if (cid == pwr_cClass_trans)
+          {
             sts = exo_node_exec(exoctx, next_node);
             if (EVEN(sts))
               return sts;
@@ -599,13 +632,14 @@ int exo_exec_m4(exo_ctx exoctx, vldh_t_node node)
 
   /* Check the nodes connected with executer order connections */
 
-  sts = vldh_get_nodes_node(node, &node_count, &nodelist,
-      GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ, VLDH_NODE_SOURCE);
+  sts = vldh_get_nodes_node(node, &node_count, &nodelist, GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ,
+                            VLDH_NODE_SOURCE);
   if (EVEN(sts))
     return sts;
 
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     sts = exo_node_exec(exoctx, *node_ptr);
     if (EVEN(sts))
       return sts;
@@ -638,12 +672,14 @@ int exo_exec_m5(exo_ctx exoctx, vldh_t_node node)
   unsigned long node_count;
   unsigned long step_execute_order = 0;
 
-  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED) {
+  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED)
+  {
     return GSX__SUCCESS;
   }
 
   sts = exo_objectarray_insert(exoctx, node);
-  if (sts == GSX__ALREADY_INSERTED) {
+  if (sts == GSX__ALREADY_INSERTED)
+  {
     /* A loop is detected */
     exoctx->errornode = node;
     return GSX__AMBIGOUS_EXECUTEORDER;
@@ -652,23 +688,26 @@ int exo_exec_m5(exo_ctx exoctx, vldh_t_node node)
      connectionpoint of the current node */
 
   /* Check the inputs */
-  for (i = 0; i < 2; i++) {
+  for (i = 0; i < 2; i++)
+  {
     /* Get the point for this parameter if there is one */
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         sts = exo_node_exec(exoctx, output_node);
         if (EVEN(sts))
           return sts;
       }
-      if (i == 0) {
+      if (i == 0)
+      {
         if (output_count > 0)
           /* Store the executer order of the step */
           step_execute_order = output_node->hn.executeorder;
@@ -681,13 +720,14 @@ int exo_exec_m5(exo_ctx exoctx, vldh_t_node node)
 
   /* Check the nodes connected with executer order connections */
 
-  sts = vldh_get_nodes_node(node, &node_count, &nodelist,
-      GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ, VLDH_NODE_SOURCE);
+  sts = vldh_get_nodes_node(node, &node_count, &nodelist, GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ,
+                            VLDH_NODE_SOURCE);
   if (EVEN(sts))
     return sts;
 
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     sts = exo_node_exec(exoctx, *node_ptr);
     if (EVEN(sts))
       return sts;
@@ -720,12 +760,14 @@ int exo_exec_m6(exo_ctx exoctx, vldh_t_node node)
   unsigned long order_execute_order = 0;
   pwr_tClassId cid;
 
-  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED) {
+  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED)
+  {
     return GSX__SUCCESS;
   }
 
   sts = exo_objectarray_insert(exoctx, node);
-  if (sts == GSX__ALREADY_INSERTED) {
+  if (sts == GSX__ALREADY_INSERTED)
+  {
     /* A loop is detected */
     exoctx->errornode = node;
     return GSX__AMBIGOUS_EXECUTEORDER;
@@ -733,18 +775,20 @@ int exo_exec_m6(exo_ctx exoctx, vldh_t_node node)
   /* Check the the nodes with an output connected to an input
      connectionpoint of the current node */
 
-  for (i = 0; i < 1; i++) {
+  for (i = 0; i < 1; i++)
+  {
     /* Get the point for this parameter if there is one */
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         sts = exo_node_exec(exoctx, output_node);
         if (EVEN(sts))
           return sts;
@@ -763,13 +807,14 @@ int exo_exec_m6(exo_ctx exoctx, vldh_t_node node)
 
   /* Check the nodes connected with executer order connections */
 
-  sts = vldh_get_nodes_node(node, &node_count, &nodelist,
-      GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ, VLDH_NODE_SOURCE);
+  sts = vldh_get_nodes_node(node, &node_count, &nodelist, GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ,
+                            VLDH_NODE_SOURCE);
   if (EVEN(sts))
     return sts;
 
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     sts = exo_node_exec(exoctx, *node_ptr);
     if (EVEN(sts))
       return sts;
@@ -780,7 +825,8 @@ int exo_exec_m6(exo_ctx exoctx, vldh_t_node node)
 
   if (order_execute_order)
     node->hn.executeorder = order_execute_order;
-  else {
+  else
+  {
     node->hn.executeorder = exoctx->execute_counter;
     exoctx->execute_counter++;
   }
@@ -805,12 +851,14 @@ int exo_exec_m7(exo_ctx exoctx, vldh_t_node node)
   vldh_t_node next_node;
   pwr_tClassId cid;
 
-  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED) {
+  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED)
+  {
     return GSX__SUCCESS;
   }
 
   sts = exo_objectarray_insert(exoctx, node);
-  if (sts == GSX__ALREADY_INSERTED) {
+  if (sts == GSX__ALREADY_INSERTED)
+  {
     /* A loop is detected */
     exoctx->errornode = node;
     return GSX__AMBIGOUS_EXECUTEORDER;
@@ -819,20 +867,25 @@ int exo_exec_m7(exo_ctx exoctx, vldh_t_node node)
      connectionpoint of the current node */
 
   /* Check only the trans output on par nr 0 */
-  for (i = 0; i < 1; i++) {
+  for (i = 0; i < 1; i++)
+  {
     /* Get the point for this parameter if there is one */
     sts = gcg_get_point(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       gcg_get_conpoint_nodes(node, point, &point_count, &pointlist,
-          GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
-      if (point_count > 1) {
-        for (k = 1; k < (int)point_count; k++) {
+                             GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
+      if (point_count > 1)
+      {
+        for (k = 1; k < (int)point_count; k++)
+        {
           next_node = (pointlist + k)->node;
           /* Check class of connected nodes */
           sts = ldh_GetObjectClass(exoctx->ldhses, next_node->ln.oid, &cid);
           if (EVEN(sts))
             return sts;
-          if (cid == pwr_cClass_trans) {
+          if (cid == pwr_cClass_trans)
+          {
             sts = exo_node_exec(exoctx, next_node);
             if (EVEN(sts))
               return sts;
@@ -844,13 +897,14 @@ int exo_exec_m7(exo_ctx exoctx, vldh_t_node node)
 
   /* Check the nodes connected with executer order connections */
 
-  sts = vldh_get_nodes_node(node, &node_count, &nodelist,
-      GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ, VLDH_NODE_SOURCE);
+  sts = vldh_get_nodes_node(node, &node_count, &nodelist, GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ,
+                            VLDH_NODE_SOURCE);
   if (EVEN(sts))
     return sts;
 
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     sts = exo_node_exec(exoctx, *node_ptr);
     if (EVEN(sts))
       return sts;
@@ -883,12 +937,14 @@ int exo_exec_m8(exo_ctx exoctx, vldh_t_node node)
   vldh_t_node next_node;
   pwr_tClassId cid;
 
-  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED) {
+  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED)
+  {
     return GSX__SUCCESS;
   }
 
   sts = exo_objectarray_insert(exoctx, node);
-  if (sts == GSX__ALREADY_INSERTED) {
+  if (sts == GSX__ALREADY_INSERTED)
+  {
     /* A loop is detected */
     exoctx->errornode = node;
     return GSX__AMBIGOUS_EXECUTEORDER;
@@ -897,14 +953,18 @@ int exo_exec_m8(exo_ctx exoctx, vldh_t_node node)
      connectionpoint of the current node */
 
   /* Check only the transportobjects output on par nr 0 and 1 */
-  for (i = 0; i < 2; i++) {
+  for (i = 0; i < 2; i++)
+  {
     /* Get the point for this parameter if there is one */
     sts = gcg_get_point(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       gcg_get_conpoint_nodes(node, point, &point_count, &pointlist,
-          GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
-      if (point_count > 1) {
-        for (k = 1; k < (int)point_count; k++) {
+                             GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
+      if (point_count > 1)
+      {
+        for (k = 1; k < (int)point_count; k++)
+        {
           next_node = (pointlist + k)->node;
           /* Check class of connected nodes */
           sts = ldh_GetObjectClass(exoctx->ldhses, next_node->ln.oid, &cid);
@@ -921,13 +981,14 @@ int exo_exec_m8(exo_ctx exoctx, vldh_t_node node)
 
   /* Check the nodes connected with executer order connections */
 
-  sts = vldh_get_nodes_node(node, &node_count, &nodelist,
-      GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ, VLDH_NODE_SOURCE);
+  sts = vldh_get_nodes_node(node, &node_count, &nodelist, GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ,
+                            VLDH_NODE_SOURCE);
   if (EVEN(sts))
     return sts;
 
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     sts = exo_node_exec(exoctx, *node_ptr);
     if (EVEN(sts))
       return sts;
@@ -959,12 +1020,14 @@ int exo_exec_m9(exo_ctx exoctx, vldh_t_node node)
   vldh_t_node* node_ptr;
   unsigned long node_count;
 
-  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED) {
+  if (node->hn.executeorder != EXO_NOT_YET_EXECUTED)
+  {
     return GSX__SUCCESS;
   }
 
   sts = exo_objectarray_insert(exoctx, node);
-  if (sts == GSX__ALREADY_INSERTED) {
+  if (sts == GSX__ALREADY_INSERTED)
+  {
     /* A loop is detected */
     exoctx->errornode = node;
     return GSX__AMBIGOUS_EXECUTEORDER;
@@ -973,18 +1036,20 @@ int exo_exec_m9(exo_ctx exoctx, vldh_t_node node)
      connectionpoint of the current node */
 
   /* Check only the trigg condition inputs */
-  for (i = 2; i < 6; i++) {
+  for (i = 2; i < 6; i++)
+  {
     /* Get the point for this parameter if there is one */
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_EXECUTEORDER | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         sts = exo_node_exec(exoctx, output_node);
         if (EVEN(sts))
           return sts;
@@ -994,13 +1059,14 @@ int exo_exec_m9(exo_ctx exoctx, vldh_t_node node)
 
   /* Check the nodes connected with executer order connections */
 
-  sts = vldh_get_nodes_node(node, &node_count, &nodelist,
-      GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ, VLDH_NODE_SOURCE);
+  sts = vldh_get_nodes_node(node, &node_count, &nodelist, GOEN_CON_EXECUTEORDER | GOEN_CON_OBJTOOBJ,
+                            VLDH_NODE_SOURCE);
   if (EVEN(sts))
     return sts;
 
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     sts = exo_node_exec(exoctx, *node_ptr);
     if (EVEN(sts))
       return sts;

@@ -35,7 +35,7 @@
  */
 
 /* rt_io_m_nodave_plc.c -- io methods for a libnodave PLC
-*/
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -89,12 +89,14 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   rp->Local = calloc(1, sizeof(io_sRackLocal));
   local = rp->Local;
 
-  if (op->Connection == pwr_eNodave_ConnectionEnum_Serial) {
+  if (op->Connection == pwr_eNodave_ConnectionEnum_Serial)
+  {
     /* Serial connection */
     char serial_parity;
     char serial_speed[40];
 
-    switch (op->SerialParity) {
+    switch (op->SerialParity)
+    {
     case pwr_eParityEnum_None:
       serial_parity = 'N';
       break;
@@ -109,22 +111,27 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     snprintf(serial_speed, sizeof(serial_speed), "%d", op->SerialSpeed);
 
     local->fds.rfd = setPort(op->SerialDevice, serial_speed, serial_parity);
-    if (local->fds.rfd <= 0) {
+    if (local->fds.rfd <= 0)
+    {
       errh_Error("Nodave PLC, open device error, %s", rp->Name);
       strcpy(op->Status, "No such device");
       return IO__ERRINIDEVICE;
     }
-  } else {
+  }
+  else
+  {
     /* TCP connection */
     local->fds.rfd = openSocket(op->Port, op->IP_Address);
     local->fds.wfd = local->fds.rfd;
-    if (local->fds.rfd <= 0) {
+    if (local->fds.rfd <= 0)
+    {
       errh_Error("Nodave PLC, open socket error, %s", rp->Name);
       return IO__ERRINIDEVICE;
     }
   }
 
-  switch (op->Protocol) {
+  switch (op->Protocol)
+  {
   case pwr_eNodave_ProtocolEnum_MPI:
     protocol = daveProtoMPI;
     break;
@@ -166,7 +173,8 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     break;
   }
 
-  switch (op->Speed) {
+  switch (op->Speed)
+  {
   case pwr_eNodave_SpeedEnum_9k:
     speed = daveSpeed9k;
     break;
@@ -190,13 +198,12 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     break;
   }
 
-  local->di
-      = daveNewInterface(local->fds, name, op->MPI_Local, protocol, speed);
+  local->di = daveNewInterface(local->fds, name, op->MPI_Local, protocol, speed);
 
   res = daveInitAdapter(local->di);
-  if (res != 0) {
-    errh_Error("Nodave PLC, new interface error, %s (%d), %s",
-        daveStrerror(res), res, rp->Name);
+  if (res != 0)
+  {
+    errh_Error("Nodave PLC, new interface error, %s (%d), %s", daveStrerror(res), res, rp->Name);
     strncpy(op->Status, daveStrerror(res), sizeof(op->Status));
     local->status = IO__ERRINIDEVICE;
     return IO__ERRINIDEVICE;
@@ -205,9 +212,9 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   local->dc = daveNewConnection(local->di, op->MPI_Address, op->Rack, op->Slot);
 
   res = daveConnectPLC(local->dc);
-  if (res != 0) {
-    errh_Error("Nodave PLC, new connection error, %s (%d), %s",
-        daveStrerror(res), res, rp->Name);
+  if (res != 0)
+  {
+    errh_Error("Nodave PLC, new connection error, %s (%d), %s", daveStrerror(res), res, rp->Name);
     strncpy(op->Status, daveStrerror(res), sizeof(op->Status));
     local->status = IO__ERRINIDEVICE;
     return IO__ERRINIDEVICE;
@@ -227,17 +234,19 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
   /* Calculate total input and output area size */
   cardp = rp->cardlist;
-  while (cardp) {
+  while (cardp)
+  {
     cid = cardp->Class;
     /* Find the super class */
     while (ODD(gdh_GetSuperClass(cid, &cid, cardp->Objid)))
       ;
 
-    switch (cid) {
-    case pwr_cClass_Nodave_Transaction: {
-      io_bus_card_init(ctx, cardp, &input_area_offset, &input_area_chansize,
-          &output_area_offset, &output_area_chansize, op->ByteOrdering,
-          io_eAlignment_Packed);
+    switch (cid)
+    {
+    case pwr_cClass_Nodave_Transaction:
+    {
+      io_bus_card_init(ctx, cardp, &input_area_offset, &input_area_chansize, &output_area_offset,
+                       &output_area_chansize, op->ByteOrdering, io_eAlignment_Packed);
       break;
     }
     }
@@ -260,7 +269,8 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   output_area_chansize = 0;
 
   cardp = rp->cardlist;
-  while (cardp) {
+  while (cardp)
+  {
     local_card = calloc(1, sizeof(*local_card));
 
     cid = cardp->Class;
@@ -268,28 +278,25 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     while (ODD(gdh_GetSuperClass(cid, &cid, cardp->Objid)))
       ;
 
-    switch (cid) {
-    case pwr_cClass_Nodave_Transaction: {
+    switch (cid)
+    {
+    case pwr_cClass_Nodave_Transaction:
+    {
       pwr_sClass_Nodave_Transaction* tp;
 
       cardp->Local = local_card;
 
-      local_card->input_area
-          = local->input_area + input_area_offset + input_area_chansize;
-      local_card->output_area
-          = local->output_area + output_area_offset + output_area_chansize;
+      local_card->input_area = local->input_area + input_area_offset + input_area_chansize;
+      local_card->output_area = local->output_area + output_area_offset + output_area_chansize;
 
       tp = (pwr_sClass_Nodave_Transaction*)cardp->op;
       strcpy(tp->Status, "Starting...");
 
-      io_bus_card_init(ctx, cardp, &input_area_offset, &input_area_chansize,
-          &output_area_offset, &output_area_chansize, op->ByteOrdering,
-          io_eAlignment_Packed);
+      io_bus_card_init(ctx, cardp, &input_area_offset, &input_area_chansize, &output_area_offset,
+                       &output_area_chansize, op->ByteOrdering, io_eAlignment_Packed);
 
-      local_card->input_size
-          = input_area_offset + input_area_chansize - prev_input_area_offset;
-      local_card->output_size
-          = output_area_offset + output_area_chansize - prev_output_area_offset;
+      local_card->input_size = input_area_offset + input_area_chansize - prev_input_area_offset;
+      local_card->output_size = output_area_offset + output_area_chansize - prev_output_area_offset;
 
       break;
     }
@@ -318,7 +325,8 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   io_sRackLocal* local = (io_sRackLocal*)rp->Local;
   pwr_sClass_Nodave_PLC* op = (pwr_sClass_Nodave_PLC*)rp->op;
 
-  if (op->Debug) {
+  if (op->Debug)
+  {
     int size = sizeof(op->Inputs);
     if (local->input_size < size)
       size = local->input_size;
@@ -336,7 +344,8 @@ static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   io_sRackLocal* local = (io_sRackLocal*)rp->Local;
   pwr_sClass_Nodave_PLC* op = (pwr_sClass_Nodave_PLC*)rp->op;
 
-  if (op->Debug) {
+  if (op->Debug)
+  {
     int size = sizeof(op->Outputs);
     if (local->output_size < size)
       size = local->output_size;
@@ -373,28 +382,16 @@ static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 }
 
 #else
-static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__RELEASEBUILD;
-}
-static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__RELEASEBUILD;
-}
-static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__RELEASEBUILD;
-}
-static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__RELEASEBUILD;
-}
+static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__RELEASEBUILD; }
+static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__RELEASEBUILD; }
+static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__RELEASEBUILD; }
+static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__RELEASEBUILD; }
 #endif
 
 /*----------------------------------------------------------------------------*\
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Nodave_PLC) = { pwr_BindIoMethod(IoRackInit),
-  pwr_BindIoMethod(IoRackRead), pwr_BindIoMethod(IoRackWrite),
-  pwr_BindIoMethod(IoRackClose), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Nodave_PLC) = {pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackRead),
+                                             pwr_BindIoMethod(IoRackWrite), pwr_BindIoMethod(IoRackClose),
+                                             pwr_NullMethod};

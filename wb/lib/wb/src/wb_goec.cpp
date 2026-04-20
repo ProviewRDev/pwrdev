@@ -46,22 +46,22 @@
 #include "wb_goec.h"
 
 /*************************************************************************
-*
-* Name:		gre_con_draw()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* WGre	gre		I	gre context.
-* vldh_t_con	con_object	I	vldh connection.
-* int		create_flag	I	type of creation ( GRE_CON_CREATE,
-*					GRE_CON_REDRAW or GRE_CON_NONROUTE)
-* vldh_t_node	node		I	node to reconfigure ref cons.
-*
-* Description:
-*	This routine draws a connection in the neted window.
-*
-**************************************************************************/
+ *
+ * Name:		gre_con_draw()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * WGre	gre		I	gre context.
+ * vldh_t_con	con_object	I	vldh connection.
+ * int		create_flag	I	type of creation ( GRE_CON_CREATE,
+ *					GRE_CON_REDRAW or GRE_CON_NONROUTE)
+ * vldh_t_node	node		I	node to reconfigure ref cons.
+ *
+ * Description:
+ *	This routine draws a connection in the neted window.
+ *
+ **************************************************************************/
 
 int goec_con_draw(WGre* gre, vldh_t_con con, int create_flag, vldh_t_node node)
 {
@@ -76,21 +76,16 @@ int goec_con_draw(WGre* gre, vldh_t_con con, int create_flag, vldh_t_node node)
 
   if (con->lc.drawtype == GOEN_CONSYSREF || con->lc.drawtype == GOEN_CONUSERREF)
     /* This is a fix for backward compatibility */
-    sts = gre->get_conclass(
-        0, (con->hc.wind)->hw.ldhses, con->lc.object_type, &con_class);
+    sts = gre->get_conclass(0, (con->hc.wind)->hw.ldhses, con->lc.object_type, &con_class);
   else
-    sts = gre->get_conclass(con->lc.cid, (con->hc.wind)->hw.ldhses,
-        con->lc.object_type, &con_class);
+    sts = gre->get_conclass(con->lc.cid, (con->hc.wind)->hw.ldhses, con->lc.object_type, &con_class);
 
   /* For grafcet-connectins source and destination class has to be right*/
-  if ((con->lc.cid == pwr_cClass_TransDiv
-          && con->hc.dest_node->ln.cid == pwr_cClass_trans)
-      || (con->lc.cid == pwr_cClass_TransConv
-             && con->hc.source_node->ln.cid == pwr_cClass_trans)
-      || (con->lc.cid == pwr_cClass_StepDiv
-             && con->hc.source_node->ln.cid == pwr_cClass_trans)
-      || (con->lc.cid == pwr_cClass_StepConv
-             && con->hc.dest_node->ln.cid == pwr_cClass_trans)) {
+  if ((con->lc.cid == pwr_cClass_TransDiv && con->hc.dest_node->ln.cid == pwr_cClass_trans) ||
+      (con->lc.cid == pwr_cClass_TransConv && con->hc.source_node->ln.cid == pwr_cClass_trans) ||
+      (con->lc.cid == pwr_cClass_StepDiv && con->hc.source_node->ln.cid == pwr_cClass_trans) ||
+      (con->lc.cid == pwr_cClass_StepConv && con->hc.dest_node->ln.cid == pwr_cClass_trans))
+  {
     /* Shift */
     tmp_node_pointer = con->hc.source_node;
     tmp_point = con->lc.source_point;
@@ -103,39 +98,44 @@ int goec_con_draw(WGre* gre, vldh_t_con con, int create_flag, vldh_t_node node)
     con->lc.dest_oid = tmp_node_did;
   }
 
-  if (create_flag != GRE_CON_NONROUTE) {
-    flow_CreateCon(gre->flow_ctx, con->hc.name, con_class,
-        con->hc.source_node->hn.node_id, con->hc.dest_node->hn.node_id,
-        con->lc.source_point, con->lc.dest_point, con, &con->hc.con_id, 0, NULL,
-        NULL, &sts);
-    if (EVEN(sts)) {
-      printf("** Corrupt connection deleted: source %s, destination %s\n",
-          con->hc.source_node->hn.name, con->hc.dest_node->hn.name);
+  if (create_flag != GRE_CON_NONROUTE)
+  {
+    flow_CreateCon(gre->flow_ctx, con->hc.name, con_class, con->hc.source_node->hn.node_id,
+                   con->hc.dest_node->hn.node_id, con->lc.source_point, con->lc.dest_point, con,
+                   &con->hc.con_id, 0, NULL, NULL, &sts);
+    if (EVEN(sts))
+    {
+      printf("** Corrupt connection deleted: source %s, destination %s\n", con->hc.source_node->hn.name,
+             con->hc.dest_node->hn.name);
       vldh_con_delete(con);
       return sts;
     }
     flow_GetConPosition(con->hc.con_id, &x_arr, &y_arr, &num);
-    for (i = 0; i < num; i++) {
+    for (i = 0; i < num; i++)
+    {
       con->lc.point[i].x = x_arr[i];
       con->lc.point[i].y = y_arr[i];
     }
     con->lc.point_count = num;
-  } else {
+  }
+  else
+  {
     // In V2.7 max point was 10, in flow it is 8...
     if (con->lc.point_count > 8)
       con->lc.point_count = 8;
 
-    for (i = 0; i < (int)con->lc.point_count; i++) {
+    for (i = 0; i < (int)con->lc.point_count; i++)
+    {
       x[i] = con->lc.point[i].x;
       y[i] = con->lc.point[i].y;
     }
-    flow_CreateCon(gre->flow_ctx, con->hc.name, con_class,
-        con->hc.source_node->hn.node_id, con->hc.dest_node->hn.node_id,
-        con->lc.source_point, con->lc.dest_point, con, &con->hc.con_id,
-        con->lc.point_count, x, y, &sts);
-    if (EVEN(sts)) {
-      printf("** Corrupt connection deleted: source %s, destination %s\n",
-          con->hc.source_node->hn.name, con->hc.dest_node->hn.name);
+    flow_CreateCon(gre->flow_ctx, con->hc.name, con_class, con->hc.source_node->hn.node_id,
+                   con->hc.dest_node->hn.node_id, con->lc.source_point, con->lc.dest_point, con,
+                   &con->hc.con_id, con->lc.point_count, x, y, &sts);
+    if (EVEN(sts))
+    {
+      printf("** Corrupt connection deleted: source %s, destination %s\n", con->hc.source_node->hn.name,
+             con->hc.dest_node->hn.name);
       vldh_con_delete(con);
       return sts;
     }
@@ -202,8 +202,7 @@ int goec_con_delete_noredraw(WGre* gre, vldh_t_con con)
  *
  **************************************************************************/
 
-int goec_con_sethighlight(
-    WGre* gre, vldh_t_con con_object, unsigned long highlight_flag)
+int goec_con_sethighlight(WGre* gre, vldh_t_con con_object, unsigned long highlight_flag)
 {
   flow_SetHighlight(con_object->hc.con_id, highlight_flag);
   return GRE__SUCCESS;
@@ -227,8 +226,7 @@ int goec_con_sethighlight(
  *
  **************************************************************************/
 
-int goec_con_gethighlight(
-    WGre* gre, vldh_t_con con_object, unsigned long* highlight_flag)
+int goec_con_gethighlight(WGre* gre, vldh_t_con con_object, unsigned long* highlight_flag)
 {
   flow_GetHighlight(con_object->hc.con_id, (int*)highlight_flag);
   return GRE__SUCCESS;

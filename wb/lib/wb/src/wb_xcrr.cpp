@@ -43,25 +43,21 @@
 #include "wb_watt_msg.h"
 #include "wb_xcrr.h"
 
-WCrr::~WCrr()
-{
-}
+WCrr::~WCrr() {}
 
-WCrr::WCrr(void* xa_parent_ctx, ldh_tSesContext xa_ldhses,
-    pwr_sAttrRef* xa_objar, int xa_advanced_user, int* xa_sts)
-    : parent_ctx(xa_parent_ctx), ldhses(xa_ldhses), objar(*xa_objar),
-      input_open(0), input_multiline(0), close_cb(0), redraw_cb(0),
-      popup_menu_cb(0), start_trace_cb(0), client_data(0)
+WCrr::WCrr(void* xa_parent_ctx, ldh_tSesContext xa_ldhses, pwr_sAttrRef* xa_objar, int xa_advanced_user,
+           int* xa_sts)
+    : parent_ctx(xa_parent_ctx), ldhses(xa_ldhses), objar(*xa_objar), input_open(0), input_multiline(0),
+      close_cb(0), redraw_cb(0), popup_menu_cb(0), start_trace_cb(0), client_data(0)
 {
   *xa_sts = WATT__SUCCESS;
 }
 
-void WCrr::xcrr_popup_menu_cb(void* ctx, pwr_sAttrRef attrref,
-    unsigned long item_type, unsigned long utility, char* arg, int x, int y)
+void WCrr::xcrr_popup_menu_cb(void* ctx, pwr_sAttrRef attrref, unsigned long item_type, unsigned long utility,
+                              char* arg, int x, int y)
 {
   if (((WCrr*)ctx)->popup_menu_cb)
-    (((WCrr*)ctx)->popup_menu_cb)(
-        ((WCrr*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
+    (((WCrr*)ctx)->popup_menu_cb)(((WCrr*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
 }
 
 void WCrr::xcrr_start_trace_cb(void* ctx, pwr_tObjid objid, char* name)

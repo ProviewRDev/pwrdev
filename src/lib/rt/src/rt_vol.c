@@ -80,8 +80,7 @@ gdb_sMountServer* vol_AddMountClient(pwr_tStatus* sts, gdb_sObject* op)
   return msp;
 }
 
-gdb_sMountedOn* vol_AddMountedOn(
-    pwr_tStatus* sts, pwr_tVolumeId vid, gdb_sNode* np)
+gdb_sMountedOn* vol_AddMountedOn(pwr_tStatus* sts, pwr_tVolumeId vid, gdb_sNode* np)
 {
   gdb_sMountedOn* mop;
   gdb_sVolume* vp;
@@ -124,9 +123,11 @@ gdb_sMountServer* vol_AddMountServer(pwr_tStatus* sts, pwr_tObjid soid)
 
   pool_QinsertPred(NULL, gdbroot->pool, &msp->volms_ll, &vp->l.volms_lh);
 
-  if (vp->l.flags.b.isMounted) {
+  if (vp->l.flags.b.isMounted)
+  {
     op = hash_Search(NULL, gdbroot->oid_ht, &soid);
-    if (op != NULL) {
+    if (op != NULL)
+    {
       msp->msor = pool_ItemReference(NULL, gdbroot->pool, op);
       op->l.flags.b.isMountServer = 1;
     }
@@ -141,8 +142,8 @@ gdb_sMountServer* vol_AddMountServer(pwr_tStatus* sts, pwr_tObjid soid)
 /* Translate an attribute reference to the internal
    attribute format.  */
 
-mvol_sAttribute* vol_ArefToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
-    pwr_sAttrRef* arp, pwr_tBitMask lo_flags, pwr_tBitMask trans)
+mvol_sAttribute* vol_ArefToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap, pwr_sAttrRef* arp,
+                                     pwr_tBitMask lo_flags, pwr_tBitMask trans)
 {
   ap->op = vol_OidToObject(sts, arp->Objid, lo_flags, trans, cvol_eHint_none);
   if (ap->op == NULL)
@@ -162,11 +163,11 @@ void* vol_AttributeToAddress(pwr_tStatus* sts, mvol_sAttribute* ap)
   if (ap->op->g.size == 0 || (ap->op->l.flags.m & gdb_mLo_native) == 0)
     pwr_Return(NULL, sts, GDH__BADOBJTYPE);
 
-  if (ap->offs + (ap->flags.b.Indirect ? sizeof(pool_tRef) : ap->size)
-      > ap->op->g.size)
+  if (ap->offs + (ap->flags.b.Indirect ? sizeof(pool_tRef) : ap->size) > ap->op->g.size)
     pwr_Return(NULL, sts, GDH__SIZE);
 
-  do {
+  do
+  {
     p = pool_Address(sts, gdbroot->rtdb, ap->op->u.n.body);
     if (p == NULL)
       break;
@@ -186,8 +187,7 @@ void* vol_AttributeToAddress(pwr_tStatus* sts, mvol_sAttribute* ap)
     pwr_Return(p, sts, GDH__SUCCESS);
 }
 
-char* vol_AttributeToName(
-    pwr_tStatus* sts, mvol_sAttribute* ap, pwr_tBitMask nametype, char* s)
+char* vol_AttributeToName(pwr_tStatus* sts, mvol_sAttribute* ap, pwr_tBitMask nametype, char* s)
 {
   char index[20];
   cdh_mName lnametype;
@@ -199,11 +199,13 @@ char* vol_AttributeToName(
   if (s == NULL)
     return NULL;
 
-  if (ap->aop != NULL && lnametype.b.attribute) {
+  if (ap->aop != NULL && lnametype.b.attribute)
+  {
     if (*s != '\0' || lnametype.b.separator)
       strcat(s, ".");
     strcat(s, ap->name);
-    if (ap->idx != UINT_MAX && lnametype.b.index) {
+    if (ap->idx != UINT_MAX && lnametype.b.index)
+    {
       sprintf(index, "[%d]", ap->idx);
       strcat(s, index);
     }
@@ -225,14 +227,20 @@ void vol_InsertSiblist(pwr_tStatus* sts, gdb_sObject* op, gdb_sObject* pop)
   pwr_Assert(op->g.sib.blink == pwr_cNObjectIx);
   pwr_Assert(op->g.oid.vid == pop->g.oid.vid);
 
-  if (cdh_ObjidIsNull(pop->g.soid)) {
+  if (cdh_ObjidIsNull(pop->g.soid))
+  {
     pop->g.soid = op->g.oid;
     op->g.sib.flink = op->g.sib.blink = op->g.oid.oix;
-  } else {
+  }
+  else
+  {
     fop = hash_Search(sts, gdbroot->oid_ht, &pop->g.soid);
-    if (fop->g.sib.blink == fop->g.oid.oix) {
+    if (fop->g.sib.blink == fop->g.oid.oix)
+    {
       lop = fop;
-    } else {
+    }
+    else
+    {
       soid.oix = fop->g.sib.blink;
       lop = hash_Search(sts, gdbroot->oid_ht, &soid);
     }
@@ -258,11 +266,11 @@ pool_tRef vol_AttributeToReference(pwr_tStatus* sts, mvol_sAttribute* ap)
   if (ap->op->g.size == 0 || (ap->op->l.flags.m & gdb_mLo_native) == 0)
     pwr_Return(pool_cNRef, sts, GDH__BADOBJTYPE);
 
-  if (ap->offs + (ap->flags.b.Indirect ? sizeof(pool_tRef) : ap->size)
-      > ap->op->g.size)
+  if (ap->offs + (ap->flags.b.Indirect ? sizeof(pool_tRef) : ap->size) > ap->op->g.size)
     pwr_Return(pool_cNRef, sts, GDH__SIZE);
 
-  do {
+  do
+  {
     if (ap->op->u.n.body == pool_cNRef)
       break;
 
@@ -283,8 +291,7 @@ pool_tRef vol_AttributeToReference(pwr_tStatus* sts, mvol_sAttribute* ap)
 
 /* Link an object.  */
 
-gdb_sObject* vol_LinkObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask ilink)
+gdb_sObject* vol_LinkObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask ilink)
 {
   pwr_tStatus lsts = 1;
   gdb_sObject* pop;
@@ -298,66 +305,77 @@ gdb_sObject* vol_LinkObject(
 
   pwr_Assert(vp->g.vid == op->g.oid.vid);
 
-  if (link.b.init) {
+  if (link.b.init)
+  {
     op->l.flags.m |= (vp->l.flags.m & gdb_mLv_objectFlags);
     pool_Qinit(NULL, gdbroot->pool, &op->l.obj_ll);
     pool_Qinit(NULL, gdbroot->pool, &op->l.oid_htl);
     pool_Qinit(NULL, gdbroot->pool, &op->l.family_htl);
-    if (vp->l.flags.b.isNative) {
+    if (vp->l.flags.b.isNative)
+    {
       pool_Qinit(NULL, gdbroot->pool, &op->u.n.cid_ll);
       pool_Qinit(NULL, gdbroot->pool, &op->u.n.cli_ll);
       pool_Qinit(NULL, gdbroot->pool, &op->u.n.sib_lh);
       pool_Qinit(NULL, gdbroot->pool, &op->u.n.sib_ll);
-    } else if (vp->l.flags.b.isCached) {
+    }
+    else if (vp->l.flags.b.isCached)
+    {
       pool_Qinit(NULL, gdbroot->pool, &op->u.c.cache_ll);
       pool_Qinit(NULL, gdbroot->pool, &op->u.c.sanc_ll);
     }
   }
 
   pop = hash_Search(&lsts, gdbroot->oid_ht, &op->g.f.poid);
-  if (pop == NULL && cdh_ObjidIsNotNull(op->g.f.poid)) {
-    sprintf(string, "Orphan found. Objid %s, Name %s\n",
-        cdh_ObjidToString(op->g.oid, 0), op->g.f.name.orig);
+  if (pop == NULL && cdh_ObjidIsNotNull(op->g.f.poid))
+  {
+    sprintf(string, "Orphan found. Objid %s, Name %s\n", cdh_ObjidToString(op->g.oid, 0), op->g.f.name.orig);
     errh_Bugcheck(lsts, string);
   }
 
   /* Local part.  */
 
-  if (link.b.loObjList && !op->l.flags.b.inObjList) {
+  if (link.b.loObjList && !op->l.flags.b.inObjList)
+  {
     pool_QinsertPred(NULL, gdbroot->pool, &op->l.obj_ll, &vp->l.obj_lh);
     op->l.flags.b.inObjList = 1;
   }
 
-  if (link.b.loOidTab && !op->l.flags.b.inOidTab) {
+  if (link.b.loOidTab && !op->l.flags.b.inOidTab)
+  {
     op = hash_Insert(&lsts, gdbroot->oid_ht, op);
     if (op == NULL)
       pwr_Return(NULL, sts, lsts);
     op->l.flags.b.inOidTab = 1;
   }
 
-  if (link.b.loFamilyTab && !op->l.flags.b.inFamilyTab) {
+  if (link.b.loFamilyTab && !op->l.flags.b.inFamilyTab)
+  {
     op = hash_Insert(&lsts, gdbroot->family_ht, op);
     if (op == NULL)
       errh_Bugcheck(lsts, "hash_Insert(sts, gdbroot->family_ht, op)");
     op->l.flags.b.inFamilyTab = 1;
   }
 
-  if (link.b.loParentRef && op->l.por == pool_cNRef) {
+  if (link.b.loParentRef && op->l.por == pool_cNRef)
+  {
     if (pop != NULL)
       op->l.por = pool_ItemReference(NULL, gdbroot->pool, pop);
     else
       op->l.por = pool_cNRef;
   }
 
-  if (link.b.loVolumeRef && op->l.vr == pool_cNRef) {
+  if (link.b.loVolumeRef && op->l.vr == pool_cNRef)
+  {
     op->l.vr = pool_ItemReference(NULL, gdbroot->pool, vp);
   }
 
   /* Check if mount server.  */
 
-  if (link.b.loMountServer && !op->l.flags.b.isMountServer) {
+  if (link.b.loMountServer && !op->l.flags.b.isMountServer)
+  {
     msp = hash_Search(NULL, gdbroot->ms_ht, &op->g.oid);
-    if (msp != NULL) {
+    if (msp != NULL)
+    {
       msp->msor = pool_ItemReference(NULL, gdbroot->pool, op);
       op->l.flags.b.isMountServer = 1;
     }
@@ -365,43 +383,45 @@ gdb_sObject* vol_LinkObject(
 
   /* Native part.  */
 
-  if (op->l.flags.b.isNative) {
+  if (op->l.flags.b.isNative)
+  {
     /* Global part. This is only done in native volumes.  */
 
-    if (link.b.goAdopt && vp->l.flags.b.isLoaded && pop != NULL) {
+    if (link.b.goAdopt && vp->l.flags.b.isLoaded && pop != NULL)
+    {
       vol_InsertSiblist(NULL, op, pop);
     }
 
     if (link.b.noCidList && !op->u.n.flags.b.inCidList)
       mvol_LinkObject(NULL, vp, op, link.m);
 
-    if (link.b.noAliasClientList && op->g.flags.b.isAliasClient
-        && !op->u.n.flags.b.inAliasClientList)
+    if (link.b.noAliasClientList && op->g.flags.b.isAliasClient && !op->u.n.flags.b.inAliasClientList)
       vol_AddAliasClient(NULL, op);
 
-    if (link.b.noMountClientList && op->g.flags.b.isMountClient
-        && !op->u.n.flags.b.inMountClientList)
+    if (link.b.noMountClientList && op->g.flags.b.isMountClient && !op->u.n.flags.b.inMountClientList)
       vol_AddMountClient(NULL, op);
 
-    if (pop != NULL && link.b.noSibList && !op->u.n.flags.b.inSibList) {
+    if (pop != NULL && link.b.noSibList && !op->u.n.flags.b.inSibList)
+    {
       pool_QinsertPred(NULL, gdbroot->pool, &op->u.n.sib_ll, &pop->u.n.sib_lh);
       op->u.n.flags.b.inSibList = 1;
       pop->u.n.flags.b.hasChild = 1;
     }
 
-    if (op->u.n.body == pool_cNRef && op->g.size > 0) {
+    if (op->u.n.body == pool_cNRef && op->g.size > 0)
+    {
       op->u.n.body = pool_RefAlloc(NULL, gdbroot->rtdb, op->g.size);
     }
-
-  } else if (op->l.flags.b.isCached) {
+  }
+  else if (op->l.flags.b.isCached)
+  {
   }
   return op;
 }
 
 /* Link a Sub Class object.  */
 
-gdb_sScObject* vol_LinkScObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sScObject* scp, pwr_tBitMask ilink)
+gdb_sScObject* vol_LinkScObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sScObject* scp, pwr_tBitMask ilink)
 {
   pwr_tStatus lsts = 1;
   gdb_sObject* pop = NULL;
@@ -416,7 +436,8 @@ gdb_sScObject* vol_LinkScObject(
 
   pwr_Assert(vp->g.vid == (scp->oid.vid & 0xffffff));
 
-  if (link.b.init) {
+  if (link.b.init)
+  {
     // scp->flags.m |= (vp->l.flags.m & gdb_mLv_objectFlags);
     pool_Qinit(NULL, gdbroot->pool, &scp->sc_htl);
     pool_Qinit(NULL, gdbroot->pool, &scp->sc_ll);
@@ -427,50 +448,59 @@ gdb_sScObject* vol_LinkScObject(
     scp->flags.b.isParentSc = ((scp->poid.vid & 0xff000000) != 0);
   }
 
-  if (scp->flags.b.isParentSc) {
+  if (scp->flags.b.isParentSc)
+  {
     pscp = hash_Search(&lsts, gdbroot->sc_ht, &scp->poid);
-    if (pscp == NULL) {
-      sprintf(
-          string, "Orphan found. Objid %s\n", cdh_ObjidToString(scp->oid, 0));
+    if (pscp == NULL)
+    {
+      sprintf(string, "Orphan found. Objid %s\n", cdh_ObjidToString(scp->oid, 0));
       errh_Bugcheck(lsts, string);
     }
-  } else {
+  }
+  else
+  {
     pop = hash_Search(&lsts, gdbroot->oid_ht, &scp->poid);
-    if (pop == NULL) {
-      sprintf(
-          string, "Orphan found. Objid %s\n", cdh_ObjidToString(scp->oid, 0));
+    if (pop == NULL)
+    {
+      sprintf(string, "Orphan found. Objid %s\n", cdh_ObjidToString(scp->oid, 0));
       errh_Bugcheck(lsts, string);
     }
   }
 
-  if (link.b.scList && !scp->flags.b.inScList) {
+  if (link.b.scList && !scp->flags.b.inScList)
+  {
     pool_QinsertPred(NULL, gdbroot->pool, &scp->sc_ll, &vp->u.n.sc_lh);
     scp->flags.b.inScList = 1;
   }
 
-  if (link.b.scTab && !scp->flags.b.inScTab) {
+  if (link.b.scTab && !scp->flags.b.inScTab)
+  {
     scp = hash_Insert(&lsts, gdbroot->sc_ht, scp);
     if (scp == NULL)
       pwr_Return(NULL, sts, lsts);
     scp->flags.b.inScTab = 1;
   }
 
-  if (link.b.parentRef && scp->por == pool_cNRef) {
+  if (link.b.parentRef && scp->por == pool_cNRef)
+  {
     if (scp->flags.b.isParentSc)
       scp->por = pool_ItemReference(NULL, gdbroot->pool, pscp);
     else
       scp->por = pool_ItemReference(NULL, gdbroot->pool, pop);
   }
 
-  if (link.b.volumeRef && scp->vr == pool_cNRef) {
+  if (link.b.volumeRef && scp->vr == pool_cNRef)
+  {
     scp->vr = pool_ItemReference(NULL, gdbroot->pool, vp);
   }
 
-  if (link.b.classRef && scp->cr == pool_cNRef) {
+  if (link.b.classRef && scp->cr == pool_cNRef)
+  {
     cp = hash_Search(&lsts, gdbroot->cid_ht, &scp->cid);
-    if (cp != NULL) {
+    if (cp != NULL)
+    {
       sprintf(string, "Class 0x%x not found for object, objid %s\n", scp->cid,
-          cdh_ObjidToString(scp->oid, 0));
+              cdh_ObjidToString(scp->oid, 0));
 
       errh_Bugcheck(lsts, string);
     }
@@ -481,23 +511,30 @@ gdb_sScObject* vol_LinkScObject(
   if (link.b.cidList && !scp->flags.b.inCidList)
     mvol_LinkScObject(NULL, vp, scp);
 
-  if (link.b.sibList && !scp->flags.b.inSibList) {
-    if (scp->flags.b.isParentSc) {
+  if (link.b.sibList && !scp->flags.b.inSibList)
+  {
+    if (scp->flags.b.isParentSc)
+    {
       pool_QinsertPred(NULL, gdbroot->pool, &scp->sib_ll, &pscp->sib_lh);
       pscp->flags.b.hasSc = 1;
-
-    } else {
+    }
+    else
+    {
       pool_QinsertPred(NULL, gdbroot->pool, &scp->sib_ll, &pop->u.n.sc_lh);
       pop->u.n.flags.b.hasSc = 1;
     }
     scp->flags.b.inSibList = 1;
   }
 
-  if (scp->body == pool_cNRef && scp->size > 0) {
-    if (scp->flags.b.isParentSc) {
+  if (scp->body == pool_cNRef && scp->size > 0)
+  {
+    if (scp->flags.b.isParentSc)
+    {
       pwr_Assert(pscp->body != pool_cNRef);
       scp->body = pscp->body + scp->offset;
-    } else {
+    }
+    else
+    {
       pwr_Assert(pop->u.n.body != pool_cNRef);
       scp->body = pop->u.n.body + scp->offset;
     }
@@ -523,15 +560,16 @@ gdb_sVolume* vol_MountVolume(pwr_tStatus* sts, pwr_tVolumeId vid)
   return vp;
 }
 
-typedef enum {
+typedef enum
+{
   item_eAttr_,
   item_eAttr_MeanValue,
   item_eAttr_StandardDeviation,
   item_eAttr_TableName
 } item_eAttr;
 
-mvol_sAttribute* vol_BlockNameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
-		 cdh_sParseName* pn, gdb_sObject *op, pwr_tBitMask lo_flags, pwr_tBitMask trans)
+mvol_sAttribute* vol_BlockNameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap, cdh_sParseName* pn,
+                                          gdb_sObject* op, pwr_tBitMask lo_flags, pwr_tBitMask trans)
 {
   gdb_sObject* nop;
   pwr_tAName aname;
@@ -543,32 +581,36 @@ mvol_sAttribute* vol_BlockNameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
   gdb_AssumeLocked;
 
   strcpy(aname, "");
-  for (i = 0; i < pn->nObject; i++) {
+  for (i = 0; i < pn->nObject; i++)
+  {
     strcat(aname, pn->object[i].name.orig);
     if (pn->nAttribute != 0)
       strcat(aname, "-");
   }
 
   n_attr = pn->nAttribute;
-  if (strncmp(pn->attribute[pn->nAttribute-1].name.orig, "__", 2) == 0) {
+  if (strncmp(pn->attribute[pn->nAttribute - 1].name.orig, "__", 2) == 0)
+  {
     is_item_attr = 1;
-    strcpy(item_attr_name, &pn->attribute[pn->nAttribute-1].name.orig[2]);
+    strcpy(item_attr_name, &pn->attribute[pn->nAttribute - 1].name.orig[2]);
     n_attr--;
   }
 
-  for (i = 0; i < n_attr; i++) {
+  for (i = 0; i < n_attr; i++)
+  {
     strcat(aname, pn->attribute[i].name.orig);
-    if ( i != n_attr - 1)
+    if (i != n_attr - 1)
       strcat(aname, "-");
   }
-  if (pn->nAttribute != 0 && pn->hasIndex[pn->nAttribute-1])
-    sprintf(&aname[strlen(aname)], "__%d", pn->index[pn->nAttribute-1]);
+  if (pn->nAttribute != 0 && pn->hasIndex[pn->nAttribute - 1])
+    sprintf(&aname[strlen(aname)], "__%d", pn->index[pn->nAttribute - 1]);
 
-  if (is_item_attr) {
+  if (is_item_attr)
+  {
     strcat(aname, ".");
     strcat(aname, item_attr_name);
   }
-  else 
+  else
     strcat(aname, ".Value");
 
   cdh_ParseName(sts, pn, pn->poid, aname, pn->parseFlags.m);
@@ -593,8 +635,8 @@ mvol_sAttribute* vol_BlockNameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
    Return the attribute definition, and optionally
    fill in 'arp' if not null.  */
 
-mvol_sAttribute* vol_NameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
-    cdh_sParseName* pn, pwr_tBitMask lo_flags, pwr_tBitMask trans)
+mvol_sAttribute* vol_NameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap, cdh_sParseName* pn,
+                                     pwr_tBitMask lo_flags, pwr_tBitMask trans)
 {
   gdb_sObject* op;
 
@@ -604,7 +646,8 @@ mvol_sAttribute* vol_NameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
   if (op == NULL)
     return NULL;
 
-  if (op->g.cid == pwr_eClass_Block && pn->nAttribute != 0) {
+  if (op->g.cid == pwr_eClass_Block && pn->nAttribute != 0)
+  {
     return vol_BlockNameToAttribute(sts, ap, pn, op, lo_flags, trans);
   }
 
@@ -620,27 +663,35 @@ mvol_sAttribute* vol_NameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
 
 /* Get the object corresponding to a given name.  */
 
-gdb_sObject* vol_NameToParentObject(pwr_tStatus* sts, cdh_sParseName* pn,
-    pwr_tBitMask lo_flags, pwr_tBitMask trans)
+gdb_sObject* vol_NameToParentObject(pwr_tStatus* sts, cdh_sParseName* pn, pwr_tBitMask lo_flags,
+                                    pwr_tBitMask trans)
 {
   gdb_sObject* op = NULL;
   gdb_sVolume* vp;
 
-  if (pn->flags.b.idString && pn->eId == cdh_eId_objid) {
+  if (pn->flags.b.idString && pn->eId == cdh_eId_objid)
+  {
     op = vol_OidToObject(sts, pn->uId.oid, lo_flags, trans, cvol_eHint_none);
     if (op == NULL || op->g.oid.oix == pwr_cNObjectIx)
       pwr_Return(NULL, sts, GDH__NOSUCHOBJ);
     op = vol_OidToObject(sts, op->g.f.poid, lo_flags, trans, cvol_eHint_none);
-  } else if (pn->nObject > 1) {
+  }
+  else if (pn->nObject > 1)
+  {
     pn->nObject--;
     op = vol_NameToObject(sts, pn, lo_flags, trans);
     pn->nObject++;
-  } else if (pn->nObject == 1) {
-    if (pn->flags.b.volume) {
+  }
+  else if (pn->nObject == 1)
+  {
+    if (pn->flags.b.volume)
+    {
       vp = hash_Search(sts, gdbroot->vn_ht, &pn->volume);
       if (vp != NULL)
         op = hash_Search(sts, gdbroot->oid_ht, &vp->g.oid);
-    } else {
+    }
+    else
+    {
       op = hash_Search(sts, gdbroot->oid_ht, &gdbroot->my_volume->g.oid);
     }
   }
@@ -652,53 +703,57 @@ gdb_sObject* vol_NameToParentObject(pwr_tStatus* sts, cdh_sParseName* pn,
 
 /* Get the object corresponding to a given name.  */
 
-gdb_sObject* vol_NameToObject(pwr_tStatus* sts, cdh_sParseName* pn,
-    pwr_tBitMask lo_flags, pwr_tBitMask trans)
+gdb_sObject* vol_NameToObject(pwr_tStatus* sts, cdh_sParseName* pn, pwr_tBitMask lo_flags, pwr_tBitMask trans)
 {
   gdb_sObject* op = NULL;
   gdb_sObject* pop = NULL;
   int i;
   gdb_sVolume* vp;
 
-  if (pn->flags.b.idString) {
+  if (pn->flags.b.idString)
+  {
     if (pn->eId == cdh_eId_objid)
-      return vol_OidToObject(
-          sts, pn->uId.oid, lo_flags, trans, cvol_eHint_none);
+      return vol_OidToObject(sts, pn->uId.oid, lo_flags, trans, cvol_eHint_none);
     else
       pwr_Return(NULL, sts, GDH__NOSUCHOBJ);
   }
 
-  if (pn->flags.b.volume) {
+  if (pn->flags.b.volume)
+  {
     vp = hash_Search(sts, gdbroot->vn_ht, &pn->volume);
     if (vp == NULL)
       return NULL;
-    op = vol_OidToObject(
-        sts, vp->g.oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_name);
-  } else if (pn->flags.b.parent) {
-    op = vol_OidToObject(
-        sts, pn->poid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_name);
-  } else {
-    op = vol_OidToObject(sts, gdbroot->my_volume->g.oid, gdb_mLo_owned,
-        vol_mTrans_none, cvol_eHint_none);
+    op = vol_OidToObject(sts, vp->g.oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_name);
+  }
+  else if (pn->flags.b.parent)
+  {
+    op = vol_OidToObject(sts, pn->poid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_name);
+  }
+  else
+  {
+    op = vol_OidToObject(sts, gdbroot->my_volume->g.oid, gdb_mLo_owned, vol_mTrans_none, cvol_eHint_none);
   }
 
   if (op == NULL)
     return NULL;
 
-  for (i = 0; op != NULL && i < pn->nObject; i++) {
+  for (i = 0; op != NULL && i < pn->nObject; i++)
+  {
     pop = vol_TranslateObject(sts, op, lo_flags, trans);
     if (pop == NULL)
       return NULL;
 
     pn->object[i].poid = pop->g.oid;
     op = hash_Search(sts, gdbroot->family_ht, &pn->object[i]);
-    if (op == NULL) {
+    if (op == NULL)
+    {
       vp = pool_Address(NULL, gdbroot->pool, pop->l.vr);
       if (vp->l.flags.b.isMounted && vp->l.flags.b.isCached)
         return cvolc_NameToObject(sts, pop, pn, i, trans);
-      else {
-	if ( vp->g.cid == pwr_cClass_SystemVolume)
-	  *sts = GDH__NODYNLOCOBJ;
+      else
+      {
+        if (vp->g.cid == pwr_cClass_SystemVolume)
+          *sts = GDH__NODYNLOCOBJ;
         return NULL;
       }
     }
@@ -724,8 +779,7 @@ char* vol_ObjectToAddress(pwr_tStatus* sts, gdb_sObject* op)
    NOTA BENE !!!
     This function is not reentrant.  */
 
-char* vol_ObjectToName(
-    pwr_tStatus* sts, gdb_sObject* op, pwr_tBitMask nametype, char* buff)
+char* vol_ObjectToName(pwr_tStatus* sts, gdb_sObject* op, pwr_tBitMask nametype, char* buff)
 {
   char* s = NULL;
   gdb_sObject* pop;
@@ -739,8 +793,10 @@ char* vol_ObjectToName(
   if (level == 0)
     buff[0] = '\0';
 
-  if (op->g.oid.oix != pwr_cNObjectIx) {
-    if (op->l.por != pool_cNRef) {
+  if (op->g.oid.oix != pwr_cNObjectIx)
+  {
+    if (op->l.por != pool_cNRef)
+    {
       pop = pool_Address(NULL, gdbroot->pool, op->l.por);
       level++;
       s = vol_ObjectToName(sts, pop, nametype, buff);
@@ -748,12 +804,15 @@ char* vol_ObjectToName(
     }
     if (s == NULL)
       return NULL;
-    if ((lnametype.b.path && level > 0) || (lnametype.b.object && level == 0)) {
+    if ((lnametype.b.path && level > 0) || (lnametype.b.object && level == 0))
+    {
       strcat(buff, op->g.f.name.orig);
       if (level > 0)
         strcat(buff, "-");
     }
-  } else if (lnametype.b.volume) {
+  }
+  else if (lnametype.b.volume)
+  {
     strcat(buff, op->g.f.name.orig);
     strcat(buff, ":");
   }
@@ -772,10 +831,9 @@ pwr_tObjid vol_Oid(pwr_tStatus* sts, gdb_sVolume* vp, pwr_tClassId cid)
    objid. Mount client-server translation is done only if server object
    is in root volume or in system volumes.  */
 
-gdb_sObject* vol_OidToObject(
-    pwr_tStatus* sts, pwr_tObjid oid, pwr_tBitMask lo_flags,
-    pwr_tBitMask itrans, cvol_eHint hint /* Give a hint to the cache handler. */
-    )
+gdb_sObject* vol_OidToObject(pwr_tStatus* sts, pwr_tObjid oid, pwr_tBitMask lo_flags, pwr_tBitMask itrans,
+                             cvol_eHint hint /* Give a hint to the cache handler. */
+)
 {
   gdb_sVolume* vp = NULL;
   gdb_sObject* op = NULL;
@@ -790,8 +848,10 @@ gdb_sObject* vol_OidToObject(
     pwr_Return(NULL, sts, GDH__NOSUCHOBJ);
 
   op = hash_Search(sts, gdbroot->oid_ht, &oid);
-  if (op == NULL) {
-    if (lo_flags & gdb_mLo_remote) {
+  if (op == NULL)
+  {
+    if (lo_flags & gdb_mLo_remote)
+    {
       vp = hash_Search(sts, gdbroot->vid_ht, &oid.vid);
       if (vp == NULL)
         pwr_Return(NULL, sts, GDH__NOSUCHOBJ);
@@ -800,12 +860,15 @@ gdb_sObject* vol_OidToObject(
       if (!vp->l.flags.b.isMounted)
         pwr_Return(NULL, sts, GDH__NOTMOUNTED);
 
-      if (vp->l.flags.m & lo_flags) {
+      if (vp->l.flags.m & lo_flags)
+      {
         return cvolc_OidToObject(sts, vp, oid, trans.m, hint);
       }
     }
     pwr_Return(NULL, sts, GDH__NOSUCHOBJ);
-  } else {
+  }
+  else
+  {
     vp = pool_Address(NULL, gdbroot->pool, op->l.vr);
   }
 
@@ -813,29 +876,43 @@ gdb_sObject* vol_OidToObject(
      it is possible to mount an alias, but it is not possible to
      create an alias of a mount object.  */
 
-  if (op->g.flags.b.isMountClient) {
-    if (trans.b.mount && vp->l.flags.b.transMount) {
+  if (op->g.flags.b.isMountClient)
+  {
+    if (trans.b.mount && vp->l.flags.b.transMount)
+    {
       nop = vol_OidToObject(sts, op->g.soid, lo_flags, trans.m, hint);
-      if (nop == NULL) {
+      if (nop == NULL)
+      {
         pwr_Return(op, sts, GDH__SUCCESS); /* ??? Should we do this ?? */
-      } else {
+      }
+      else
+      {
         op = nop;
       }
-    } else {
+    }
+    else
+    {
       /* ??? Should I return the untranslated oh or NULL ??? */
       return op;
     }
   }
 
-  if (op->g.flags.b.isAliasClient) {
-    if (trans.b.alias /* && vp->l.flags.b.transAlias */) {
+  if (op->g.flags.b.isAliasClient)
+  {
+    if (trans.b.alias /* && vp->l.flags.b.transAlias */)
+    {
       nop = vol_OidToObject(sts, op->g.soid, lo_flags, trans.m, hint);
-      if (nop == NULL) {
+      if (nop == NULL)
+      {
         pwr_Return(op, sts, GDH__SUCCESS); /* ??? Should we do this ?? */
-      } else {
+      }
+      else
+      {
         op = nop;
       }
-    } else {
+    }
+    else
+    {
       /* ??? Should I return the untranslated oh or NULL ??? */
       return op;
     }
@@ -851,10 +928,9 @@ gdb_sObject* vol_OidToObject(
    object index (oix). Mount client-server translation is done
    only if server object is in root volume or in system volumes.  */
 
-gdb_sObject* vol_OixToObject(pwr_tStatus* sts, pwr_tVolumeId vid,
-    pwr_tObjectIx oix, pwr_tBitMask lo_flags, pwr_tBitMask trans,
-    cvol_eHint hint /* Give a hint to the cache handler.  */
-    )
+gdb_sObject* vol_OixToObject(pwr_tStatus* sts, pwr_tVolumeId vid, pwr_tObjectIx oix, pwr_tBitMask lo_flags,
+                             pwr_tBitMask trans, cvol_eHint hint /* Give a hint to the cache handler.  */
+)
 {
   pwr_tObjid oid;
 
@@ -866,19 +942,18 @@ gdb_sObject* vol_OixToObject(pwr_tStatus* sts, pwr_tVolumeId vid,
 
 /* Propagate an alarmlevel upwards.  */
 
-void vol_PropagateAlarmLevel(pwr_tStatus* status, gdb_sObject* op,
-    pwr_tBoolean l_maxa, pwr_tUInt32 old_maxa, pwr_tUInt32 new_maxa,
-    pwr_tBoolean propagate_alias)
+void vol_PropagateAlarmLevel(pwr_tStatus* status, gdb_sObject* op, pwr_tBoolean l_maxa, pwr_tUInt32 old_maxa,
+                             pwr_tUInt32 new_maxa, pwr_tBoolean propagate_alias)
 {
   pwr_tUInt32 pold_maxa; /* Parents old max alarm level.  */
   pwr_tUInt32 pnew_maxa; /* Parents new max alarm level.  */
   pwr_tUInt32 max = 0;
   pwr_tUInt32 max2;
-  gdb_sObject* pop; /* Parent object pointer.  */
-  pool_sQlink* col; /* Child object link.  */
-  gdb_sObject* cop; /* Child object pointer.  */
-  pool_sQlink* aol; /* Alias client object link.  */
-  gdb_sObject* aop; /* Alias client object pointer.  */
+  gdb_sObject* pop;      /* Parent object pointer.  */
+  pool_sQlink* col;      /* Child object link.  */
+  gdb_sObject* cop;      /* Child object pointer.  */
+  pool_sQlink* aol;      /* Alias client object link.  */
+  gdb_sObject* aop;      /* Alias client object pointer.  */
   gdb_sAliasServer* asp; /* Alias server pointer.  */
 
   pwr_dStatus(sts, status, 1);
@@ -896,29 +971,33 @@ void vol_PropagateAlarmLevel(pwr_tStatus* status, gdb_sObject* op,
 
   pold_maxa = l_maxa ? pop->l.al.maxa : MAX(pop->u.n.ral.maxa, pop->l.al.a);
 
-  if (old_maxa < new_maxa) {
+  if (old_maxa < new_maxa)
+  {
     if (l_maxa)
       pop->l.al.maxa = MAX(pop->l.al.maxa, new_maxa);
     else
       pop->u.n.ral.maxa = MAX(pop->u.n.ral.maxa, new_maxa);
-
-  } else {
-    for (col = pool_Qsucc(NULL, gdbroot->pool, &pop->u.n.sib_lh);
-         col != &pop->u.n.sib_lh; col = pool_Qsucc(NULL, gdbroot->pool, col)) {
+  }
+  else
+  {
+    for (col = pool_Qsucc(NULL, gdbroot->pool, &pop->u.n.sib_lh); col != &pop->u.n.sib_lh;
+         col = pool_Qsucc(NULL, gdbroot->pool, col))
+    {
       cop = pool_Qitem(col, gdb_sObject, u.n.sib_ll);
       if (l_maxa)
-        max2 = cop->g.flags.b.isMountClient ? MAX(cop->l.al.maxa, cop->l.al.a)
-                                            : cop->l.al.maxa;
+        max2 = cop->g.flags.b.isMountClient ? MAX(cop->l.al.maxa, cop->l.al.a) : cop->l.al.maxa;
       else
-        max2 = cop->g.flags.b.isMountClient ? 0 : MAX(cop->u.n.ral.maxa,
-                                                      cop->l.al.a);
+        max2 = cop->g.flags.b.isMountClient ? 0 : MAX(cop->u.n.ral.maxa, cop->l.al.a);
       max = MAX(max, max2);
     }
 
-    if (l_maxa) {
+    if (l_maxa)
+    {
       if (max != pop->l.al.maxa)
         pop->l.al.maxa = max;
-    } else {
+    }
+    else
+    {
       if (max != pop->u.n.ral.maxa)
         pop->u.n.ral.maxa = max;
     }
@@ -927,7 +1006,8 @@ void vol_PropagateAlarmLevel(pwr_tStatus* status, gdb_sObject* op,
   pop->l.al.idx = op->l.al.idx;
   pnew_maxa = l_maxa ? pop->l.al.maxa : MAX(pop->u.n.ral.maxa, pop->l.al.a);
 
-  if (pop->l.flags.b.isMountServer) {
+  if (pop->l.flags.b.isMountServer)
+  {
     /* Walk trough all mount clients.  */
     gdb_sMountServer* sp;
     unsigned int o_maxa, n_maxa;
@@ -937,7 +1017,8 @@ void vol_PropagateAlarmLevel(pwr_tStatus* status, gdb_sObject* op,
       return;
 
     for (col = pool_Qsucc(NULL, gdbroot->pool, &sp->cli_lh); col != &sp->cli_lh;
-         col = pool_Qsucc(NULL, gdbroot->pool, col)) {
+         col = pool_Qsucc(NULL, gdbroot->pool, col))
+    {
       cop = pool_Qitem(col, gdb_sObject, u.n.cli_ll);
       o_maxa = MAX(cop->l.al.a, cop->l.al.maxa);
       cop->l.al.maxa = pop->u.n.ral.maxa;
@@ -948,18 +1029,18 @@ void vol_PropagateAlarmLevel(pwr_tStatus* status, gdb_sObject* op,
     }
   }
 
-  if (propagate_alias && pop->g.flags.b.isAliasServer
-      && pop->l.flags.b.isOwned) {
+  if (propagate_alias && pop->g.flags.b.isAliasServer && pop->l.flags.b.isOwned)
+  {
     /* Walk trough all alias clients.  */
 
     /* Left todo */
     asp = (gdb_sAliasServer*)hash_Search(sts, gdbroot->as_ht, &pop->g.oid);
     pwr_Assert(asp != NULL);
-    for (aol = pool_Qsucc(NULL, gdbroot->pool, &asp->cli_lh);
-         aol != &asp->cli_lh; aol = pool_Qsucc(NULL, gdbroot->pool, aol)) {
+    for (aol = pool_Qsucc(NULL, gdbroot->pool, &asp->cli_lh); aol != &asp->cli_lh;
+         aol = pool_Qsucc(NULL, gdbroot->pool, aol))
+    {
       aop = pool_Qitem(aol, gdb_sObject, u.n.cli_ll);
-      pwr_Assert(
-          aop->g.flags.b.isAliasClient && aop->u.n.flags.b.inAliasClientList);
+      pwr_Assert(aop->g.flags.b.isAliasClient && aop->u.n.flags.b.inAliasClientList);
       aop->l.al.a = pop->l.al.a;
       aop->l.al.maxa = pop->l.al.maxa;
       aop->u.n.ral.maxa = pop->u.n.ral.maxa;
@@ -971,23 +1052,21 @@ void vol_PropagateAlarmLevel(pwr_tStatus* status, gdb_sObject* op,
   }
 
   if (pold_maxa != pnew_maxa)
-    vol_PropagateAlarmLevel(
-        sts, pop, l_maxa, pold_maxa, pnew_maxa, propagate_alias);
+    vol_PropagateAlarmLevel(sts, pop, l_maxa, pold_maxa, pnew_maxa, propagate_alias);
 }
 
-void vol_PropagateBlockLevel(pwr_tStatus* status, gdb_sObject* op,
-    pwr_tBoolean l_maxb, pwr_tUInt32 old_maxb, pwr_tUInt32 new_maxb,
-    pwr_tBoolean propagate_alias)
+void vol_PropagateBlockLevel(pwr_tStatus* status, gdb_sObject* op, pwr_tBoolean l_maxb, pwr_tUInt32 old_maxb,
+                             pwr_tUInt32 new_maxb, pwr_tBoolean propagate_alias)
 {
   pwr_tUInt32 pold_maxb; /* Parents old max alarm level.  */
   pwr_tUInt32 pnew_maxb; /* Parents new max alarm level.  */
   pwr_tUInt32 max = 0;
   pwr_tUInt32 max2;
-  gdb_sObject* pop; /* Parent object pointer.  */
-  pool_sQlink* col; /* Child object link.  */
-  gdb_sObject* cop; /* Child object pointer.  */
-  pool_sQlink* aol; /* Alias client object link.  */
-  gdb_sObject* aop; /* Alias client object pointer.  */
+  gdb_sObject* pop;      /* Parent object pointer.  */
+  pool_sQlink* col;      /* Child object link.  */
+  gdb_sObject* cop;      /* Child object pointer.  */
+  pool_sQlink* aol;      /* Alias client object link.  */
+  gdb_sObject* aop;      /* Alias client object pointer.  */
   gdb_sAliasServer* asp; /* Alias server pointer.  */
 
   pwr_dStatus(sts, status, 1);
@@ -1005,29 +1084,33 @@ void vol_PropagateBlockLevel(pwr_tStatus* status, gdb_sObject* op,
 
   pold_maxb = l_maxb ? pop->l.al.maxb : MAX(pop->u.n.ral.maxb, pop->l.al.b);
 
-  if (old_maxb < new_maxb) {
+  if (old_maxb < new_maxb)
+  {
     if (l_maxb)
       pop->l.al.maxb = MAX(pop->l.al.maxb, new_maxb);
     else
       pop->u.n.ral.maxb = MAX(pop->u.n.ral.maxb, new_maxb);
-
-  } else {
-    for (col = pool_Qsucc(NULL, gdbroot->pool, &pop->u.n.sib_lh);
-         col != &pop->u.n.sib_lh; col = pool_Qsucc(NULL, gdbroot->pool, col)) {
+  }
+  else
+  {
+    for (col = pool_Qsucc(NULL, gdbroot->pool, &pop->u.n.sib_lh); col != &pop->u.n.sib_lh;
+         col = pool_Qsucc(NULL, gdbroot->pool, col))
+    {
       cop = pool_Qitem(col, gdb_sObject, u.n.sib_ll);
       if (l_maxb)
-        max2 = cop->g.flags.b.isMountClient ? MAX(cop->l.al.maxb, cop->l.al.b)
-                                            : cop->l.al.maxb;
+        max2 = cop->g.flags.b.isMountClient ? MAX(cop->l.al.maxb, cop->l.al.b) : cop->l.al.maxb;
       else
-        max2 = cop->g.flags.b.isMountClient ? 0 : MAX(cop->u.n.ral.maxb,
-                                                      cop->l.al.b);
+        max2 = cop->g.flags.b.isMountClient ? 0 : MAX(cop->u.n.ral.maxb, cop->l.al.b);
       max = MAX(max, max2);
     }
 
-    if (l_maxb) {
+    if (l_maxb)
+    {
       if (max != pop->l.al.maxb)
         pop->l.al.maxb = max;
-    } else {
+    }
+    else
+    {
       if (max != pop->u.n.ral.maxb)
         pop->u.n.ral.maxb = max;
     }
@@ -1036,7 +1119,8 @@ void vol_PropagateBlockLevel(pwr_tStatus* status, gdb_sObject* op,
   pop->l.al.idx = op->l.al.idx;
   pnew_maxb = l_maxb ? pop->l.al.maxb : MAX(pop->u.n.ral.maxb, pop->l.al.b);
 
-  if (pop->l.flags.b.isMountServer) {
+  if (pop->l.flags.b.isMountServer)
+  {
     /* Walk trough all mount clients.  */
     gdb_sMountServer* sp;
     unsigned int o_maxb, n_maxb;
@@ -1046,7 +1130,8 @@ void vol_PropagateBlockLevel(pwr_tStatus* status, gdb_sObject* op,
       return;
 
     for (col = pool_Qsucc(NULL, gdbroot->pool, &sp->cli_lh); col != &sp->cli_lh;
-         col = pool_Qsucc(NULL, gdbroot->pool, col)) {
+         col = pool_Qsucc(NULL, gdbroot->pool, col))
+    {
       cop = pool_Qitem(col, gdb_sObject, u.n.cli_ll);
       o_maxb = MAX(cop->l.al.b, cop->l.al.maxb);
       cop->l.al.maxb = pop->u.n.ral.maxb;
@@ -1057,17 +1142,17 @@ void vol_PropagateBlockLevel(pwr_tStatus* status, gdb_sObject* op,
     }
   }
 
-  if (propagate_alias && pop->g.flags.b.isAliasServer
-      && pop->l.flags.b.isOwned) {
+  if (propagate_alias && pop->g.flags.b.isAliasServer && pop->l.flags.b.isOwned)
+  {
     /* Walk trough all alias clients.  */
 
     asp = (gdb_sAliasServer*)hash_Search(sts, gdbroot->as_ht, &pop->g.oid);
     pwr_Assert(asp != NULL);
-    for (aol = pool_Qsucc(NULL, gdbroot->pool, &asp->cli_lh);
-         aol != &asp->cli_lh; aol = pool_Qsucc(NULL, gdbroot->pool, aol)) {
+    for (aol = pool_Qsucc(NULL, gdbroot->pool, &asp->cli_lh); aol != &asp->cli_lh;
+         aol = pool_Qsucc(NULL, gdbroot->pool, aol))
+    {
       aop = pool_Qitem(aol, gdb_sObject, u.n.cli_ll);
-      pwr_Assert(
-          aop->g.flags.b.isAliasClient && aop->u.n.flags.b.inAliasClientList);
+      pwr_Assert(aop->g.flags.b.isAliasClient && aop->u.n.flags.b.inAliasClientList);
       aop->l.al.b = pop->l.al.b;
       aop->l.al.maxb = pop->l.al.maxb;
       aop->u.n.ral.maxb = pop->u.n.ral.maxb;
@@ -1079,13 +1164,10 @@ void vol_PropagateBlockLevel(pwr_tStatus* status, gdb_sObject* op,
   }
 
   if (pold_maxb != pnew_maxb)
-    vol_PropagateBlockLevel(
-        sts, pop, l_maxb, pold_maxb, pnew_maxb, propagate_alias);
+    vol_PropagateBlockLevel(sts, pop, l_maxb, pold_maxb, pnew_maxb, propagate_alias);
 }
 
-void vol_RemoveMountClient(pwr_tStatus* sts, gdb_sObject* op)
-{
-}
+void vol_RemoveMountClient(pwr_tStatus* sts, gdb_sObject* op) {}
 
 void vol_RemoveMountedOn(pwr_tStatus* sts, gdb_sMountedOn* mop)
 {
@@ -1115,22 +1197,24 @@ void vol_RemoveSiblist(pwr_tStatus* sts, gdb_sObject* op, gdb_sObject* pop)
   pwr_Assert(cdh_ObjidIsNotNull(pop->g.soid));
   pwr_Assert(op->g.flags.b.inSibList);
 
-  f_op = vol_OixToObject(sts, vid, op->g.sib.flink, gdb_mLo_native,
-      vol_mTrans_none, cvol_eHint_none);
+  f_op = vol_OixToObject(sts, vid, op->g.sib.flink, gdb_mLo_native, vol_mTrans_none, cvol_eHint_none);
   if (f_op == NULL)
     errh_Bugcheck(GDH__WEIRD, "vol_RemoveSiblist forward");
-  b_op = vol_OixToObject(sts, vid, op->g.sib.blink, gdb_mLo_native,
-      vol_mTrans_none, cvol_eHint_none);
+  b_op = vol_OixToObject(sts, vid, op->g.sib.blink, gdb_mLo_native, vol_mTrans_none, cvol_eHint_none);
   if (b_op == NULL)
     errh_Bugcheck(GDH__WEIRD, "vol_RemoveSiblist backward");
 
-  if (op == f_op) {
+  if (op == f_op)
+  {
     pwr_Assert(f_op == b_op);
     pop->g.soid = pwr_cNObjid;
-  } else {
+  }
+  else
+  {
     f_op->g.sib.blink = op->g.sib.blink;
     b_op->g.sib.flink = op->g.sib.flink;
-    if (cdh_ObjidIsEqual(pop->g.soid, op->g.oid)) {
+    if (cdh_ObjidIsEqual(pop->g.soid, op->g.oid))
+    {
       pop->g.soid = f_op->g.oid;
     }
   }
@@ -1146,7 +1230,8 @@ void vol_SetAlarmLevel(pwr_tStatus* sts, gdb_sObject* op, pwr_tUInt32 a)
   pwr_tUInt32 old_rmaxa;
   pwr_tUInt32 new_rmaxa;
 
-  if (!op->l.flags.b.isOwned) {
+  if (!op->l.flags.b.isOwned)
+  {
     *sts = GDH__NOTOWNED;
     return;
   }
@@ -1160,7 +1245,8 @@ void vol_SetAlarmLevel(pwr_tStatus* sts, gdb_sObject* op, pwr_tUInt32 a)
   op->u.n.ral.idx = gdbroot->db->al_idx;
   new_rmaxa = MAX(op->l.al.a, op->u.n.ral.maxa);
 
-  if (op->l.flags.b.isMountServer) {
+  if (op->l.flags.b.isMountServer)
+  {
     gdb_sMountServer* sp;
     pool_sQlink* col;
     gdb_sObject* cop;
@@ -1170,7 +1256,8 @@ void vol_SetAlarmLevel(pwr_tStatus* sts, gdb_sObject* op, pwr_tUInt32 a)
       return;
 
     for (col = pool_Qsucc(NULL, gdbroot->pool, &sp->cli_lh); col != &sp->cli_lh;
-         col = pool_Qsucc(NULL, gdbroot->pool, col)) {
+         col = pool_Qsucc(NULL, gdbroot->pool, col))
+    {
       cop = pool_Qitem(col, gdb_sObject, u.n.cli_ll);
       cop->l.al.a = op->l.al.a;
       cop->u.n.ral.maxa = op->l.al.maxa;
@@ -1180,20 +1267,21 @@ void vol_SetAlarmLevel(pwr_tStatus* sts, gdb_sObject* op, pwr_tUInt32 a)
     }
   }
 
-  if (op->g.flags.b.isAliasServer) {
-    pool_sQlink* aol; /* Alias client object link.  */
-    gdb_sObject* aop; /* Alias client object pointer.  */
+  if (op->g.flags.b.isAliasServer)
+  {
+    pool_sQlink* aol;      /* Alias client object link.  */
+    gdb_sObject* aop;      /* Alias client object pointer.  */
     gdb_sAliasServer* asp; /* Alias server pointer.  */
 
     /* Walk trough all alias clients.  */
 
     asp = (gdb_sAliasServer*)hash_Search(NULL, gdbroot->as_ht, &op->g.oid);
     pwr_Assert(asp != NULL);
-    for (aol = pool_Qsucc(NULL, gdbroot->pool, &asp->cli_lh);
-         aol != &asp->cli_lh; aol = pool_Qsucc(NULL, gdbroot->pool, aol)) {
+    for (aol = pool_Qsucc(NULL, gdbroot->pool, &asp->cli_lh); aol != &asp->cli_lh;
+         aol = pool_Qsucc(NULL, gdbroot->pool, aol))
+    {
       aop = pool_Qitem(aol, gdb_sObject, u.n.cli_ll);
-      pwr_Assert(
-          aop->g.flags.b.isAliasClient && aop->u.n.flags.b.inAliasClientList);
+      pwr_Assert(aop->g.flags.b.isAliasClient && aop->u.n.flags.b.inAliasClientList);
       aop->l.al.a = op->l.al.a;
       aop->l.al.maxa = op->l.al.maxa;
       aop->u.n.ral.maxa = op->u.n.ral.maxa;
@@ -1213,7 +1301,8 @@ void vol_SetBlockLevel(pwr_tStatus* sts, gdb_sObject* op, pwr_tUInt32 b)
   pwr_tUInt32 old_rmaxb;
   pwr_tUInt32 new_rmaxb;
 
-  if (!op->l.flags.b.isOwned) {
+  if (!op->l.flags.b.isOwned)
+  {
     *sts = GDH__NOTOWNED;
     return;
   }
@@ -1227,7 +1316,8 @@ void vol_SetBlockLevel(pwr_tStatus* sts, gdb_sObject* op, pwr_tUInt32 b)
   op->u.n.ral.idx = gdbroot->db->al_idx;
   new_rmaxb = MAX(op->l.al.b, op->u.n.ral.maxb);
 
-  if (op->l.flags.b.isMountServer) {
+  if (op->l.flags.b.isMountServer)
+  {
     gdb_sMountServer* sp;
     pool_sQlink* col;
     gdb_sObject* cop;
@@ -1237,7 +1327,8 @@ void vol_SetBlockLevel(pwr_tStatus* sts, gdb_sObject* op, pwr_tUInt32 b)
       return;
 
     for (col = pool_Qsucc(NULL, gdbroot->pool, &sp->cli_lh); col != &sp->cli_lh;
-         col = pool_Qsucc(NULL, gdbroot->pool, col)) {
+         col = pool_Qsucc(NULL, gdbroot->pool, col))
+    {
       cop = pool_Qitem(col, gdb_sObject, u.n.cli_ll);
       cop->l.al.b = op->l.al.b;
       cop->u.n.ral.maxb = op->l.al.maxb;
@@ -1247,20 +1338,21 @@ void vol_SetBlockLevel(pwr_tStatus* sts, gdb_sObject* op, pwr_tUInt32 b)
     }
   }
 
-  if (op->g.flags.b.isAliasServer) {
-    pool_sQlink* aol; /* Alias client object link.  */
-    gdb_sObject* aop; /* Alias client object pointer.  */
+  if (op->g.flags.b.isAliasServer)
+  {
+    pool_sQlink* aol;      /* Alias client object link.  */
+    gdb_sObject* aop;      /* Alias client object pointer.  */
     gdb_sAliasServer* asp; /* Alias server pointer.  */
 
     /* Walk trough all alias clients.  */
 
     asp = (gdb_sAliasServer*)hash_Search(NULL, gdbroot->as_ht, &op->g.oid);
     pwr_Assert(asp != NULL);
-    for (aol = pool_Qsucc(NULL, gdbroot->pool, &asp->cli_lh);
-         aol != &asp->cli_lh; aol = pool_Qsucc(NULL, gdbroot->pool, aol)) {
+    for (aol = pool_Qsucc(NULL, gdbroot->pool, &asp->cli_lh); aol != &asp->cli_lh;
+         aol = pool_Qsucc(NULL, gdbroot->pool, aol))
+    {
       aop = pool_Qitem(aol, gdb_sObject, u.n.cli_ll);
-      pwr_Assert(
-          aop->g.flags.b.isAliasClient && aop->u.n.flags.b.inAliasClientList);
+      pwr_Assert(aop->g.flags.b.isAliasClient && aop->u.n.flags.b.inAliasClientList);
       aop->l.al.b = op->l.al.b;
       aop->l.al.maxb = op->l.al.maxb;
       aop->u.n.ral.maxb = op->u.n.ral.maxb;
@@ -1281,28 +1373,31 @@ gdb_sObject* vol_FamilyToObject(pwr_tStatus* sts, char* name, pwr_tObjid poid)
 {
   cdh_sFamily f;
 
-  return (gdb_sObject*)hash_Search(
-      sts, gdbroot->family_ht, cdh_Family(&f, name, poid));
+  return (gdb_sObject*)hash_Search(sts, gdbroot->family_ht, cdh_Family(&f, name, poid));
 }
 
-gdb_sObject* vol_TranslateObject(pwr_tStatus* sts, gdb_sObject* op,
-    pwr_tBitMask lo_flags, pwr_tBitMask itrans)
+gdb_sObject* vol_TranslateObject(pwr_tStatus* sts, gdb_sObject* op, pwr_tBitMask lo_flags,
+                                 pwr_tBitMask itrans)
 {
   gdb_sVolume* vp;
   vol_mTrans trans;
 
   trans.m = itrans;
 
-  if (op->g.flags.b.isAliasClient && trans.b.alias) {
+  if (op->g.flags.b.isAliasClient && trans.b.alias)
+  {
     op = vol_OidToObject(sts, op->g.soid, lo_flags, trans.m, cvol_eHint_none);
   }
 
-  if (op != NULL && op->g.flags.b.isMountClient && trans.b.mount) {
+  if (op != NULL && op->g.flags.b.isMountClient && trans.b.mount)
+  {
     vp = pool_Address(NULL, gdbroot->pool, op->l.vr);
-    if (vp->l.flags.b.transMount) {
-      if (cdh_ObjidIsNull(op->g.soid) && op->g.cid == pwr_cClass_MountDynObject) {
-	*sts = GDH__NODYNLOCOBJ;
-	return NULL;
+    if (vp->l.flags.b.transMount)
+    {
+      if (cdh_ObjidIsNull(op->g.soid) && op->g.cid == pwr_cClass_MountDynObject)
+      {
+        *sts = GDH__NODYNLOCOBJ;
+        return NULL;
       }
       op = vol_OidToObject(sts, op->g.soid, lo_flags, trans.m, cvol_eHint_none);
     }
@@ -1313,8 +1408,7 @@ gdb_sObject* vol_TranslateObject(pwr_tStatus* sts, gdb_sObject* op,
 
 /* Unlink an object.  */
 
-void vol_UnlinkObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask ilink)
+void vol_UnlinkObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask ilink)
 {
   gdb_sObject* pop = NULL;
   vol_mLink link;
@@ -1329,25 +1423,29 @@ void vol_UnlinkObject(
 
   /* Global part. This is only done in native volumes.  */
 
-  if (link.b.goAdopt && op->l.flags.b.isLoaded && pop != NULL) {
+  if (link.b.goAdopt && op->l.flags.b.isLoaded && pop != NULL)
+  {
     vol_RemoveSiblist(NULL, op, pop);
   }
 
   /* Local part.  */
 
-  if (link.b.loObjList && op->l.flags.b.inObjList) {
+  if (link.b.loObjList && op->l.flags.b.inObjList)
+  {
     pwr_Assert(pool_QisLinked(NULL, gdbroot->pool, &op->l.obj_ll));
     pool_Qremove(NULL, gdbroot->pool, &op->l.obj_ll);
     op->l.flags.b.inObjList = 0;
   }
 
-  if (link.b.loOidTab && op->l.flags.b.inOidTab) {
+  if (link.b.loOidTab && op->l.flags.b.inOidTab)
+  {
     pwr_Assert(op == hash_Search(NULL, gdbroot->oid_ht, &op->g.oid));
     hash_Remove(NULL, gdbroot->oid_ht, op);
     op->l.flags.b.inOidTab = 0;
   }
 
-  if (link.b.loFamilyTab && op->l.flags.b.inFamilyTab) {
+  if (link.b.loFamilyTab && op->l.flags.b.inFamilyTab)
+  {
     pwr_Assert(op == hash_Search(NULL, gdbroot->family_ht, &op->g.f));
     hash_Remove(NULL, gdbroot->family_ht, op);
     op->l.flags.b.inFamilyTab = 0;
@@ -1361,9 +1459,11 @@ void vol_UnlinkObject(
 
   /* Check if mount server.  */
 
-  if (link.b.loMountServer && op->l.flags.b.isMountServer) {
+  if (link.b.loMountServer && op->l.flags.b.isMountServer)
+  {
     msp = hash_Search(NULL, gdbroot->ms_ht, &op->g.oid);
-    if (msp != NULL) {
+    if (msp != NULL)
+    {
       msp->msor = pool_cNRef;
     }
     op->l.flags.b.isMountServer = 0;
@@ -1371,47 +1471,55 @@ void vol_UnlinkObject(
 
   /* Native/Cached part.  */
 
-  if (op->l.flags.b.isNative) {
-    if (link.b.noSibList && op->u.n.flags.b.inSibList) {
+  if (op->l.flags.b.isNative)
+  {
+    if (link.b.noSibList && op->u.n.flags.b.inSibList)
+    {
       pool_Qremove(NULL, gdbroot->pool, &op->u.n.sib_ll);
       op->u.n.flags.b.inSibList = 0;
     }
-    if (pop != NULL) {
+    if (pop != NULL)
+    {
       if (pool_QisLinked(NULL, gdbroot->pool, &pop->u.n.sib_lh))
         pwr_Assert(pop->u.n.flags.b.hasChild);
-      else {
+      else
+      {
         pop->u.n.flags.b.hasChild = 0;
         if (pop->u.n.flags.b.pendingDelete)
           gdb_RemoveObject(NULL, pop);
       }
     }
 
-    if (link.b.noCidList && op->u.n.flags.b.inCidList) {
+    if (link.b.noCidList && op->u.n.flags.b.inCidList)
+    {
       pool_Qremove(NULL, gdbroot->pool, &op->u.n.cid_ll);
       op->u.n.flags.b.inCidList = 0;
     }
 
-    if (link.b.noAliasClientList && op->g.flags.b.isAliasClient
-        && op->u.n.flags.b.inAliasClientList) {
+    if (link.b.noAliasClientList && op->g.flags.b.isAliasClient && op->u.n.flags.b.inAliasClientList)
+    {
       pool_Qremove(NULL, gdbroot->pool, &op->u.n.cli_ll);
       op->u.n.flags.b.inAliasClientList = 0;
     }
 
-    if (link.b.noMountClientList && op->g.flags.b.isMountClient
-        && op->u.n.flags.b.inMountClientList) {
+    if (link.b.noMountClientList && op->g.flags.b.isMountClient && op->u.n.flags.b.inMountClientList)
+    {
       pool_Qremove(NULL, gdbroot->pool, &op->u.n.cli_ll);
       op->u.n.flags.b.inMountClientList = 0;
     }
 
-    if (link.b.noSub && op->u.n.subcount != 0) {
+    if (link.b.noSub && op->u.n.subcount != 0)
+    {
       sub_UnlinkObject(op);
     }
 
-    if (link.b.init) {
+    if (link.b.init)
+    {
       gdb_RemoveObject(NULL, op);
     }
-
-  } else if (op->l.flags.b.isCached) {
+  }
+  else if (op->l.flags.b.isCached)
+  {
   }
 }
 
@@ -1424,7 +1532,8 @@ void vol_UpdateAlarm(pwr_tStatus* status, gdb_sObject* op, net_sAlarm al)
 
   gdb_AssumeLocked;
 
-  if (op->l.flags.b.isMountServer) {
+  if (op->l.flags.b.isMountServer)
+  {
     gdb_sMountServer* sp;
     pwr_tUInt32 old_maxa;
     pwr_tUInt32 new_maxa;
@@ -1442,7 +1551,8 @@ void vol_UpdateAlarm(pwr_tStatus* status, gdb_sObject* op, net_sAlarm al)
       return;
 
     for (col = pool_Qsucc(NULL, gdbroot->pool, &sp->cli_lh); col != &sp->cli_lh;
-         col = pool_Qsucc(NULL, gdbroot->pool, col)) {
+         col = pool_Qsucc(NULL, gdbroot->pool, col))
+    {
       cop = pool_Qitem(col, gdb_sObject, u.n.cli_ll);
       cop->l.al.a = op->l.al.a;
       cop->l.al.maxa = op->l.al.maxa;
@@ -1458,7 +1568,8 @@ void vol_UpdateAlarm(pwr_tStatus* status, gdb_sObject* op, net_sAlarm al)
     new_maxb = MAX(op->l.al.b, op->l.al.maxb);
 
     for (col = pool_Qsucc(NULL, gdbroot->pool, &sp->cli_lh); col != &sp->cli_lh;
-         col = pool_Qsucc(NULL, gdbroot->pool, col)) {
+         col = pool_Qsucc(NULL, gdbroot->pool, col))
+    {
       cop = pool_Qitem(col, gdb_sObject, u.n.cli_ll);
       cop->l.al.b = op->l.al.b;
       cop->l.al.maxb = op->l.al.maxb;
@@ -1466,8 +1577,8 @@ void vol_UpdateAlarm(pwr_tStatus* status, gdb_sObject* op, net_sAlarm al)
       if (old_maxb != new_maxb)
         vol_PropagateBlockLevel(sts, cop, YES, old_maxb, new_maxb, YES);
     }
-
-  } else
+  }
+  else
     op->l.al = al;
 }
 
@@ -1486,8 +1597,7 @@ pwr_tDisableAttr vol_ArefDisabled(pwr_tStatus* sts, pwr_sAttrRef* arp)
   gdb_AssumeLocked;
 
   daref = cdh_ArefToDisableAref(arp);
-  ap = vol_ArefToAttribute(
-      sts, &attribute, &daref, gdb_mLo_native, vol_mTrans_none);
+  ap = vol_ArefToAttribute(sts, &attribute, &daref, gdb_mLo_native, vol_mTrans_none);
   if (ap == NULL)
     return pwr_cNDisableAttr;
 
@@ -1511,11 +1621,12 @@ void vol_MountDynObject(pwr_tStatus* sts, gdb_sObject* op)
   if (p == NULL)
     return;
 
-  if (op->g.cid != pwr_eClass_MountDynObject) {
+  if (op->g.cid != pwr_eClass_MountDynObject)
+  {
     *sts = GDH__BADARG;
     return;
   }
-    
+
   cdh_sParseName parseName, *pn;
   gdb_sObject* sop = NULL;
 
@@ -1524,9 +1635,10 @@ void vol_MountDynObject(pwr_tStatus* sts, gdb_sObject* op)
     return;
 
   sop = vol_NameToObject(sts, pn, gdb_mLo_global, vol_mTrans_all);
-  if (sop == NULL || cdh_ObjidIsNull(sop->g.oid)) {
+  if (sop == NULL || cdh_ObjidIsNull(sop->g.oid))
+  {
     *sts = GDH__NOMOUNTOBJECT;
-    return;      
+    return;
   }
 
   soid = sop->g.oid;
@@ -1538,10 +1650,10 @@ void vol_MountDynObject(pwr_tStatus* sts, gdb_sObject* op)
 
   pwr_Assert(cdh_ObjidIsEqual(op->g.soid, soid));
 
-  if (!op->u.n.flags.b.inMountClientList) {
+  if (!op->u.n.flags.b.inMountClientList)
+  {
     msp = vol_AddMountClient(sts, op);
     if (msp == NULL)
       return;
   }
 }
-

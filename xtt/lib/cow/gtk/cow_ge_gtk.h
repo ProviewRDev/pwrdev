@@ -41,7 +41,8 @@
 
 #include "cow_wow_gtk.h"
 
-class CowGeGtk : public CowGe {
+class CowGeGtk : public CowGe
+{
 public:
   GtkWidget* parent_wid;
   GtkWidget* grow_widget;
@@ -68,44 +69,34 @@ public:
   GtkWidget* edit_graphattributes;
   CoWowFocusTimerGtk focustimer;
 
-  CowGeGtk(GtkWidget* parent_wid, void* parent_ctx, const char* name,
-      const char* filename, int scrollbar, int menu, int navigator, int width,
-      int height, int x, int y, double scan_time, const char* object_name,
-      int use_default_access, unsigned int access, unsigned int options,
-      void* basewidget, double* borders, int color_theme, int dashboard,
-      int (*xg_command_cb)(void*, char*, char*, char*, void*),
-      int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-      int (*xg_is_authorized_cb)(void*, unsigned int),
-      void (*xg_keyboard_cb)(void*, void*, int, int),
-      int (*xg_extern_connect_cb)(void*, char*, void**, pwr_tRefId*));
+  CowGeGtk(GtkWidget* parent_wid, void* parent_ctx, const char* name, const char* filename, int scrollbar,
+           int menu, int navigator, int width, int height, int x, int y, double scan_time,
+           const char* object_name, int use_default_access, unsigned int access, unsigned int options,
+           void* basewidget, double* borders, int color_theme, int dashboard,
+           int (*xg_command_cb)(void*, char*, char*, char*, void*),
+           int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+           int (*xg_is_authorized_cb)(void*, unsigned int), void (*xg_keyboard_cb)(void*, void*, int, int),
+           int (*xg_extern_connect_cb)(void*, char*, void**, pwr_tRefId*));
   ~CowGeGtk();
 
   void pop();
   void iconify();
-  void set_title(char *t);
+  void set_title(char* t);
   void set_size(int width, int height);
   void create_confirm_dialog();
   void confirm_reply(int ok);
-  void* get_widget()
-  {
-    return toplevel;
-  }
-  GtkWidget* get_graph_widget()
-  {
-    return graph_form;
-  }
+  void* get_widget() { return toplevel; }
+  GtkWidget* get_graph_widget() { return graph_form; }
   void iconify(int val);
   void set_below(int val);
   void menu_setup(int edit);
-  void get_context_menu(void* mdata,
-      unsigned int caller, unsigned int priv, char* arg, int x, int y);
+  void get_context_menu(void* mdata, unsigned int caller, unsigned int priv, char* arg, int x, int y);
 
   static void ge_change_value_cb(void* ge_ctx, void* value_object, char* text);
   static void confirm_cb(void* ge_ctx, void* confirm_object, char* text);
   static void message_dialog_cb(void* ge_ctx, const char* text);
 
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void activate_value_input(GtkWidget* w, gpointer data);
   static void activate_confirm_ok(GtkWidget* w, gpointer data);
   static void activate_confirm_cancel(GtkWidget* w, gpointer data);
@@ -133,8 +124,7 @@ public:
   static void create_message_dia(GtkWidget* w, gpointer data);
   static void create_menu(GtkWidget* w, gpointer data);
   static void create_value_input(GtkWidget* w, gpointer data);
-  static void action_resize(
-      GtkWidget* w, GtkAllocation* allocation, gpointer data);
+  static void action_resize(GtkWidget* w, GtkAllocation* allocation, gpointer data);
 };
 
 #endif

@@ -54,8 +54,7 @@
 /*----------------------------------------------------------------------------*\
   Move di data word to valuebase.
 \*----------------------------------------------------------------------------*/
-void pbio_DiUnpackWord(io_sCard* cp, pwr_tUInt16 data, pwr_tUInt16 mask,
-                       int index)
+void pbio_DiUnpackWord(io_sCard* cp, pwr_tUInt16 data, pwr_tUInt16 mask, int index)
 {
   io_sChannel* chanp;
 
@@ -172,8 +171,7 @@ void pbio_DiUnpackWord(io_sCard* cp, pwr_tUInt16 data, pwr_tUInt16 mask,
 /*----------------------------------------------------------------------------*\
    Init method for the Pb module Di
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                              io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   pwr_sClass_Pb_Di* op;
@@ -184,8 +182,7 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 
   // Check configuration
 
-  if (op->NumberOfChannels != 8 && op->NumberOfChannels != 16 &&
-      op->NumberOfChannels != 32)
+  if (op->NumberOfChannels != 8 && op->NumberOfChannels != 16 && op->NumberOfChannels != 32)
     op->Status = PB_MODULE_STATE_NOTINIT;
 
   if (op->Orientation > op->NumberOfChannels)
@@ -200,8 +197,7 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 /*----------------------------------------------------------------------------*\
    Read method for the Pb module Di
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                              io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   pwr_sClass_Pb_Di* op;
@@ -269,8 +265,7 @@ static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                               io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   local = cp->Local;
@@ -284,6 +279,5 @@ static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Pb_Di) = {
-    pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardRead),
-    pwr_BindIoMethod(IoCardClose), pwr_NullMethod};
+pwr_dExport pwr_BindIoMethods(Pb_Di) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardRead),
+                                        pwr_BindIoMethod(IoCardClose), pwr_NullMethod};

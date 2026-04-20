@@ -42,11 +42,10 @@
 
 #include "flow_image.h"
 
-FlowImage::FlowImage(FlowCtx* flow_ctx, const char* imagefile, double x,
-    double y, flow_mDisplayLevel display_lev)
-    : ctx(flow_ctx), ll(flow_ctx, x, y), ur(flow_ctx, x, y),
-      display_level(display_lev), image(0), original_image(0), pixmap(0),
-      nav_pixmap(0), clip_mask(0), nav_clip_mask(0), current_zoom_factor(0)
+FlowImage::FlowImage(FlowCtx* flow_ctx, const char* imagefile, double x, double y,
+                     flow_mDisplayLevel display_lev)
+    : ctx(flow_ctx), ll(flow_ctx, x, y), ur(flow_ctx, x, y), display_level(display_lev), image(0),
+      original_image(0), pixmap(0), nav_pixmap(0), clip_mask(0), nav_clip_mask(0), current_zoom_factor(0)
 {
   imlib = ctx->fdraw->imlib;
   if (imagefile)
@@ -56,21 +55,22 @@ FlowImage::FlowImage(FlowCtx* flow_ctx, const char* imagefile, double x,
 int FlowImage::insert_image(const char* imagefile)
 {
   ctx->fdraw->image_load(imagefile, ctx->zoom_factor / ctx->base_zoom_factor,
-      ctx->nav_zoom_factor / ctx->base_zoom_factor, &original_image, &image,
-      &pixmap, &clip_mask, &nav_pixmap, &nav_clip_mask);
+                         ctx->nav_zoom_factor / ctx->base_zoom_factor, &original_image, &image, &pixmap,
+                         &clip_mask, &nav_pixmap, &nav_clip_mask);
 
-  if (original_image) {
-    current_width = int(ctx->zoom_factor / ctx->base_zoom_factor
-        * ctx->fdraw->image_get_width(original_image));
-    current_height = int(ctx->zoom_factor / ctx->base_zoom_factor
-        * ctx->fdraw->image_get_height(original_image));
-    current_nav_width = int(ctx->nav_zoom_factor / ctx->base_zoom_factor
-        * ctx->fdraw->image_get_width(original_image));
-    current_nav_height = int(ctx->nav_zoom_factor / ctx->base_zoom_factor
-        * ctx->fdraw->image_get_height(original_image));
+  if (original_image)
+  {
+    current_width =
+        int(ctx->zoom_factor / ctx->base_zoom_factor * ctx->fdraw->image_get_width(original_image));
+    current_height =
+        int(ctx->zoom_factor / ctx->base_zoom_factor * ctx->fdraw->image_get_height(original_image));
+    current_nav_width =
+        int(ctx->nav_zoom_factor / ctx->base_zoom_factor * ctx->fdraw->image_get_width(original_image));
+    current_nav_height =
+        int(ctx->nav_zoom_factor / ctx->base_zoom_factor * ctx->fdraw->image_get_height(original_image));
 
     ur.posit(ll.x + double(current_width) / ctx->zoom_factor,
-        ll.y + double(current_height) / ctx->zoom_factor);
+             ll.y + double(current_height) / ctx->zoom_factor);
     current_zoom_factor = ctx->zoom_factor;
   }
   return 1;
@@ -106,13 +106,12 @@ void FlowImage::print(void* pos, void* node, int highlight)
     return;
   if (draw_type == flow_eDrawType_LineErase)
     return;
-  int idx
-      = int(ctx->print_zoom_factor / ctx->base_zoom_factor * line_width - 1);
+  int idx = int(ctx->print_zoom_factor / ctx->base_zoom_factor * line_width - 1);
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   ctx->current_print->image(ll.print_z_x + ((FlowPoint*)pos)->print_z_x,
-      ll.print_z_y + ((FlowPoint*)pos)->print_z_y, ur.print_z_x - ll.print_z_x,
-      ur.print_z_y - ll.print_z_y, image, draw_type);
+                            ll.print_z_y + ((FlowPoint*)pos)->print_z_y, ur.print_z_x - ll.print_z_x,
+                            ur.print_z_y - ll.print_z_y, image, draw_type);
 }
 
 void FlowImage::save(std::ofstream& fp, flow_eSaveMode mode)
@@ -120,8 +119,7 @@ void FlowImage::save(std::ofstream& fp, flow_eSaveMode mode)
   fp << int(flow_eSave_Rect) << '\n';
   fp << int(flow_eSave_Rect_draw_type) << FSPACE << int(draw_type) << '\n';
   fp << int(flow_eSave_Rect_line_width) << FSPACE << line_width << '\n';
-  fp << int(flow_eSave_Rect_display_level) << FSPACE << int(display_level)
-     << '\n';
+  fp << int(flow_eSave_Rect_display_level) << FSPACE << int(display_level) << '\n';
   fp << int(flow_eSave_Rect_ll) << '\n';
   ll.save(fp, mode);
   fp << int(flow_eSave_Rect_ur) << '\n';
@@ -136,9 +134,11 @@ void FlowImage::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
+  for (;;)
+  {
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case flow_eSave_Rect:
       break;
     case flow_eSave_Rect_draw_type:
@@ -175,27 +175,27 @@ void FlowImage::draw(void* pos, int highlight, int dimmed, int hot, void* node)
   if (!(display_level & ctx->display_level))
     return;
 
-  if (pixmap || image) {
-    if (fabs(current_zoom_factor - ctx->zoom_factor) > DBL_EPSILON) {
+  if (pixmap || image)
+  {
+    if (fabs(current_zoom_factor - ctx->zoom_factor) > DBL_EPSILON)
+    {
       current_zoom_factor = ctx->zoom_factor;
 
-      ctx->fdraw->image_scale(ctx->zoom_factor / ctx->base_zoom_factor,
-          original_image, &image, &pixmap, &clip_mask);
-      current_width = int(ctx->zoom_factor / ctx->base_zoom_factor
-          * ctx->fdraw->image_get_width(image));
-      current_height = int(ctx->zoom_factor / ctx->base_zoom_factor
-          * ctx->fdraw->image_get_height(image));
+      ctx->fdraw->image_scale(ctx->zoom_factor / ctx->base_zoom_factor, original_image, &image, &pixmap,
+                              &clip_mask);
+      current_width = int(ctx->zoom_factor / ctx->base_zoom_factor * ctx->fdraw->image_get_width(image));
+      current_height = int(ctx->zoom_factor / ctx->base_zoom_factor * ctx->fdraw->image_get_height(image));
     }
 
     ctx->fdraw->image(ctx, ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-        ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y,
-        ctx->fdraw->image_get_width(image) /*ur.z_x - ll.z_x*/,
-        ctx->fdraw->image_get_height(image) /*ur.z_y - ll.z_y*/, image, pixmap,
-        clip_mask);
-  } else
+                      ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y,
+                      ctx->fdraw->image_get_width(image) /*ur.z_x - ll.z_x*/,
+                      ctx->fdraw->image_get_height(image) /*ur.z_y - ll.z_y*/, image, pixmap, clip_mask);
+  }
+  else
     ctx->fdraw->fill_rect(ctx, ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-        ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x,
-        ur.z_y - ll.z_y, flow_eDrawType_LineGray);
+                          ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x, ur.z_y - ll.z_y,
+                          flow_eDrawType_LineGray);
 }
 
 void FlowImage::erase(void* pos, int hot, void* node)
@@ -203,36 +203,33 @@ void FlowImage::erase(void* pos, int hot, void* node)
   if (!(display_level & ctx->display_level))
     return;
   ctx->fdraw->fill_rect(ctx, ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-      ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x,
-      ur.z_y - ll.z_y, flow_eDrawType_LineErase);
+                        ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x, ur.z_y - ll.z_y,
+                        flow_eDrawType_LineErase);
 }
 
-void FlowImage::nav_draw(void* pos, int highlight, void* node)
-{
-}
+void FlowImage::nav_draw(void* pos, int highlight, void* node) {}
 
-void FlowImage::nav_erase(void* pos, void* node)
-{
-}
+void FlowImage::nav_erase(void* pos, void* node) {}
 
-int FlowImage::event_handler(
-    void* pos, flow_eEvent event, int x, int y, void* node)
+int FlowImage::event_handler(void* pos, flow_eEvent event, int x, int y, void* node)
 {
   FlowPoint* p;
 
   p = (FlowPoint*)pos;
-  if (ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x <= x
-      && x <= ur.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x
-      && ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y <= y
-      && y <= ur.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y) {
+  if (ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x <= x &&
+      x <= ur.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x &&
+      ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y <= y &&
+      y <= ur.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y)
+  {
     //    std::cout << "Event handler: Hit in rect\n";
     return 1;
-  } else
+  }
+  else
     return 0;
 }
 
-void FlowImage::get_borders(double pos_x, double pos_y, double* x_right,
-    double* x_left, double* y_high, double* y_low, void* node)
+void FlowImage::get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                            double* y_low, void* node)
 {
   if (display_level != flow_mDisplayLevel_1)
     return;
@@ -246,8 +243,7 @@ void FlowImage::get_borders(double pos_x, double pos_y, double* x_right,
     *y_high = pos_y + ur.y;
 }
 
-void FlowImage::move(
-    void* pos, double x, double y, int highlight, int dimmed, int hot)
+void FlowImage::move(void* pos, double x, double y, int highlight, int dimmed, int hot)
 {
   double width, height;
 
@@ -261,8 +257,7 @@ void FlowImage::move(
   nav_zoom();
 }
 
-void FlowImage::shift(void* pos, double delta_x, double delta_y, int highlight,
-    int dimmed, int hot)
+void FlowImage::shift(void* pos, double delta_x, double delta_y, int highlight, int dimmed, int hot)
 {
   ll.x += delta_x;
   ll.y += delta_y;
@@ -274,8 +269,7 @@ void FlowImage::shift(void* pos, double delta_x, double delta_y, int highlight,
 
 std::ostream& operator<<(std::ostream& o, const FlowImage r)
 {
-  o << '(' << r.ll.x << ',' << r.ll.y << ')' << '(' << r.ur.x << ',' << r.ur.y
-    << ')' << '[' << r.ll.z_x << ',' << r.ll.z_y << ']' << '[' << r.ur.z_x
-    << ',' << r.ur.z_y << ']';
+  o << '(' << r.ll.x << ',' << r.ll.y << ')' << '(' << r.ur.x << ',' << r.ur.y << ')' << '[' << r.ll.z_x
+    << ',' << r.ll.z_y << ']' << '[' << r.ur.z_x << ',' << r.ur.z_y << ']';
   return o;
 }

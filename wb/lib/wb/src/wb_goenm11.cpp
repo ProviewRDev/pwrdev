@@ -56,28 +56,27 @@
 /*_Methods defined for this module_______________________________________*/
 
 /*************************************************************************
-*
-* Name:		goen_create_nodetype_m11()
-*
-* Type
-*
-* Type		Parameter	IOGF	Description
-*    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
-*    Widget	        widget			Neted widget
-*    unsigned long 	*mask			Mask for drawing inputs/outputs
-*    int		color			Highlight color
-*    Cursor		cursor			Hot cursor
-*    unsigned long      *node_type_id		Nodetypeid for created nodetype
-*
-* Description:
-*	Create a nodetype
-*
-**************************************************************************/
+ *
+ * Name:		goen_create_nodetype_m11()
+ *
+ * Type
+ *
+ * Type		Parameter	IOGF	Description
+ *    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
+ *    Widget	        widget			Neted widget
+ *    unsigned long 	*mask			Mask for drawing inputs/outputs
+ *    int		color			Highlight color
+ *    Cursor		cursor			Hot cursor
+ *    unsigned long      *node_type_id		Nodetypeid for created nodetype
+ *
+ * Description:
+ *	Create a nodetype
+ *
+ **************************************************************************/
 
-int goen_create_nodetype_m11(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
-    ldh_tSesContext ldhses, flow_tCtx ctx, unsigned int* mask,
-    unsigned long subwindowmark, unsigned long node_width,
-    flow_tNodeClass* node_class, vldh_t_node node)
+int goen_create_nodetype_m11(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid, ldh_tSesContext ldhses,
+                             flow_tCtx ctx, unsigned int* mask, unsigned long subwindowmark,
+                             unsigned long node_width, flow_tNodeClass* node_class, vldh_t_node node)
 {
   int sts, size;
   float* frame_width_ptr;
@@ -98,20 +97,22 @@ int goen_create_nodetype_m11(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
     return sts;
   sprintf(&name[strlen(name)], "%d", idx++);
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "AreaWidth",
-      (char**)&frame_width_ptr, &size);
-  if (ODD(sts)) {
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "AreaWidth", (char**)&frame_width_ptr, &size);
+  if (ODD(sts))
+  {
     frame_width = *frame_width_ptr;
     free((char*)frame_width_ptr);
-  } else
+  }
+  else
     frame_width = 0.0;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "AreaHeight",
-      (char**)&frame_height_ptr, &size);
-  if (ODD(sts)) {
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "AreaHeight", (char**)&frame_height_ptr, &size);
+  if (ODD(sts))
+  {
     frame_height = *frame_height_ptr;
     free((char*)frame_height_ptr);
-  } else
+  }
+  else
     frame_height = 0.0;
 
   line_type = flow_eDrawType_Line;
@@ -124,19 +125,16 @@ int goen_create_nodetype_m11(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   flow_SetNoConObstacle(nc, 1);
 
   /* Draw the rectangle for the frame */
-  flow_AddRect(nc, 0, -y_offs, f_width, y_offs * 2, flow_eDrawType_Line, 2,
-      flow_mDisplayLevel_1);
+  flow_AddRect(nc, 0, -y_offs, f_width, y_offs * 2, flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
   // flow_AddLine( nc, 0, -y_offs, f_width, -y_offs, line_type, line_width);
-  flow_AddLine(
-      nc, f_width, -y_offs, f_width, f_height - y_offs, line_type, line_width);
-  flow_AddLine(nc, f_width, f_height - y_offs, 0, f_height - y_offs, line_type,
-      line_width);
+  flow_AddLine(nc, f_width, -y_offs, f_width, f_height - y_offs, line_type, line_width);
+  flow_AddLine(nc, f_width, f_height - y_offs, 0, f_height - y_offs, line_type, line_width);
   flow_AddLine(nc, 0, f_height - y_offs, 0, -y_offs, line_type, line_width);
 
-  switch (graphbody->graphindex) {
+  switch (graphbody->graphindex)
+  {
   case 7:
-    sts = goen_create_nodetype_m7(graphbody, cid, ldhses, ctx, mask,
-        subwindowmark, node_width, &nc, node);
+    sts = goen_create_nodetype_m7(graphbody, cid, ldhses, ctx, mask, subwindowmark, node_width, &nc, node);
     if (EVEN(sts))
       return sts;
     break;
@@ -149,83 +147,81 @@ int goen_create_nodetype_m11(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 }
 
 /*************************************************************************
-*
-* Name:		goen_get_point_info_m11()
-*
-* Type
-*
-* Type		Parameter	IOGF	Description
-*    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
-*    unsigned long	point			Connection point nr
-*    unsigned long 	*mask			Mask for drawing inputs/outputs
-*    goen_conpoint_type	*info_pointer		Pointer to calculated data
-*
-* Description:
-*	Calculates relativ koordinates for a connectionpoint and investigates
-*	the connectionpoint type.
-*
-**************************************************************************/
-int goen_get_point_info_m11(WGre* grectx, pwr_sGraphPlcNode* graphbody,
-    unsigned long point, unsigned int* mask, unsigned long node_width,
-    goen_conpoint_type* info_pointer, vldh_t_node node)
+ *
+ * Name:		goen_get_point_info_m11()
+ *
+ * Type
+ *
+ * Type		Parameter	IOGF	Description
+ *    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
+ *    unsigned long	point			Connection point nr
+ *    unsigned long 	*mask			Mask for drawing inputs/outputs
+ *    goen_conpoint_type	*info_pointer		Pointer to calculated data
+ *
+ * Description:
+ *	Calculates relativ koordinates for a connectionpoint and investigates
+ *	the connectionpoint type.
+ *
+ **************************************************************************/
+int goen_get_point_info_m11(WGre* grectx, pwr_sGraphPlcNode* graphbody, unsigned long point,
+                            unsigned int* mask, unsigned long node_width, goen_conpoint_type* info_pointer,
+                            vldh_t_node node)
 {
-  switch (graphbody->graphindex) {
+  switch (graphbody->graphindex)
+  {
   case 7:
-    return goen_get_point_info_m7(
-        grectx, graphbody, point, mask, node_width, info_pointer, node);
+    return goen_get_point_info_m7(grectx, graphbody, point, mask, node_width, info_pointer, node);
   default:;
   }
   return GOEN__NOPOINT;
 }
 
 /*************************************************************************
-*
-* Name:		goen_get_parameter_m11()
-*
-* Type
-*
-* Type		Parameter	IOGF	Description
-*    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
-*    unsigned long	point			Connection point nr
-*    unsigned long 	*mask			Mask for drawing inputs/outputs
-*    unsigned long	*par_type		Input or output parameter
-*    godd_parameter_type **par_pointer		Pointer to parameter data
-*
-* Description:
-*	Gets pointer to parameterdata for connectionpoint.
-*
-**************************************************************************/
-int goen_get_parameter_m11(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
-    ldh_tSesContext ldhses, unsigned long con_point, unsigned int* mask,
-    unsigned long* par_type, unsigned long* par_inverted,
-    unsigned long* par_index)
+ *
+ * Name:		goen_get_parameter_m11()
+ *
+ * Type
+ *
+ * Type		Parameter	IOGF	Description
+ *    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
+ *    unsigned long	point			Connection point nr
+ *    unsigned long 	*mask			Mask for drawing inputs/outputs
+ *    unsigned long	*par_type		Input or output parameter
+ *    godd_parameter_type **par_pointer		Pointer to parameter data
+ *
+ * Description:
+ *	Gets pointer to parameterdata for connectionpoint.
+ *
+ **************************************************************************/
+int goen_get_parameter_m11(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid, ldh_tSesContext ldhses,
+                           unsigned long con_point, unsigned int* mask, unsigned long* par_type,
+                           unsigned long* par_inverted, unsigned long* par_index)
 {
-  switch (graphbody->graphindex) {
+  switch (graphbody->graphindex)
+  {
   case 7:
-    return goen_get_parameter_m7(graphbody, cid, ldhses, con_point, mask,
-        par_type, par_inverted, par_index);
+    return goen_get_parameter_m7(graphbody, cid, ldhses, con_point, mask, par_type, par_inverted, par_index);
   default:;
   }
   return GOEN__NOPOINT;
 }
 
 /*************************************************************************
-*
-* Name:		goen_get_location_point_m11()
-*
-* Type
-*
-* Type		Parameter	IOGF	Description
-*    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
-*    goen_point_type	*info_pointer		Locationpoint
-*
-* Description:
-*	Calculates kooridates for locationpoint relativ geomtrical center.
-*
-**************************************************************************/
-int goen_get_location_point_m11(WGre* grectx, pwr_sGraphPlcNode* graphbody,
-    unsigned int* mask, unsigned long node_width, goen_point_type* info_pointer,
-    vldh_t_node node)
+ *
+ * Name:		goen_get_location_point_m11()
+ *
+ * Type
+ *
+ * Type		Parameter	IOGF	Description
+ *    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
+ *    goen_point_type	*info_pointer		Locationpoint
+ *
+ * Description:
+ *	Calculates kooridates for locationpoint relativ geomtrical center.
+ *
+ **************************************************************************/
+int goen_get_location_point_m11(WGre* grectx, pwr_sGraphPlcNode* graphbody, unsigned int* mask,
+                                unsigned long node_width, goen_point_type* info_pointer, vldh_t_node node)
 {
   return GOEN__SUCCESS;
 }

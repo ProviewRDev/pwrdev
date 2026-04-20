@@ -89,9 +89,9 @@
         really an error, since the situation is completely dealt with by the   \
         algorithms. The time performance may be somewhat affected, however,    \
         and the flag can be relevant for tuning the margin. Manual only. */
-//#define AS_ERR_AUTO_DISRUPT 16u /* autoGo switched off while in travel. This
-//is not treated as a crucial error, to avoid having to toggle enable to
-//continue. Auto only. */
+// #define AS_ERR_AUTO_DISRUPT 16u /* autoGo switched off while in travel. This
+// is not treated as a crucial error, to avoid having to toggle enable to
+// continue. Auto only. */
 #define AS_ERR_MERGE_ITER                                                      \
   32u /* Number of iterations in mergeSet while loop exceeded                  \
          AS_MERGE_ITER_LIM. This will cause a residual sway vector to be       \
@@ -103,32 +103,34 @@
          diagnose, however. */
 #define AS_ERR_OTHER 128u /* Other object disabled. Auto only. */
 
-#define AS_ERR_MINOR 255u /* Maximum value of errstatus for non-crucial error  \
-                             */
+#define AS_ERR_MINOR                                                           \
+  255u /* Maximum value of errstatus for non-crucial error                     \
+        */
 
 /* "Internal" crucial error flags */
 #define AS_ERR_DISABLED 256u
 #define AS_ERR_WASENABLED 512u
 
 /* Crucial errors that will cause the disabling of the object */
-#define AS_ERR_UCOM 1024u /* Non-valid command velocity input. Manual only. */
-#define AS_ERR_XCOM 2048u /* Non-valid command position input. Auto only. */
-#define AS_ERR_MODE 4096u /* Non-valid antisway mode */
+#define AS_ERR_UCOM 1024u  /* Non-valid command velocity input. Manual only. */
+#define AS_ERR_XCOM 2048u  /* Non-valid command position input. Auto only. */
+#define AS_ERR_MODE 4096u  /* Non-valid antisway mode */
 #define AS_ERR_LSIGN 8192u /* Zero or negative pendulum length */
 #define AS_ERR_AMAX 16384u /* amaxH output violation */
 #define AS_ERR_UMAX 32768u /* umaxH*limfact output violation */
 #define AS_ERR_XLIM 65536u /* xmax or xmin output violation. Auto only. */
 #define AS_ERR_XMAX 65536u
-//#define AS_ERR_UMAXL 131072u /* umaxL input violation. Auto only */
+// #define AS_ERR_UMAXL 131072u /* umaxL input violation. Auto only */
 
 #define AS_NERR_FLAGS 18 // Number of error flags
 
 /* 3.1 Degrees of verbosity */
 
 #define AS_VERB_DISABLED 1 /* Object will print message if disabled */
-#define AS_VERB_ERR 2 /* Object will print message if any error occurs */
-#define AS_VERB_ALL 3 /* Object will print message when anything new happens   \
-                         */
+#define AS_VERB_ERR 2      /* Object will print message if any error occurs */
+#define AS_VERB_ALL                                                            \
+  3 /* Object will print message when anything new happens                     \
+     */
 
 /* 3.2 Compensation degrees in automatic mode */
 
@@ -140,8 +142,8 @@
 
 #define AS_ALARMTYPE_DISABLED 0
 #define AS_ALARMTYPE_ERR 1
-//#define AS_ALARM_WAIT 10
-//#define AS_ALARM_HOLD 50
+// #define AS_ALARM_WAIT 10
+// #define AS_ALARM_HOLD 50
 #define AS_OBJ_SETALARM(i)                                                     \
   {                                                                            \
     if (i == 0)                                                                \
@@ -165,19 +167,17 @@
   (object->limits[0]) /* Default 0.001. Will set uR to zero if |uR| < limit */
 #define AS_OBJ_UR_MAX_ERRFACT                                                  \
   (object->limits[1]) /* Default 2.0. Will disable object if |uR|>limit*umaxH  \
-                         */
+                       */
 #define AS_OBJ_UR_MIN                                                          \
-  (                                                                            \
-      object->limits[2]) /* Default 0.01. Minimum steady reference velocity    \
-                            that can be passed to frequency converter */
+  (object->limits[2]) /* Default 0.01. Minimum steady reference velocity       \
+                         that can be passed to frequency converter */
 #define AS_OBJ_XMAX                                                            \
   (object->limits[3]) /* Default 99999.0. Maximum reference position. */
 #define AS_OBJ_XMIN                                                            \
   (object->limits[4]) /* Default -99999.0. Minimum reference position. */
 #define AS_OBJ_UR_ATTAIN_ERRLIM                                                \
-  (                                                                            \
-      object->limits[5]) /* Default 0.001. Will warn if final uR misses        \
-                            uCommand (or zero if auto) with more than limit */
+  (object->limits[5]) /* Default 0.001. Will warn if final uR misses           \
+                         uCommand (or zero if auto) with more than limit */
 #define AS_OBJ_L_MIN_CHANGE                                                    \
   (object->limits[6]) /* Default 0.005. Length interval between compensation   \
                          for new pendulum length = 5mm. */
@@ -185,13 +185,11 @@
   (object->limits[7]) /* Default 0.005. Minimum hoisting speed that will be    \
                          compensated for = 5 mm/s. */
 #define AS_OBJ_XR_ATTAIN_ERRLIM                                                \
-  (                                                                            \
-      object->limits[8]) /* Default 0.001. Will warn if final xR misses        \
-                            xCommand with more than limit. Auto only. */
+  (object->limits[8]) /* Default 0.001. Will warn if final xR misses           \
+                         xCommand with more than limit. Auto only. */
 #define AS_OBJ_XCOM_MIN_CHANGE                                                 \
-  (                                                                            \
-      object->limits[9]) /* Default 0.01. Minimum change in command position   \
-                            that will invoke a new call. Auto only. */
+  (object->limits[9]) /* Default 0.01. Minimum change in command position      \
+                         that will invoke a new call. Auto only. */
 
 /* The following limits are of more internal character, and should probably not
  * be made object attributes */
@@ -207,14 +205,14 @@
   0.1 /*Travel time difference between objects that makeSet_auto will          \
          tolerate. - **** possibly include this in limits attribute instead.   \
          */
-//#define AS_MESSAGE_LENGTH 79 /*length of the message internal attribute. Last
-//character is '\0', and is not included (i.e. AS_MESSAGE_LENGTH = 79 for a
-//String80).*/
-//#define AS_MESSAGE_NLIMIT 100 /* max No of messages in queue */
+// #define AS_MESSAGE_LENGTH 79 /*length of the message internal attribute. Last
+// character is '\0', and is not included (i.e. AS_MESSAGE_LENGTH = 79 for a
+// String80).*/
+// #define AS_MESSAGE_NLIMIT 100 /* max No of messages in queue */
 
 /* 5. Readability macros */
 
-#define AS_OBJ_SETP ((AS_phasorSet*)&(object->Set))
+#define AS_OBJ_SETP ((AS_phasorSet *)&(object->Set))
 #define AS_OBJ_AMAXHM (object->amax[0])
 #define AS_OBJ_AMAXSM (object->amax[1])
 #define AS_OBJ_UMAXHM (object->umax[0])
@@ -240,9 +238,8 @@
 #define AS_OBJ_M_ALHOLD                                                        \
   (object->mparams[3]) // Default 30. Hold the current message this number of
                        // cycles.
-#define AS_OBJ_MESSAGEQP(i)                                                    \
-  ((AS_messageQ*)object->messageQ[(i)])
-#define AS_OBJ_MESSAGEQPP(i) ((AS_messageQ**)&object->messageQ[(i)])
+#define AS_OBJ_MESSAGEQP(i) ((AS_messageQ *)object->messageQ[(i)])
+#define AS_OBJ_MESSAGEQPP(i) ((AS_messageQ **)&object->messageQ[(i)])
 #define AS_ADDMESSAGE(type, charpp, messageArgs...)                            \
   {                                                                            \
     if (asprintf(charpp, messageArgs) < 0) { /* ! a malloc() failure */        \
@@ -254,11 +251,11 @@
   }
 
 /* Access attributes of other antisway object */
-#define AS_OBJ_OTHER ((pwr_sClass_Ssab_AntiSway*)(object->other))
+#define AS_OBJ_OTHER ((pwr_sClass_Ssab_AntiSway *)(object->other))
 #define AS_OBJ_OTHER_SETP                                                      \
-  ((AS_phasorSet*)&(((pwr_sClass_Ssab_AntiSway*)(object->other))->Set))
+  ((AS_phasorSet *)&(((pwr_sClass_Ssab_AntiSway *)(object->other))->Set))
 
-#define AS_OTHER_SETP ((AS_phasorSet*)&(other->Set))
+#define AS_OTHER_SETP ((AS_phasorSet *)&(other->Set))
 #define AS_OTHER_AMAXHM (other->amax[0])
 #define AS_OTHER_AMAXSM (other->amax[1])
 #define AS_OTHER_UMAXHM (other->umax[0])
@@ -275,11 +272,11 @@
 
 /* More readability */
 #define AS_SHP_COLLAPSEOK                                                      \
-  (((shp->ID == AS_NO_AS) || (shp->ID == AS_DPULSE))                           \
-      || ((shp->ID == AS_UMZV) || (shp->ID == AS_UMZVD)))
+  (((shp->ID == AS_NO_AS) || (shp->ID == AS_DPULSE)) ||                        \
+   ((shp->ID == AS_UMZV) || (shp->ID == AS_UMZVD)))
 #define AS_SHP_NEG                                                             \
-  (((shp->ID == AS_UMZV) || (shp->ID == AS_UMZVD))                             \
-      || ((shp->ID == AS_ZV122) || (shp->ID == AS_ZVD122)))
+  (((shp->ID == AS_UMZV) || (shp->ID == AS_UMZVD)) ||                          \
+   ((shp->ID == AS_ZV122) || (shp->ID == AS_ZVD122)))
 #define AS_SHP_ROBUST                                                          \
   ((shp->ID == AS_DDPULSE) || ((shp->ID == AS_UMZVD) || (shp->ID == AS_ZVD122)))
 
@@ -317,13 +314,13 @@
 
 /* 7. Antisway mode values */
 
-#define AS_NO_AS 0 /* No antisway */
-#define AS_DPULSE 1 /* Double pulse */
+#define AS_NO_AS 0   /* No antisway */
+#define AS_DPULSE 1  /* Double pulse */
 #define AS_DDPULSE 2 /* Robust, or double double pulse */
-#define AS_UMZV 3 /* Unity-magnitude negative ZV, or triple pulse */
+#define AS_UMZV 3    /* Unity-magnitude negative ZV, or triple pulse */
 #define AS_UMZVD                                                               \
   4 /* Unity-magnitude negative ZVS, robust variant of triple pulse above */
-#define AS_ZV122 5 /* Time-optimal negative ZV */
+#define AS_ZV122 5  /* Time-optimal negative ZV */
 #define AS_ZVD122 6 /* Time-optimal negative ZVD, robust variant of ZV122. */
 
 /* 8. Structures */
@@ -402,13 +399,13 @@ typedef struct {
 typedef struct {
   int N;
   double extSum;
-  AS_phasor* ph;
+  AS_phasor *ph;
 } AS_phasorSet;
 
 typedef struct AS_messageQ {
-  char* mess;
+  char *mess;
   int count;
-  struct AS_messageQ* next;
+  struct AS_messageQ *next;
 } AS_messageQ;
 
 #endif
@@ -416,36 +413,39 @@ typedef struct AS_messageQ {
 /* 9. Prototype declarations of visible phasor methods */
 
 unsigned int AS_Engine_man(int newCall, int hoisting, int hoisted, int verbose,
-    const AS_shaper* shp, double uCommand, double uR, double DLc, double omega,
-    double amaxH, double amaxS, double dt, double* aRp, AS_phasorSet* Setp);
+                           const AS_shaper *shp, double uCommand, double uR,
+                           double DLc, double omega, double amaxH, double amaxS,
+                           double dt, double *aRp, AS_phasorSet *Setp);
 
 unsigned int AS_Engine_auto(int newCall, int hoisting, int hoisted, int verbose,
-    pwr_sClass_Ssab_AntiSway* other, const AS_shaper* shp, double xCommand,
-    double xR, double uR, double DLc, double omega, double amaxH, double amaxS,
-    double umaxH, double umaxS, double umin, double dt, double* aRp,
-    unsigned int* astsp, AS_phasorSet* Setp);
+                            pwr_sClass_Ssab_AntiSway *other,
+                            const AS_shaper *shp, double xCommand, double xR,
+                            double uR, double DLc, double omega, double amaxH,
+                            double amaxS, double umaxH, double umaxS,
+                            double umin, double dt, double *aRp,
+                            unsigned int *astsp, AS_phasorSet *Setp);
 
-void AS_collapseSet(AS_phasorSet* Setp, const AS_shaper* shp, double amax);
+void AS_collapseSet(AS_phasorSet *Setp, const AS_shaper *shp, double amax);
 
-void AS_displaySet(
-    const AS_phasorSet* Setp, double omega); // mainly for diagnose
+void AS_displaySet(const AS_phasorSet *Setp,
+                   double omega); // mainly for diagnose
 
-void AS_displayQ(
-    const double* acp, const double* aEp, double uc, double dt); // obsolete
+void AS_displayQ(const double *acp, const double *aEp, double uc,
+                 double dt); // obsolete
 
-void AS_emptySet(AS_phasorSet* Setp);
+void AS_emptySet(AS_phasorSet *Setp);
 
-void AS_emptyQ(double** aQpp, double** acpp, double** aEpp); // obsolete
+void AS_emptyQ(double **aQpp, double **acpp, double **aEpp); // obsolete
 
-int AS_cmpPhasors(const void* p1, const void* p2);
+int AS_cmpPhasors(const void *p1, const void *p2);
 
-void AS_enQMessage(AS_messageQ** objectmQp, int nlimit, const char* newMessage);
+void AS_enQMessage(AS_messageQ **objectmQp, int nlimit, const char *newMessage);
 
-void AS_deQMessage(AS_messageQ** objectmQp);
+void AS_deQMessage(AS_messageQ **objectmQp);
 
-void AS_diagnose(const AS_phasorSet* Setp, double omega, int reflected,
-    double SuDiff, double uDiff);
+void AS_diagnose(const AS_phasorSet *Setp, double omega, int reflected,
+                 double SuDiff, double uDiff);
 
-const AS_shaper* AS_SetupIST(int mode);
+const AS_shaper *AS_SetupIST(int mode);
 
 #endif

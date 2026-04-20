@@ -43,38 +43,42 @@
 #include "pwr_baseclasses.h"
 #include "wb_bck.h"
 
-typedef enum {
+typedef enum
+{
   expw_mOpen_All = ~0,
   expw_mOpen_Children = 1 << 0,
 } expw_mOpen;
 
-typedef enum {
+typedef enum
+{
   expw_eType_Export,
   expw_eType_Import,
   expw_eType_BuildDirectories
 } expw_eType;
 
-typedef enum {
+typedef enum
+{
   expwitem_eItemType_Exp,
   expwitem_eItemType_Dir
 } expwitem_eItemType;
 
-typedef enum {
+typedef enum
+{
   expw_eListType_Dir,
   expw_eListType_Copy,
   expw_eListType_Exec,
 } expw_eListType;
 
-class ExpWList {
+class ExpWList
+{
 public:
   int update;
 
-  ExpWList() : update(0)
-  {
-  }
+  ExpWList() : update(0) {}
 };
 
-class ExpWCopy : public ExpWList {
+class ExpWCopy : public ExpWList
+{
 public:
   ExpWCopy* next;
   ExpWCopy* prev;
@@ -82,36 +86,33 @@ public:
   pwr_tFileName target;
   pwr_tFileConvertEnum conversion;
 
-  ExpWCopy() : next(0), prev(0)
-  {
-  }
+  ExpWCopy() : next(0), prev(0) {}
 };
 
-class ExpWExec : public ExpWList {
+class ExpWExec : public ExpWList
+{
 public:
   ExpWExec* next;
   ExpWExec* prev;
   pwr_tCmd command;
   pwr_tFileName dir;
 
-  ExpWExec() : next(0), prev(0)
-  {
-  }
+  ExpWExec() : next(0), prev(0) {}
 };
 
-class ExpWMake : public ExpWList {
+class ExpWMake : public ExpWList
+{
 public:
   ExpWMake* next;
   ExpWMake* prev;
   pwr_tFileName makefile;
   pwr_tFileName dir;
 
-  ExpWMake() : next(0), prev(0)
-  {
-  }
+  ExpWMake() : next(0), prev(0) {}
 };
 
-class ExpWDir : public ExpWList {
+class ExpWDir : public ExpWList
+{
 public:
   ExpWDir* next;
   ExpWDir* prev;
@@ -123,22 +124,16 @@ public:
   pwr_tMask options;
   char description[80];
 
-  ExpWDir()
-      : next(0), prev(0), copylist(0), makelist(0), execlist(0), open(0),
-        options(0)
-  {
-  }
-  ExpWCopy* copy_insert(char* source, char* target, pwr_tFileConvertEnum conversion, 
-			int update);
+  ExpWDir() : next(0), prev(0), copylist(0), makelist(0), execlist(0), open(0), options(0) {}
+  ExpWCopy* copy_insert(char* source, char* target, pwr_tFileConvertEnum conversion, int update);
   ExpWMake* make_insert(char* dir, char* makefile, int update);
   ExpWExec* exec_insert(char* dir, char* command, int update);
 };
 
-class WbExpWNavBrow {
+class WbExpWNavBrow
+{
 public:
-  WbExpWNavBrow(BrowCtx* brow_ctx, void* lwnav) : ctx(brow_ctx), expwnav(lwnav)
-  {
-  }
+  WbExpWNavBrow(BrowCtx* brow_ctx, void* lwnav) : ctx(brow_ctx), expwnav(lwnav) {}
   ~WbExpWNavBrow();
 
   BrowCtx* ctx;
@@ -156,10 +151,10 @@ public:
   void brow_setup();
 };
 
-class WbExpWNav {
+class WbExpWNav
+{
 public:
-  WbExpWNav(
-      void* l_parent_ctx, ldh_tSesContext l_ldhses, int l_type, int l_editmode);
+  WbExpWNav(void* l_parent_ctx, ldh_tSesContext l_ldhses, int l_type, int l_editmode);
   virtual ~WbExpWNav();
 
   void* parent_ctx;
@@ -170,9 +165,7 @@ public:
   int show_all;
   ExpWDir* dirlist;
 
-  virtual void set_input_focus()
-  {
-  }
+  virtual void set_input_focus() {}
 
   void show();
   void update();
@@ -195,10 +188,11 @@ public:
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
 };
 
-class ItemExp {
+class ItemExp
+{
 public:
-  ItemExp(WbExpWNav* expwnav, char* item_source, char* item_target,
-      ExpWList* item_listp, brow_tNode dest, flow_eDest dest_code);
+  ItemExp(WbExpWNav* expwnav, char* item_source, char* item_target, ExpWList* item_listp, brow_tNode dest,
+          flow_eDest dest_code);
   expwitem_eItemType type;
   WbExpWNav* expwnav;
   brow_tNode node;
@@ -212,10 +206,11 @@ public:
   virtual ~ItemExp();
 };
 
-class ItemDir {
+class ItemDir
+{
 public:
-  ItemDir(WbExpWNav* expwnav, ExpWDir* item_dir, char* item_name,
-      char* item_description, brow_tNode dest, flow_eDest dest_code);
+  ItemDir(WbExpWNav* expwnav, ExpWDir* item_dir, char* item_name, char* item_description, brow_tNode dest,
+          flow_eDest dest_code);
   expwitem_eItemType type;
   WbExpWNav* expwnav;
   ExpWDir* dir;

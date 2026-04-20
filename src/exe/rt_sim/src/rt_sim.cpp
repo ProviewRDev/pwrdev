@@ -54,9 +54,13 @@
 
 #include "nmps.h"
 
-pwr_tCid cellclass[] = { pwr_cClass_NMpsCell, pwr_cClass_NMpsCell60,
-  pwr_cClass_NMpsCell120, pwr_cClass_NMpsStoreCell, pwr_cClass_NMpsStoreCell60,
-  pwr_cClass_NMpsStoreCell120, 0 };
+pwr_tCid cellclass[] = {pwr_cClass_NMpsCell,
+                        pwr_cClass_NMpsCell60,
+                        pwr_cClass_NMpsCell120,
+                        pwr_cClass_NMpsStoreCell,
+                        pwr_cClass_NMpsStoreCell60,
+                        pwr_cClass_NMpsStoreCell120,
+                        0};
 
 pwr_tStatus rt_sim::print_object(FILE* fp, pwr_tOid oid)
 {
@@ -69,8 +73,7 @@ pwr_tStatus rt_sim::print_object(FILE* fp, pwr_tOid oid)
   pwr_tOName oname;
   pwr_tObjName cname;
   gdh_sVolumeInfo info;
-  pwr_tCid skip_cid[]
-      = { pwr_eClass_Node, pwr_cClass_PlcProcess, pwr_cClass_PlcThread, 0 };
+  pwr_tCid skip_cid[] = {pwr_eClass_Node, pwr_cClass_PlcProcess, pwr_cClass_PlcThread, 0};
   int skip;
 
   sts = gdh_GetAttrRefTid(&aref, &tid);
@@ -78,14 +81,17 @@ pwr_tStatus rt_sim::print_object(FILE* fp, pwr_tOid oid)
     return sts;
 
   skip = 0;
-  for (int i = 0; skip_cid[i]; i++) {
-    if (tid == skip_cid[i]) {
+  for (int i = 0; skip_cid[i]; i++)
+  {
+    if (tid == skip_cid[i])
+    {
       skip = 1;
       break;
     }
   }
 
-  if (!skip) {
+  if (!skip)
+  {
     sts = gdh_ObjidToName(oid, oname, sizeof(oname), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
@@ -95,16 +101,20 @@ pwr_tStatus rt_sim::print_object(FILE* fp, pwr_tOid oid)
       return sts;
 
     fprintf(fp, "// %s\n", oname);
-    if (info.cid == pwr_eClass_DynamicVolume) {
-      sts = gdh_ObjidToName(
-          cdh_ClassIdToObjid(tid), cname, sizeof(cname), cdh_mName_object);
+    if (info.cid == pwr_eClass_DynamicVolume)
+    {
+      sts = gdh_ObjidToName(cdh_ClassIdToObjid(tid), cname, sizeof(cname), cdh_mName_object);
       if (EVEN(sts))
         throw co_error(sts);
 
       fprintf(fp, "<dynamicname> %s %s\n", oname, cname);
-    } else if (info.cid == pwr_eClass_SystemVolume) {
+    }
+    else if (info.cid == pwr_eClass_SystemVolume)
+    {
       fprintf(fp, "<oname> %s\n", oname);
-    } else {
+    }
+    else
+    {
       fprintf(fp, "<oid> %s\n", cdh_ObjidToString(oid, 1));
     }
 
@@ -122,8 +132,8 @@ pwr_tStatus rt_sim::print_object(FILE* fp, pwr_tOid oid)
 
     gdh_FWriteObjectR(fp, ap, aname, &aref, tid);
   }
-  for (sts = gdh_GetChild(oid, &child); ODD(sts);
-       sts = gdh_GetNextSibling(child, &child)) {
+  for (sts = gdh_GetChild(oid, &child); ODD(sts); sts = gdh_GetNextSibling(child, &child))
+  {
     print_object(fp, child);
   }
   return 1;
@@ -155,17 +165,19 @@ pwr_tStatus rt_sim::load()
   if (!fp)
     return SIM__FILE;
 
-  while (dcli_read_line(line, sizeof(line), fp)) {
+  while (dcli_read_line(line, sizeof(line), fp))
+  {
     line_cnt++;
 
     str_trim(line, line);
-    if (streq(line, "") || line[0] == '#'
-        || (line[0] == '/' && line[1] == '/'))
+    if (streq(line, "") || line[0] == '#' || (line[0] == '/' && line[1] == '/'))
       continue;
 
-    if (str_StartsWith(line, "<oid> ")) {
+    if (str_StartsWith(line, "<oid> "))
+    {
       sts = cdh_StringToObjid(&line[6], &oid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("** Objid syntax error, line %d\n", line_cnt);
         ap = 0;
         continue;
@@ -174,7 +186,8 @@ pwr_tStatus rt_sim::load()
       oaref = cdh_ObjidToAref(oid);
 
       sts = gdh_GetAttrRefTid(&oaref, &tid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("** Object not found %s, line %d\n", &line[6], line_cnt);
         ap = 0;
         continue;
@@ -183,21 +196,25 @@ pwr_tStatus rt_sim::load()
       if (!cdh_tidIsCid(tid))
         return GDH__NOOBJECT;
 
-      if (tid == pwr_eClass_Security || tid == pwr_eClass_System
-          || tid == pwr_cClass_SimulateConfig) {
+      if (tid == pwr_eClass_Security || tid == pwr_eClass_System || tid == pwr_cClass_SimulateConfig)
+      {
         ap = 0;
         continue;
       }
 
       sts = gdh_AttrRefToPointer(&oaref, (void**)&ap);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("** Unable to link to object %s, line %d\n", &line[6], line_cnt);
         ap = 0;
         continue;
       }
-    } else if (str_StartsWith(line, "<oname> ")) {
+    }
+    else if (str_StartsWith(line, "<oname> "))
+    {
       sts = gdh_NameToObjid(&line[8], &oid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("** Object not found, line %d\n", line_cnt);
         ap = 0;
         continue;
@@ -206,7 +223,8 @@ pwr_tStatus rt_sim::load()
       oaref = cdh_ObjidToAref(oid);
 
       sts = gdh_GetAttrRefTid(&oaref, &tid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("** Object not found %s, line %d\n", &line[8], line_cnt);
         ap = 0;
         continue;
@@ -215,38 +233,42 @@ pwr_tStatus rt_sim::load()
       if (!cdh_tidIsCid(tid))
         return GDH__NOOBJECT;
 
-      if (tid == pwr_eClass_Security || tid == pwr_eClass_System
-          || tid == pwr_cClass_SimulateConfig) {
+      if (tid == pwr_eClass_Security || tid == pwr_eClass_System || tid == pwr_cClass_SimulateConfig)
+      {
         ap = 0;
         continue;
       }
 
       sts = gdh_AttrRefToPointer(&oaref, (void**)&ap);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("** Unable to link to object %s, line %d\n", &line[8], line_cnt);
         ap = 0;
         continue;
       }
-    } else if (str_StartsWith(line, "<dynamicname> ")) {
-      nr = dcli_parse(line, " 	", "", (char*)line_elem,
-          sizeof(line_elem) / sizeof(line_elem[0]), sizeof(line_elem[0]), 1);
+    }
+    else if (str_StartsWith(line, "<dynamicname> "))
+    {
+      nr = dcli_parse(line, " 	", "", (char*)line_elem, sizeof(line_elem) / sizeof(line_elem[0]),
+                      sizeof(line_elem[0]), 1);
       if (nr != 3)
         continue;
 
       sts = gdh_ClassNameToId(line_elem[1], &tid);
-      if (EVEN(sts)) {
-        printf("** Unable to find object class %s, line %d\n", line_elem[1],
-            line_cnt);
+      if (EVEN(sts))
+      {
+        printf("** Unable to find object class %s, line %d\n", line_elem[1], line_cnt);
         ap = 0;
         continue;
       }
 
-      sts = gdh_CreateObject(
-          line_elem[1], tid, 0, &oid, pwr_cNOid, 0, pwr_cNOid);
-      if (EVEN(sts)) {
+      sts = gdh_CreateObject(line_elem[1], tid, 0, &oid, pwr_cNOid, 0, pwr_cNOid);
+      if (EVEN(sts))
+      {
         // Object exist, link to object
         sts = gdh_NameToObjid(line_elem[1], &oid);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           printf("** Object not found, line %d\n", line_cnt);
           ap = 0;
           continue;
@@ -255,7 +277,8 @@ pwr_tStatus rt_sim::load()
         oaref = cdh_ObjidToAref(oid);
 
         sts = gdh_GetAttrRefTid(&oaref, &tid);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           printf("** Object not found %s, line %d\n", line_elem[1], line_cnt);
           ap = 0;
           continue;
@@ -265,18 +288,20 @@ pwr_tStatus rt_sim::load()
       }
 
       sts = gdh_AttrRefToPointer(&oaref, (void**)&ap);
-      if (EVEN(sts)) {
-        printf("** Unable to link to object %s, line %d\n", line_elem[1],
-            line_cnt);
+      if (EVEN(sts))
+      {
+        printf("** Unable to link to object %s, line %d\n", line_elem[1], line_cnt);
         ap = 0;
         continue;
       }
-    } else {
+    }
+    else
+    {
       if (!ap)
         continue;
 
-      nr = dcli_parse(line, " 	", "", (char*)line_elem,
-          sizeof(line_elem) / sizeof(line_elem[0]), sizeof(line_elem[0]), 1);
+      nr = dcli_parse(line, " 	", "", (char*)line_elem, sizeof(line_elem) / sizeof(line_elem[0]),
+                      sizeof(line_elem[0]), 1);
       if (nr != 2)
         continue;
 
@@ -284,12 +309,12 @@ pwr_tStatus rt_sim::load()
       if (EVEN(sts))
         continue;
 
-      sts = gdh_GetAttributeCharAttrref(
-          &aref, &a_tid, &a_size, &a_offs, &a_elem);
+      sts = gdh_GetAttributeCharAttrref(&aref, &a_tid, &a_size, &a_offs, &a_elem);
       if (EVEN(sts))
         continue;
 
-      switch (a_tid) {
+      switch (a_tid)
+      {
       case pwr_eType_String:
       case pwr_eType_Text:
       case pwr_eType_Objid:
@@ -297,18 +322,16 @@ pwr_tStatus rt_sim::load()
       case pwr_eType_ClassId:
       case pwr_eType_TypeId:
       case pwr_eType_CastId:
-        if (line_elem[1][0] == '"'
-            && line_elem[1][strlen(line_elem[1]) - 1] == '"') {
+        if (line_elem[1][0] == '"' && line_elem[1][strlen(line_elem[1]) - 1] == '"')
+        {
           line_elem[1][strlen(line_elem[1]) - 1] = 0;
-          sts = gdh_AttrStringToValue(
-              a_tid, &line_elem[1][1], buffer, sizeof(buffer), a_size);
-        } else
-          sts = gdh_AttrStringToValue(
-              a_tid, line_elem[1], buffer, sizeof(buffer), a_size);
+          sts = gdh_AttrStringToValue(a_tid, &line_elem[1][1], buffer, sizeof(buffer), a_size);
+        }
+        else
+          sts = gdh_AttrStringToValue(a_tid, line_elem[1], buffer, sizeof(buffer), a_size);
         break;
       default:
-        sts = gdh_AttrStringToValue(
-            a_tid, line_elem[1], buffer, sizeof(buffer), a_size);
+        sts = gdh_AttrStringToValue(a_tid, line_elem[1], buffer, sizeof(buffer), a_size);
       }
       if (EVEN(sts))
         continue;
@@ -334,13 +357,14 @@ pwr_tStatus rt_sim::store()
   dcli_translate_filename(fname, conf->LoadFile);
 
   fp = fopen(fname, "w");
-  if (!fp) {
+  if (!fp)
+  {
     printf("Unable to open file \"%s\"\n", fname);
     return SIM__FILE;
   }
 
-  for (sts = gdh_GetRootList(&oid); ODD(sts);
-       sts = gdh_GetNextSibling(oid, &oid)) {
+  for (sts = gdh_GetRootList(&oid); ODD(sts); sts = gdh_GetNextSibling(oid, &oid))
+  {
     sts = print_object(fp, oid);
     if (EVEN(sts))
       return sts;
@@ -360,7 +384,8 @@ void rt_sim::init(qcom_sQid* qid)
   pwr_tStatus sts;
 
   sts = gdh_Init("rt_sim");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     exit(sts);
   }
@@ -368,7 +393,8 @@ void rt_sim::init(qcom_sQid* qid)
   errh_Init("pwr_sim", errh_eAnix_sim);
   errh_SetStatus(PWR__SRVSTARTUP);
 
-  if (!qcom_Init(&sts, 0, "pwr_sim")) {
+  if (!qcom_Init(&sts, 0, "pwr_sim"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -376,14 +402,16 @@ void rt_sim::init(qcom_sQid* qid)
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, qid, &qini)) {
+  if (!qcom_Bind(&sts, qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
@@ -392,12 +420,14 @@ void rt_sim::init(qcom_sQid* qid)
 
 void rt_sim::clear_timers()
 {
-  for (unsigned int i = 0; i < thread_cnt; i++) {
+  for (unsigned int i = 0; i < thread_cnt; i++)
+  {
     void *cp, *next;
 
     cp = RELPTR(threadp[i]->TimerStart);
     threadp[i]->TimerStart = 0;
-    while (cp) {
+    while (cp)
+    {
       next = RELPTR(((plc_sTimer*)cp)->TimerNext);
       ((plc_sTimer*)cp)->TimerNext = 0;
       cp = next;
@@ -405,7 +435,8 @@ void rt_sim::clear_timers()
   }
 }
 
-typedef struct {
+typedef struct
+{
   pwr_tCid cid;
   unsigned int timer_offset;
 } sim_sTimerObject;
@@ -417,39 +448,44 @@ void rt_sim::restore_timers(int thread_idx, pwr_tOid oid)
   pwr_tCid cid;
   char* op;
   plc_sTimer* timerp;
-  sim_sTimerObject tlist[]
-      = { { pwr_cClass_ASup, offsetof(pwr_sClass_ASup, TimerFlag) },
-          { pwr_cClass_dorder, offsetof(pwr_sClass_dorder, TimerFlag) },
-          { pwr_cClass_drive, offsetof(pwr_sClass_drive, TimerFlag) },
-          { pwr_cClass_DSup, offsetof(pwr_sClass_DSup, TimerFlag) },
-          { pwr_cClass_inc3p, offsetof(pwr_sClass_inc3p, TimerFlag) },
-          { pwr_cClass_lorder, offsetof(pwr_sClass_lorder, TimerFlag) },
-          { pwr_cClass_mvalve, offsetof(pwr_sClass_mvalve, TimerFlag) },
-          { pwr_cClass_pos3p, offsetof(pwr_sClass_pos3p, TimerFlag) },
-          { pwr_cClass_posit, offsetof(pwr_sClass_posit, TimerFlag) },
-          { pwr_cClass_pulse, offsetof(pwr_sClass_pulse, TimerFlag) },
-          { pwr_cClass_timer, offsetof(pwr_sClass_timer, TimerFlag) },
-          { pwr_cClass_valve, offsetof(pwr_sClass_valve, TimerFlag) },
-          { pwr_cClass_waith, offsetof(pwr_sClass_waith, TimerFlag) },
-          { pwr_cClass_wait, offsetof(pwr_sClass_wait, TimerFlag) }, { 0, 0 } };
+  sim_sTimerObject tlist[] = {{pwr_cClass_ASup, offsetof(pwr_sClass_ASup, TimerFlag)},
+                              {pwr_cClass_dorder, offsetof(pwr_sClass_dorder, TimerFlag)},
+                              {pwr_cClass_drive, offsetof(pwr_sClass_drive, TimerFlag)},
+                              {pwr_cClass_DSup, offsetof(pwr_sClass_DSup, TimerFlag)},
+                              {pwr_cClass_inc3p, offsetof(pwr_sClass_inc3p, TimerFlag)},
+                              {pwr_cClass_lorder, offsetof(pwr_sClass_lorder, TimerFlag)},
+                              {pwr_cClass_mvalve, offsetof(pwr_sClass_mvalve, TimerFlag)},
+                              {pwr_cClass_pos3p, offsetof(pwr_sClass_pos3p, TimerFlag)},
+                              {pwr_cClass_posit, offsetof(pwr_sClass_posit, TimerFlag)},
+                              {pwr_cClass_pulse, offsetof(pwr_sClass_pulse, TimerFlag)},
+                              {pwr_cClass_timer, offsetof(pwr_sClass_timer, TimerFlag)},
+                              {pwr_cClass_valve, offsetof(pwr_sClass_valve, TimerFlag)},
+                              {pwr_cClass_waith, offsetof(pwr_sClass_waith, TimerFlag)},
+                              {pwr_cClass_wait, offsetof(pwr_sClass_wait, TimerFlag)},
+                              {0, 0}};
 
   sts = gdh_GetObjectClass(oid, &cid);
   if (EVEN(sts))
     throw co_error(sts);
 
   // If activated timer, insert object in thread timerlist
-  for (unsigned int i = 0; tlist[i].cid != 0; i++) {
-    if (cid == tlist[i].cid) {
+  for (unsigned int i = 0; tlist[i].cid != 0; i++)
+  {
+    if (cid == tlist[i].cid)
+    {
       sts = gdh_ObjidToPointer(oid, (void**)&op);
       if (EVEN(sts))
         throw co_error(sts);
 
       timerp = (plc_sTimer*)(op + tlist[i].timer_offset);
-      if (timerp->TimerFlag) {
-        if (timerp->TimerCount > 0) {
+      if (timerp->TimerFlag)
+      {
+        if (timerp->TimerCount > 0)
+        {
           timerp->TimerNext = threadp[thread_idx]->TimerStart;
           PTRREL(&threadp[thread_idx]->TimerStart, &timerp->TimerFlag);
-        } else
+        }
+        else
           ((plc_sTimer*)(op + tlist[i].timer_offset))->TimerFlag = 0;
       }
       break;
@@ -457,8 +493,8 @@ void rt_sim::restore_timers(int thread_idx, pwr_tOid oid)
   }
 
   // Examine children
-  for (sts = gdh_GetChild(oid, &child); ODD(sts);
-       sts = gdh_GetNextSibling(child, &child)) {
+  for (sts = gdh_GetChild(oid, &child); ODD(sts); sts = gdh_GetNextSibling(child, &child))
+  {
     restore_timers(thread_idx, child);
   }
 }
@@ -469,10 +505,11 @@ void rt_sim::restore_timers()
   pwr_tOid plcoid;
   pwr_tStatus sts;
 
-  for (unsigned int i = 0; i < thread_cnt; i++) {
+  for (unsigned int i = 0; i < thread_cnt; i++)
+  {
     // Find all PlcPgm for this thread
-    for (sts = gdh_GetClassList(pwr_cClass_plc, &plcoid); ODD(sts);
-         sts = gdh_GetNextObject(plcoid, &plcoid)) {
+    for (sts = gdh_GetClassList(pwr_cClass_plc, &plcoid); ODD(sts); sts = gdh_GetNextObject(plcoid, &plcoid))
+    {
       sts = gdh_ObjidToPointer(plcoid, (void**)&plcp);
       if (EVEN(sts))
         throw co_error(sts);
@@ -489,7 +526,8 @@ void rt_sim::delete_children(pwr_tOid oid)
   pwr_tOid coid, next;
 
   int last = 0;
-  for (sts = gdh_GetChild(oid, &coid); ODD(sts);) {
+  for (sts = gdh_GetChild(oid, &coid); ODD(sts);)
+  {
     sts = gdh_GetNextSibling(coid, &next);
     if (EVEN(sts))
       last = 1;
@@ -515,9 +553,10 @@ void rt_sim::clear_nmps(sim_eNMpsClear mode)
   pwr_tOid oid;
 
   // Unref and remove all data objects in NMps cells
-  for (int i = 0; cellclass[i]; i++) {
-    for (sts = gdh_GetClassList(cellclass[i], &oid); ODD(sts);
-         sts = gdh_GetNextObject(oid, &oid)) {
+  for (int i = 0; cellclass[i]; i++)
+  {
+    for (sts = gdh_GetClassList(cellclass[i], &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+    {
       pwr_sClass_NMpsCell* cellp;
       plc_t_DataInfo* dip;
 
@@ -525,12 +564,12 @@ void rt_sim::clear_nmps(sim_eNMpsClear mode)
       if (EVEN(sts))
         throw co_error(sts);
 
-      if (mode == sim_eNMpsClear_NoBackup
-          && cellp->Function & NMPS_CELLFUNC_BACKUP)
+      if (mode == sim_eNMpsClear_NoBackup && cellp->Function & NMPS_CELLFUNC_BACKUP)
         continue;
 
       dip = (plc_t_DataInfo*)&cellp->Data1P;
-      for (int i = 0; i < cellp->LastIndex; i++) {
+      for (int i = 0; i < cellp->LastIndex; i++)
+      {
         gdh_UnrefObjectInfo(dip->Data_Dlid);
         memset(dip, 0, sizeof(*dip));
         dip++;
@@ -546,13 +585,14 @@ void rt_sim::clear_nmps(sim_eNMpsClear mode)
   }
 
   // Remove all dynamic objects
-  for (sts = gdh_GetVolumeList(&vid); ODD(sts);
-       sts = gdh_GetNextVolume(vid, &vid)) {
+  for (sts = gdh_GetVolumeList(&vid); ODD(sts); sts = gdh_GetNextVolume(vid, &vid))
+  {
     sts = gdh_GetVolumeInfo(vid, &info);
     if (EVEN(sts))
       throw co_error(sts);
 
-    if (info.cid == pwr_eClass_DynamicVolume) {
+    if (info.cid == pwr_eClass_DynamicVolume)
+    {
       oid.oix = 0;
       oid.vid = vid;
 
@@ -567,9 +607,10 @@ void rt_sim::store_nmps()
   pwr_tOid oid;
   int backup_found = 0;
 
-  for (int i = 0; cellclass[i]; i++) {
-    for (sts = gdh_GetClassList(cellclass[i], &oid); ODD(sts);
-         sts = gdh_GetNextObject(oid, &oid)) {
+  for (int i = 0; cellclass[i]; i++)
+  {
+    for (sts = gdh_GetClassList(cellclass[i], &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+    {
       pwr_sClass_NMpsCell* cellp;
 
       sts = gdh_ObjidToPointer(oid, (void**)&cellp);
@@ -581,10 +622,12 @@ void rt_sim::store_nmps()
     }
   }
 
-  if (backup_found) {
+  if (backup_found)
+  {
     // Copy nmps backup files
     sts = gdh_GetClassList(pwr_cClass_NMpsBackupConfig, &oid);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       pwr_sClass_NMpsBackupConfig* bckp;
       char cmd[700];
       pwr_tFileName fname;
@@ -599,8 +642,7 @@ void rt_sim::store_nmps()
         *s = 0;
       strcat(fname, "_nmpsbck");
 
-      sprintf(cmd, "cp %s1 %s.bck1;cp %s2 %s.bck2", bckp->BackupFile, fname,
-          bckp->BackupFile, fname);
+      sprintf(cmd, "cp %s1 %s.bck1;cp %s2 %s.bck2", bckp->BackupFile, fname, bckp->BackupFile, fname);
       system(cmd);
     }
   }
@@ -624,7 +666,8 @@ void rt_sim::load_nmps()
 void rt_sim::store_state()
 {
   // Store current state
-  for (unsigned int i = 0; i < plcpgm_cnt; i++) {
+  for (unsigned int i = 0; i < plcpgm_cnt; i++)
+  {
     plcpgm_stored_scanoff[i] = windowplcp[i]->ScanOff;
   }
   state_stored = 1;
@@ -634,7 +677,8 @@ void rt_sim::scan()
 {
   pwr_tStatus sts;
 
-  if (!ioconf->IOSimulFlag) {
+  if (!ioconf->IOSimulFlag)
+  {
     conf->Message = SIM__SIMULFLAG;
     conf->PlcHalt = 0;
     conf->PlcContinue = 0;
@@ -650,12 +694,14 @@ void rt_sim::scan()
     conf->Message = 0;
 
   // Set PlcPgm thread and plcpgm status
-  for (unsigned int i = 0; i < plcpgm_cnt; i++) {
+  for (unsigned int i = 0; i < plcpgm_cnt; i++)
+  {
     conf->PlcPgmThreadStatus[i] = conf->ThreadStatus[plcpgm_thread_idx[i]];
     conf->PlcPgmStatus[i] = windowplcp[i]->ScanOff ? SIM__SCANOFF : SIM__SCANON;
   }
 
-  if (conf->Disable) {
+  if (conf->Disable)
+  {
     if (conf->PlcHalt)
       conf->PlcHalt = 0;
     if (conf->PlcContinue)
@@ -673,15 +719,19 @@ void rt_sim::scan()
     if (conf->Reset)
       conf->Reset = 0;
 
-    if (!disable_old) {
+    if (!disable_old)
+    {
       // Set running status on all threads
-      for (unsigned int i = 0; i < thread_cnt; i++) {
+      for (unsigned int i = 0; i < thread_cnt; i++)
+      {
         if (conf->ThreadStatus[i] == SIM__THREAD_HALT)
           conf->ThreadStatus[i] = SIM__THREAD_RUNNING;
       }
       // Set scan on of plcpgm
-      if (state_stored) {
-        for (unsigned int i = 0; i < plcpgm_cnt; i++) {
+      if (state_stored)
+      {
+        for (unsigned int i = 0; i < plcpgm_cnt; i++)
+        {
           windowplcp[i]->ScanOff = plcpgm_stored_scanoff[i];
         }
       }
@@ -697,7 +747,8 @@ void rt_sim::scan()
     return;
   }
 
-  if (!conf->Disable && disable_old) {
+  if (!conf->Disable && disable_old)
+  {
     conf->Message = SIM__ACTIVE;
 
     store_state();
@@ -706,35 +757,40 @@ void rt_sim::scan()
   disable_old = conf->Disable;
 
   // Select all threads request
-  if (conf->SelectAllThreads) {
+  if (conf->SelectAllThreads)
+  {
     conf->SelectAllThreads = 0;
     for (unsigned int i = 0; i < thread_cnt; i++)
       conf->ThreadSelected[i] = 1;
   }
 
   // Clear all threads request
-  if (conf->ClearAllThreads) {
+  if (conf->ClearAllThreads)
+  {
     conf->ClearAllThreads = 0;
     for (unsigned int i = 0; i < thread_cnt; i++)
       conf->ThreadSelected[i] = 0;
   }
 
   // Select all plcpgm request
-  if (conf->SelectAllPlcPgm) {
+  if (conf->SelectAllPlcPgm)
+  {
     conf->SelectAllPlcPgm = 0;
     for (unsigned int i = 0; i < plcpgm_cnt; i++)
       conf->PlcPgmSelected[i] = 1;
   }
 
   // Clear all plcpgm request
-  if (conf->ClearAllPlcPgm) {
+  if (conf->ClearAllPlcPgm)
+  {
     conf->ClearAllPlcPgm = 0;
     for (unsigned int i = 0; i < plcpgm_cnt; i++)
       conf->PlcPgmSelected[i] = 0;
   }
 
   // Plc halt request
-  if (conf->PlcHalt) {
+  if (conf->PlcHalt)
+  {
     conf->PlcHalt = 0;
     conf->PlcContinueStatus = 0;
 
@@ -743,25 +799,30 @@ void rt_sim::scan()
 
     // Count selected threads in running state
     select_thread_cnt = 0;
-    for (unsigned int i = 0; i < thread_cnt; i++) {
-      if (conf->ThreadSelected[i]
-          && conf->ThreadStatus[i] == SIM__THREAD_RUNNING)
+    for (unsigned int i = 0; i < thread_cnt; i++)
+    {
+      if (conf->ThreadSelected[i] && conf->ThreadStatus[i] == SIM__THREAD_RUNNING)
         select_thread_cnt++;
     }
 
-    if (select_thread_cnt > 0) {
+    if (select_thread_cnt > 0)
+    {
       conf->PlcHaltOrder = select_thread_cnt;
       halt_order_active = true;
       conf->PlcHaltStatus = SIM__THREADRESPOND;
       conf->Message = SIM__THREADRESPOND;
-    } else {
+    }
+    else
+    {
       conf->PlcHaltStatus = SIM__NORUNNING;
       conf->Message = SIM__NORUNNING;
     }
   }
 
-  if (halt_order_active) {
-    if (conf->PlcHaltOrder == 0) {
+  if (halt_order_active)
+  {
+    if (conf->PlcHaltOrder == 0)
+    {
       conf->PlcHaltStatus = SIM__SUCCESS;
       conf->Message = SIM__HALTED;
       halt_order_active = false;
@@ -769,7 +830,8 @@ void rt_sim::scan()
   }
 
   // Plc continue request
-  if (conf->PlcContinue) {
+  if (conf->PlcContinue)
+  {
     conf->PlcContinue = 0;
     conf->PlcHaltStatus = 0;
 
@@ -778,66 +840,82 @@ void rt_sim::scan()
 
     // Count selected threads
     select_thread_cnt = 0;
-    for (unsigned int i = 0; i < thread_cnt; i++) {
+    for (unsigned int i = 0; i < thread_cnt; i++)
+    {
       if (conf->ThreadSelected[i] && conf->ThreadStatus[i] == SIM__THREAD_HALT)
         select_thread_cnt++;
     }
 
-    if (select_thread_cnt > 0) {
+    if (select_thread_cnt > 0)
+    {
       conf->PlcContinueOrder = select_thread_cnt;
       continue_order_active = true;
       conf->Message = SIM__THREADRESPOND;
-    } else {
+    }
+    else
+    {
       conf->Message = SIM__NOHALTED;
     }
     conf->PlcStepOrder = 0;
   }
 
-  if (continue_order_active) {
-    if (conf->PlcContinueOrder == 0) {
+  if (continue_order_active)
+  {
+    if (conf->PlcContinueOrder == 0)
+    {
       continue_order_active = false;
       conf->Message = SIM__CONTINUED;
     }
   }
 
   // Plc step request
-  if (conf->PlcStep) {
+  if (conf->PlcStep)
+  {
     conf->PlcStep = 0;
 
     if (!state_stored)
       store_state();
 
-    if (conf->PlcStepOrder > 0) {
+    if (conf->PlcStepOrder > 0)
+    {
       // Previous step not ready yet
       conf->Message = SIM__NOTREADY;
-    } else {
+    }
+    else
+    {
       // Count selected threads
       select_thread_cnt = 0;
-      for (unsigned int i = 0; i < thread_cnt; i++) {
-        if (conf->ThreadSelected[i]
-            && conf->ThreadStatus[i] == SIM__THREAD_HALT)
+      for (unsigned int i = 0; i < thread_cnt; i++)
+      {
+        if (conf->ThreadSelected[i] && conf->ThreadStatus[i] == SIM__THREAD_HALT)
           select_thread_cnt++;
       }
 
-      if (select_thread_cnt > 0) {
+      if (select_thread_cnt > 0)
+      {
         conf->PlcStepOrder = select_thread_cnt * 2;
         step_order_active = true;
         conf->Message = SIM__THREADRESPOND;
-      } else {
+      }
+      else
+      {
         conf->Message = SIM__NOHALTED;
       }
     }
   }
 
-  if (step_order_active) {
-    if (conf->PlcStepOrder == 0) {
+  if (step_order_active)
+  {
+    if (conf->PlcStepOrder == 0)
+    {
       step_order_active = false;
       conf->Message = SIM__STEPPED;
     }
   }
 
   // Load database request
-  if (conf->Load) {
+  if (conf->Load)
+  {
     conf->Load = 0;
 
     if (!state_stored)
@@ -845,16 +923,21 @@ void rt_sim::scan()
 
     // Check that all thread are halted
     int not_halted = 0;
-    for (unsigned int i = 0; i < thread_cnt; i++) {
-      if (conf->ThreadStatus[i] != SIM__THREAD_HALT) {
+    for (unsigned int i = 0; i < thread_cnt; i++)
+    {
+      if (conf->ThreadStatus[i] != SIM__THREAD_HALT)
+      {
         not_halted = 1;
         break;
       }
     }
 
-    if (not_halted) {
+    if (not_halted)
+    {
       conf->Message = SIM__NOTALLHALTED;
-    } else {
+    }
+    else
+    {
       conf->Message = SIM__LOADING;
 
       qcom_SignalOr(&sts, &qcom_cQini, ini_mEvent_simLoadStart);
@@ -885,15 +968,18 @@ void rt_sim::scan()
     }
   }
 
-  if (load_order_active) {
-    if (conf->PlcLoadOrder == 0) {
+  if (load_order_active)
+  {
+    if (conf->PlcLoadOrder == 0)
+    {
       load_order_active = false;
 
       conf->Message = SIM__LOADED;
     }
   }
 
-  if (conf->Store) {
+  if (conf->Store)
+  {
     conf->Store = 0;
 
     if (!state_stored)
@@ -901,16 +987,21 @@ void rt_sim::scan()
 
     // Check that all thread are halted
     int not_halted = 0;
-    for (unsigned int i = 0; i < thread_cnt; i++) {
-      if (conf->ThreadStatus[i] != SIM__THREAD_HALT) {
+    for (unsigned int i = 0; i < thread_cnt; i++)
+    {
+      if (conf->ThreadStatus[i] != SIM__THREAD_HALT)
+      {
         not_halted = 1;
         break;
       }
     }
 
-    if (not_halted) {
+    if (not_halted)
+    {
       conf->Message = SIM__NOTALLHALTED;
-    } else {
+    }
+    else
+    {
       conf->Message = SIM__STORING;
       store();
       conf->Message = SIM__STORED;
@@ -918,15 +1009,18 @@ void rt_sim::scan()
   }
 
   // PlcPgm scan on request
-  if (conf->PlcPgmScanOn) {
+  if (conf->PlcPgmScanOn)
+  {
     conf->PlcPgmScanOn = 0;
 
     if (!state_stored)
       store_state();
 
     int found = 0;
-    for (unsigned int i = 0; i < plcpgm_cnt; i++) {
-      if (conf->PlcPgmSelected[i]) {
+    for (unsigned int i = 0; i < plcpgm_cnt; i++)
+    {
+      if (conf->PlcPgmSelected[i])
+      {
         windowplcp[i]->ScanOff = 0;
         conf->PlcPgmStatus[i] = SIM__SCANON;
         found = 1;
@@ -939,15 +1033,18 @@ void rt_sim::scan()
   }
 
   // PlcPgm scan off request
-  if (conf->PlcPgmScanOff) {
+  if (conf->PlcPgmScanOff)
+  {
     conf->PlcPgmScanOff = 0;
 
     if (!state_stored)
       store_state();
 
     int found = 0;
-    for (unsigned int i = 0; i < plcpgm_cnt; i++) {
-      if (conf->PlcPgmSelected[i]) {
+    for (unsigned int i = 0; i < plcpgm_cnt; i++)
+    {
+      if (conf->PlcPgmSelected[i])
+      {
         windowplcp[i]->ScanOff = 1;
         conf->PlcPgmStatus[i] = SIM__SCANOFF;
         found = 1;
@@ -959,12 +1056,15 @@ void rt_sim::scan()
       conf->Message = SIM__NOSELPLCPGM;
   }
 
-  if (conf->Reset) {
+  if (conf->Reset)
+  {
     conf->Reset = 0;
 
     // Revert to stored state
-    if (state_stored) {
-      for (unsigned int i = 0; i < plcpgm_cnt; i++) {
+    if (state_stored)
+    {
+      for (unsigned int i = 0; i < plcpgm_cnt; i++)
+      {
         windowplcp[i]->ScanOff = plcpgm_stored_scanoff[i];
       }
     }
@@ -976,12 +1076,14 @@ void rt_sim::scan()
 
     // Set continue order on halted threads
     select_thread_cnt = 0;
-    for (unsigned int i = 0; i < thread_cnt; i++) {
+    for (unsigned int i = 0; i < thread_cnt; i++)
+    {
       if (conf->ThreadStatus[i] == SIM__THREAD_HALT)
         select_thread_cnt++;
     }
 
-    if (select_thread_cnt > 0) {
+    if (select_thread_cnt > 0)
+    {
       conf->PlcContinueOrder = select_thread_cnt;
       continue_order_active = true;
       conf->Message = SIM__THREADRESPOND;
@@ -989,9 +1091,7 @@ void rt_sim::scan()
   }
 }
 
-void rt_sim::close()
-{
-}
+void rt_sim::close() {}
 
 void rt_sim::open()
 {
@@ -1004,13 +1104,16 @@ void rt_sim::open()
 
   // Find server configuration object SimulateConfig
   sts = gdh_GetClassList(pwr_cClass_SimulateConfig, &oid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(oid, (void**)&conf);
     if (EVEN(sts))
       throw co_error(sts);
 
     aproc_RegisterObject(oid);
-  } else {
+  }
+  else
+  {
     errh_Info("No Simulate configuration");
     errh_SetStatus(0);
     exit(0);
@@ -1018,11 +1121,14 @@ void rt_sim::open()
 
   // Find IOHandler
   sts = gdh_GetClassList(pwr_cClass_IOHandler, &oid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(oid, (void**)&ioconf);
     if (EVEN(sts))
       throw co_error(sts);
-  } else {
+  }
+  else
+  {
     errh_Fatal("Unable to find IOHandler object, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(0);
@@ -1030,15 +1136,15 @@ void rt_sim::open()
 
   // Get all plc threads and insert into array
   thread_cnt = 0;
-  for (sts = gdh_GetClassList(pwr_cClass_PlcThread, &oid); ODD(sts);
-       sts = gdh_GetNextObject(oid, &oid)) {
+  for (sts = gdh_GetClassList(pwr_cClass_PlcThread, &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+  {
     conf->PlcThreads[thread_cnt] = oid;
     conf->ThreadSelected[thread_cnt] = 1;
 
     pwr_tAttrRef aref = cdh_ObjidToAref(oid);
-    sts = gdh_DLRefObjectInfoAttrref(
-        &aref, (void**)&threadp[thread_cnt], &thread_dlid[thread_cnt]);
-    if (EVEN(sts)) {
+    sts = gdh_DLRefObjectInfoAttrref(&aref, (void**)&threadp[thread_cnt], &thread_dlid[thread_cnt]);
+    if (EVEN(sts))
+    {
       errh_Fatal("Unable to link to plc thread object, %m", sts);
       errh_SetStatus(PWR__SRVTERM);
       exit(0);
@@ -1051,20 +1157,21 @@ void rt_sim::open()
 
   // Get all plcpgm and insert into array
   plcpgm_cnt = 0;
-  for (sts = gdh_GetClassList(pwr_cClass_plc, &oid); ODD(sts);
-       sts = gdh_GetNextObject(oid, &oid)) {
+  for (sts = gdh_GetClassList(pwr_cClass_plc, &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+  {
     conf->PlcPgm[plcpgm_cnt] = oid;
     conf->PlcPgmSelected[plcpgm_cnt] = 1;
 
     int found = 0;
-    for (sts = gdh_GetChild(oid, &child); ODD(sts);
-         sts = gdh_GetNextSibling(child, &child)) {
+    for (sts = gdh_GetChild(oid, &child); ODD(sts); sts = gdh_GetNextSibling(child, &child))
+    {
       sts = gdh_GetObjectClass(child, &cid);
-      if (cid == pwr_cClass_windowplc) {
+      if (cid == pwr_cClass_windowplc)
+      {
         pwr_tAttrRef aref = cdh_ObjidToAref(child);
-        sts = gdh_DLRefObjectInfoAttrref(&aref, (void**)&windowplcp[plcpgm_cnt],
-            &windowplc_dlid[plcpgm_cnt]);
-        if (EVEN(sts)) {
+        sts = gdh_DLRefObjectInfoAttrref(&aref, (void**)&windowplcp[plcpgm_cnt], &windowplc_dlid[plcpgm_cnt]);
+        if (EVEN(sts))
+        {
           errh_Fatal("Unable to link to plc window object, %m", sts);
           errh_SetStatus(PWR__SRVTERM);
           exit(0);
@@ -1073,7 +1180,8 @@ void rt_sim::open()
         break;
       }
     }
-    if (!found) {
+    if (!found)
+    {
       errh_Error("Unable to find plc window object");
     }
 
@@ -1083,14 +1191,17 @@ void rt_sim::open()
       throw co_error(sts);
 
     sts = gdh_GetObjectInfoAttrref(&taref, &thread_oid, sizeof(thread_oid));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_Error("No valid thread object in PlcPgm");
       continue;
     }
 
     found = 0;
-    for (unsigned int i = 0; i < thread_cnt; i++) {
-      if (cdh_ObjidIsEqual(thread_oid, conf->PlcThreads[i])) {
+    for (unsigned int i = 0; i < thread_cnt; i++)
+    {
+      if (cdh_ObjidIsEqual(thread_oid, conf->PlcThreads[i]))
+      {
         plcpgm_thread_idx[plcpgm_cnt] = i;
         found = 1;
         break;
@@ -1123,9 +1234,12 @@ int main(int argc, char* argv[])
   sim = new rt_sim();
   sim->init(&qid);
 
-  try {
+  try
+  {
     sim->open();
-  } catch (co_error& e) {
+  }
+  catch (co_error& e)
+  {
     errh_Error((char*)e.what().c_str());
     errh_Fatal("rt_sim aborting");
     errh_SetStatus(PWR__SRVTERM);
@@ -1136,33 +1250,43 @@ int main(int argc, char* argv[])
   errh_SetStatus(PWR__SRUN);
 
   first_scan = true;
-  for (;;) {
-    if (first_scan) {
+  for (;;)
+  {
+    if (first_scan)
+    {
       tmo = (int)(sim->scantime() * 1000 - 1);
     }
 
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &qid, &get, tmo);
-    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+    {
       if (!swap)
         sim->scan();
-    } else {
+    }
+    else
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop && !swap) {
+      if (new_event.b.oldPlcStop && !swap)
+      {
         errh_SetStatus(PWR__SRVRESTART);
         sim->conf->Status = PWR__SRVRESTART;
         swap = 1;
         sim->close();
-      } else if (new_event.b.swapDone && swap) {
+      }
+      else if (new_event.b.swapDone && swap)
+      {
         swap = 0;
         sim->open();
         errh_SetStatus(PWR__SRUN);
         sim->conf->Status = PWR__SRUN;
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         exit(0);
       }
     }

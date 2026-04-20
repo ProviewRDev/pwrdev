@@ -41,8 +41,7 @@
 #include "wb_pwrb_msg.h"
 #include "wb_session.h"
 
-static pwr_tStatus PostCreate(
-    ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
 {
   pwr_tOid oid;
   pwr_tOid toid;
@@ -62,30 +61,31 @@ static pwr_tStatus PostCreate(
   if (EVEN(sts))
     return sts;
 
-  for (int i = 0; i < rows; i++) {
-    if (bodydef[i].Par->Param.TypeRef == pwr_cClass_PlcEmbed) {
+  for (int i = 0; i < rows; i++)
+  {
+    if (bodydef[i].Par->Param.TypeRef == pwr_cClass_PlcEmbed)
+    {
       sts = ldh_GetClassList(Session, pwr_cClass_PlcThread, &oid);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         cnt++;
         toid = oid;
         sts = ldh_GetNextObject(Session, oid, &oid);
       }
 
-      if (cnt > 0) {
+      if (cnt > 0)
+      {
         pwr_tAttrRef object_aref, plcembed_aref, threadobject_aref;
 
         object_aref = cdh_ObjidToAref(Object);
-        sts = ldh_ArefANameToAref(
-            Session, &object_aref, bodydef[i].ParName, &plcembed_aref);
+        sts = ldh_ArefANameToAref(Session, &object_aref, bodydef[i].ParName, &plcembed_aref);
         if (EVEN(sts))
           return sts;
-        sts = ldh_ArefANameToAref(
-            Session, &plcembed_aref, "ThreadObject", &threadobject_aref);
+        sts = ldh_ArefANameToAref(Session, &plcembed_aref, "ThreadObject", &threadobject_aref);
         if (EVEN(sts))
           return sts;
 
-        sts = ldh_WriteAttribute(
-            Session, &threadobject_aref, (void*)&toid, sizeof(toid));
+        sts = ldh_WriteAttribute(Session, &threadobject_aref, (void*)&toid, sizeof(toid));
       }
       break;
     }
@@ -98,5 +98,4 @@ static pwr_tStatus PostCreate(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(PlcEmbed)
-    = { pwr_BindMethod(PostCreate), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(PlcEmbed) = {pwr_BindMethod(PostCreate), pwr_NullMethod};

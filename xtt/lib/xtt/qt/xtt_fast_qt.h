@@ -41,13 +41,13 @@
 
 #include "xtt_fast.h"
 
-class XttFastQt : public XttFast {
+class XttFastQt : public XttFast
+{
 public:
-  XttFastQt(void* xn_parent_ctx, char* xn_name, QWidget** w,
-      pwr_sAttrRef* fast_arp, int width, int height, unsigned int xn_options,
-      int xn_color_theme, void* basewidget, int* sts);
-  XttFastQt(void* parent_ctx, const char* name, QWidget** w, char* filename,
-      int xn_color_theme, void* basewidget, int* sts);
+  XttFastQt(void* xn_parent_ctx, char* xn_name, QWidget** w, pwr_sAttrRef* fast_arp, int width, int height,
+            unsigned int xn_options, int xn_color_theme, void* basewidget, int* sts);
+  XttFastQt(void* parent_ctx, const char* name, QWidget** w, char* filename, int xn_color_theme,
+            void* basewidget, int* sts);
   ~XttFastQt();
 };
 

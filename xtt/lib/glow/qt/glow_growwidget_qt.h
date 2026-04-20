@@ -38,10 +38,8 @@
 
 #include <QWidget>
 
-QWidget* growwidgetqt_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data);
-QWidget* scrolledgrowwidgetqt_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
-    QWidget** growwidget);
+QWidget* growwidgetqt_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data);
+QWidget* scrolledgrowwidgetqt_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
+                                  QWidget** growwidget);
 
 QWidget* grownavwidgetqt_new(QWidget* main_grow);

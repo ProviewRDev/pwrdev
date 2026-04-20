@@ -68,10 +68,8 @@ LOCAL_DATA
 #pragma check_stack(off)
 #endif
 
-FUNCTION PUBLIC INT16 dpgdl_get_data_len(IN INT16 result, IN USIGN8 service,
-                                         IN USIGN8 primitive,
-                                         IN USIGN8 FAR* data_ptr,
-                                         OUT INT16 FAR* data_len_ptr)
+FUNCTION PUBLIC INT16 dpgdl_get_data_len(IN INT16 result, IN USIGN8 service, IN USIGN8 primitive,
+                                         IN USIGN8 FAR* data_ptr, OUT INT16 FAR* data_len_ptr)
 /*------------------------------------------------------------------------*/
 /* FUNCTIONAL_DESCRIPTION                                                 */
 /*------------------------------------------------------------------------*/
@@ -86,7 +84,7 @@ FUNCTION PUBLIC INT16 dpgdl_get_data_len(IN INT16 result, IN USIGN8 service,
 
   switch (primitive)
   {
-  /*--- USER REQUESTS ----------------------------------------------------*/
+    /*--- USER REQUESTS ----------------------------------------------------*/
 
   case REQ:
   {
@@ -117,14 +115,12 @@ FUNCTION PUBLIC INT16 dpgdl_get_data_len(IN INT16 result, IN USIGN8 service,
     case DP_DOWNLOAD_LOC:
     case DP_DOWNLOAD:
     {
-      if (((T_DP_DOWNLOAD_REQ FAR*)(data_ptr))->data_len >
-          DP_MAX_DOWNLOAD_DATA_LEN)
+      if (((T_DP_DOWNLOAD_REQ FAR*)(data_ptr))->data_len > DP_MAX_DOWNLOAD_DATA_LEN)
       {
         return (E_IF_INVALID_DATA_SIZE);
       }
 
-      *data_len_ptr = sizeof(T_DP_DOWNLOAD_REQ) +
-                      ((T_DP_DOWNLOAD_REQ FAR*)(data_ptr))->data_len;
+      *data_len_ptr = sizeof(T_DP_DOWNLOAD_REQ) + ((T_DP_DOWNLOAD_REQ FAR*)(data_ptr))->data_len;
       break;
     }
 
@@ -145,31 +141,27 @@ FUNCTION PUBLIC INT16 dpgdl_get_data_len(IN INT16 result, IN USIGN8 service,
     case DP_SET_PRM:
     case DP_SET_PRM_LOC:
     {
-      service_data_len = swap_16_intel_motorola(
-          ((T_DP_SET_PRM_REQ FAR*)(data_ptr))->prm_data.prm_data_len);
+      service_data_len = swap_16_intel_motorola(((T_DP_SET_PRM_REQ FAR*)(data_ptr))->prm_data.prm_data_len);
 
       if (service_data_len > DP_MAX_PRM_DATA_LEN)
       {
         return (E_IF_INVALID_DATA_SIZE);
       }
 
-      *data_len_ptr =
-          sizeof(T_DP_SET_PRM_REQ) - sizeof(T_DP_PRM_DATA) + service_data_len;
+      *data_len_ptr = sizeof(T_DP_SET_PRM_REQ) - sizeof(T_DP_PRM_DATA) + service_data_len;
       break;
     }
 
     case DP_CHK_CFG:
     {
-      service_data_len = swap_16_intel_motorola(
-          ((T_DP_CHK_CFG_REQ FAR*)(data_ptr))->cfg_data.cfg_data_len);
+      service_data_len = swap_16_intel_motorola(((T_DP_CHK_CFG_REQ FAR*)(data_ptr))->cfg_data.cfg_data_len);
 
       if (service_data_len > DP_MAX_CFG_DATA_LEN)
       {
         return (E_IF_INVALID_DATA_SIZE);
       }
 
-      *data_len_ptr =
-          sizeof(T_DP_CHK_CFG_REQ) - sizeof(T_DP_CFG_DATA) + service_data_len;
+      *data_len_ptr = sizeof(T_DP_CHK_CFG_REQ) - sizeof(T_DP_CFG_DATA) + service_data_len;
       break;
     }
 
@@ -188,28 +180,25 @@ FUNCTION PUBLIC INT16 dpgdl_get_data_len(IN INT16 result, IN USIGN8 service,
 
     case DP_DATA_EXCHANGE:
     {
-      if (((T_DP_DATA_EXCHANGE_REQ FAR*)(data_ptr))->outp_data_len >
-          DP_MAX_OUTPUT_DATA_LEN)
-      {
-        return (E_IF_INVALID_DATA_SIZE);
-      }
-
-      *data_len_ptr = sizeof(T_DP_DATA_EXCHANGE_REQ) +
-                      ((T_DP_DATA_EXCHANGE_REQ FAR*)(data_ptr))->outp_data_len;
-      break;
-    }
-
-    case DP_SET_SLAVE_ADD:
-    {
-      if (((T_DP_SET_SLAVE_ADD_REQ FAR*)(data_ptr))->rem_slave_data_len >
-          DP_MAX_REM_SLAVE_DATA_LEN)
+      if (((T_DP_DATA_EXCHANGE_REQ FAR*)(data_ptr))->outp_data_len > DP_MAX_OUTPUT_DATA_LEN)
       {
         return (E_IF_INVALID_DATA_SIZE);
       }
 
       *data_len_ptr =
-          sizeof(T_DP_SET_SLAVE_ADD_REQ) +
-          ((T_DP_SET_SLAVE_ADD_REQ FAR*)(data_ptr))->rem_slave_data_len;
+          sizeof(T_DP_DATA_EXCHANGE_REQ) + ((T_DP_DATA_EXCHANGE_REQ FAR*)(data_ptr))->outp_data_len;
+      break;
+    }
+
+    case DP_SET_SLAVE_ADD:
+    {
+      if (((T_DP_SET_SLAVE_ADD_REQ FAR*)(data_ptr))->rem_slave_data_len > DP_MAX_REM_SLAVE_DATA_LEN)
+      {
+        return (E_IF_INVALID_DATA_SIZE);
+      }
+
+      *data_len_ptr =
+          sizeof(T_DP_SET_SLAVE_ADD_REQ) + ((T_DP_SET_SLAVE_ADD_REQ FAR*)(data_ptr))->rem_slave_data_len;
       break;
     }
 
@@ -230,37 +219,32 @@ FUNCTION PUBLIC INT16 dpgdl_get_data_len(IN INT16 result, IN USIGN8 service,
     {
       if ((((T_DP_SET_BUSPARAMETER_REQ FAR*)(data_ptr))->master_user_data_len >
            DP_MAX_SET_BUSPARAMETER_LEN) ||
-          (((T_DP_SET_BUSPARAMETER_REQ FAR*)(data_ptr))->master_user_data_len <
-           DP_MASTER_USER_DATA_LEN))
+          (((T_DP_SET_BUSPARAMETER_REQ FAR*)(data_ptr))->master_user_data_len < DP_MASTER_USER_DATA_LEN))
       {
         return (E_IF_INVALID_DATA_SIZE);
       }
 
-      *data_len_ptr =
-          sizeof(T_DP_SET_BUSPARAMETER_REQ) +
-          ((T_DP_SET_BUSPARAMETER_REQ FAR*)(data_ptr))->master_user_data_len -
-          DP_MASTER_USER_DATA_LEN;
+      *data_len_ptr = sizeof(T_DP_SET_BUSPARAMETER_REQ) +
+                      ((T_DP_SET_BUSPARAMETER_REQ FAR*)(data_ptr))->master_user_data_len -
+                      DP_MASTER_USER_DATA_LEN;
       break;
     }
 
     case DP_SET_MASTER_PARAM:
     {
-      if (((T_DP_SET_MASTER_PARAM_REQ FAR*)(data_ptr))->data_len >
-          DP_MAX_TELEGRAM_LEN)
+      if (((T_DP_SET_MASTER_PARAM_REQ FAR*)(data_ptr))->data_len > DP_MAX_TELEGRAM_LEN)
       {
         return (E_IF_INVALID_DATA_SIZE);
       }
 
-      *data_len_ptr = sizeof(T_DP_SET_MASTER_PARAM_REQ) +
-                      ((T_DP_SET_MASTER_PARAM_REQ FAR*)(data_ptr))->data_len;
+      *data_len_ptr =
+          sizeof(T_DP_SET_MASTER_PARAM_REQ) + ((T_DP_SET_MASTER_PARAM_REQ FAR*)(data_ptr))->data_len;
       break;
     }
 
     case DP_INITIATE:
-      *data_len_ptr =
-          sizeof(T_DP_INITIATE_REQ) +
-          ((T_DP_INITIATE_REQ FAR*)(data_ptr))->add_addr_param.s_len +
-          ((T_DP_INITIATE_REQ FAR*)(data_ptr))->add_addr_param.d_len;
+      *data_len_ptr = sizeof(T_DP_INITIATE_REQ) + ((T_DP_INITIATE_REQ FAR*)(data_ptr))->add_addr_param.s_len +
+                      ((T_DP_INITIATE_REQ FAR*)(data_ptr))->add_addr_param.d_len;
       break;
 
     case DP_ABORT:
@@ -272,13 +256,11 @@ FUNCTION PUBLIC INT16 dpgdl_get_data_len(IN INT16 result, IN USIGN8 service,
       break;
 
     case DP_WRITE:
-      *data_len_ptr =
-          sizeof(T_DP_WRITE_REQ) + ((T_DP_WRITE_REQ FAR*)(data_ptr))->length;
+      *data_len_ptr = sizeof(T_DP_WRITE_REQ) + ((T_DP_WRITE_REQ FAR*)(data_ptr))->length;
       break;
 
     case DP_DATA_TRANSPORT:
-      *data_len_ptr = sizeof(T_DP_DATA_TRANSPORT_REQ) +
-                      ((T_DP_DATA_TRANSPORT_REQ FAR*)(data_ptr))->length;
+      *data_len_ptr = sizeof(T_DP_DATA_TRANSPORT_REQ) + ((T_DP_DATA_TRANSPORT_REQ FAR*)(data_ptr))->length;
       break;
 
     default:
@@ -288,7 +270,7 @@ FUNCTION PUBLIC INT16 dpgdl_get_data_len(IN INT16 result, IN USIGN8 service,
     break;
   } /* case REQ */
 
-  /*---- USER RESPONSES --------------------------------------------------*/
+    /*---- USER RESPONSES --------------------------------------------------*/
 
   case RES:
   {
@@ -309,27 +291,24 @@ FUNCTION PUBLIC INT16 dpgdl_get_data_len(IN INT16 result, IN USIGN8 service,
 
     case DP_UPLOAD:
     {
-      if (((T_DP_UPLOAD_RES_CON FAR*)(data_ptr))->data_len >
-          DP_MAX_UPLOAD_DATA_LEN)
+      if (((T_DP_UPLOAD_RES_CON FAR*)(data_ptr))->data_len > DP_MAX_UPLOAD_DATA_LEN)
       {
         return (E_IF_INVALID_DATA_SIZE);
       }
 
-      *data_len_ptr = sizeof(T_DP_UPLOAD_RES_CON) +
-                      ((T_DP_UPLOAD_RES_CON FAR*)(data_ptr))->data_len;
+      *data_len_ptr = sizeof(T_DP_UPLOAD_RES_CON) + ((T_DP_UPLOAD_RES_CON FAR*)(data_ptr))->data_len;
       break;
     }
 
     case DP_GET_MASTER_DIAG:
     {
-      if (((T_DP_GET_MASTER_DIAG_RES_CON FAR*)(data_ptr))->data_len >
-          DP_MAX_TELEGRAM_LEN)
+      if (((T_DP_GET_MASTER_DIAG_RES_CON FAR*)(data_ptr))->data_len > DP_MAX_TELEGRAM_LEN)
       {
         return (E_IF_INVALID_DATA_SIZE);
       }
 
-      *data_len_ptr = sizeof(T_DP_GET_MASTER_DIAG_RES_CON) +
-                      ((T_DP_GET_MASTER_DIAG_RES_CON FAR*)(data_ptr))->data_len;
+      *data_len_ptr =
+          sizeof(T_DP_GET_MASTER_DIAG_RES_CON) + ((T_DP_GET_MASTER_DIAG_RES_CON FAR*)(data_ptr))->data_len;
       break;
     }
 
@@ -340,7 +319,7 @@ FUNCTION PUBLIC INT16 dpgdl_get_data_len(IN INT16 result, IN USIGN8 service,
     break;
   } /* case RES */
 
-  /*---- WRONG PRIMITIVE -------------------------------------------------*/
+    /*---- WRONG PRIMITIVE -------------------------------------------------*/
 
   default:
     return (E_IF_INVALID_PRIMITIVE);

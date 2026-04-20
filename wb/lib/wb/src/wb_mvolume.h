@@ -36,7 +36,8 @@
 
 #include "wb_volume.h"
 
-class wb_mvolume {
+class wb_mvolume
+{
   wb_mvrepdbs* m_mvrep;
   int m_vid;
 

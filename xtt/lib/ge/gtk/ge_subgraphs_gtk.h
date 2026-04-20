@@ -47,10 +47,11 @@
 /*@{*/
 
 //! Display loaded subgraphs.
-class SubGraphsGtk : public SubGraphs {
+class SubGraphsGtk : public SubGraphs
+{
 public:
-  SubGraphsGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-      const char* xn_name, void* grow_ctx, GtkWidget** w, pwr_tStatus* status);
+  SubGraphsGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name, void* grow_ctx,
+               GtkWidget** w, pwr_tStatus* status);
 
   GtkWidget* parent_wid;
   GtkWidget* subgraphs_form;

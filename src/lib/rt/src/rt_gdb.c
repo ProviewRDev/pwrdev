@@ -55,26 +55,30 @@
 gdb_sLocal* gdbroot = NULL;
 
 /** Compare two keys in class attribute binary tree
-*/
+ */
 
 static int compCatt(ptree_sTable* tp, ptree_sNode* x, ptree_sNode* y)
 {
   gdb_sClassAttrKey* xKey = (gdb_sClassAttrKey*)(tp->g->keyOffset + (char*)x);
   gdb_sClassAttrKey* yKey = (gdb_sClassAttrKey*)(tp->g->keyOffset + (char*)y);
 
-  if (xKey->subCid == yKey->subCid) {
-    if (xKey->hostCid == yKey->hostCid) {
+  if (xKey->subCid == yKey->subCid)
+  {
+    if (xKey->hostCid == yKey->hostCid)
+    {
       if (xKey->idx == yKey->idx)
         return 0;
       else if (xKey->idx < yKey->idx)
         return -1;
       else
         return 1;
-    } else if (xKey->hostCid < yKey->hostCid)
+    }
+    else if (xKey->hostCid < yKey->hostCid)
       return -1;
     else
       return 1;
-  } else if (xKey->subCid < yKey->subCid)
+  }
+  else if (xKey->subCid < yKey->subCid)
     return -1;
   else
     return 1;
@@ -115,45 +119,30 @@ static void evaluateInit(gdb_sInit* ip)
      (a minimal system that need to extend the pool heavily) is
      600k + 255*60k = 15.9M.  */
 
-  errh_Info("Objects      : %d : %d bytes", ip->objects,
-      ip->objects * sizeof(gdb_sObject));
-  errh_Info("Volumes      : %d : %d bytes", ip->volumes,
-      ip->volumes * sizeof(gdb_sVolume));
-  errh_Info("Classes      : %d : %d bytes", ip->classes,
-      ip->classes * sizeof(gdb_sClass));
-  errh_Info(
-      "Nodes        : %d : %d bytes", ip->nodes, ip->nodes * sizeof(gdb_sNode));
-  errh_Info("Mount servers: %d : %d bytes", ip->mountServers,
-      ip->mountServers * sizeof(gdb_sMountServer));
-  errh_Info("Alias servers: %d : %d bytes", ip->aliasServers,
-      ip->aliasServers * sizeof(gdb_sAliasServer));
-  errh_Info("Sub servers  : %d : %d bytes", ip->subServers,
-      ip->subServers * sizeof(sub_sServer));
-  errh_Info("Sub clients  : %d : %d bytes", ip->subClients,
-      ip->subClients * sizeof(sub_sClient));
-  errh_Info("San servers  : %d : %d bytes", ip->sanServers,
-      ip->sanServers * sizeof(san_sServer));
+  errh_Info("Objects      : %d : %d bytes", ip->objects, ip->objects * sizeof(gdb_sObject));
+  errh_Info("Volumes      : %d : %d bytes", ip->volumes, ip->volumes * sizeof(gdb_sVolume));
+  errh_Info("Classes      : %d : %d bytes", ip->classes, ip->classes * sizeof(gdb_sClass));
+  errh_Info("Nodes        : %d : %d bytes", ip->nodes, ip->nodes * sizeof(gdb_sNode));
+  errh_Info("Mount servers: %d : %d bytes", ip->mountServers, ip->mountServers * sizeof(gdb_sMountServer));
+  errh_Info("Alias servers: %d : %d bytes", ip->aliasServers, ip->aliasServers * sizeof(gdb_sAliasServer));
+  errh_Info("Sub servers  : %d : %d bytes", ip->subServers, ip->subServers * sizeof(sub_sServer));
+  errh_Info("Sub clients  : %d : %d bytes", ip->subClients, ip->subClients * sizeof(sub_sClient));
+  errh_Info("San servers  : %d : %d bytes", ip->sanServers, ip->sanServers * sizeof(san_sServer));
   errh_Info("Cache	  : %d", ip->cvol_max);
 
   /** @todo Better values for cached classes and volumes to the initial pool */
   errh_Info("Cached classes: %d : %d bytes", ip->cclasses,
-      ip->cclasses * (sizeof(gdb_sCclass) + 20 * sizeof(gdb_sCattribute)));
-  errh_Info("Cached class volumes: %d : %d bytes", ip->ccvolumes,
-      ip->ccvolumes * sizeof(gdb_sCclassVolume));
-  errh_Info("Sub class objects: %d : %d bytes", ip->scObjects,
-      ip->scObjects * sizeof(gdb_sScObject));
+            ip->cclasses * (sizeof(gdb_sCclass) + 20 * sizeof(gdb_sCattribute)));
+  errh_Info("Cached class volumes: %d : %d bytes", ip->ccvolumes, ip->ccvolumes * sizeof(gdb_sCclassVolume));
+  errh_Info("Sub class objects: %d : %d bytes", ip->scObjects, ip->scObjects * sizeof(gdb_sScObject));
 
-  ip->pool_isize = ip->objects * sizeof(gdb_sObject)
-      + ip->volumes * sizeof(gdb_sVolume) + ip->classes * sizeof(gdb_sClass)
-      + ip->nodes * sizeof(gdb_sNode)
-      + ip->ccvolumes * sizeof(gdb_sCclassVolume)
-      + ip->cclasses * (sizeof(gdb_sCclass) + 20 * sizeof(gdb_sCattribute))
-      + ip->mountServers * sizeof(gdb_sMountServer)
-      + ip->aliasServers * sizeof(gdb_sAliasServer)
-      + ip->subServers * sizeof(sub_sServer)
-      + ip->subClients * sizeof(sub_sClient)
-      + ip->sanServers * sizeof(san_sServer)
-      + ip->scObjects * sizeof(gdb_sScObject);
+  ip->pool_isize = ip->objects * sizeof(gdb_sObject) + ip->volumes * sizeof(gdb_sVolume) +
+                   ip->classes * sizeof(gdb_sClass) + ip->nodes * sizeof(gdb_sNode) +
+                   ip->ccvolumes * sizeof(gdb_sCclassVolume) +
+                   ip->cclasses * (sizeof(gdb_sCclass) + 20 * sizeof(gdb_sCattribute)) +
+                   ip->mountServers * sizeof(gdb_sMountServer) + ip->aliasServers * sizeof(gdb_sAliasServer) +
+                   ip->subServers * sizeof(sub_sServer) + ip->subClients * sizeof(sub_sClient) +
+                   ip->sanServers * sizeof(san_sServer) + ip->scObjects * sizeof(gdb_sScObject);
 
   ip->pool_isize = MAX(ip->pool_isize, gdb_cMin_pool_isize);
   ip->pool_esize = ip->pool_isize / 8;
@@ -182,91 +171,81 @@ static gdb_sLocal* mapLocalDb(pwr_tStatus* sts)
     pwr_Return(NULL, sts, GDH__REVLEVEL);
 
   pthread_mutexattr_init(&mattr);
-  if (pthread_mutex_init(&gdbroot->thread_lock, &mattr) == -1) {
+  if (pthread_mutex_init(&gdbroot->thread_lock, &mattr) == -1)
+  {
     perror("mapLocalDb: pthread_mutex_init, ");
     pwr_Return(NULL, sts, GDB__MUTEXINIT);
   }
 
   /* Map hash tables.  */
 
-  gdbroot->oid_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.oid_ht,
-      &gdbroot->db->h.oid_ht, NULL, NULL);
+  gdbroot->oid_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.oid_ht, &gdbroot->db->h.oid_ht, NULL, NULL);
   if (gdbroot->oid_ht == NULL)
     errh_Bugcheck(*sts, "initiating oid hash table");
 
-  gdbroot->vid_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.vid_ht,
-      &gdbroot->db->h.vid_ht, NULL, NULL);
+  gdbroot->vid_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.vid_ht, &gdbroot->db->h.vid_ht, NULL, NULL);
   if (gdbroot->vid_ht == NULL)
     errh_Bugcheck(*sts, "initiating vid hash table");
 
-  gdbroot->vn_ht = hash_Create(
-      sts, gdbroot->pool, &gdbroot->h.vn_ht, &gdbroot->db->h.vn_ht, NULL, NULL);
+  gdbroot->vn_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.vn_ht, &gdbroot->db->h.vn_ht, NULL, NULL);
   if (gdbroot->vn_ht == NULL)
     errh_Bugcheck(*sts, "initiating vn hash table");
 
-  gdbroot->nid_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.nid_ht,
-      &gdbroot->db->h.nid_ht, NULL, NULL);
+  gdbroot->nid_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.nid_ht, &gdbroot->db->h.nid_ht, NULL, NULL);
   if (gdbroot->nid_ht == NULL)
     errh_Bugcheck(*sts, "initiating nid hash table");
 
-  gdbroot->cid_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.cid_ht,
-      &gdbroot->db->h.cid_ht, NULL, NULL);
+  gdbroot->cid_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.cid_ht, &gdbroot->db->h.cid_ht, NULL, NULL);
   if (gdbroot->cid_ht == NULL)
     errh_Bugcheck(*sts, "initiating cid hash table");
 
-  gdbroot->tid_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.tid_ht,
-      &gdbroot->db->h.tid_ht, NULL, NULL);
+  gdbroot->tid_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.tid_ht, &gdbroot->db->h.tid_ht, NULL, NULL);
   if (gdbroot->tid_ht == NULL)
     errh_Bugcheck(*sts, "initiating tid hash table");
 
-  gdbroot->family_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.family_ht,
-      &gdbroot->db->h.family_ht, NULL, NULL);
+  gdbroot->family_ht =
+      hash_Create(sts, gdbroot->pool, &gdbroot->h.family_ht, &gdbroot->db->h.family_ht, NULL, NULL);
   if (gdbroot->family_ht == NULL)
     errh_Bugcheck(*sts, "initiating family hash table");
 
-  gdbroot->ms_ht = hash_Create(
-      sts, gdbroot->pool, &gdbroot->h.ms_ht, &gdbroot->db->h.ms_ht, NULL, NULL);
+  gdbroot->ms_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.ms_ht, &gdbroot->db->h.ms_ht, NULL, NULL);
   if (gdbroot->ms_ht == NULL)
     errh_Bugcheck(*sts, "initiating mount server hash table");
 
-  gdbroot->as_ht = hash_Create(
-      sts, gdbroot->pool, &gdbroot->h.as_ht, &gdbroot->db->h.as_ht, NULL, NULL);
+  gdbroot->as_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.as_ht, &gdbroot->db->h.as_ht, NULL, NULL);
   if (gdbroot->as_ht == NULL)
     errh_Bugcheck(*sts, "initiating alias server hash table");
 
-  gdbroot->subc_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.subc_ht,
-      &gdbroot->db->h.subc_ht, NULL, NULL);
+  gdbroot->subc_ht =
+      hash_Create(sts, gdbroot->pool, &gdbroot->h.subc_ht, &gdbroot->db->h.subc_ht, NULL, NULL);
   if (gdbroot->subc_ht == NULL)
     errh_Bugcheck(*sts, "initiating subscription client hash table");
 
-  gdbroot->subs_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.subs_ht,
-      &gdbroot->db->h.subs_ht, NULL, NULL);
+  gdbroot->subs_ht =
+      hash_Create(sts, gdbroot->pool, &gdbroot->h.subs_ht, &gdbroot->db->h.subs_ht, NULL, NULL);
   if (gdbroot->subs_ht == NULL)
     errh_Bugcheck(*sts, "initiating subscription server hash table");
 
-  gdbroot->sans_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.sans_ht,
-      &gdbroot->db->h.sans_ht, NULL, NULL);
+  gdbroot->sans_ht =
+      hash_Create(sts, gdbroot->pool, &gdbroot->h.sans_ht, &gdbroot->db->h.sans_ht, NULL, NULL);
   if (gdbroot->sans_ht == NULL)
-    errh_Bugcheck(
-        *sts, "initiating subscribed alarm notification server hash table");
+    errh_Bugcheck(*sts, "initiating subscribed alarm notification server hash table");
 
-  gdbroot->ccvol_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.ccvol_ht,
-      &gdbroot->db->h.ccvol_ht, NULL, NULL);
+  gdbroot->ccvol_ht =
+      hash_Create(sts, gdbroot->pool, &gdbroot->h.ccvol_ht, &gdbroot->db->h.ccvol_ht, NULL, NULL);
   if (gdbroot->ccvol_ht == NULL)
     errh_Bugcheck(*sts, "initiating cached class volume hash table");
 
-  gdbroot->cclass_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.cclass_ht,
-      &gdbroot->db->h.cclass_ht, NULL, NULL);
+  gdbroot->cclass_ht =
+      hash_Create(sts, gdbroot->pool, &gdbroot->h.cclass_ht, &gdbroot->db->h.cclass_ht, NULL, NULL);
   if (gdbroot->cclass_ht == NULL)
     errh_Bugcheck(*sts, "initiating cached class hash table");
 
-  gdbroot->sc_ht = hash_Create(
-      sts, gdbroot->pool, &gdbroot->h.sc_ht, &gdbroot->db->h.sc_ht, NULL, NULL);
+  gdbroot->sc_ht = hash_Create(sts, gdbroot->pool, &gdbroot->h.sc_ht, &gdbroot->db->h.sc_ht, NULL, NULL);
   if (gdbroot->sc_ht == NULL)
     errh_Bugcheck(*sts, "initiating sub class object hash table");
 
-  gdbroot->catt_tt = ptree_Create(sts, gdbroot->pool, &gdbroot->t.catt_tt,
-      &gdbroot->db->t.catt_tt, compCatt);
+  gdbroot->catt_tt = ptree_Create(sts, gdbroot->pool, &gdbroot->t.catt_tt, &gdbroot->db->t.catt_tt, compCatt);
   if (gdbroot->catt_tt == NULL)
     errh_Bugcheck(*sts, "initiating class attribute tree table");
 
@@ -278,10 +257,9 @@ static gdb_sLocal* mapLocalDb(pwr_tStatus* sts)
     errh_Bugcheck(GDH__WEIRD, "offset htl: client - server");
   if (offsetof(sub_sClient, subc_htl) != offsetof(dl_sLink, subc_htl))
     errh_Bugcheck(GDH__WEIRD, "offset htl: client - dlink");
-  if ((offsetof(gdb_sNobject, flags) - offsetof(gdb_sNobject, cid_ll))
-      != (offsetof(gdb_sScObject, flags) - offsetof(gdb_sScObject, cid_ll)))
-    errh_Bugcheck(GDH__WEIRD,
-        "offset between cid_ll and flags in gdb_sNobject and gdb_sScObject");
+  if ((offsetof(gdb_sNobject, flags) - offsetof(gdb_sNobject, cid_ll)) !=
+      (offsetof(gdb_sScObject, flags) - offsetof(gdb_sScObject, cid_ll)))
+    errh_Bugcheck(GDH__WEIRD, "offset between cid_ll and flags in gdb_sNobject and gdb_sScObject");
   if (gdb_mNo_isSc != gdb_mSc_isSc)
     errh_Bugcheck(GDH__WEIRD, "gdb_mNo_isSubClass != gdb_mSc_isSubClass");
 
@@ -311,9 +289,10 @@ static void unlinkPool(const char* name)
 
   sprintf(segname, "%s_%.3s", name, busid);
 
-/* This is the only way I know to find out if the memory is created, ML */
+  /* This is the only way I know to find out if the memory is created, ML */
   fd = open(segname, flags, mode);
-  if (fd != -1) {
+  if (fd != -1)
+  {
     close(fd);
 
     key = ftok(segname, 'P');
@@ -322,7 +301,8 @@ static void unlinkPool(const char* name)
 
     unlink(segname);
 
-    for (i = 1; TRUE; i++) {
+    for (i = 1; TRUE; i++)
+    {
       sprintf(segname, "%.11s%4.4x_%.3s", name, i, busid);
       fd = open(segname, flags, mode);
 
@@ -340,8 +320,7 @@ static void unlinkPool(const char* name)
   }
 }
 
-gdb_sAliasServer* gdb_AddAliasServer(
-    pwr_tStatus* sts, pwr_tObjid soid, pwr_tBitMask flags)
+gdb_sAliasServer* gdb_AddAliasServer(pwr_tStatus* sts, pwr_tObjid soid, pwr_tBitMask flags)
 {
   gdb_sAliasServer* asp;
   gdb_sObject* op = NULL;
@@ -351,7 +330,8 @@ gdb_sAliasServer* gdb_AddAliasServer(
   pwr_Assert(cdh_ObjidIsNotNull(soid));
 
   asp = hash_Search(sts, gdbroot->as_ht, &soid);
-  if (asp != NULL) {
+  if (asp != NULL)
+  {
     if (flags & gdb_mAdd_failIfAdded)
       pwr_Return(NULL, sts, GDB__DUPLADD);
     else
@@ -390,7 +370,8 @@ gdb_sClass* gdb_AddClass(pwr_tStatus* sts, pwr_tClassId cid, pwr_tBitMask flags)
   gdb_AssumeLocked;
 
   cp = hash_Search(sts, gdbroot->cid_ht, &cid);
-  if (cp != NULL) {
+  if (cp != NULL)
+  {
     if (flags & gdb_mAdd_failIfAdded)
       pwr_Return(NULL, sts, GDB__DUPLADD);
     else
@@ -416,8 +397,7 @@ gdb_sClass* gdb_AddClass(pwr_tStatus* sts, pwr_tClassId cid, pwr_tBitMask flags)
   return cp;
 }
 
-gdb_sMountServer* gdb_AddMountServer(
-    pwr_tStatus* sts, pwr_tObjid soid, pwr_tBitMask flags)
+gdb_sMountServer* gdb_AddMountServer(pwr_tStatus* sts, pwr_tObjid soid, pwr_tBitMask flags)
 {
   gdb_sMountServer* msp;
 
@@ -428,7 +408,8 @@ gdb_sMountServer* gdb_AddMountServer(
     return NULL;
 
   msp = hash_Search(sts, gdbroot->ms_ht, &soid);
-  if (msp != NULL) {
+  if (msp != NULL)
+  {
     if (flags & gdb_mAdd_failIfAdded)
       pwr_Return(NULL, sts, GDB__DUPLADD);
     else
@@ -465,7 +446,8 @@ gdb_sNode* gdb_AddNode(pwr_tStatus* sts, pwr_tNodeId nid, pwr_tBitMask flags)
   np = hash_Search(sts, gdbroot->nid_ht, &nid);
   if (np != NULL)
     return np;
-  if (np != NULL) {
+  if (np != NULL)
+  {
     if (flags & gdb_mAdd_failIfAdded)
       pwr_Return(NULL, sts, GDB__DUPLADD);
     else
@@ -498,8 +480,7 @@ gdb_sNode* gdb_AddNode(pwr_tStatus* sts, pwr_tNodeId nid, pwr_tBitMask flags)
   np->cacheNode.lc_max = 200;
 
   np->cacheNode.flags.b.cacheNode = 1;
-  np->cacheNode.next
-      = pool_Reference(NULL, gdbroot->pool, &gdbroot->db->cacheCom);
+  np->cacheNode.next = pool_Reference(NULL, gdbroot->pool, &gdbroot->db->cacheCom);
 
   np = hash_Insert(sts, gdbroot->nid_ht, np);
   if (np == NULL)
@@ -512,15 +493,15 @@ gdb_sNode* gdb_AddNode(pwr_tStatus* sts, pwr_tNodeId nid, pwr_tBitMask flags)
 
 /* Add a volume */
 
-gdb_sVolume* gdb_AddVolume(
-    pwr_tStatus* sts, pwr_tVolumeId vid, pwr_tBitMask flags)
+gdb_sVolume* gdb_AddVolume(pwr_tStatus* sts, pwr_tVolumeId vid, pwr_tBitMask flags)
 {
   gdb_sVolume* vp;
 
   gdb_AssumeLocked;
 
   vp = hash_Search(sts, gdbroot->vid_ht, &vid);
-  if (vp != NULL) {
+  if (vp != NULL)
+  {
     if (flags & gdb_mAdd_failIfAdded)
       pwr_Return(NULL, sts, GDB__DUPLADD);
     else
@@ -554,9 +535,7 @@ gdb_sVolume* gdb_AddVolume(
    This should be done after initialization of the DB, before
    starting the nethandler.  */
 
-void gdb_BuildGlobalDatabase(pwr_tObjid systemobject, pwr_tObjid nodeobject)
-{
-}
+void gdb_BuildGlobalDatabase(pwr_tObjid systemobject, pwr_tObjid nodeobject) {}
 
 /* This routine maps the object and node database.
    It should only be called by the init program.  */
@@ -584,8 +563,8 @@ gdb_sLocal* gdb_CreateDb(pwr_tStatus* sts, gdb_sInit* ip)
 
   /* Create lock section.  */
 
-  gdbroot->lock = sect_Alloc(sts, &created, &gdbroot->h.lock,
-      sizeof(sect_sMutex), gdb_cNameDbLock, sect_mFlags_Create);
+  gdbroot->lock =
+      sect_Alloc(sts, &created, &gdbroot->h.lock, sizeof(sect_sMutex), gdb_cNameDbLock, sect_mFlags_Create);
   if (gdbroot->lock == NULL)
     errh_Bugcheck(*sts, "creating database lock");
   if (!created)
@@ -598,18 +577,15 @@ gdb_sLocal* gdb_CreateDb(pwr_tStatus* sts, gdb_sInit* ip)
   unlinkPool(gdb_cNamePool);
   unlinkPool(gdb_cNameRtdb);
 
-  gdbroot->pool = pool_Create(
-      sts, &gdbroot->h.pool, gdb_cNamePool, ip->pool_isize, ip->pool_esize);
+  gdbroot->pool = pool_Create(sts, &gdbroot->h.pool, gdb_cNamePool, ip->pool_isize, ip->pool_esize);
   if (gdbroot->pool == NULL)
     errh_Bugcheck(*sts, "initating pool");
 
-  gdbroot->rtdb = pool_Create(
-      sts, &gdbroot->h.rtdb, gdb_cNameRtdb, ip->rtdb_isize, ip->rtdb_esize);
+  gdbroot->rtdb = pool_Create(sts, &gdbroot->h.rtdb, gdb_cNameRtdb, ip->rtdb_isize, ip->rtdb_esize);
   if (gdbroot->rtdb == NULL)
     errh_Bugcheck(*sts, "initiating rtdb");
 
-  gdbroot->db = pool_AllocNamedSegment(
-      sts, gdbroot->pool, sizeof(*gdbroot->db), gdb_cNameDatabase);
+  gdbroot->db = pool_AllocNamedSegment(sts, gdbroot->pool, sizeof(*gdbroot->db), gdb_cNameDatabase);
   if (gdbroot->db == NULL)
     errh_Bugcheck(*sts, "database directory");
 
@@ -665,77 +641,60 @@ gdb_sLocal* gdb_CreateDb(pwr_tStatus* sts, gdb_sInit* ip)
 
     /* Hash tables.  */
 
-    hash_Init(&gdbroot->db->h.oid_ht, ip->objects, sizeof(pwr_tObjid),
-        sizeof(gdb_sObject), offsetof(gdb_sObject, g.oid),
-        offsetof(gdb_sObject, l.oid_htl), hash_eKey_oid);
+    hash_Init(&gdbroot->db->h.oid_ht, ip->objects, sizeof(pwr_tObjid), sizeof(gdb_sObject),
+              offsetof(gdb_sObject, g.oid), offsetof(gdb_sObject, l.oid_htl), hash_eKey_oid);
 
-    hash_Init(&gdbroot->db->h.vid_ht, ip->volumes, sizeof(pwr_tVolumeId),
-        sizeof(gdb_sVolume), offsetof(gdb_sVolume, g.vid),
-        offsetof(gdb_sVolume, l.vid_htl), hash_eKey_vid);
+    hash_Init(&gdbroot->db->h.vid_ht, ip->volumes, sizeof(pwr_tVolumeId), sizeof(gdb_sVolume),
+              offsetof(gdb_sVolume, g.vid), offsetof(gdb_sVolume, l.vid_htl), hash_eKey_vid);
 
-    hash_Init(&gdbroot->db->h.vn_ht, ip->volumes, sizeof(cdh_sObjName),
-        sizeof(gdb_sVolume), offsetof(gdb_sVolume, g.name),
-        offsetof(gdb_sVolume, l.vn_htl), hash_eKey_objName);
+    hash_Init(&gdbroot->db->h.vn_ht, ip->volumes, sizeof(cdh_sObjName), sizeof(gdb_sVolume),
+              offsetof(gdb_sVolume, g.name), offsetof(gdb_sVolume, l.vn_htl), hash_eKey_objName);
 
-    hash_Init(&gdbroot->db->h.cid_ht, ip->classes, sizeof(pwr_tClassId),
-        sizeof(gdb_sClass), offsetof(gdb_sClass, cid),
-        offsetof(gdb_sClass, cid_htl), hash_eKey_cid);
+    hash_Init(&gdbroot->db->h.cid_ht, ip->classes, sizeof(pwr_tClassId), sizeof(gdb_sClass),
+              offsetof(gdb_sClass, cid), offsetof(gdb_sClass, cid_htl), hash_eKey_cid);
 
-    hash_Init(&gdbroot->db->h.nid_ht, ip->nodes, sizeof(pwr_tNodeId),
-        sizeof(gdb_sNode), offsetof(gdb_sNode, nid),
-        offsetof(gdb_sNode, nid_htl), hash_eKey_nid);
+    hash_Init(&gdbroot->db->h.nid_ht, ip->nodes, sizeof(pwr_tNodeId), sizeof(gdb_sNode),
+              offsetof(gdb_sNode, nid), offsetof(gdb_sNode, nid_htl), hash_eKey_nid);
 
-    hash_Init(&gdbroot->db->h.family_ht, ip->objects, sizeof(cdh_sFamily),
-        sizeof(gdb_sObject), offsetof(gdb_sObject, g.f),
-        offsetof(gdb_sObject, l.family_htl), hash_eKey_family);
+    hash_Init(&gdbroot->db->h.family_ht, ip->objects, sizeof(cdh_sFamily), sizeof(gdb_sObject),
+              offsetof(gdb_sObject, g.f), offsetof(gdb_sObject, l.family_htl), hash_eKey_family);
 
-    hash_Init(&gdbroot->db->h.ms_ht, ip->mountServers, sizeof(pwr_tObjid),
-        sizeof(gdb_sMountServer), offsetof(gdb_sMountServer, oid),
-        offsetof(gdb_sMountServer, ms_htl), hash_eKey_oid);
+    hash_Init(&gdbroot->db->h.ms_ht, ip->mountServers, sizeof(pwr_tObjid), sizeof(gdb_sMountServer),
+              offsetof(gdb_sMountServer, oid), offsetof(gdb_sMountServer, ms_htl), hash_eKey_oid);
 
-    hash_Init(&gdbroot->db->h.as_ht, ip->aliasServers, sizeof(pwr_tObjid),
-        sizeof(gdb_sAliasServer), offsetof(gdb_sAliasServer, oid),
-        offsetof(gdb_sAliasServer, as_htl), hash_eKey_oid);
+    hash_Init(&gdbroot->db->h.as_ht, ip->aliasServers, sizeof(pwr_tObjid), sizeof(gdb_sAliasServer),
+              offsetof(gdb_sAliasServer, oid), offsetof(gdb_sAliasServer, as_htl), hash_eKey_oid);
 
-    hash_Init(&gdbroot->db->h.subc_ht, ip->subClients, sizeof(pwr_tSubid),
-        sizeof(sub_sClient), offsetof(sub_sClient, sid),
-        offsetof(sub_sClient, subc_htl), hash_eKey_oid);
+    hash_Init(&gdbroot->db->h.subc_ht, ip->subClients, sizeof(pwr_tSubid), sizeof(sub_sClient),
+              offsetof(sub_sClient, sid), offsetof(sub_sClient, subc_htl), hash_eKey_oid);
 
-    hash_Init(&gdbroot->db->h.subs_ht, ip->subServers, sizeof(pwr_tSubid),
-        sizeof(sub_sServer), offsetof(sub_sServer, sid),
-        offsetof(sub_sServer, subs_htl), hash_eKey_oid);
+    hash_Init(&gdbroot->db->h.subs_ht, ip->subServers, sizeof(pwr_tSubid), sizeof(sub_sServer),
+              offsetof(sub_sServer, sid), offsetof(sub_sServer, subs_htl), hash_eKey_oid);
 
-    hash_Init(&gdbroot->db->h.sans_ht, ip->sanServers, sizeof(pwr_tSubid),
-        sizeof(san_sServer), offsetof(san_sServer, sane.sid),
-        offsetof(san_sServer, sans_htl), hash_eKey_oid);
+    hash_Init(&gdbroot->db->h.sans_ht, ip->sanServers, sizeof(pwr_tSubid), sizeof(san_sServer),
+              offsetof(san_sServer, sane.sid), offsetof(san_sServer, sans_htl), hash_eKey_oid);
 
-    hash_Init(&gdbroot->db->h.ccvol_ht, ip->ccvolumes, sizeof(pwr_tObjid),
-        sizeof(gdb_sCclassVolume), offsetof(gdb_sCclassVolume, key),
-        offsetof(gdb_sCclassVolume, ccvol_htl), hash_eKey_oid);
+    hash_Init(&gdbroot->db->h.ccvol_ht, ip->ccvolumes, sizeof(pwr_tObjid), sizeof(gdb_sCclassVolume),
+              offsetof(gdb_sCclassVolume, key), offsetof(gdb_sCclassVolume, ccvol_htl), hash_eKey_oid);
 
-    hash_Init(&gdbroot->db->h.cclass_ht, ip->cclasses, sizeof(gdb_sCclassKey),
-        sizeof(gdb_sCclass), offsetof(gdb_sCclass, key),
-        offsetof(gdb_sCclass, cclass_htl), hash_eKey_memcmp);
+    hash_Init(&gdbroot->db->h.cclass_ht, ip->cclasses, sizeof(gdb_sCclassKey), sizeof(gdb_sCclass),
+              offsetof(gdb_sCclass, key), offsetof(gdb_sCclass, cclass_htl), hash_eKey_memcmp);
 
-    hash_Init(&gdbroot->db->h.sc_ht, ip->scObjects, sizeof(pwr_tObjid),
-        sizeof(gdb_sScObject), offsetof(gdb_sScObject, sc_htl),
-        offsetof(gdb_sCclass, cclass_htl), hash_eKey_oid);
+    hash_Init(&gdbroot->db->h.sc_ht, ip->scObjects, sizeof(pwr_tObjid), sizeof(gdb_sScObject),
+              offsetof(gdb_sScObject, sc_htl), offsetof(gdb_sCclass, cclass_htl), hash_eKey_oid);
 
-    ptree_Init(gdbroot->pool, &gdbroot->db->t.catt_tt,
-        sizeof(gdb_sClassAttrKey), offsetof(gdb_sClassAttr, key),
-        sizeof(gdb_sClassAttr), 100);
+    ptree_Init(gdbroot->pool, &gdbroot->db->t.catt_tt, sizeof(gdb_sClassAttrKey),
+               offsetof(gdb_sClassAttr, key), sizeof(gdb_sClassAttr), 100);
 
     lp = mapLocalDb(sts);
     if (lp == NULL)
       break;
 
-    gdbroot->my_volume
-        = gdb_AddVolume(sts, gdbroot->db->vid, gdb_mAdd_failIfAdded);
+    gdbroot->my_volume = gdb_AddVolume(sts, gdbroot->db->vid, gdb_mAdd_failIfAdded);
     if (gdbroot->my_volume == NULL)
       errh_Bugcheck(*sts, "creating root volume");
 
-    gdbroot->no_volume
-        = gdb_AddVolume(sts, pwr_cNVolumeId, gdb_mAdd_failIfAdded);
+    gdbroot->no_volume = gdb_AddVolume(sts, pwr_cNVolumeId, gdb_mAdd_failIfAdded);
     if (gdbroot->no_volume == NULL)
       errh_Bugcheck(*sts, "creating the null volume");
 
@@ -782,10 +741,10 @@ gdb_sLocal* gdb_CreateDb(pwr_tStatus* sts, gdb_sInit* ip)
     tqp->flags.b.cacheFree = 1;
     tqp->next = pool_cNRef;
 
-    for (i = 0; i < tqp->lc_max; i++) {
+    for (i = 0; i < tqp->lc_max; i++)
+    {
       op = pool_Alloc(NULL, gdbroot->pool, sizeof(*op));
-      pool_QinsertPred(
-          NULL, gdbroot->pool, &op->u.c.cache_ll, &gdbroot->db->cacheFree.lh);
+      pool_QinsertPred(NULL, gdbroot->pool, &op->u.c.cache_ll, &gdbroot->db->cacheFree.lh);
       op->u.c.flags.b.cacheFree = 1;
     }
 
@@ -840,9 +799,8 @@ void gdb_UnlinkDb()
 /* Allocate an object header and initiate
    the global part of the header.  */
 
-gdb_sObject* gdb_AddObject(pwr_tStatus* sts, const char* name, pwr_tObjid oid,
-    pwr_tClassId cid, pwr_tUInt32 size, pwr_tObjid poid, pwr_tBitMask iflags,
-    pwr_tObjid soid)
+gdb_sObject* gdb_AddObject(pwr_tStatus* sts, const char* name, pwr_tObjid oid, pwr_tClassId cid,
+                           pwr_tUInt32 size, pwr_tObjid poid, pwr_tBitMask iflags, pwr_tObjid soid)
 {
   gdb_sObject* op;
   net_sGobject* gop;
@@ -868,9 +826,8 @@ gdb_sObject* gdb_AddObject(pwr_tStatus* sts, const char* name, pwr_tObjid oid,
 /* Allocate an sub class object header and
    initiate it.  */
 
-gdb_sScObject* gdb_AddScObject(pwr_tStatus* sts, pwr_tObjid oid,
-    pwr_tClassId cid, pwr_tUInt32 size, pwr_tObjid poid, pwr_tUInt32 aidx,
-    pwr_tUInt32 elem, gdb_mSc flags)
+gdb_sScObject* gdb_AddScObject(pwr_tStatus* sts, pwr_tObjid oid, pwr_tClassId cid, pwr_tUInt32 size,
+                               pwr_tObjid poid, pwr_tUInt32 aidx, pwr_tUInt32 elem, gdb_mSc flags)
 {
   gdb_sScObject* scp;
 
@@ -892,9 +849,8 @@ gdb_sScObject* gdb_AddScObject(pwr_tStatus* sts, pwr_tObjid oid,
 
 /* Load a volume */
 
-gdb_sVolume* gdb_LoadVolume(pwr_tStatus* sts, pwr_tVolumeId vid,
-    const char* name, pwr_tClassId cid, pwr_tNodeId nid, pwr_tTime time,
-    pwr_tBitMask iload, const co_mFormat* format)
+gdb_sVolume* gdb_LoadVolume(pwr_tStatus* sts, pwr_tVolumeId vid, const char* name, pwr_tClassId cid,
+                            pwr_tNodeId nid, pwr_tTime time, pwr_tBitMask iload, const co_mFormat* format)
 {
   gdb_sVolume* vp;
   pwr_tObjName volname;
@@ -912,16 +868,15 @@ gdb_sVolume* gdb_LoadVolume(pwr_tStatus* sts, pwr_tVolumeId vid,
     return NULL;
 
   vp->g.cid = cid;
-  if (name == NULL || *name == '\0') {
+  if (name == NULL || *name == '\0')
+  {
     lvid.pwr = vid;
-    sprintf(volname, "%u_%u_%u_%u", lvid.v.vid_3, lvid.v.vid_2, lvid.v.vid_1,
-        lvid.v.vid_0);
+    sprintf(volname, "%u_%u_%u_%u", lvid.v.vid_3, lvid.v.vid_2, lvid.v.vid_1, lvid.v.vid_0);
     name = volname;
   }
   cdh_ObjName(&vp->g.name, name);
   vp = hash_Insert(sts, gdbroot->vn_ht, vp);
-  sprintf(string, "adding volume: %s (%s)",
-      cdh_VolumeIdToString(volstr, sizeof(volstr), vid, 0, 0), name);
+  sprintf(string, "adding volume: %s (%s)", cdh_VolumeIdToString(volstr, sizeof(volstr), vid, 0, 0), name);
   if (vp == NULL)
     errh_Bugcheck(*sts, string);
 
@@ -946,42 +901,41 @@ gdb_sVolume* gdb_LoadVolume(pwr_tStatus* sts, pwr_tVolumeId vid,
   vp->l.flags.b.root = vid == gdbroot->db->vid;
   vp->l.flags.b.sub = load.b.native && cid == pwr_eClass_SubVolume;
   vp->l.flags.b.system = load.b.native && cid == pwr_eClass_SystemVolume;
-  vp->l.flags.b.dynamic = vp->l.flags.b.system
-      | (load.b.native && cid == pwr_eClass_DynamicVolume);
-  vp->l.flags.b.shared
-      = cid == pwr_eClass_DynamicVolume || cid == pwr_eClass_SharedVolume;
+  vp->l.flags.b.dynamic = vp->l.flags.b.system | (load.b.native && cid == pwr_eClass_DynamicVolume);
+  vp->l.flags.b.shared = cid == pwr_eClass_DynamicVolume || cid == pwr_eClass_SharedVolume;
   vp->l.flags.b.classvol = cdh_isClassVolumeClass(cid);
   vp->l.flags.b.netCached = load.b.netCached;
   vp->l.flags.b.fileCached = load.b.fileCached;
   vp->l.flags.b.remote = load.b.netCached | load.b.fileCached;
 
-  vp->l.flags.b.isOwned = nid == gdbroot->db->nid
-      && (vp->l.flags.b.root | vp->l.flags.b.sub | vp->l.flags.b.system
-             | vp->l.flags.b.dynamic | vp->l.flags.b.classvol
-             | vp->l.flags.b.shared);
+  vp->l.flags.b.isOwned =
+      nid == gdbroot->db->nid && (vp->l.flags.b.root | vp->l.flags.b.sub | vp->l.flags.b.system |
+                                  vp->l.flags.b.dynamic | vp->l.flags.b.classvol | vp->l.flags.b.shared);
 
-  if (vp->l.flags.b.isOwned) {
+  if (vp->l.flags.b.isOwned)
+  {
     vp->g.nid = nid;
 
     if (vp->l.flags.b.classvol)
-      pool_QinsertSucc(
-          NULL, gdbroot->pool, &vp->l.own_ll, &gdbroot->my_node->own_lh);
+      pool_QinsertSucc(NULL, gdbroot->pool, &vp->l.own_ll, &gdbroot->my_node->own_lh);
     else
-      pool_QinsertPred(
-          NULL, gdbroot->pool, &vp->l.own_ll, &gdbroot->my_node->own_lh);
+      pool_QinsertPred(NULL, gdbroot->pool, &vp->l.own_ll, &gdbroot->my_node->own_lh);
     vp->l.flags.b.inOwnList = 1;
   }
 
   /* Native/Cache part.  */
 
-  if (vp->l.flags.b.isNative) {
+  if (vp->l.flags.b.isNative)
+  {
     pool_Qinit(NULL, gdbroot->pool, &vp->u.n.volmo_lh);
     pool_Qinit(NULL, gdbroot->pool, &vp->u.n.sc_lh);
     vp->u.n.next_oid.vid = vid;
     vp->u.n.format = *format;
     if (cid != pwr_eClass_DynamicVolume)
       vp->u.n.next_oid.oix = 0x80000000;
-  } else if (vp->l.flags.b.isCached) {
+  }
+  else if (vp->l.flags.b.isCached)
+  {
   }
 
   return vp;
@@ -1016,13 +970,14 @@ gdb_sLocal* gdb_MapDb(pwr_tStatus* sts, qcom_sQid* qid, const char* name)
 
   /* Map lock sections.  */
 
-  gdbroot->lock = sect_Alloc(
-      sts, &created, &gdbroot->h.lock, sizeof(sect_sMutex), gdb_cNameDbLock, 0);
-  if (gdbroot->lock == NULL) {
+  gdbroot->lock = sect_Alloc(sts, &created, &gdbroot->h.lock, sizeof(sect_sMutex), gdb_cNameDbLock, 0);
+  if (gdbroot->lock == NULL)
+  {
     errh_Fatal("Error mapping db lock\n%m", *sts);
     pwr_Return(NULL, sts, GDH__DBLOCK);
   }
-  if (created) {
+  if (created)
+  {
     sect_Free(&lsts, gdbroot->lock);
     pwr_Return(NULL, sts, GDH__RTNOTSTARTED);
   }
@@ -1037,8 +992,7 @@ gdb_sLocal* gdb_MapDb(pwr_tStatus* sts, qcom_sQid* qid, const char* name)
   if (gdbroot->rtdb == NULL)
     errh_Bugcheck(*sts, "initiating rtdb");
 
-  gdbroot->db = pool_AllocNamedSegment(
-      sts, gdbroot->pool, sizeof(*gdbroot->db), gdb_cNameDatabase);
+  gdbroot->db = pool_AllocNamedSegment(sts, gdbroot->pool, sizeof(*gdbroot->db), gdb_cNameDatabase);
   if (gdbroot->db == NULL)
     errh_Bugcheck(*sts, "database directory");
 
@@ -1073,15 +1027,14 @@ gdb_sLocal* gdb_MapDb(pwr_tStatus* sts, qcom_sQid* qid, const char* name)
   return gdbroot;
 }
 
-gdb_sClass* gdb_ReAddClass(
-    pwr_tStatus* sts, gdb_sClass* cp, unsigned int acount)
+gdb_sClass* gdb_ReAddClass(pwr_tStatus* sts, gdb_sClass* cp, unsigned int acount)
 {
   gdb_sClass* new_cp;
 
   gdb_AssumeLocked;
 
-  new_cp = pool_Alloc(sts, gdbroot->pool,
-      sizeof(*cp) + (acount == 0 ? 0 : acount - 1) * sizeof(gdb_sAttribute));
+  new_cp =
+      pool_Alloc(sts, gdbroot->pool, sizeof(*cp) + (acount == 0 ? 0 : acount - 1) * sizeof(gdb_sAttribute));
   if (new_cp == NULL)
     return NULL;
 
@@ -1097,8 +1050,7 @@ gdb_sClass* gdb_ReAddClass(
     errh_Bugcheck(GDH__WEIRD, "adding new class");
 
   pool_Qremove(NULL, gdbroot->pool, &cp->class_ll);
-  pool_QinsertSucc(
-      NULL, gdbroot->pool, &new_cp->class_ll, &gdbroot->db->class_lh);
+  pool_QinsertSucc(NULL, gdbroot->pool, &new_cp->class_ll, &gdbroot->db->class_lh);
 
   pool_Qmove(sts, gdbroot->pool, &cp->cid_lh, &new_cp->cid_lh);
   pool_Free(NULL, gdbroot->pool, cp);
@@ -1123,14 +1075,17 @@ void gdb_RemoveObject(pwr_tStatus* sts, gdb_sObject* op)
   pwr_Assert(pool_QisUnlinked(&op->u.n.cli_ll));
   pwr_Assert(pool_QisUnlinked(&op->u.n.sib_ll));
 
-  if (op->u.n.dlcount == 0
-      && !pool_QisLinked(NULL, gdbroot->pool, &op->u.n.sib_lh)) {
-    if (op->u.n.body != pool_cNRef) {
+  if (op->u.n.dlcount == 0 && !pool_QisLinked(NULL, gdbroot->pool, &op->u.n.sib_lh))
+  {
+    if (op->u.n.body != pool_cNRef)
+    {
       pwr_Assert(op->g.size > 0);
       pool_FreeReference(sts, gdbroot->rtdb, op->u.n.body);
     }
     pool_Free(NULL, gdbroot->pool, op);
-  } else {
+  }
+  else
+  {
     op->u.n.flags.b.pendingDelete = 1;
   }
 }

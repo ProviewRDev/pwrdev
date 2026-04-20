@@ -46,13 +46,15 @@
 #include "xtt_trace.h"
 #include "xtt_item.h"
 
-extern "C" {
+extern "C"
+{
 #include "rt_qdb.h"
 #include "rt_sub.h"
 #include "rt_io_base.h"
 }
 
-typedef struct {
+typedef struct
+{
   void* chanp;
   void* cardp;
   pwr_tCid chan_cid;
@@ -64,8 +66,7 @@ static int xnav_subcli_remote_cnt;
 static int xnav_get_nodename(pwr_tNodeId nid, char* nodename);
 static int xnav_show_subsrv_insert(XNav* xnav, sub_sServer* ssrvp);
 extern "C" void xnav_show_subsrv_scan(XNav* xnav);
-static int xnav_show_subcli_insert(
-    XNav* xnav, gdb_sNode* np, sub_sClient* sclip);
+static int xnav_show_subcli_insert(XNav* xnav, gdb_sNode* np, sub_sClient* sclip);
 extern "C" void xnav_show_subcli_scan(XNav* xnav);
 
 int XNav::show_plcthreads()
@@ -101,15 +102,14 @@ int XNav::show_plcthreads()
   new ItemTableHeader(brow, this, "Title", &th, NULL, flow_eDest_IntoLast);
 
   sts = gdh_GetClassList(pwr_cClass_PlcThread, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     attrref = cdh_ObjidToAref(objid);
-    sts = gdh_DLRefObjectInfoAttrref(
-        &attrref, (pwr_tAddress*)&object_ptr, &subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&object_ptr, &subid);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_ObjidToName(
-        objid, object_name, sizeof(object_name), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(objid, object_name, sizeof(object_name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
@@ -128,8 +128,7 @@ int XNav::show_plcthreads()
     // Prio
     strcpy(attr_name, object_name);
     strcat(attr_name, ".Prio");
-    sts = gdh_GetAttributeCharacteristics(
-        attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+    sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
     if (EVEN(sts))
       return sts;
 
@@ -141,8 +140,7 @@ int XNav::show_plcthreads()
     // Count
     strcpy(attr_name, object_name);
     strcat(attr_name, ".Count");
-    sts = gdh_GetAttributeCharacteristics(
-        attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+    sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
     if (EVEN(sts))
       return sts;
 
@@ -154,8 +152,7 @@ int XNav::show_plcthreads()
     // ScanTime
     strcpy(attr_name, object_name);
     strcat(attr_name, ".ScanTime");
-    sts = gdh_GetAttributeCharacteristics(
-        attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+    sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
     if (EVEN(sts))
       return sts;
 
@@ -167,8 +164,7 @@ int XNav::show_plcthreads()
     // ScanTimeMean
     strcpy(attr_name, object_name);
     strcat(attr_name, ".ScanTimeMean");
-    sts = gdh_GetAttributeCharacteristics(
-        attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+    sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
     if (EVEN(sts))
       return sts;
 
@@ -180,8 +176,7 @@ int XNav::show_plcthreads()
     // Coverage
     strcpy(attr_name, object_name);
     strcat(attr_name, ".Coverage");
-    sts = gdh_GetAttributeCharacteristics(
-        attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+    sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
     if (EVEN(sts))
       return sts;
 
@@ -193,8 +188,7 @@ int XNav::show_plcthreads()
     // Count_1_8
     strcpy(attr_name, object_name);
     strcat(attr_name, ".Count_1_8");
-    sts = gdh_GetAttributeCharacteristics(
-        attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+    sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
     if (EVEN(sts))
       return sts;
 
@@ -206,8 +200,7 @@ int XNav::show_plcthreads()
     // Count_1_4
     strcpy(attr_name, object_name);
     strcat(attr_name, ".Count_1_4");
-    sts = gdh_GetAttributeCharacteristics(
-        attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+    sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
     if (EVEN(sts))
       return sts;
 
@@ -219,8 +212,7 @@ int XNav::show_plcthreads()
     // Count_1_2
     strcpy(attr_name, object_name);
     strcat(attr_name, ".Count_1_2");
-    sts = gdh_GetAttributeCharacteristics(
-        attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+    sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
     if (EVEN(sts))
       return sts;
 
@@ -232,8 +224,7 @@ int XNav::show_plcthreads()
     // Count_1_1
     strcpy(attr_name, object_name);
     strcat(attr_name, ".Count_1_1");
-    sts = gdh_GetAttributeCharacteristics(
-        attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+    sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
     if (EVEN(sts))
       return sts;
 
@@ -244,8 +235,7 @@ int XNav::show_plcthreads()
 
     ts.subid[0] = subid;
     ts.subid_cnt = 1;
-    new ItemTable(
-        brow, this, objid, &t, &ts, -1, 0, 0, 0, NULL, flow_eDest_IntoLast);
+    new ItemTable(brow, this, objid, &t, &ts, -1, 0, 0, 0, NULL, flow_eDest_IntoLast);
 
     sts = gdh_GetNextObject(objid, &objid);
   }
@@ -278,8 +268,9 @@ int XNav::show_nethandler()
 
   gdb_ScopeLock
   {
-    for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh);
-         nl != &gdbroot->db->nod_lh; nl = pool_Qsucc(&sts, gdbroot->pool, nl)) {
+    for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh); nl != &gdbroot->db->nod_lh;
+         nl = pool_Qsucc(&sts, gdbroot->pool, nl))
+    {
       np = pool_Qitem(nl, gdb_sNode, nod_ll);
 
       if (streq(np->name, "******"))
@@ -290,11 +281,14 @@ int XNav::show_nethandler()
       // Node name
       // strcpy( t.elem[t.elem_cnt].fix_str, np->name);
       // t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
-      if (np == gdbroot->my_node) {
+      if (np == gdbroot->my_node)
+      {
         // Local node
         strcpy(t.elem[t.elem_cnt].fix_str, np->name);
         t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
-      } else {
+      }
+      else
+      {
         t.elem[t.elem_cnt].value_p = np->name;
         t.elem[t.elem_cnt].type_id = pwr_eType_String;
         t.elem[t.elem_cnt].size = sizeof(np->name);
@@ -302,7 +296,8 @@ int XNav::show_nethandler()
       }
 
       // Os
-      switch (np->hw) {
+      switch (np->hw)
+      {
       case co_eHW_x86:
         strcpy(t.elem[t.elem_cnt].fix_str, "x86");
         break;
@@ -324,7 +319,8 @@ int XNav::show_nethandler()
       default:
         strcpy(t.elem[t.elem_cnt].fix_str, "-");
       }
-      switch (np->os) {
+      switch (np->os)
+      {
       case co_eOS_Lynx:
         strcat(t.elem[t.elem_cnt].fix_str, "_Lynx");
         break;
@@ -348,11 +344,14 @@ int XNav::show_nethandler()
       t.elem[t.elem_cnt].fix_str[11] = 0;
       t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
-      if (np == gdbroot->my_node) {
+      if (np == gdbroot->my_node)
+      {
         // Local node
         strcpy(t.elem[t.elem_cnt].fix_str, "Local");
         t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
-      } else {
+      }
+      else
+      {
         t.elem[t.elem_cnt].value_p = &np->flags;
         t.elem[t.elem_cnt].type_id = xnav_eType_GdbNodeFlags;
         t.elem[t.elem_cnt].size = sizeof(np->flags.b);
@@ -371,8 +370,7 @@ int XNav::show_nethandler()
       t.elem[t.elem_cnt++].size = sizeof(np->timeup);
 
       ts.subid_cnt = 0;
-      new ItemTable(brow, this, pwr_cNObjid, &t, &ts, -1, 0, 0, 0, NULL,
-          flow_eDest_IntoLast);
+      new ItemTable(brow, this, pwr_cNObjid, &t, &ts, -1, 0, 0, 0, NULL, flow_eDest_IntoLast);
     }
   }
   gdb_ScopeUnlock;
@@ -414,15 +412,14 @@ int XNav::show_subsrv()
   strcpy(th.title[th.table_cnt++], "Size");
   strcpy(th.title[th.table_cnt++], "Offset");
   strcpy(th.title[th.table_cnt++], "Attribute");
-  item_header = new ItemTableHeader(
-      brow, this, "Title", &th, NULL, flow_eDest_IntoLast);
+  item_header = new ItemTableHeader(brow, this, "Title", &th, NULL, flow_eDest_IntoLast);
   item_header->add_bc(xnav_show_subsrv_scan, NULL);
 
   gdb_ScopeLock
   {
-    for (sl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->subs_lh);
-         sl != &gdbroot->db->subs_lh;
-         sl = pool_Qsucc(&sts, gdbroot->pool, sl)) {
+    for (sl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->subs_lh); sl != &gdbroot->db->subs_lh;
+         sl = pool_Qsucc(&sts, gdbroot->pool, sl))
+    {
       ssrvp = pool_Qitem(sl, sub_sServer, subs_ll);
 
       xnav_show_subsrv_insert(this, ssrvp);
@@ -478,8 +475,7 @@ static int xnav_show_subsrv_insert(XNav* xnav, sub_sServer* ssrvp)
   t.elem[t.elem_cnt++].size = sizeof(ssrvp->aref);
 
   ts.subid_cnt = 0;
-  item = new ItemTable(xnav->brow, xnav, pwr_cNObjid, &t, &ts, -1, 0, 0, 0,
-      NULL, flow_eDest_IntoLast);
+  item = new ItemTable(xnav->brow, xnav, pwr_cNObjid, &t, &ts, -1, 0, 0, 0, NULL, flow_eDest_IntoLast);
   item->found = 1;
   return XNAV__SUCCESS;
 }
@@ -502,7 +498,8 @@ extern "C" void xnav_show_subsrv_scan(XNav* xnav)
 
   // Reset found
   object_p = node_list + 1;
-  for (i = 1; i < node_cnt; i++) {
+  for (i = 1; i < node_cnt; i++)
+  {
     brow_GetUserData(*object_p, (void**)&item);
     item->found = 0;
     object_p++;
@@ -510,26 +507,29 @@ extern "C" void xnav_show_subsrv_scan(XNav* xnav)
 
   gdb_ScopeLock
   {
-    for (sl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->subs_lh);
-         sl != &gdbroot->db->subs_lh;
-         sl = pool_Qsucc(&sts, gdbroot->pool, sl)) {
+    for (sl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->subs_lh); sl != &gdbroot->db->subs_lh;
+         sl = pool_Qsucc(&sts, gdbroot->pool, sl))
+    {
       ssrvp = pool_Qitem(sl, sub_sServer, subs_ll);
 
       object_p = node_list + 1;
       found = 0;
-      for (i = 1; i < node_cnt; i++) {
+      for (i = 1; i < node_cnt; i++)
+      {
         brow_GetUserData(*object_p, (void**)&item);
-        if (memcmp(item->col.elem[0].value_p, &ssrvp->sid, sizeof(pwr_tSubid))
-            == 0) {
+        if (memcmp(item->col.elem[0].value_p, &ssrvp->sid, sizeof(pwr_tSubid)) == 0)
+        {
           found = 1;
           break;
         }
         object_p++;
       }
-      if (!found) {
+      if (!found)
+      {
         xnav_show_subsrv_insert(xnav, ssrvp);
         change_detected = 1;
-      } else
+      }
+      else
         item->found = 1;
     }
   }
@@ -537,12 +537,15 @@ extern "C" void xnav_show_subsrv_scan(XNav* xnav)
 
   // Remove all that were not found
   object_p = node_list + 1;
-  for (i = 1; i < node_cnt; i++) {
+  for (i = 1; i < node_cnt; i++)
+  {
     brow_GetUserData(*object_p, (void**)&item);
-    if (!item->found) {
+    if (!item->found)
+    {
       brow_DeleteNode(xnav->brow->ctx, item->node);
       change_detected = 1;
-    } else
+    }
+    else
       object_p++;
   }
   brow_ResetNodraw(xnav->brow->ctx);
@@ -596,8 +599,7 @@ int XNav::show_subcli()
   strcpy(t.elem[t.elem_cnt++].format, "%8d");
 
   ts.subid_cnt = 0;
-  new ItemTable(
-      brow, this, pwr_cNObjid, &t, &ts, -1, 0, 0, 0, NULL, flow_eDest_IntoLast);
+  new ItemTable(brow, this, pwr_cNObjid, &t, &ts, -1, 0, 0, 0, NULL, flow_eDest_IntoLast);
 
   th.table_cnt = 0;
   strcpy(th.title[th.table_cnt++], "Subid");
@@ -606,18 +608,19 @@ int XNav::show_subcli()
   strcpy(th.title[th.table_cnt++], "Node");
   strcpy(th.title[th.table_cnt++], "Size");
   strcpy(th.title[th.table_cnt++], "Attribute");
-  item_header = new ItemTableHeader(
-      brow, this, "Title", &th, NULL, flow_eDest_IntoLast);
+  item_header = new ItemTableHeader(brow, this, "Title", &th, NULL, flow_eDest_IntoLast);
   item_header->add_bc(xnav_show_subcli_scan, NULL);
 
   xnav_subcli_remote_cnt = 0;
   gdb_ScopeLock
   {
-    for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh);
-         nl != &gdbroot->db->nod_lh; nl = pool_Qsucc(&sts, gdbroot->pool, nl)) {
+    for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh); nl != &gdbroot->db->nod_lh;
+         nl = pool_Qsucc(&sts, gdbroot->pool, nl))
+    {
       np = pool_Qitem(nl, gdb_sNode, nod_ll);
-      for (sl = pool_Qsucc(&sts, gdbroot->pool, &np->subc_lh);
-           sl != &np->subc_lh; sl = pool_Qsucc(&sts, gdbroot->pool, sl)) {
+      for (sl = pool_Qsucc(&sts, gdbroot->pool, &np->subc_lh); sl != &np->subc_lh;
+           sl = pool_Qsucc(&sts, gdbroot->pool, sl))
+      {
         sclip = pool_Qitem(sl, sub_sClient, subc_ll);
         xnav_show_subcli_insert(this, np, sclip);
       }
@@ -633,8 +636,7 @@ int XNav::show_subcli()
   return XNAV__SUCCESS;
 }
 
-static int xnav_show_subcli_insert(
-    XNav* xnav, gdb_sNode* np, sub_sClient* sclip)
+static int xnav_show_subcli_insert(XNav* xnav, gdb_sNode* np, sub_sClient* sclip)
 {
   item_sTable t;
   item_sTableSubid ts;
@@ -683,20 +685,19 @@ static int xnav_show_subcli_insert(
   // Name
   if (sclip->sub_by_name)
     strcpy(t.elem[t.elem_cnt].fix_str, sclip->name);
-  else {
+  else
+  {
     if (sclip->aref.Flags.b.Indirect)
       strcpy(astr, "@");
     else
       strcpy(astr, "");
-    cdh_ArefToString(
-        &astr[strlen(astr)], sizeof(astr) - strlen(astr), &sclip->aref, 1);
+    cdh_ArefToString(&astr[strlen(astr)], sizeof(astr) - strlen(astr), &sclip->aref, 1);
     strcpy(t.elem[t.elem_cnt].fix_str, astr);
   }
   t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
   ts.subid_cnt = 0;
-  item = new ItemTable(xnav->brow, xnav, pwr_cNObjid, &t, &ts, -1, 0, 0, 0,
-      NULL, flow_eDest_IntoLast);
+  item = new ItemTable(xnav->brow, xnav, pwr_cNObjid, &t, &ts, -1, 0, 0, 0, NULL, flow_eDest_IntoLast);
   item->found = 1;
   return XNAV__SUCCESS;
 }
@@ -721,7 +722,8 @@ extern "C" void xnav_show_subcli_scan(XNav* xnav)
 
   // Reset found
   object_p = node_list + 2;
-  for (i = 2; i < node_cnt; i++) {
+  for (i = 2; i < node_cnt; i++)
+  {
     brow_GetUserData(*object_p, (void**)&item);
     item->found = 0;
     object_p++;
@@ -730,28 +732,33 @@ extern "C" void xnav_show_subcli_scan(XNav* xnav)
   xnav_subcli_remote_cnt = 0;
   gdb_ScopeLock
   {
-    for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh);
-         nl != &gdbroot->db->nod_lh; nl = pool_Qsucc(&sts, gdbroot->pool, nl)) {
+    for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh); nl != &gdbroot->db->nod_lh;
+         nl = pool_Qsucc(&sts, gdbroot->pool, nl))
+    {
       np = pool_Qitem(nl, gdb_sNode, nod_ll);
-      for (sl = pool_Qsucc(&sts, gdbroot->pool, &np->subc_lh);
-           sl != &np->subc_lh; sl = pool_Qsucc(&sts, gdbroot->pool, sl)) {
+      for (sl = pool_Qsucc(&sts, gdbroot->pool, &np->subc_lh); sl != &np->subc_lh;
+           sl = pool_Qsucc(&sts, gdbroot->pool, sl))
+      {
         sclip = pool_Qitem(sl, sub_sClient, subc_ll);
 
         object_p = node_list + 2;
         found = 0;
-        for (i = 1; i < node_cnt; i++) {
+        for (i = 1; i < node_cnt; i++)
+        {
           brow_GetUserData(*object_p, (void**)&item);
-          if (memcmp(item->col.elem[0].value_p, &sclip->sid, sizeof(pwr_tSubid))
-              == 0) {
+          if (memcmp(item->col.elem[0].value_p, &sclip->sid, sizeof(pwr_tSubid)) == 0)
+          {
             found = 1;
             break;
           }
           object_p++;
         }
-        if (!found) {
+        if (!found)
+        {
           xnav_show_subcli_insert(xnav, np, sclip);
           change_detected = 1;
-        } else
+        }
+        else
           item->found = 1;
       }
       if (!(np == gdbroot->my_node || np == gdbroot->no_node))
@@ -762,12 +769,15 @@ extern "C" void xnav_show_subcli_scan(XNav* xnav)
 
   // Remove all that were not found
   object_p = node_list + 2;
-  for (i = 2; i < node_cnt; i++) {
+  for (i = 2; i < node_cnt; i++)
+  {
     brow_GetUserData(*object_p, (void**)&item);
-    if (!item->found) {
+    if (!item->found)
+    {
       brow_DeleteNode(xnav->brow->ctx, item->node);
       change_detected = 1;
-    } else
+    }
+    else
       object_p++;
   }
   brow_ResetNodraw(xnav->brow->ctx);
@@ -777,7 +787,8 @@ extern "C" void xnav_show_subcli_scan(XNav* xnav)
 
 void process_to_name(char* name, pwr_tUInt32 process)
 {
-  switch (process) {
+  switch (process)
+  {
   case pwr_mIoProcessMask_Plc:
     strcpy(name, "Plc");
     break;
@@ -850,14 +861,16 @@ int XNav::show_device()
   if (EVEN(sts))
     return sts;
 
-  for (i = 0; i < rack_class_cnt; i++) {
+  for (i = 0; i < rack_class_cnt; i++)
+  {
     sts = gdh_GetClassList(rack_class[i], &rack_objid);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       // Get all children
       sts = gdh_GetChild(rack_objid, &device_objid);
-      while (ODD(sts)) {
-        sts = gdh_ObjidToName(device_objid, object_name, sizeof(object_name),
-            cdh_mName_volumeStrict);
+      while (ODD(sts))
+      {
+        sts = gdh_ObjidToName(device_objid, object_name, sizeof(object_name), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
 
@@ -873,12 +886,14 @@ int XNav::show_device()
         // ErrorCount
         strcpy(attr_name, object_name);
         strcat(attr_name, ".ErrorCount");
-        sts = gdh_GetAttributeCharacteristics(
-            attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
-        if (EVEN(sts)) {
+        sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+        if (EVEN(sts))
+        {
           strcpy(t.elem[t.elem_cnt].fix_str, "       -");
           t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
-        } else {
+        }
+        else
+        {
           sts = gdh_NameToAttrref(pwr_cNObjid, attr_name, &attrref);
           if (EVEN(sts))
             return sts;
@@ -900,29 +915,33 @@ int XNav::show_device()
         sts = gdh_GetObjectInfo(attr_name, (void*)&process, sizeof(process));
         if (ODD(sts))
           process_to_name(t.elem[t.elem_cnt].fix_str, process);
-        else {
+        else
+        {
           process = 0;
           strcpy(t.elem[t.elem_cnt].fix_str, "-");
         }
         t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
         // ThreadObject
-        if (!(process & 1)) {
+        if (!(process & 1))
+        {
           strcpy(t.elem[t.elem_cnt].fix_str, "-");
           t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
-        } else {
+        }
+        else
+        {
           strcpy(attr_name, object_name);
           strcat(attr_name, ".ThreadObject");
-          sts = gdh_GetObjectInfo(
-              attr_name, (void*)&thread_objid, sizeof(thread_objid));
-          if (ODD(sts)) {
-            sts = gdh_ObjidToName(
-                thread_objid, namebuf, sizeof(namebuf), cdh_mName_object);
+          sts = gdh_GetObjectInfo(attr_name, (void*)&thread_objid, sizeof(thread_objid));
+          if (ODD(sts))
+          {
+            sts = gdh_ObjidToName(thread_objid, namebuf, sizeof(namebuf), cdh_mName_object);
             if (ODD(sts))
               strcpy(t.elem[t.elem_cnt].fix_str, namebuf);
             else
               strcpy(t.elem[t.elem_cnt].fix_str, "-");
-          } else
+          }
+          else
             strcpy(t.elem[t.elem_cnt].fix_str, "-");
           t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
         }
@@ -938,8 +957,7 @@ int XNav::show_device()
 
         // Class name
         sts = gdh_GetObjectClass(device_objid, &classid);
-        sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), namebuf,
-            sizeof(namebuf), cdh_mName_object);
+        sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), namebuf, sizeof(namebuf), cdh_mName_object);
         strcpy(t.elem[t.elem_cnt].fix_str, namebuf);
         t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
@@ -948,12 +966,14 @@ int XNav::show_device()
         // Description
         strcpy(attr_name, object_name);
         strcat(attr_name, ".Description");
-        sts = gdh_GetAttributeCharacteristics(
-            attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
-        if (EVEN(sts)) {
+        sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+        if (EVEN(sts))
+        {
           strcpy(t.elem[t.elem_cnt].fix_str, "");
           t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
-        } else {
+        }
+        else
+        {
           sts = gdh_NameToAttrref(pwr_cNObjid, attr_name, &attrref);
           if (EVEN(sts))
             return sts;
@@ -969,8 +989,7 @@ int XNav::show_device()
           ts.subid[ts.subid_cnt++] = subid;
         }
 
-        new ItemDevice(brow, this, device_objid, &t, &ts, -1, 0, 0, 0, NULL,
-            flow_eDest_IntoLast);
+        new ItemDevice(brow, this, device_objid, &t, &ts, -1, 0, 0, 0, NULL, flow_eDest_IntoLast);
         sts = gdh_GetNextSibling(device_objid, &device_objid);
       }
       sts = gdh_GetNextObject(rack_objid, &rack_objid);
@@ -984,28 +1003,32 @@ int XNav::show_device()
   return XNAV__SUCCESS;
 }
 
-static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
-    pwr_tCid chan_cid, int* conv, int* inv, int* teston)
+static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid, pwr_tCid chan_cid, int* conv,
+                                   int* inv, int* teston)
 {
   *conv = 0;
   *inv = 0;
   *teston = 0;
 
-  switch (card_cid) {
-  case pwr_cClass_Ssab_DI32D: {
+  switch (card_cid)
+  {
+  case pwr_cClass_Ssab_DI32D:
+  {
     pwr_sClass_Ssab_BaseDiCard* cp = (pwr_sClass_Ssab_BaseDiCard*)cardp;
     pwr_tMask mask;
     unsigned int chan_idx;
 
-    chan_idx = ((char*)chanp - (char*)cp
-                   - pwr_AlignLW(sizeof(pwr_sClass_Ssab_BaseDiCard)))
-        / pwr_AlignLW(sizeof(pwr_sClass_ChanDi));
-    if (chan_idx < 16) {
+    chan_idx = ((char*)chanp - (char*)cp - pwr_AlignLW(sizeof(pwr_sClass_Ssab_BaseDiCard))) /
+               pwr_AlignLW(sizeof(pwr_sClass_ChanDi));
+    if (chan_idx < 16)
+    {
       mask = 1 << chan_idx;
       *conv = cp->ConvMask1 & mask ? 1 : 0;
       *inv = cp->InvMask1 & mask ? 1 : 0;
       *teston = 0;
-    } else if (chan_idx < 32) {
+    }
+    else if (chan_idx < 32)
+    {
       mask = 1 << (chan_idx - 16);
       *conv = cp->ConvMask2 & mask ? 1 : 0;
       *inv = cp->InvMask2 & mask ? 1 : 0;
@@ -1014,20 +1037,23 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
     break;
   }
   case pwr_cClass_Ssab_DO32DKS:
-  case pwr_cClass_Ssab_DO32DKS_Stall: {
+  case pwr_cClass_Ssab_DO32DKS_Stall:
+  {
     pwr_sClass_Ssab_BaseDoCard* cp = (pwr_sClass_Ssab_BaseDoCard*)cardp;
     pwr_tMask mask;
     unsigned int chan_idx;
 
-    chan_idx = ((char*)chanp - (char*)cp
-                   - pwr_AlignLW(sizeof(pwr_sClass_Ssab_BaseDoCard)))
-        / pwr_AlignLW(sizeof(pwr_sClass_ChanDo));
-    if (chan_idx < 16) {
+    chan_idx = ((char*)chanp - (char*)cp - pwr_AlignLW(sizeof(pwr_sClass_Ssab_BaseDoCard))) /
+               pwr_AlignLW(sizeof(pwr_sClass_ChanDo));
+    if (chan_idx < 16)
+    {
       mask = 1 << chan_idx;
       *conv = 1;
       *inv = cp->InvMask1 & mask ? 1 : 0;
       *teston = cp->TestMask1 & mask ? 1 : 0;
-    } else if (chan_idx < 32) {
+    }
+    else if (chan_idx < 32)
+    {
       mask = 1 << (chan_idx - 16);
       *conv = 1;
       *inv = cp->InvMask2 & mask ? 1 : 0;
@@ -1035,9 +1061,12 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
     }
     break;
   }
-  default: {
-    switch (chan_cid) {
-    case pwr_cClass_ChanDi: {
+  default:
+  {
+    switch (chan_cid)
+    {
+    case pwr_cClass_ChanDi:
+    {
       pwr_sClass_ChanDi* cp = (pwr_sClass_ChanDi*)chanp;
 
       *inv = cp->InvertOn;
@@ -1045,7 +1074,8 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
       *teston = 0;
       break;
     }
-    case pwr_cClass_ChanDo: {
+    case pwr_cClass_ChanDo:
+    {
       pwr_sClass_ChanDo* cp = (pwr_sClass_ChanDo*)chanp;
 
       *inv = cp->InvertOn;
@@ -1053,7 +1083,8 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
       *teston = cp->TestOn;
       break;
     }
-    case pwr_cClass_ChanD: {
+    case pwr_cClass_ChanD:
+    {
       pwr_sClass_ChanD* cp = (pwr_sClass_ChanD*)chanp;
 
       *inv = cp->InvertOn;
@@ -1061,7 +1092,8 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
       *teston = cp->TestOn;
       break;
     }
-    case pwr_cClass_ChanIi: {
+    case pwr_cClass_ChanIi:
+    {
       pwr_sClass_ChanIi* cp = (pwr_sClass_ChanIi*)chanp;
 
       *inv = 0;
@@ -1069,7 +1101,8 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
       *teston = 0;
       break;
     }
-    case pwr_cClass_ChanIo: {
+    case pwr_cClass_ChanIo:
+    {
       pwr_sClass_ChanIo* cp = (pwr_sClass_ChanIo*)chanp;
 
       *inv = 0;
@@ -1077,7 +1110,8 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
       *teston = cp->TestOn;
       break;
     }
-    case pwr_cClass_ChanAi: {
+    case pwr_cClass_ChanAi:
+    {
       pwr_sClass_ChanAi* cp = (pwr_sClass_ChanAi*)chanp;
 
       *inv = 0;
@@ -1085,7 +1119,8 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
       *teston = 0;
       break;
     }
-    case pwr_cClass_ChanAit: {
+    case pwr_cClass_ChanAit:
+    {
       pwr_sClass_ChanAit* cp = (pwr_sClass_ChanAit*)chanp;
 
       *inv = 0;
@@ -1093,7 +1128,8 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
       *teston = 0;
       break;
     }
-    case pwr_cClass_ChanCo: {
+    case pwr_cClass_ChanCo:
+    {
       pwr_sClass_ChanCo* cp = (pwr_sClass_ChanCo*)chanp;
 
       *inv = 0;
@@ -1101,7 +1137,8 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
       *teston = 0;
       break;
     }
-    case pwr_cClass_ChanAo: {
+    case pwr_cClass_ChanAo:
+    {
       pwr_sClass_ChanAo* cp = (pwr_sClass_ChanAo*)chanp;
 
       *inv = 0;
@@ -1109,7 +1146,8 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
       *teston = cp->TestOn;
       break;
     }
-    case pwr_cClass_ChanBi: {
+    case pwr_cClass_ChanBi:
+    {
       pwr_sClass_ChanBi* cp = (pwr_sClass_ChanBi*)chanp;
 
       *inv = 0;
@@ -1140,15 +1178,16 @@ static void xnav_show_channels_scan(XNav* xnav)
 
   brow_GetObjectList(xnav->brow->ctx, &node_list, &node_cnt);
 
-  for (i = 1; i < node_cnt; i++) {
+  for (i = 1; i < node_cnt; i++)
+  {
     brow_GetUserData(node_list[i], (void**)&item);
 
-    if (item->type == xnav_eItemType_Channel) {
+    if (item->type == xnav_eItemType_Channel)
+    {
       xnav_channel_get_flags(((tab_sChannelFlagsData*)item->col.user)->cardp,
-          ((tab_sChannelFlagsData*)item->col.user)->chanp,
-          ((tab_sChannelFlagsData*)item->col.user)->card_cid,
-          ((tab_sChannelFlagsData*)item->col.user)->chan_cid, &conv, &inv,
-          &teston);
+                             ((tab_sChannelFlagsData*)item->col.user)->chanp,
+                             ((tab_sChannelFlagsData*)item->col.user)->card_cid,
+                             ((tab_sChannelFlagsData*)item->col.user)->chan_cid, &conv, &inv, &teston);
 
       strcpy((char*)item->col.elem[2].value_p, "");
       if (!conv)
@@ -1159,20 +1198,26 @@ static void xnav_show_channels_scan(XNav* xnav)
         strcat((char*)item->col.elem[2].value_p, "Test ");
 
       brow_GetAnnotPixmap(node_list[i], 1, &pixmap);
-      if (!conv) {
+      if (!conv)
+      {
         brow_GetAnnotPixmap(node_list[i], 1, &pixmap);
         if (pixmap != xnav->brow->pixmap_offline)
           brow_SetAnnotPixmap(node_list[i], 1, xnav->brow->pixmap_offline);
-      } else if (teston) {
+      }
+      else if (teston)
+      {
         if (pixmap != xnav->brow->pixmap_teston)
           brow_SetAnnotPixmap(node_list[i], 1, xnav->brow->pixmap_teston);
-      } else if (inv) {
+      }
+      else if (inv)
+      {
         if (pixmap != xnav->brow->pixmap_inverted)
           brow_SetAnnotPixmap(node_list[i], 1, xnav->brow->pixmap_inverted);
-      } else {
-        if (pixmap == xnav->brow->pixmap_offline
-            || pixmap == xnav->brow->pixmap_teston
-            || pixmap == xnav->brow->pixmap_inverted)
+      }
+      else
+      {
+        if (pixmap == xnav->brow->pixmap_offline || pixmap == xnav->brow->pixmap_teston ||
+            pixmap == xnav->brow->pixmap_inverted)
           brow_RemoveAnnotPixmap(node_list[i], 1);
       }
     }
@@ -1188,9 +1233,11 @@ static void xnav_show_channels_close(XNav* xnav)
 
   brow_GetObjectList(xnav->brow->ctx, &node_list, &node_cnt);
 
-  for (i = 1; i < node_cnt; i++) {
+  for (i = 1; i < node_cnt; i++)
+  {
     brow_GetUserData(node_list[i], (void**)&item);
-    if (item->type == xnav_eItemType_Channel) {
+    if (item->type == xnav_eItemType_Channel)
+    {
       free(item->col.elem[2].value_p);
       free(item->col.user);
     }
@@ -1237,8 +1284,7 @@ int XNav::show_channels(pwr_tObjid card_objid)
   strcpy(th.title[th.table_cnt++], "");
   strcpy(th.title[th.table_cnt++], "");
   strcpy(th.title[th.table_cnt++], "Description");
-  item_header = new ItemTableHeader(
-      brow, this, "Title", &th, NULL, flow_eDest_IntoLast);
+  item_header = new ItemTableHeader(brow, this, "Title", &th, NULL, flow_eDest_IntoLast);
   item_header->add_bc(xnav_show_channels_scan, xnav_show_channels_close);
 
   sts = gdh_GetObjectClass(card_objid, &card_cid);
@@ -1252,14 +1298,14 @@ int XNav::show_channels(pwr_tObjid card_objid)
 
   // Get all children
   sts = gdh_GetChild(card_objid, &chan_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     child_found = 1;
 
     t.elem_cnt = 0;
     ts.subid_cnt = 0;
 
-    sts = gdh_ObjidToName(
-        chan_objid, object_name, sizeof(object_name), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(chan_objid, object_name, sizeof(object_name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
@@ -1273,7 +1319,8 @@ int XNav::show_channels(pwr_tObjid card_objid)
       return sts;
 
     ts.subid[ts.subid_cnt++] = subid;
-    if (card_subid.nid != 0) {
+    if (card_subid.nid != 0)
+    {
       ts.subid[ts.subid_cnt++] = card_subid;
       card_subid = pwr_cNSubid;
     }
@@ -1287,16 +1334,17 @@ int XNav::show_channels(pwr_tObjid card_objid)
     // Get connected signal
     strcpy(attr_name, object_name);
     strcat(attr_name, ".SigChanCon");
-    sts = gdh_GetObjectInfo(
-        attr_name, (void*)&signal_aref, sizeof(signal_aref));
-    if (ODD(sts)) {
-      sts = gdh_AttrrefToName(
-          &signal_aref, signal_name, sizeof(signal_name), cdh_mNName);
-      if (EVEN(sts)) {
+    sts = gdh_GetObjectInfo(attr_name, (void*)&signal_aref, sizeof(signal_aref));
+    if (ODD(sts))
+    {
+      sts = gdh_AttrrefToName(&signal_aref, signal_name, sizeof(signal_name), cdh_mNName);
+      if (EVEN(sts))
+      {
         signal_aref.Objid = pwr_cNObjid;
         strcpy(signal_name, "-");
       }
-    } else
+    }
+    else
       signal_aref.Objid = pwr_cNObjid;
 
     // Object name
@@ -1306,12 +1354,13 @@ int XNav::show_channels(pwr_tObjid card_objid)
     t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
     // Value
-    if (cdh_ObjidIsNotNull(signal_aref.Objid)
-        && !(chan_cid == pwr_cClass_ChanBi || chan_cid == pwr_cClass_ChanBo
-               || chan_cid == pwr_cClass_ChanBiBlob
-               || chan_cid == pwr_cClass_ChanBiBlob)) {
+    if (cdh_ObjidIsNotNull(signal_aref.Objid) &&
+        !(chan_cid == pwr_cClass_ChanBi || chan_cid == pwr_cClass_ChanBo ||
+          chan_cid == pwr_cClass_ChanBiBlob || chan_cid == pwr_cClass_ChanBiBlob))
+    {
       strcpy(attr_name, signal_name);
-      switch (chan_cid) {
+      switch (chan_cid)
+      {
       case pwr_cClass_ChanDi:
       case pwr_cClass_ChanDo:
       case pwr_cClass_ChanD:
@@ -1325,21 +1374,23 @@ int XNav::show_channels(pwr_tObjid card_objid)
         strcat(attr_name, ".RawValue");
         break;
       }
-      sts = gdh_GetAttributeCharacteristics(
-          attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
-      if (EVEN(sts)) {
+      sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+      if (EVEN(sts))
+      {
         free(t.user);
         return sts;
       }
 
       sts = gdh_NameToAttrref(pwr_cNObjid, attr_name, &attrref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(t.user);
         return sts;
       }
 
       sts = gdh_DLRefObjectInfoAttrref(&attrref, &attr_ptr, &subid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(t.user);
         return sts;
       }
@@ -1348,7 +1399,8 @@ int XNav::show_channels(pwr_tObjid card_objid)
       t.elem[t.elem_cnt].type_id = attrtype;
       t.elem[t.elem_cnt].size = attrsize;
 
-      switch (chan_cid) {
+      switch (chan_cid)
+      {
       case pwr_cClass_ChanDi:
       case pwr_cClass_ChanDo:
       case pwr_cClass_ChanD:
@@ -1365,7 +1417,8 @@ int XNav::show_channels(pwr_tObjid card_objid)
         t.elem[t.elem_cnt++].type_id = xnav_eType_Empty;
       }
       ts.subid[ts.subid_cnt++] = subid;
-    } else
+    }
+    else
       t.elem[t.elem_cnt++].type_id = xnav_eType_Empty;
 
     // Flags
@@ -1376,9 +1429,11 @@ int XNav::show_channels(pwr_tObjid card_objid)
     t.elem[t.elem_cnt++].type_id = pwr_eType_String;
 
     // Signal
-    if (cdh_ObjidIsNotNull(signal_aref.Objid)) {
+    if (cdh_ObjidIsNotNull(signal_aref.Objid))
+    {
       strcpy(t.elem[t.elem_cnt].fix_str, signal_name);
-    } else
+    }
+    else
       strcpy(t.elem[t.elem_cnt].fix_str, "-");
     t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
@@ -1393,7 +1448,8 @@ int XNav::show_channels(pwr_tObjid card_objid)
       strcpy(attr_name, object_name);
     strcat(attr_name, ".Description");
     sts = gdh_GetObjectInfo(attr_name, (void*)&descr, sizeof(descr));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       free(t.user);
       return sts;
     }
@@ -1401,15 +1457,15 @@ int XNav::show_channels(pwr_tObjid card_objid)
     strcpy(t.elem[t.elem_cnt].fix_str, descr);
     t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
-    item = new ItemChannel(brow, this, chan_objid, &t, &ts, -1, 0, 0, 1, NULL,
-        flow_eDest_IntoLast);
+    item = new ItemChannel(brow, this, chan_objid, &t, &ts, -1, 0, 0, 1, NULL, flow_eDest_IntoLast);
     item->signal_aref = signal_aref;
 
     sts = gdh_GetNextSibling(chan_objid, &chan_objid);
   }
 
   // Get all intern channels
-  if (!child_found) {
+  if (!child_found)
+  {
     pwr_tAttrRef card_aref = cdh_ObjidToAref(card_objid);
 
     sts = show_attr_channels(&card_aref, cardp, &card_subid, card_cid);
@@ -1423,8 +1479,7 @@ int XNav::show_channels(pwr_tObjid card_objid)
   return XNAV__SUCCESS;
 }
 
-int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
-    pwr_tSubid* card_subid, pwr_tCid card_cid)
+int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp, pwr_tSubid* card_subid, pwr_tCid card_cid)
 {
   gdh_sAttrDef* bd;
   int rows;
@@ -1455,8 +1510,7 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_AttrrefToName(
-      mod_aref, mod_name, sizeof(mod_name), cdh_mName_volumeStrict);
+  sts = gdh_AttrrefToName(mod_aref, mod_name, sizeof(mod_name), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -1464,8 +1518,10 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
   if (EVEN(sts))
     return sts;
 
-  for (i = 0; i < rows; i++) {
-    switch (bd[i].attr->Param.TypeRef) {
+  for (i = 0; i < rows; i++)
+  {
+    switch (bd[i].attr->Param.TypeRef)
+    {
     case pwr_cClass_ChanAi:
     case pwr_cClass_ChanAit:
     case pwr_cClass_ChanAo:
@@ -1481,7 +1537,8 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
     case pwr_cClass_ChanBiBlob:
       break;
     default:
-      if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS) {
+      if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS)
+      {
         // This could be an IO module object, look for channels
         pwr_sAttrRef aref;
 
@@ -1501,15 +1558,19 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
     else
       elem = 1;
 
-    for (int j = 0; j < elem; j++) {
+    for (int j = 0; j < elem; j++)
+    {
       t.elem_cnt = 0;
       ts.subid_cnt = 0;
 
-      if (elem == 1) {
+      if (elem == 1)
+      {
         strcpy(object_name, mod_name);
         strcat(object_name, ".");
         strcat(object_name, bd[i].attrName);
-      } else {
+      }
+      else
+      {
         sprintf(object_name, "%s.%s[%d]", mod_name, bd[i].attrName, j);
       }
 
@@ -1522,7 +1583,8 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
         return sts;
 
       ts.subid[ts.subid_cnt++] = subid;
-      if (card_subid->nid != 0) {
+      if (card_subid->nid != 0)
+      {
         ts.subid[ts.subid_cnt++] = *card_subid;
         *card_subid = pwr_cNSubid;
       }
@@ -1536,16 +1598,17 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
       // Get connected signal
       strcpy(attr_name, object_name);
       strcat(attr_name, ".SigChanCon");
-      sts = gdh_GetObjectInfo(
-          attr_name, (void*)&signal_aref, sizeof(signal_aref));
-      if (ODD(sts)) {
-        sts = gdh_AttrrefToName(
-            &signal_aref, signal_name, sizeof(signal_name), cdh_mNName);
-        if (EVEN(sts)) {
+      sts = gdh_GetObjectInfo(attr_name, (void*)&signal_aref, sizeof(signal_aref));
+      if (ODD(sts))
+      {
+        sts = gdh_AttrrefToName(&signal_aref, signal_name, sizeof(signal_name), cdh_mNName);
+        if (EVEN(sts))
+        {
           signal_aref.Objid = pwr_cNObjid;
           strcpy(signal_name, "-");
         }
-      } else
+      }
+      else
         signal_aref.Objid = pwr_cNObjid;
 
       // Object name
@@ -1555,12 +1618,13 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
       t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
       // Value
-      if (cdh_ObjidIsNotNull(signal_aref.Objid)
-          && !(chan_cid == pwr_cClass_ChanBi || chan_cid == pwr_cClass_ChanBo
-                 || chan_cid == pwr_cClass_ChanBiBlob
-                 || chan_cid == pwr_cClass_ChanBiBlob)) {
+      if (cdh_ObjidIsNotNull(signal_aref.Objid) &&
+          !(chan_cid == pwr_cClass_ChanBi || chan_cid == pwr_cClass_ChanBo ||
+            chan_cid == pwr_cClass_ChanBiBlob || chan_cid == pwr_cClass_ChanBiBlob))
+      {
         strcpy(attr_name, signal_name);
-        switch (chan_cid) {
+        switch (chan_cid)
+        {
         case pwr_cClass_ChanDi:
         case pwr_cClass_ChanDo:
         case pwr_cClass_ChanD:
@@ -1574,21 +1638,23 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
           strcat(attr_name, ".RawValue");
           break;
         }
-        sts = gdh_GetAttributeCharacteristics(
-            attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
-        if (EVEN(sts)) {
+        sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+        if (EVEN(sts))
+        {
           free(t.user);
           return sts;
         }
 
         sts = gdh_NameToAttrref(pwr_cNObjid, attr_name, &attrref);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           free(t.user);
           return sts;
         }
 
         sts = gdh_DLRefObjectInfoAttrref(&attrref, &attr_ptr, &subid);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           free(t.user);
           return sts;
         }
@@ -1597,7 +1663,8 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
         t.elem[t.elem_cnt].type_id = attrtype;
         t.elem[t.elem_cnt].size = attrsize;
 
-        switch (chan_cid) {
+        switch (chan_cid)
+        {
         case pwr_cClass_ChanDi:
         case pwr_cClass_ChanDo:
         case pwr_cClass_ChanD:
@@ -1612,7 +1679,8 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
           break;
         }
         ts.subid[ts.subid_cnt++] = subid;
-      } else
+      }
+      else
         t.elem[t.elem_cnt++].type_id = xnav_eType_Empty;
 
       // Flags
@@ -1622,9 +1690,11 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
       t.elem[t.elem_cnt++].type_id = pwr_eType_String;
 
       // Signal
-      if (cdh_ObjidIsNotNull(signal_aref.Objid)) {
+      if (cdh_ObjidIsNotNull(signal_aref.Objid))
+      {
         strcpy(t.elem[t.elem_cnt].fix_str, signal_name);
-      } else
+      }
+      else
         strcpy(t.elem[t.elem_cnt].fix_str, "-");
       t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
@@ -1639,7 +1709,8 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
         strcpy(attr_name, object_name);
       strcat(attr_name, ".Description");
       sts = gdh_GetObjectInfo(attr_name, (void*)&descr, sizeof(descr));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(t.user);
         return sts;
       }
@@ -1647,8 +1718,7 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
       strcpy(t.elem[t.elem_cnt].fix_str, descr);
       t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
-      item = new ItemChannel(brow, this, mod_aref->Objid, &t, &ts, -1, 0, 0, 1,
-          NULL, flow_eDest_IntoLast);
+      item = new ItemChannel(brow, this, mod_aref->Objid, &t, &ts, -1, 0, 0, 1, NULL, flow_eDest_IntoLast);
       item->signal_aref = signal_aref;
     }
   }
@@ -1665,7 +1735,8 @@ int XNav::show_object(pwr_tAttrRef* oarp, brow_tNode node)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node) & xnav_mOpen_Attributes) {
+  if (brow_IsOpen(node) & xnav_mOpen_Attributes)
+  {
     // Attributes is open, close
     brow_SetNodraw(brow->ctx);
     brow_CloseNode(brow->ctx, node);
@@ -1673,14 +1744,16 @@ int XNav::show_object(pwr_tAttrRef* oarp, brow_tNode node)
     brow_RemoveAnnotPixmap(node, 1);
     brow_ResetNodraw(brow->ctx);
     brow_Redraw(brow->ctx, node_y);
-  } else {
+  }
+  else
+  {
     int sts;
     Item* item;
     pwr_tTypeId atype;
     unsigned int asize, aoffset, adim, aflags;
 
-    if (brow_IsOpen(node) & xnav_mOpen_Children
-        || brow_IsOpen(node) & xnav_mOpen_Crossref) {
+    if (brow_IsOpen(node) & xnav_mOpen_Children || brow_IsOpen(node) & xnav_mOpen_Crossref)
+    {
       // Close children first
       brow_SetNodraw(brow->ctx);
       brow_CloseNode(brow->ctx, node);
@@ -1693,10 +1766,12 @@ int XNav::show_object(pwr_tAttrRef* oarp, brow_tNode node)
 
     sts = gdh_GetAttributeCharAttrref(oarp, &atype, &asize, &aoffset, &adim);
 
-    if (oarp->Flags.b.Object) {
-      item = (Item*)new ItemObject(
-          brow, oarp->Objid, node, flow_eDest_IntoLast, 0);
-    } else {
+    if (oarp->Flags.b.Object)
+    {
+      item = (Item*)new ItemObject(brow, oarp->Objid, node, flow_eDest_IntoLast, 0);
+    }
+    else
+    {
       pwr_tAName aname;
       pwr_tOName attrname;
       char* s;
@@ -1710,8 +1785,8 @@ int XNav::show_object(pwr_tAttrRef* oarp, brow_tNode node)
 
       aflags = PWR_MASK_CLASS;
 
-      item = (Item*)new ItemAttrObject(brow, oarp->Objid, node,
-          flow_eDest_IntoLast, attrname, atype, asize, aflags, 0, 0);
+      item = (Item*)new ItemAttrObject(brow, oarp->Objid, node, flow_eDest_IntoLast, attrname, atype, asize,
+                                       aflags, 0, 0);
     }
     brow_SetOpen(node, xnav_mOpen_Attributes);
     brow_SetAnnotPixmap(node, 1, brow->pixmap_openattr);
@@ -1745,8 +1820,10 @@ int XNav::show_remnode()
   strcpy(th.title[th.table_cnt++], "Description");
   new ItemTableHeader(brow, this, "Title", &th, NULL, flow_eDest_IntoLast);
 
-  for (int i = 0; i < 10; i++) {
-    switch (i) {
+  for (int i = 0; i < 10; i++)
+  {
+    switch (i)
+    {
     case 0:
       cid = pwr_cClass_RemnodeUDP;
       break;
@@ -1780,70 +1857,57 @@ int XNav::show_remnode()
     }
 
     sts = gdh_GetClassList(cid, &objid);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       sts = gdh_ObjidToPointer(objid, (void**)&object_ptr);
       if (EVEN(sts))
         return sts;
 
-      sts = gdh_ObjidToName(
-          objid, object_name, sizeof(object_name), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(objid, object_name, sizeof(object_name), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
 
-      switch (i) {
+      switch (i)
+      {
       case 0:
         strncpy(id, ((pwr_sClass_RemnodeUDP*)object_ptr)->Id, sizeof(id));
-        strncpy(description, ((pwr_sClass_RemnodeUDP*)object_ptr)->Description,
-            sizeof(description));
+        strncpy(description, ((pwr_sClass_RemnodeUDP*)object_ptr)->Description, sizeof(description));
         break;
       case 1:
         strncpy(id, ((pwr_sClass_RemnodeTCP*)object_ptr)->Id, sizeof(id));
-        strncpy(description, ((pwr_sClass_RemnodeTCP*)object_ptr)->Description,
-            sizeof(description));
+        strncpy(description, ((pwr_sClass_RemnodeTCP*)object_ptr)->Description, sizeof(description));
         break;
       case 2:
         strncpy(id, ((pwr_sClass_Remnode3964R*)object_ptr)->Id, sizeof(id));
-        strncpy(description,
-            ((pwr_sClass_Remnode3964R*)object_ptr)->Description,
-            sizeof(description));
+        strncpy(description, ((pwr_sClass_Remnode3964R*)object_ptr)->Description, sizeof(description));
         break;
       case 3:
         strncpy(id, ((pwr_sClass_RemnodeALCM*)object_ptr)->Id, sizeof(id));
-        strncpy(description, ((pwr_sClass_RemnodeALCM*)object_ptr)->Description,
-            sizeof(description));
+        strncpy(description, ((pwr_sClass_RemnodeALCM*)object_ptr)->Description, sizeof(description));
         break;
       case 4:
         strncpy(id, ((pwr_sClass_RemnodeSerial*)object_ptr)->Id, sizeof(id));
-        strncpy(description,
-            ((pwr_sClass_RemnodeSerial*)object_ptr)->Description,
-            sizeof(description));
+        strncpy(description, ((pwr_sClass_RemnodeSerial*)object_ptr)->Description, sizeof(description));
         break;
       case 5:
         strncpy(id, ((pwr_sClass_RemnodeModbus*)object_ptr)->Id, sizeof(id));
-        strncpy(description,
-            ((pwr_sClass_RemnodeModbus*)object_ptr)->Description,
-            sizeof(description));
+        strncpy(description, ((pwr_sClass_RemnodeModbus*)object_ptr)->Description, sizeof(description));
         break;
       case 6:
         strncpy(id, ((pwr_sClass_RemnodeMQ*)object_ptr)->Id, sizeof(id));
-        strncpy(description, ((pwr_sClass_RemnodeMQ*)object_ptr)->Description,
-            sizeof(description));
+        strncpy(description, ((pwr_sClass_RemnodeMQ*)object_ptr)->Description, sizeof(description));
         break;
       case 7:
         strncpy(id, ((pwr_sClass_RemnodeWMQ*)object_ptr)->Id, sizeof(id));
-        strncpy(description, ((pwr_sClass_RemnodeWMQ*)object_ptr)->Description,
-            sizeof(description));
+        strncpy(description, ((pwr_sClass_RemnodeWMQ*)object_ptr)->Description, sizeof(description));
         break;
       case 8:
         strncpy(id, ((pwr_sClass_RemnodeQCom*)object_ptr)->Id, sizeof(id));
-        strncpy(description, ((pwr_sClass_RemnodeQCom*)object_ptr)->Description,
-            sizeof(description));
+        strncpy(description, ((pwr_sClass_RemnodeQCom*)object_ptr)->Description, sizeof(description));
         break;
       case 9:
         strncpy(id, ((pwr_sClass_RemnodeRabbitMQ*)object_ptr)->Id, sizeof(id));
-        strncpy(description,
-            ((pwr_sClass_RemnodeRabbitMQ*)object_ptr)->Description,
-            sizeof(description));
+        strncpy(description, ((pwr_sClass_RemnodeRabbitMQ*)object_ptr)->Description, sizeof(description));
         break;
       }
 
@@ -1866,8 +1930,7 @@ int XNav::show_remnode()
       t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
       ts.subid_cnt = 0;
-      new ItemRemNode(
-          brow, this, objid, &t, &ts, -1, 0, 0, 1, NULL, flow_eDest_IntoLast);
+      new ItemRemNode(brow, this, objid, &t, &ts, -1, 0, 0, 1, NULL, flow_eDest_IntoLast);
 
       sts = gdh_GetNextObject(objid, &objid);
     }
@@ -1915,20 +1978,20 @@ int XNav::show_remtrans(pwr_tObjid remnode_objid)
     sts = gdh_GetClassList(pwr_cClass_RemTrans, &objid);
   else
     sts = gdh_GetChild(remnode_objid, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(objid, &cid);
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_RemTrans) {
+    if (cid == pwr_cClass_RemTrans)
+    {
       attrref = cdh_ObjidToAref(objid);
-      sts = gdh_DLRefObjectInfoAttrref(
-          &attrref, (pwr_tAddress*)&object_ptr, &subid);
+      sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&object_ptr, &subid);
       if (EVEN(sts))
         return sts;
 
-      sts = gdh_ObjidToName(
-          objid, object_name, sizeof(object_name), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(objid, object_name, sizeof(object_name), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
 
@@ -1945,8 +2008,7 @@ int XNav::show_remtrans(pwr_tObjid remnode_objid)
       // DataValid
       strcpy(attr_name, object_name);
       strcat(attr_name, ".DataValid");
-      sts = gdh_GetAttributeCharacteristics(
-          attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+      sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
       if (EVEN(sts))
         return sts;
 
@@ -1956,7 +2018,8 @@ int XNav::show_remtrans(pwr_tObjid remnode_objid)
       strcpy(t.elem[t.elem_cnt++].format, "%2d");
 
       // Direction
-      switch (object_ptr->Direction) {
+      switch (object_ptr->Direction)
+      {
       case 1:
         strcpy(t.elem[t.elem_cnt].fix_str, "Rcv");
         break;
@@ -1969,8 +2032,7 @@ int XNav::show_remtrans(pwr_tObjid remnode_objid)
       // TransCount
       strcpy(attr_name, object_name);
       strcat(attr_name, ".TransCount");
-      sts = gdh_GetAttributeCharacteristics(
-          attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+      sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
       if (EVEN(sts))
         return sts;
 
@@ -1982,8 +2044,7 @@ int XNav::show_remtrans(pwr_tObjid remnode_objid)
       // TransTime
       strcpy(attr_name, object_name);
       strcat(attr_name, ".TransTime");
-      sts = gdh_GetAttributeCharacteristics(
-          attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+      sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
       if (EVEN(sts))
         return sts;
 
@@ -1997,8 +2058,7 @@ int XNav::show_remtrans(pwr_tObjid remnode_objid)
       // ErrCount
       strcpy(attr_name, object_name);
       strcat(attr_name, ".ErrCount");
-      sts = gdh_GetAttributeCharacteristics(
-          attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+      sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
       if (EVEN(sts))
         return sts;
 
@@ -2010,8 +2070,7 @@ int XNav::show_remtrans(pwr_tObjid remnode_objid)
       // LastSts
       strcpy(attr_name, object_name);
       strcat(attr_name, ".LastSts");
-      sts = gdh_GetAttributeCharacteristics(
-          attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
+      sts = gdh_GetAttributeCharacteristics(attr_name, &attrtype, &attrsize, &attroffs, &attrelem);
       if (EVEN(sts))
         return sts;
 
@@ -2022,8 +2081,7 @@ int XNav::show_remtrans(pwr_tObjid remnode_objid)
 
       ts.subid[0] = subid;
       ts.subid_cnt = 1;
-      new ItemRemTrans(
-          brow, this, objid, &t, &ts, -1, 0, 0, 0, NULL, flow_eDest_IntoLast);
+      new ItemRemTrans(brow, this, objid, &t, &ts, -1, 0, 0, 0, NULL, flow_eDest_IntoLast);
     }
     if (cdh_ObjidIsNull(remnode_objid))
       sts = gdh_GetNextObject(objid, &objid);
@@ -2053,7 +2111,7 @@ int XNav::show_plcpgm()
   pwr_tCid cid;
   pwr_tOid window_oid;
   int window_found;
-  pwr_sClass_windowplc *window_ptr;
+  pwr_sClass_windowplc* window_ptr;
 
   brow_pop();
   brow_SetNodraw(brow->ctx);
@@ -2070,15 +2128,18 @@ int XNav::show_plcpgm()
   new ItemTableHeader(brow, this, "Title", &th, NULL, flow_eDest_IntoLast);
 
   sts = gdh_GetClassList(pwr_cClass_plc, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     // Don't display template plcpgm in class volumes
     sts = gdh_GetParent(objid, &parent);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = gdh_GetObjectClass(parent, &cid);
       if (EVEN(sts))
         return sts;
 
-      if (cid == pwr_eClass_ClassDef) {
+      if (cid == pwr_eClass_ClassDef)
+      {
         sts = gdh_GetNextObject(objid, &objid);
         continue;
       }
@@ -2094,18 +2155,18 @@ int XNav::show_plcpgm()
 
     // Get window
     window_found = 0;
-    for (sts = gdh_GetChild(objid, &window_oid); 
-	 ODD(sts); 
-	 sts = gdh_GetNextSibling(window_oid, &window_oid)) {
+    for (sts = gdh_GetChild(objid, &window_oid); ODD(sts); sts = gdh_GetNextSibling(window_oid, &window_oid))
+    {
       sts = gdh_GetObjectClass(window_oid, &cid);
       if (EVEN(sts))
-	return sts;
-      if (cid == pwr_cClass_windowplc) {
-	sts = gdh_ObjidToPointer(window_oid, (void**)&window_ptr);
-	if (EVEN(sts))
-      return sts;
-	window_found = 1;
-	break;
+        return sts;
+      if (cid == pwr_cClass_windowplc)
+      {
+        sts = gdh_ObjidToPointer(window_oid, (void**)&window_ptr);
+        if (EVEN(sts))
+          return sts;
+        window_found = 1;
+        break;
       }
     }
 
@@ -2122,21 +2183,22 @@ int XNav::show_plcpgm()
     // ThreadObject
     strcpy(attr_name, object_name);
     strcat(attr_name, ".ThreadObject");
-    sts = gdh_GetObjectInfo(
-        attr_name, (void*)&thread_objid, sizeof(thread_objid));
-    if (ODD(sts)) {
-      sts = gdh_ObjidToName(
-          thread_objid, namebuf, sizeof(namebuf), cdh_mName_object);
+    sts = gdh_GetObjectInfo(attr_name, (void*)&thread_objid, sizeof(thread_objid));
+    if (ODD(sts))
+    {
+      sts = gdh_ObjidToName(thread_objid, namebuf, sizeof(namebuf), cdh_mName_object);
       if (ODD(sts))
         strcpy(t.elem[t.elem_cnt].fix_str, namebuf);
       else
         strcpy(t.elem[t.elem_cnt].fix_str, "-");
-    } else
+    }
+    else
       strcpy(t.elem[t.elem_cnt].fix_str, "-");
     t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
     // ExecTime and MaxExecTime
-    if (window_found) {
+    if (window_found)
+    {
       t.elem[t.elem_cnt].value_p = &window_ptr->ExecTime;
       t.elem[t.elem_cnt].type_id = pwr_eType_Float32;
       t.elem[t.elem_cnt].size = sizeof(pwr_tFloat32);
@@ -2146,7 +2208,9 @@ int XNav::show_plcpgm()
       t.elem[t.elem_cnt].type_id = pwr_eType_Float32;
       t.elem[t.elem_cnt].size = sizeof(pwr_tFloat32);
       strcpy(t.elem[t.elem_cnt++].format, "%8.6f");
-    } else {
+    }
+    else
+    {
       strcpy(t.elem[t.elem_cnt].fix_str, "-");
       t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
       strcpy(t.elem[t.elem_cnt].fix_str, "-");
@@ -2158,8 +2222,7 @@ int XNav::show_plcpgm()
     t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
 
     ts.subid_cnt = 0;
-    new ItemPlc(
-        brow, this, objid, &t, &ts, -1, 0, 0, 1, NULL, flow_eDest_IntoLast);
+    new ItemPlc(brow, this, objid, &t, &ts, -1, 0, 0, 1, NULL, flow_eDest_IntoLast);
 
     sts = gdh_GetNextObject(objid, &objid);
   }

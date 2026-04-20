@@ -39,7 +39,8 @@
 
 #include "pwr.h"
 
-typedef enum {
+typedef enum
+{
   xtt_eUtility_,
   xtt_eUtility_XNav,
   xtt_eUtility_Graph,
@@ -50,7 +51,8 @@ typedef enum {
   xtt_eUtility_Ev
 } xtt_eUtility;
 
-class XttUtility {
+class XttUtility
+{
 public:
   xtt_eUtility type;
   virtual ~XttUtility();

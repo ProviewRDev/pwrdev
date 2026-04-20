@@ -91,83 +91,55 @@ void WRevNavBrow::create_nodeclasses()
 
   // Create common-class
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
+  brow_CreateNodeClass(ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
   brow_AddAnnotPixmap(nc_object, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_object, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_object, 7, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_object, 11, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_object, 7, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 11, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_object, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create table nodeclass
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorTable", flow_eNodeGroup_Common, &nc_table);
+  brow_CreateNodeClass(ctx, "NavigatorTable", flow_eNodeGroup_Common, &nc_table);
   brow_AddAnnotPixmap(nc_table, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_table, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_table, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 12, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 16, 0.6, 3, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 20, 0.6, 4, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 24, 0.6, 5, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 28, 0.6, 6, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 32, 0.6, 7, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 35, 0.6, 8, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 38, 0.6, 9, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 12, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 16, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 20, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 24, 0.6, 5, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 28, 0.6, 6, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 32, 0.6, 7, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 35, 0.6, 8, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 38, 0.6, 9, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_table, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 
-void WRevNav::message(char sev, const char* text)
-{
-  (message_cb)(parent_ctx, sev, text);
-}
+void WRevNav::message(char sev, const char* text) { (message_cb)(parent_ctx, sev, text); }
 //
 //  Get current zoom factor
 //
-void WRevNav::get_zoom(double* zoom_factor)
-{
-  brow_GetZoom(brow->ctx, zoom_factor);
-}
+void WRevNav::get_zoom(double* zoom_factor) { brow_GetZoom(brow->ctx, zoom_factor); }
 
 //
 //  Zoom
 //
-void WRevNav::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void WRevNav::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void WRevNav::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void WRevNav::unzoom() { brow_UnZoom(brow->ctx); }
 
 //
 // Create the navigator widget
 //
-WRevNav::WRevNav(void* wa_parent_ctx, ldh_tSession wa_ldhses,
-    const char* wa_name, wb_eUtility wa_utility, pwr_tStatus* status)
-    : parent_ctx(wa_parent_ctx), ldhses(wa_ldhses), message_cb(0),
-      set_clock_cursor_cb(0), reset_cursor_cb(0), utility(wa_utility),
-      displayed(0), rev(0)
+WRevNav::WRevNav(void* wa_parent_ctx, ldh_tSession wa_ldhses, const char* wa_name, wb_eUtility wa_utility,
+                 pwr_tStatus* status)
+    : parent_ctx(wa_parent_ctx), ldhses(wa_ldhses), message_cb(0), set_clock_cursor_cb(0), reset_cursor_cb(0),
+      utility(wa_utility), displayed(0), rev(0)
 {
   strcpy(name, wa_name);
   *status = 1;
@@ -176,9 +148,7 @@ WRevNav::WRevNav(void* wa_parent_ctx, ldh_tSession wa_ldhses,
 //
 //  Delete a nav context
 //
-WRevNav::~WRevNav()
-{
-}
+WRevNav::~WRevNav() {}
 
 //
 // Callbacks from brow
@@ -188,7 +158,8 @@ int WRevNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   WRevNav* wrevnav;
   WItemRev* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
@@ -196,21 +167,27 @@ int WRevNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
 
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&wrevnav);
   wrevnav->message(' ', "");
-  switch (event->event) {
-  case flow_eEvent_Key_Up: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(wrevnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLast(wrevnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
+    }
+    else
+    {
       sts = brow_GetPrevious(wrevnav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         if (node_count)
           free(node_list);
         return 1;
@@ -225,20 +202,25 @@ int WRevNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(wrevnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirst(wrevnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
+    }
+    else
+    {
       sts = brow_GetNext(wrevnav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         if (node_count)
           free(node_list);
         return 1;
@@ -256,15 +238,18 @@ int WRevNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   case flow_eEvent_SelectClear:
     brow_ResetSelectInverse(wrevnav->brow->ctx);
     break;
-  case flow_eEvent_MB1Click: {
+  case flow_eEvent_MB1Click:
+  {
     // Select
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -276,9 +261,12 @@ int WRevNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(wrevnav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(wrevnav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(wrevnav->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(wrevnav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(wrevnav->brow->ctx, event->object.object);
@@ -289,7 +277,8 @@ int WRevNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
@@ -302,10 +291,12 @@ int WRevNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (brow_IsOpen(node_list[0]))
       // Close this node
       object = node_list[0];
-    else {
+    else
+    {
       // Close parent
       sts = brow_GetParent(wrevnav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(node_list);
         return 1;
       }
@@ -320,7 +311,8 @@ int WRevNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     int node_count;
     int sts;
@@ -337,7 +329,8 @@ int WRevNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_ShiftRight: {
+  case flow_eEvent_Key_ShiftRight:
+  {
     brow_tNode* node_list;
     int node_count;
     int sts;
@@ -355,25 +348,30 @@ int WRevNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_MB1DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
       (wrevnav->set_clock_cursor_cb)(wrevnav->parent_ctx);
-      item->open_children(
-          wrevnav->brow, wrevnav->rev, event->object.x, event->object.y);
+      item->open_children(wrevnav->brow, wrevnav->rev, event->object.x, event->object.y);
       (wrevnav->reset_cursor_cb)(wrevnav->parent_ctx);
       break;
     default:;
     }
     break;
-  case flow_eEvent_MB1ClickShift: {
+  case flow_eEvent_MB1ClickShift:
+  {
     // Add elect
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
-      if (brow_FindSelectedObject(wrevnav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(wrevnav->brow->ctx, event->object.object))
+      {
         brow_SetInverse(event->object.object, 0);
         brow_SelectRemove(wrevnav->brow->ctx, event->object.object);
-      } else {
+      }
+      else
+      {
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(wrevnav->brow->ctx, event->object.object);
       }
@@ -390,23 +388,28 @@ int WRevNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     // Add select region
     brow_SetSelectInverse(wrevnav->brow->ctx);
     break;
-  case flow_eEvent_Key_PageDown: {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(wrevnav->brow->ctx, 0.8);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(wrevnav->brow->ctx, -0.8);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(wrevnav->brow->ctx, 0.1);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(wrevnav->brow->ctx, -0.1);
     break;
   }
-  case flow_eEvent_Map: {
+  case flow_eEvent_Map:
+  {
     wrevnav->displayed = 1;
     break;
   }
@@ -430,12 +433,12 @@ int WRevNav::root_objects()
   rev = new wb_revision(this, (wb_session*)ldhses);
   rev->command_cb(rev_command_cb);
 
-  for (int i = 0; i < rev->size(); i++) {
+  for (int i = 0; i < rev->size(); i++)
+  {
     wb_rev_item* rev_item = rev->vect(i);
-    WItemRevision* item = new WItemRevision(brow, rev_item->name,
-        rev_item->description, rev_item->date, rev_item->version,
-        rev_item->current, rev_item->current_branch, rev_item->in_manager,
-        rev_item->vect.size(), 0, flow_eDest_IntoLast);
+    WItemRevision* item = new WItemRevision(
+        brow, rev_item->name, rev_item->description, rev_item->date, rev_item->version, rev_item->current,
+        rev_item->current_branch, rev_item->in_manager, rev_item->vect.size(), 0, flow_eDest_IntoLast);
     if (rev_item->current_branch)
       item->open_children(brow, rev, 0, 0);
   }
@@ -444,11 +447,13 @@ int WRevNav::root_objects()
   brow_Redraw(brow->ctx, 0);
 
   brow_GetObjectList(brow->ctx, &object_list, &object_cnt);
-  for (int i = 0; i < object_cnt; i++) {
+  for (int i = 0; i < object_cnt; i++)
+  {
     WItemRevision* item;
 
     brow_GetUserData(object_list[i], (void**)&item);
-    if (item->current) {
+    if (item->current)
+    {
       brow_CenterObject(brow->ctx, object_list[i], 0.75);
       break;
     }
@@ -458,40 +463,23 @@ int WRevNav::root_objects()
 
 void WRevNav::enable_events()
 {
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB1Press, flow_eEventType_RegionSelect, brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_MB1PressShift,
-      flow_eEventType_RegionAddSelect, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB1ClickShift, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_ShiftRight, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Map, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1Press, flow_eEventType_RegionSelect, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1PressShift, flow_eEventType_RegionAddSelect, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1ClickShift, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftRight, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Map, flow_eEventType_CallBack, brow_cb);
 }
 
 //
@@ -515,14 +503,12 @@ int WRevNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   return 1;
 }
 
-void WRevNav::redraw()
-{
-  brow_Redraw(brow->ctx, 0);
-}
+void WRevNav::redraw() { brow_Redraw(brow->ctx, 0); }
 
 void WRevNav::refresh_node(WItemRev* item)
 {
-  if (brow_IsOpen(item->node)) {
+  if (brow_IsOpen(item->node))
+  {
     item->close(brow, 0, 0);
     item->open_children(brow, rev, 0, 0);
   }
@@ -549,12 +535,14 @@ int WRevNav::get_select(WItemRev*** items, int* item_cnt)
   WItemRev *item, **itemlist;
 
   brow_GetSelectedNodes(brow->ctx, &node_list, &node_count);
-  if (node_count == 0) {
+  if (node_count == 0)
+  {
     *items = 0;
     return REV__NOSELECT;
   }
   itemlist = (WItemRev**)calloc(node_count, sizeof(WItemRev*));
-  for (int i = 0; i < node_count; i++) {
+  for (int i = 0; i < node_count; i++)
+  {
     brow_GetUserData(node_list[i], (void**)&item);
     itemlist[i] = item;
   }
@@ -572,35 +560,26 @@ int WRevNav::rev_command_cb(void* ctx, char* cmd)
   return 0;
 }
 
-WItemRev::WItemRev() : node(0), children(0)
-{
-}
+WItemRev::WItemRev() : node(0), children(0) {}
 
-int WItemRev::open_children(
-    WRevNavBrow* brow, wb_revision* rev, double x, double y)
-{
-  return 1;
-}
+int WItemRev::open_children(WRevNavBrow* brow, wb_revision* rev, double x, double y) { return 1; }
 
-int WItemRev::open_attributes(WRevNavBrow* brow, double x, double y)
-{
-  return 1;
-}
+int WItemRev::open_attributes(WRevNavBrow* brow, double x, double y) { return 1; }
 
-WItemRev::~WItemRev()
-{
-}
+WItemRev::~WItemRev() {}
 
 int WItemRev::close(WRevNavBrow* brow, double x, double y)
 {
   double node_x, node_y;
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_GetNodePosition(node, &node_x, &node_y);
     brow_SetNodraw(brow->ctx);
     brow_CloseNode(brow->ctx, node);
-    if (brow_IsOpen(node) & wnav_mOpen_Children) {
+    if (brow_IsOpen(node) & wnav_mOpen_Children)
+    {
       if (children)
         brow_SetAnnotPixmap(node, 0, brow->pixmap_map);
       else
@@ -613,12 +592,10 @@ int WItemRev::close(WRevNavBrow* brow, double x, double y)
   return 1;
 }
 
-WItemRevision::WItemRevision(WRevNavBrow* brow, char* item_name,
-    char* item_description, pwr_tTime item_date, char* item_version,
-    bool item_current, bool item_current_branch, bool item_in_manager,
-    int item_children, brow_tNode dest, flow_eDest dest_code)
-    : current(item_current), current_branch(item_current_branch),
-      in_manager(item_in_manager)
+WItemRevision::WItemRevision(WRevNavBrow* brow, char* item_name, char* item_description, pwr_tTime item_date,
+                             char* item_version, bool item_current, bool item_current_branch,
+                             bool item_in_manager, int item_children, brow_tNode dest, flow_eDest dest_code)
+    : current(item_current), current_branch(item_current_branch), in_manager(item_in_manager)
 {
   strcpy(name, item_name);
   strcpy(description, item_description);
@@ -627,8 +604,7 @@ WItemRevision::WItemRevision(WRevNavBrow* brow, char* item_name,
   strcpy(version, item_version);
   children = item_children;
 
-  brow_CreateNode(
-      brow->ctx, name, brow->nc_table, dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, name, brow->nc_table, dest, dest_code, (void*)this, 1, &node);
   if (children)
     brow_SetAnnotPixmap(node, 0, brow->pixmap_map);
   else
@@ -644,12 +620,12 @@ WItemRevision::WItemRevision(WRevNavBrow* brow, char* item_name,
     brow_SetAnnotPixmap(node, 1, brow->pixmap_warning);
 }
 
-int WItemRevision::open_children(
-    WRevNavBrow* brow, wb_revision* rev, double x, double y)
+int WItemRevision::open_children(WRevNavBrow* brow, wb_revision* rev, double x, double y)
 {
   WItemRevision* item;
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     close(brow, 0, 0);
     return 1;
   }
@@ -660,9 +636,11 @@ int WItemRevision::open_children(
   // Find in revision
   wb_rev_item* rev_item = NULL;
   bool found = false;
-  for (int i = 0; i < rev->size(); i++) {
+  for (int i = 0; i < rev->size(); i++)
+  {
     rev_item = rev->vect(i);
-    if (streq(rev_item->name, name)) {
+    if (streq(rev_item->name, name))
+    {
       found = true;
       break;
     }
@@ -672,12 +650,12 @@ int WItemRevision::open_children(
 
   brow_SetNodraw(brow->ctx);
 
-  for (unsigned int i = 0; i < rev_item->vect.size(); i++) {
-    item = new WItemRevision(brow, rev_item->vect[i].name,
-        rev_item->vect[i].description, rev_item->vect[i].date,
-        rev_item->vect[i].version, rev_item->vect[i].current,
-        rev_item->vect[i].current_branch, rev_item->vect[i].in_manager,
-        rev_item->vect[i].vect.size(), node, flow_eDest_IntoLast);
+  for (unsigned int i = 0; i < rev_item->vect.size(); i++)
+  {
+    item = new WItemRevision(brow, rev_item->vect[i].name, rev_item->vect[i].description,
+                             rev_item->vect[i].date, rev_item->vect[i].version, rev_item->vect[i].current,
+                             rev_item->vect[i].current_branch, rev_item->vect[i].in_manager,
+                             rev_item->vect[i].vect.size(), node, flow_eDest_IntoLast);
   }
   brow_SetOpen(node, wnav_mOpen_Children);
   brow_SetAnnotPixmap(node, 0, brow->pixmap_openmap);
@@ -692,15 +670,15 @@ int WItemRevision::open_attributes(WRevNavBrow* brow, double x, double y)
   WItemRevAttr* item;
   char status[80];
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     close(brow, 0, 0);
     return 1;
   }
 
   brow_SetNodraw(brow->ctx);
 
-  item = new WItemRevAttr(
-      brow, "Description", description, node, flow_eDest_IntoLast);
+  item = new WItemRevAttr(brow, "Description", description, node, flow_eDest_IntoLast);
   item = new WItemRevAttr(brow, "Time", time, node, flow_eDest_IntoLast);
   if (current)
     strcpy(status, "Current");
@@ -718,19 +696,16 @@ int WItemRevision::open_attributes(WRevNavBrow* brow, double x, double y)
   return 1;
 }
 
-WItemRevAttr::WItemRevAttr(WRevNavBrow* brow, const char* item_name,
-    char* item_value, brow_tNode dest, flow_eDest dest_code)
+WItemRevAttr::WItemRevAttr(WRevNavBrow* brow, const char* item_name, char* item_value, brow_tNode dest,
+                           flow_eDest dest_code)
 {
   strcpy(name, item_name);
   strcpy(value, item_value);
 
-  brow_CreateNode(
-      brow->ctx, name, brow->nc_object, dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, name, brow->nc_object, dest, dest_code, (void*)this, 1, &node);
   brow_SetAnnotPixmap(node, 0, brow->pixmap_attr);
   brow_SetAnnotation(node, 0, name, strlen(name));
   brow_SetAnnotation(node, 1, value, strlen(value));
 }
 
-WItemRevAttr::~WItemRevAttr()
-{
-}
+WItemRevAttr::~WItemRevAttr() {}

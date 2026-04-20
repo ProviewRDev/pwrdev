@@ -39,8 +39,8 @@
 #include "flow_pixmap.h"
 #include "flow_draw.h"
 
-FlowPixmap::FlowPixmap(FlowCtx* flow_ctx, flow_sPixmapData* pix_data, double x,
-    double y, flow_eDrawType d_type, int size)
+FlowPixmap::FlowPixmap(FlowCtx* flow_ctx, flow_sPixmapData* pix_data, double x, double y,
+                       flow_eDrawType d_type, int size)
     : ctx(flow_ctx), p(flow_ctx, x, y), pixmap_size(size), draw_type(d_type)
 {
   if (pix_data == NULL)
@@ -51,34 +51,19 @@ FlowPixmap::FlowPixmap(FlowCtx* flow_ctx, flow_sPixmapData* pix_data, double x,
 
 FlowPixmap::FlowPixmap(const FlowPixmap& p)
 {
-  memcpy((void *)this, (void *)&p, sizeof(p));
+  memcpy((void*)this, (void*)&p, sizeof(p));
   ctx->fdraw->pixmaps_create(ctx, (flow_sPixmapData*)pixmap_data, &pixmaps);
 }
 
-FlowPixmap::~FlowPixmap()
-{
-  ctx->fdraw->pixmaps_delete(ctx, pixmaps);
-}
+FlowPixmap::~FlowPixmap() { ctx->fdraw->pixmaps_delete(ctx, pixmaps); }
 
-void FlowPixmap::zoom()
-{
-  p.zoom();
-}
+void FlowPixmap::zoom() { p.zoom(); }
 
-void FlowPixmap::nav_zoom()
-{
-  p.nav_zoom();
-}
+void FlowPixmap::nav_zoom() { p.nav_zoom(); }
 
-void FlowPixmap::print_zoom()
-{
-  p.print_zoom();
-}
+void FlowPixmap::print_zoom() { p.print_zoom(); }
 
-void FlowPixmap::traverse(int x, int y)
-{
-  p.traverse(x, y);
-}
+void FlowPixmap::traverse(int x, int y) { p.traverse(x, y); }
 
 void FlowPixmap::print(void* pos, void* node, int highlight)
 {
@@ -97,85 +82,69 @@ void FlowPixmap::print(void* pos, void* node, int highlight)
 #endif
 }
 
-void FlowPixmap::save(std::ofstream& fp, flow_eSaveMode mode)
-{
-}
+void FlowPixmap::save(std::ofstream& fp, flow_eSaveMode mode) {}
 
-void FlowPixmap::open(std::ifstream& fp)
-{
-}
+void FlowPixmap::open(std::ifstream& fp) {}
 
 void FlowPixmap::draw(void* pos, int highlight, int dimmed, int hot, void* node)
 {
-  int idx
-      = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
+  int idx = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   if (idx < 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   ctx->fdraw->pixmap(ctx, p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-      p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, &pixmap_data, pixmaps,
-      draw_type, idx, highlight, 0);
+                     p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, &pixmap_data, pixmaps, draw_type, idx,
+                     highlight, 0);
 }
 
 void FlowPixmap::draw_inverse(void* pos, int hot, void* node)
 {
-  int idx
-      = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
+  int idx = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   if (idx < 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  ctx->fdraw->pixmap_inverse(ctx,
-      p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-      p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, &pixmap_data, pixmaps,
-      draw_type, idx, 0);
+  ctx->fdraw->pixmap_inverse(ctx, p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
+                             p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, &pixmap_data, pixmaps, draw_type,
+                             idx, 0);
 }
 
 void FlowPixmap::erase(void* pos, int hot, void* node)
 {
-  int idx
-      = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
+  int idx = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   if (idx < 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   ctx->fdraw->pixmap_erase(ctx, p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-      p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, &pixmap_data, pixmaps,
-      draw_type, idx, 0);
+                           p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, &pixmap_data, pixmaps, draw_type,
+                           idx, 0);
 }
 
 void FlowPixmap::nav_draw(void* pos, int highlight, void* node)
 {
-  int idx = int(
-      ctx->nav_zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
+  int idx = int(ctx->nav_zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   if (idx < 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  ctx->fdraw->nav_pixmap(ctx,
-      p.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
-      p.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y, &pixmap_data,
-      pixmaps, draw_type, idx, highlight, 0);
+  ctx->fdraw->nav_pixmap(ctx, p.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
+                         p.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y, &pixmap_data, pixmaps,
+                         draw_type, idx, highlight, 0);
 }
 
 void FlowPixmap::nav_erase(void* pos, void* node)
 {
-  int idx = int(
-      ctx->nav_zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
+  int idx = int(ctx->nav_zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   if (idx < 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  ctx->fdraw->nav_pixmap_erase(ctx,
-      p.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
-      p.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y, &pixmap_data,
-      pixmaps, draw_type, idx, 0);
+  ctx->fdraw->nav_pixmap_erase(ctx, p.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
+                               p.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y, &pixmap_data,
+                               pixmaps, draw_type, idx, 0);
 }
 
-int FlowPixmap::event_handler(
-    void* pos, flow_eEvent event, int x, int y, void* node)
-{
-  return 0;
-}
+int FlowPixmap::event_handler(void* pos, flow_eEvent event, int x, int y, void* node) { return 0; }
 
-void FlowPixmap::get_borders(double pos_x, double pos_y, double* x_right,
-    double* x_left, double* y_high, double* y_low, void* node)
+void FlowPixmap::get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                             double* y_low, void* node)
 {
   /*
     if ( pos_x + p1.x < *x_left)
@@ -197,8 +166,7 @@ void FlowPixmap::get_borders(double pos_x, double pos_y, double* x_right,
   */
 }
 
-void FlowPixmap::move(
-    void* pos, double x, double y, int highlight, int dimmed, int hot)
+void FlowPixmap::move(void* pos, double x, double y, int highlight, int dimmed, int hot)
 {
   p.x = x;
   p.y = y;
@@ -206,8 +174,7 @@ void FlowPixmap::move(
   nav_zoom();
 }
 
-void FlowPixmap::shift(void* pos, double delta_x, double delta_y, int highlight,
-    int dimmed, int hot)
+void FlowPixmap::shift(void* pos, double delta_x, double delta_y, int highlight, int dimmed, int hot)
 {
   p.x += delta_x;
   p.y += delta_y;

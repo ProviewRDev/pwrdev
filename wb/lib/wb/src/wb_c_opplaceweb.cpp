@@ -56,15 +56,15 @@ static pwr_tStatus Build(ldh_sMenuCall* ip)
   return build.sts();
 }
 
-static pwr_tStatus PostCreate(
-    ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
 {
   wb_session* sp = (wb_session*)Session;
   wb_object o = sp->object(Object);
 
   // Find a unique name for FileName
   int idx = 0;
-  for (wb_object co = sp->object(pwr_cClass_OpPlaceWeb); co; co = co.next()) {
+  for (wb_object co = sp->object(pwr_cClass_OpPlaceWeb); co; co = co.next())
+  {
     pwr_tString80 filename;
     int i;
 
@@ -78,19 +78,24 @@ static pwr_tStatus PostCreate(
     ca.value(filename);
     if ((streq(filename, "index.html")) && idx < 1)
       idx = 2;
-    else if (sscanf(filename, "index%d.html", &i) != 0) {
+    else if (sscanf(filename, "index%d.html", &i) != 0)
+    {
       if (idx <= i)
         idx = i + 1;
     }
-    if (idx > 0) {
+    if (idx > 0)
+    {
       wb_attribute a = sp->attribute(o.oid(), "RtBody", "FileName");
       if (!a)
         return a.sts();
 
       sprintf(filename, "index%d.html", idx);
-      try {
+      try
+      {
         sp->writeAttribute(a, filename, sizeof(filename));
-      } catch (wb_error& e) {
+      }
+      catch (wb_error& e)
+      {
         return e.sts();
       }
     }
@@ -99,5 +104,4 @@ static pwr_tStatus PostCreate(
   return PWRB__SUCCESS;
 }
 
-pwr_dExport pwr_BindMethods(OpPlaceWeb)
-    = { pwr_BindMethod(Build), pwr_BindMethod(PostCreate), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(OpPlaceWeb) = {pwr_BindMethod(Build), pwr_BindMethod(PostCreate), pwr_NullMethod};

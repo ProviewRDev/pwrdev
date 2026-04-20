@@ -41,25 +41,29 @@
 
 #include "pwr.h"
 
-typedef enum { sect_mFlags_Create = 1 << 0 } sect_mFlags;
+typedef enum
+{
+  sect_mFlags_Create = 1 << 0
+} sect_mFlags;
 
 #include "rt_semaphore.h"
 
 typedef sem_t sect_sMutex;
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
   pwr_32Bits(pwr_Bits(mapped, 1),
 
-      pwr_Bits(fill, 31), , , , , , , , , , , , , , , , , , , , , , , , , , , ,
-      , , ) b;
+             pwr_Bits(fill, 31), , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ) b;
 
 #define sect_mHead__ 0
 #define sect_mHead_mapped pwr_Bit(0)
 #define sect_mHead_ (~sect_mHead__)
 } sect_mHead;
 
-typedef struct {
+typedef struct
+{
   void* base; /* Virtual address of section.  */
   size_t size;
   char name[32]; /* Name of section.  */
@@ -68,18 +72,15 @@ typedef struct {
 
 /* Function prototypes */
 
-sect_sHead* sect_Alloc(pwr_tStatus* sts, pwr_tBoolean* created, sect_sHead* shp,
-    size_t size, char* name, unsigned int flags);
+sect_sHead* sect_Alloc(pwr_tStatus* sts, pwr_tBoolean* created, sect_sHead* shp, size_t size, char* name,
+                       unsigned int flags);
 
 pwr_tBoolean sect_Free(pwr_tStatus* sts, sect_sHead* shp);
 
-pwr_tBoolean sect_InitLock(
-    pwr_tStatus* sts, sect_sHead* shp, sect_sMutex* sect_mutex);
+pwr_tBoolean sect_InitLock(pwr_tStatus* sts, sect_sHead* shp, sect_sMutex* sect_mutex);
 
-pwr_tBoolean sect_Lock(
-    pwr_tStatus* sts, sect_sHead* shp, sect_sMutex* sect_mutex);
+pwr_tBoolean sect_Lock(pwr_tStatus* sts, sect_sHead* shp, sect_sMutex* sect_mutex);
 
-pwr_tBoolean sect_Unlock(
-    pwr_tStatus* sts, sect_sHead* shp, sect_sMutex* sect_mutex);
+pwr_tBoolean sect_Unlock(pwr_tStatus* sts, sect_sHead* shp, sect_sMutex* sect_mutex);
 
 #endif

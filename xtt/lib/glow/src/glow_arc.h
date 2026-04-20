@@ -37,6 +37,8 @@
 #ifndef glow_arc_h
 #define glow_arc_h
 
+#include <iosfwd>
+
 #include "glow.h"
 #include "glow_point.h"
 #include "glow_array_elem.h"
@@ -53,10 +55,11 @@ class GrowCtx;
   The GlowArc class is still used by GlowCon, when drawing connections.
 */
 
-class GlowArc : public GlowArrayElem {
+class GlowArc : public GlowArrayElem
+{
 public:
   //! Noargs constructor.
-  GlowArc(){}
+  GlowArc() {}
 
   //! Constuctor
   /*!
@@ -79,13 +82,10 @@ public:
     \param line_w	Linewidth of border.
     \param fill_arc	Arc is filled.
   */
-  GlowArc(GrowCtx* glow_ctx, double x1 = 0, double y1 = 0, double x2 = 0,
-      double y2 = 0, int ang1 = 0, int ang2 = 0,
-      glow_eDrawType d_type = glow_eDrawType_Line, int line_w = 1,
-      int fill_arc = 0)
-      : GlowArrayElem(glow_ctx), angle1(ang1), angle2(ang2), ll(glow_ctx, x1, y1),
-        ur(glow_ctx, x2, y2), draw_type(d_type), line_width(line_w),
-        fill(fill_arc)
+  GlowArc(GrowCtx* glow_ctx, double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0, int ang1 = 0,
+          int ang2 = 0, glow_eDrawType d_type = glow_eDrawType_Line, int line_w = 1, int fill_arc = 0)
+      : GlowArrayElem(glow_ctx), angle1(ang1), angle2(ang2), ll(glow_ctx, x1, y1), ur(glow_ctx, x2, y2),
+        draw_type(d_type), line_width(line_w), fill(fill_arc)
   {
   }
 
@@ -110,24 +110,23 @@ public:
 
     Detects if the object is hit by the event.
   */
-  int event_handler(
-      GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
+  int event_handler(GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
 
   //! Not implemented
-  void conpoint_select(void* pos, int x, int y, double* distance, void** cp){}
+  void conpoint_select(void* pos, int x, int y, double* distance, void** cp) {}
 
   //! Save the content of the object to file.
   /*!
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Draw the object.
   /*!
@@ -176,8 +175,8 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left,
-      double* y_high, double* y_low, void* node);
+  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,
+                   void* node);
 
   //! Move the arc to the specified coordinates.
   /*!
@@ -195,8 +194,8 @@ public:
     arc can
     be entirely different.
   */
-  void move(void* pos, double x1, double y1, double x2, double y2, int ang1,
-      int ang2, int highlight, int hot);
+  void move(void* pos, double x1, double y1, double x2, double y2, int ang1, int ang2, int highlight,
+            int hot);
 
   //! Move the arc to the specified coordinates without erase.
   /*!
@@ -214,8 +213,8 @@ public:
     arc can
     be entirely different.
   */
-  void move_noerase(void* pos, double x1, double y1, double x2, double y2,
-      int ang1, int ang2, int highlight, int hot);
+  void move_noerase(void* pos, double x1, double y1, double x2, double y2, int ang1, int ang2, int highlight,
+                    int hot);
 
   //! Move the arc.
   /*!
@@ -227,42 +226,27 @@ public:
   */
   void shift(void* pos, double delta_x, double delta_y, int highlight, int hot);
 
-  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir)
-  {
-    return 0;
-  }
-  void set_drawtype(glow_eDrawType drawtype)
-  {
-    draw_type = drawtype;
-  }
+  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir) { return 0; }
+  void set_drawtype(glow_eDrawType drawtype) { draw_type = drawtype; }
 
   //! Set the linewidth.
   /*!
     \param linewidth	Linewidth in range 0 to 8. 0 gives a linewidth of 1
     pixel at original zoom. 1 -> 2 pixel etc.
   */
-  void set_linewidth(int linewidth)
-  {
-    line_width = linewidth;
-  }
+  void set_linewidth(int linewidth) { line_width = linewidth; }
 
   //! Set fill.
   /*!
     \param fillval		Draw the object with fill.
   */
-  void set_fill(int fillval)
-  {
-    fill = fillval;
-  }
+  void set_fill(int fillval) { fill = fillval; }
 
   //! Get the object type
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_Arc;
-  }
+  glow_eObjectType type() { return glow_eObjectType_Arc; }
 
   //! Export the object as a java shape.
   /*!
@@ -280,8 +264,8 @@ public:
     used to generate
     java code for the shape.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ostream& fp);
 
   //! Export the shadow of the object as a java shape.
   /*!
@@ -301,9 +285,8 @@ public:
     used to generate
     java code for the shape.
   */
-  void export_javabean_shadow(GlowTransform* t, void* node,
-      glow_eExportPass pass, int* shape_cnt, int node_cnt, int in_nc,
-      std::ofstream& fp, int border, int shadow);
+  void export_javabean_shadow(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
+                              int node_cnt, int in_nc, std::ostream& fp, int border, int shadow);
 
   //! Conversion between different versions of Glow
   /*!
@@ -311,15 +294,15 @@ public:
   */
   void convert(glow_eConvert version);
 
-  int angle1; //!< Start angle or arc from x-axis in degrees.
-  int angle2; //!< Length of arc in degrees.
+  int angle1;   //!< Start angle or arc from x-axis in degrees.
+  int angle2;   //!< Length of arc in degrees.
   GlowPoint ll; //!< Lower left corner of rectangle that surroundes the elipse
   //! of the arc.
   GlowPoint ur; //!< Upper right corner of rectangle that surroundes the elipse
   //! of the arc.
   glow_eDrawType draw_type; //!< Border color.
-  int line_width; //!< Line width of border.
-  int fill; //!< Fill the object.
+  int line_width;           //!< Line width of border.
+  int fill;                 //!< Fill the object.
 };
 
 /*@}*/

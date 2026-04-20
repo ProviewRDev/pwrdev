@@ -43,11 +43,9 @@
 #include "glow_draw.h"
 #include "glow_msg.h"
 
-int GlowCustomColors::get_color(
-    glow_eDrawType dtype, double* r, double* g, double* b)
+int GlowCustomColors::get_color(glow_eDrawType dtype, double* r, double* g, double* b)
 {
-  if (dtype < glow_eDrawType_CustomColor1
-      || dtype >= glow_eDrawType_CustomColor__)
+  if (dtype < glow_eDrawType_CustomColor1 || dtype >= glow_eDrawType_CustomColor__)
     return 0;
 
   int idx = dtype - glow_eDrawType_CustomColor1;
@@ -58,11 +56,9 @@ int GlowCustomColors::get_color(
   return 1;
 }
 
-int GlowCustomColors::set_color(
-    glow_eDrawType dtype, double r, double g, double b)
+int GlowCustomColors::set_color(glow_eDrawType dtype, double r, double g, double b)
 {
-  if (dtype < glow_eDrawType_CustomColor1
-      || dtype >= glow_eDrawType_CustomColor__)
+  if (dtype < glow_eDrawType_CustomColor1 || dtype >= glow_eDrawType_CustomColor__)
     return 0;
 
   int idx = dtype - glow_eDrawType_CustomColor1;
@@ -78,11 +74,14 @@ int GlowCustomColors::set_color(
 
   // Light
   double mv = (r + g + b) / 3;
-  if (mv > 0.4) {
+  if (mv > 0.4)
+  {
     colors[idx + 2][0] = MIN(r + 0.18, 1);
     colors[idx + 2][1] = MIN(g + 0.18, 1);
     colors[idx + 2][2] = MIN(b + 0.18, 1);
-  } else {
+  }
+  else
+  {
     colors[idx + 2][0] = MIN(r + 0.35 * mv + 0.04, 1);
     colors[idx + 2][1] = MIN(g + 0.35 * mv + 0.04, 1);
     colors[idx + 2][2] = MIN(b + 0.35 * mv + 0.04, 1);
@@ -110,37 +109,37 @@ int GlowCustomColors::is_empty()
   return 1;
 }
 
-void GlowCustomColors::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowCustomColors::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_CustomColors) << '\n';
-  fp << int(glow_eSave_CustomColors_colortheme_lightness) << FSPACE
-     << colortheme_lightness << '\n';
-  fp << int(glow_eSave_CustomColors_is_default_colortheme) << FSPACE
-     << is_default_colortheme << '\n';
-  fp << int(glow_eSave_CustomColors_colors_size) << FSPACE << colors_size
-     << '\n';
+  fp << int(glow_eSave_CustomColors_colortheme_lightness) << FSPACE << colortheme_lightness << '\n';
+  fp << int(glow_eSave_CustomColors_is_default_colortheme) << FSPACE << is_default_colortheme << '\n';
+  fp << int(glow_eSave_CustomColors_colors_size) << FSPACE << colors_size << '\n';
   fp << int(glow_eSave_CustomColors_colors) << '\n';
   for (int i = 0; i < colors_size; i++)
     fp << colors[i][0] << " " << colors[i][1] << " " << colors[i][2] << '\n';
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowCustomColors::open(std::ifstream& fp)
+void GlowCustomColors::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
   char dummy[40];
   int csize = 0;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GlowCustomColors: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_CustomColors:
       break;
     case glow_eSave_CustomColors_colortheme_lightness:
@@ -153,7 +152,8 @@ void GlowCustomColors::open(std::ifstream& fp)
       fp >> csize;
       break;
     case glow_eSave_CustomColors_colors:
-      for (int i = 0; i < csize; i++) {
+      for (int i = 0; i < csize; i++)
+      {
         fp >> colors[i][0];
         fp >> colors[i][1];
         fp >> colors[i][2];
@@ -176,12 +176,15 @@ int GlowCustomColors::write_colorfile(char* name)
   pwr_tFileName path_name;
   std::ofstream fp;
 
-  if (strchr(name, '/') == 0) {
+  if (strchr(name, '/') == 0)
+  {
     if (!strstr(name, ".pwgc"))
       sprintf(path_name, "$pwrp_exe/%s.pwgc", name);
     else
       sprintf(path_name, "$pwrp_exe/%s", name);
-  } else {
+  }
+  else
+  {
     if (!strstr(name, ".pwgc"))
       sprintf(path_name, "%s.pwgc", name);
     else
@@ -215,17 +218,21 @@ int GlowCustomColors::read_colorfile(GrowCtx* ctx, char* name)
     found = 1;
 
   // Add some search path
-  if (!found && ctx) {
-    for (int i = 0; i < ctx->path_cnt; i++) {
+  if (!found && ctx)
+  {
+    for (int i = 0; i < ctx->path_cnt; i++)
+    {
       strcpy(path_name, ctx->path[i]);
       strcat(path_name, filename);
       dcli_translate_filename(path_name, path_name);
-      if (check_file(path_name)) {
+      if (check_file(path_name))
+      {
         found = 1;
         break;
       }
     }
-  } else
+  }
+  else
     strcpy(path_name, filename);
 
   if (!found)
@@ -244,19 +251,18 @@ int GlowCustomColors::read_colorfile(GrowCtx* ctx, char* name)
   return GLOW__SUCCESS;
 }
 
-int GlowCustomColors::get_colortheme_colors(
-    char* file, double** colorvect, int* size)
+int GlowCustomColors::get_colortheme_colors(char* file, double** colorvect, int* size)
 {
   int sts;
   GlowCustomColors cc;
-  static double
-      cv[(glow_eDrawType_CustomColor__ - glow_eDrawType_CustomColor1) * 3];
+  static double cv[(glow_eDrawType_CustomColor__ - glow_eDrawType_CustomColor1) * 3];
 
   sts = cc.read_colorfile(0, file);
   if (EVEN(sts))
     return sts;
 
-  for (int i = 0; i < 360; i++) {
+  for (int i = 0; i < 360; i++)
+  {
     for (int j = 0; j < 3; j++)
       cv[i * 3 + j] = cc.colors[i][j];
   }

@@ -34,7 +34,8 @@
  * General Public License plus this exception.
  */
 
-class wb_vname {
+class wb_vname
+{
   string name;
   pwr_tVid vid;
   pwr_tCid cid;

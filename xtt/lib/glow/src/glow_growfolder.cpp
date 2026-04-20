@@ -45,18 +45,15 @@
 #include "glow_grownode.h"
 #include "glow_draw.h"
 
-GrowFolder::GrowFolder(GrowCtx* glow_ctx, const char* name, double x, double y,
-    double w, double h, glow_eDrawType border_d_type, int line_w,
-    glow_eDrawType sel_color, glow_eDrawType unsel_color,
-    glow_mDisplayLevel display_lev, int nodraw)
-    : GrowWindow(glow_ctx, name, x, y, w, h, border_d_type, line_w, display_lev,
-          nodraw),
-      folders(2), text_size(1), text_drawtype(glow_eDrawType_TextHelveticaBold),
-      text_color_drawtype(glow_eDrawType_Line), header_height(0.5),
-      current_folder(0), color_selected(sel_color),
-      color_unselected(unsel_color)
+GrowFolder::GrowFolder(GrowCtx* glow_ctx, const char* name, double x, double y, double w, double h,
+                       glow_eDrawType border_d_type, int line_w, glow_eDrawType sel_color,
+                       glow_eDrawType unsel_color, glow_mDisplayLevel display_lev, int nodraw)
+    : GrowWindow(glow_ctx, name, x, y, w, h, border_d_type, line_w, display_lev, nodraw), folders(2),
+      text_size(1), text_drawtype(glow_eDrawType_TextHelveticaBold), text_color_drawtype(glow_eDrawType_Line),
+      header_height(0.5), current_folder(0), color_selected(sel_color), color_unselected(unsel_color)
 {
-  for (int i = 0; i < MAX_FOLDERS; i++) {
+  for (int i = 0; i < MAX_FOLDERS; i++)
+  {
     strcpy(folder_file_names[i], "");
     strcpy(folder_text[i], "");
     folder_scale[i] = 1;
@@ -71,60 +68,51 @@ GrowFolder::GrowFolder(GrowCtx* glow_ctx, const char* name, double x, double y,
     draw();
 }
 
-GrowFolder::~GrowFolder()
-{
-}
+GrowFolder::~GrowFolder() {}
 
-void GrowFolder::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowFolder::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowFolder) << '\n';
   fp << int(glow_eSave_GrowFolder_folders) << FSPACE << folders << '\n';
   fp << int(glow_eSave_GrowFolder_text_size) << FSPACE << text_size << '\n';
-  fp << int(glow_eSave_GrowFolder_text_drawtype) << FSPACE << text_drawtype
-     << '\n';
-  fp << int(glow_eSave_GrowFolder_text_color_drawtype) << FSPACE
-     << text_color_drawtype << '\n';
-  fp << int(glow_eSave_GrowFolder_header_height) << FSPACE << header_height
-     << '\n';
-  fp << int(glow_eSave_GrowFolder_color_selected) << FSPACE << color_selected
-     << '\n';
-  fp << int(glow_eSave_GrowFolder_color_unselected) << FSPACE
-     << color_unselected << '\n';
-  for (int i = 0; i < MAX_FOLDERS; i++) {
-    fp << int(glow_eSave_GrowFolder_folder_file_names1) + i * 5 << FSPACE
-       << folder_file_names[i] << '\n';
-    fp << int(glow_eSave_GrowFolder_folder_text1) + i * 5 << FSPACE
-       << folder_text[i] << '\n';
-    fp << int(glow_eSave_GrowFolder_folder_scale1) + i * 5 << FSPACE
-       << folder_scale[i] << '\n';
-    fp << int(glow_eSave_GrowFolder_folder_v_scrollbar1) + i * 5 << FSPACE
-       << folder_v_scrollbar[i] << '\n';
-    fp << int(glow_eSave_GrowFolder_folder_h_scrollbar1) + i * 5 << FSPACE
-       << folder_h_scrollbar[i] << '\n';
-    fp << int(glow_eSave_GrowFolder_folder_owner1) + i << FSPACE
-       << folder_owner[i] << '\n';
+  fp << int(glow_eSave_GrowFolder_text_drawtype) << FSPACE << text_drawtype << '\n';
+  fp << int(glow_eSave_GrowFolder_text_color_drawtype) << FSPACE << text_color_drawtype << '\n';
+  fp << int(glow_eSave_GrowFolder_header_height) << FSPACE << header_height << '\n';
+  fp << int(glow_eSave_GrowFolder_color_selected) << FSPACE << color_selected << '\n';
+  fp << int(glow_eSave_GrowFolder_color_unselected) << FSPACE << color_unselected << '\n';
+  for (int i = 0; i < MAX_FOLDERS; i++)
+  {
+    fp << int(glow_eSave_GrowFolder_folder_file_names1) + i * 5 << FSPACE << folder_file_names[i] << '\n';
+    fp << int(glow_eSave_GrowFolder_folder_text1) + i * 5 << FSPACE << folder_text[i] << '\n';
+    fp << int(glow_eSave_GrowFolder_folder_scale1) + i * 5 << FSPACE << folder_scale[i] << '\n';
+    fp << int(glow_eSave_GrowFolder_folder_v_scrollbar1) + i * 5 << FSPACE << folder_v_scrollbar[i] << '\n';
+    fp << int(glow_eSave_GrowFolder_folder_h_scrollbar1) + i * 5 << FSPACE << folder_h_scrollbar[i] << '\n';
+    fp << int(glow_eSave_GrowFolder_folder_owner1) + i << FSPACE << folder_owner[i] << '\n';
   }
   fp << int(glow_eSave_GrowFolder_window_part) << '\n';
   GrowWindow::save(fp, mode);
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowFolder::open(std::ifstream& fp)
+void GrowFolder::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowFolder: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowFolder:
       break;
     case glow_eSave_GrowFolder_folders:
@@ -430,23 +418,24 @@ void GrowFolder::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
 {
   int tmp;
 
-  if (ll_x > ur_x) {
+  if (ll_x > ur_x)
+  {
     /* Shift */
     tmp = ll_x;
     ll_x = ur_x;
     ur_x = tmp;
   }
-  if (ll_y > ur_y) {
+  if (ll_y > ur_y)
+  {
     /* Shift */
     tmp = ll_y;
     ll_y = ur_y;
     ur_y = tmp;
   }
 
-  if (x_right * w->zoom_factor_x - w->offset_x >= ll_x
-      && x_left * w->zoom_factor_x - w->offset_x <= ur_x
-      && y_high * w->zoom_factor_y - w->offset_y >= ll_y
-      && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
+  if (x_right * w->zoom_factor_x - w->offset_x >= ll_x && x_left * w->zoom_factor_x - w->offset_x <= ur_x &&
+      y_high * w->zoom_factor_y - w->offset_y >= ll_y && y_low * w->zoom_factor_y - w->offset_y <= ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
   }
 }
@@ -459,21 +448,23 @@ void GrowFolder::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
   int obj_ur_y = int(y_high * w->zoom_factor_y) - w->offset_y;
   int obj_ll_y = int(y_low * w->zoom_factor_y) - w->offset_y;
 
-  if (*ll_x > *ur_x) {
+  if (*ll_x > *ur_x)
+  {
     /* Shift */
     tmp = *ll_x;
     *ll_x = *ur_x;
     *ur_x = tmp;
   }
-  if (*ll_y > *ur_y) {
+  if (*ll_y > *ur_y)
+  {
     /* Shift */
     tmp = *ll_y;
     *ll_y = *ur_y;
     *ur_y = tmp;
   }
 
-  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
-      && obj_ll_y <= *ur_y) {
+  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y && obj_ll_y <= *ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
 
     // Increase the redraw area
@@ -494,12 +485,13 @@ void GrowFolder::set_highlight(int on)
   draw();
 }
 
-void GrowFolder::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode, void *transpnode)
+void GrowFolder::draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+                      void* transpnode)
 {
   if (ctx->nodraw || !(display_level & ctx->display_level))
     return;
-  if (w == &ctx->navw) {
+  if (w == &ctx->navw)
+  {
     if (ctx->no_nav)
       return;
     hot = 0;
@@ -512,20 +504,22 @@ void GrowFolder::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
 
-  int text_idx
-      = int(w->zoom_factor_y / w->base_zoom_factor * (text_size + 4) - 4);
+  int text_idx = int(w->zoom_factor_y / w->base_zoom_factor * (text_size + 4) - 4);
   double tsize = w->zoom_factor_y / w->base_zoom_factor * (8 + 2 * text_size);
   text_idx = MIN(text_idx, DRAW_TYPE_SIZE - 1);
 
   int ll_x, ll_y, ur_x, ur_y;
   double dx1, dy1, dx2, dy2;
 
-  if (!t) {
+  if (!t)
+  {
     dx1 = trf.x(ll.x, ll.y);
     dy1 = trf.y(ll.x, ll.y);
     dx2 = trf.x(ur.x, ur.y);
     dy2 = trf.y(ur.x, ur.y);
-  } else {
+  }
+  else
+  {
     dx1 = trf.x(t, ll.x, ll.y);
     dy1 = trf.y(t, ll.x, ll.y);
     dx2 = trf.x(t, ur.x, ur.y);
@@ -541,17 +535,15 @@ void GrowFolder::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   ur_y = int((dy1 + y_low_offs) * w->zoom_factor_y) - w->offset_y;
   ll_y = int(dy1 * w->zoom_factor_y) - w->offset_y;
 
-  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
-      highlight, (GrowNode*)colornode, 0);
-  glow_eDrawType drawtype_light
-      = ctx->shift_drawtype(color_unselected, -2, (GrowNode*)colornode);
-  glow_eDrawType drawtype_dark
-      = ctx->shift_drawtype(color_unselected, 2, (GrowNode*)colornode);
+  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight, (GrowNode*)colornode, 0);
+  glow_eDrawType drawtype_light = ctx->shift_drawtype(color_unselected, -2, (GrowNode*)colornode);
+  glow_eDrawType drawtype_dark = ctx->shift_drawtype(color_unselected, 2, (GrowNode*)colornode);
   int x;
   int width = (ur_x - ll_x) / folders;
   int h = ur_y - ll_y;
   glow_sPointX p[4];
-  for (int i = folders - 1; i >= -1; i--) {
+  for (int i = folders - 1; i >= -1; i--)
+  {
     if (i == current_folder)
       // Draw this last
       continue;
@@ -577,12 +569,14 @@ void GrowFolder::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
     if (i == current_folder)
       ctx->gdraw->fill_polyline(w, p, 4, color_selected, 0);
-    else {
+    else
+    {
       ctx->gdraw->fill_polyline(w, p, 4, color_unselected, 0);
-      if (shadow) {
-        ctx->gdraw->line(
-            w, p[0].x + 1, p[0].y, p[1].x + 1, p[1].y, drawtype_light, 0, 0);
-        if (i != 0) {
+      if (shadow)
+      {
+        ctx->gdraw->line(w, p[0].x + 1, p[0].y, p[1].x + 1, p[1].y, drawtype_light, 0, 0);
+        if (i != 0)
+        {
           glow_sPointX ps[4];
 
           ps[0].x = x + h / 4;
@@ -599,58 +593,55 @@ void GrowFolder::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       }
     }
 
-    if (shadow) {
-      if (i == current_folder) {
-        drawtype_light
-            = ((GrowCtx*)ctx)
-                  ->shift_drawtype(color_selected, -2, (GrowNode*)colornode);
-        ctx->gdraw->line(
-            w, p[0].x + 1, p[0].y, p[1].x + 1, p[1].y, drawtype_light, 0, 0);
+    if (shadow)
+    {
+      if (i == current_folder)
+      {
+        drawtype_light = ((GrowCtx*)ctx)->shift_drawtype(color_selected, -2, (GrowNode*)colornode);
+        ctx->gdraw->line(w, p[0].x + 1, p[0].y, p[1].x + 1, p[1].y, drawtype_light, 0, 0);
       }
-      ctx->gdraw->line(
-          w, p[1].x, p[1].y + 1, p[2].x, p[2].y + 1, drawtype_light, 0, 0);
+      ctx->gdraw->line(w, p[1].x, p[1].y + 1, p[2].x, p[2].y + 1, drawtype_light, 0, 0);
     }
     ctx->gdraw->polyline(w, p, 4, drawtype, idx, 0);
 
-    if (text_idx >= 0) {
-      ctx->gdraw->text(w, x + h / 2, ll_y + h - 2, folder_text[i],
-          strlen(folder_text[i]), text_drawtype, text_color_drawtype, text_idx,
-          highlight, 0, glow_eFont_Helvetica, tsize, 0);
+    if (text_idx >= 0)
+    {
+      ctx->gdraw->text(w, x + h / 2, ll_y + h - 2, folder_text[i], strlen(folder_text[i]), text_drawtype,
+                       text_color_drawtype, text_idx, highlight, 0, glow_eFont_Helvetica, tsize, 0);
     }
     if (i == current_folder)
       break;
   }
   GrowWindow::draw(w, t, highlight, hot, node, colornode, transpnode);
-  ctx->gdraw->line(
-      w, p[0].x + 1, p[0].y, p[3].x - 1, p[3].y, color_selected, idx, 0);
+  ctx->gdraw->line(w, p[0].x + 1, p[0].y, p[3].x - 1, p[3].y, color_selected, idx, 0);
 }
 
 void GrowFolder::draw()
 {
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
-void GrowFolder::export_javabean(GlowTransform* t, void* node,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, int in_nc,
-    std::ofstream& fp)
+void GrowFolder::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
+                                 int node_cnt, int in_nc, std::ostream& fp)
 {
   double x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
 
-  if (!t) {
+  if (!t)
+  {
     x1 = trf.x(ll.x, ll.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = trf.y(ll.x, ll.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = trf.x(ur.x, ur.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y2 = trf.y(ur.x, ur.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
-  } else {
+  }
+  else
+  {
     x1 = trf.x(t, ll.x, ll.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = trf.y(t, ll.x, ll.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = trf.x(t, ur.x, ur.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
@@ -662,33 +653,37 @@ void GrowFolder::export_javabean(GlowTransform* t, void* node,
   ll_y = MIN(y1, y2);
   ur_y = MAX(y1, y2);
 
-  ctx->export_jbean->folder(ll_x, ll_y, ur_x, ur_y, folders,
-      (char*)folder_file_names, (char*)folder_text, (int*)folder_v_scrollbar,
-      (int*)folder_h_scrollbar, owner, pass, shape_cnt, node_cnt, fp);
+  ctx->export_jbean->folder(ll_x, ll_y, ur_x, ur_y, folders, (char*)folder_file_names, (char*)folder_text,
+                            (int*)folder_v_scrollbar, (int*)folder_h_scrollbar, owner, pass, shape_cnt,
+                            node_cnt, fp);
 }
 
 void GrowFolder::convert(glow_eConvert version)
 {
-  switch (version) {
-  case glow_eConvert_V34: {
+  switch (version)
+  {
+  case glow_eConvert_V34:
+  {
     // Conversion of colors
   }
   }
 }
 
-int GrowFolder::event_handler(
-    GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
+int GrowFolder::event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
 {
   int sts;
 
   // Convert coordinates to local coordinates
-  if (event == glow_eEvent_MB1Click) {
-    if (x_left <= fx && fx <= x_right && y_low <= fy
-        && fy <= y_low + header_height) {
+  if (event == glow_eEvent_MB1Click)
+  {
+    if (x_left <= fx && fx <= x_right && y_low <= fy && fy <= y_low + header_height)
+    {
       double w = (x_right - x_left) / folders;
       double x = x_left + w;
-      for (int i = 0; i < folders; i++) {
-        if (fx <= x) {
+      for (int i = 0; i < folders; i++)
+      {
+        if (fx <= x)
+        {
           // Change file
           strcpy(input_file_name, folder_file_names[i]);
           window_scale = folder_scale[i];
@@ -718,7 +713,8 @@ void GrowFolder::update_attributes()
   if (current_folder >= folders)
     current_folder = 0;
 
-  if (!streq(folder_file_names[current_folder], "")) {
+  if (!streq(folder_file_names[current_folder], ""))
+  {
     strcpy(input_file_name, folder_file_names[current_folder]);
     window_scale = folder_scale[current_folder];
     vertical_scrollbar = folder_v_scrollbar[current_folder];
@@ -736,8 +732,8 @@ void GrowFolder::set_textsize(int size)
 
 void GrowFolder::set_textbold(int bold)
 {
-  if ((bold && draw_type == glow_eDrawType_TextHelveticaBold)
-      || (!bold && draw_type == glow_eDrawType_TextHelvetica))
+  if ((bold && draw_type == glow_eDrawType_TextHelveticaBold) ||
+      (!bold && draw_type == glow_eDrawType_TextHelvetica))
     return;
 
   if (bold)

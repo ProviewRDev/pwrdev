@@ -45,7 +45,8 @@
 
 class XttGeQtWidget;
 
-class XttGeQt : public XttGe {
+class XttGeQt : public XttGe
+{
 public:
   XttGeQtWidget* toplevel;
   QWidget* grow_widget;
@@ -57,15 +58,13 @@ public:
   QMessageBox* confirm_widget = NULL;
   CoWowFocusTimerQt focustimer;
 
-  XttGeQt(void* parent_ctx, const char* name, const char* filename,
-      int scrollbar, int menu, int navigator, int width, int height, int x,
-      int y, double scan_time, const char* object_name, int use_default_access,
-      unsigned int access, unsigned int options, void* basewidget,
-      double* borders, int color_theme, int dashboard,
-      int (*xg_command_cb)(void*, char*, char*, char*, void*),
-      int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-      int (*xg_is_authorized_cb)(void*, unsigned int),
-      void (*xg_keyboard_cb)(void*, void*, int, int));
+  XttGeQt(void* parent_ctx, const char* name, const char* filename, int scrollbar, int menu, int navigator,
+          int width, int height, int x, int y, double scan_time, const char* object_name,
+          int use_default_access, unsigned int access, unsigned int options, void* basewidget,
+          double* borders, int color_theme, int dashboard,
+          int (*xg_command_cb)(void*, char*, char*, char*, void*),
+          int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+          int (*xg_is_authorized_cb)(void*, unsigned int), void (*xg_keyboard_cb)(void*, void*, int, int));
   ~XttGeQt();
 
   void pop();
@@ -74,15 +73,9 @@ public:
   void create_confirm_dialog();
   void confirm_reply(int ok);
 
-  void* get_widget()
-  {
-    return this;
-  }
+  void* get_widget() { return this; }
 
-  QWidget* get_graph_widget()
-  {
-    return graph_form;
-  }
+  QWidget* get_graph_widget() { return graph_form; }
 
   void iconify(int val);
   void set_below(int val);
@@ -92,7 +85,8 @@ public:
   static void message_dialog_cb(void* ge_ctx, const char* text);
 };
 
-class XttGeQtWidget : public QWidget {
+class XttGeQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

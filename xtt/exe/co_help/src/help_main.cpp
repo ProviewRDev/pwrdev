@@ -61,16 +61,15 @@ static void usage()
             << "  -o    Open Operator Help\n\n";
 }
 
-CoHelpMain::~CoHelpMain()
-{
-}
+CoHelpMain::~CoHelpMain() {}
 
 void CoHelpMain::exec_help()
 {
   pwr_tStatus sts;
 
   sts = CoXHelp::dhelp(topic, bookmark, type, helpfile, strict);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     char msg[80];
     msg_GetText(sts, msg, sizeof(msg));
     printf("%s\n", msg);
@@ -78,47 +77,66 @@ void CoHelpMain::exec_help()
   }
 }
 
-CoHelpMain::CoHelpMain(int argc, char* argv[], int* return_sts)
-    : strict(0), type(navh_eHelpFile_Project)
+CoHelpMain::CoHelpMain(int argc, char* argv[], int* return_sts) : strict(0), type(navh_eHelpFile_Project)
 {
   strcpy(topic, "index");
   strcpy(helpfile, "");
   strcpy(bookmark, "");
 
   // Set language
-  for (int i = 1; i < argc; i++) {
-    if (streq(argv[i], "-l") && i + 1 < argc) {
+  for (int i = 1; i < argc; i++)
+  {
+    if (streq(argv[i], "-l") && i + 1 < argc)
+    {
       Lng::set(argv[i + 1]);
       i++;
-    } else if (streq(argv[i], "-t") && i + 1 < argc) {
+    }
+    else if (streq(argv[i], "-t") && i + 1 < argc)
+    {
       strcpy(topic, argv[i + 1]);
       i++;
-    } else if (streq(argv[i], "-s") && i + 1 < argc) {
+    }
+    else if (streq(argv[i], "-s") && i + 1 < argc)
+    {
       type = navh_eHelpFile_Other;
       strcpy(helpfile, argv[i + 1]);
       i++;
-    } else if (streq(argv[i], "-b") && i + 1 < argc) {
+    }
+    else if (streq(argv[i], "-b") && i + 1 < argc)
+    {
       strcpy(bookmark, argv[i + 1]);
       i++;
-    } else if (streq(argv[i], "-c")) {
+    }
+    else if (streq(argv[i], "-c"))
+    {
       type = navh_eHelpFile_Other;
       if (streq(topic, "index"))
         strcpy(topic, "overview");
       strcpy(helpfile, pwr_cNameBaseWttHelp);
-    } else if (streq(argv[i], "-d")) {
+    }
+    else if (streq(argv[i], "-d"))
+    {
       type = navh_eHelpFile_Other;
       strcpy(helpfile, "$pwr_lang/man_dg.dat");
-    } else if (streq(argv[i], "-p")) {
+    }
+    else if (streq(argv[i], "-p"))
+    {
       type = navh_eHelpFile_Project;
-    } else if (streq(argv[i], "-o")) {
+    }
+    else if (streq(argv[i], "-o"))
+    {
       type = navh_eHelpFile_Other;
       if (streq(topic, "index"))
         strcpy(topic, "overview");
       strcpy(helpfile, pwr_cNameBaseXttHelp);
-    } else if (streq(argv[i], "-g")) {
+    }
+    else if (streq(argv[i], "-g"))
+    {
       type = navh_eHelpFile_Other;
       strcpy(helpfile, "$pwr_lang/man_geref.dat");
-    } else if (streq(argv[i], "-h")) {
+    }
+    else if (streq(argv[i], "-h"))
+    {
       usage();
       exit(0);
     }

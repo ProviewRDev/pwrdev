@@ -39,23 +39,22 @@
 
 #include "pwr.h"
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(swapInit, 1), pwr_Bits(rebuildInit, 1),
-      pwr_Bits(newPlcInit, 1), pwr_Bits(newPlcInitDone, 1),
-      pwr_Bits(newPlcStart, 1), pwr_Bits(newPlcStartDone, 1),
-      pwr_Bits(oldPlcStop, 1), pwr_Bits(oldPlcStopDone, 1),
+  pwr_32Bits(pwr_Bits(swapInit, 1), pwr_Bits(rebuildInit, 1), pwr_Bits(newPlcInit, 1),
+             pwr_Bits(newPlcInitDone, 1), pwr_Bits(newPlcStart, 1), pwr_Bits(newPlcStartDone, 1),
+             pwr_Bits(oldPlcStop, 1), pwr_Bits(oldPlcStopDone, 1),
 
-      pwr_Bits(swapDone, 1), pwr_Bits(terminate, 1), pwr_Bits(simLoadStart, 1),
-      pwr_Bits(simLoadDone, 1),
+             pwr_Bits(swapDone, 1), pwr_Bits(terminate, 1), pwr_Bits(simLoadStart, 1),
+             pwr_Bits(simLoadDone, 1),
 
-      pwr_Bits(plcProc1, 1), pwr_Bits(plcProc2, 1), pwr_Bits(plcProc3, 1),
-      pwr_Bits(plcProc4, 1), pwr_Bits(plcProc5, 1), pwr_Bits(plcProc6, 1),
-      pwr_Bits(plcProc7, 1), pwr_Bits(plcProc8, 1), pwr_Bits(plcProc9, 1),
-      pwr_Bits(plcProc10, 1), pwr_Bits(plcProc11, 1), pwr_Bits(plcProc12, 1),
-      pwr_Bits(plcProc13, 1), pwr_Bits(plcProc14, 1), pwr_Bits(plcProc15, 1),
-      pwr_Bits(plcProc16, 1), pwr_Bits(plcProc17, 1), pwr_Bits(plcProc18, 1),
-      pwr_Bits(plcProc19, 1), pwr_Bits(plcProc20, 1)) b;
+             pwr_Bits(plcProc1, 1), pwr_Bits(plcProc2, 1), pwr_Bits(plcProc3, 1), pwr_Bits(plcProc4, 1),
+             pwr_Bits(plcProc5, 1), pwr_Bits(plcProc6, 1), pwr_Bits(plcProc7, 1), pwr_Bits(plcProc8, 1),
+             pwr_Bits(plcProc9, 1), pwr_Bits(plcProc10, 1), pwr_Bits(plcProc11, 1), pwr_Bits(plcProc12, 1),
+             pwr_Bits(plcProc13, 1), pwr_Bits(plcProc14, 1), pwr_Bits(plcProc15, 1), pwr_Bits(plcProc16, 1),
+             pwr_Bits(plcProc17, 1), pwr_Bits(plcProc18, 1), pwr_Bits(plcProc19, 1),
+             pwr_Bits(plcProc20, 1)) b;
 
 #define ini_mEvent__ 0
 #define ini_mEvent_swapInit pwr_Bit(0)

@@ -42,8 +42,7 @@
 
 static pool_tRef allocNode(ptree_sTable* tp, void* key);
 
-static void ptreePrintInorder(
-    ptree_sTable* tp, pool_tRef nr, void (*printNode)(ptree_sNode*, pool_tRef));
+static void ptreePrintInorder(ptree_sTable* tp, pool_tRef nr, void (*printNode)(ptree_sNode*, pool_tRef));
 
 static void deleteTree(pwr_tStatus* sts, ptree_sTable* tp);
 
@@ -67,8 +66,8 @@ static pool_tRef deleteNode(ptree_sTable* tp, pool_tRef zr);
 
 static pool_tRef insertNode(ptree_sTable* tp, pool_tRef zr);
 
-static void ptreeCheck(ptree_sTable* tp, pool_tRef nr, int* count,
-    int* maxlevel, int* hight, int level, char* (*printKey)(ptree_sNode*));
+static void ptreeCheck(ptree_sTable* tp, pool_tRef nr, int* count, int* maxlevel, int* hight, int level,
+                       char* (*printKey)(ptree_sNode*));
 
 static pool_tRef allocNode(ptree_sTable* tp, void* key)
 {
@@ -86,10 +85,10 @@ static pool_tRef allocNode(ptree_sTable* tp, void* key)
 
   nr = gttp->free;
 
-  if (nr == pool_cNRef) {
+  if (nr == pool_cNRef)
+  {
     gttp->nMalloc++;
-    ar = pool_RefAlloc(&sts, tp->php,
-        gttp->allocCount * gttp->recordSize + sizeof(ptree_sAlloc));
+    ar = pool_RefAlloc(&sts, tp->php, gttp->allocCount * gttp->recordSize + sizeof(ptree_sAlloc));
     ap = (ptree_sAlloc*)pool_Address(&sts, tp->php, ar);
     ap->next = gttp->firstAlloc;
     gttp->firstAlloc = ar;
@@ -101,13 +100,16 @@ static pool_tRef allocNode(ptree_sTable* tp, void* key)
     fp = (ptree_sNode*)(gttp->recordSize + (char*)fp);
     gttp->free = fr;
     gttp->nFree += gttp->allocCount;
-    for (i = 1, op = fp, or = fr; i < gttp->allocCount - 1; i++) {
+    for (i = 1, op = fp, or = fr; i < gttp->allocCount - 1; i++)
+    {
       fp = (ptree_sNode*)(gttp->recordSize + (char*)fp);
       fr = gttp->recordSize + fr;
       op->right = fr;
       op = fp;
     }
-  } else {
+  }
+  else
+  {
     np = pool_Address(&sts, tp->php, gttp->free);
     gttp->free = np->right;
   }
@@ -119,8 +121,7 @@ static pool_tRef allocNode(ptree_sTable* tp, void* key)
   return nr;
 }
 
-static void ptreePrintInorder(
-    ptree_sTable* tp, pool_tRef nr, void (*printNode)(ptree_sNode*, pool_tRef))
+static void ptreePrintInorder(ptree_sTable* tp, pool_tRef nr, void (*printNode)(ptree_sNode*, pool_tRef))
 {
   pwr_tStatus sts;
 
@@ -137,9 +138,8 @@ static void ptreePrintInorder(
     ptreePrintInorder(tp, np->left, printNode);
 }
 
-ptree_sTable* ptree_Create(pwr_tStatus* sts, pool_sHead* php, ptree_sTable* ttp,
-    ptree_sGtable* gttp,
-    int (*compareFunc)(ptree_sTable* tp, ptree_sNode* x, ptree_sNode* y))
+ptree_sTable* ptree_Create(pwr_tStatus* sts, pool_sHead* php, ptree_sTable* ttp, ptree_sGtable* gttp,
+                           int (*compareFunc)(ptree_sTable* tp, ptree_sNode* x, ptree_sNode* y))
 {
   ttp->php = php;
   ttp->g = gttp;
@@ -151,8 +151,8 @@ ptree_sTable* ptree_Create(pwr_tStatus* sts, pool_sHead* php, ptree_sTable* ttp,
   return ttp;
 }
 
-void ptree_Init(pool_sHead* php, ptree_sGtable* gttp, size_t keySize,
-    ptrdiff_t keyOffset, size_t recordSize, unsigned int allocCount)
+void ptree_Init(pool_sHead* php, ptree_sGtable* gttp, size_t keySize, ptrdiff_t keyOffset, size_t recordSize,
+                unsigned int allocCount)
 {
   pwr_tStatus sts;
   ptree_sNode* nullp;
@@ -185,7 +185,8 @@ static void deleteTree(pwr_tStatus* sts, ptree_sTable* tp)
   if (tp == NULL)
     return;
 
-  for (ar = tp->g->firstAlloc; ar != pool_cNRef;) {
+  for (ar = tp->g->firstAlloc; ar != pool_cNRef;)
+  {
     far = ar;
     ap = pool_Address(sts, tp->php, ar);
     ar = ap->next;
@@ -201,7 +202,8 @@ static void emptyTree(pwr_tStatus* sts, ptree_sTable* tp)
   if (tp == NULL)
     return;
 
-  for (mr = minimumNode(tp, tp->g->root); mr != pool_cNRef;) {
+  for (mr = minimumNode(tp, tp->g->root); mr != pool_cNRef;)
+  {
     if (mr == tp->g->null)
       return;
     nr = successorNode(tp, mr);
@@ -235,9 +237,9 @@ static pool_tRef findNearNode(ptree_sTable* tp, void* key)
   /* use key node for comparisons */
   memcpy(tp->g->keyOffset + (char*)tp->keyp, key, tp->g->keySize);
 
-  for (nr = tp->last = tp->g->root, np = pool_Address(&sts, tp->php, nr);
-       nr != tp->g->null;
-       tp->lastComp = comp, np = pool_Address(&sts, tp->php, nr)) {
+  for (nr = tp->last = tp->g->root, np = pool_Address(&sts, tp->php, nr); nr != tp->g->null;
+       tp->lastComp = comp, np = pool_Address(&sts, tp->php, nr))
+  {
     tp->last = nr;
     comp = tp->compareFunc(tp, tp->keyp, np);
     if (comp == 0)
@@ -267,7 +269,8 @@ static pool_tRef findNode(ptree_sTable* tp, void* key)
   memcpy(tp->g->keyOffset + (char*)tp->keyp, key, tp->g->keySize);
 
   for (nr = tp->g->root, np = (ptree_sNode*)pool_Address(&sts, tp->php, nr);;
-       np = pool_Address(&sts, tp->php, nr)) {
+       np = pool_Address(&sts, tp->php, nr))
+  {
     comp = tp->compareFunc(tp, tp->keyp, np);
     if (comp == 0)
       break;
@@ -285,8 +288,7 @@ static pool_tRef minimumNode(ptree_sTable* tp, pool_tRef nr)
   pwr_tStatus sts;
   ptree_sNode* np = pool_Address(&sts, tp->php, nr);
 
-  for (; np->left != tp->g->null;
-       nr = np->left, np = pool_Address(&sts, tp->php, nr))
+  for (; np->left != tp->g->null; nr = np->left, np = pool_Address(&sts, tp->php, nr))
     ;
   return nr;
 }
@@ -296,8 +298,7 @@ static pool_tRef maximumNode(ptree_sTable* tp, pool_tRef nr)
   pwr_tStatus sts;
   ptree_sNode* np = pool_Address(&sts, tp->php, nr);
 
-  for (; np->right != tp->g->null;
-       nr = np->right, np = pool_Address(&sts, tp->php, nr))
+  for (; np->right != tp->g->null; nr = np->right, np = pool_Address(&sts, tp->php, nr))
     ;
   return nr;
 }
@@ -312,8 +313,7 @@ static pool_tRef successorNode(ptree_sTable* tp, pool_tRef nr)
   if (np->right != tp->g->null)
     return minimumNode(tp, np->right);
 
-  for (pr = np->parent, p = pool_Address(&sts, tp->php, pr);
-       pr != tp->g->null && nr == p->right;
+  for (pr = np->parent, p = pool_Address(&sts, tp->php, pr); pr != tp->g->null && nr == p->right;
        np = p, nr = pr, pr = p->parent, p = pool_Address(&sts, tp->php, pr))
     ;
   return pr;
@@ -329,8 +329,7 @@ static pool_tRef predecessorNode(ptree_sTable* tp, pool_tRef nr)
   if (np->left != tp->g->null)
     return maximumNode(tp, np->left);
 
-  for (pr = np->parent, p = pool_Address(&sts, tp->php, pr);
-       pr != tp->g->null && nr == p->left;
+  for (pr = np->parent, p = pool_Address(&sts, tp->php, pr); pr != tp->g->null && nr == p->left;
        np = p, nr = pr, pr = p->parent, p = pool_Address(&sts, tp->php, pr))
     ;
   return pr;
@@ -358,10 +357,13 @@ static pool_tRef deleteNode(ptree_sTable* tp, pool_tRef zr)
   tp->g->nDelete++;
   tp->g->nNode--;
 
-  if (z->left == tp->g->null || z->right == tp->g->null) {
+  if (z->left == tp->g->null || z->right == tp->g->null)
+  {
     y = z;
     yr = zr;
-  } else {
+  }
+  else
+  {
     yr = successorNode(tp, zr);
     y = pool_Address(&sts, tp->php, yr);
   }
@@ -374,52 +376,70 @@ static pool_tRef deleteNode(ptree_sTable* tp, pool_tRef zr)
   x = pool_Address(&sts, tp->php, xr);
   x->parent = y->parent;
   parent = pool_Address(&sts, tp->php, y->parent);
-  if (y->parent == tp->g->null) {
+  if (y->parent == tp->g->null)
+  {
     tp->g->root = xr;
     h = 0;
-  } else if (yr == parent->left) {
+  }
+  else if (yr == parent->left)
+  {
     parent->left = xr;
     h = 1; /* left branch has shrunk */
-  } else {
+  }
+  else
+  {
     parent->right = xr;
     h = -1; /* right branch has shrunk */
   }
 
-  if (y->parent == zr) {
+  if (y->parent == zr)
+  {
     p = y;
     pr = yr;
-  } else {
+  }
+  else
+  {
     pr = y->parent;
     p = parent;
   }
 
-  if (z != y) { /* Replace z with y */
+  if (z != y)
+  { /* Replace z with y */
     y->bal = z->bal;
     y->parent = z->parent;
     parent = pool_Address(&sts, tp->php, z->parent);
-    if (z->parent == tp->g->null) {
+    if (z->parent == tp->g->null)
+    {
       tp->g->root = yr;
-    } else if (zr == parent->left) {
+    }
+    else if (zr == parent->left)
+    {
       parent->left = yr;
-    } else {
+    }
+    else
+    {
       parent->right = yr;
     }
     y->left = z->left;
-    if (z->left != tp->g->null) {
+    if (z->left != tp->g->null)
+    {
       left = pool_Address(&sts, tp->php, z->left);
       left->parent = yr;
     }
     y->right = z->right;
-    if (z->right != tp->g->null) {
+    if (z->right != tp->g->null)
+    {
       right = pool_Address(&sts, tp->php, z->right);
       right->parent = yr;
     }
   }
 
-  for (; pr != tp->g->null && h != 0;
-       pr = p->parent, p = pool_Address(&sts, tp->php, pr)) {
-    if (h == -1) { /* right branch has shrunk */
-      switch (p->bal) {
+  for (; pr != tp->g->null && h != 0; pr = p->parent, p = pool_Address(&sts, tp->php, pr))
+  {
+    if (h == -1)
+    { /* right branch has shrunk */
+      switch (p->bal)
+      {
       case 1:
         p->bal = 0;
         break;
@@ -431,17 +451,21 @@ static pool_tRef deleteNode(ptree_sTable* tp, pool_tRef zr)
         p1r = p->left;
         p1 = pool_Address(&sts, tp->php, p1r);
         b1 = p1->bal;
-        if (b1 < 1) { /* single LL rotation */
+        if (b1 < 1)
+        { /* single LL rotation */
           tp->g->nLL++;
           p->left = p1->right;
           right = pool_Address(&sts, tp->php, p1->right);
           right->parent = pr;
           p1->right = pr;
-          if (b1 == 0) {
+          if (b1 == 0)
+          {
             p->bal = -1;
             p1->bal = 1;
             h = 0;
-          } else {
+          }
+          else
+          {
             p->bal = p1->bal = 0;
           }
           p1->parent = p->parent;
@@ -455,7 +479,9 @@ static pool_tRef deleteNode(ptree_sTable* tp, pool_tRef zr)
           p->parent = p1r;
           p = p1;
           pr = p1r;
-        } else { /* double LR rotation */
+        }
+        else
+        { /* double LR rotation */
           tp->g->nLR++;
           p2r = p1->right;
           p2 = pool_Address(&sts, tp->php, p2r);
@@ -491,8 +517,11 @@ static pool_tRef deleteNode(ptree_sTable* tp, pool_tRef zr)
         }
         break;
       }
-    } else { /* left branch has grown */
-      switch (p->bal) {
+    }
+    else
+    { /* left branch has grown */
+      switch (p->bal)
+      {
       case -1:
         p->bal = 0;
         break;
@@ -504,17 +533,21 @@ static pool_tRef deleteNode(ptree_sTable* tp, pool_tRef zr)
         p1r = p->right;
         p1 = pool_Address(&sts, tp->php, p1r);
         b1 = p1->bal;
-        if (b1 > -1) { /* single RR rotation */
+        if (b1 > -1)
+        { /* single RR rotation */
           tp->g->nRR++;
           p->right = p1->left;
           left = pool_Address(&sts, tp->php, p1->left);
           left->parent = pr;
           p1->left = pr;
-          if (b1 == 0) {
+          if (b1 == 0)
+          {
             p->bal = 1;
             p1->bal = -1;
             h = 0;
-          } else {
+          }
+          else
+          {
             p->bal = p1->bal = 0;
           }
           p1->parent = p->parent;
@@ -528,7 +561,9 @@ static pool_tRef deleteNode(ptree_sTable* tp, pool_tRef zr)
           p->parent = p1r;
           p = p1;
           pr = p1r;
-        } else { /* double RL rotation */
+        }
+        else
+        { /* double RL rotation */
           tp->g->nRL++;
           p2r = p1->left;
           p2 = pool_Address(&sts, tp->php, p2r);
@@ -593,26 +628,34 @@ static pool_tRef insertNode(ptree_sTable* tp, pool_tRef zr)
   ptree_sNode *left, *right, *parent;
   ptree_sNode* z = pool_Address(&sts, tp->php, zr);
 
-  for (yr = tp->g->null, y = tp->nullp, xr = tp->g->root,
-      x = pool_Address(&sts, tp->php, xr);
-       xr != tp->g->null; x = pool_Address(&sts, tp->php, xr)) {
+  for (yr = tp->g->null, y = tp->nullp, xr = tp->g->root, x = pool_Address(&sts, tp->php, xr);
+       xr != tp->g->null; x = pool_Address(&sts, tp->php, xr))
+  {
     y = x;
     yr = xr;
     comp = tp->compareFunc(tp, z, x);
     if (comp == 0)
       return xr; /* already exists */
-    if (comp < 0) {
+    if (comp < 0)
+    {
       xr = x->left;
-    } else {
+    }
+    else
+    {
       xr = x->right;
     }
   }
   z->parent = yr;
-  if (yr == tp->g->null) {
+  if (yr == tp->g->null)
+  {
     tp->g->root = zr;
-  } else if (comp < 0) {
+  }
+  else if (comp < 0)
+  {
     y->left = zr;
-  } else {
+  }
+  else
+  {
     y->right = zr;
   }
 
@@ -621,12 +664,13 @@ static pool_tRef insertNode(ptree_sTable* tp, pool_tRef zr)
   tp->g->nNode++;
   tp->g->nInsert++;
 
-  for (h = 1, y = z, yr = zr, pr = z->parent,
-      p = pool_Address(&sts, tp->php, pr);
-       pr != tp->g->null && h != 0;
-       y = p, yr = pr, pr = p->parent, p = pool_Address(&sts, tp->php, pr)) {
-    if (yr == p->left) { /* left branch has grown */
-      switch (p->bal) {
+  for (h = 1, y = z, yr = zr, pr = z->parent, p = pool_Address(&sts, tp->php, pr);
+       pr != tp->g->null && h != 0; y = p, yr = pr, pr = p->parent, p = pool_Address(&sts, tp->php, pr))
+  {
+    if (yr == p->left)
+    { /* left branch has grown */
+      switch (p->bal)
+      {
       case 1:
         p->bal = 0;
         h = 0;
@@ -637,7 +681,8 @@ static pool_tRef insertNode(ptree_sTable* tp, pool_tRef zr)
       case -1:
         p1r = p->left;
         p1 = pool_Address(&sts, tp->php, p1r);
-        if (p1->bal == -1) { /* single LL rotation */
+        if (p1->bal == -1)
+        { /* single LL rotation */
           tp->g->nLL++;
           p->left = p1->right;
           right = pool_Address(&sts, tp->php, p1->right);
@@ -656,7 +701,9 @@ static pool_tRef insertNode(ptree_sTable* tp, pool_tRef zr)
           p = p1;
           pr = p1r;
           h = 0;
-        } else { /* double LR rotation */
+        }
+        else
+        { /* double LR rotation */
           tp->g->nLR++;
           p2r = p1->right;
           p2 = pool_Address(&sts, tp->php, p2r);
@@ -692,8 +739,11 @@ static pool_tRef insertNode(ptree_sTable* tp, pool_tRef zr)
         }
         break;
       }
-    } else { /* right branch has grown */
-      switch (p->bal) {
+    }
+    else
+    { /* right branch has grown */
+      switch (p->bal)
+      {
       case -1:
         p->bal = 0;
         h = 0;
@@ -704,7 +754,8 @@ static pool_tRef insertNode(ptree_sTable* tp, pool_tRef zr)
       case 1:
         p1r = p->right;
         p1 = pool_Address(&sts, tp->php, p1r);
-        if (p1->bal == 1) { /* single RR rotation */
+        if (p1->bal == 1)
+        { /* single RR rotation */
           tp->g->nRR++;
           p->right = p1->left;
           left = pool_Address(&sts, tp->php, p1->left);
@@ -723,7 +774,9 @@ static pool_tRef insertNode(ptree_sTable* tp, pool_tRef zr)
           p = p1;
           pr = p1r;
           h = 0;
-        } else { /* double RL rotation */
+        }
+        else
+        { /* double RL rotation */
           tp->g->nRL++;
           p2r = p1->left;
           p2 = pool_Address(&sts, tp->php, p2r);
@@ -765,8 +818,8 @@ static pool_tRef insertNode(ptree_sTable* tp, pool_tRef zr)
   return zr;
 }
 
-static void ptreeCheck(ptree_sTable* tp, pool_tRef nr, int* count,
-    int* maxlevel, int* hight, int level, char* (*printKey)(ptree_sNode*))
+static void ptreeCheck(ptree_sTable* tp, pool_tRef nr, int* count, int* maxlevel, int* hight, int level,
+                       char* (*printKey)(ptree_sNode*))
 {
   int comp;
   int hleft;
@@ -774,7 +827,8 @@ static void ptreeCheck(ptree_sTable* tp, pool_tRef nr, int* count,
   ptree_sNode *np, *left, *right;
   pwr_tStatus sts;
 
-  if (nr == tp->g->null) {
+  if (nr == tp->g->null)
+  {
     *hight = 0;
     return;
   }
@@ -784,50 +838,47 @@ static void ptreeCheck(ptree_sTable* tp, pool_tRef nr, int* count,
 
   np = pool_Address(&sts, tp->php, nr);
   ptreeCheck(tp, np->left, count, maxlevel, &hleft, level + 1, printKey);
-  if (np->left != tp->g->null) {
+  if (np->left != tp->g->null)
+  {
     left = pool_Address(&sts, tp->php, np->left);
-    if (left->parent != nr) {
-      printf("leftLinkerror: Node key: %s not linked to parent key: %s\n",
-          printKey(left), printKey(np));
+    if (left->parent != nr)
+    {
+      printf("leftLinkerror: Node key: %s not linked to parent key: %s\n", printKey(left), printKey(np));
     }
     comp = tp->compareFunc(tp, np, left);
-    if (comp < 1) {
-      printf("leftLink sort error: Node key: %s not less than key: %s\n",
-          printKey(left), printKey(np));
+    if (comp < 1)
+    {
+      printf("leftLink sort error: Node key: %s not less than key: %s\n", printKey(left), printKey(np));
     }
   }
 
   (*count)++;
   ptreeCheck(tp, np->right, count, maxlevel, &hright, level + 1, printKey);
-  if (np->right != tp->g->null) {
+  if (np->right != tp->g->null)
+  {
     right = pool_Address(&sts, tp->php, np->right);
-    if (right->parent != nr) {
-      printf("rightLinkerror: Node key: %s not linked to parent key: %s\n",
-          printKey(right), printKey(np));
+    if (right->parent != nr)
+    {
+      printf("rightLinkerror: Node key: %s not linked to parent key: %s\n", printKey(right), printKey(np));
     }
     comp = tp->compareFunc(tp, np, right);
-    if (comp > -1) {
-      printf("rightLink sort error: Node key: %s not greater than key: %s\n",
-          printKey(right), printKey(np));
+    if (comp > -1)
+    {
+      printf("rightLink sort error: Node key: %s not greater than key: %s\n", printKey(right), printKey(np));
     }
   }
 
-  if ((hright - hleft) != np->bal) {
-    printf("balerror key: %s, level: %d, hr: %d, hl: %d, bal: %d\n",
-        printKey(np), level, hright, hleft, np->bal);
+  if ((hright - hleft) != np->bal)
+  {
+    printf("balerror key: %s, level: %d, hr: %d, hl: %d, bal: %d\n", printKey(np), level, hright, hleft,
+           np->bal);
   }
   *hight = (hright > hleft ? hright : hleft) + 1;
 }
 
-void ptree_DeleteTable(pwr_tStatus* sts, ptree_sTable* tp)
-{
-  deleteTree(sts, tp);
-}
+void ptree_DeleteTable(pwr_tStatus* sts, ptree_sTable* tp) { deleteTree(sts, tp); }
 
-void ptree_EmptyTable(pwr_tStatus* sts, ptree_sTable* tp)
-{
-  emptyTree(sts, tp);
-}
+void ptree_EmptyTable(pwr_tStatus* sts, ptree_sTable* tp) { emptyTree(sts, tp); }
 
 pool_tRef ptree_Insert(pwr_tStatus* sts, ptree_sTable* tp, void* key)
 {
@@ -844,9 +895,12 @@ pool_tRef ptree_Insert(pwr_tStatus* sts, ptree_sTable* tp, void* key)
     pwr_Return(pool_cNRef, sts, TREE__ERROR);
   or = insertNode(tp, nr);
 
-  if (nr == or) {
+  if (nr == or)
+  {
     pwr_Return(nr, sts, TREE__INSERTED);
-  } else {
+  }
+  else
+  {
     freeNode(tp, nr);
     pwr_Return(pool_cNRef, sts, TREE__ERROR);
   }
@@ -911,10 +965,7 @@ void* ptree_FindSuccessor(pwr_tStatus* sts, ptree_sTable* tp, void* key)
   pwr_Return((void*)np, sts, TREE__FOUND);
 }
 
-int ptree_TableIsEmpty(pwr_tStatus* sts, ptree_sTable* tp)
-{
-  return tp->g->nNode == 0;
-}
+int ptree_TableIsEmpty(pwr_tStatus* sts, ptree_sTable* tp) { return tp->g->nNode == 0; }
 
 void* ptree_Maximum(pwr_tStatus* sts, ptree_sTable* tp)
 {
@@ -955,8 +1006,8 @@ void* ptree_Predecessor(pwr_tStatus* sts, ptree_sTable* tp, void* np)
   pwr_Return(np, sts, TREE__FOUND);
 }
 
-void ptree_PrintTable(pwr_tStatus* sts, ptree_sTable* tp,
-    void (*printNode)(ptree_sNode*, pool_tRef), char* (*printKey)(ptree_sNode*))
+void ptree_PrintTable(pwr_tStatus* sts, ptree_sTable* tp, void (*printNode)(ptree_sNode*, pool_tRef),
+                      char* (*printKey)(ptree_sNode*))
 {
   int count = 0;
   int maxlevel = 0;
@@ -990,7 +1041,8 @@ void ptree_Remove(pwr_tStatus* sts, ptree_sTable* tp, void* key)
   pool_tRef nr;
 
   nr = findNode(tp, key);
-  if (nr != tp->g->null) {
+  if (nr != tp->g->null)
+  {
     nr = deleteNode(tp, nr);
     freeNode(tp, nr);
   }
@@ -1092,14 +1144,16 @@ int ptree_Comp_oid(ptree_sTable* tp, ptree_sNode* x, ptree_sNode* y)
   pwr_tOid* xKey = (pwr_tOid*)(tp->g->keyOffset + (char*)x);
   pwr_tOid* yKey = (pwr_tOid*)(tp->g->keyOffset + (char*)y);
 
-  if (xKey->vid == yKey->vid) {
+  if (xKey->vid == yKey->vid)
+  {
     if (xKey->oix == yKey->oix)
       return 0;
     else if (xKey->oix < yKey->oix)
       return -1;
     else
       return 1;
-  } else if (xKey->vid < yKey->vid)
+  }
+  else if (xKey->vid < yKey->vid)
     return -1;
   else
     return 1;
@@ -1110,14 +1164,16 @@ int ptree_Comp_time(ptree_sTable* tp, ptree_sNode* x, ptree_sNode* y)
   pwr_tTime* xKey = (pwr_tTime*)(tp->g->keyOffset + (char*)x);
   pwr_tTime* yKey = (pwr_tTime*)(tp->g->keyOffset + (char*)y);
 
-  if (xKey->tv_sec == yKey->tv_sec) {
+  if (xKey->tv_sec == yKey->tv_sec)
+  {
     if (xKey->tv_nsec == yKey->tv_nsec)
       return 0;
     else if ((int)xKey->tv_nsec < (int)yKey->tv_nsec)
       return -1;
     else
       return 1;
-  } else if ((int)xKey->tv_sec < (int)yKey->tv_sec)
+  }
+  else if ((int)xKey->tv_sec < (int)yKey->tv_sec)
     return -1;
   else
     return 1;

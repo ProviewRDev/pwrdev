@@ -55,28 +55,30 @@
 #include <linux/joystick.h>
 #include <errno.h>
 
-typedef struct {
+typedef struct
+{
   int fd;
   int axis_map[ABS_MAX + 1];
   int button_map[KEY_MAX - BTN_MISC + 1];
 } io_sLocalUSB_Joystick;
 
 static char* axis_names[ABS_MAX + 1] = {
-  "X", "Y", "Z", "Rx", "Ry", "Rz", "Throttle", "Rudder", "Wheel", "Gas",
-  "Brake", "?", "?", "?", "?", "?", "Hat0X", "Hat0Y", "Hat1X", "Hat1Y", "Hat2X",
-  "Hat2Y", "Hat3X", "Hat3Y", "?", "?", "?", "?", "?", "?", "?", 0,
+    "X",     "Y",     "Z", "Rx", "Ry", "Rz",    "Throttle", "Rudder", "Wheel", "Gas",   "Brake",
+    "?",     "?",     "?", "?",  "?",  "Hat0X", "Hat0Y",    "Hat1X",  "Hat1Y", "Hat2X", "Hat2Y",
+    "Hat3X", "Hat3Y", "?", "?",  "?",  "?",     "?",        "?",      "?",     0,
 };
 
 static char* button_names[KEY_MAX - BTN_MISC + 1] = {
-  "Btn0", "Btn1", "Btn2", "Btn3", "Btn4", "Btn5", "Btn6", "Btn7", "Btn8",
-  "Btn9", "?", "?", "?", "?", "?", "?", "LeftBtn", "RightBtn", "MiddleBtn",
-  "SideBtn", "ExtraBtn", "ForwardBtn", "BackBtn", "TaskBtn", "?", "?", "?", "?",
-  "?", "?", "?", "?", "Trigger", "ThumbBtn", "ThumbBtn2", "TopBtn", "TopBtn2",
-  "PinkieBtn", "BaseBtn", "BaseBtn2", "BaseBtn3", "BaseBtn4", "BaseBtn5",
-  "BaseBtn6", "BtnDead", "BtnA", "BtnB", "BtnC", "BtnX", "BtnY", "BtnZ",
-  "BtnTL", "BtnTR", "BtnTL2", "BtnTR2", "BtnSelect", "BtnStart", "BtnMode",
-  "BtnThumbL", "BtnThumbR", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?",
-  "?", "?", "?", "?", "?", "?", "?", "WheelBtn", "Gear up", 0,
+    "Btn0",     "Btn1",     "Btn2",      "Btn3",      "Btn4",     "Btn5",       "Btn6",    "Btn7",
+    "Btn8",     "Btn9",     "?",         "?",         "?",        "?",          "?",       "?",
+    "LeftBtn",  "RightBtn", "MiddleBtn", "SideBtn",   "ExtraBtn", "ForwardBtn", "BackBtn", "TaskBtn",
+    "?",        "?",        "?",         "?",         "?",        "?",          "?",       "?",
+    "Trigger",  "ThumbBtn", "ThumbBtn2", "TopBtn",    "TopBtn2",  "PinkieBtn",  "BaseBtn", "BaseBtn2",
+    "BaseBtn3", "BaseBtn4", "BaseBtn5",  "BaseBtn6",  "BtnDead",  "BtnA",       "BtnB",    "BtnC",
+    "BtnX",     "BtnY",     "BtnZ",      "BtnTL",     "BtnTR",    "BtnTL2",     "BtnTR2",  "BtnSelect",
+    "BtnStart", "BtnMode",  "BtnThumbL", "BtnThumbR", "?",        "?",          "?",       "?",
+    "?",        "?",        "?",         "?",         "?",        "?",          "?",       "?",
+    "?",        "?",        "?",         "?",         "?",        "WheelBtn",   "Gear up", 0,
 };
 
 #define NAME_LENGTH 128
@@ -92,12 +94,14 @@ device, eg /dev/input/js0\n\n\
 
 int main(int argc, char** argv)
 {
-  if (argc < 2) {
+  if (argc < 2)
+  {
     usage();
     exit(0);
   }
 
-  if (streq(argv[1], "-h")) {
+  if (streq(argv[1], "-h"))
+  {
     usage();
     exit(0);
   }
@@ -111,9 +115,9 @@ int main(int argc, char** argv)
   char name[NAME_LENGTH] = "Unknown";
 
   fd = open(argv[1], O_RDONLY);
-  if (fd == -1) {
-    printf("USB_Joystick, unable to attach device, sts %d, '%s'\n", errno,
-        argv[1]);
+  if (fd == -1)
+  {
+    printf("USB_Joystick, unable to attach device, sts %d, '%s'\n", errno, argv[1]);
     exit(0);
   }
 

@@ -76,7 +76,8 @@ int read_adc(int chan) // 'chan' must be 0 or 1. This is not checked!
 
   // wait for SPI to be ready
   // This will take about 16 micro seconds
-  do {
+  do
+  {
     status = SPI0_CNTLSTAT;
   } while ((status & SPI0_CS_DONE) == 0);
   SPI0_CNTLSTAT = SPI0_CS_DONE; // clear the done bit
@@ -100,7 +101,7 @@ int read_adc(int chan) // 'chan' must be 0 or 1. This is not checked!
 // datasheet of the AD chip (MCP4802/MCP4812/MCP4822)
 //
 void write_dac(int chan, // chan must be 0 or 1, this is not checked
-    int val) // chan must be max 12 bit
+               int val)  // chan must be max 12 bit
 {
   char v1, v2, dummy;
   int status;
@@ -124,7 +125,8 @@ void write_dac(int chan, // chan must be 0 or 1, this is not checked
 
   // wait for SPI to be ready
   // This will take about 16 micro seconds
-  do {
+  do
+  {
     status = SPI0_CNTLSTAT;
   } while ((status & SPI0_CS_DONE) == 0);
   SPI0_CNTLSTAT = SPI0_CS_DONE; // clear the done bit

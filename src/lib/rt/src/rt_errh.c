@@ -71,7 +71,7 @@
 #define ERRH_MAX_ANIX_NAME_LEN 32
 
 typedef void* aa_list[];
-#define aa_arg(ap, vap, type) (ap ? ((type)*ap++) : va_arg(vap, type))
+#define aa_arg(ap, vap, type) (ap ? ((type) * ap++) : va_arg(vap, type))
 
 typedef enum
 {
@@ -1000,6 +1000,7 @@ static int msg_vsprintf(char* buf, const char* fmt, aa_list ap, va_list vap)
 
     case 'X':
       flags |= LARGE;
+    /* fall through */
     case 'x':
       base = 16;
       break;

@@ -42,7 +42,8 @@
 #include <vector>
 #include <map>
 
-extern "C" {
+extern "C"
+{
 #include "rt_qdb.h"
 #include "rt_gdh_msg.h"
 #include "rt_gdh.h"
@@ -64,11 +65,10 @@ extern "C" {
 #include "co_provider.h"
 #include "rt_procom.h"
 
-class psub {
-  public:
-  psub() : occupied(1), count(0), nid(0), dt(0), sub_by_name(0), p(0)
-  {
-  }
+class psub
+{
+public:
+  psub() : occupied(1), count(0), nid(0), dt(0), sub_by_name(0), p(0) {}
 
   int occupied;
   pwr_tSubid sid;
@@ -80,17 +80,14 @@ class psub {
   void* p;
 };
 
-class subkey {
-  public:
+class subkey
+{
+public:
   int m_nid;
   int m_rix;
 
-  subkey() : m_nid(0), m_rix(0)
-  {
-  }
-  subkey(pwr_tSubid sid) : m_nid(sid.nid), m_rix(sid.rix)
-  {
-  }
+  subkey() : m_nid(0), m_rix(0) {}
+  subkey(pwr_tSubid sid) : m_nid(sid.nid), m_rix(sid.rix) {}
   friend bool operator<(const subkey x1, const subkey x2)
   {
     if (x1.m_nid < x2.m_nid)
@@ -106,10 +103,9 @@ std::map<subkey, psub> m_sublist;
 
 static rt_procom* pvd_procom;
 
-rt_procom::rt_procom(co_provider* p, errh_eAnix anix, const char* name,
-    pwr_tSid sid, pwr_tVid vid, const char* volumename, int global)
-    : co_procom(p), m_anix(anix), m_sid(sid), m_vid(vid), m_global(global),
-      m_getmsg(0)
+rt_procom::rt_procom(co_provider* p, errh_eAnix anix, const char* name, pwr_tSid sid, pwr_tVid vid,
+                     const char* volumename, int global)
+    : co_procom(p), m_anix(anix), m_sid(sid), m_vid(vid), m_global(global), m_getmsg(0)
 {
   pvd_procom = this;
   strcpy(m_name, name);
@@ -157,37 +153,74 @@ static pwr_tBoolean pvd_SubSendBuffer();
 /* Dispatcher for 'net_cMsgClass' messages.  */
 
 static const char* cMsg[net_eMsg_end] = {
-  "error", "id", "idAck", "idAck2", "volumes", "volumesR", "subAdd",
-  "subRemove", "subData", "sanAdd", "sanRemove", "sanUpdate", "nameToObject",
-  "oidToObject", "objectR", "getObjectInfo", "getObjectInfoR", "setObjectInfo",
-  "setObjectInfoR", "flush", "createObject", "deleteObject", "moveObject",
-  "renameObject", "nodeUp", "nodeDown", "getCclass", "getCclassR", "getGclass",
-  "getGclassR", "net_eMsg_", "volumes7"
-                             "net_eMsg_",
+    "error",
+    "id",
+    "idAck",
+    "idAck2",
+    "volumes",
+    "volumesR",
+    "subAdd",
+    "subRemove",
+    "subData",
+    "sanAdd",
+    "sanRemove",
+    "sanUpdate",
+    "nameToObject",
+    "oidToObject",
+    "objectR",
+    "getObjectInfo",
+    "getObjectInfoR",
+    "setObjectInfo",
+    "setObjectInfoR",
+    "flush",
+    "createObject",
+    "deleteObject",
+    "moveObject",
+    "renameObject",
+    "nodeUp",
+    "nodeDown",
+    "getCclass",
+    "getCclassR",
+    "getGclass",
+    "getGclassR",
+    "net_eMsg_",
+    "volumes7"
+    "net_eMsg_",
 };
 static void (*fromApplication[net_eMsg_end])(qcom_sGet*) = {
-  netError, id, id, idAck2, volumes, volumesR,
-  pvd_SubAdd, /* Add subscription */
-  pvd_SubRemove, /* Remove subscription */
-  subcm_Data, /* Subscription data transfer */
-  sansm_Add, /* Add subscription */
-  sansm_Remove, /* Remove subscription */
-  sancm_Update, /* Subscription data transfer */
-  pvd_NameToObject, /* Cache inquiry, fetch name */
-  pvd_OidToObject, /* Cache inquiry, fetch objid */
-  bugError, /* net_eMsg_ObjectR will never reach neth.  */
-  pvd_GetObjectInfo,
-  bugError, /* net_eMsg_GetObjectInfoR will never reach neth.  */
-  pvd_SetObjectInfo,
-  bugError, /* net_eMsg_SetObjectInfoR, will never reach neth.  */
-  flush, /* net_eMsg_Flush, Cache flush request */
-  cvolcm_CreateObject, cvolcm_DeleteObject, cvolcm_MoveObject,
-  cvolcm_RenameObject, bugError, /* net_eMsg_NodeUp will never reach neth.  */
-  bugError, /* net_eMsg_NodeDown is not for neth. */
-  cmvolsm_GetCclass, bugError, /* net_eMsg_GetCclassR will never reach neth */
-  cmvolsm_GetGclass, bugError, /* net_eMsg_GetGclassR will never reach neth */
-  bugError, /* net_eMsg_ */
-  volumes7, bugError /* net_eMsg_serverConnect */
+    netError,
+    id,
+    id,
+    idAck2,
+    volumes,
+    volumesR,
+    pvd_SubAdd,       /* Add subscription */
+    pvd_SubRemove,    /* Remove subscription */
+    subcm_Data,       /* Subscription data transfer */
+    sansm_Add,        /* Add subscription */
+    sansm_Remove,     /* Remove subscription */
+    sancm_Update,     /* Subscription data transfer */
+    pvd_NameToObject, /* Cache inquiry, fetch name */
+    pvd_OidToObject,  /* Cache inquiry, fetch objid */
+    bugError,         /* net_eMsg_ObjectR will never reach neth.  */
+    pvd_GetObjectInfo,
+    bugError, /* net_eMsg_GetObjectInfoR will never reach neth.  */
+    pvd_SetObjectInfo,
+    bugError, /* net_eMsg_SetObjectInfoR, will never reach neth.  */
+    flush,    /* net_eMsg_Flush, Cache flush request */
+    cvolcm_CreateObject,
+    cvolcm_DeleteObject,
+    cvolcm_MoveObject,
+    cvolcm_RenameObject,
+    bugError, /* net_eMsg_NodeUp will never reach neth.  */
+    bugError, /* net_eMsg_NodeDown is not for neth. */
+    cmvolsm_GetCclass,
+    bugError, /* net_eMsg_GetCclassR will never reach neth */
+    cmvolsm_GetGclass,
+    bugError, /* net_eMsg_GetGclassR will never reach neth */
+    bugError, /* net_eMsg_ */
+    volumes7,
+    bugError /* net_eMsg_serverConnect */
 };
 
 /* Add my own node.  */
@@ -231,7 +264,7 @@ static gdb_sNode* addNode(qcom_sNode* node)
     if (np == NULL)
       break;
 
-    sprintf(np->name, "%s_s%d", node->name, pvd_procom->m_sid);
+    snprintf(np->name, sizeof(np->name), "%s_s%d", node->name, pvd_procom->m_sid);
     np->os = node->os;
     np->hw = node->hw;
     np->upcnt++;
@@ -258,11 +291,9 @@ static void flushAllNodes(void)
 
   gdb_AssumeUnlocked;
 
-  for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid) {
-    gdb_ScopeLock
-    {
-      np = (gdb_sNode*)hash_Search(&sts, gdbroot->nid_ht, &node.nid);
-    }
+  for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid)
+  {
+    gdb_ScopeLock { np = (gdb_sNode*)hash_Search(&sts, gdbroot->nid_ht, &node.nid); }
     gdb_ScopeUnlock;
 
     if (np == NULL)
@@ -271,7 +302,8 @@ static void flushAllNodes(void)
     if (np == gdbroot->my_node || np == gdbroot->no_node)
       continue;
 
-    if (node.flags.b.connected) {
+    if (node.flags.b.connected)
+    {
       sendFlush(np);
     }
   }
@@ -281,9 +313,8 @@ static void flushAllNodes(void)
 
 static void bugError(qcom_sGet* get)
 {
-  errh_Warning("Unexpected message type <%d:%d> received from %x @ %s",
-      get->type.b, get->type.s, get->pid,
-      cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
+  errh_Warning("Unexpected message type <%d:%d> received from %x @ %s", get->type.b, get->type.s, get->pid,
+               cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
 }
 /* Flush all information on remote node.  */
 
@@ -314,12 +345,17 @@ static void fromEvent(qcom_sGet* get)
   cur_event.m = sav_event;
   new_event.m = ep->mask;
 
-  if (new_event.b.swapDone & !cur_event.b.swapDone) {
+  if (new_event.b.swapDone & !cur_event.b.swapDone)
+  {
     errh_Info("Warm restart completed.");
     flushAllNodes();
-  } else if (new_event.b.swapInit & !cur_event.b.swapInit) {
+  }
+  else if (new_event.b.swapInit & !cur_event.b.swapInit)
+  {
     errh_Info("Warm restart initiated.");
-  } else if (new_event.b.terminate & !cur_event.b.terminate) {
+  }
+  else if (new_event.b.terminate & !cur_event.b.terminate)
+  {
     exit(0);
   }
 
@@ -330,7 +366,8 @@ static void fromEvent(qcom_sGet* get)
 
 static void fromNet(qcom_sGet* get)
 {
-  switch (get->type.s) {
+  switch (get->type.s)
+  {
   case qcom_eStype_linkActive:
     linkActive(get);
     break;
@@ -349,9 +386,8 @@ static void fromNet(qcom_sGet* get)
   case qcom_eStype_applDisconnect:
     break;
   default:
-    errh_Error("Unexpected message type <%d:%d> received from %x @ %s",
-        get->type.b, get->type.s, get->pid,
-        cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
+    errh_Error("Unexpected message type <%d:%d> received from %x @ %s", get->type.b, get->type.s, get->pid,
+               cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
     break;
   }
 }
@@ -366,18 +402,15 @@ static void flush(qcom_sGet* get)
 
   gdb_AssumeUnlocked;
 
-  gdb_ScopeLock
-  {
-    np = (gdb_sNode*)hash_Search(&sts, gdbroot->nid_ht, &mp->hdr.nid);
-  }
+  gdb_ScopeLock { np = (gdb_sNode*)hash_Search(&sts, gdbroot->nid_ht, &mp->hdr.nid); }
   gdb_ScopeUnlock;
 
   if (np == NULL)
     return;
 
-  if (np->flags.b.connected) {
-    errh_Info("Flushing, node %s (%s)", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0));
+  if (np->flags.b.connected)
+  {
+    errh_Info("Flushing, node %s (%s)", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0));
     flushNode(np);
     sendId(np);
   }
@@ -395,36 +428,42 @@ static void id(qcom_sGet* get)
 
   gdb_AssumeUnlocked;
 
-  if (gdbroot->db->log.b.messages) {
-    errh_Info("Received '%s' from nid %s", cMsg[get->type.s],
-        cdh_NodeIdToString(NULL, mp->hdr.nid, 0, 0));
+  if (gdbroot->db->log.b.messages)
+  {
+    errh_Info("Received '%s' from nid %s", cMsg[get->type.s], cdh_NodeIdToString(NULL, mp->hdr.nid, 0, 0));
   }
 
-  if (mp->hdr.nid == gdbroot->my_node->nid) {
+  if (mp->hdr.nid == gdbroot->my_node->nid)
+  {
     errh_Error("New node using nid %s, attempts to appear as local node %s, "
                "'%s' ignored",
-        cdh_NodeIdToString(NULL, get->sender.nid, 0, 0),
-        cdh_NodeIdToString(NULL, mp->hdr.nid, 0, 0), cMsg[get->type.s]);
+               cdh_NodeIdToString(NULL, get->sender.nid, 0, 0), cdh_NodeIdToString(NULL, mp->hdr.nid, 0, 0),
+               cMsg[get->type.s]);
     return;
   }
-  if (mp->node.netver != net_cVersion) {
-    if (mp->node.netver == 7) {
+  if (mp->node.netver != net_cVersion)
+  {
+    if (mp->node.netver == 7)
+    {
       cclassSupport = FALSE;
       errh_Warning("Accepting older net protocol version, '%s' old version: "
                    "%d, my version: %d, node: %s",
-          cMsg[get->type.s], mp->node.netver, net_cVersion,
-          cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
-
-    } else if (mp->node.netver > net_cVersion) {
+                   cMsg[get->type.s], mp->node.netver, net_cVersion,
+                   cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
+    }
+    else if (mp->node.netver > net_cVersion)
+    {
       errh_Warning("Accepting newer net protocol version, '%s' new version: "
                    "%d, my version: %d, node: %s",
-          cMsg[get->type.s], mp->node.netver, net_cVersion,
-          cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
-    } else {
+                   cMsg[get->type.s], mp->node.netver, net_cVersion,
+                   cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
+    }
+    else
+    {
       errh_Error("Proview net protocol version not supported, '%s' ignored "
                  "version: %d, my version: %d, node: %s",
-          cMsg[get->type.s], mp->node.netver, net_cVersion,
-          cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
+                 cMsg[get->type.s], mp->node.netver, net_cVersion,
+                 cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
       return;
     }
   }
@@ -439,9 +478,9 @@ static void id(qcom_sGet* get)
     // np = gdb_AddNode(NULL, get->sender.nid, gdb_mAdd__);
 
     np = (gdb_sNode*)hash_Search(&sts, gdbroot->nid_ht, &mp->hdr.nid);
-    if (np == NULL) {
-      errh_Warning("New node (%s) not connected",
-          cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
+    if (np == NULL)
+    {
+      errh_Warning("New node (%s) not connected", cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
       event = net_eEvent_error;
       break;
     }
@@ -459,8 +498,7 @@ static void id(qcom_sGet* get)
 
 static void idAck2(qcom_sGet* get)
 {
-  errh_Error("Received 'idAck2' from (%s)",
-      cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
+  errh_Error("Received 'idAck2' from (%s)", cdh_NodeIdToString(NULL, get->sender.nid, 0, 0));
 }
 
 /* Initialize the nethandler data and communications.  */
@@ -481,7 +519,8 @@ void rt_procom::init()
   qid.nid = qcom_cNNid;
 
   gdb_MapDb(&sts, &qid, m_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("gdb_MapDb, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -490,19 +529,22 @@ void rt_procom::init()
   // gdbroot->db->nethandler = qid;
   pvd_qid = qid;
 
-  if (!qcom_Bind(&sts, &gdbroot->my_qid, &qcom_cQnetEvent)) {
+  if (!qcom_Bind(&sts, &gdbroot->my_qid, &qcom_cQnetEvent))
+  {
     errh_Error("qcom_Bind(QnetEvent), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
-  if (!qcom_Bind(&sts, &gdbroot->my_qid, &qcom_cQapplEvent)) {
+  if (!qcom_Bind(&sts, &gdbroot->my_qid, &qcom_cQapplEvent))
+  {
     errh_Error("qcom_Bind(QapplEvent), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
-  if (!qcom_Bind(&sts, &gdbroot->my_qid, &qcom_cQini)) {
+  if (!qcom_Bind(&sts, &gdbroot->my_qid, &qcom_cQini))
+  {
     errh_Error("qcom_Bind(Qini), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -521,15 +563,12 @@ static void linkActive(qcom_sGet* get)
 
   gdb_AssumeUnlocked;
 
-  gdb_ScopeLock
-  {
-    np = gdb_AddNode(&sts, node->nid, gdb_mAdd__);
-  }
+  gdb_ScopeLock { np = gdb_AddNode(&sts, node->nid, gdb_mAdd__); }
   gdb_ScopeUnlock;
 
-  if (!np->flags.b.active) {
-    errh_Info("Active, link to node %s (%s)", node->name,
-        cdh_NodeIdToString(NULL, node->nid, 0, 0));
+  if (!np->flags.b.active)
+  {
+    errh_Info("Active, link to node %s (%s)", node->name, cdh_NodeIdToString(NULL, node->nid, 0, 0));
 
     pwr_Assert(np->flags.b.connected);
     np->flags.b.active = 1;
@@ -547,13 +586,9 @@ static void linkConnect(qcom_sGet* get)
   np = (gdb_sNode*)hash_Search(NULL, gdbroot->nid_ht, &node->nid);
   sendServerConnect(np);
 }
-static void linkDisconnect(qcom_sGet* get)
-{
-}
+static void linkDisconnect(qcom_sGet* get) {}
 
-static void linkStalled(qcom_sGet* get)
-{
-}
+static void linkStalled(qcom_sGet* get) {}
 
 /* Receive messages.  */
 
@@ -567,15 +602,18 @@ void rt_procom::mainLoop()
 
   errh_SetStatus(PWR__SRUN);
 
-  for (;;) {
+  for (;;)
+  {
     memset(&get, 0, sizeof(get));
     mp = net_Receive(&sts, &get, tmo);
-    if (sts == QCOM__TMO) {
+    if (sts == QCOM__TMO)
+    {
       m_provider->cyclic(this);
       pvd_SubSendBuffer();
       continue;
     }
-    if (mp == NULL) {
+    if (mp == NULL)
+    {
       if (log_alloc_fail)
         errh_Error("net_Receive %m", sts);
       log_alloc_fail = FALSE;
@@ -584,26 +622,29 @@ void rt_procom::mainLoop()
 
     log_alloc_fail = TRUE;
 
-    switch (get.type.b) {
+    switch (get.type.b)
+    {
     case qcom_eBtype_qcom:
       if (gdbroot->db->log.b.messages)
         errh_Info("Received message from %x (%d) @ %s, aix: %d, type=%d, "
                   "subtype=%d and length=%d",
-            get.pid, get.pid, cdh_NodeIdToString(NULL, get.sender.nid, 0, 0),
-            get.sender.aix, get.type.b, get.type.b, get.size);
+                  get.pid, get.pid, cdh_NodeIdToString(NULL, get.sender.nid, 0, 0), get.sender.aix,
+                  get.type.b, get.type.b, get.size);
       fromNet(&get);
       break;
     case net_cMsgClass:
-      if (((int)get.type.s > (int)net_eMsg__
-              && (int)get.type.s < (int)net_eMsg_)
-          || ((net_eMsg)get.type.s == net_eMsg_volumes7)) {
-        if (gdbroot->db->log.b.messages) {
-          errh_Info("Received '%s' from %x @ %s, length=%d", cMsg[get.type.s],
-              get.pid, cdh_NodeIdToString(NULL, get.sender.nid, 0, 0),
-              get.size);
+      if (((int)get.type.s > (int)net_eMsg__ && (int)get.type.s < (int)net_eMsg_) ||
+          ((net_eMsg)get.type.s == net_eMsg_volumes7))
+      {
+        if (gdbroot->db->log.b.messages)
+        {
+          errh_Info("Received '%s' from %x @ %s, length=%d", cMsg[get.type.s], get.pid,
+                    cdh_NodeIdToString(NULL, get.sender.nid, 0, 0), get.size);
         }
         fromApplication[get.type.s](&get);
-      } else {
+      }
+      else
+      {
         errh_Warning("Unexpected message sub type %d", get.type.s);
       }
       break;
@@ -613,8 +654,8 @@ void rt_procom::mainLoop()
     default:
       errh_Warning("Unexpected message type %d, subtype %d\n pid %x sender.aix "
                    "%d, sender.nid 0x%x\n, reply.qix 0x%x, reply.nid 0x%x",
-          get.type.b, get.type.s, get.pid, get.sender.aix, get.sender.nid,
-          get.reply.qix, get.reply.nid);
+                   get.type.b, get.type.s, get.pid, get.sender.aix, get.sender.nid, get.reply.qix,
+                   get.reply.nid);
       break;
     }
 
@@ -624,13 +665,9 @@ void rt_procom::mainLoop()
   }
 }
 
-static void netError(qcom_sGet* get)
-{
-}
+static void netError(qcom_sGet* get) {}
 
-static void sendFlush(gdb_sNode* np)
-{
-}
+static void sendFlush(gdb_sNode* np) {}
 
 /* This routine sends an id to a remote node.  */
 static void sendId(gdb_sNode* np)
@@ -640,9 +677,9 @@ static void sendId(gdb_sNode* np)
   qcom_sQid tgt;
   pwr_tUInt32 size;
 
-  if (gdbroot->db->log.b.id) {
-    errh_Info("Sending 'id' to %s (%s)", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0));
+  if (gdbroot->db->log.b.id)
+  {
+    errh_Info("Sending 'id' to %s (%s)", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0));
   }
 
   tgt.nid = np->nid;
@@ -658,8 +695,7 @@ static void sendId(gdb_sNode* np)
 
   net_Put(&sts, &tgt, &msg, net_eMsg_id, 0, size, pvd_procom->m_sid);
   if (EVEN(sts))
-    errh_Error("Sending 'id' to %s (%s)\n%m", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0), sts);
+    errh_Error("Sending 'id' to %s (%s)\n%m", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0), sts);
 }
 
 /* Send a list of all volumes owned by this node to the
@@ -677,9 +713,9 @@ static void sendVolumes(gdb_sNode* np, pool_tRef vr)
   int nVol = 1;
   cdh_sObjName oname;
 
-  if (gdbroot->db->log.b.messages) {
-    errh_Info("Sending 'volumes' to %s (%s)", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0));
+  if (gdbroot->db->log.b.messages)
+  {
+    errh_Info("Sending 'volumes' to %s (%s)", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0));
   }
 
   cclassSupport = np->cclassSupport;
@@ -690,14 +726,15 @@ static void sendVolumes(gdb_sNode* np, pool_tRef vr)
     size = sizeof(*mp) + ((nVol - 1) * sizeof(mp->g[0]));
 
   mp = (net_sVolumes*)malloc(size);
-  if (mp == NULL) {
-    errh_Error("Failed to allocate 'volumes' to %s (%s)", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0));
+  if (mp == NULL)
+  {
+    errh_Error("Failed to allocate 'volumes' to %s (%s)", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0));
     return;
   }
 
   cdh_ObjName(&oname, pvd_procom->m_volumename);
-  if (!cclassSupport) {
+  if (!cclassSupport)
+  {
     m7p = (net_sVolumes7*)mp;
 
     m7p->g[0].vid = pvd_procom->m_vid;
@@ -707,7 +744,9 @@ static void sendVolumes(gdb_sNode* np, pool_tRef vr)
     m7p->g[0].cid = pwr_eClass_ExternVolume;
     m7p->g[0].nid = gdbroot->my_node->nid;
     msgtype = net_eMsg_volumes7;
-  } else {
+  }
+  else
+  {
     mp->g[0].vid = pvd_procom->m_vid;
     mp->g[0].oid.oix = 0;
     mp->g[0].oid.vid = pvd_procom->m_vid;
@@ -725,25 +764,20 @@ static void sendVolumes(gdb_sNode* np, pool_tRef vr)
   tgt.qix = net_cProcHandler;
 
   if (!net_Put(&sts, &tgt, mp, msgtype, 0, size, 0))
-    errh_Error("Sending 'volumes' to %s (%s)\n%m", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0), sts);
+    errh_Error("Sending 'volumes' to %s (%s)\n%m", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0), sts);
 
   free(mp);
 }
 
 /* Receive a list of all volumes owned by the sending node.  */
 
-static void volumes(qcom_sGet* get)
-{
-}
+static void volumes(qcom_sGet* get) {}
 
 /* Receive a list of all volumes owned by the sending node.
  * Neth version 7 of net_sVolumes
  */
 
-static void volumes7(qcom_sGet* get)
-{
-}
+static void volumes7(qcom_sGet* get) {}
 
 /* Receive a list of all volumes the remote node have mounted.  */
 
@@ -756,7 +790,8 @@ static void volumesR(qcom_sGet* get)
   {
     np = (gdb_sNode*)hash_Search(NULL, gdbroot->nid_ht, &mp->hdr.nid);
 
-    if (!np->flags.b.connected) {
+    if (!np->flags.b.connected)
+    {
       np = NULL;
       break;
     }
@@ -774,10 +809,12 @@ void pvd_OidToObject(qcom_sGet* get)
 {
   net_sOidToObject* mp = (net_sOidToObject*)get->data;
 
-  if (mp->oid.vid == pvd_procom->m_vid) {
+  if (mp->oid.vid == pvd_procom->m_vid)
+  {
     pvd_procom->m_getmsg = get;
     pvd_procom->m_provider->objectOid(pvd_procom, mp->oid.oix);
-  } else
+  }
+  else
     respondError(get, pwr_cNObjid, GDH__NOSUCHOBJ);
 }
 
@@ -816,9 +853,9 @@ static void sendServerConnect(gdb_sNode* np)
   qcom_sQid tgt;
   pwr_tUInt32 size;
 
-  if (gdbroot->db->log.b.id) {
-    errh_Info("Sending 'serverConnect' to %s (%s)", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0));
+  if (gdbroot->db->log.b.id)
+  {
+    errh_Info("Sending 'serverConnect' to %s (%s)", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0));
   }
 
   tgt.nid = np->nid;
@@ -834,8 +871,8 @@ static void sendServerConnect(gdb_sNode* np)
 
   net_Put(&sts, &tgt, &msg, net_eMsg_serverConnect, 0, size, pvd_procom->m_sid);
   if (EVEN(sts))
-    errh_Error("Sending 'serverConnect' to %s (%s)\n%m", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0), sts);
+    errh_Error("Sending 'serverConnect' to %s (%s)\n%m", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0),
+               sts);
 }
 
 static void sendServerConnectAll()
@@ -847,27 +884,24 @@ static void sendServerConnectAll()
   gdb_sNode* np;
 
   // Send to local node
-  gdb_ScopeLock
-  {
-    np = (gdb_sNode*)hash_Search(NULL, gdbroot->nid_ht, &gdbroot->db->nid);
-  }
+  gdb_ScopeLock { np = (gdb_sNode*)hash_Search(NULL, gdbroot->nid_ht, &gdbroot->db->nid); }
   gdb_ScopeUnlock;
 
   sendServerConnect(np);
 
-  if (pvd_procom->m_global) {
+  if (pvd_procom->m_global)
+  {
     // Send to all other nodes...
-    for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid) {
-      gdb_ScopeLock
-      {
-        np = (gdb_sNode*)hash_Search(&sts, gdbroot->nid_ht, &node.nid);
-      }
+    for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid)
+    {
+      gdb_ScopeLock { np = (gdb_sNode*)hash_Search(&sts, gdbroot->nid_ht, &node.nid); }
       gdb_ScopeUnlock;
 
       if (np == NULL)
         continue;
 
-      if (node.flags.b.connected) {
+      if (node.flags.b.connected)
+      {
         sendServerConnect(np);
       }
     }
@@ -894,20 +928,22 @@ static void pvd_SetObjectInfo(qcom_sGet* get)
 
   p = malloc(mp->aref.Size);
 
-  if (p != NULL) {
+  if (p != NULL)
+  {
     size = mp->aref.Size;
     cid.pwr = mp->aref.Body;
     cid.c.bix = 0; /* To get the class id.  */
     cp = (gdb_sClass*)hash_Search(&sts, gdbroot->cid_ht, &cid.pwr);
-    if (cp != NULL) {
+    if (cp != NULL)
+    {
       aref = mp->aref;
-      ndc_ConvertData(&sts, np, cp, &aref, p, mp->info, (pwr_tUInt32*)&size,
-          ndc_eOp_decode, mp->aref.Offset, 0);
+      ndc_ConvertData(&sts, np, cp, &aref, p, mp->info, (pwr_tUInt32*)&size, ndc_eOp_decode, mp->aref.Offset,
+                      0);
     }
   }
   pvd_procom->m_getmsg = get;
-  pvd_procom->m_provider->writeAttribute(
-      pvd_procom, mp->aref.Objid.oix, mp->aref.Offset, mp->aref.Size, (char*)p);
+  pvd_procom->m_provider->writeAttribute(pvd_procom, mp->aref.Objid.oix, mp->aref.Offset, mp->aref.Size,
+                                         (char*)p);
 }
 
 static void pvd_GetObjectInfo(qcom_sGet* get)
@@ -915,8 +951,7 @@ static void pvd_GetObjectInfo(qcom_sGet* get)
   net_sGetObjectInfo* mp = (net_sGetObjectInfo*)get->data;
 
   pvd_procom->m_getmsg = get;
-  pvd_procom->m_provider->readAttribute(
-      pvd_procom, mp->aref.Objid.oix, mp->aref.Offset, mp->aref.Size);
+  pvd_procom->m_provider->readAttribute(pvd_procom, mp->aref.Objid.oix, mp->aref.Offset, mp->aref.Size);
 }
 
 static void pvd_SubAdd(qcom_sGet* get)
@@ -932,9 +967,9 @@ static void pvd_SubAdd(qcom_sGet* get)
   gdb_ScopeLock
   {
     np = (gdb_sNode*)hash_Search(&sts, gdbroot->nid_ht, &get->sender.nid);
-    if (np == NULL) {
-      errh_Error("subsm_Add, node (%s), is not known",
-          cdh_NodeIdToString(NULL, get->sender.nid, 1, 0));
+    if (np == NULL)
+    {
+      errh_Error("subsm_Add, node (%s), is not known", cdh_NodeIdToString(NULL, get->sender.nid, 1, 0));
       break;
     }
   }
@@ -942,7 +977,8 @@ static void pvd_SubAdd(qcom_sGet* get)
 
   pvd_procom->m_getmsg = get;
   specp = &mp->spec[0];
-  for (i = 0; i < (int)mp->count; i++, specp++) {
+  for (i = 0; i < (int)mp->count; i++, specp++)
+  {
     /* For all entries in the message.  */
     psub sub;
 
@@ -951,8 +987,8 @@ static void pvd_SubAdd(qcom_sGet* get)
     sub.sub_by_name = specp->sub_by_name;
     sub.aref = specp->aref;
     sub.dt = specp->dt;
-    pvd_procom->m_provider->subAssociateBuffer(pvd_procom, &sub.p,
-        sub.aref.Objid.oix, sub.aref.Offset, sub.aref.Size, sub.sid);
+    pvd_procom->m_provider->subAssociateBuffer(pvd_procom, &sub.p, sub.aref.Objid.oix, sub.aref.Offset,
+                                               sub.aref.Size, sub.sid);
     subkey k(sub.sid);
     m_sublist[k] = sub;
   }
@@ -964,7 +1000,8 @@ static void pvd_SubRemove(qcom_sGet* get)
   pwr_tSubid sid;
 
   pvd_procom->m_getmsg = get;
-  for (int i = 0; i < (int)mp->count; i++) {
+  for (int i = 0; i < (int)mp->count; i++)
+  {
     sid = mp->sid[i];
     subkey k(sid);
     sublist_iterator it = m_sublist.find(k);
@@ -998,10 +1035,13 @@ static pwr_tBoolean pvd_SubSendBuffer()
   /* Fill in buffer */
 
   // Get nodes
-  for (sublist_iterator it = m_sublist.begin(); it != m_sublist.end(); it++) {
+  for (sublist_iterator it = m_sublist.begin(); it != m_sublist.end(); it++)
+  {
     int found = 0;
-    for (int j = 0; j < subnid_cnt; j++) {
-      if (subnid[j] == it->second.nid) {
+    for (int j = 0; j < subnid_cnt; j++)
+    {
+      if (subnid[j] == it->second.nid)
+      {
         found = 1;
         break;
       }
@@ -1010,14 +1050,17 @@ static pwr_tBoolean pvd_SubSendBuffer()
       subnid[subnid_cnt++] = it->second.nid;
   }
 
-  for (int j = 0; j < subnid_cnt; j++) {
+  for (int j = 0; j < subnid_cnt; j++)
+  {
     nid = subnid[j];
 
     /* Build a buffer containing the update message */
     totsize = 0;
     bufsubs_lc = 0;
-    for (sublist_iterator it = m_sublist.begin(); it != m_sublist.end(); it++) {
-      if (it->second.nid == nid) {
+    for (sublist_iterator it = m_sublist.begin(); it != m_sublist.end(); it++)
+    {
+      if (it->second.nid == nid)
+      {
         totsize += it->second.aref.Size;
         bufsubs_lc++;
       }
@@ -1025,7 +1068,7 @@ static pwr_tBoolean pvd_SubSendBuffer()
 
     subdatahdrsize = sizeof(*dp) - sizeof(dp->data);
     size = totsize + bufsubs_lc * subdatahdrsize + /* size of data hdrs */
-        sizeof(*mp) - sizeof(mp->subdata); /* size of msg hdr */
+           sizeof(*mp) - sizeof(mp->subdata);      /* size of msg hdr */
 
     size = (size + 3) & ~3; /* Size up to nearest multiple of 4.  */
 
@@ -1040,33 +1083,33 @@ static pwr_tBoolean pvd_SubSendBuffer()
       if (np == NULL)
         continue;
 
-      for (sublist_iterator it = m_sublist.begin(); it != m_sublist.end();
-           it++) {
+      for (sublist_iterator it = m_sublist.begin(); it != m_sublist.end(); it++)
+      {
         if (it->second.nid != nid)
           continue;
         dp->sid = it->second.sid;
         dp->size = it->second.aref.Size;
         dp->sts = GDH__SUCCESS;
 
-        if (ODD(dp->sts)) {
+        if (ODD(dp->sts))
+        {
           asize = it->second.aref.Size;
           cid.pwr = it->second.aref.Body;
           cid.c.bix = 0; /* To get the class id.  */
           classp = (gdb_sClass*)hash_Search(&sts, gdbroot->cid_ht, &cid.pwr);
-          if (classp && it->second.p) {
-	    
-            ndc_ConvertData(&lsts, np, classp, &it->second.aref, dp->data,
-                it->second.p, (pwr_tUInt32*)&asize, ndc_eOp_encode,
-                it->second.aref.Offset, 0);
-	    dp->sts = lsts;
-	  }
+          if (classp && it->second.p)
+          {
+
+            ndc_ConvertData(&lsts, np, classp, &it->second.aref, dp->data, it->second.p, (pwr_tUInt32*)&asize,
+                            ndc_eOp_encode, it->second.aref.Offset, 0);
+            dp->sts = lsts;
+          }
           it->second.count++;
           mp->count++;
         }
 
         /* Advance pointer to next sdata slot */
-        dp = (net_sSubData*)((unsigned long)dp + it->second.aref.Size
-            + subdatahdrsize);
+        dp = (net_sSubData*)((unsigned long)dp + it->second.aref.Size + subdatahdrsize);
       }
     }
     gdb_ScopeUnlock;
@@ -1077,8 +1120,7 @@ static pwr_tBoolean pvd_SubSendBuffer()
     tgt.qix = net_cProcHandler;
     tgt.nid = nid;
 
-    net_Put(
-        &sts, &tgt, mp, net_eMsg_subData, buf_id++, size, pvd_procom->m_sid);
+    net_Put(&sts, &tgt, mp, net_eMsg_subData, buf_id++, size, pvd_procom->m_sid);
 
     free(mp);
   }
@@ -1104,15 +1146,17 @@ void rt_procom::provideObjects(pwr_tStatus sts, std::vector<procom_obj>& ovect)
 
   size = sizeof(net_sObjectR) + count * sizeof(net_sGobject);
   rsp = (net_sObjectR*)net_Alloc(&sts, &put, size, net_eMsg_objectR);
-  if (rsp == NULL) {
+  if (rsp == NULL)
+  {
     printf("NETH: could not allocate pams buffer for Cache send response, sts: "
            "%d\n",
-        sts);
+           sts);
     respondError(m_getmsg, g.oid, sts);
     return;
   }
 
-  for (i = 0; i < (int)ovect.size(); i++) {
+  for (i = 0; i < (int)ovect.size(); i++)
+  {
     /* Copy target object.  */
     g.oid.vid = m_vid;
     g.oid.oix = ovect[i].oix;
@@ -1126,7 +1170,8 @@ void rt_procom::provideObjects(pwr_tStatus sts, std::vector<procom_obj>& ovect)
       g.f.poid.vid = 0;
     g.sib.flink = ovect[i].fwsoix;
     g.sib.blink = ovect[i].bwsoix;
-    if (ovect[i].fchoix) {
+    if (ovect[i].fchoix)
+    {
       g.soid.vid = m_vid;
       g.soid.oix = ovect[i].fchoix;
       g.flags.b.isParent = 1;
@@ -1136,10 +1181,12 @@ void rt_procom::provideObjects(pwr_tStatus sts, std::vector<procom_obj>& ovect)
     rsp->g[i] = g;
   }
 
-  if (m_getmsg->type.s == (qcom_eStype)net_eMsg_oidToObject) {
+  if (m_getmsg->type.s == (qcom_eStype)net_eMsg_oidToObject)
+  {
     net_sOidToObject* mp = (net_sOidToObject*)m_getmsg->data;
     rsp->oid = mp->oid;
-  } else
+  }
+  else
     rsp->oid = g.oid;
 
   rsp->sts = GDH__SUCCESS;
@@ -1149,8 +1196,7 @@ void rt_procom::provideObjects(pwr_tStatus sts, std::vector<procom_obj>& ovect)
     errh_Bugcheck(sts, "net_Reply");
 }
 
-void rt_procom::provideAttr(
-    pwr_tStatus sts, pwr_tOix oix, int bsize, void* buff)
+void rt_procom::provideAttr(pwr_tStatus sts, pwr_tOix oix, int bsize, void* buff)
 {
   net_sGetObjectInfoR* rmp;
   qcom_sPut put;
@@ -1162,8 +1208,7 @@ void rt_procom::provideAttr(
 
   size = mp->aref.Size + sizeof(net_sGetObjectInfoR) - sizeof(rmp->info);
   size = (size + 3) & ~3; /* Size up to nearest multiple of 4.  */
-  rmp = (net_sGetObjectInfoR*)net_Alloc(
-      &sts, &put, size, net_eMsg_getObjectInfoR);
+  rmp = (net_sGetObjectInfoR*)net_Alloc(&sts, &put, size, net_eMsg_getObjectInfoR);
   if (EVEN(sts))
     return;
 
@@ -1174,14 +1219,15 @@ void rt_procom::provideAttr(
   }
   gdb_ScopeUnlock;
 
-  if (buff != NULL) {
+  if (buff != NULL)
+  {
     size = mp->aref.Size;
     cid.pwr = mp->aref.Body;
     cid.c.bix = 0; /* To get the class id.  */
     cp = (gdb_sClass*)hash_Search(&sts, gdbroot->cid_ht, &cid.pwr);
     if (cp != NULL)
-      ndc_ConvertData(&sts, np, cp, &mp->aref, rmp->info, buff,
-          (pwr_tUInt32*)&size, ndc_eOp_encode, mp->aref.Offset, 0);
+      ndc_ConvertData(&sts, np, cp, &mp->aref, rmp->info, buff, (pwr_tUInt32*)&size, ndc_eOp_encode,
+                      mp->aref.Offset, 0);
   }
 
   rmp->aref = mp->aref;
@@ -1195,16 +1241,17 @@ void rt_procom::provideStatus(pwr_tStatus rsts)
 {
   pwr_tStatus sts;
 
-  switch ((int)m_getmsg->type.s) {
-  case net_eMsg_getObjectInfo: {
+  switch ((int)m_getmsg->type.s)
+  {
+  case net_eMsg_getObjectInfo:
+  {
     qcom_sPut put;
     net_sGetObjectInfoR* rmp;
     net_sGetObjectInfo* mp = (net_sGetObjectInfo*)m_getmsg->data;
 
     int size = mp->aref.Size + sizeof(net_sGetObjectInfoR) - sizeof(rmp->info);
     size = (size + 3) & ~3; /* Size up to nearest multiple of 4.  */
-    rmp = (net_sGetObjectInfoR*)net_Alloc(
-        &sts, &put, size, net_eMsg_getObjectInfoR);
+    rmp = (net_sGetObjectInfoR*)net_Alloc(&sts, &put, size, net_eMsg_getObjectInfoR);
     if (EVEN(sts))
       return;
 
@@ -1215,11 +1262,12 @@ void rt_procom::provideStatus(pwr_tStatus rsts)
     net_Reply(&sts, m_getmsg, &put, 0);
     break;
   }
-  case net_eMsg_setObjectInfo: {
+  case net_eMsg_setObjectInfo:
+  {
     qcom_sPut put;
     net_sSetObjectInfo* mp = (net_sSetObjectInfo*)m_getmsg->data;
-    net_sSetObjectInfoR* rmp = (net_sSetObjectInfoR*)net_Alloc(
-        &sts, &put, sizeof(*rmp), net_eMsg_setObjectInfoR);
+    net_sSetObjectInfoR* rmp =
+        (net_sSetObjectInfoR*)net_Alloc(&sts, &put, sizeof(*rmp), net_eMsg_setObjectInfoR);
     if (EVEN(sts))
       return;
 
@@ -1230,7 +1278,8 @@ void rt_procom::provideStatus(pwr_tStatus rsts)
     break;
   }
   case net_eMsg_nameToObject:
-  case net_eMsg_oidToObject: {
+  case net_eMsg_oidToObject:
+  {
     respondError(m_getmsg, pwr_cNObjid, rsts);
     break;
   }
@@ -1240,10 +1289,7 @@ void rt_procom::provideStatus(pwr_tStatus rsts)
 
 void rt_procom::flushNodes()
 {
-  gdb_ScopeLock
-  {
-    cvolcm_ExternVolumeFlush(gdbroot->my_node);
-  }
+  gdb_ScopeLock { cvolcm_ExternVolumeFlush(gdbroot->my_node); }
   gdb_ScopeUnlock;
 
   // cvolcm_FlushNode(NULL, gdbroot->my_node);

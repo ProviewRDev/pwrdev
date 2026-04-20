@@ -69,102 +69,88 @@ static int trace_flow_cb(FlowCtx* ctx, flow_tEvent event);
 static void trace_changevalue(WGre* gre, flow_tNode fnode);
 static pwr_tStatus trace_aanalyse_set_value(WFoe* foe, char* valuestr);
 
-typedef pwr_tStatus (*tra_tMethod)(
-    WGre*, vldh_t_node, char*, char*, char*, flow_eTraceType*, int*);
+typedef pwr_tStatus (*tra_tMethod)(WGre*, vldh_t_node, char*, char*, char*, flow_eTraceType*, int*);
 
-static pwr_tStatus trace_get_attr_m0(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted)
+static pwr_tStatus trace_get_attr_m0(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted)
 {
   return TRA__DISCARD;
 }
-static pwr_tStatus trace_get_attr_m1(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted);
-static pwr_tStatus trace_get_attr_m2(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted);
-static pwr_tStatus trace_get_attr_m3(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted);
-static pwr_tStatus trace_get_attr_m4(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted);
-static pwr_tStatus trace_get_attr_m5(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted);
-static pwr_tStatus trace_get_attr_m6(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted);
-static pwr_tStatus trace_get_attr_m7(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted);
-static pwr_tStatus trace_get_attr_m8(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted);
-static pwr_tStatus trace_get_attr_m9(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted);
-pwr_tStatus trace_get_attr_mno(WGre* gre, vldh_t_node node, char* debug_par,
-    char* object_str, char* attr_str, flow_eTraceType* trace_type,
-    int* inverted)
+static pwr_tStatus trace_get_attr_m1(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted);
+static pwr_tStatus trace_get_attr_m2(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted);
+static pwr_tStatus trace_get_attr_m3(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted);
+static pwr_tStatus trace_get_attr_m4(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted);
+static pwr_tStatus trace_get_attr_m5(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted);
+static pwr_tStatus trace_get_attr_m6(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted);
+static pwr_tStatus trace_get_attr_m7(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted);
+static pwr_tStatus trace_get_attr_m8(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted);
+static pwr_tStatus trace_get_attr_m9(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted);
+pwr_tStatus trace_get_attr_mno(WGre* gre, vldh_t_node node, char* debug_par, char* object_str, char* attr_str,
+                               flow_eTraceType* trace_type, int* inverted)
 {
   return TRA__NOMETHOD;
 }
 
-tra_tMethod trace_get_attr_m[TRA_MAX_TRACEMETHOD] = { trace_get_attr_m0,
-  trace_get_attr_m1, trace_get_attr_m2, trace_get_attr_m3, trace_get_attr_m4,
-  trace_get_attr_m5, trace_get_attr_m6, trace_get_attr_m7, trace_get_attr_m8,
-  trace_get_attr_m9 };
+tra_tMethod trace_get_attr_m[TRA_MAX_TRACEMETHOD] = {
+    trace_get_attr_m0, trace_get_attr_m1, trace_get_attr_m2, trace_get_attr_m3, trace_get_attr_m4,
+    trace_get_attr_m5, trace_get_attr_m6, trace_get_attr_m7, trace_get_attr_m8, trace_get_attr_m9};
 
-int trace_get_attributes(WGre* gre, vldh_t_node node, char* object_str,
-    char* attr_str, flow_eTraceType* trace_type, int* inverted)
+int trace_get_attributes(WGre* gre, vldh_t_node node, char* object_str, char* attr_str,
+                         flow_eTraceType* trace_type, int* inverted)
 {
   int sts, size;
   pwr_tClassId bodyclass;
   pwr_sGraphPlcNode* graphbody;
 
-  sts = ldh_GetClassBody(node->hn.wind->hw.ldhses, node->ln.cid, "GraphPlcNode",
-      &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(node->hn.wind->hw.ldhses, node->ln.cid, "GraphPlcNode", &bodyclass,
+                         (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
   if (graphbody->tracemethod >= TRA_MAX_TRACEMETHOD)
     return TRA__BADMETHOD;
 
-  sts = (trace_get_attr_m[graphbody->tracemethod])(gre, node,
-      graphbody->debugpar, object_str, attr_str, trace_type, inverted);
+  sts = (trace_get_attr_m[graphbody->tracemethod])(gre, node, graphbody->debugpar, object_str, attr_str,
+                                                   trace_type, inverted);
   return sts;
 }
 
 /*************************************************************************
-*
-* Name:		trace_getm1()
-*
-* Description:
-* Get the trace information for objects that refers to other objects:
-*  getdi, getdo , getdv , getai , getao , getav ,
-*  stodo , stodv , stoao , stoav ,
-*  setdo , setdv , resdo , resdv .
-*
-*  Notice : 1. debug par is not the parameter to be debuged ,
-* 					(life is sometimes more complicated):
-*   o: As usual debug par give the name of a parameter under the rtbody
-* ( of the object with tracemethod 1 ) but,
-*   a: The parameter refered by debug par is supposed to have the flags
-*   rtvirtual and devbodyref sets.
-*   b: The pgmname of this parameter is the pgmname of the parameter
-*   to trace in the refered object.
-*   c: the value of the first barn of type objdid under the devbody
-* ( of the object with tracemethod 1 ) is the objdid of the refered object.
-*
-*  Notice 2: annotation is irrelevant for these nodes.
-*  Notice 3: These nodes use only one tranode. So nb_ptr is irrelevant.
-**************************************************************************/
+ *
+ * Name:		trace_getm1()
+ *
+ * Description:
+ * Get the trace information for objects that refers to other objects:
+ *  getdi, getdo , getdv , getai , getao , getav ,
+ *  stodo , stodv , stoao , stoav ,
+ *  setdo , setdv , resdo , resdv .
+ *
+ *  Notice : 1. debug par is not the parameter to be debuged ,
+ * 					(life is sometimes more complicated):
+ *   o: As usual debug par give the name of a parameter under the rtbody
+ * ( of the object with tracemethod 1 ) but,
+ *   a: The parameter refered by debug par is supposed to have the flags
+ *   rtvirtual and devbodyref sets.
+ *   b: The pgmname of this parameter is the pgmname of the parameter
+ *   to trace in the refered object.
+ *   c: the value of the first barn of type objdid under the devbody
+ * ( of the object with tracemethod 1 ) is the objdid of the refered object.
+ *
+ *  Notice 2: annotation is irrelevant for these nodes.
+ *  Notice 3: These nodes use only one tranode. So nb_ptr is irrelevant.
+ **************************************************************************/
 
-static pwr_tStatus trace_get_attr_m1(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted)
+static pwr_tStatus trace_get_attr_m1(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted)
 {
   pwr_tStatus sts;
   pwr_eType par_type;
@@ -176,7 +162,8 @@ static pwr_tStatus trace_get_attr_m1(WGre* gre, vldh_t_node node,
   if (EVEN(sts))
     return sts;
 
-  switch (par_type) {
+  switch (par_type)
+  {
   case pwr_eType_Boolean:
     *trace_type = flow_eTraceType_Boolean;
     break;
@@ -194,43 +181,42 @@ static pwr_tStatus trace_get_attr_m1(WGre* gre, vldh_t_node node,
 }
 
 /*************************************************************************
-*
-* Name:		trace_getm2()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* tra_ctx	tractx		I	trace context
-* tra_t_tranode	*tranode_ptr    O	pointer to a tranode to fill up.
-* int		*nb_ptr		IO	irrelevant for this method
-*
-* Description:
-* Tracemethod for the objects of type input which refers to another
-* object trough the connection .
-* ( ie the id refered object is not saved in the object ( as it is
-* in the case of the tracemethod 2 ).
-* Notice1 : this method is quite similar to getm8.
-* Notice2 : debug par refers a parameter of type RTvirtual
-* which IS NOT of type objdid.
-* As it is today, only : setcond  object is concerned by this method.
-**************************************************************************/
+ *
+ * Name:		trace_getm2()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * tra_ctx	tractx		I	trace context
+ * tra_t_tranode	*tranode_ptr    O	pointer to a tranode to fill up.
+ * int		*nb_ptr		IO	irrelevant for this method
+ *
+ * Description:
+ * Tracemethod for the objects of type input which refers to another
+ * object trough the connection .
+ * ( ie the id refered object is not saved in the object ( as it is
+ * in the case of the tracemethod 2 ).
+ * Notice1 : this method is quite similar to getm8.
+ * Notice2 : debug par refers a parameter of type RTvirtual
+ * which IS NOT of type objdid.
+ * As it is today, only : setcond  object is concerned by this method.
+ **************************************************************************/
 
-static pwr_tStatus trace_get_attr_m2(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted)
+static pwr_tStatus trace_get_attr_m2(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted)
 {
   pwr_tStatus sts;
   pwr_eType par_type;
   int par_inverted;
 
   /* Get the object and parameter that should be traced */
-  sts = gcg_get_debug_virtual(
-      node, debug_par, object_str, attr_str, &par_type, &par_inverted);
+  sts = gcg_get_debug_virtual(node, debug_par, object_str, attr_str, &par_type, &par_inverted);
   if (EVEN(sts))
     return sts;
 
   *inverted = par_inverted;
-  switch (par_type) {
+  switch (par_type)
+  {
   case pwr_eType_Boolean:
     *trace_type = flow_eTraceType_Boolean;
     break;
@@ -248,28 +234,27 @@ static pwr_tStatus trace_get_attr_m2(WGre* gre, vldh_t_node node,
 }
 
 /*************************************************************************
-*
-* Name:		trace_getm3 ()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* tra_ctx	tractx		I	trace context
-* tra_t_tranode	*tranode_ptr    O	pointer to a tranode to fill up.
-* int		*nb_ptr		IO	irrelevant for this method
-*
-* Description:
-* In this method the parameter to trace is a barn of the rtbody which name
-* is given by 'debugpar' in the graphplcnode.
-* tracing method for the following objects :
-* and,	or,	xor,
-*   	edge,	sr_s,	sr_r,	dsup,	asup,
-* 	trans,	reset_so
-**************************************************************************/
+ *
+ * Name:		trace_getm3 ()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * tra_ctx	tractx		I	trace context
+ * tra_t_tranode	*tranode_ptr    O	pointer to a tranode to fill up.
+ * int		*nb_ptr		IO	irrelevant for this method
+ *
+ * Description:
+ * In this method the parameter to trace is a barn of the rtbody which name
+ * is given by 'debugpar' in the graphplcnode.
+ * tracing method for the following objects :
+ * and,	or,	xor,
+ *   	edge,	sr_s,	sr_r,	dsup,	asup,
+ * 	trans,	reset_so
+ **************************************************************************/
 
-static pwr_tStatus trace_get_attr_m3(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted)
+static pwr_tStatus trace_get_attr_m3(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted)
 {
   pwr_tStatus sts;
   int size;
@@ -282,25 +267,27 @@ static pwr_tStatus trace_get_attr_m3(WGre* gre, vldh_t_node node,
   *inverted = 0;
 
   /* Get the name of the object */
-  sts = ldh_ObjidToName(node->hn.wind->hw.ldhses, node->ln.oid,
-      ldh_eName_Hierarchy, name, sizeof(name), &size);
+  sts =
+      ldh_ObjidToName(node->hn.wind->hw.ldhses, node->ln.oid, ldh_eName_Hierarchy, name, sizeof(name), &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectBodyDef(
-      node->hn.wind->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(node->hn.wind->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   found = 0;
-  for (i = 0; i < rows; i++) {
-    if (streq(bodydef[i].ParName, debug_par)) {
+  for (i = 0; i < rows; i++)
+  {
+    if (streq(bodydef[i].ParName, debug_par))
+    {
       found = 1;
       break;
     }
   }
 
-  if (!found) {
+  if (!found)
+  {
     free((char*)bodydef);
     return TRA__NOPAR;
   }
@@ -308,7 +295,8 @@ static pwr_tStatus trace_get_attr_m3(WGre* gre, vldh_t_node node,
   strcpy(attr_str, debug_par);
 
   par_type = bodydef[i].Par->Param.Info.Type;
-  switch (par_type) {
+  switch (par_type)
+  {
   case pwr_eType_Boolean:
     *trace_type = flow_eTraceType_Boolean;
     break;
@@ -328,28 +316,27 @@ static pwr_tStatus trace_get_attr_m3(WGre* gre, vldh_t_node node,
 }
 
 /*************************************************************************
-*
-* Name:		trace_getm4()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Tracemethod for objects handling digital parameters:
-*	stodp, setdp, resdp.
-*
-*	The referenced object and its parameter for a xxxdp is stored
-*	this way:
-*	- the object to be traced is stored in the parameter Object
-*	- the parameter to bre traced in this object is stored in the parameter
-*	  "Parameter" in the xxxdp object.
-*
-**************************************************************************/
+ *
+ * Name:		trace_getm4()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Tracemethod for objects handling digital parameters:
+ *	stodp, setdp, resdp.
+ *
+ *	The referenced object and its parameter for a xxxdp is stored
+ *	this way:
+ *	- the object to be traced is stored in the parameter Object
+ *	- the parameter to bre traced in this object is stored in the parameter
+ *	  "Parameter" in the xxxdp object.
+ *
+ **************************************************************************/
 
-static pwr_tStatus trace_get_attr_m4(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted)
+static pwr_tStatus trace_get_attr_m4(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted)
 {
   pwr_tAName aname;
   pwr_tStatus sts;
@@ -364,7 +351,8 @@ static pwr_tStatus trace_get_attr_m4(WGre* gre, vldh_t_node node,
   *inverted = 0;
 
   /* Get the objdid stored in the parameter Object */
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_GetAp:
     strcpy(parname, "ApObject");
     break;
@@ -374,8 +362,7 @@ static pwr_tStatus trace_get_attr_m4(WGre* gre, vldh_t_node node,
   default:
     strcpy(parname, "Object");
   }
-  sts = ldh_GetObjectPar(node->hn.wind->hw.ldhses, node->ln.oid, "DevBody",
-      parname, (char**)&objarp, &size);
+  sts = ldh_GetObjectPar(node->hn.wind->hw.ldhses, node->ln.oid, "DevBody", parname, (char**)&objarp, &size);
   if (EVEN(sts))
     return sts;
 
@@ -390,8 +377,7 @@ static pwr_tStatus trace_get_attr_m4(WGre* gre, vldh_t_node node,
     return TRA__NOPAR;
 
   /* Get the name of the node */
-  sts = ldh_AttrRefToName(
-      node->hn.wind->hw.ldhses, &objar, cdh_mNName, &np, &size);
+  sts = ldh_AttrRefToName(node->hn.wind->hw.ldhses, &objar, cdh_mNName, &np, &size);
   if (EVEN(sts))
     return sts;
   strcpy(aname, np);
@@ -403,12 +389,12 @@ static pwr_tStatus trace_get_attr_m4(WGre* gre, vldh_t_node node,
   *s = 0;
   strcpy(object_str, aname);
 
-  sts = ldh_GetObjectBody(node->hn.wind->hw.ldhses, cdh_TypeIdToObjid(tid),
-      "SysBody", (void**)&tdef, &size);
+  sts = ldh_GetObjectBody(node->hn.wind->hw.ldhses, cdh_TypeIdToObjid(tid), "SysBody", (void**)&tdef, &size);
   if (EVEN(sts))
     return sts;
 
-  switch (tdef->Type) {
+  switch (tdef->Type)
+  {
   case pwr_eType_Boolean:
     *trace_type = flow_eTraceType_Boolean;
     break;
@@ -427,24 +413,23 @@ static pwr_tStatus trace_get_attr_m4(WGre* gre, vldh_t_node node,
 }
 
 /*************************************************************************
-*
-* Name:		trace_getm5()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Tracemethod for Disable.
-*
-*	The method should trace the DisableAttr attribute for the
-*       referenced object.
-*
-**************************************************************************/
+ *
+ * Name:		trace_getm5()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Tracemethod for Disable.
+ *
+ *	The method should trace the DisableAttr attribute for the
+ *       referenced object.
+ *
+ **************************************************************************/
 
-static pwr_tStatus trace_get_attr_m5(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted)
+static pwr_tStatus trace_get_attr_m5(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted)
 {
   pwr_tAName aname;
   pwr_tStatus sts;
@@ -457,8 +442,7 @@ static pwr_tStatus trace_get_attr_m5(WGre* gre, vldh_t_node node,
   *inverted = 0;
 
   /* Get the attrref stored in the attribute Object */
-  sts = ldh_GetObjectPar(node->hn.wind->hw.ldhses, node->ln.oid, "DevBody",
-      "Object", (char**)&objarp, &size);
+  sts = ldh_GetObjectPar(node->hn.wind->hw.ldhses, node->ln.oid, "DevBody", "Object", (char**)&objarp, &size);
   if (EVEN(sts))
     return sts;
 
@@ -475,8 +459,7 @@ static pwr_tStatus trace_get_attr_m5(WGre* gre, vldh_t_node node,
   disar = cdh_ArefToDisableAref(&objar);
 
   /* Get the name of the node */
-  sts = ldh_AttrRefToName(
-      node->hn.wind->hw.ldhses, &disar, cdh_mNName, &np, &size);
+  sts = ldh_AttrRefToName(node->hn.wind->hw.ldhses, &disar, cdh_mNName, &np, &size);
   if (EVEN(sts))
     return sts;
   strcpy(aname, np);
@@ -494,24 +477,23 @@ static pwr_tStatus trace_get_attr_m5(WGre* gre, vldh_t_node node,
 }
 
 /*************************************************************************
-*
-* Name:		trace_getm6()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Trace method for SetRefD, StoRefD and similar objects.
-*
-*	The attribute RefAttribute contains a reference to an attribute of type
-*       pwr_tAttrRef that points to the actual attribute.
-*
-**************************************************************************/
+ *
+ * Name:		trace_getm6()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Trace method for SetRefD, StoRefD and similar objects.
+ *
+ *	The attribute RefAttribute contains a reference to an attribute of type
+ *       pwr_tAttrRef that points to the actual attribute.
+ *
+ **************************************************************************/
 
-static pwr_tStatus trace_get_attr_m6(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted)
+static pwr_tStatus trace_get_attr_m6(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted)
 {
   pwr_tAName aname;
   pwr_tStatus sts;
@@ -522,13 +504,12 @@ static pwr_tStatus trace_get_attr_m6(WGre* gre, vldh_t_node node,
   char *np, *s;
   ldh_sAttrRefInfo info;
 
-  sts = ldh_GetObjectPar(node->hn.wind->hw.ldhses, node->ln.oid, "DevBody",
-      "RefAttribute", (char**)&refarp, &size);
+  sts = ldh_GetObjectPar(node->hn.wind->hw.ldhses, node->ln.oid, "DevBody", "RefAttribute", (char**)&refarp,
+                         &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetAttrObjectPar(
-      node->hn.wind->hw.ldhses, refarp, "RtBody", "", (char**)&arp, &size);
+  sts = ldh_GetAttrObjectPar(node->hn.wind->hw.ldhses, refarp, "RtBody", "", (char**)&arp, &size);
   free((char*)refarp);
   if (EVEN(sts))
     return sts;
@@ -541,13 +522,13 @@ static pwr_tStatus trace_get_attr_m6(WGre* gre, vldh_t_node node,
     return sts;
 
   /* Get the name of the node */
-  sts = ldh_AttrRefToName(
-      node->hn.wind->hw.ldhses, &aref, cdh_mNName, &np, &size);
+  sts = ldh_AttrRefToName(node->hn.wind->hw.ldhses, &aref, cdh_mNName, &np, &size);
   if (EVEN(sts))
     return sts;
   strcpy(aname, np);
 
-  switch (tid) {
+  switch (tid)
+  {
   case pwr_cClass_Dv:
   case pwr_cClass_Di:
   case pwr_cClass_Do:
@@ -569,7 +550,8 @@ static pwr_tStatus trace_get_attr_m6(WGre* gre, vldh_t_node node,
     if (EVEN(sts))
       return sts;
 
-    switch (info.type) {
+    switch (info.type)
+    {
     case pwr_eType_Boolean:
       *trace_type = flow_eTraceType_Boolean;
       break;
@@ -589,29 +571,28 @@ static pwr_tStatus trace_get_attr_m6(WGre* gre, vldh_t_node node,
 }
 
 /*************************************************************************
-*
-* Name:		trace_getm7 ()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* tra_ctx	tractx		I	trace context
-* tra_t_tranode	*tranode_ptr    O	pointer to a tranode to fill up.
-* int		*nb_ptr		IO	irrelevant for this method
-*
-* Description:
-* tracing method for the following objects :
-* step , initstep , substep , ssbegin , ssend , order
-* the name of relevant parameter ( in rtdb ) is debugpar in the graphplcnode
-* it differs from getm3 by the fact that the param is an array element
-* SG 02.06.91 This method is the same as getm3.
-* FOR TEST ONLY keeps it to verify that the information in rdb is relevant
-* ie that there is a parameter under rt body which name is given by debugpar
-**************************************************************************/
+ *
+ * Name:		trace_getm7 ()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * tra_ctx	tractx		I	trace context
+ * tra_t_tranode	*tranode_ptr    O	pointer to a tranode to fill up.
+ * int		*nb_ptr		IO	irrelevant for this method
+ *
+ * Description:
+ * tracing method for the following objects :
+ * step , initstep , substep , ssbegin , ssend , order
+ * the name of relevant parameter ( in rtdb ) is debugpar in the graphplcnode
+ * it differs from getm3 by the fact that the param is an array element
+ * SG 02.06.91 This method is the same as getm3.
+ * FOR TEST ONLY keeps it to verify that the information in rdb is relevant
+ * ie that there is a parameter under rt body which name is given by debugpar
+ **************************************************************************/
 
-static pwr_tStatus trace_get_attr_m7(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted)
+static pwr_tStatus trace_get_attr_m7(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted)
 {
   pwr_tStatus sts;
   int size;
@@ -632,13 +613,12 @@ static pwr_tStatus trace_get_attr_m7(WGre* gre, vldh_t_node node,
   /* The size of the parameter is in the runtime body of the object */
 
   /* get the name of the object */
-  sts = ldh_ObjidToName(node->hn.wind->hw.ldhses, node->ln.oid,
-      ldh_eName_Hierarchy, name, sizeof(name), &size);
+  sts =
+      ldh_ObjidToName(node->hn.wind->hw.ldhses, node->ln.oid, ldh_eName_Hierarchy, name, sizeof(name), &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectBodyDef(
-      node->hn.wind->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(node->hn.wind->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
@@ -647,24 +627,26 @@ static pwr_tStatus trace_get_attr_m7(WGre* gre, vldh_t_node node,
   pos2 = strcspn(debug_par, "]");
   len = strlen(debug_par);
   offset = debug_par[pos1 + 1] - '0';
-  if (pos1 == len || pos2 == len || pos2 != pos1 + 2 || offset > 9
-      || offset < 0)
+  if (pos1 == len || pos2 == len || pos2 != pos1 + 2 || offset > 9 || offset < 0)
     return TRA__BADARRAY;
-  else {
+  else
+  {
     /* the format was ok save the relevent information */
     strcpy(array_name, debug_par);
     array_name[pos1] = '\0';
   }
 
   found = 0;
-  for (i = 0; i < rows; i++) {
-    if (streq(bodydef[i].ParName, array_name)
-        && bodydef[i].Par->Param.Info.Flags & PWR_MASK_ARRAY) {
+  for (i = 0; i < rows; i++)
+  {
+    if (streq(bodydef[i].ParName, array_name) && bodydef[i].Par->Param.Info.Flags & PWR_MASK_ARRAY)
+    {
       found = 1;
       break;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     free((char*)bodydef);
     return TRA__NOPAR;
   }
@@ -672,7 +654,8 @@ static pwr_tStatus trace_get_attr_m7(WGre* gre, vldh_t_node node,
   strcpy(attr_str, debug_par);
 
   par_type = bodydef[i].Par->Param.Info.Type;
-  switch (par_type) {
+  switch (par_type)
+  {
   case pwr_eType_Boolean:
     *trace_type = flow_eTraceType_Boolean;
     break;
@@ -692,26 +675,26 @@ static pwr_tStatus trace_get_attr_m7(WGre* gre, vldh_t_node node,
 }
 
 /*************************************************************************
-*
-* Name:		trace_getm8()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* tra_ctx	tractx		I	trace context
-* tra_t_tranode	*tranode_ptr 	I	pointer to the tranode to fill up.
-* int		*nb_ptr		IO	pointer to the nb of tra nodes
-*to create.
-*					irrelevant for this method
-*
-* Description:
-* Tracemethod for a aanalyseobject which refers to a parameter to another
-* object trough the connection between the analyse node and this other object.
-* Notice: This method does not create an additionnal tranode. So nb_ptr
-* is irrelevant.
-**************************************************************************/
-pwr_tStatus trace_get_attr_con(WGre* gre, vldh_t_con con, const char* debug_par,
-    char* object_str, char* attr_str, flow_eTraceType* trace_type)
+ *
+ * Name:		trace_getm8()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * tra_ctx	tractx		I	trace context
+ * tra_t_tranode	*tranode_ptr 	I	pointer to the tranode to fill up.
+ * int		*nb_ptr		IO	pointer to the nb of tra nodes
+ *to create.
+ *					irrelevant for this method
+ *
+ * Description:
+ * Tracemethod for a aanalyseobject which refers to a parameter to another
+ * object trough the connection between the analyse node and this other object.
+ * Notice: This method does not create an additionnal tranode. So nb_ptr
+ * is irrelevant.
+ **************************************************************************/
+pwr_tStatus trace_get_attr_con(WGre* gre, vldh_t_con con, const char* debug_par, char* object_str,
+                               char* attr_str, flow_eTraceType* trace_type)
 {
   vldh_t_node conn_node;
   pwr_tStatus sts;
@@ -723,34 +706,37 @@ pwr_tStatus trace_get_attr_con(WGre* gre, vldh_t_con con, const char* debug_par,
   pwr_tObjid objdid;
 
   /* Get the object and parameter that is connected to the source object */
-  sts = gcg_get_connected_parameter(con->hc.source_node, con->lc.source_point,
-      &conn_node, object_str, attr_str);
+  sts = gcg_get_connected_parameter(con->hc.source_node, con->lc.source_point, &conn_node, object_str,
+                                    attr_str);
   if (EVEN(sts))
     return sts;
 
   /* Get the trace type */
   sts = ldh_NameToObjid(conn_node->hn.wind->hw.ldhses, &objdid, object_str);
   sts = ldh_GetObjectClass(conn_node->hn.wind->hw.ldhses, objdid, &cid);
-  sts = ldh_GetObjectBodyDef(
-      conn_node->hn.wind->hw.ldhses, cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(conn_node->hn.wind->hw.ldhses, cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   found = 0;
-  for (i = 0; i < rows; i++) {
-    if (streq(bodydef[i].ParName, attr_str)) {
+  for (i = 0; i < rows; i++)
+  {
+    if (streq(bodydef[i].ParName, attr_str))
+    {
       found = 1;
       break;
     }
   }
 
-  if (!found) {
+  if (!found)
+  {
     free((char*)bodydef);
     return TRA__NOPAR;
   }
 
   par_type = bodydef[i].Par->Param.Info.Type;
-  switch (par_type) {
+  switch (par_type)
+  {
   case pwr_eType_Boolean:
     *trace_type = flow_eTraceType_Boolean;
     break;
@@ -769,25 +755,24 @@ pwr_tStatus trace_get_attr_con(WGre* gre, vldh_t_con con, const char* debug_par,
 }
 
 /*************************************************************************
-*
-* Name:		trace_getm8 ()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* tra_ctx	tractx		I	trace context
-* tra_t_tranode	*tranode_ptr    O	pointer to a tranode to fill up.
-* int		*nb_ptr		IO	irrelevant for this method
-*
-* Description:
-* In this method the parameter to trace is a child of the rtbody which name
-* is given by 'debugpar' in the graphplcnode, where the attribute can be in
-* a bus.
-**************************************************************************/
+ *
+ * Name:		trace_getm8 ()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * tra_ctx	tractx		I	trace context
+ * tra_t_tranode	*tranode_ptr    O	pointer to a tranode to fill up.
+ * int		*nb_ptr		IO	irrelevant for this method
+ *
+ * Description:
+ * In this method the parameter to trace is a child of the rtbody which name
+ * is given by 'debugpar' in the graphplcnode, where the attribute can be in
+ * a bus.
+ **************************************************************************/
 
-static pwr_tStatus trace_get_attr_m8(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted)
+static pwr_tStatus trace_get_attr_m8(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted)
 {
   pwr_tStatus sts;
   int size;
@@ -798,8 +783,8 @@ static pwr_tStatus trace_get_attr_m8(WGre* gre, vldh_t_node node,
   *inverted = 0;
 
   /* Get the name of the object */
-  sts = ldh_ObjidToName(node->hn.wind->hw.ldhses, node->ln.oid,
-      ldh_eName_Hierarchy, name, sizeof(name), &size);
+  sts =
+      ldh_ObjidToName(node->hn.wind->hw.ldhses, node->ln.oid, ldh_eName_Hierarchy, name, sizeof(name), &size);
   if (EVEN(sts))
     return sts;
 
@@ -817,7 +802,8 @@ static pwr_tStatus trace_get_attr_m8(WGre* gre, vldh_t_node node,
   if (EVEN(sts))
     return sts;
 
-  switch (tid) {
+  switch (tid)
+  {
   case pwr_eType_Boolean:
     *trace_type = flow_eTraceType_Boolean;
     break;
@@ -836,19 +822,18 @@ static pwr_tStatus trace_get_attr_m8(WGre* gre, vldh_t_node node,
 }
 
 /*************************************************************************
-*
-* Name:		trace_getm9 ()
-*
-* Type		int
-*
-* Description:
-* tracing method for the following objects:
-* GetAattr, GetDattr, GetIattr, StoDattr, SetDattr, ResDattr
-**************************************************************************/
+ *
+ * Name:		trace_getm9 ()
+ *
+ * Type		int
+ *
+ * Description:
+ * tracing method for the following objects:
+ * GetAattr, GetDattr, GetIattr, StoDattr, SetDattr, ResDattr
+ **************************************************************************/
 
-static pwr_tStatus trace_get_attr_m9(WGre* gre, vldh_t_node node,
-    char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type, int* inverted)
+static pwr_tStatus trace_get_attr_m9(WGre* gre, vldh_t_node node, char* debug_par, char* object_str,
+                                     char* attr_str, flow_eTraceType* trace_type, int* inverted)
 {
   pwr_tStatus sts;
   char* attribute;
@@ -860,15 +845,15 @@ static pwr_tStatus trace_get_attr_m9(WGre* gre, vldh_t_node node,
   strcpy(object_str, "$host");
 
   /* Get attribute from Attribute */
-  sts = ldh_GetObjectPar(node->hn.wind->hw.ldhses, node->ln.oid, "DevBody",
-      "Attribute", &attribute, &size);
+  sts = ldh_GetObjectPar(node->hn.wind->hw.ldhses, node->ln.oid, "DevBody", "Attribute", &attribute, &size);
   if (EVEN(sts))
     return sts;
 
   strcpy(attr_str, attribute);
   free((char*)attribute);
 
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_GetAattr:
     *trace_type = flow_eTraceType_Float32;
     break;
@@ -886,22 +871,14 @@ pwr_tStatus trace_simsetup(WFoe* foe)
   flow_tCtx ctx = foe->gre->flow_ctx;
 
   flow_DisableEventAll(ctx);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1PressCtrl, flow_eEventType_MoveNode, trace_flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB2Press, flow_eEventType_CreateCon, trace_flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB2DoubleClick, flow_eEventType_CallBack, trace_flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, trace_flow_cb);
-  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShift,
-      flow_eEventType_CallBack, trace_flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, trace_flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1ClickCtrl, flow_eEventType_CallBack, trace_flow_cb);
-  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShiftCtrl,
-      flow_eEventType_CallBack, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1PressCtrl, flow_eEventType_MoveNode, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2Press, flow_eEventType_CreateCon, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2DoubleClick, flow_eEventType_CallBack, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1ClickCtrl, flow_eEventType_CallBack, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShiftCtrl, flow_eEventType_CallBack, trace_flow_cb);
   return 1;
 }
 
@@ -910,25 +887,17 @@ pwr_tStatus trace_trasetup(WFoe* foe)
   flow_tCtx ctx = foe->gre->flow_ctx;
 
   flow_DisableEventAll(ctx);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1PressCtrl, flow_eEventType_MoveNode, trace_flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB2Press, flow_eEventType_CreateCon, trace_flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB2DoubleClick, flow_eEventType_CallBack, trace_flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, trace_flow_cb);
-  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShift,
-      flow_eEventType_CallBack, trace_flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, trace_flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1ClickCtrl, flow_eEventType_CallBack, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1PressCtrl, flow_eEventType_MoveNode, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2Press, flow_eEventType_CreateCon, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2DoubleClick, flow_eEventType_CallBack, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, trace_flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1ClickCtrl, flow_eEventType_CallBack, trace_flow_cb);
   return 1;
 }
 
-static int trace_connect_bc(
-    flow_tObject object, char* name, char* attr, flow_eTraceType type, void** p)
+static int trace_connect_bc(flow_tObject object, char* name, char* attr, flow_eTraceType type, void** p)
 {
   pwr_tAName attr_str;
   int size;
@@ -941,7 +910,8 @@ static int trace_connect_bc(
   if (streq(name, "") || streq(attr, ""))
     return 1;
 
-  switch (type) {
+  switch (type)
+  {
   case flow_eTraceType_Boolean:
     size = sizeof(pwr_tBoolean);
     break;
@@ -959,8 +929,10 @@ static int trace_connect_bc(
   strcat(attr_str, ".");
   strcat(attr_str, attr);
 
-  if (flow_GetObjectType(object) == flow_eObjectType_Node) {
-    if (flow_GetNodeGroup(object) == flow_eNodeGroup_Trace) {
+  if (flow_GetObjectType(object) == flow_eObjectType_Node)
+  {
+    if (flow_GetNodeGroup(object) == flow_eNodeGroup_Trace)
+    {
       sts = gdh_RefObjectInfo(attr_str, p, &subid, size);
       if (EVEN(sts))
         return sts;
@@ -968,7 +940,9 @@ static int trace_connect_bc(
       subid_p = (pwr_tSubid*)calloc(1, sizeof(pwr_tSubid));
       *subid_p = subid;
       flow_SetUserData(object, (void*)subid_p);
-    } else {
+    }
+    else
+    {
       flow_GetUserData(object, (void**)&vnode);
       sts = gdh_RefObjectInfo(attr_str, p, &vnode->hn.trace_subid, size);
       if (EVEN(sts))
@@ -984,14 +958,19 @@ static int trace_disconnect_bc(flow_tObject object)
   vldh_t_node vnode;
 
   printf("DisConnecting something...\n");
-  if (flow_GetObjectType(object) == flow_eObjectType_Node) {
-    if (flow_GetNodeGroup(object) == flow_eNodeGroup_Trace) {
+  if (flow_GetObjectType(object) == flow_eObjectType_Node)
+  {
+    if (flow_GetNodeGroup(object) == flow_eNodeGroup_Trace)
+    {
       flow_GetUserData(object, (void**)&subid_p);
       gdh_UnrefObjectInfo(*subid_p);
       free((char*)subid_p);
-    } else {
+    }
+    else
+    {
       FlowTraceAttr attr = flow_GetTraceAttr(object);
-      if (!(streq(attr.object, "") || streq(attr.attribute, ""))) {
+      if (!(streq(attr.object, "") || streq(attr.attribute, "")))
+      {
         flow_GetUserData(object, (void**)&vnode);
         gdh_UnrefObjectInfo(vnode->hn.trace_subid);
       }
@@ -1007,10 +986,13 @@ int trace_start(WFoe* foe)
   int sts;
   double f_width, f_height;
 
-  if (!gre->trace_started) {
-    if (!gdh_initialized) {
+  if (!gre->trace_started)
+  {
+    if (!gdh_initialized)
+    {
       sts = gdh_Init("wb_trace");
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         foe->message("Unable to attach to Proview runtime");
         WFoe::error_msg(sts);
         return sts;
@@ -1023,32 +1005,27 @@ int trace_start(WFoe* foe)
 
     flow_ResetHighlightAll(gre->flow_ctx);
     flow_SelectClear(gre->flow_ctx);
-    sts = flow_TraceInit(
-        gre->flow_ctx, trace_connect_bc, trace_disconnect_bc, NULL);
+    sts = flow_TraceInit(gre->flow_ctx, trace_connect_bc, trace_disconnect_bc, NULL);
     if (EVEN(sts))
       return sts;
 
     gre->trace_start();
 
     /* Create node and con classes for trace */
-    if (!gre->trace_analyse_nc) {
+    if (!gre->trace_analyse_nc)
+    {
       f_width = 4 * GOEN_F_GRID;
       f_height = GOEN_F_GRID;
-      flow_CreateNodeClass(gre->flow_ctx, "TraceNode", flow_eNodeGroup_Trace,
-          &gre->trace_analyse_nc);
-      flow_AddRect(gre->trace_analyse_nc, 0, 0, f_width, f_height,
-          flow_eDrawType_Line, 1, flow_mDisplayLevel_1);
-      flow_AddAnnot(gre->trace_analyse_nc, f_width / 8, 0.7 * f_height, 0,
-          flow_eDrawType_TextRoboto, 4, flow_eAnnotType_OneLine,
-          flow_mDisplayLevel_1);
-      flow_AddConPoint(
-          gre->trace_analyse_nc, 0, 0.5 * f_height, 0, flow_eDirection_Left);
-      flow_AddConPoint(gre->trace_analyse_nc, f_width, 0.5 * f_height, 1,
-          flow_eDirection_Right);
+      flow_CreateNodeClass(gre->flow_ctx, "TraceNode", flow_eNodeGroup_Trace, &gre->trace_analyse_nc);
+      flow_AddRect(gre->trace_analyse_nc, 0, 0, f_width, f_height, flow_eDrawType_Line, 1,
+                   flow_mDisplayLevel_1);
+      flow_AddAnnot(gre->trace_analyse_nc, f_width / 8, 0.7 * f_height, 0, flow_eDrawType_TextRoboto, 4,
+                    flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
+      flow_AddConPoint(gre->trace_analyse_nc, 0, 0.5 * f_height, 0, flow_eDirection_Left);
+      flow_AddConPoint(gre->trace_analyse_nc, f_width, 0.5 * f_height, 1, flow_eDirection_Right);
 
-      flow_CreateConClass(gre->flow_ctx, "TraceCon", flow_eConType_Straight,
-          flow_eCorner_Right, flow_eDrawType_Line, 1, 0, 0, 0,
-          flow_eConGroup_Trace, &gre->trace_con_cc);
+      flow_CreateConClass(gre->flow_ctx, "TraceCon", flow_eConType_Straight, flow_eCorner_Right,
+                          flow_eDrawType_Line, 1, 0, 0, 0, flow_eConGroup_Trace, &gre->trace_con_cc);
     }
   }
   return TRA__SUCCESS;
@@ -1058,7 +1035,8 @@ int trace_stop(WFoe* foe)
 {
   WGre* gre = foe->gre;
 
-  if (gre->trace_started) {
+  if (gre->trace_started)
+  {
     flow_TraceClose(gre->flow_ctx);
     flow_ResetHighlightAll(gre->flow_ctx);
     flow_SelectClear(gre->flow_ctx);
@@ -1068,8 +1046,7 @@ int trace_stop(WFoe* foe)
   return 1;
 }
 
-int trace_create_analyse(
-    WGre* gre, double x, double y, vldh_t_node source, int source_conpoint)
+int trace_create_analyse(WGre* gre, double x, double y, vldh_t_node source, int source_conpoint)
 {
   static int idx = 0;
   vldh_t_conobject dummy_con;
@@ -1081,23 +1058,22 @@ int trace_create_analyse(
   char name[80];
   int sts;
 
-  if (gre->trace_started) {
+  if (gre->trace_started)
+  {
     /* Create a trace object */
     sprintf(name, "Trace%d", idx++);
 
     dummy_con.hc.source_node = source;
     dummy_con.lc.source_point = source_conpoint;
-    sts = trace_get_attr_con(
-        gre, &dummy_con, "", object_str, attr_str, &trace_type);
+    sts = trace_get_attr_con(gre, &dummy_con, "", object_str, attr_str, &trace_type);
     if (EVEN(sts))
       return sts;
 
-    flow_CreateNode(
-        gre->flow_ctx, name, gre->trace_analyse_nc, x, y, NULL, &n1);
+    flow_CreateNode(gre->flow_ctx, name, gre->trace_analyse_nc, x, y, NULL, &n1);
     flow_SetTraceAttr(n1, object_str, attr_str, trace_type, 0);
 
-    flow_CreateCon(gre->flow_ctx, name, gre->trace_con_cc, source->hn.node_id,
-        n1, source_conpoint, 0, NULL, &c1, 0, NULL, NULL, &sts);
+    flow_CreateCon(gre->flow_ctx, name, gre->trace_con_cc, source->hn.node_id, n1, source_conpoint, 0, NULL,
+                   &c1, 0, NULL, NULL, &sts);
     if (EVEN(sts))
       return sts;
   }
@@ -1105,16 +1081,16 @@ int trace_create_analyse(
 }
 
 /*************************************************************************
-*
-* Name:		int	trace_flow_cb()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Callback from flow.
-**************************************************************************/
+ *
+ * Name:		int	trace_flow_cb()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Callback from flow.
+ **************************************************************************/
 static int trace_flow_cb(FlowCtx* ctx, flow_tEvent event)
 {
   WGre* gre;
@@ -1128,29 +1104,32 @@ static int trace_flow_cb(FlowCtx* ctx, flow_tEvent event)
 
   gre->search_rectangle_delete();
 
-  if (event->any.type == flow_eEventType_CreateCon) {
-    if (flow_GetNodeGroup(event->con_create.source_object)
-        == flow_eNodeGroup_Trace)
+  if (event->any.type == flow_eEventType_CreateCon)
+  {
+    if (flow_GetNodeGroup(event->con_create.source_object) == flow_eNodeGroup_Trace)
       return 1;
     flow_GetUserData(event->con_create.source_object, (void**)&source);
-    if (event->con_create.dest_object) {
-      if (flow_GetNodeGroup(event->con_create.dest_object)
-          == flow_eNodeGroup_Trace)
+    if (event->con_create.dest_object)
+    {
+      if (flow_GetNodeGroup(event->con_create.dest_object) == flow_eNodeGroup_Trace)
         return 1;
       flow_GetUserData(event->con_create.dest_object, (void**)&dest);
-    } else
+    }
+    else
       dest = 0;
-    (gre->gre_con_created)(gre, event->con_create.x, event->con_create.y,
-        source, event->con_create.source_conpoint, dest,
-        event->con_create.dest_conpoint, 0, &sts);
+    (gre->gre_con_created)(gre, event->con_create.x, event->con_create.y, source,
+                           event->con_create.source_conpoint, dest, event->con_create.dest_conpoint, 0, &sts);
   }
-  switch (event->event) {
+  switch (event->event)
+  {
   case flow_eEvent_Init:
     break;
   case flow_eEvent_MB2DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
-      if (flow_GetNodeGroup(event->object.object) == flow_eNodeGroup_Trace) {
+      if (flow_GetNodeGroup(event->object.object) == flow_eNodeGroup_Trace)
+      {
         flow_DeleteNodeCons(event->object.object);
         flow_DeleteNode(event->object.object);
       }
@@ -1158,7 +1137,8 @@ static int trace_flow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
     break;
-  case flow_eEvent_MB1PressCtrl: {
+  case flow_eEvent_MB1PressCtrl:
+  {
     vldh_t_node vnode;
     vldh_t_con vcon;
     double pos_x, pos_y;
@@ -1166,7 +1146,8 @@ static int trace_flow_cb(FlowCtx* ctx, flow_tEvent event)
     int i, num;
 
     /* Object moved */
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       if (flow_GetNodeGroup(event->object.object) == flow_eNodeGroup_Trace)
         break;
@@ -1183,7 +1164,8 @@ static int trace_flow_cb(FlowCtx* ctx, flow_tEvent event)
         break;
       flow_GetUserData(event->object.object, (void**)&vcon);
       flow_GetConPosition(event->object.object, &x_arr, &y_arr, &num);
-      for (i = 0; i < num; i++) {
+      for (i = 0; i < num; i++)
+      {
         vcon->lc.point[i].x = x_arr[i];
         vcon->lc.point[i].y = y_arr[i];
       }
@@ -1196,7 +1178,8 @@ static int trace_flow_cb(FlowCtx* ctx, flow_tEvent event)
   }
   case flow_eEvent_MB1DoubleClick:
     /* Open attribute editor */
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       if (flow_GetNodeGroup(event->object.object) == flow_eNodeGroup_Trace)
         break;
@@ -1209,7 +1192,8 @@ static int trace_flow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   case flow_eEvent_MB1DoubleClickShift:
     /* Open subwindow */
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       if (flow_GetNodeGroup(event->object.object) == flow_eNodeGroup_Trace)
         break;
@@ -1226,7 +1210,8 @@ static int trace_flow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
     break;
-  case flow_eEvent_MB3Press: {
+  case flow_eEvent_MB3Press:
+  {
     /* Popup menu */
     int x_pix, y_pix;
     vldh_t_node current_node;
@@ -1238,52 +1223,53 @@ static int trace_flow_cb(FlowCtx* ctx, flow_tEvent event)
     if (flow_GetNodeGroup(event->object.object) == flow_eNodeGroup_Trace)
       break;
 
-    flow_PositionToPixel(
-        gre->flow_ctx, event->object.x, event->object.y, &x_pix, &y_pix);
+    flow_PositionToPixel(gre->flow_ctx, event->object.x, event->object.y, &x_pix, &y_pix);
 
     gre->get_popup_position(&x_pix, &y_pix);
 
     current_node = 0;
 
     /* If there is no selected object, select current object */
-    if (gre->popupmenu_mode == GRE_POPUPMENUMODE_OBJECT) {
+    if (gre->popupmenu_mode == GRE_POPUPMENUMODE_OBJECT)
+    {
       flow_GetSelectList(ctx, &select_list, &select_cnt);
-      if (!select_cnt) {
+      if (!select_cnt)
+      {
         if (event->object.object_type == flow_eObjectType_Node)
           /* Get the current object */
           flow_GetUserData(event->object.object, (void**)&current_node);
       }
     }
 
-    (gre->gre_popupmenu)(
-        gre, x_pix, y_pix, gre->popupmenu_mode, current_node, 1);
+    (gre->gre_popupmenu)(gre, x_pix, y_pix, gre->popupmenu_mode, current_node, 1);
     break;
   }
-  case flow_eEvent_MB1ClickCtrl: {
+  case flow_eEvent_MB1ClickCtrl:
+  {
     char help_title[32];
     vldh_t_node node;
     vldh_t_con con;
     int size, sts;
 
-    if (event->object.object_type == flow_eObjectType_Node) {
+    if (event->object.object_type == flow_eObjectType_Node)
+    {
       if (flow_GetNodeGroup(event->object.object) == flow_eNodeGroup_Trace)
         break;
       flow_GetUserData(event->object.object, (void**)&node);
-      sts = ldh_ObjidToName((node->hn.wind)->hw.ldhses,
-          cdh_ClassIdToObjid(node->ln.cid), ldh_eName_Object, help_title,
-          sizeof(help_title), &size);
+      sts = ldh_ObjidToName((node->hn.wind)->hw.ldhses, cdh_ClassIdToObjid(node->ln.cid), ldh_eName_Object,
+                            help_title, sizeof(help_title), &size);
       WFoe::error_msg(sts);
       if (EVEN(sts))
         return 1;
       (gre->gre_help)(gre, help_title);
     }
-    if (event->object.object_type == flow_eObjectType_Con) {
+    if (event->object.object_type == flow_eObjectType_Con)
+    {
       if (flow_GetConGroup(event->object.object) == flow_eConGroup_Trace)
         break;
       flow_GetUserData(event->object.object, (void**)&con);
-      sts = ldh_ObjidToName((gre->wind)->hw.ldhses,
-          cdh_ClassIdToObjid(con->lc.cid), ldh_eName_Object, help_title,
-          sizeof(help_title), &size);
+      sts = ldh_ObjidToName((gre->wind)->hw.ldhses, cdh_ClassIdToObjid(con->lc.cid), ldh_eName_Object,
+                            help_title, sizeof(help_title), &size);
       WFoe::error_msg(sts);
       if (EVEN(sts))
         return 1;
@@ -1291,7 +1277,8 @@ static int trace_flow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_MB1DoubleClickShiftCtrl: {
+  case flow_eEvent_MB1DoubleClickShiftCtrl:
+  {
     trace_changevalue(gre, event->object.object);
     break;
   }
@@ -1339,22 +1326,27 @@ static void trace_changevalue(WGre* gre, flow_tNode fnode)
   if (foe->msg_label_id != 0)
     foe->message("");
 
-  if (flow_GetNodeGroup(fnode) == flow_eNodeGroup_Trace) {
+  if (flow_GetNodeGroup(fnode) == flow_eNodeGroup_Trace)
+  {
     gre->trace_changenode = fnode;
 
     /* Get a value */
     foe->get_textinput("Enter value : ", &trace_aanalyse_set_value);
     return;
-  } else {
+  }
+  else
+  {
     /* Toggle the value, start to get the current value */
     FlowTraceAttr attr = flow_GetTraceAttr(fnode);
     strcpy(name, attr.object);
     strcat(name, ".");
     strcat(name, attr.attribute);
-    switch (attr.type) {
+    switch (attr.type)
+    {
     case flow_eTraceType_Boolean:
       sts = gdh_GetObjectInfo(name, &value, sizeof(value));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         foe->message("Unable to set value");
         WFoe::error_msg(sts);
         return;
@@ -1367,7 +1359,8 @@ static void trace_changevalue(WGre* gre, flow_tNode fnode)
         value = 0;
 
       sts = gdh_SetObjectInfo(name, &value, sizeof(value));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         foe->message("Unable to set value");
         WFoe::error_msg(sts);
         return;
@@ -1380,15 +1373,15 @@ static void trace_changevalue(WGre* gre, flow_tNode fnode)
 }
 
 /*************************************************************************
-*
-* Name:		trace_aanalyse_set_value ()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-**************************************************************************/
+ *
+ * Name:		trace_aanalyse_set_value ()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ **************************************************************************/
 
 static pwr_tStatus trace_aanalyse_set_value(WFoe* foe, char* valuestr)
 {
@@ -1401,16 +1394,19 @@ static pwr_tStatus trace_aanalyse_set_value(WFoe* foe, char* valuestr)
   strcpy(name, attr.object);
   strcat(name, ".");
   strcat(name, attr.attribute);
-  switch (attr.type) {
+  switch (attr.type)
+  {
   case flow_eTraceType_Boolean:
     /* Convert to Boolean */
-    if (sscanf(valuestr, "%d", &boolean_value) != 1) {
+    if (sscanf(valuestr, "%d", &boolean_value) != 1)
+    {
       foe->message("Syntax error");
       return 0;
     }
 
     sts = gdh_SetObjectInfo(name, &boolean_value, sizeof(boolean_value));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       foe->message("Unable to set value");
       WFoe::error_msg(sts);
       return 1;
@@ -1418,13 +1414,15 @@ static pwr_tStatus trace_aanalyse_set_value(WFoe* foe, char* valuestr)
     break;
   case flow_eTraceType_Float32:
     /* Convert to float */
-    if (sscanf(valuestr, "%f", &float_value) != 1) {
+    if (sscanf(valuestr, "%f", &float_value) != 1)
+    {
       foe->message("Syntax error");
       return 0;
     }
 
     sts = gdh_SetObjectInfo(name, &float_value, sizeof(float_value));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       foe->message("Unable to set value");
       WFoe::error_msg(sts);
       return 1;

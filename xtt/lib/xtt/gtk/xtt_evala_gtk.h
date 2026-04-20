@@ -41,12 +41,12 @@
 
 #include "xtt_evala.h"
 
-class EvAlaGtk : public EvAla {
+class EvAlaGtk : public EvAla
+{
 public:
-  EvAlaGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* ala_name,
-      pwr_tObjid ev_user, int ev_eventname_seg, int ev_width, int ev_height,
-      int ev_x, int ev_y, pwr_tObjid ev_view, unsigned int ev_options,
-      void* widget, pwr_tStatus* status);
+  EvAlaGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* ala_name, pwr_tObjid ev_user,
+           int ev_eventname_seg, int ev_width, int ev_height, int ev_x, int ev_y, pwr_tObjid ev_view,
+           unsigned int ev_options, void* widget, pwr_tStatus* status);
   ~EvAlaGtk();
 
   GtkWidget* parent_wid;
@@ -59,13 +59,9 @@ public:
   void map_ala();
   void unmap_ala();
   void set_title_ala(char* title);
-  GtkWidget* get_widget()
-  {
-    return ala_vbox;
-  }
+  GtkWidget* get_widget() { return ala_vbox; }
 
-  static gboolean ala_action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean ala_action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void ala_activate_exit(GtkWidget* w, gpointer data);
   static void ala_activate_print(GtkWidget* w, gpointer data);
   static void ala_activate_ack_last(GtkWidget* w, gpointer data);

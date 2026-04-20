@@ -35,16 +35,16 @@
  */
 
 /* rt_io_m_mb_rtu_master.c -- io methods for the Modbus RTU Master object
-*/
+ */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 #include <termios.h>
+#include <unistd.h>
 #if defined OS_LINUX
 #include <termio.h>
 #endif
@@ -54,30 +54,27 @@
 #include <sys/ioctl.h>
 
 #include "co_cdh.h"
+#include "co_time.h"
 #include "pwr_basecomponentclasses.h"
 #include "pwr_otherioclasses.h"
+#include "rt_io_agent_init.h"
 #include "rt_io_base.h"
 #include "rt_io_bus.h"
-#include "rt_io_msg.h"
-#include "co_cdh.h"
-#include "co_time.h"
-#include "rt_mb_msg.h"
 #include "rt_io_mb_rtu.h"
-#include "rt_io_agent_init.h"
+#include "rt_io_msg.h"
+#include "rt_mb_msg.h"
 
-static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap);
-static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap);
-static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap);
-static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap);
+static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent *ap);
+static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent *ap);
+static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent *ap);
+static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent *ap);
 
-static void float_to_timeval(struct timeval* tv, float t)
-{
+static void float_to_timeval(struct timeval *tv, float t) {
   tv->tv_sec = t;
   tv->tv_usec = (t - (float)tv->tv_sec) * 1000000;
 }
 
-static void float_to_timespec(struct timespec* tv, float t)
-{
+static void float_to_timespec(struct timespec *tv, float t) {
   tv->tv_sec = t;
   tv->tv_nsec = (t - (float)tv->tv_sec) * 1000000000;
 }
@@ -85,12 +82,11 @@ static void float_to_timespec(struct timespec* tv, float t)
 /*----------------------------------------------------------------------------*\
    Init method for the Modbus RTU Master agent
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
-{
+static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent *ap) {
   struct termios tty_attributes;
   int sts;
-  io_sAgentLocal* local;
-  pwr_sClass_Modbus_RTU_Master* op = (pwr_sClass_Modbus_RTU_Master*)ap->op;
+  io_sAgentLocal *local;
+  pwr_sClass_Modbus_RTU_Master *op = (pwr_sClass_Modbus_RTU_Master *)ap->op;
 
   /* Allocate area for local data structure */
   ap->Local = calloc(1, sizeof(io_sAgentLocal));
@@ -101,7 +97,8 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 
   local->fd = open(op->Device, O_RDWR | O_NDELAY | O_NOCTTY);
   if (local->fd == -1) {
-    errh_Error("Modbus RTU Master, open device error, %s, errno %d", ap->Name, errno);
+    errh_Error("Modbus RTU Master, open device error, %s, errno %d", ap->Name,
+               errno);
     return IO__ERRINIDEVICE;
   }
 
@@ -114,7 +111,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   tty_attributes.c_oflag &= ~(ONLCR);
   tty_attributes.c_iflag &= ~(INLCR | ICRNL);
 
-/* Speed */
+  /* Speed */
 
 #if defined OS_LINUX
   tty_attributes.c_cflag &= ~CBAUD;
@@ -228,8 +225,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   return IO__SUCCESS;
 }
 
-static void generate_crc(unsigned char* buf, int size, unsigned char* result)
-{
+static void generate_crc(unsigned char *buf, int size, unsigned char *result) {
   unsigned short int crc;
   unsigned short int gen_polynomial = 0xA001;
   unsigned short int flag_mask = 0x0001;
@@ -253,13 +249,15 @@ static void generate_crc(unsigned char* buf, int size, unsigned char* result)
   result[1] = (unsigned char)((crc >> 8) & 0x00FF);
 }
 
-static pwr_tStatus rtu_send(io_sRack* rp, io_sAgentLocal* local_master,
-    io_sRackLocal* local_slave, io_sCardLocalMsg* local_card,
-    pwr_sClass_Modbus_RTU_Master* masterp, pwr_sClass_Modbus_RTU_Slave* slavep,
-    pwr_sClass_Modbus_RTU_Module* modulep, unsigned char* buf, int buffer_size)
-{
+static pwr_tStatus rtu_send(io_sRack *rp, io_sAgentLocal *local_master,
+                            io_sRackLocal *local_slave,
+                            io_sCardLocalMsg *local_card,
+                            pwr_sClass_Modbus_RTU_Master *masterp,
+                            pwr_sClass_Modbus_RTU_Slave *slavep,
+                            pwr_sClass_Modbus_RTU_Module *modulep,
+                            unsigned char *buf, int buffer_size) {
   int sts;
-  rec_buf* rb;
+  rec_buf *rb;
   unsigned char fc;
   int data_size = 0;
   unsigned char telegram[512];
@@ -349,7 +347,7 @@ static pwr_tStatus rtu_send(io_sRack* rp, io_sAgentLocal* local_master,
 
   slavep->RX_packets++;
 
-  rb = (rec_buf*)telegram;
+  rb = (rec_buf *)telegram;
 
   fc = rb->fc;
 
@@ -362,34 +360,34 @@ static pwr_tStatus rtu_send(io_sRack* rp, io_sAgentLocal* local_master,
 
   switch (fc) {
   case pwr_eModbus_FCEnum_ReadCoils: {
-    res_read* res_r;
-    res_r = (res_read*)rb;
+    res_read *res_r;
+    res_r = (res_read *)rb;
     memcpy(local_card->input_area, res_r->buf,
-        MIN(res_r->bc, local_card->input_size));
+           MIN(res_r->bc, local_card->input_size));
     break;
   }
 
   case pwr_eModbus_FCEnum_ReadDiscreteInputs: {
-    res_read* res_r;
-    res_r = (res_read*)rb;
+    res_read *res_r;
+    res_r = (res_read *)rb;
     memcpy(local_card->input_area, res_r->buf,
-        MIN(res_r->bc, local_card->input_size));
+           MIN(res_r->bc, local_card->input_size));
     break;
   }
 
   case pwr_eModbus_FCEnum_ReadHoldingRegisters: {
-    res_read* res_r;
-    res_r = (res_read*)rb;
+    res_read *res_r;
+    res_r = (res_read *)rb;
     memcpy(local_card->input_area, res_r->buf,
-        MIN(res_r->bc, local_card->input_size));
+           MIN(res_r->bc, local_card->input_size));
     break;
   }
 
   case pwr_eModbus_FCEnum_ReadInputRegisters: {
-    res_read* res_r;
-    res_r = (res_read*)rb;
+    res_read *res_r;
+    res_r = (res_read *)rb;
     memcpy(local_card->input_area, res_r->buf,
-        MIN(res_r->bc, local_card->input_size));
+           MIN(res_r->bc, local_card->input_size));
     break;
   }
 
@@ -403,13 +401,14 @@ static pwr_tStatus rtu_send(io_sRack* rp, io_sAgentLocal* local_master,
   return IO__SUCCESS;
 }
 
-static pwr_tStatus mb_rtu_send_data(io_sRack* rp, io_sAgentLocal* local_master,
-    io_sRackLocal* local_slave, pwr_sClass_Modbus_RTU_Master* masterp,
-    pwr_sClass_Modbus_RTU_Slave* slavep, mb_tSendMask mask)
-{
-  io_sCardLocalMsg* local_card;
-  io_sCard* cardp;
-  pwr_sClass_Modbus_RTU_Module* modulep = NULL;
+static pwr_tStatus mb_rtu_send_data(io_sRack *rp, io_sAgentLocal *local_master,
+                                    io_sRackLocal *local_slave,
+                                    pwr_sClass_Modbus_RTU_Master *masterp,
+                                    pwr_sClass_Modbus_RTU_Slave *slavep,
+                                    mb_tSendMask mask) {
+  io_sCardLocalMsg *local_card;
+  io_sCard *cardp;
+  pwr_sClass_Modbus_RTU_Module *modulep = NULL;
   pwr_tStatus sts;
   pwr_tCid cid;
   int modules;
@@ -428,7 +427,7 @@ static pwr_tStatus mb_rtu_send_data(io_sRack* rp, io_sAgentLocal* local_master,
 
     switch (cid) {
     case pwr_cClass_Modbus_RTU_Module:
-      modulep = (pwr_sClass_Modbus_RTU_Module*)cardp->op;
+      modulep = (pwr_sClass_Modbus_RTU_Module *)cardp->op;
       modules = 1;
       break;
     default:
@@ -449,7 +448,7 @@ static pwr_tStatus mb_rtu_send_data(io_sRack* rp, io_sAgentLocal* local_master,
         break;
       }
 
-      local_card = &((io_sCardLocal*)cardp->Local)->msg[i];
+      local_card = &((io_sCardLocal *)cardp->Local)->msg[i];
       if (modulep->ScanInterval > 1 && local_card->interval_cnt != 0) {
         modulep++;
         continue;
@@ -470,7 +469,8 @@ static pwr_tStatus mb_rtu_send_data(io_sRack* rp, io_sAgentLocal* local_master,
           //              rr.quant = ntohs(local_card->input_size * 8);
 
           sts = rtu_send(rp, local_master, local_slave, local_card, masterp,
-              slavep, modulep, (unsigned char*)&rr, sizeof(read_req) - 2);
+                         slavep, modulep, (unsigned char *)&rr,
+                         sizeof(read_req) - 2);
           if (EVEN(sts)) {
             slavep->Status = MB__CONNDOWN;
             slavep->ErrorCount++;
@@ -494,7 +494,8 @@ static pwr_tStatus mb_rtu_send_data(io_sRack* rp, io_sAgentLocal* local_master,
           rr.quant = ntohs((local_card->input_size + 1) / 2);
 
           sts = rtu_send(rp, local_master, local_slave, local_card, masterp,
-              slavep, modulep, (unsigned char*)&rr, sizeof(read_req) - 2);
+                         slavep, modulep, (unsigned char *)&rr,
+                         sizeof(read_req) - 2);
           if (EVEN(sts)) {
             slavep->Status = MB__CONNDOWN;
             slavep->ErrorCount++;
@@ -518,25 +519,26 @@ static pwr_tStatus mb_rtu_send_data(io_sRack* rp, io_sAgentLocal* local_master,
           wsr.fc = modulep->FunctionCode;
           wsr.addr = htons(modulep->Address);
           if (local_card->output_size == 4) {
-            if (*(int*)local_card->output_area)
+            if (*(int *)local_card->output_area)
               wsr.value = ntohs(0xFF00);
             else
               wsr.value = 0;
           } else if (local_card->output_size == 2) {
-            if (*(short int*)local_card->output_area)
+            if (*(short int *)local_card->output_area)
               wsr.value = ntohs(0xFF00);
             else
               wsr.value = 0;
           } else if (local_card->output_size == 1) {
-            if (*(char*)local_card->output_area)
+            if (*(char *)local_card->output_area)
               wsr.value = ntohs(0xFF00);
             else
               wsr.value = 0;
           } else
             wsr.value = 0;
 
-          sts = rtu_send(rp, local_master, local_slave, local_card, masterp,
-              slavep, modulep, (unsigned char*)&wsr, sizeof(wsr) - 2);
+          sts =
+              rtu_send(rp, local_master, local_slave, local_card, masterp,
+                       slavep, modulep, (unsigned char *)&wsr, sizeof(wsr) - 2);
           if (EVEN(sts)) {
             slavep->Status = MB__CONNDOWN;
             slavep->ErrorCount++;
@@ -561,8 +563,9 @@ static pwr_tStatus mb_rtu_send_data(io_sRack* rp, io_sAgentLocal* local_master,
           memcpy(wcr.reg, local_card->output_area, local_card->output_size);
 
           sts = rtu_send(rp, local_master, local_slave, local_card, masterp,
-              slavep, modulep, (unsigned char*)&wcr,
-              sizeof(wcr) - 2 - sizeof(wcr.reg) + local_card->output_size);
+                         slavep, modulep, (unsigned char *)&wcr,
+                         sizeof(wcr) - 2 - sizeof(wcr.reg) +
+                             local_card->output_size);
           if (EVEN(sts)) {
             slavep->Status = MB__CONNDOWN;
             slavep->ErrorCount++;
@@ -586,8 +589,9 @@ static pwr_tStatus mb_rtu_send_data(io_sRack* rp, io_sAgentLocal* local_master,
           memcpy(wrr.reg, local_card->output_area, local_card->output_size);
 
           sts = rtu_send(rp, local_master, local_slave, local_card, masterp,
-              slavep, modulep, (unsigned char*)&wrr,
-              sizeof(wrr) - 2 - sizeof(wrr.reg) + local_card->output_size);
+                         slavep, modulep, (unsigned char *)&wrr,
+                         sizeof(wrr) - 2 - sizeof(wrr.reg) +
+                             local_card->output_size);
           if (EVEN(sts)) {
             slavep->Status = MB__CONNDOWN;
             slavep->ErrorCount++;
@@ -607,8 +611,9 @@ static pwr_tStatus mb_rtu_send_data(io_sRack* rp, io_sAgentLocal* local_master,
           wrr.addr = htons(modulep->Address);
           memcpy(&wrr.value, local_card->output_area, sizeof(wrr.value));
 
-          sts = rtu_send(rp, local_master, local_slave, local_card, masterp,
-              slavep, modulep, (unsigned char*)&wrr, sizeof(wrr) - 2);
+          sts =
+              rtu_send(rp, local_master, local_slave, local_card, masterp,
+                       slavep, modulep, (unsigned char *)&wrr, sizeof(wrr) - 2);
           if (EVEN(sts)) {
             slavep->Status = MB__CONNDOWN;
             slavep->ErrorCount++;
@@ -644,17 +649,16 @@ static pwr_tStatus mb_rtu_send_data(io_sRack* rp, io_sAgentLocal* local_master,
 /*----------------------------------------------------------------------------*\
    Read method for the Modbus RTU Master agent
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
-{
-  io_sAgentLocal* local;
-  io_sRackLocal* local_rack;
+static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent *ap) {
+  io_sAgentLocal *local;
+  io_sRackLocal *local_rack;
   pwr_tUInt16 sts;
-  io_sRack* rp;
+  io_sRack *rp;
   pwr_tCid cid;
-  pwr_sClass_Modbus_RTU_Slave* sp;
-  pwr_sClass_Modbus_RTU_Master* op = (pwr_sClass_Modbus_RTU_Master*)ap->op;
+  pwr_sClass_Modbus_RTU_Slave *sp;
+  pwr_sClass_Modbus_RTU_Master *op = (pwr_sClass_Modbus_RTU_Master *)ap->op;
 
-  local = (io_sAgentLocal*)ap->Local;
+  local = (io_sAgentLocal *)ap->Local;
 
   if (!local->initialized)
     return IO__SUCCESS;
@@ -669,13 +673,13 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
     switch (cid) {
     case pwr_cClass_Modbus_RTU_Slave:
 
-      sp = (pwr_sClass_Modbus_RTU_Slave*)rp->op;
+      sp = (pwr_sClass_Modbus_RTU_Slave *)rp->op;
       local_rack = rp->Local;
 
       /* Request new data */
       if (/* sp->Status == MB__NORMAL && */ sp->DisableSlave != 1) {
-        sts = mb_rtu_send_data(
-            rp, local, local_rack, op, sp, mb_mSendMask_ReadReq);
+        sts = mb_rtu_send_data(rp, local, local_rack, op, sp,
+                               mb_mSendMask_ReadReq);
 
         if (sp->ErrorCount >= sp->ErrorLimit) {
           switch (sp->StallAction) {
@@ -703,17 +707,16 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 /*----------------------------------------------------------------------------*\
    Write method for the Modbus RTU Master agent
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
-{
-  io_sAgentLocal* local;
-  io_sRackLocal* local_rack;
+static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent *ap) {
+  io_sAgentLocal *local;
+  io_sRackLocal *local_rack;
   pwr_tUInt16 sts;
-  io_sRack* rp;
+  io_sRack *rp;
   pwr_tCid cid;
-  pwr_sClass_Modbus_RTU_Slave* sp;
-  pwr_sClass_Modbus_RTU_Master* op = (pwr_sClass_Modbus_RTU_Master*)ap->op;
+  pwr_sClass_Modbus_RTU_Slave *sp;
+  pwr_sClass_Modbus_RTU_Master *op = (pwr_sClass_Modbus_RTU_Master *)ap->op;
 
-  local = (io_sAgentLocal*)ap->Local;
+  local = (io_sAgentLocal *)ap->Local;
 
   if (!local->initialized)
     return IO__SUCCESS;
@@ -728,13 +731,13 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
     switch (cid) {
     case pwr_cClass_Modbus_RTU_Slave:
 
-      sp = (pwr_sClass_Modbus_RTU_Slave*)rp->op;
+      sp = (pwr_sClass_Modbus_RTU_Slave *)rp->op;
       local_rack = rp->Local;
 
       /* Request new data */
       if (/* sp->Status == MB__NORMAL && */ sp->DisableSlave != 1) {
-        sts = mb_rtu_send_data(
-            rp, local, local_rack, op, sp, mb_mSendMask_WriteReq);
+        sts = mb_rtu_send_data(rp, local, local_rack, op, sp,
+                               mb_mSendMask_WriteReq);
       }
       break;
     }
@@ -748,9 +751,8 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap)
-{
-  io_sAgentLocal* local = (io_sAgentLocal*)ap->Local;
+static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent *ap) {
+  io_sAgentLocal *local = (io_sAgentLocal *)ap->Local;
 
   close(local->fd);
   return IO__SUCCESS;
@@ -760,7 +762,7 @@ static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Modbus_RTU_Master)
-    = { pwr_BindIoMethod(IoAgentInit), pwr_BindIoMethod(IoAgentRead),
-        pwr_BindIoMethod(IoAgentWrite), pwr_BindIoMethod(IoAgentClose),
-        pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Modbus_RTU_Master) = {
+    pwr_BindIoMethod(IoAgentInit), pwr_BindIoMethod(IoAgentRead),
+    pwr_BindIoMethod(IoAgentWrite), pwr_BindIoMethod(IoAgentClose),
+    pwr_NullMethod};

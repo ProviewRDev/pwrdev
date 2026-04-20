@@ -38,24 +38,27 @@
 #define cow_api_h
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #if !defined cow_msgwindow_h
-typedef enum { msgw_ePop_No, msgw_ePop_Yes, msgw_ePop_Default } msgw_ePop;
+  typedef enum
+  {
+    msgw_ePop_No,
+    msgw_ePop_Yes,
+    msgw_ePop_Default
+  } msgw_ePop;
 #endif
 
-void msgw_message(int severity, const char* text, msgw_ePop pop);
-void msgw_message_sts(pwr_tStatus sts, const char* text1, const char* text2);
-void msgw_message_object(
-    pwr_tStatus sts, const char* text1, const char* text2, pwr_tOid oid);
-void msgw_message_plcobject(
-    pwr_tStatus sts, const char* text1, const char* text2, pwr_tOid oid);
-void msgw_set_nodraw();
-void msgw_reset_nodraw();
-int msgw_has_default();
-int xhelp_help(char* key, char* help_bookmark, navh_eHelpFile file_type,
-    char* file_name, int strict);
+  void msgw_message(int severity, const char* text, msgw_ePop pop);
+  void msgw_message_sts(pwr_tStatus sts, const char* text1, const char* text2);
+  void msgw_message_object(pwr_tStatus sts, const char* text1, const char* text2, pwr_tOid oid);
+  void msgw_message_plcobject(pwr_tStatus sts, const char* text1, const char* text2, pwr_tOid oid);
+  void msgw_set_nodraw();
+  void msgw_reset_nodraw();
+  int msgw_has_default();
+  int xhelp_help(char* key, char* help_bookmark, navh_eHelpFile file_type, char* file_name, int strict);
 #if defined __cplusplus
 }
 #endif

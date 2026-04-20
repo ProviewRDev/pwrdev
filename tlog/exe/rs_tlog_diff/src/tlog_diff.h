@@ -35,18 +35,17 @@
  */
 
 /************************************************************************
-*
-* Filename:		rs_tlog_diff.h
-*			Date	Pgm.	Read.	Remark
-* Modified		950914	CS		Initial creation
-*
-* Description:
-*	Include file for Test Logging difference function.
-*
-**************************************************************************/
+ *
+ * Filename:		rs_tlog_diff.h
+ *			Date	Pgm.	Read.	Remark
+ * Modified		950914	CS		Initial creation
+ *
+ * Description:
+ *	Include file for Test Logging difference function.
+ *
+ **************************************************************************/
 
-pwr_tStatus tlog_diff(char* filename, char* output, char* timestr,
-    int parallell, int attribute, int text, int ttext, int noorder, int exact,
-    char* since_str, char* before_str);
+pwr_tStatus tlog_diff(char* filename, char* output, char* timestr, int parallell, int attribute, int text,
+                      int ttext, int noorder, int exact, char* since_str, char* before_str);
 
 int tlog_save(char* filename);

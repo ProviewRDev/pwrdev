@@ -40,148 +40,162 @@
 #include "pwr.h"
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-typedef struct {
-  int cid;
-  pwr_tOix oix;
-  pwr_tOix fthoix;
-  pwr_tOix bwsoix;
-  pwr_tOix fwsoix;
-  pwr_tOix fchoix;
-  pwr_tOix lchoix;
-  char name[32];
-} rpvd_sObject;
+  typedef struct
+  {
+    int cid;
+    pwr_tOix oix;
+    pwr_tOix fthoix;
+    pwr_tOix bwsoix;
+    pwr_tOix fwsoix;
+    pwr_tOix fchoix;
+    pwr_tOix lchoix;
+    char name[32];
+  } rpvd_sObject;
 
-typedef enum {
-  rpvd_eMsg_Oid,
-  rpvd_eMsg_ObjectName,
-  rpvd_eMsg_Object,
-  rpvd_eMsg_ReadAttribute,
-  rpvd_eMsg_WriteAttribute,
-  rpvd_eMsg_Attribute,
-  rpvd_eMsg_Status,
-  rpvd_eMsg_SubAdd,
-  rpvd_eMsg_SubRemove,
-  rpvd_eMsg_SubSend,
-  rpvd_eMsg_SubRequest,
-  rpvd_eMsg_NodeUp
-} rpvd_eMsg;
+  typedef enum
+  {
+    rpvd_eMsg_Oid,
+    rpvd_eMsg_ObjectName,
+    rpvd_eMsg_Object,
+    rpvd_eMsg_ReadAttribute,
+    rpvd_eMsg_WriteAttribute,
+    rpvd_eMsg_Attribute,
+    rpvd_eMsg_Status,
+    rpvd_eMsg_SubAdd,
+    rpvd_eMsg_SubRemove,
+    rpvd_eMsg_SubSend,
+    rpvd_eMsg_SubRequest,
+    rpvd_eMsg_NodeUp
+  } rpvd_eMsg;
 
-typedef struct {
-  int Type;
-  int Id;
-  int Status;
-} rpvd_sMsgAny;
+  typedef struct
+  {
+    int Type;
+    int Id;
+    int Status;
+  } rpvd_sMsgAny;
 
-typedef struct {
-  int Type;
-  int Id;
-  int Status;
-  pwr_tOid Oid;
-} rpvd_sMsgOid;
+  typedef struct
+  {
+    int Type;
+    int Id;
+    int Status;
+    pwr_tOid Oid;
+  } rpvd_sMsgOid;
 
-typedef struct {
-  int Type;
-  int Id;
-  int Status;
-  pwr_tOName Name;
-  pwr_tOid POid;
-} rpvd_sMsgObjectName;
+  typedef struct
+  {
+    int Type;
+    int Id;
+    int Status;
+    pwr_tOName Name;
+    pwr_tOid POid;
+  } rpvd_sMsgObjectName;
 
-typedef struct {
-  int Type;
-  int Id;
-  int Status;
-  pwr_tOid Oid;
-  int OSize;
-  rpvd_sObject o[136];
-} rpvd_sMsgObject;
+  typedef struct
+  {
+    int Type;
+    int Id;
+    int Status;
+    pwr_tOid Oid;
+    int OSize;
+    rpvd_sObject o[136];
+  } rpvd_sMsgObject;
 
-typedef struct {
-  int Type;
-  int Id;
-  int Status;
-  pwr_tOid Oid;
-  pwr_tOName Attribute;
-} rpvd_sMsgReadAttribute;
+  typedef struct
+  {
+    int Type;
+    int Id;
+    int Status;
+    pwr_tOid Oid;
+    pwr_tOName Attribute;
+  } rpvd_sMsgReadAttribute;
 
-typedef struct {
-  int Type;
-  int Id;
-  int Status;
-  pwr_tOid Oid;
-  pwr_tOName Attribute;
-  int Size;
-  pwr_tTypeId Tid;
-  char Value[1200];
-} rpvd_sMsgAttribute;
+  typedef struct
+  {
+    int Type;
+    int Id;
+    int Status;
+    pwr_tOid Oid;
+    pwr_tOName Attribute;
+    int Size;
+    pwr_tTypeId Tid;
+    char Value[1200];
+  } rpvd_sMsgAttribute;
 
-typedef struct {
-  int Type;
-  int Id;
-  int Status;
-  pwr_tOid Oid;
-  pwr_tOName Attribute;
-  int Size;
-  pwr_tTypeId Tid;
-  char Value[1200];
-} rpvd_sMsgWriteAttribute;
+  typedef struct
+  {
+    int Type;
+    int Id;
+    int Status;
+    pwr_tOid Oid;
+    pwr_tOName Attribute;
+    int Size;
+    pwr_tTypeId Tid;
+    char Value[1200];
+  } rpvd_sMsgWriteAttribute;
 
-typedef struct {
-  int Type;
-  int Id;
-  int Status;
-  pwr_tOid Oid;
-  pwr_tOName Attribute;
-  int Size;
-  pwr_tTypeId Tid;
-  int Rix;
-} rpvd_sMsgSubAdd;
+  typedef struct
+  {
+    int Type;
+    int Id;
+    int Status;
+    pwr_tOid Oid;
+    pwr_tOName Attribute;
+    int Size;
+    pwr_tTypeId Tid;
+    int Rix;
+  } rpvd_sMsgSubAdd;
 
-typedef struct {
-  int Type;
-  int Id;
-  int Status;
-  int Rix;
-} rpvd_sMsgSubRemove;
+  typedef struct
+  {
+    int Type;
+    int Id;
+    int Status;
+    int Rix;
+  } rpvd_sMsgSubRemove;
 
-typedef struct {
-  int Type;
-  int Id;
-  int Status;
-  int More;
-  char Data[8184];
-} rpvd_sMsgSubSend;
+  typedef struct
+  {
+    int Type;
+    int Id;
+    int Status;
+    int More;
+    char Data[8184];
+  } rpvd_sMsgSubSend;
 
-typedef union {
-  rpvd_sMsgAny Any;
-  rpvd_sMsgOid Oid;
-  rpvd_sMsgObjectName ObjectName;
-  rpvd_sMsgObject Object;
-  rpvd_sMsgReadAttribute ReadAttribute;
-  rpvd_sMsgWriteAttribute WriteAttribute;
-  rpvd_sMsgAttribute Attribute;
-  rpvd_sMsgSubAdd SubAdd;
-  rpvd_sMsgSubRemove SubRemove;
-  rpvd_sMsgSubSend SubSend;
-} rpvd_sMsg;
+  typedef union
+  {
+    rpvd_sMsgAny Any;
+    rpvd_sMsgOid Oid;
+    rpvd_sMsgObjectName ObjectName;
+    rpvd_sMsgObject Object;
+    rpvd_sMsgReadAttribute ReadAttribute;
+    rpvd_sMsgWriteAttribute WriteAttribute;
+    rpvd_sMsgAttribute Attribute;
+    rpvd_sMsgSubAdd SubAdd;
+    rpvd_sMsgSubRemove SubRemove;
+    rpvd_sMsgSubSend SubSend;
+  } rpvd_sMsg;
 
-void udp_Disable();
+  void udp_Disable();
 
-void udp_Enable();
+  void udp_Enable();
 
-pwr_tStatus udp_Send(char* buf, int buf_size);
+  pwr_tStatus udp_Send(char* buf, int buf_size);
 
-pwr_tStatus udp_Receive(char** buff, int tmo);
+  pwr_tStatus udp_Receive(char** buff, int tmo);
 
-pwr_tStatus udp_Request(char* sendbuf, int sendbuf_size, char** rcvbuf);
+  pwr_tStatus udp_Request(char* sendbuf, int sendbuf_size, char** rcvbuf);
 
-pwr_tStatus udp_Init(char* remote_address, char* remote_host_name, int port);
+  pwr_tStatus udp_Init(char* remote_address, char* remote_host_name, int port);
 
-void udp_LinkFailure();
-pwr_tStatus udp_CheckLink();
+  void udp_LinkFailure();
+  pwr_tStatus udp_CheckLink();
 
 #if defined __cplusplus
 }

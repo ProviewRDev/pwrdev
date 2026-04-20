@@ -40,9 +40,7 @@
 #include "wb_cdrep.h"
 #include "wb_object.h"
 
-wb_cdef::wb_cdef() : wb_status(LDH__NOCLASS), m_cdrep(0)
-{
-}
+wb_cdef::wb_cdef() : wb_status(LDH__NOCLASS), m_cdrep(0) {}
 
 wb_cdef::wb_cdef(wb_cdrep* cdrep) : wb_status(LDH__SUCCESS), m_cdrep(cdrep)
 {
@@ -55,33 +53,42 @@ wb_cdef::wb_cdef(wb_cdrep* cdrep) : wb_status(LDH__SUCCESS), m_cdrep(cdrep)
 wb_cdef::wb_cdef(wb_adef& a) : m_cdrep(0)
 {
   wb_adrep* adrep = a;
-  try {
+  try
+  {
     m_cdrep = new wb_cdrep(adrep);
     m_cdrep->ref();
     m_sts = m_cdrep->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     m_sts = e.sts();
   }
 }
 
 wb_cdef::wb_cdef(const wb_orep& x) : m_cdrep(0)
 {
-  try {
+  try
+  {
     m_cdrep = new wb_cdrep(x);
     m_cdrep->ref();
     m_sts = m_cdrep->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     m_sts = e.sts();
   }
 }
 
 wb_cdef::wb_cdef(wb_mvrep* mvrep, pwr_tCid cid) : m_cdrep(0)
 {
-  try {
+  try
+  {
     m_cdrep = new wb_cdrep(mvrep, cid);
     m_cdrep->ref();
     m_sts = m_cdrep->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     m_sts = e.sts();
   }
 }
@@ -175,15 +182,13 @@ wb_object wb_cdef::classBody(const char* bname)
     return wb_object();
 }
 
-void wb_cdef::templateBody(
-    pwr_tStatus* sts, pwr_eBix bix, void* p, pwr_tOid oid)
+void wb_cdef::templateBody(pwr_tStatus* sts, pwr_eBix bix, void* p, pwr_tOid oid)
 {
   check();
   m_cdrep->templateBody(sts, bix, p, oid);
 }
 
-void wb_cdef::attrTemplateBody(
-    pwr_tStatus* sts, pwr_eBix bix, void* p, wb_attribute& a)
+void wb_cdef::attrTemplateBody(pwr_tStatus* sts, pwr_eBix bix, void* p, wb_attribute& a)
 {
   check();
   m_cdrep->attrTemplateBody(sts, bix, p, a);

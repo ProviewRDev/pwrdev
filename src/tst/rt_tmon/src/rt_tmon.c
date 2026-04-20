@@ -35,7 +35,7 @@
  */
 
 /* rt_tmon.c -- Timer Monitor
-*/
+ */
 
 #include <stdio.h>
 #include <stddef.h>
@@ -61,7 +61,8 @@ int main(int argc, char** argv)
   pwr_tTime now;
   int sec, nsec;
 
-  for (sec = 0, nsec = 10000000;;) {
+  for (sec = 0, nsec = 10000000;;)
+  {
     nowTime(&now);
     printf("%d:%d\n", now.tv_sec, now.tv_nsec);
     waitTime(&now);
@@ -109,10 +110,13 @@ static pwr_tTime* subTime(pwr_tTime* t1, pwr_tTime* t2)
 
   tv_sec = tv_sec + tv_nsec / 1000000000;
   tv_nsec = tv_nsec % 1000000000;
-  if (tv_nsec < 0 && tv_sec > 0) {
+  if (tv_nsec < 0 && tv_sec > 0)
+  {
     tv_sec--;
     tv_nsec += 1000000000;
-  } else if (tv_sec < 0 && tv_nsec > 0) {
+  }
+  else if (tv_sec < 0 && tv_nsec > 0)
+  {
     tv_sec++;
     tv_nsec -= 1000000000;
   }
@@ -124,10 +128,7 @@ static pwr_tTime* subTime(pwr_tTime* t1, pwr_tTime* t2)
 
 /* Get current uptime.  */
 
-static pwr_tTime* nowTime(pwr_tTime* tp)
-{
-  return tp;
-}
+static pwr_tTime* nowTime(pwr_tTime* tp) { return tp; }
 
 /* Wait for a while.  */
 
@@ -139,6 +140,8 @@ static void waitTime(pwr_tTime* t)
   char tims[24];
   short len;
   struct dsc$descriptor_s tims_desc = {
-    sizeof(tims) - 1, DSC$K_DTYPE_T, DSC$K_CLASS_S,
+      sizeof(tims) - 1,
+      DSC$K_DTYPE_T,
+      DSC$K_CLASS_S,
   };
 }

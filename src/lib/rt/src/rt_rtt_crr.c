@@ -58,42 +58,42 @@ static int one = 1;
 
 /*** Local funktions ***************************************************/
 
-static int rtt_get_signal_line(
-    FILE* file, char* line, int size, int* spaces, char* text, int* lines);
+static int rtt_get_signal_line(FILE* file, char* line, int size, int* spaces, char* text, int* lines);
 static char* rtt_VolumeIdToStr(pwr_tVolumeId volumeid);
 
 /*************************************************************************
-*
-* Name:		rtt_get_signal_line()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Reads a line i a proview signal or plcmodule list.
-*	Returns the read line (line), number of spaces to the first charachter,
-*	the number of lines read( empty lines are not returned),
-*	and the first word (text).
-*	Returns RTT__EOF if end of file.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_signal_line()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Reads a line i a proview signal or plcmodule list.
+ *	Returns the read line (line), number of spaces to the first charachter,
+ *	the number of lines read( empty lines are not returned),
+ *	and the first word (text).
+ *	Returns RTT__EOF if end of file.
+ *
+ **************************************************************************/
 
-static int rtt_get_signal_line(
-    FILE* file, char* line, int size, int* spaces, char* text, int* lines)
+static int rtt_get_signal_line(FILE* file, char* line, int size, int* spaces, char* text, int* lines)
 {
   char* s;
   char* f;
 
   *lines = 0;
-  while (1) {
+  while (1)
+  {
     if (rtt_read_line(line, size, file) == 0)
       return RTT__EOF;
     (*lines)++;
 
     /* Get number of spaces before text */
     *spaces = 0;
-    for (s = line; !((*s == 0) || ((*s != ' ') && (*s != 9))); s++) {
+    for (s = line; !((*s == 0) || ((*s != ' ') && (*s != 9))); s++)
+    {
       (*spaces)++;
       if (*s == 9)
         (*spaces) += 7;
@@ -108,8 +108,10 @@ static int rtt_get_signal_line(
     /* Check the text, if no text read next line */
     if (text[0] == 0)
       continue;
-    if (text[0] == '-') {
-      if (*spaces > 30) {
+    if (text[0] == '-')
+    {
+      if (*spaces > 30)
+      {
         /* Next line is a header */
         if (rtt_read_line(line, size, file) == 0)
           return RTT__EOF;
@@ -123,26 +125,26 @@ static int rtt_get_signal_line(
 }
 
 /*************************************************************************
-*
-* Name:		rtt_crossref_signal()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Prints the cross references to a signal.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_crossref_signal()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Prints the cross references to a signal.
+ *
+ **************************************************************************/
 
-int rtt_crossref_signal(unsigned long ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+int rtt_crossref_signal(unsigned long ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3, void* arg4)
 {
   pwr_tOName hiername;
   int sts;
 
   sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rtt_message('E', "Cross reference not defined");
     return RTT__NOPICTURE;
   }
@@ -152,38 +154,38 @@ int rtt_crossref_signal(unsigned long ctx, pwr_tObjid objid, void* arg1,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_crossref_signal()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Prints the cross references to a signal.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_crossref_signal()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Prints the cross references to a signal.
+ *
+ **************************************************************************/
 
-int rtt_crossref_channel(unsigned long ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+int rtt_crossref_channel(unsigned long ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3, void* arg4)
 {
   pwr_tAName hiername;
   int sts;
   pwr_sAttrRef signal_aref;
 
   sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rtt_message('E', "Cross reference not defined");
     return RTT__NOPICTURE;
   }
   strcat(hiername, ".SigChanCon");
-  sts = gdh_GetObjectInfo(
-      hiername, (pwr_tAddress)&signal_aref, sizeof(signal_aref));
+  sts = gdh_GetObjectInfo(hiername, (pwr_tAddress)&signal_aref, sizeof(signal_aref));
   if (EVEN(sts))
     return sts;
 
   sts = gdh_AttrrefToName(&signal_aref, hiername, sizeof(hiername), cdh_mNName);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rtt_message('E', "Cross reference not defined");
     return RTT__NOPICTURE;
   }
@@ -193,17 +195,17 @@ int rtt_crossref_channel(unsigned long ctx, pwr_tObjid objid, void* arg1,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_crr_signal()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Prints the cross references to a signal.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_crr_signal()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Prints the cross references to a signal.
+ *
+ **************************************************************************/
 
 int rtt_crr_signal(char* filename, char* signalname)
 {
@@ -237,32 +239,39 @@ int rtt_crr_signal(char* filename, char* signalname)
     wildcard = 1;
 
   /* Open file */
-  if (filename == NULL) {
+  if (filename == NULL)
+  {
     /* Open file, first get the volume id */
-    if (!wildcard) {
+    if (!wildcard)
+    {
       sts = gdh_NameToObjid(signalname, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Object not found");
         return RTT__NOPICTURE;
       }
       volid = objid.vid;
-    } else {
+    }
+    else
+    {
       sts = gdh_GetNodeObject(0, &objid);
       if (EVEN(sts))
         return sts;
       volid = objid.vid;
     }
 
-    sprintf(default_filename, "%srtt_crr_%s.dat", rtt_pwr_dir("pwrp_load"),
-        rtt_VolumeIdToStr(volid));
+    sprintf(default_filename, "%srtt_crr_%s.dat", rtt_pwr_dir("pwrp_load"), rtt_VolumeIdToStr(volid));
     rtt_get_defaultfilename(default_filename, filestr, NULL);
     file = fopen(filestr, "r");
-  } else {
+  }
+  else
+  {
     rtt_get_defaultfilename(filename, filestr, ".lis");
     file = fopen(filestr, "r");
   }
 
-  if (file == 0) {
+  if (file == 0)
+  {
     char tmp[300];
     snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", filestr);
     rtt_message('E', tmp);
@@ -270,7 +279,8 @@ int rtt_crr_signal(char* filename, char* signalname)
   }
 
   buff = calloc(1, CRR_BUFF_SIZE);
-  if (!buff) {
+  if (!buff)
+  {
     rtt_message('E', "Unable to allocate memory");
     fclose(file);
     return RTT__NOPICTURE;
@@ -283,31 +293,34 @@ int rtt_crr_signal(char* filename, char* signalname)
   object_spaces = spaces;
 
   first = 1;
-  while (1) {
+  while (1)
+  {
     if ((s = strchr(object, ':')))
       strcpy(objname, s + 1);
     else
       strcpy(objname, object);
 
     sts = rtt_wildcard(signalname, objname);
-    if (!sts) {
+    if (!sts)
+    {
       /* Hit, print this object */
-      if (signalcount == 0) {
+      if (signalcount == 0)
+      {
         rtt_clear_screen();
         buffcnt = sprintf(buff, "Crossreferens list   %s\n\n", show_objname);
       }
       signalcount++;
 
-      sts = rtt_get_signal_line(
-          file, line, sizeof(line), &spaces, object, &lines);
+      sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
       if (EVEN(sts))
         goto finish;
-      while (spaces > object_spaces) {
+      while (spaces > object_spaces)
+      {
         str_trim(line, line);
 
-        if (buffcnt > CRR_BUFF_SIZE - 100) {
-          buffcnt += sprintf(
-              buff + buffcnt, "RTT-E-QUOTAEXC, Crossref quota exceeded");
+        if (buffcnt > CRR_BUFF_SIZE - 100)
+        {
+          buffcnt += sprintf(buff + buffcnt, "RTT-E-QUOTAEXC, Crossref quota exceeded");
           goto finish;
         }
         if (line[0] == '#')
@@ -315,21 +328,21 @@ int rtt_crr_signal(char* filename, char* signalname)
         else
           buffcnt += sprintf(buff + buffcnt, "   %s\n", line);
 
-        sts = rtt_get_signal_line(
-            file, line, sizeof(line), &spaces, object, &lines);
+        sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
         if (EVEN(sts))
           goto finish;
       }
       if (!wildcard)
         goto finish;
-    } else {
-      sts = rtt_get_signal_line(
-          file, line, sizeof(line), &spaces, object, &lines);
+    }
+    else
+    {
+      sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
       if (EVEN(sts))
         goto finish;
-      while (spaces > object_spaces) {
-        sts = rtt_get_signal_line(
-            file, line, sizeof(line), &spaces, object, &lines);
+      while (spaces > object_spaces)
+      {
+        sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
         if (EVEN(sts))
           goto finish;
       }
@@ -339,27 +352,30 @@ int rtt_crr_signal(char* filename, char* signalname)
 finish:
   fclose(file);
 
-  if (signalcount > 0) {
+  if (signalcount > 0)
+  {
     sts = rtt_view(0, 0, buff, "Crossreference list", RTT_VIEWTYPE_BUF);
     return sts;
-  } else {
+  }
+  else
+  {
     rtt_message('E', "Object not found");
     return RTT__NOPICTURE;
   }
 }
 
 /*************************************************************************
-*
-* Name:		rtt_crr_object()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Prints the cross references to a object that is not a signal.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_crr_object()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Prints the cross references to a object that is not a signal.
+ *
+ **************************************************************************/
 
 int rtt_crr_object(char* filename, char* objectname)
 {
@@ -393,32 +409,39 @@ int rtt_crr_object(char* filename, char* objectname)
     wildcard = 1;
 
   /* Open file */
-  if (filename == NULL) {
+  if (filename == NULL)
+  {
     /* Open file, first get the volume id */
-    if (!wildcard) {
+    if (!wildcard)
+    {
       sts = gdh_NameToObjid(objectname, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Object not found");
         return RTT__NOPICTURE;
       }
       volid = objid.vid;
-    } else {
+    }
+    else
+    {
       sts = gdh_GetNodeObject(0, &objid);
       if (EVEN(sts))
         return sts;
       volid = objid.vid;
     }
 
-    sprintf(default_filename, "%srtt_crro_%s.dat", rtt_pwr_dir("pwrp_load"),
-        rtt_VolumeIdToStr(volid));
+    sprintf(default_filename, "%srtt_crro_%s.dat", rtt_pwr_dir("pwrp_load"), rtt_VolumeIdToStr(volid));
     rtt_get_defaultfilename(default_filename, filestr, NULL);
     file = fopen(filestr, "r");
-  } else {
+  }
+  else
+  {
     rtt_get_defaultfilename(filename, filestr, ".lis");
     file = fopen(filestr, "r");
   }
 
-  if (file == 0) {
+  if (file == 0)
+  {
     char tmp[300];
     snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", filestr);
     rtt_message('E', tmp);
@@ -426,7 +449,8 @@ int rtt_crr_object(char* filename, char* objectname)
   }
 
   buff = calloc(1, CRR_BUFF_SIZE);
-  if (!buff) {
+  if (!buff)
+  {
     rtt_message('E', "Unable to allocate memory");
     fclose(file);
     return RTT__NOPICTURE;
@@ -439,7 +463,8 @@ int rtt_crr_object(char* filename, char* objectname)
   object_spaces = spaces;
 
   first = 1;
-  while (1) {
+  while (1)
+  {
     if ((s = strchr(object, ':')))
       strcpy(objname, s + 1);
     else
@@ -449,54 +474,57 @@ int rtt_crr_object(char* filename, char* objectname)
     rtt_toupper(objname, objname);
 
     sts = rtt_wildcard(objectname, objname);
-    if (sts) {
+    if (sts)
+    {
       pwr_tAName subname;
       strcpy(subname, objectname);
       strcat(subname, ".*");
 
       sts = rtt_wildcard(subname, objname);
     }
-    if (!sts) {
+    if (!sts)
+    {
       /* Hit, print this object */
-      if (signalcount == 0) {
+      if (signalcount == 0)
+      {
         rtt_clear_screen();
         buffcnt = sprintf(buff, "Crossreferens list   %s\n\n", show_objname);
       }
       signalcount++;
 
-      sts = rtt_get_signal_line(
-          file, line, sizeof(line), &spaces, object, &lines);
+      sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
       if (EVEN(sts))
         goto finish;
-      while (spaces > object_spaces) {
+      while (spaces > object_spaces)
+      {
         str_trim(line, line);
 
-        if (buffcnt > CRR_BUFF_SIZE - 100) {
-          buffcnt += sprintf(
-              buff + buffcnt, "RTT-E-QUOTAEXC, Crossref quota exceeded");
+        if (buffcnt > CRR_BUFF_SIZE - 100)
+        {
+          buffcnt += sprintf(buff + buffcnt, "RTT-E-QUOTAEXC, Crossref quota exceeded");
           goto finish;
         }
 
         buffcnt += sprintf(buff + buffcnt, " %s\n", line);
 
-        sts = rtt_get_signal_line(
-            file, line, sizeof(line), &spaces, object, &lines);
+        sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
         if (EVEN(sts))
           goto finish;
       }
-    } else {
+    }
+    else
+    {
       if (!wildcard && signalcount)
         goto finish;
 
-      sts = rtt_get_signal_line(
-          file, line, sizeof(line), &spaces, object, &lines);
+      sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
       if (EVEN(sts))
         goto finish;
     }
 
-    while (spaces != object_spaces) {
-      sts = rtt_get_signal_line(
-          file, line, sizeof(line), &spaces, object, &lines);
+    while (spaces != object_spaces)
+    {
+      sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
       if (EVEN(sts))
         goto finish;
     }
@@ -505,31 +533,33 @@ int rtt_crr_object(char* filename, char* objectname)
 finish:
   fclose(file);
 
-  if (signalcount > 0) {
+  if (signalcount > 0)
+  {
     sts = rtt_view(0, 0, buff, "Crossreference list", RTT_VIEWTYPE_BUF);
     return sts;
-  } else {
+  }
+  else
+  {
     rtt_message('E', "Object not found");
     return RTT__NOPICTURE;
   }
 }
 
 /*************************************************************************
-*
-* Name:		rtt_crr_code()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Prints the cross references to a fuction or string
-*		in arithm objects.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_crr_code()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Prints the cross references to a fuction or string
+ *		in arithm objects.
+ *
+ **************************************************************************/
 
-int rtt_crr_code(
-    char* filename, char* str, int brief, int func, int case_sensitive)
+int rtt_crr_code(char* filename, char* str, int brief, int func, int case_sensitive)
 {
   pwr_tFileName default_filename;
   FILE* file;
@@ -555,22 +585,25 @@ int rtt_crr_code(
   char* tst_char;
 
   /* Open file */
-  if (filename == NULL) {
+  if (filename == NULL)
+  {
     sts = gdh_GetNodeObject(0, &objid);
     if (EVEN(sts))
       return sts;
     volid = objid.vid;
 
-    sprintf(default_filename, "%srtt_crrc_%s.dat", rtt_pwr_dir("pwrp_load"),
-        rtt_VolumeIdToStr(volid));
+    sprintf(default_filename, "%srtt_crrc_%s.dat", rtt_pwr_dir("pwrp_load"), rtt_VolumeIdToStr(volid));
     rtt_get_defaultfilename(default_filename, filestr, NULL);
     file = fopen(filestr, "r");
-  } else {
+  }
+  else
+  {
     rtt_get_defaultfilename(filename, filestr, ".lis");
     file = fopen(filestr, "r");
   }
 
-  if (file == 0) {
+  if (file == 0)
+  {
     char tmp[200];
     snprintf(tmp, 200, "Unable to open file \"%s\"", filestr);
     rtt_message('E', tmp);
@@ -579,85 +612,96 @@ int rtt_crr_code(
 
   /* Case sensitive if any lowercase */
   if (!case_sensitive)
-    for (s = str; *s != 0; s++) {
+    for (s = str; *s != 0; s++)
+    {
       if (!isupper(*s))
         case_sensitive = 1;
     }
 
   buff = calloc(1, CRR_BUFF_SIZE);
-  if (!buff) {
+  if (!buff)
+  {
     rtt_message('E', "Unable to allocate memory");
     fclose(file);
     return RTT__NOPICTURE;
   }
 
   /* Get the hierarchy */
-  while (!str_StartsWith(line, " _Obj_ ")) {
-    sts = rtt_get_signal_line(
-        file, line, sizeof(line), &spaces, object, &lines);
+  while (!str_StartsWith(line, " _Obj_ "))
+  {
+    sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
     if (EVEN(sts))
       goto finish;
   }
 
   first = 1;
-  while (1) {
+  while (1)
+  {
     strcpy(objname, &line[7]);
     for (s = objname; !(*s == 32 || *s == 9 || *s == 0); s++)
       ;
     *s = 0;
 
-    sts = rtt_get_signal_line(
-        file, line, sizeof(line), &spaces, object, &lines);
+    sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
     objname_written = 0;
-    while (!str_StartsWith(line, " _Obj_ ")) {
+    while (!str_StartsWith(line, " _Obj_ "))
+    {
       if (!case_sensitive)
         rtt_toupper(tst_line, line);
       else
         strcpy(tst_line, line);
 
       hit = 0;
-      if (!func) {
+      if (!func)
+      {
         if (strstr(tst_line, str) != 0)
           hit = 1;
-      } else {
-        if ((s = strstr(tst_line, str)) != 0) {
+      }
+      else
+      {
+        if ((s = strstr(tst_line, str)) != 0)
+        {
           hit = 1;
           /* Check char after */
           tst_char = s + strlen(str);
           if (isalpha(*tst_char) || isdigit(*tst_char) || *tst_char == '_')
             hit = 0;
           /* Check char before */
-          if (s != tst_line) {
+          if (s != tst_line)
+          {
             tst_char = s - 1;
             if (isalpha(*tst_char) || isdigit(*tst_char) || *tst_char == '_')
               hit = 0;
           }
         }
       }
-      if (hit) {
+      if (hit)
+      {
         /* Hit, print this object */
-        if (signalcount == 0) {
+        if (signalcount == 0)
+        {
           rtt_clear_screen();
           if (func)
-            buffcnt
-                = sprintf(buff, "Crossreferens list Function  \"%s\"\n\n", str);
+            buffcnt = sprintf(buff, "Crossreferens list Function  \"%s\"\n\n", str);
           else
-            buffcnt
-                = sprintf(buff, "Crossreferens list String    \"%s\"\n\n", str);
+            buffcnt = sprintf(buff, "Crossreferens list String    \"%s\"\n\n", str);
         }
         signalcount++;
 
-        if (buffcnt > CRR_BUFF_SIZE - 100) {
-          buffcnt += sprintf(
-              buff + buffcnt, "RTT-E-QUOTAEXC, Crossref quota exceeded");
+        if (buffcnt > CRR_BUFF_SIZE - 100)
+        {
+          buffcnt += sprintf(buff + buffcnt, "RTT-E-QUOTAEXC, Crossref quota exceeded");
           goto finish;
         }
-        if (!objname_written) {
+        if (!objname_written)
+        {
           len = sprintf(buff + buffcnt, " %s", objname);
           objname_written = 1;
-        } else
+        }
+        else
           len = 0;
-        for (i = len; i < 45; i++) {
+        for (i = len; i < 45; i++)
+        {
           strcat(buff + buffcnt + len, " ");
           len++;
         }
@@ -665,22 +709,25 @@ int rtt_crr_code(
 
         buffcnt += sprintf(buff + buffcnt, " \"%s\"\n", line);
 
-        if (brief) {
-          while (!str_StartsWith(line, " _Obj_ ")) {
-            sts = rtt_get_signal_line(
-                file, line, sizeof(line), &spaces, object, &lines);
+        if (brief)
+        {
+          while (!str_StartsWith(line, " _Obj_ "))
+          {
+            sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
             if (EVEN(sts))
               goto finish;
           }
-        } else {
-          sts = rtt_get_signal_line(
-              file, line, sizeof(line), &spaces, object, &lines);
+        }
+        else
+        {
+          sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
           if (EVEN(sts))
             goto finish;
         }
-      } else {
-        sts = rtt_get_signal_line(
-            file, line, sizeof(line), &spaces, object, &lines);
+      }
+      else
+      {
+        sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
         if (EVEN(sts))
           goto finish;
       }
@@ -690,10 +737,13 @@ int rtt_crr_code(
 finish:
   fclose(file);
 
-  if (signalcount > 0) {
+  if (signalcount > 0)
+  {
     sts = rtt_view(0, 0, buff, "Crossreference list", RTT_VIEWTYPE_BUF);
     return sts;
-  } else {
+  }
+  else
+  {
     if (func)
       rtt_message('E', "String not found");
     else
@@ -703,21 +753,20 @@ finish:
 }
 
 /*************************************************************************
-*
-* Name:		rtt_show_signals()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*wildname	I	wildcard name.
-* char		*name		I	object name.
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		rtt_show_signals()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*wildname	I	wildcard name.
+ * char		*name		I	object name.
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int rtt_show_signals(
-    menu_ctx parent_ctx, char* filename, char* windowname, int debug)
+int rtt_show_signals(menu_ctx parent_ctx, char* filename, char* windowname, int debug)
 {
   pwr_tFileName default_filename;
   FILE* file;
@@ -753,32 +802,39 @@ int rtt_show_signals(
     wildcard = 1;
 
   /* Open file */
-  if (filename == NULL) {
+  if (filename == NULL)
+  {
     /* Open file, first get the volume id */
-    if (!wildcard) {
+    if (!wildcard)
+    {
       sts = gdh_NameToObjid(windowname, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Window not found");
         return RTT__NOPICTURE;
       }
       volid = objid.vid;
-    } else {
+    }
+    else
+    {
       sts = gdh_GetNodeObject(0, &objid);
       if (EVEN(sts))
         return sts;
       volid = objid.vid;
     }
 
-    sprintf(default_filename, "%srtt_plc_%s.dat", rtt_pwr_dir("pwrp_load"),
-        rtt_VolumeIdToStr(volid));
+    sprintf(default_filename, "%srtt_plc_%s.dat", rtt_pwr_dir("pwrp_load"), rtt_VolumeIdToStr(volid));
     rtt_get_defaultfilename(default_filename, filestr, NULL);
     file = fopen(filestr, "r");
-  } else {
+  }
+  else
+  {
     rtt_get_defaultfilename(filename, filestr, ".lis");
     file = fopen(filestr, "r");
   }
 
-  if (file == 0) {
+  if (file == 0)
+  {
     char tmp[200];
     snprintf(tmp, 200, "Unable to open file \"%s\"", filestr);
     rtt_message('E', tmp);
@@ -786,25 +842,25 @@ int rtt_show_signals(
   }
 
   /* First line is a header, skip it */
-  sts = rtt_get_signal_line(
-      file, line, sizeof(line), &window_spaces, object, &lines);
+  sts = rtt_get_signal_line(file, line, sizeof(line), &window_spaces, object, &lines);
   if (EVEN(sts))
     return RTT__NOFILE;
 
   /* Get the hierarchy */
-  while (spaces >= 30) {
+  while (spaces >= 30)
+  {
     /* This is still the header */
-    sts = rtt_get_signal_line(
-        file, line, sizeof(line), &spaces, object, &lines);
+    sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
     if (EVEN(sts))
       return RTT__NOFILE;
   }
   window_spaces = spaces;
 
-  while (1) {
-    while (spaces != window_spaces) {
-      sts = rtt_get_signal_line(
-          file, line, sizeof(line), &spaces, object, &lines);
+  while (1)
+  {
+    while (spaces != window_spaces)
+    {
+      sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
       if (EVEN(sts))
         goto finish;
     }
@@ -812,14 +868,15 @@ int rtt_show_signals(
     rtt_toupper(window, window);
 
     sts = rtt_wildcard(windowname, window);
-    if (!sts) {
+    if (!sts)
+    {
       window_found = 1;
       /* Hit, print the window */
       /* Get objid for the object */
       sts = gdh_NameToObjid(window, &objid);
-      if (EVEN(sts)) {
-        sts = rtt_get_signal_line(
-            file, line, sizeof(line), &spaces, object, &lines);
+      if (EVEN(sts))
+      {
+        sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
         if (EVEN(sts))
           goto finish;
         continue;
@@ -847,37 +904,38 @@ int rtt_show_signals(
       if (ODD(sts))
         strcat(title, " *");
 
-      if (!debug) {
-        sts = rtt_menu_list_add(&menulist, index, 0, title,
-            &rtt_hierarchy_child, &rtt_object_parameters, &rtt_crossref_signal,
-            objid, 0, 0, 0, 0);
+      if (!debug)
+      {
+        sts = rtt_menu_list_add(&menulist, index, 0, title, &rtt_hierarchy_child, &rtt_object_parameters,
+                                &rtt_crossref_signal, objid, 0, 0, 0, 0);
         if (EVEN(sts))
           return sts;
         index++;
       }
 
       /* Find the signal list */
-      sts = rtt_get_signal_line(
-          file, line, sizeof(line), &spaces, object, &lines);
+      sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
       if (EVEN(sts))
         goto finish;
-      while (spaces > window_spaces) {
-        if (streq(object, "Signals")) {
+      while (spaces > window_spaces)
+      {
+        if (streq(object, "Signals"))
+        {
           /* This is the signals */
-          sts = rtt_get_signal_line(
-              file, line, sizeof(line), &spaces, object, &lines);
+          sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
           if (EVEN(sts))
             goto finish;
           lines = 1;
-          while ((spaces > window_spaces) && (lines == 1)) {
+          while ((spaces > window_spaces) && (lines == 1))
+          {
             /* Insert the object in menulist */
 
             /* Get objid for the object */
             sts = gdh_NameToObjid(object, &objid);
-            if (EVEN(sts)) {
+            if (EVEN(sts))
+            {
               /* End of this list, read next line and continue */
-              sts = rtt_get_signal_line(
-                  file, line, sizeof(line), &spaces, object, &lines);
+              sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
               if (EVEN(sts))
                 goto finish;
               continue;
@@ -900,41 +958,43 @@ int rtt_show_signals(
             strcat(title, " ");
             strcat(title, classname);
 
-            if (!debug) {
-              sts = rtt_menu_list_add(&menulist, index, 0, title,
-                  &rtt_hierarchy_child, &rtt_object_parameters,
-                  &rtt_crossref_signal, objid, 0, 0, 0, 0);
+            if (!debug)
+            {
+              sts = rtt_menu_list_add(&menulist, index, 0, title, &rtt_hierarchy_child,
+                                      &rtt_object_parameters, &rtt_crossref_signal, objid, 0, 0, 0, 0);
               if (EVEN(sts))
                 return sts;
               index++;
-            } else {
-              sts = rtt_debug_object_add(
-                  objid, (rtt_t_menu_upd**)&menulist, &index, &one, 0, 0);
+            }
+            else
+            {
+              sts = rtt_debug_object_add(objid, (rtt_t_menu_upd**)&menulist, &index, &one, 0, 0);
               if (EVEN(sts))
                 return sts;
             }
 
-            sts = rtt_get_signal_line(
-                file, line, sizeof(line), &spaces, object, &lines);
+            sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
             if (EVEN(sts))
               goto finish;
             /* Check if end of signals !! */
           }
-        } else {
-          sts = rtt_get_signal_line(
-              file, line, sizeof(line), &spaces, object, &lines);
+        }
+        else
+        {
+          sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
           if (EVEN(sts))
             goto finish;
         }
       }
       if (!wildcard)
         goto finish;
-    } else {
+    }
+    else
+    {
       if (window_found)
         goto finish;
 
-      sts = rtt_get_signal_line(
-          file, line, sizeof(line), &spaces, object, &lines);
+      sts = rtt_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
       if (EVEN(sts))
         goto finish;
     }
@@ -943,22 +1003,24 @@ int rtt_show_signals(
 finish:
   fclose(file);
 
-  if (menulist != 0) {
+  if (menulist != 0)
+  {
     strcpy(title, "LIST OF SIGNALS");
     /*	  sts = rtt_menu_bubblesort( menulist);*/
     if (!debug)
-      sts = rtt_menu_new(
-          parent_ctx, pwr_cNObjid, &menulist, title, 0, RTT_MENUTYPE_DYN);
+      sts = rtt_menu_new(parent_ctx, pwr_cNObjid, &menulist, title, 0, RTT_MENUTYPE_DYN);
     else
-      sts = rtt_menu_upd_new(parent_ctx, pwr_cNObjid,
-          (rtt_t_menu_upd**)&menulist, title, 0, RTT_MENUTYPE_DYN);
+      sts =
+          rtt_menu_upd_new(parent_ctx, pwr_cNObjid, (rtt_t_menu_upd**)&menulist, title, 0, RTT_MENUTYPE_DYN);
     if (sts == RTT__FASTBACK)
       return sts;
     else if (sts == RTT__BACKTOCOLLECT)
       return sts;
     else if (EVEN(sts))
       return sts;
-  } else {
+  }
+  else
+  {
     rtt_message('E', "No windows found");
     return RTT__NOPICTURE;
   }
@@ -967,19 +1029,19 @@ finish:
 }
 
 /*************************************************************************
-*
-* Name:		rtt_VolumeIdToStr()
-*
-* Type		* char
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Converts an VolumeId to a string.
-*	The returned string is static and must be used befor next call
-*	of the function.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_VolumeIdToStr()
+ *
+ * Type		* char
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Converts an VolumeId to a string.
+ *	The returned string is static and must be used befor next call
+ *	of the function.
+ *
+ **************************************************************************/
 
 static char* rtt_VolumeIdToStr(pwr_tVolumeId volumeid)
 {
@@ -987,8 +1049,7 @@ static char* rtt_VolumeIdToStr(pwr_tVolumeId volumeid)
   unsigned char volid[4];
 
   memcpy(&volid, &volumeid, sizeof(volid));
-  sprintf(
-      str, "%3.3u_%3.3u_%3.3u_%3.3u", volid[3], volid[2], volid[1], volid[0]);
+  sprintf(str, "%3.3u_%3.3u_%3.3u_%3.3u", volid[3], volid[2], volid[1], volid[0]);
   return str;
 }
 

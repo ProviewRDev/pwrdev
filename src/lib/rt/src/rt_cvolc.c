@@ -76,22 +76,26 @@ static gdb_sObject* fetch(pwr_tStatus* sts, gdb_sVolume* vp, qcom_sPut* put)
 
   if (EVEN(lsts))
     pwr_Return(NULL, sts, lsts);
-  if (EVEN(lsts = rsp->sts)) {
+  if (EVEN(lsts = rsp->sts))
+  {
     net_Free(NULL, rsp);
     pwr_Return(NULL, sts, lsts);
   }
   if (!vp->l.flags.b.isConnected)
     pwr_Return(NULL, sts, GDH__CONNLOST);
 
-  for (i = 0; i < rsp->count; i++) {
+  for (i = 0; i < rsp->count; i++)
+  {
     go = rsp->g[i];
-    if (vp->g.vid != go.oid.vid) {
+    if (vp->g.vid != go.oid.vid)
+    {
       net_Free(NULL, rsp);
       pwr_Return(NULL, sts, GDH__REMOTEMOUNT);
     }
 
     op = cvol_LoadObject(&lsts, np, vp, &go);
-    if (cdh_ObjidIsEqual(go.oid, rsp->oid)) {
+    if (cdh_ObjidIsEqual(go.oid, rsp->oid))
+    {
       /* This is the referenced object.  */
       rop = op;
       if (sts != NULL)
@@ -106,13 +110,12 @@ static gdb_sObject* fetch(pwr_tStatus* sts, gdb_sVolume* vp, qcom_sPut* put)
   return rop;
 }
 
-void* cvolc_GetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np,
-    const pwr_sAttrRef* arp, gdb_sCclass* ccp, const pwr_sAttrRef* rarp,
-    pwr_tUInt32 ridx, mvol_sAttribute* ap, void* p, int size)
+void* cvolc_GetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np, const pwr_sAttrRef* arp, gdb_sCclass* ccp,
+                          const pwr_sAttrRef* rarp, pwr_tUInt32 ridx, mvol_sAttribute* ap, void* p, int size)
 {
   qcom_sQid tgt;
   qcom_sPut put;
-  net_sGetObjectInfo* smp; /* Send message.  */
+  net_sGetObjectInfo* smp;  /* Send message.  */
   net_sGetObjectInfoR* rmp; /* Receive message.  */
   pwr_tBoolean equal;
   ndc_sRemoteToNative* tbl = NULL;
@@ -123,10 +126,13 @@ void* cvolc_GetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np,
   gdb_AssumeUnlocked;
   pwr_Assert(sts != NULL);
 
-  if (ccp == NULL) {
+  if (ccp == NULL)
+  {
     equal = 1;
     rarp = arp;
-  } else {
+  }
+  else
+  {
     equal = 0;
     cmvolc_AssumeLocked(ccp);
   }
@@ -140,40 +146,51 @@ void* cvolc_GetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np,
 
   rmp = net_Request(sts, &tgt, &put, NULL, net_eMsg_getObjectInfoR, 0, 0);
 
-  if (rmp == NULL) {
+  if (rmp == NULL)
+  {
     return NULL;
-  } else {
-    if (ODD(rmp->sts)) {
+  }
+  else
+  {
+    if (ODD(rmp->sts))
+    {
       size = MIN(arp->Size, size);
-      if (ccp == NULL || equal) {
+      if (ccp == NULL || equal)
+      {
         gdb_sClass* cp;
         cid.pwr = arp->Body;
         cid.c.bix = 0; /* To get the class id.  */
         cp = hash_Search(sts, gdbroot->cid_ht, &cid.pwr);
-        if (cp != NULL) {
-          ndc_ConvertData(sts, np, cp, arp, p, rmp->info, (pwr_tUInt32*)&size,
-              ndc_eOp_decode, arp->Offset, 0);
+        if (cp != NULL)
+        {
+          ndc_ConvertData(sts, np, cp, arp, p, rmp->info, (pwr_tUInt32*)&size, ndc_eOp_decode, arp->Offset,
+                          0);
         }
-      } else {
-        if (!ccp->flags.b.rnConv && ap->aop == NULL) { /* whole object */
+      }
+      else
+      {
+        if (!ccp->flags.b.rnConv && ap->aop == NULL)
+        { /* whole object */
 
           gdb_ScopeLock
           {
-            if (!ccp->flags.b.rnConv) {
+            if (!ccp->flags.b.rnConv)
+            {
               if (ap->cp == NULL)
                 errh_Bugcheck(GDH__WEIRD, "can't get class");
 
-              tbl = pool_Alloc(
-                  sts, gdbroot->pool, sizeof(*tbl) * ap->cp->acount);
+              tbl = pool_Alloc(sts, gdbroot->pool, sizeof(*tbl) * ap->cp->acount);
               if (tbl == NULL)
                 break;
 
-              ndc_UpdateRemoteToNativeTable(
-                  sts, tbl, ap->cp->acount, ap->cp, ccp, np->nid);
-              if (ODD(*sts)) {
+              ndc_UpdateRemoteToNativeTable(sts, tbl, ap->cp->acount, ap->cp, ccp, np->nid);
+              if (ODD(*sts))
+              {
                 ccp->rnConv = pool_Reference(NULL, gdbroot->pool, tbl);
                 ccp->flags.b.rnConv = 1;
-              } else {
+              }
+              else
+              {
                 pool_Free(NULL, gdbroot->pool, tbl);
                 tbl = NULL;
               }
@@ -183,34 +200,37 @@ void* cvolc_GetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np,
         }
 
         rsize = rarp->Size;
-        ndc_ConvertRemoteData(sts, np, ccp, rarp, rmp->info, rmp->info,
-            (pwr_tUInt32*)&rsize, ndc_eOp_decode, rarp->Offset, 0);
-        if (ODD(*sts)) {
-          if (ccp->flags.b.rnConv) {
-            if (tbl == NULL) {
+        ndc_ConvertRemoteData(sts, np, ccp, rarp, rmp->info, rmp->info, (pwr_tUInt32*)&rsize, ndc_eOp_decode,
+                              rarp->Offset, 0);
+        if (ODD(*sts))
+        {
+          if (ccp->flags.b.rnConv)
+          {
+            if (tbl == NULL)
+            {
               tbl = pool_Address(sts, gdbroot->pool, ccp->rnConv);
               if (tbl == NULL)
-                errh_Bugcheck(
-                    *sts, "failed getting address for conversion table");
+                errh_Bugcheck(*sts, "failed getting address for conversion table");
             }
             gdb_ScopeLock
             {
-              ndc_ConvertRemoteToNativeTable(sts, ccp, tbl, rarp, arp, p,
-                  rmp->info, (pwr_tUInt32*)&size, arp->Offset, 0, 0, &first,
-                  np->nid);
+              ndc_ConvertRemoteToNativeTable(sts, ccp, tbl, rarp, arp, p, rmp->info, (pwr_tUInt32*)&size,
+                                             arp->Offset, 0, 0, &first, np->nid);
             }
             gdb_ScopeUnlock;
-
-          } else {
+          }
+          else
+          {
             /* The object pointer may be invalid after gdb has been open, reset
              * it */
             ap->op = NULL;
-            ndc_ConvertRemoteToNativeData(sts, ccp, ridx, ap, rarp, arp, p,
-                rmp->info, (pwr_tUInt32*)&size, arp->Offset, 0, 0, np->nid);
+            ndc_ConvertRemoteToNativeData(sts, ccp, ridx, ap, rarp, arp, p, rmp->info, (pwr_tUInt32*)&size,
+                                          arp->Offset, 0, 0, np->nid);
           }
         }
       }
-    } else if (sts != NULL)
+    }
+    else if (sts != NULL)
       *sts = rmp->sts;
     net_Free(NULL, rmp);
     return p;
@@ -238,8 +258,8 @@ void cvolc_LockObject(pwr_tStatus* sts, gdb_sObject* op)
 
 /* Fetch an object identified by its name.  */
 
-gdb_sObject* cvolc_NameToObject(pwr_tStatus* sts, gdb_sObject* p_op,
-    cdh_sParseName* pn, int index, pwr_tBitMask trans)
+gdb_sObject* cvolc_NameToObject(pwr_tStatus* sts, gdb_sObject* p_op, cdh_sParseName* pn, int index,
+                                pwr_tBitMask trans)
 {
   net_sNameToObject* mp;
   qcom_sPut put;
@@ -271,7 +291,8 @@ gdb_sObject* cvolc_NameToObject(pwr_tStatus* sts, gdb_sObject* p_op,
   mp->len = len;
   mp->rcount = mp->lcount = net_cObjectMaxCount / 2;
 
-  for (i = index, s = mp->name; i < pn->nObject; i++) {
+  for (i = index, s = mp->name; i < pn->nObject; i++)
+  {
     memcpy(s, pn->object[i].name.norm, pn->object[i].name.pack.c.len);
     s += pn->object[i].name.pack.c.len;
     *s++ = '-';
@@ -283,8 +304,8 @@ gdb_sObject* cvolc_NameToObject(pwr_tStatus* sts, gdb_sObject* p_op,
 
 /* Fetch an object identified by its object identifier.  */
 
-gdb_sObject* cvolc_OidToObject(pwr_tStatus* sts, gdb_sVolume* vp,
-    pwr_tObjid oid, pwr_tBitMask trans, cvol_eHint hint)
+gdb_sObject* cvolc_OidToObject(pwr_tStatus* sts, gdb_sVolume* vp, pwr_tObjid oid, pwr_tBitMask trans,
+                               cvol_eHint hint)
 {
   net_sOidToObject* mp;
   qcom_sPut put;
@@ -298,7 +319,8 @@ gdb_sObject* cvolc_OidToObject(pwr_tStatus* sts, gdb_sVolume* vp,
   mp->oid = oid;
   mp->trans = trans;
 
-  switch (hint) {
+  switch (hint)
+  {
   case cvol_eHint_prev:
     mp->lcount = net_cObjectMaxCount;
     mp->rcount = 0;
@@ -321,9 +343,9 @@ gdb_sObject* cvolc_OidToObject(pwr_tStatus* sts, gdb_sVolume* vp,
 /* Update the object body of an object residing on
    a remote node.  */
 
-pwr_tBoolean cvolc_SetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np,
-    const pwr_sAttrRef* arp, const gdb_sCclass* ccp, const pwr_sAttrRef* rarp,
-    pwr_tUInt32 ridx, mvol_sAttribute* ap, const void* p, int size)
+pwr_tBoolean cvolc_SetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np, const pwr_sAttrRef* arp,
+                                 const gdb_sCclass* ccp, const pwr_sAttrRef* rarp, pwr_tUInt32 ridx,
+                                 mvol_sAttribute* ap, const void* p, int size)
 {
   qcom_sQid tgt;
   qcom_sPut put;
@@ -336,10 +358,13 @@ pwr_tBoolean cvolc_SetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np,
 
   gdb_AssumeUnlocked;
 
-  if (ccp == NULL) {
+  if (ccp == NULL)
+  {
     equal = 1;
     rarp = arp;
-  } else {
+  }
+  else
+  {
     equal = 0;
     cmvolc_AssumeLocked(ccp);
   }
@@ -358,27 +383,32 @@ pwr_tBoolean cvolc_SetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np,
   smp->size = rarp->Size;
   smp->aref = *rarp;
 
-  if (equal) {
+  if (equal)
+  {
     gdb_sClass* cp;
     cid.pwr = arp->Body;
     cid.c.bix = 0; /* To get the class id.  */
     cp = hash_Search(sts, gdbroot->cid_ht, &cid.pwr);
-    if (cp != NULL) {
-      ndc_ConvertData(sts, np, cp, arp, smp->info, p, (pwr_tUInt32*)&size,
-          ndc_eOp_encode, arp->Offset, 0);
+    if (cp != NULL)
+    {
+      ndc_ConvertData(sts, np, cp, arp, smp->info, p, (pwr_tUInt32*)&size, ndc_eOp_encode, arp->Offset, 0);
     }
-  } else {
+  }
+  else
+  {
     /* The object pointer may be invalid after gdb has been open, reset it */
     ap->op = NULL;
     rsize = rarp->Size;
-    ndc_ConvertNativeToRemoteData(sts, ccp, ridx, ap, rarp, arp, smp->info, p,
-        (pwr_tUInt32*)&rsize, rarp->Offset, 0, 0, np->nid);
-    if (ODD(*sts)) {
+    ndc_ConvertNativeToRemoteData(sts, ccp, ridx, ap, rarp, arp, smp->info, p, (pwr_tUInt32*)&rsize,
+                                  rarp->Offset, 0, 0, np->nid);
+    if (ODD(*sts))
+    {
       rsize = rarp->Size;
-      ndc_ConvertRemoteData(sts, np, ccp, rarp, smp->info, smp->info,
-          (pwr_tUInt32*)&rsize, ndc_eOp_encode, rarp->Offset, 0);
+      ndc_ConvertRemoteData(sts, np, ccp, rarp, smp->info, smp->info, (pwr_tUInt32*)&rsize, ndc_eOp_encode,
+                            rarp->Offset, 0);
     }
-    if (EVEN(*sts)) {
+    if (EVEN(*sts))
+    {
       net_Free(NULL, smp);
       return NO;
     }
@@ -386,9 +416,12 @@ pwr_tBoolean cvolc_SetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np,
 
   rmp = net_Request(sts, &tgt, &put, NULL, net_eMsg_setObjectInfoR, 0, 0);
 
-  if (rmp == NULL) {
+  if (rmp == NULL)
+  {
     return NO;
-  } else {
+  }
+  else
+  {
     if (sts != NULL)
       *sts = rmp->sts;
     net_Free(NULL, rmp);
@@ -443,8 +476,8 @@ void cvolc_UnlockObject(pwr_tStatus* sts, gdb_sObject* op)
   cvol_Qtrim(vqp);
 }
 
-void cvolc_FileList(pwr_tStatus* sts, gdb_sObject* p_op, char* dir,
-    char* pattern, pwr_tString40* filelist[], int* filecnt)
+void cvolc_FileList(pwr_tStatus* sts, gdb_sObject* p_op, char* dir, char* pattern, pwr_tString40* filelist[],
+                    int* filecnt)
 {
   net_sFileList* mp;
   qcom_sPut put;
@@ -457,12 +490,14 @@ void cvolc_FileList(pwr_tStatus* sts, gdb_sObject* p_op, char* dir,
 
   gdb_AssumeLocked;
 
-  if (!p_op->l.flags.b.isCached) {
+  if (!p_op->l.flags.b.isCached)
+  {
     *sts = GDH__NOSUCHOBJ;
     return;
   }
   vp = pool_Address(NULL, gdbroot->pool, p_op->l.vr);
-  if (vp == NULL) {
+  if (vp == NULL)
+  {
     *sts = GDH__NOSUCHOBJ;
     return;
   }
@@ -486,11 +521,13 @@ void cvolc_FileList(pwr_tStatus* sts, gdb_sObject* p_op, char* dir,
 
   gdb_Lock;
 
-  if (EVEN(lsts)) {
+  if (EVEN(lsts))
+  {
     *sts = lsts;
     return;
   }
-  if (EVEN(rsp->sts)) {
+  if (EVEN(rsp->sts))
+  {
     *sts = rsp->sts;
     net_Free(NULL, rsp);
     return;
@@ -503,8 +540,8 @@ void cvolc_FileList(pwr_tStatus* sts, gdb_sObject* p_op, char* dir,
   net_Free(NULL, rsp);
 }
 
-void cvolc_ClassList(pwr_tStatus* sts, pwr_tNid nid, int cidcnt, pwr_tCid* cid,
-    int attrobjects, pwr_tAttrRef* classlist[], int* listcnt)
+void cvolc_ClassList(pwr_tStatus* sts, pwr_tNid nid, int cidcnt, pwr_tCid* cid, int attrobjects,
+                     pwr_tAttrRef* classlist[], int* listcnt)
 {
   gdb_sNode* np = NULL;
   net_sClassList* mp;
@@ -529,8 +566,7 @@ void cvolc_ClassList(pwr_tStatus* sts, pwr_tNid nid, int cidcnt, pwr_tCid* cid,
 
   tgt = np->handler;
 
-  mp = net_Alloc(sts, &put, sizeof(*mp) + (cidcnt - 1) * sizeof(pwr_tCid),
-      net_eMsg_classList);
+  mp = net_Alloc(sts, &put, sizeof(*mp) + (cidcnt - 1) * sizeof(pwr_tCid), net_eMsg_classList);
   if (mp == NULL)
     return;
 
@@ -542,7 +578,8 @@ void cvolc_ClassList(pwr_tStatus* sts, pwr_tNid nid, int cidcnt, pwr_tCid* cid,
 
   if (EVEN(*sts))
     return;
-  if (EVEN(rsp->sts)) {
+  if (EVEN(rsp->sts))
+  {
     *sts = rsp->sts;
     net_Free(NULL, rsp);
     return;

@@ -43,10 +43,10 @@
 
 class XAttNav;
 
-class XCrr {
+class XCrr
+{
 public:
-  XCrr(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user,
-      int* xa_sts);
+  XCrr(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user, int* xa_sts);
   virtual ~XCrr();
   void* parent_ctx;
   pwr_sAttrRef objar;
@@ -58,27 +58,19 @@ public:
   void* object;
   void (*close_cb)(void*, void*);
   void (*redraw_cb)(void*);
-  void (*popup_menu_cb)(
-      void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  void (*popup_menu_cb)(void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
   void (*start_trace_cb)(void*, pwr_tObjid, char*);
   void* client_data;
   brow_tObject input_node;
   char input_name[80];
 
-  virtual void pop()
-  {
-  }
-  virtual void print()
-  {
-  }
+  virtual void pop() {}
+  virtual void print() {}
 
   int crossref();
-  void activate_print()
-  {
-    print();
-  }
-  static void xcrr_popup_menu_cb(void* ctx, pwr_sAttrRef attrref,
-      unsigned long item_type, unsigned long utility, char* arg, int x, int y);
+  void activate_print() { print(); }
+  static void xcrr_popup_menu_cb(void* ctx, pwr_sAttrRef attrref, unsigned long item_type,
+                                 unsigned long utility, char* arg, int x, int y);
   static void xcrr_start_trace_cb(void* ctx, pwr_tObjid objid, char* name);
   static void xcrr_close_cb(void* ctx);
   static int init_cb(void* ctx);

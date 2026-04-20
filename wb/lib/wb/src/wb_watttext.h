@@ -45,10 +45,11 @@
 #include "wb_ldh.h"
 #include "wb_utility.h"
 
-class WAttText {
+class WAttText
+{
 public:
-  WAttText(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref,
-      int wa_editmode, pwr_tStatus* status);
+  WAttText(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref, int wa_editmode,
+           pwr_tStatus* status);
   virtual ~WAttText();
   void* parent_ctx;
   ldh_tSesContext ldhses;
@@ -60,21 +61,11 @@ public:
   wb_eUtility utility;
   CoWow* wow;
 
-  virtual void message(char severity, const char* message)
-  {
-  }
-  virtual void pop()
-  {
-  }
-  virtual void set_editmode(int editmode, ldh_tSesContext ldhses)
-  {
-  }
-  virtual void print(const char* title)
-  {
-  }
-  virtual void set_attr_value()
-  {
-  }
+  virtual void message(char severity, const char* message) {}
+  virtual void pop() {}
+  virtual void set_editmode(int editmode, ldh_tSesContext ldhses) {}
+  virtual void print(const char* title) {}
+  virtual void set_attr_value() {}
 
   void activate_print();
   void activate_exit();

@@ -43,24 +43,23 @@
 /*_*
   @aref windowplc WindowPlc
 */
-#define windowplc_exec(object)                                                 \
-  if (object->ScanOff)                                                         \
-    return;                                                                    \
-  pwr_tTime wplc_exec_start, wplc_exec_end;                                    \
+#define windowplc_exec(object)                                                                               \
+  if (object->ScanOff)                                                                                       \
+    return;                                                                                                  \
+  pwr_tTime wplc_exec_start, wplc_exec_end;                                                                  \
   time_GetTimeMonotonic(&wplc_exec_start)
 
-
-#define windowplc_exec2(object)                                                \
-  time_GetTimeMonotonic(&wplc_exec_end);                                       \
-  object->ExecTime = time_AdiffToFloat(&wplc_exec_end, &wplc_exec_start);      \
-  if (object->ExecTime > object->MaxExecTime)                                  \
-    object->MaxExecTime = object->ExecTime;   
+#define windowplc_exec2(object)                                                                              \
+  time_GetTimeMonotonic(&wplc_exec_end);                                                                     \
+  object->ExecTime = time_AdiffToFloat(&wplc_exec_end, &wplc_exec_start);                                    \
+  if (object->ExecTime > object->MaxExecTime)                                                                \
+    object->MaxExecTime = object->ExecTime;
 
 /*_*
   @aref windowcond WindowCond
 */
-#define windowcond_exec(object)                                                \
-  if (object->ScanOff)                                                         \
+#define windowcond_exec(object)                                                                              \
+  if (object->ScanOff)                                                                                       \
     return;
 
 #define windowcond_exec2(object)
@@ -68,8 +67,8 @@
 /*_*
   @aref windoworderact WindowOrderact
 */
-#define windoworderact_exec(object)                                            \
-  if (object->ScanOff)                                                         \
+#define windoworderact_exec(object)                                                                          \
+  if (object->ScanOff)                                                                                       \
     return;
 
 #define windoworderact_exec2(object)
@@ -77,8 +76,8 @@
 /*_*
   @aref windowsubstep WindowSubstep
 */
-#define windowsubstep_exec(object)                                             \
-  if (object->ScanOff)                                                         \
+#define windowsubstep_exec(object)                                                                           \
+  if (object->ScanOff)                                                                                       \
     return;
 
 #define windowsubstep_exec2(object)
@@ -96,8 +95,8 @@
 /*_*
   @aref iosimulflag IOSimulFlag
 */
-#define IOSimulFlag_exec(object)                                               \
-  if (tp->pp->IOHandler)                                                       \
+#define IOSimulFlag_exec(object)                                                                             \
+  if (tp->pp->IOHandler)                                                                                     \
     object->Status = tp->pp->IOHandler->IOSimulFlag;
 
 /*_*
@@ -113,44 +112,37 @@
 /*_*
   @aref sin Sin
 */
-#define Sin_exec(object, in)                                                   \
-  object->ActVal = object->FactorVal * sinf(object->FactorIn * in);
+#define Sin_exec(object, in) object->ActVal = object->FactorVal * sinf(object->FactorIn * in);
 
 /*_*
   @aref sin Cos
 */
-#define Cos_exec(object, in)                                                   \
-  object->ActVal = object->FactorVal * cosf(object->FactorIn * in);
+#define Cos_exec(object, in) object->ActVal = object->FactorVal * cosf(object->FactorIn * in);
 
 /*_*
   @aref sin Tan
 */
-#define Tan_exec(object, in)                                                   \
-  object->ActVal = object->FactorVal * tanf(object->FactorIn * in);
+#define Tan_exec(object, in) object->ActVal = object->FactorVal * tanf(object->FactorIn * in);
 
 /*_*
   @aref asin ASin
 */
-#define ASin_exec(object, in)                                                  \
-  object->ActVal = object->FactorVal * asinf(object->FactorIn * in);
+#define ASin_exec(object, in) object->ActVal = object->FactorVal * asinf(object->FactorIn * in);
 
 /*_*
   @aref sin ACos
 */
-#define ACos_exec(object, in)                                                  \
-  object->ActVal = object->FactorVal * acosf(object->FactorIn * in);
+#define ACos_exec(object, in) object->ActVal = object->FactorVal * acosf(object->FactorIn * in);
 
 /*_*
   @aref sin ATan
 */
-#define ATan_exec(object, in)                                                  \
-  object->ActVal = object->FactorVal * atanf(object->FactorIn * in);
+#define ATan_exec(object, in) object->ActVal = object->FactorVal * atanf(object->FactorIn * in);
 
 /*_*
   @aref sqrt Sqrt
 */
-#define Sqrt_exec(object, in)                                                  \
-  object->ActVal = object->FactorVal * sqrtf(object->FactorIn * in);
+#define Sqrt_exec(object, in) object->ActVal = object->FactorVal * sqrtf(object->FactorIn * in);
 
 /*_*
   @aref even Even
@@ -165,20 +157,17 @@
 /*_*
   @aref ln Ln
 */
-#define Ln_exec(object, in)                                                    \
-  object->ActVal = object->FactorVal * logf(object->FactorIn * in);
+#define Ln_exec(object, in) object->ActVal = object->FactorVal * logf(object->FactorIn * in);
 
 /*_*
   @aref log Log
 */
-#define Log_exec(object, in)                                                   \
-  object->ActVal = object->FactorVal * log10f(object->FactorIn * in);
+#define Log_exec(object, in) object->ActVal = object->FactorVal * log10f(object->FactorIn * in);
 
 /*_*
   @aref exp Exp
 */
-#define Exp_exec(object, in)                                                   \
-  object->ActVal = object->FactorVal * expf(object->FactorIn * in);
+#define Exp_exec(object, in) object->ActVal = object->FactorVal * expf(object->FactorIn * in);
 
 /*_*
   @aref bwand BwAnd
@@ -203,86 +192,84 @@
 /*_*
   @aref getdatarefp GetDataRefp
 */
-#define GetDataRefp_exec(object, in)                                           \
-  memcpy(&object->ActVal, &in, sizeof(object->ActVal));
+#define GetDataRefp_exec(object, in) memcpy(&object->ActVal, &in, sizeof(object->ActVal));
 
 /*_*
   @aref getdatainput GetDatainput
 */
-#define GetDataInput_exec(object, in)                                          \
-  if (in)                                                                      \
+#define GetDataInput_exec(object, in)                                                                        \
+  if (in)                                                                                                    \
     memcpy(&object->OutDataP, in, 12);
 
 /*_*
   @aref pulsetrain PulseTrain
 */
-#define PulseTrain_exec(o)                                                     \
-  o->P30s = (tp->before_scan.tv_sec / 15) & 1 ? 1 : 0;                         \
-  o->P10s = (tp->before_scan.tv_sec / 5) & 1 ? 1 : 0;                          \
-  o->P5s                                                                       \
-      = ((tp->before_scan.tv_sec * 10 + tp->before_scan.tv_nsec / 100000000)   \
-            / 25)                                                              \
-          & 1                                                                  \
-      ? 1                                                                      \
-      : 0;                                                                     \
-  o->P2s = tp->before_scan.tv_sec & 1 ? 1 : 0;                                 \
-  o->P1s = (tp->before_scan.tv_nsec / 500000000) & 1 ? 1 : 0;                  \
-  o->P500ms = (tp->before_scan.tv_nsec / 250000000) & 1 ? 1 : 0;               \
-  o->P200ms = (tp->before_scan.tv_nsec / 100000000) & 1 ? 1 : 0;               \
-  o->P100ms = (tp->before_scan.tv_nsec / 50000000) & 1 ? 1 : 0;                \
-  o->P50ms = (tp->before_scan.tv_nsec / 25000000) & 1 ? 1 : 0;                 \
-  o->P20ms = (tp->before_scan.tv_nsec / 10000000) & 1 ? 1 : 0;                 \
-  o->P10ms = (tp->before_scan.tv_nsec / 5000000) & 1 ? 1 : 0;                  \
-  o->P5ms = (tp->before_scan.tv_nsec / 2500000) & 1 ? 1 : 0;                   \
-  o->P2ms = (tp->before_scan.tv_nsec / 1000000) & 1 ? 1 : 0;                   \
+#define PulseTrain_exec(o)                                                                                   \
+  o->P30s = (tp->before_scan.tv_sec / 15) & 1 ? 1 : 0;                                                       \
+  o->P10s = (tp->before_scan.tv_sec / 5) & 1 ? 1 : 0;                                                        \
+  o->P5s = ((tp->before_scan.tv_sec * 10 + tp->before_scan.tv_nsec / 100000000) / 25) & 1 ? 1 : 0;           \
+  o->P2s = tp->before_scan.tv_sec & 1 ? 1 : 0;                                                               \
+  o->P1s = (tp->before_scan.tv_nsec / 500000000) & 1 ? 1 : 0;                                                \
+  o->P500ms = (tp->before_scan.tv_nsec / 250000000) & 1 ? 1 : 0;                                             \
+  o->P200ms = (tp->before_scan.tv_nsec / 100000000) & 1 ? 1 : 0;                                             \
+  o->P100ms = (tp->before_scan.tv_nsec / 50000000) & 1 ? 1 : 0;                                              \
+  o->P50ms = (tp->before_scan.tv_nsec / 25000000) & 1 ? 1 : 0;                                               \
+  o->P20ms = (tp->before_scan.tv_nsec / 10000000) & 1 ? 1 : 0;                                               \
+  o->P10ms = (tp->before_scan.tv_nsec / 5000000) & 1 ? 1 : 0;                                                \
+  o->P5ms = (tp->before_scan.tv_nsec / 2500000) & 1 ? 1 : 0;                                                 \
+  o->P2ms = (tp->before_scan.tv_nsec / 1000000) & 1 ? 1 : 0;                                                 \
   o->P1ms = (tp->before_scan.tv_nsec / 500000) & 1 ? 1 : 0;
 
 /*_*
   @aref pulsetrainm PulseTrainM
 */
-#define PulseTrainM_exec(o)                                                    \
-  o->P128s = (tp->before_scan.tv_sec / 64) & 1 ? 1 : 0;                        \
-  o->P64s = (tp->before_scan.tv_sec / 32) & 1 ? 1 : 0;                         \
-  o->P32s = (tp->before_scan.tv_sec / 16) & 1 ? 1 : 0;                         \
-  o->P16s = (tp->before_scan.tv_sec / 8) & 1 ? 1 : 0;                          \
-  o->P8s = (tp->before_scan.tv_sec / 4) & 1 ? 1 : 0;                           \
-  o->P4s = (tp->before_scan.tv_sec / 2) & 1 ? 1 : 0;                           \
-  o->P2s = tp->before_scan.tv_sec & 1 ? 1 : 0;                                 \
-  o->P1s = (tp->before_scan.tv_nsec / 500000000) & 1 ? 1 : 0;                  \
-  o->P500ms = (tp->before_scan.tv_nsec / 250000000) & 1 ? 1 : 0;               \
-  o->P250ms = (tp->before_scan.tv_nsec / 125000000) & 1 ? 1 : 0;               \
-  o->P125ms = (tp->before_scan.tv_nsec / 62500000) & 1 ? 1 : 0;                \
-  o->P62ms = (tp->before_scan.tv_nsec / 31250000) & 1 ? 1 : 0;                 \
-  o->P31ms = (tp->before_scan.tv_nsec / 15625000) & 1 ? 1 : 0;                 \
+#define PulseTrainM_exec(o)                                                                                  \
+  o->P128s = (tp->before_scan.tv_sec / 64) & 1 ? 1 : 0;                                                      \
+  o->P64s = (tp->before_scan.tv_sec / 32) & 1 ? 1 : 0;                                                       \
+  o->P32s = (tp->before_scan.tv_sec / 16) & 1 ? 1 : 0;                                                       \
+  o->P16s = (tp->before_scan.tv_sec / 8) & 1 ? 1 : 0;                                                        \
+  o->P8s = (tp->before_scan.tv_sec / 4) & 1 ? 1 : 0;                                                         \
+  o->P4s = (tp->before_scan.tv_sec / 2) & 1 ? 1 : 0;                                                         \
+  o->P2s = tp->before_scan.tv_sec & 1 ? 1 : 0;                                                               \
+  o->P1s = (tp->before_scan.tv_nsec / 500000000) & 1 ? 1 : 0;                                                \
+  o->P500ms = (tp->before_scan.tv_nsec / 250000000) & 1 ? 1 : 0;                                             \
+  o->P250ms = (tp->before_scan.tv_nsec / 125000000) & 1 ? 1 : 0;                                             \
+  o->P125ms = (tp->before_scan.tv_nsec / 62500000) & 1 ? 1 : 0;                                              \
+  o->P62ms = (tp->before_scan.tv_nsec / 31250000) & 1 ? 1 : 0;                                               \
+  o->P31ms = (tp->before_scan.tv_nsec / 15625000) & 1 ? 1 : 0;                                               \
   o->P15ms = (tp->before_scan.tv_nsec / 7812500) & 1 ? 1 : 0;
 
 /*_*
   @aref iswap16 ISwap16
 */
-#define ISwap16_exec(o, in) { \
-    unsigned int tmp;		\
-    tmp = (in << 8) & 0xff00ff00; \
-    tmp |= (in >> 8) & 0xff00ff; \
-    o->ActVal = tmp; \
+#define ISwap16_exec(o, in)                                                                                  \
+  {                                                                                                          \
+    unsigned int tmp;                                                                                        \
+    tmp = (in << 8) & 0xff00ff00;                                                                            \
+    tmp |= (in >> 8) & 0xff00ff;                                                                             \
+    o->ActVal = tmp;                                                                                         \
   }
 
 /*_*
   @aref iswap32 ISwap32
 */
-#define ISwap32_exec(o, in) { \
-    unsigned int tmp;		 \
-    tmp = (in << 24) & 0xff000000; \
-    tmp |= (in << 8) & 0xff0000; \
-    tmp |= (in >> 8) & 0xff00; \
-    tmp |= (in >> 24) & 0xff; \
-    o->ActVal = tmp; \
+#define ISwap32_exec(o, in)                                                                                  \
+  {                                                                                                          \
+    unsigned int tmp;                                                                                        \
+    tmp = (in << 24) & 0xff000000;                                                                           \
+    tmp |= (in << 8) & 0xff0000;                                                                             \
+    tmp |= (in >> 8) & 0xff00;                                                                               \
+    tmp |= (in >> 24) & 0xff;                                                                                \
+    o->ActVal = tmp;                                                                                         \
   }
 
-#define GetBus_generic_exec(tp, o, bus) { \
-  o->Out = *bus; \
-}
+#define GetBus_generic_exec(tp, o, bus)                                                                      \
+  {                                                                                                          \
+    o->Out = *bus;                                                                                           \
+  }
 
-#define CStoBus_generic_exec(tp, o, bus) { \
-  if (o->Cond) \
-    *bus = *o->InP; \
-}
+#define CStoBus_generic_exec(tp, o, bus)                                                                     \
+  {                                                                                                          \
+    if (o->Cond)                                                                                             \
+      *bus = *o->InP;                                                                                        \
+  }

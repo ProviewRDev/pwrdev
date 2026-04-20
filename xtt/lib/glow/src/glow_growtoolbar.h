@@ -37,6 +37,8 @@
 #ifndef glow_growtoolbar_h
 #define glow_growtoolbar_h
 
+#include <iosfwd>
+
 #include "glow_grownode.h"
 
 /*! \file glow_growtoolbar.h
@@ -50,7 +52,8 @@
   events when the
   object is clicked on, moved etc.
 */
-class GrowToolbar : public GrowNode {
+class GrowToolbar : public GrowNode
+{
 public:
   int hot_tool;
   unsigned int tools1_mask;
@@ -64,12 +67,11 @@ public:
     \param y		y coordinate.
     \param nodraw	Don't draw the object now.
   */
-  GrowToolbar(GrowCtx* glow_ctx, const char* name, const char* nc_name,
-      char* tools1, char* tools2, int tools1_cnt, int tools2_cnt, double x,
-      double y, int nodraw = 0);
+  GrowToolbar(GrowCtx* glow_ctx, const char* name, const char* nc_name, char* tools1, char* tools2,
+              int tools1_cnt, int tools2_cnt, double x, double y, int nodraw = 0);
 
   //! Noargs constructor.
-  GrowToolbar(){}
+  GrowToolbar() {}
 
   ~GrowToolbar();
 
@@ -84,13 +86,13 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Dissolve the group.
   /*! Add the transform of the group to the transformation of all members, and
@@ -158,13 +160,10 @@ public:
   }
 
   int event_handler(GlowWind* w, glow_eEvent event, double fx, double fy);
-  int event_handler(
-      GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
-  int nc_event_handler(
-      GlowWind* w, glow_eEvent event, double x, double y, int* idx);
-  void configure(char* tools1, char* tools2, int tools1_cnt, int tools2_cnt,
-      unsigned int show_mask1, unsigned int show_mask2,
-      unsigned int insensitive_mask1, unsigned int insensitive_mask2);
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
+  int nc_event_handler(GlowWind* w, glow_eEvent event, double x, double y, int* idx);
+  void configure(char* tools1, char* tools2, int tools1_cnt, int tools2_cnt, unsigned int show_mask1,
+                 unsigned int show_mask2, unsigned int insensitive_mask1, unsigned int insensitive_mask2);
   int get_mask_index(int idx, int* category, int* mask_idx);
   void scale();
   int export_script(GlowExportScript* es, void* o, void* m);

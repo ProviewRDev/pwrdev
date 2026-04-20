@@ -48,16 +48,18 @@
 class XAttNav;
 class CoWow;
 
-typedef enum {
+typedef enum
+{
   xcolwind_eType_Collect,
   xcolwind_eType_CollectSignals,
   xcolwind_eType_CollectIOSignals
 } xcolwind_eType;
 
-class XColWind {
+class XColWind
+{
 public:
-  XColWind(void* xa_parent_ctx, pwr_sAttrRef* xa_objar_list, char* xa_title,
-      int xa_advanced_user, xcolwind_eType xa_type, int* xa_sts);
+  XColWind(void* xa_parent_ctx, pwr_sAttrRef* xa_objar_list, char* xa_title, int xa_advanced_user,
+           xcolwind_eType xa_type, int* xa_sts);
   virtual ~XColWind();
   void* parent_ctx;
   pwr_sAttrRef* objar_list;
@@ -69,10 +71,8 @@ public:
   void* object;
   void (*close_cb)(void*, void*);
   void (*redraw_cb)(void*);
-  void (*popup_menu_cb)(
-      void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
-  int (*call_method_cb)(void*, const char*, const char*, pwr_sAttrRef,
-      unsigned long, unsigned long, char*);
+  void (*popup_menu_cb)(void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  int (*call_method_cb)(void*, const char*, const char*, pwr_sAttrRef, unsigned long, unsigned long, char*);
   int (*is_authorized_cb)(void*, unsigned int);
   int (*command_cb)(void*, char*);
   int (*get_select_cb)(void*, pwr_tAttrRef*, int*);
@@ -84,33 +84,15 @@ public:
   char title[80];
   xcolwind_eType type;
 
-  virtual void message(char severity, const char* message)
-  {
-  }
-  virtual void set_prompt(const char* prompt)
-  {
-  }
-  virtual void change_value(int set_focus)
-  {
-  }
-  virtual void change_value_close()
-  {
-  }
-  virtual void pop()
-  {
-  }
-  virtual void set_title(char* title)
-  {
-  }
-  virtual void set_window_size(int w, int h)
-  {
-  }
-  virtual void get_window_size(int* w, int* h)
-  {
-  }
-  virtual void print()
-  {
-  }
+  virtual void message(char severity, const char* message) {}
+  virtual void set_prompt(const char* prompt) {}
+  virtual void change_value(int set_focus) {}
+  virtual void change_value_close() {}
+  virtual void pop() {}
+  virtual void set_title(char* title) {}
+  virtual void set_window_size(int w, int h) {}
+  virtual void get_window_size(int* w, int* h) {}
+  virtual void print() {}
 
   int open_changevalue(char* name);
   void swap(int mode);
@@ -136,15 +118,15 @@ public:
   void activate_help();
   void activate_print();
 
-  static void xcolwind_popup_menu_cb(void* ctx, pwr_sAttrRef attrref,
-      unsigned long item_type, unsigned long utility, char* arg, int x, int y);
+  static void xcolwind_popup_menu_cb(void* ctx, pwr_sAttrRef attrref, unsigned long item_type,
+                                     unsigned long utility, char* arg, int x, int y);
   static int xcolwind_is_authorized_cb(void* ctx, unsigned int access);
   static void message_cb(void* xcolwind, char severity, const char* message);
   static void change_value_cb(void* xcolwind);
   static void file_selected_cb(void* ctx, void* data, char* text);
   static int init_cb(void* ctx);
-  static void signal_insert_cb(void* ctx, void* parent_node,
-      navc_eItemType item_type, char* text1, char* text2, int write);
+  static void signal_insert_cb(void* ctx, void* parent_node, navc_eItemType item_type, char* text1,
+                               char* text2, int write);
   static int name_to_objid_cb(void* ctx, char* name, pwr_tObjid* objid);
 };
 

@@ -52,11 +52,11 @@
 #include "co_cdh.h"
 #include "co_string.h"
 
+#include "rs_dataq_msg.h"
 #include "rt_gdh.h"
-#include "rt_lck.h"
 #include "rt_gdh_msg.h"
 #include "rt_hash_msg.h"
-#include "rs_dataq_msg.h"
+#include "rt_lck.h"
 
 #include "dataq_appl.h"
 
@@ -70,17 +70,17 @@ typedef struct qappl_s_data_list {
   pwr_tDlid subid;
   int remove;
   int pending_remove;
-  struct qappl_s_data_list* prev_ptr;
-  struct qappl_s_data_list* next_ptr;
+  struct qappl_s_data_list *prev_ptr;
+  struct qappl_s_data_list *next_ptr;
 } qappl_tDataList;
 
 typedef struct qappl_s_basectx {
-  qappl_tQueueList* queuelist;
+  qappl_tQueueList *queuelist;
   int queuelist_count;
   qappl_tCtx applctx_list;
   int applctx_count;
-  qappl_tDataList* datalist;
-} * qappl_tBaseCtx;
+  qappl_tDataList *datalist;
+} *qappl_tBaseCtx;
 
 /*_Global variables______________________________________________________*/
 
@@ -88,26 +88,27 @@ static qappl_tBaseCtx qappl_basectx = 0;
 
 /*_Local functions________________________________________________________*/
 
-static pwr_tStatus qappl_data_db_create(qappl_tDataList** data_list,
-    pwr_tOid objid, int options, qappl_tDataList** datalist_ptr);
-static pwr_tStatus qappl_data_db_delete(
-    qappl_tDataList** data_list, qappl_tDataList* data_ptr);
+static pwr_tStatus qappl_data_db_create(qappl_tDataList **data_list,
+                                        pwr_tOid objid, int options,
+                                        qappl_tDataList **datalist_ptr);
+static pwr_tStatus qappl_data_db_delete(qappl_tDataList **data_list,
+                                        qappl_tDataList *data_ptr);
 
 /****************************************************************************
-* Name:		qappl_data_db_create()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Create an entry in the datalist for an objid.
-*
-**************************************************************************/
-static pwr_tStatus qappl_data_db_create(qappl_tDataList** data_list,
-    pwr_tOid objid, int options, qappl_tDataList** datalist_ptr)
-{
-  qappl_tDataList* next_ptr;
+ * Name:		qappl_data_db_create()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Create an entry in the datalist for an objid.
+ *
+ **************************************************************************/
+static pwr_tStatus qappl_data_db_create(qappl_tDataList **data_list,
+                                        pwr_tOid objid, int options,
+                                        qappl_tDataList **datalist_ptr) {
+  qappl_tDataList *next_ptr;
   pwr_tStatus sts;
   pwr_tOName name;
   pwr_sAttrRef attrref;
@@ -148,19 +149,18 @@ static pwr_tStatus qappl_data_db_create(qappl_tDataList** data_list,
 }
 
 /****************************************************************************
-* Name:		qappl_data_db_delete()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Delete an entry in the datalist.
-*
-**************************************************************************/
-static pwr_tStatus qappl_data_db_delete(
-    qappl_tDataList** data_list, qappl_tDataList* data_ptr)
-{
+ * Name:		qappl_data_db_delete()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Delete an entry in the datalist.
+ *
+ **************************************************************************/
+static pwr_tStatus qappl_data_db_delete(qappl_tDataList **data_list,
+                                        qappl_tDataList *data_ptr) {
   int sts;
 
   sts = gdh_DLUnrefObjectInfo(data_ptr->subid);
@@ -183,18 +183,18 @@ static pwr_tStatus qappl_data_db_delete(
 }
 
 /****************************************************************************
-* Name:		qappl_queue_init()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
-static pwr_tStatus qappl_queue_init(char* queue_name, pwr_tOid* orig_objid,
-    void** orig_queue, pwr_tSubid* orig_subid, pwr_tCid* orig_class)
-{
+ * Name:		qappl_queue_init()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
+static pwr_tStatus qappl_queue_init(char *queue_name, pwr_tOid *orig_objid,
+                                    void **orig_queue, pwr_tSubid *orig_subid,
+                                    pwr_tCid *orig_class) {
   pwr_sAttrRef attrref;
   pwr_tStatus sts;
   pwr_tOid queue_objid;
@@ -212,8 +212,8 @@ static pwr_tStatus qappl_queue_init(char* queue_name, pwr_tOid* orig_objid,
     return sts;
 
   /* Link to object */
-  sts = gdh_DLRefObjectInfoAttrref(
-      &attrref, (pwr_tAddress*)orig_queue, orig_subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress *)orig_queue,
+                                   orig_subid);
   if (EVEN(sts))
     return DATAQ__APPLQUEUE;
 
@@ -240,21 +240,20 @@ static pwr_tStatus qappl_queue_init(char* queue_name, pwr_tOid* orig_objid,
  * @return pwr_tStatus
  */
 pwr_tStatus qappl_MirrorInit(
-    pwr_tOName* queue_array, /**< A string array with the
+    pwr_tOName *queue_array, /**< A string array with the
                      names of the queues that
                      should be mirrored. The
                      element after the last
                      queuename should be a NULL
                      string. */
     unsigned long options, /**< Bitmask specifying options for the mirroring.*/
-    qappl_tCtx* ctx /**< Context pointer. */
-)
-{
-  pwr_tOName* queuename;
+    qappl_tCtx *ctx        /**< Context pointer. */
+) {
+  pwr_tOName *queuename;
   qappl_tBaseCtx basectx;
   qappl_tCtx applctx;
-  qappl_tQueueList* queuelist_ptr;
-  qappl_tQueueList* c_ptr;
+  qappl_tQueueList *queuelist_ptr;
+  qappl_tQueueList *c_ptr;
   int found;
   int sts;
   int maxsize;
@@ -287,14 +286,14 @@ pwr_tStatus qappl_MirrorInit(
 
   /* Add queues to queuelist */
   queuename = queue_array;
-  while (!streq((char*)queuename, "")) {
-    str_ToUpper((char*)queuename, (char*)queuename);
+  while (!streq((char *)queuename, "")) {
+    str_ToUpper((char *)queuename, (char *)queuename);
 
     /* Check if queue already is inserted */
     queuelist_ptr = basectx->queuelist;
     found = 0;
     while (queuelist_ptr) {
-      if (streq((char*)queuename, queuelist_ptr->name)) {
+      if (streq((char *)queuename, queuelist_ptr->name)) {
         found = 1;
         break;
       }
@@ -304,9 +303,10 @@ pwr_tStatus qappl_MirrorInit(
       /* Insert queue last position in queuelist */
 
       queuelist_ptr = calloc(1, sizeof(qappl_tQueueList));
-      strcpy((char*)queuelist_ptr->name, (char*)queuename);
+      strcpy((char *)queuelist_ptr->name, (char *)queuename);
       sts = qappl_queue_init(queuelist_ptr->name, &queuelist_ptr->objid,
-          &queuelist_ptr->object_ptr, &queuelist_ptr->subid, &queuelist_ptr->classid);
+                             &queuelist_ptr->object_ptr, &queuelist_ptr->subid,
+                             &queuelist_ptr->classid);
       if (EVEN(sts))
         return sts;
 
@@ -339,10 +339,10 @@ pwr_tStatus qappl_MirrorInit(
     case pwr_cClass_DataQ5:
     case pwr_cClass_DataQ30:
     case pwr_cClass_DataQ120:
-      maxsize = ((pwr_sClass_DataQ*)queuelist_ptr->object_ptr)->Config.MaxSize;
+      maxsize = ((pwr_sClass_DataQ *)queuelist_ptr->object_ptr)->Config.MaxSize;
       applctx->total_queuesize += maxsize;
       queuelist_ptr->tmp_size = sizeof(pwr_sClass_DataQ) + sizeof(pwr_tUInt32) +
-          sizeof(pwr_sClass_DataQBus) * maxsize;
+                                sizeof(pwr_sClass_DataQBus) * maxsize;
       break;
 #if 0
     case pwr_cClass_DataQMirrorQueue:
@@ -354,17 +354,17 @@ pwr_tStatus qappl_MirrorInit(
       break;
 #endif
     }
-    queuelist_ptr->tmp_queue = (void*)calloc(1, queuelist_ptr->tmp_size);
+    queuelist_ptr->tmp_queue = (void *)calloc(1, queuelist_ptr->tmp_size);
   }
 
   /* Allocate memory for the data objects array in applctx */
   if (options & qappl_mOption_Remove)
     /* Remove requires the double size */
-    applctx->datainfo = (qappl_tDataInfo*)calloc(
-        applctx->total_queuesize * 2, sizeof(qappl_tDataInfo));
+    applctx->datainfo = (qappl_tDataInfo *)calloc(applctx->total_queuesize * 2,
+                                                  sizeof(qappl_tDataInfo));
   else
-    applctx->datainfo = (qappl_tDataInfo*)calloc(
-        applctx->total_queuesize, sizeof(qappl_tDataInfo));
+    applctx->datainfo = (qappl_tDataInfo *)calloc(applctx->total_queuesize,
+                                                  sizeof(qappl_tDataInfo));
 
   lck_Create(&sts, lck_eLock_NMps);
   if (EVEN(sts))
@@ -381,15 +381,15 @@ pwr_tStatus qappl_MirrorInit(
  * qappl_Mirror mirrors the content of one or several queues into an
  * application program.
  *
- * The function handles direct link of queues and dataobjects, and returns a list
- * of data objects to the application together with information about front, back,
- * select properties, and which data objects are new or has disappeard. The 
+ * The function handles direct link of queues and dataobjects, and returns a
+ *list of data objects to the application together with information about front,
+ *back, select properties, and which data objects are new or has disappeard. The
  * application also receives a pointer to each data object.
  *
  * The mirroring is initiated by calling qappl_MirrorInit. The queues are
  * mirrored are specified in this call. Then qappl_Mirror is called cyclic
- * to recieve the current content of the queues. All the dataobjects found in the
- * queues are placed in an array, and the order the queues was specified in
+ * to recieve the current content of the queues. All the dataobjects found in
+ *the queues are placed in an array, and the order the queues was specified in
  * qappl_MirrorInit determines the order in the dataobject array.
  *
  * Several mirroring can be handled in the same application (max 32), and each
@@ -445,16 +445,15 @@ pwr_tStatus qappl_MirrorInit(
  */
 pwr_tStatus qappl_Mirror(
     qappl_tCtx applctx, /**< Context for dataqappl mirror. */
-    int* data_count, /**< Number or data object in the array. */
-    qappl_tDataInfo**
-        datainfo /**< Data strucure with dataobjects found in the queues. */
-    )
-{
+    int *data_count,    /**< Number or data object in the array. */
+    qappl_tDataInfo *
+        *datainfo /**< Data strucure with dataobjects found in the queues. */
+) {
   int i, j, k;
   int found;
-  qappl_tQueueList* queuelist_ptr;
-  qappl_tDataList* data_ptr;
-  qappl_tDataList* data_next_ptr;
+  qappl_tQueueList *queuelist_ptr;
+  qappl_tDataList *data_ptr;
+  qappl_tDataList *data_next_ptr;
   int sts;
 
   /* Copy queue-objects into the temporary buffer, and hope that
@@ -462,8 +461,8 @@ pwr_tStatus qappl_Mirror(
   for (i = 0; i < applctx->queuelist_count; i++) {
     queuelist_ptr = applctx->queuelist[i];
     lck_LockNMps;
-    memcpy(
-        queuelist_ptr->tmp_queue, queuelist_ptr->object_ptr, queuelist_ptr->tmp_size);
+    memcpy(queuelist_ptr->tmp_queue, queuelist_ptr->object_ptr,
+           queuelist_ptr->tmp_size);
     lck_UnlockNMps;
   }
 
@@ -475,14 +474,15 @@ pwr_tStatus qappl_Mirror(
     case pwr_cClass_DataQ5:
     case pwr_cClass_DataQ30:
     case pwr_cClass_DataQ120: {
-      pwr_sClass_DataQ1* object_ptr;
-      pwr_sClass_DataQBus* data_block_ptr;
+      pwr_sClass_DataQ1 *object_ptr;
+      pwr_sClass_DataQBus *data_block_ptr;
 
-      object_ptr = (pwr_sClass_DataQ1*)queuelist_ptr->tmp_queue;
-      if (!(object_ptr->Super.Intern.ReloadDone & pwr_mDataQBackupMask_BackupInitialized))
+      object_ptr = (pwr_sClass_DataQ1 *)queuelist_ptr->tmp_queue;
+      if (!(object_ptr->Super.Intern.ReloadDone &
+            pwr_mDataQBackupMask_BackupInitialized))
         continue;
 
-      data_block_ptr = (pwr_sClass_DataQBus*)&object_ptr->Data[0];
+      data_block_ptr = (pwr_sClass_DataQBus *)&object_ptr->Data[0];
       if (applctx->options & qappl_mOption_ReverseOrder)
         data_block_ptr += object_ptr->DataSize - 1;
       for (i = 0; i < object_ptr->DataSize; i++) {
@@ -490,33 +490,29 @@ pwr_tStatus qappl_Mirror(
         found = 0;
         for (j = 0; j < applctx->data_count; j++) {
           if (cdh_ObjidIsEqual(applctx->datainfo[j].objid,
-                  data_block_ptr->Data.Aref.Objid)) {
+                               data_block_ptr->Data.Aref.Objid)) {
             found = 1;
             break;
           }
         }
         if (!found) {
-          applctx->datainfo[applctx->data_count].objid
-              = data_block_ptr->Data.Aref.Objid;
-          applctx->datainfo[applctx->data_count].front
-              = data_block_ptr->Front;
-          applctx->datainfo[applctx->data_count].back
-              = data_block_ptr->Back;
-          applctx->datainfo[applctx->data_count].select
-              = data_block_ptr->Select;
-          applctx->datainfo[applctx->data_count].queue_mask
-              = queuelist_ptr->index_mask[applctx->index];
+          applctx->datainfo[applctx->data_count].objid =
+              data_block_ptr->Data.Aref.Objid;
+          applctx->datainfo[applctx->data_count].front = data_block_ptr->Front;
+          applctx->datainfo[applctx->data_count].back = data_block_ptr->Back;
+          applctx->datainfo[applctx->data_count].select =
+              data_block_ptr->Select;
+          applctx->datainfo[applctx->data_count].queue_mask =
+              queuelist_ptr->index_mask[applctx->index];
           applctx->datainfo[applctx->data_count].removed = 0;
           applctx->data_count++;
         } else {
-          applctx->datainfo[applctx->data_count].front
-              |= data_block_ptr->Front;
-          applctx->datainfo[applctx->data_count].back
-              |= data_block_ptr->Back;
+          applctx->datainfo[applctx->data_count].front |= data_block_ptr->Front;
+          applctx->datainfo[applctx->data_count].back |= data_block_ptr->Back;
           if (data_block_ptr->Select)
             applctx->datainfo[applctx->data_count].select = 1;
-          applctx->datainfo[applctx->data_count].queue_mask
-              |= queuelist_ptr->index_mask[applctx->index];
+          applctx->datainfo[applctx->data_count].queue_mask |=
+              queuelist_ptr->index_mask[applctx->index];
         }
         if (applctx->options & qappl_mOption_ReverseOrder)
           data_block_ptr--;
@@ -613,7 +609,8 @@ pwr_tStatus qappl_Mirror(
     if (!found) {
       /* A new object, insert it into the data database */
       sts = qappl_data_db_create(&qappl_basectx->datalist,
-          applctx->datainfo[i].objid, applctx->options, &data_ptr);
+                                 applctx->datainfo[i].objid, applctx->options,
+                                 &data_ptr);
       if (EVEN(sts))
         return sts;
 
@@ -631,8 +628,8 @@ pwr_tStatus qappl_Mirror(
   data_ptr = qappl_basectx->datalist;
   while (data_ptr) {
     if (data_ptr->remove && data_ptr->possession & applctx->index_mask) {
-      if (data_ptr->possession == applctx->index_mask
-          && data_ptr->pending_remove) {
+      if (data_ptr->possession == applctx->index_mask &&
+          data_ptr->pending_remove) {
         /* Remove the object from the database */
         data_next_ptr = data_ptr->next_ptr;
         sts = qappl_data_db_delete(&qappl_basectx->datalist, data_ptr);
@@ -677,11 +674,10 @@ pwr_tStatus qappl_Mirror(
  */
 pwr_tStatus qappl_RemoveData(
     qappl_tCtx applctx, /**< Context for dataqappl mirror. */
-    pwr_tOid objid /**< Objid for dataobject that is to be removed. */
-    )
-{
+    pwr_tOid objid      /**< Objid for dataobject that is to be removed. */
+) {
   int k;
-  qappl_tQueueList* queuelist_ptr;
+  qappl_tQueueList *queuelist_ptr;
 
   for (k = 0; k < applctx->queuelist_count; k++) {
     queuelist_ptr = applctx->queuelist[k];
@@ -690,9 +686,9 @@ pwr_tStatus qappl_RemoveData(
     case pwr_cClass_DataQ5:
     case pwr_cClass_DataQ30:
     case pwr_cClass_DataQ120: {
-      pwr_sClass_DataQ* object_ptr;
+      pwr_sClass_DataQ *object_ptr;
 
-      object_ptr = (pwr_sClass_DataQ*)queuelist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_DataQ *)queuelist_ptr->object_ptr;
       object_ptr->Control.Operation = pwr_eDataQCtlEnum_Delete;
       object_ptr->Control.Objid = objid;
       object_ptr->Control.Commit = 1;
@@ -714,11 +710,10 @@ pwr_tStatus qappl_RemoveData(
  */
 pwr_tStatus qappl_RemoveAndDeleteData(
     qappl_tCtx applctx, /**< dataqappl mirror context. */
-    pwr_tOid objid /**< Objid for the data object that is to be removed. */
-    )
-{
+    pwr_tOid objid      /**< Objid for the data object that is to be removed. */
+) {
   int sts, k;
-  qappl_tQueueList* queuelist_ptr;
+  qappl_tQueueList *queuelist_ptr;
 
   for (k = 0; k < applctx->queuelist_count; k++) {
     queuelist_ptr = applctx->queuelist[k];
@@ -727,9 +722,9 @@ pwr_tStatus qappl_RemoveAndDeleteData(
     case pwr_cClass_DataQ5:
     case pwr_cClass_DataQ30:
     case pwr_cClass_DataQ120: {
-      pwr_sClass_DataQ* object_ptr;
+      pwr_sClass_DataQ *object_ptr;
 
-      object_ptr = (pwr_sClass_DataQ*)queuelist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_DataQ *)queuelist_ptr->object_ptr;
       object_ptr->Control.Operation = pwr_eDataQCtlEnum_DeleteObjid;
       object_ptr->Control.Objid = objid;
       object_ptr->Control.Commit = 1;
@@ -746,10 +741,9 @@ pwr_tStatus qappl_RemoveAndDeleteData(
   return DATAQ__SUCCESS;
 }
 
-pwr_tStatus qappl_SelectData(qappl_tCtx applctx, pwr_tOid objid)
-{
+pwr_tStatus qappl_SelectData(qappl_tCtx applctx, pwr_tOid objid) {
   int k;
-  qappl_tQueueList* queuelist_ptr;
+  qappl_tQueueList *queuelist_ptr;
 
   for (k = 0; k < applctx->queuelist_count; k++) {
     queuelist_ptr = applctx->queuelist[k];
@@ -758,9 +752,9 @@ pwr_tStatus qappl_SelectData(qappl_tCtx applctx, pwr_tOid objid)
     case pwr_cClass_DataQ5:
     case pwr_cClass_DataQ30:
     case pwr_cClass_DataQ120: {
-      pwr_sClass_DataQ* object_ptr;
+      pwr_sClass_DataQ *object_ptr;
 
-      object_ptr = (pwr_sClass_DataQ*)queuelist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_DataQ *)queuelist_ptr->object_ptr;
       object_ptr->Control.Operation = pwr_eDataQCtlEnum_SelectObjid;
       object_ptr->Control.Objid = objid;
       object_ptr->Control.Commit = 1;
@@ -775,11 +769,11 @@ pwr_tStatus qappl_SelectData(qappl_tCtx applctx, pwr_tOid objid)
 }
 
 pwr_tStatus qappl_TransportData(qappl_tCtx applctx, pwr_tOid objid,
-    unsigned int from_queue_mask, unsigned int to_queue_mask)
-{
+                                unsigned int from_queue_mask,
+                                unsigned int to_queue_mask) {
   int k;
   unsigned int mask;
-  qappl_tQueueList* queuelist_ptr;
+  qappl_tQueueList *queuelist_ptr;
 
   /* Check that to queue is not busy or full */
   mask = 1;
@@ -793,9 +787,9 @@ pwr_tStatus qappl_TransportData(qappl_tCtx applctx, pwr_tOid objid,
     case pwr_cClass_DataQ5:
     case pwr_cClass_DataQ30:
     case pwr_cClass_DataQ120: {
-      pwr_sClass_DataQ* object_ptr;
+      pwr_sClass_DataQ *object_ptr;
 
-      object_ptr = (pwr_sClass_DataQ*)queuelist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_DataQ *)queuelist_ptr->object_ptr;
       if (object_ptr->Control.Commit)
         return DATAQ__QUEUEEXTERNBUSY;
       if (object_ptr->Intern.QueueFull)
@@ -820,9 +814,9 @@ pwr_tStatus qappl_TransportData(qappl_tCtx applctx, pwr_tOid objid,
     case pwr_cClass_DataQ5:
     case pwr_cClass_DataQ30:
     case pwr_cClass_DataQ120: {
-      pwr_sClass_DataQ* object_ptr;
+      pwr_sClass_DataQ *object_ptr;
 
-      object_ptr = (pwr_sClass_DataQ*)queuelist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_DataQ *)queuelist_ptr->object_ptr;
       if (object_ptr->Control.Commit)
         return DATAQ__QUEUEEXTERNBUSY;
 
@@ -848,9 +842,9 @@ pwr_tStatus qappl_TransportData(qappl_tCtx applctx, pwr_tOid objid,
     case pwr_cClass_DataQ5:
     case pwr_cClass_DataQ30:
     case pwr_cClass_DataQ120: {
-      pwr_sClass_DataQ* object_ptr;
+      pwr_sClass_DataQ *object_ptr;
 
-      object_ptr = (pwr_sClass_DataQ*)queuelist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_DataQ *)queuelist_ptr->object_ptr;
       if (object_ptr->Control.Commit)
         return DATAQ__QUEUEEXTERNBUSY;
       if (object_ptr->Intern.QueueFull)
@@ -870,12 +864,11 @@ pwr_tStatus qappl_TransportData(qappl_tCtx applctx, pwr_tOid objid,
   return DATAQ__SUCCESS;
 }
 
-pwr_tStatus qappl_InsertData(
-    qappl_tCtx applctx, pwr_tOid objid, unsigned int queue_mask)
-{
+pwr_tStatus qappl_InsertData(qappl_tCtx applctx, pwr_tOid objid,
+                             unsigned int queue_mask) {
   int k;
   unsigned int mask;
-  qappl_tQueueList* queuelist_ptr;
+  qappl_tQueueList *queuelist_ptr;
 
   /* Insert data */
   mask = 1;
@@ -889,9 +882,9 @@ pwr_tStatus qappl_InsertData(
     case pwr_cClass_DataQ5:
     case pwr_cClass_DataQ30:
     case pwr_cClass_DataQ120: {
-      pwr_sClass_DataQ* object_ptr;
+      pwr_sClass_DataQ *object_ptr;
 
-      object_ptr = (pwr_sClass_DataQ*)queuelist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_DataQ *)queuelist_ptr->object_ptr;
       if (object_ptr->Control.Commit)
         return DATAQ__QUEUEEXTERNBUSY;
 
@@ -909,12 +902,11 @@ pwr_tStatus qappl_InsertData(
   return DATAQ__SUCCESS;
 }
 
-pwr_tStatus qappl_RemoveAndKeepData(
-    qappl_tCtx applctx, pwr_tOid objid, unsigned int queue_mask)
-{
+pwr_tStatus qappl_RemoveAndKeepData(qappl_tCtx applctx, pwr_tOid objid,
+                                    unsigned int queue_mask) {
   int k;
   unsigned int mask;
-  qappl_tQueueList* queuelist_ptr;
+  qappl_tQueueList *queuelist_ptr;
 
   /* Remove data first */
   mask = 1;
@@ -928,9 +920,9 @@ pwr_tStatus qappl_RemoveAndKeepData(
     case pwr_cClass_DataQ5:
     case pwr_cClass_DataQ30:
     case pwr_cClass_DataQ120: {
-      pwr_sClass_DataQ* object_ptr;
+      pwr_sClass_DataQ *object_ptr;
 
-      object_ptr = (pwr_sClass_DataQ*)queuelist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_DataQ *)queuelist_ptr->object_ptr;
       if (object_ptr->Control.Commit)
         return DATAQ__QUEUEEXTERNBUSY;
 

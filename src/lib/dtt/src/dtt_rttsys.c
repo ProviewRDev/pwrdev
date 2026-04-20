@@ -3388,7 +3388,7 @@ int RTTSYS_PLCTHREAD(menu_ctx ctx, int event, char* parameter_ptr, char* objectn
   static rttsys_t_step_list* objectlist;
   static rttsys_t_step_list* objectlist_ptr;
   static int objectlist_count;
-  int object_alloc;
+  int object_alloc = 0;
 
   IF_NOGDH_RETURN;
   /**********************************************************
@@ -3653,7 +3653,7 @@ int RTTSYS_PID(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, c
   static rttsys_t_step_list* objectlist;
   static rttsys_t_step_list* objectlist_ptr;
   static int objectlist_count;
-  int object_alloc;
+  int object_alloc = 0;
 
   IF_NOGDH_RETURN;
 

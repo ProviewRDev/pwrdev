@@ -34,37 +34,23 @@
  * General Public License plus this exception.
  */
 
-extern "C" {
+extern "C"
+{
 #include "co_msg.h"
 }
 #include "co_status.h"
 
-co_status::co_status() : m_sts(0)
-{
-}
+co_status::co_status() : m_sts(0) {}
 
-co_status::co_status(pwr_tStatus sts) : m_sts(sts)
-{
-}
+co_status::co_status(pwr_tStatus sts) : m_sts(sts) {}
 
-co_status::~co_status()
-{
-}
+co_status::~co_status() {}
 
-pwr_tStatus co_status::sts() const
-{
-  return m_sts;
-}
+pwr_tStatus co_status::sts() const { return m_sts; }
 
-bool co_status::evenSts() const
-{
-  return EVEN(m_sts);
-}
+bool co_status::evenSts() const { return EVEN(m_sts); }
 
-bool co_status::oddSts() const
-{
-  return ODD(m_sts);
-}
+bool co_status::oddSts() const { return ODD(m_sts); }
 
 std::string co_status::what() const
 {

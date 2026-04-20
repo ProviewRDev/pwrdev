@@ -667,6 +667,7 @@ int GlowArray::brow_insert(GlowArrayElem* element, GlowArrayElem* destination, g
     a[idx] = element;
     ((GlowNode*)element)->set_level(destination_level);
     a_size++;
+    break;
   case glow_eDest_Before:
     if (idx > 0)
       idx--;
@@ -961,7 +962,7 @@ void GlowArray::print(void* pos, void* node)
   }
 }
 
-void GlowArray::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowArray::save(std::ostream& fp, glow_eSaveMode mode)
 {
   int i;
 
@@ -979,7 +980,7 @@ void GlowArray::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowArray::open(GrowCtx* ctx, std::ifstream& fp)
+void GlowArray::open(GrowCtx* ctx, std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

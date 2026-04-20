@@ -41,16 +41,14 @@
 
 class CnvReadWbl;
 
-class CnvWblToH : public CnvWblTo {
-  public:
+class CnvWblToH : public CnvWblTo
+{
+public:
   CnvWblToH(CnvCtx* cnv_ctx)
-      : ctx(cnv_ctx), struct_class_open(0), struct_filler_cnt(0), attr_count(0),
-        attr_next_alignlw(0)
+      : ctx(cnv_ctx), struct_class_open(0), struct_filler_cnt(0), attr_count(0), attr_next_alignlw(0)
   {
   }
-  virtual ~CnvWblToH()
-  {
-  }
+  virtual ~CnvWblToH() {}
 
   CnvCtx* ctx;
   int struct_class_open;
@@ -75,30 +73,12 @@ class CnvWblToH : public CnvWblTo {
   int typedef_exec();
   int typedef_close();
   int bit_exec();
-  int graphplcnode()
-  {
-    return 1;
-  }
-  int graphplccon()
-  {
-    return 1;
-  }
-  int template_exec()
-  {
-    return 1;
-  }
-  Cnv_eWblToType type()
-  {
-    return Cnv_eWblToType_H;
-  }
-  int class_open()
-  {
-    return struct_class_open;
-  }
-  int index_open()
-  {
-    return 0;
-  }
+  int graphplcnode() { return 1; }
+  int graphplccon() { return 1; }
+  int template_exec() { return 1; }
+  Cnv_eWblToType type() { return Cnv_eWblToType_H; }
+  int class_open() { return struct_class_open; }
+  int index_open() { return 0; }
 
   int volname_to_id();
   void cix_to_classid(unsigned int cix, pwr_tClassId* cid);

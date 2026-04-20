@@ -54,7 +54,8 @@ void pwrb_IOHandler_Exec(void (*handler_event_cb)(int, int), int swap)
   static pwr_tBoolean old_CardErrorSoftLimit = 0;
   static pwr_tBoolean old_CardErrorHardLimit = 0;
 
-  if (!iop || swap) {
+  if (!iop || swap)
+  {
     pwr_tOid oid;
     pwr_tStatus sts;
 
@@ -68,7 +69,8 @@ void pwrb_IOHandler_Exec(void (*handler_event_cb)(int, int), int swap)
   if (!iop)
     return;
 
-  if (handler_event_cb) {
+  if (handler_event_cb)
+  {
     if (iop->CardErrorSoftLimit && !old_CardErrorSoftLimit)
       (handler_event_cb)(pwr_eSystemEventTypeEnum_IOErrorSoftLimit, 1);
     else if (!iop->CardErrorSoftLimit && old_CardErrorSoftLimit)

@@ -39,10 +39,11 @@
 
 #include "flow_point.h"
 
-class FlowPixmap : public FlowArrayElem {
+class FlowPixmap : public FlowArrayElem
+{
 public:
-  FlowPixmap(FlowCtx* flow_ctx, flow_sPixmapData* pixmap_data, double x = 0,
-      double y = 0, flow_eDrawType d_type = flow_eDrawType_Line, int size = 2);
+  FlowPixmap(FlowCtx* flow_ctx, flow_sPixmapData* pixmap_data, double x = 0, double y = 0,
+             flow_eDrawType d_type = flow_eDrawType_Line, int size = 2);
   FlowPixmap(const FlowPixmap& p);
   ~FlowPixmap();
   friend std::ostream& operator<<(std::ostream& o, const FlowPixmap t);
@@ -51,7 +52,7 @@ public:
   void print_zoom();
   void traverse(int x, int y);
   int event_handler(void* pos, flow_eEvent event, int x, int y, void* node);
-  void conpoint_select(void* pos, int x, int y, double* distance, void** cp){}
+  void conpoint_select(void* pos, int x, int y, double* distance, void** cp) {}
   void print(void* pos, void* node, int highlight);
   void save(std::ofstream& fp, flow_eSaveMode mode);
   void open(std::ifstream& fp);
@@ -61,18 +62,11 @@ public:
   void erase(void* pos, int hot, void* node);
   void nav_erase(void* pos, void* node);
   void move(void* pos, double x, double y, int highlight, int dimmed, int hot);
-  void shift(void* pos, double delta_x, double delta_y, int highlight,
-      int dimmed, int hot);
-  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left,
-      double* y_high, double* y_low, void* node);
-  int get_conpoint(int num, double* x, double* y, flow_eDirection* dir)
-  {
-    return 0;
-  }
-  flow_eObjectType type()
-  {
-    return flow_eObjectType_Pixmap;
-  }
+  void shift(void* pos, double delta_x, double delta_y, int highlight, int dimmed, int hot);
+  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,
+                   void* node);
+  int get_conpoint(int num, double* x, double* y, flow_eDirection* dir) { return 0; }
+  flow_eObjectType type() { return flow_eObjectType_Pixmap; }
   FlowCtx* ctx;
   FlowPoint p;
   void* pixmaps;

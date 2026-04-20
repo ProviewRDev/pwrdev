@@ -103,7 +103,7 @@ public:
 
   unsigned short m_send_clock_factor;
   unsigned short m_reduction_ratio;
-  unsigned int m_phase;            // Phase can not be greater than reduction ratio and must be > 0.
+  unsigned int m_phase; // Phase can not be greater than reduction ratio and must be > 0.
   // This configured value is currently written to both WatchdogFactor and
   // DataHoldFactor in the stack IOCR data.
   unsigned short m_watchdog_factor = PWR_PN_DEFAULT_WATCHDOG_FACTOR;

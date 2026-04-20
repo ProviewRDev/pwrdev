@@ -81,12 +81,9 @@ void WbBckWNavBrow::create_nodeclasses()
 
   brow_CreateNodeClass(ctx, "LogDefault", flow_eNodeGroup_Common, &nc_bck);
   brow_AddAnnotPixmap(nc_bck, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_bck, 2.8, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_bck, 35, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_bck, 45, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_bck, 2.8, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_bck, 35, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_bck, 45, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_bck, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create common-class with radiobutton
@@ -94,12 +91,9 @@ void WbBckWNavBrow::create_nodeclasses()
   brow_CreateNodeClass(ctx, "LogDefault", flow_eNodeGroup_Common, &nc_wbbck);
   brow_AddAnnotPixmap(nc_wbbck, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddRadiobutton(nc_wbbck, 1.4, 0.03, 0.7, 0.7, 0, flow_eDrawType_Line, 1);
-  brow_AddAnnot(nc_wbbck, 2.8, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_wbbck, 35, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_wbbck, 45, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_wbbck, 2.8, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_wbbck, 35, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_wbbck, 45, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_wbbck, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 
@@ -116,34 +110,20 @@ void WbBckWNavBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, bckwnav);
 
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, WbBckWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-      WbBckWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, WbBckWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, WbBckWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack,
-      WbBckWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack,
-      WbBckWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, WbBckWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, WbBckWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, WbBckWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack,
-      WbBckWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack,
-      WbBckWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, WbBckWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack,
-      WbBckWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack,
-      WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, WbBckWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, WbBckWNav::brow_cb);
 }
 
 //
@@ -163,40 +143,27 @@ int WbBckWNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   return 1;
 }
 
-WbBckWNav::WbBckWNav(void* l_parent_ctx, ldh_tSesContext l_ldhses,
-    wb_bck_list* l_list, int l_editmode)
-    : parent_ctx(l_parent_ctx), ldhses(l_ldhses), list(l_list),
-      editmode(l_editmode)
+WbBckWNav::WbBckWNav(void* l_parent_ctx, ldh_tSesContext l_ldhses, wb_bck_list* l_list, int l_editmode)
+    : parent_ctx(l_parent_ctx), ldhses(l_ldhses), list(l_list), editmode(l_editmode)
 {
 }
 
 //
 //  Delete ev
 //
-WbBckWNav::~WbBckWNav()
-{
-}
+WbBckWNav::~WbBckWNav() {}
 
-WbBckWNavBrow::~WbBckWNavBrow()
-{
-  free_pixmaps();
-}
+WbBckWNavBrow::~WbBckWNavBrow() { free_pixmaps(); }
 
 //
 //  Zoom
 //
-void WbBckWNav::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void WbBckWNav::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void WbBckWNav::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void WbBckWNav::unzoom() { brow_UnZoom(brow->ctx); }
 
 //
 // Callbacks from brow
@@ -206,34 +173,43 @@ int WbBckWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   WbBckWNav* bckwnav;
   ItemBck* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
   }
 
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&bckwnav);
-  switch (event->event) {
-  case flow_eEvent_Key_Up: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(bckwnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLastVisible(bckwnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              bckwnav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(bckwnav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetLastVisible(bckwnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(bckwnav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -249,26 +225,33 @@ int WbBckWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(bckwnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirstVisible(bckwnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              bckwnav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(bckwnav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetFirstVisible(bckwnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(bckwnav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -292,10 +275,12 @@ int WbBckWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -307,9 +292,12 @@ int WbBckWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(bckwnav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(bckwnav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(bckwnav->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(bckwnav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(bckwnav->brow->ctx, event->object.object);
@@ -319,29 +307,36 @@ int WbBckWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       brow_SelectClear(bckwnav->brow->ctx);
     }
     break;
-  case flow_eEvent_Key_PageDown: {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(bckwnav->brow->ctx, 0.95);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(bckwnav->brow->ctx, -0.95);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(bckwnav->brow->ctx, 0.10);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(bckwnav->brow->ctx, -0.10);
     break;
   }
   case flow_eEvent_MB1DoubleClick:
     break;
-  case flow_eEvent_Radiobutton: {
-    switch (event->object.object_type) {
+  case flow_eEvent_Radiobutton:
+  {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case bckwitem_eItemType_Bck:
         ((ItemBck*)item)->set(!event->radiobutton.value);
         break;
@@ -364,7 +359,8 @@ void WbBckWNav::show()
 
   brow_SetNodraw(brow->ctx);
 
-  for (bck_sItem* ip = list->first(); ip; ip = list->next(ip)) {
+  for (bck_sItem* ip = list->first(); ip; ip = list->next(ip))
+  {
     if (!ip->hide)
       new ItemBck(this, ip, 0, flow_eDest_IntoLast);
   }
@@ -373,10 +369,7 @@ void WbBckWNav::show()
   brow_Redraw(brow->ctx, 0);
 }
 
-void WbBckWNav::clear()
-{
-  brow_DeleteAll(brow->ctx);
-}
+void WbBckWNav::clear() { brow_DeleteAll(brow->ctx); }
 
 pwr_tStatus WbBckWNav::transfer_wb()
 {
@@ -391,22 +384,23 @@ pwr_tStatus WbBckWNav::transfer_wb()
   char* s;
   pwr_tAName aname;
 
-  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts);
-       sts = brow_GetNext(brow->ctx, node, &node)) {
+  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts); sts = brow_GetNext(brow->ctx, node, &node))
+  {
     brow_GetRadiobutton(node, 0, &rval);
 
-    if (rval) {
+    if (rval)
+    {
       brow_GetUserData(node, (void**)&item);
 
       bck_sItem* ip = item->bck_item;
 
-      sts = ldh_AttrRefToName(
-          ldhses, &ip->aref, cdh_mName_volumeStrict, &anamep, &size);
+      sts = ldh_AttrRefToName(ldhses, &ip->aref, cdh_mName_volumeStrict, &anamep, &size);
       if (EVEN(sts))
         return sts;
 
       strncpy(aname, anamep, sizeof(aname));
-      if ((s = strrchr(aname, '.')) && streq(s, ".ActualValue")) {
+      if ((s = strrchr(aname, '.')) && streq(s, ".ActualValue"))
+      {
         *s = 0;
 
         sts = ldh_NameToAttrRef(ldhses, aname, &aref);
@@ -417,7 +411,8 @@ pwr_tStatus WbBckWNav::transfer_wb()
         if (EVEN(sts))
           return sts;
 
-        switch (cid) {
+        switch (cid)
+        {
         case pwr_cClass_Ao:
         case pwr_cClass_Do:
         case pwr_cClass_Io:
@@ -436,13 +431,16 @@ pwr_tStatus WbBckWNav::transfer_wb()
         default:
           sts = ldh_WriteAttribute(ldhses, &ip->aref, ip->valuep, ip->size);
         }
-      } else
+      }
+      else
         sts = ldh_WriteAttribute(ldhses, &ip->aref, ip->valuep, ip->size);
 
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         memcpy(ip->value2p, ip->valuep, ip->size);
         item->update();
-      } else
+      }
+      else
         printf("** ldh_WriteAttribute error, %s\n", anamep);
     }
   }
@@ -460,11 +458,14 @@ pwr_tStatus WbBckWNav::filter(char* hierarchy)
   if (EVEN(sts))
     return sts;
 
-  for (bck_sItem* ip = list->first(); ip; ip = list->next(ip)) {
+  for (bck_sItem* ip = list->first(); ip; ip = list->next(ip))
+  {
     sts = 1;
     found = 0;
-    for (p = ip->aref.Objid; ODD(sts); sts = ldh_GetParent(ldhses, p, &p)) {
-      if (cdh_ObjidIsEqual(p, oid)) {
+    for (p = ip->aref.Objid; ODD(sts); sts = ldh_GetParent(ldhses, p, &p))
+    {
+      if (cdh_ObjidIsEqual(p, oid))
+      {
         found = 1;
         break;
       }
@@ -483,8 +484,7 @@ void WbBckWNav::check_all()
   int sts;
   brow_tNode node;
 
-  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts);
-       sts = brow_GetNext(brow->ctx, node, &node))
+  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts); sts = brow_GetNext(brow->ctx, node, &node))
     brow_SetRadiobutton(node, 0, 1);
 }
 
@@ -493,13 +493,11 @@ void WbBckWNav::check_clear()
   int sts;
   brow_tNode node;
 
-  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts);
-       sts = brow_GetNext(brow->ctx, node, &node))
+  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts); sts = brow_GetNext(brow->ctx, node, &node))
     brow_SetRadiobutton(node, 0, 0);
 }
 
-ItemBck::ItemBck(WbBckWNav* item_bckwnav, bck_sItem* item_bck_item,
-    brow_tNode dest, flow_eDest dest_code)
+ItemBck::ItemBck(WbBckWNav* item_bckwnav, bck_sItem* item_bck_item, brow_tNode dest, flow_eDest dest_code)
     : bckwnav(item_bckwnav), bck_item(item_bck_item)
 {
   char str[1024];
@@ -509,8 +507,7 @@ ItemBck::ItemBck(WbBckWNav* item_bckwnav, bck_sItem* item_bck_item,
 
   type = bckwitem_eItemType_Bck;
 
-  sts = ldh_AttrRefToName(
-      bckwnav->ldhses, &bck_item->aref, cdh_mName_volumeStrict, &anamep, &size);
+  sts = ldh_AttrRefToName(bckwnav->ldhses, &bck_item->aref, cdh_mName_volumeStrict, &anamep, &size);
   if (EVEN(sts))
     return;
 
@@ -523,17 +520,18 @@ ItemBck::ItemBck(WbBckWNav* item_bckwnav, bck_sItem* item_bck_item,
     strcpy(str, "-");
 
   if (bckwnav->editmode && bckwnav->list->type() == bck_eType_WbDiff)
-    brow_CreateNode(bckwnav->brow->ctx, (char*)"Bck", bckwnav->brow->nc_wbbck,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(bckwnav->brow->ctx, (char*)"Bck", bckwnav->brow->nc_wbbck, dest, dest_code, (void*)this,
+                    1, &node);
   else
-    brow_CreateNode(bckwnav->brow->ctx, (char*)"Bck", bckwnav->brow->nc_bck,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(bckwnav->brow->ctx, (char*)"Bck", bckwnav->brow->nc_bck, dest, dest_code, (void*)this, 1,
+                    &node);
 
   int annot = 0;
   brow_SetAnnotation(node, annot++, anamep, strlen(anamep));
   brow_SetAnnotation(node, annot++, str, strlen(str));
 
-  if (bck_item->value2p) {
+  if (bck_item->value2p)
+  {
     sts = cdh_AttrValueToString(atype, bck_item->value2p, str, sizeof(str));
     if (EVEN(sts))
       strcpy(str, "-");
@@ -544,9 +542,7 @@ ItemBck::ItemBck(WbBckWNav* item_bckwnav, bck_sItem* item_bck_item,
   brow_SetAnnotPixmap(node, 0, bckwnav->brow->pixmap_save);
 }
 
-ItemBck::~ItemBck()
-{
-}
+ItemBck::~ItemBck() {}
 
 void ItemBck::update()
 {
@@ -559,7 +555,8 @@ void ItemBck::update()
 
   brow_SetAnnotation(node, 1, str, strlen(str));
 
-  if (bck_item->value2p) {
+  if (bck_item->value2p)
+  {
     sts = cdh_AttrValueToString(atype, bck_item->value2p, str, sizeof(str));
     if (EVEN(sts))
       strcpy(str, "-");
@@ -568,7 +565,4 @@ void ItemBck::update()
   }
 }
 
-void ItemBck::set(int value)
-{
-  brow_SetRadiobutton(node, 0, value);
-}
+void ItemBck::set(int value) { brow_SetRadiobutton(node, 0, value); }

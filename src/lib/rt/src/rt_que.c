@@ -48,7 +48,8 @@ que_sQue* que_Create(pwr_tStatus* status, que_sQue* qp)
   que_sQue* lqp = NULL;
   pwr_dStatus(sts, status, QUE__SUCCESS);
 
-  if (qp == NULL) {
+  if (qp == NULL)
+  {
     lqp = qp = (que_sQue*)calloc(1, sizeof(*qp));
     if (lqp == NULL)
       pwr_Return(lqp, sts, QUE__INSVIRMEM);
@@ -61,16 +62,14 @@ que_sQue* que_Create(pwr_tStatus* status, que_sQue* qp)
   return qp;
 }
 
-void* que_Get(
-    pwr_tStatus* status, que_sQue* qp, pwr_tDeltaTime* tp, void* tmo_item)
+void* que_Get(pwr_tStatus* status, que_sQue* qp, pwr_tDeltaTime* tp, void* tmo_item)
 {
   void* p = NULL;
   pwr_dStatus(sts, status, QUE__SUCCESS);
 
   thread_MutexLock(&qp->mutex);
 
-  while ((p = lst_RemoveSucc(NULL, &qp->lh, NULL)) == NULL && ODD(*sts)
-      && *sts != THREAD__TIMEDOUT)
+  while ((p = lst_RemoveSucc(NULL, &qp->lh, NULL)) == NULL && ODD(*sts) && *sts != THREAD__TIMEDOUT)
     *sts = thread_CondTimedWait(&qp->cond, &qp->mutex, tp);
 
   thread_MutexUnlock(&qp->mutex);

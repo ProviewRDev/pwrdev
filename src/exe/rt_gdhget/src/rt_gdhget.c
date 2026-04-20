@@ -56,27 +56,33 @@ int main(int argc, char** argv)
   pwr_tAName astr;
   int i;
 
-  if (argc <= 1) {
+  if (argc <= 1)
+  {
     usage();
     exit(1);
   }
 
   sts = gdh_Init("rt_gdhget");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     exit(sts);
   }
 
-  for (i = 1; i < argc; i++) {
+  for (i = 1; i < argc; i++)
+  {
     c = argv[i];
-    if (*c == '-') {
+    if (*c == '-')
+    {
       c++;
-      switch (*c) {
+      switch (*c)
+      {
       case 'h':
         usage();
         exit(0);
 
       case 'c':
-        if (argc <= i + 1) {
+        if (argc <= i + 1)
+        {
           usage();
           exit(1);
         }
@@ -85,11 +91,13 @@ int main(int argc, char** argv)
         i++;
         break;
       }
-    } else
+    }
+    else
       strcpy(astr, argv[i]);
   }
 
-  if (cidopt) {
+  if (cidopt)
+  {
     // Get the first object of class cidstr, and print the value of attribute
     // astr in this object
 
@@ -102,34 +110,40 @@ int main(int argc, char** argv)
     char str[256];
 
     sts = gdh_ClassNameToId(cidstr, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       exit(sts);
     }
 
     sts = gdh_GetClassList(cid, &oid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       exit(sts);
     }
 
     aref = cdh_ObjidToAref(oid);
     sts = gdh_ArefANameToAref(&aref, astr, &aaref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       exit(sts);
     }
 
     sts = gdh_GetAttributeCharAttrref(&aaref, &a_tid, &a_size, &a_offs, &a_dim);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       exit(sts);
     }
     a_valp = calloc(1, a_size);
     sts = gdh_GetObjectInfoAttrref(&aaref, a_valp, a_size);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       free(a_valp);
       exit(sts);
     }
 
     sts = cdh_AttrValueToString(a_tid, a_valp, str, sizeof(str));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       free(a_valp);
       exit(sts);
     }
@@ -138,7 +152,9 @@ int main(int argc, char** argv)
     free(a_valp);
 
     exit(0);
-  } else {
+  }
+  else
+  {
     // Print the value of the attriute in astr
 
     pwr_tTypeId a_tid;
@@ -146,21 +162,23 @@ int main(int argc, char** argv)
     void* a_valp;
     char str[256];
 
-    sts = gdh_GetAttributeCharacteristics(
-        astr, &a_tid, &a_size, &a_offs, &a_elem);
-    if (EVEN(sts)) {
+    sts = gdh_GetAttributeCharacteristics(astr, &a_tid, &a_size, &a_offs, &a_elem);
+    if (EVEN(sts))
+    {
       exit(sts);
     }
     a_valp = calloc(1, a_size);
 
     sts = gdh_GetObjectInfo(astr, a_valp, a_size);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       free(a_valp);
       exit(sts);
     }
 
     sts = cdh_AttrValueToString(a_tid, a_valp, str, sizeof(str));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       free(a_valp);
       exit(sts);
     }

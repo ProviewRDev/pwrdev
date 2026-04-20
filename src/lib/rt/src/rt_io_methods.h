@@ -41,12 +41,14 @@
 
 #include "pwr.h"
 
-typedef struct {
+typedef struct
+{
   pwr_tObjName MethodName;
   pwr_tStatus (*Method)();
 } pwr_sMethodBinding;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjName ClassName;
   pwr_sMethodBinding (*Methods)[];
 } pwr_sClassBinding;
@@ -54,41 +56,21 @@ typedef struct {
 /* Base methods */
 #define pwr_BindIoMethods(Class) pwr_sMethodBinding pwr_g##Class##_IoMethods[]
 #define pwr_BindIoClasses(Type) pwr_sClassBinding pwr_g##Type##_IoClassMethods[]
-#define pwr_BindIoClass(Class)                                                 \
-  {                                                                            \
-    #Class, (void*) pwr_g##Class##_IoMethods                                   \
-  }
-#define pwr_BindIoMethod(Method)                                               \
-  {                                                                            \
-    #Method, (pwr_tStatus(*)()) Method                                         \
-  }
+#define pwr_BindIoClass(Class) {#Class, (void*)pwr_g##Class##_IoMethods}
+#define pwr_BindIoMethod(Method) {#Method, (pwr_tStatus(*)())Method}
 
 /* User methods */
-#define pwr_BindIoUserMethods(Class)                                           \
-  pwr_sMethodBinding pwr_g##Class##_IoUserMethods[]
-#define pwr_BindIoUserClasses(Type)                                            \
-  pwr_sClassBinding pwr_g##Type##_IoUserClassMethods[]
-#define pwr_BindIoUserClass(Class)                                             \
-  {                                                                            \
-    #Class, (void*) pwr_g##Class##_IoUserMethods                               \
-  }
-#define pwr_BindIoUserMethod(Method)                                           \
-  {                                                                            \
-    #Method, (pwr_tStatus(*)()) Method                                         \
-  }
+#define pwr_BindIoUserMethods(Class) pwr_sMethodBinding pwr_g##Class##_IoUserMethods[]
+#define pwr_BindIoUserClasses(Type) pwr_sClassBinding pwr_g##Type##_IoUserClassMethods[]
+#define pwr_BindIoUserClass(Class) {#Class, (void*)pwr_g##Class##_IoUserMethods}
+#define pwr_BindIoUserMethod(Method) {#Method, (pwr_tStatus(*)())Method}
 
 #ifndef pwr_NullMethod
-#define pwr_NullMethod                                                         \
-  {                                                                            \
-    "", NULL                                                                   \
-  }
+#define pwr_NullMethod {"", NULL}
 #endif
 
 #ifndef pwr_NullClass
-#define pwr_NullClass                                                          \
-  {                                                                            \
-    "", NULL                                                                   \
-  }
+#define pwr_NullClass {"", NULL}
 #endif
 
 #endif

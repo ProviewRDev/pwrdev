@@ -37,6 +37,8 @@
 #ifndef ge_dashboard_h
 #define ge_dashboard_h
 
+#include <iosfwd>
+
 /* ge_dashboard.h -- Ge dashboard */
 
 #include "ge_graph.h"
@@ -47,7 +49,8 @@
 #define DASH_MAX_ELEM 10
 
 //! Type of dash.
-typedef enum {
+typedef enum
+{
   ge_eDashType_,
   ge_eDashType_UserDefined,
   ge_eDashType_ObjectGraph,
@@ -63,14 +66,16 @@ typedef enum {
 } ge_eDashType;
 
 //! Type of dash attributes.
-typedef enum {
+typedef enum
+{
   ge_eDashAttr_No,
   ge_eDashAttr_Object,
   ge_eDashAttr_Analog,
   ge_eDashAttr_Digital
 } ge_eDashAttr;
 
-typedef enum {
+typedef enum
+{
   dash_eSave_Dash = 1,
   dash_eSave_Analog = 2,
   dash_eSave_Digital = 3,
@@ -105,7 +110,8 @@ class GeDashAnalog;
 class GeDashDigital;
 class Graph;
 
-class GeDash {
+class GeDash
+{
 public:
   Graph* graph; //!< Graph.
   int width;
@@ -116,21 +122,21 @@ public:
   char title[80];
   double time_range;
   glow_eDirection direction;
-  
+
   char script[80];
   unsigned int elements;
-  GeDashElem *elem[DASH_MAX_ELEM];
+  GeDashElem* elem[DASH_MAX_ELEM];
   ge_eDashType old_type;
   int old_rows;
   int old_columns;
   char old_title[80];
   unsigned int old_elements;
-  
 
-  GeDash(Graph *d_graph) : graph(d_graph), type(ge_eDashType_), 
-    new_type(0), attr_type(ge_eDashAttr_No), time_range(0), 
-    direction(glow_eDirection_Center), elements(0), 
-    old_type(ge_eDashType_), old_rows(1), old_columns(1), old_elements(0) {
+  GeDash(Graph* d_graph)
+      : graph(d_graph), type(ge_eDashType_), new_type(0), attr_type(ge_eDashAttr_No), time_range(0),
+        direction(glow_eDirection_Center), elements(0), old_type(ge_eDashType_), old_rows(1), old_columns(1),
+        old_elements(0)
+  {
     memset(elem, 0, sizeof(elem));
     strcpy(title, "");
     strcpy(old_title, "");
@@ -140,12 +146,14 @@ public:
   //! Copy constructor.
   GeDash(const GeDash& x);
 
-  void merge(grow_tObject o, GeDash *x) {
+  void merge(grow_tObject o, GeDash* x)
+  {
     if (elements + x->elements > max_elements())
       return;
-    for (int i = 0; i < x->elements; i++) {
+    for (int i = 0; i < x->elements; i++)
+    {
       elem[elements + i] = x->elem[i];
-      x->elem[i] = 0;      
+      x->elem[i] = 0;
     }
     elements += x->elements;
     old_elements = elements;
@@ -168,11 +176,11 @@ public:
 
   //! Save dash data to file.
   /*! \param fp		Output file. */
-  void save(std::ofstream& fp);
+  void save(std::ostream& fp);
 
   //! Open dash data from file.
   /*! \param fp		Input file. */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Update after edit.
   void update_elem(grow_tObject o);
@@ -184,11 +192,12 @@ public:
   ~GeDash();
 };
 
-class GeDashElem {
+class GeDashElem
+{
 public:
-  GeDash *dash;
+  GeDash* dash;
 
-  GeDashElem(GeDash *d) : dash(d) {}
+  GeDashElem(GeDash* d) : dash(d) {}
   GeDashElem(const GeDashElem& x) : dash(x.dash) {}
 
   //! Get script call string.
@@ -196,17 +205,15 @@ public:
     \param o    	Dash object.
     \param script	Script string.
   */
-  virtual void get_script(grow_tObject o, char *script)
-  {
-  }
+  virtual void get_script(grow_tObject o, char* script) {}
 
   //! Get list of attributes.
   /*!
     \param attrinfo    	List of attribute items.
     \param item_count	Number of items in list.
   */
-  virtual void get_attributes(attr_sItem* attrinfo, int* item_count, char *name,
-      unsigned int attr_mask, int num)
+  virtual void get_attributes(attr_sItem* attrinfo, int* item_count, char* name, unsigned int attr_mask,
+                              int num)
   {
   }
 
@@ -217,10 +224,7 @@ public:
     \param cnt		Counter to decide if first or second attribute is to be
     set.
   */
-  virtual void set_attribute(
-      grow_tObject object, const char* attr_name, int second)
-  {
-  }
+  virtual void set_attribute(grow_tObject object, const char* attr_name, int second) {}
 
   //! Replace an attribute string
   /*!
@@ -229,105 +233,99 @@ public:
     \param cnt		Counter of replaced attributes.
     \param strict	If 1 the comparation is case sensitive.
   */
-  virtual void replace_attribute(char* from, char* to, int* cnt, int strict)
-  {
-  }
+  virtual void replace_attribute(char* from, char* to, int* cnt, int strict) {}
 
   //! Save dash element data to file.
   /*! \param fp		Output file. */
-  virtual void save(std::ofstream& fp)
-  {
-  }
+  virtual void save(std::ostream& fp) {}
 
   //! Open dash element data from file.
   /*! \param fp		Input file. */
-  virtual void open(std::ifstream& fp)
-  {
-  }
+  virtual void open(std::istream& fp) {}
 
   //! Destructor
-  virtual ~GeDashElem()
-  {
-  }
+  virtual ~GeDashElem() {}
 };
 
-class GeDashAnalog : public GeDashElem {
+class GeDashAnalog : public GeDashElem
+{
 public:
   pwr_tAName attribute;
   char text[80];
   char format[80];
   double min_value;
   double max_value;
-  
-  GeDashAnalog(GeDash *d) : GeDashElem(d), min_value(0), max_value(0) {
+
+  GeDashAnalog(GeDash* d) : GeDashElem(d), min_value(0), max_value(0)
+  {
     strcpy(attribute, "");
     strcpy(text, "");
     strcpy(format, "");
   }
-  GeDashAnalog(const GeDashAnalog& x) : GeDashElem(x), min_value(x.min_value), 
-    max_value(x.max_value) {
+  GeDashAnalog(const GeDashAnalog& x) : GeDashElem(x), min_value(x.min_value), max_value(x.max_value)
+  {
     strcpy(attribute, x.attribute);
     strcpy(text, x.text);
     strcpy(format, x.format);
   }
-  void get_script(grow_tObject o, char *script);
-  void get_attributes(attr_sItem* attrinfo, int* item_count, char *name, 
-      unsigned int attr_mask, int num);
+  void get_script(grow_tObject o, char* script);
+  void get_attributes(attr_sItem* attrinfo, int* item_count, char* name, unsigned int attr_mask, int num);
   void set_attribute(grow_tObject object, const char* attr_name, int second);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
 };
 
-class GeDashDigital : public GeDashElem {
+class GeDashDigital : public GeDashElem
+{
 public:
   pwr_tAName attribute;
   char text[80];
   glow_eDrawType color;
   int flash;
-  
-  GeDashDigital(GeDash *d) : GeDashElem(d), color(glow_eDrawType_CustomColor26),
-    flash(0) {
+
+  GeDashDigital(GeDash* d) : GeDashElem(d), color(glow_eDrawType_CustomColor26), flash(0)
+  {
     strcpy(attribute, "");
     strcpy(text, "");
   }
-  GeDashDigital(const GeDashDigital& x) : GeDashElem(x), color(x.color),
-      flash(x.flash) {
+  GeDashDigital(const GeDashDigital& x) : GeDashElem(x), color(x.color), flash(x.flash)
+  {
     strcpy(attribute, x.attribute);
     strcpy(text, x.text);
   }
-  void get_script(grow_tObject o, char *script);
-  void get_attributes(attr_sItem* attrinfo, int* item_count, char *name, 
-      unsigned int attr_mask, int num);
+  void get_script(grow_tObject o, char* script);
+  void get_attributes(attr_sItem* attrinfo, int* item_count, char* name, unsigned int attr_mask, int num);
   void set_attribute(grow_tObject object, const char* attr_name, int second);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
 };
 
-class GeDashObject : public GeDashElem {
+class GeDashObject : public GeDashElem
+{
 public:
   pwr_tAName object;
   char text[80];
   double min_value;
   double max_value;
-  
-  GeDashObject(GeDash *d) : GeDashElem(d), min_value(0), max_value(100) {
+
+  GeDashObject(GeDash* d) : GeDashElem(d), min_value(0), max_value(100)
+  {
     strcpy(object, "");
     strcpy(text, "");
   }
-  GeDashObject(const GeDashObject& x) : GeDashElem(x), min_value(x.min_value),
-      max_value(x.max_value) {
+  GeDashObject(const GeDashObject& x) : GeDashElem(x), min_value(x.min_value), max_value(x.max_value)
+  {
     strcpy(object, x.object);
     strcpy(text, x.text);
   }
-  void get_script(grow_tObject o, char *script);
-  void get_attributes(attr_sItem* attrinfo, int* item_count, char *name, 
-      unsigned int attr_mask, int num);
+  void get_script(grow_tObject o, char* script);
+  void get_attributes(attr_sItem* attrinfo, int* item_count, char* name, unsigned int attr_mask, int num);
   void set_attribute(grow_tObject object, const char* attr_name, int second);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   char* script_filename();
 };
 

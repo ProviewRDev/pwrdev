@@ -97,10 +97,11 @@ int sev_server::init(int noneth)
 
   m_noneth = noneth;
 
-  if (!m_noneth) {
+  if (!m_noneth)
+  {
     // Check server config object
     pwr_tOid conf_oid;
-    pwr_sNode *np;
+    pwr_sNode* np;
     pwr_tOid node_oid;
 
     m_sts = gdh_Init("sev_server");
@@ -108,14 +109,16 @@ int sev_server::init(int noneth)
       throw co_error(m_sts);
 
     sts = gdh_GetClassList(pwr_cClass_SevServer, &conf_oid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_CErrLog(PWR__SRVNOTCONF, 0);
       exit(0);
     }
 
     pwr_sAttrRef aref = cdh_ObjidToAref(conf_oid);
     sts = gdh_DLRefObjectInfoAttrref(&aref, (void**)&m_config, &m_config_dlid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_CErrLog(PWR__SRVNOTCONF, 0);
       exit(0);
     }
@@ -125,18 +128,21 @@ int sev_server::init(int noneth)
       m_config->GarbageInterval = sev_cGarbageInterval;
 
     sts = gdh_GetNodeObject(0, &node_oid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_CErrLog(PWR__SRVNOTCONF, 0);
       exit(0);
     }
-    sts = gdh_ObjidToPointer(node_oid, (void **)&np);
-    if (EVEN(sts)) {
+    sts = gdh_ObjidToPointer(node_oid, (void**)&np);
+    if (EVEN(sts))
+    {
       errh_CErrLog(PWR__SRVNOTCONF, 0);
       exit(0);
     }
     sev_db::set_orignode(np->OrigName);
-
-  } else {
+  }
+  else
+  {
     // Read config from proview.cnf
     static pwr_sClass_SevServer config;
     float fvalue;
@@ -146,7 +152,8 @@ int sev_server::init(int noneth)
     m_config_dlid = pwr_cNDlid;
     m_config->GarbageInterval = sev_cGarbageInterval;
 
-    if (cnf_get_value("sevDatabaseType", str, sizeof(str))) {
+    if (cnf_get_value("sevDatabaseType", str, sizeof(str)))
+    {
       if (str_NoCaseStrcmp(str, "sqlite") == 0)
         m_config->Database = pwr_eSevDatabaseEnum_SQLite;
       else if (str_NoCaseStrcmp(str, "mysql") == 0)
@@ -155,36 +162,44 @@ int sev_server::init(int noneth)
         m_config->Database = pwr_eSevDatabaseEnum_HDF5;
       else
         m_config->Database = pwr_eSevDatabaseEnum_MySQL;
-    } else
+    }
+    else
       m_config->Database = pwr_eSevDatabaseEnum_MySQL;
 
-    if (cnf_get_value("sevUseServerThreads", str, sizeof(str))) {
+    if (cnf_get_value("sevUseServerThreads", str, sizeof(str)))
+    {
       if (str_NoCaseStrcmp(str, "1") == 0)
         m_config->UseServerThreads = 1;
     }
-    if (cnf_get_value("sevLinearRegrAll", str, sizeof(str))) {
+    if (cnf_get_value("sevLinearRegrAll", str, sizeof(str)))
+    {
       if (str_NoCaseStrcmp(str, "1") == 0)
         m_config->LinearRegrAll = 1;
     }
-    if (cnf_get_value("sevMeanValueAll", str, sizeof(str))) {
+    if (cnf_get_value("sevMeanValueAll", str, sizeof(str)))
+    {
       if (str_NoCaseStrcmp(str, "1") == 0)
         m_config->MeanValueAll = 1;
     }
-    if (cnf_get_value("sevMeanValueInterval1", str, sizeof(str))) {
+    if (cnf_get_value("sevMeanValueInterval1", str, sizeof(str)))
+    {
       if (sscanf(str, "%f", &fvalue) == 1)
         m_config->MeanValueInterval1 = fvalue;
     }
-    if (cnf_get_value("sevMeanValueInterval2", str, sizeof(str))) {
+    if (cnf_get_value("sevMeanValueInterval2", str, sizeof(str)))
+    {
       if (sscanf(str, "%f", &fvalue) == 1)
         m_config->MeanValueInterval2 = fvalue;
     }
-    if (cnf_get_value("sevLinearRegrMaxTime", str, sizeof(str))) {
+    if (cnf_get_value("sevLinearRegrMaxTime", str, sizeof(str)))
+    {
       if (sscanf(str, "%f", &fvalue) == 1)
         m_config->LinearRegrMaxTime = fvalue;
     }
   }
 
-  if (cnf_get_value("sevThreadKeyNode", str, sizeof(str))) {
+  if (cnf_get_value("sevThreadKeyNode", str, sizeof(str)))
+  {
     if (str_NoCaseStrcmp(str, "1") == 0)
       m_thread_key_node = 1;
   }
@@ -192,7 +207,8 @@ int sev_server::init(int noneth)
   if (m_config->UseServerThreads)
     m_read_threads = 1;
 
-  switch (m_config->Database) {
+  switch (m_config->Database)
+  {
   case pwr_eSevDatabaseEnum_MySQL:
     set_dbtype(sev_eDbType_Mysql);
     break;
@@ -220,7 +236,8 @@ int sev_server::init(int noneth)
   cnf_get_value("mysqlSocket", db_config.Socket, sizeof(db_config.Socket));
 
   m_db = sev_db::open_database(m_db_type, &db_config);
-  if (!m_db) {
+  if (!m_db)
+  {
     errh_Fatal("Database open error");
     exit(0);
   }
@@ -229,8 +246,8 @@ int sev_server::init(int noneth)
   m_db->get_items(&m_sts);
   m_db->get_objectitems(&m_sts);
 
-  m_refid = tree_CreateTable(&sts, sizeof(pwr_tRefId), offsetof(sev_sRefid, id),
-      sizeof(sev_sRefid), 100, sev_comp_refid);
+  m_refid = tree_CreateTable(&sts, sizeof(pwr_tRefId), offsetof(sev_sRefid, id), sizeof(sev_sRefid), 100,
+                             sev_comp_refid);
   sts = thread_MutexInit(&m_refid_mutex);
 
   sts = thread_MutexInit(&m_alloc_mutex);
@@ -244,15 +261,19 @@ int sev_server::init(int noneth)
   attr.type = qcom_eQtype_private;
   attr.quota = 200;
 
-  if (!qcom_CreateQ(&sts, &qid, &attr, "SevServer")) {
-    if (sts == QCOM__QALLREXIST) {
-      if (!qcom_AttachQ(&sts, &qid)) {
+  if (!qcom_CreateQ(&sts, &qid, &attr, "SevServer"))
+  {
+    if (sts == QCOM__QALLREXIST)
+    {
+      if (!qcom_AttachQ(&sts, &qid))
+      {
         if (!qcom_DeleteQ(&sts, &qid))
           throw co_error(sts);
         if (!qcom_CreateQ(&sts, &qid, &attr, "SevServer"))
           throw co_error(sts);
       }
-    } else
+    }
+    else
       throw co_error(sts);
   }
 
@@ -270,7 +291,8 @@ int sev_server::init(int noneth)
   strncpy(myn.name, node.name, sizeof(myn.name));
   m_nodes.push_back(myn);
 
-  for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid) {
+  for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid)
+  {
     sev_node n;
 
     n.nid = node.nid;
@@ -278,7 +300,8 @@ int sev_server::init(int noneth)
     m_nodes.push_back(n);
   }
 
-  if (!m_noneth) {
+  if (!m_noneth)
+  {
     m_sts = m_db->tree_update();
     m_sts = gdh_MountDynClients();
   }
@@ -299,7 +322,8 @@ int sev_server::connect()
   // Wait for qmon to start
   sleep(5);
 
-  for (unsigned int i = 0; i < m_nodes.size(); i++) {
+  for (unsigned int i = 0; i < m_nodes.size(); i++)
+  {
     tgt.nid = m_nodes[i].nid;
     tgt.qix = sev_eProcSevClient;
 
@@ -316,13 +340,13 @@ int sev_server::connect()
     put.data = msg;
     put.allocate = 0;
 
-    if (!qcom_Put(&sts, &tgt, &put)) {
+    if (!qcom_Put(&sts, &tgt, &put))
+    {
       qcom_Free(&sts, put.data);
-      errh_Info("No connection to %s (%s)", m_nodes[i].name,
-          cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
-    } else
-      errh_Info("Connect sent to %s (%s)", m_nodes[i].name,
-          cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      errh_Info("No connection to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+    }
+    else
+      errh_Info("Connect sent to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
   }
 
   return 1;
@@ -351,7 +375,8 @@ int sev_server::request_items(pwr_tNid nid)
   put.data = msg;
   put.allocate = 0;
 
-  if (!qcom_Put(&sts, &tgt, &put)) {
+  if (!qcom_Put(&sts, &tgt, &put))
+  {
     qcom_Free(&sts, put.data);
   }
 
@@ -367,7 +392,8 @@ int sev_server::send_itemlist(qcom_sQid tgt)
   pwr_tStatus sts, lsts;
   int size;
 
-  for (unsigned int i = 0; i < m_db->m_items.size(); i++) {
+  for (unsigned int i = 0; i < m_db->m_items.size(); i++)
+  {
     if (m_db->m_items[i].deleted)
       continue;
     item_cnt++;
@@ -379,8 +405,7 @@ int sev_server::send_itemlist(qcom_sQid tgt)
 
   size = sizeof(sev_sMsgHistItems) + (item_cnt - 1) * sizeof(sev_sHistItem);
 
-  size += itemattr_cnt * sizeof(sev_sHistAttr)
-      - item_cnt * sizeof(sev_sHistAttr);
+  size += itemattr_cnt * sizeof(sev_sHistAttr) - item_cnt * sizeof(sev_sHistAttr);
 
   put.size = size;
   put.data = qcom_Alloc(&lsts, put.size);
@@ -393,13 +418,13 @@ int sev_server::send_itemlist(qcom_sQid tgt)
   ((sev_sMsgHistItems*)put.data)->NumAttributes = itemattr_cnt;
 
   sev_sHistItem* itemPtr = ((sev_sMsgHistItems*)put.data)->Items;
-  for (unsigned int i = 0; i < m_db->m_items.size(); i++) {
+  for (unsigned int i = 0; i < m_db->m_items.size(); i++)
+  {
     if (m_db->m_items[i].deleted)
       continue;
     itemPtr->oid = m_db->m_items[i].oid;
     strcpy(itemPtr->oname, m_db->m_items[i].oname);
-    itemPtr->storagetime
-        = net_DeltaTimeToNetTime(&m_db->m_items[i].storagetime);
+    itemPtr->storagetime = net_DeltaTimeToNetTime(&m_db->m_items[i].storagetime);
     itemPtr->creatime = net_TimeToNetTime(&m_db->m_items[i].creatime);
     itemPtr->modtime = net_TimeToNetTime(&m_db->m_items[i].modtime);
     strcpy(itemPtr->description, m_db->m_items[i].description);
@@ -408,7 +433,8 @@ int sev_server::send_itemlist(qcom_sQid tgt)
     itemPtr->deadband = m_db->m_items[i].deadband;
     itemPtr->options = m_db->m_items[i].options;
     size_t j = 0;
-    for (j = 0; j < m_db->m_items[i].attr.size(); j++) {
+    for (j = 0; j < m_db->m_items[i].attr.size(); j++)
+    {
       strcpy(itemPtr->attr[j].aname, m_db->m_items[i].attr[j].aname);
       itemPtr->attr[j].type = m_db->m_items[i].attr[j].type;
       itemPtr->attr[j].size = m_db->m_items[i].attr[j].size;
@@ -428,7 +454,8 @@ int sev_server::send_itemlist(qcom_sQid tgt)
   put.type.s = (qcom_eStype)sev_eMsgType_HistItems;
   put.msg_id = m_msg_id++;
 
-  if (!qcom_Put(&sts, &tgt, &put)) {
+  if (!qcom_Put(&sts, &tgt, &put))
+  {
     qcom_Free(&sts, put.data);
     return 0;
   }
@@ -443,11 +470,11 @@ int sev_server::send_eventsitemlist(qcom_sQid tgt)
   pwr_tStatus sts, lsts;
   int size;
 
-  for (unsigned int i = 0; i < m_db->m_items.size(); i++) {
-    if (!m_db->m_items[i].deleted &&
-	strcmp(m_db->m_items[i].attr[0].aname, "Events") == 0 && 
-	m_db->m_items[i].attr[0].size == 0)
-    item_cnt++;
+  for (unsigned int i = 0; i < m_db->m_items.size(); i++)
+  {
+    if (!m_db->m_items[i].deleted && strcmp(m_db->m_items[i].attr[0].aname, "Events") == 0 &&
+        m_db->m_items[i].attr[0].size == 0)
+      item_cnt++;
   }
 
   if (!item_cnt)
@@ -465,15 +492,14 @@ int sev_server::send_eventsitemlist(qcom_sQid tgt)
   ((sev_sMsgEventsItems*)put.data)->NumItems = item_cnt;
 
   sev_sEventsItem* itemPtr = ((sev_sMsgEventsItems*)put.data)->Items;
-  for (unsigned int i = 0; i < m_db->m_items.size(); i++) {
-    if (!(!m_db->m_items[i].deleted &&
-	  strcmp(m_db->m_items[i].attr[0].aname, "Events") == 0 && 
-	  m_db->m_items[i].attr[0].size == 0))
+  for (unsigned int i = 0; i < m_db->m_items.size(); i++)
+  {
+    if (!(!m_db->m_items[i].deleted && strcmp(m_db->m_items[i].attr[0].aname, "Events") == 0 &&
+          m_db->m_items[i].attr[0].size == 0))
       continue;
     itemPtr->oid = m_db->m_items[i].oid;
     strcpy(itemPtr->oname, m_db->m_items[i].oname);
-    itemPtr->storagetime
-        = net_DeltaTimeToNetTime(&m_db->m_items[i].storagetime);
+    itemPtr->storagetime = net_DeltaTimeToNetTime(&m_db->m_items[i].storagetime);
     itemPtr->creatime = net_TimeToNetTime(&m_db->m_items[i].creatime);
     strcpy(itemPtr->description, m_db->m_items[i].description);
     itemPtr->options = m_db->m_items[i].options;
@@ -491,7 +517,8 @@ int sev_server::send_eventsitemlist(qcom_sQid tgt)
   put.type.s = (qcom_eStype)sev_eMsgType_EventsItems;
   put.msg_id = m_msg_id++;
 
-  if (!qcom_Put(&sts, &tgt, &put)) {
+  if (!qcom_Put(&sts, &tgt, &put))
+  {
     qcom_Free(&sts, put.data);
     return 0;
   }
@@ -512,7 +539,8 @@ int sev_server::send_server_status(qcom_sQid tgt)
 
   sts = m_server_status;
 
-  for (unsigned int i = 0; i < m_db->m_items.size(); i++) {
+  for (unsigned int i = 0; i < m_db->m_items.size(); i++)
+  {
     if (m_db->m_items[i].deleted || m_db->m_items[i].status == 0)
       continue;
     if (errh_Severity(m_db->m_items[i].status) > errh_Severity(sts))
@@ -527,7 +555,8 @@ int sev_server::send_server_status(qcom_sQid tgt)
   put.type.s = (qcom_eStype)sev_eMsgType_ServerStatus;
   put.msg_id = m_msg_id++;
 
-  if (!qcom_Put(&sts, &tgt, &put)) {
+  if (!qcom_Put(&sts, &tgt, &put))
+  {
     qcom_Free(&sts, put.data);
     return 0;
   }
@@ -558,7 +587,8 @@ int sev_server::delete_item(qcom_sQid tgt, sev_sMsgHistItemDelete* rmsg)
   put.type.s = (qcom_eStype)sev_eMsgType_HistItemStatus;
   put.msg_id = m_msg_id++;
 
-  if (!qcom_Put(&sts, &tgt, &put)) {
+  if (!qcom_Put(&sts, &tgt, &put))
+  {
     qcom_Free(&sts, put.data);
     return 0;
   }
@@ -594,7 +624,8 @@ int sev_server::mainloop()
 
   m_server_status = PWR__SRUN;
 
-  for (;;) {
+  for (;;)
+  {
     memset(&get, 0, sizeof(get));
     time_GetTime(&before_get);
     time_Adiff(&dt, &before_get, &currenttime);
@@ -608,30 +639,27 @@ int sev_server::mainloop()
     time_Dadd(&idle, &idle, &dt);
     time_DToFloat(&fidle, &idle);
 
-    if (time_Acomp(&currenttime, &next_stat) == 1) {
+    if (time_Acomp(&currenttime, &next_stat) == 1)
+    {
       m_stat.current_load = 100.0 * fbusy / (fbusy + fidle);
       if (feqf(m_stat.medium_load, 0.0f))
         m_stat.medium_load = m_stat.current_load;
       else
-        m_stat.medium_load
-            = a * m_stat.medium_load + (1.0 - a) * m_stat.current_load;
+        m_stat.medium_load = a * m_stat.medium_load + (1.0 - a) * m_stat.current_load;
       m_stat.storage_rate = (float)m_storage_cnt / (fbusy + fidle);
       m_stat.write_rate = (float)m_write_cnt / (fbusy + fidle);
       if (feqf(m_stat.medium_storage_rate, 0.0f))
         m_stat.medium_storage_rate = m_stat.storage_rate;
       else
-        m_stat.medium_storage_rate
-            = a * m_stat.medium_storage_rate + (1.0 - a) * m_stat.storage_rate;
+        m_stat.medium_storage_rate = a * m_stat.medium_storage_rate + (1.0 - a) * m_stat.storage_rate;
       if (feqf(m_stat.medium_write_rate, 0.0f))
         m_stat.medium_write_rate = m_stat.write_rate;
       else
-        m_stat.medium_write_rate
-            = a * m_stat.medium_write_rate + (1.0 - a) * m_stat.write_rate;
+        m_stat.medium_write_rate = a * m_stat.medium_write_rate + (1.0 - a) * m_stat.write_rate;
       if (m_stat.medium_storage_rate < FLT_EPSILON)
         m_stat.write_quota = 0;
       else
-        m_stat.write_quota
-            = m_stat.medium_write_rate / m_stat.medium_storage_rate * 100;
+        m_stat.write_quota = m_stat.medium_write_rate / m_stat.medium_storage_rate * 100;
       m_storage_cnt = 0;
       m_write_cnt = 0;
       m_db->store_stat(&m_stat);
@@ -648,11 +676,13 @@ int sev_server::mainloop()
       busy = pwr_cNDeltaTime;
       idle = pwr_cNDeltaTime;
     }
-    if (!m_read_threads && time_Acomp(&currenttime, &next_garco) == 1) {
+    if (!m_read_threads && time_Acomp(&currenttime, &next_garco) == 1)
+    {
       garbage_collector(0);
       time_Aadd(&next_garco, &next_garco, &garco_interval);
     }
-    if (sts == QCOM__ALLOCQUOTA) {
+    if (sts == QCOM__ALLOCQUOTA)
+    {
       struct timespec r, t;
       t.tv_sec = 0;
       t.tv_nsec = tmo * 1000000;
@@ -662,16 +692,17 @@ int sev_server::mainloop()
     if (sts == QCOM__TMO || !mp)
       continue;
 
-    switch ((int)get.type.b) {
+    switch ((int)get.type.b)
+    {
     case sev_cMsgClass:
-      switch ((int)get.type.s) {
+      switch ((int)get.type.s)
+      {
       case sev_eMsgType_NodeUp:
         errh_Info("Node up %s", cdh_NodeIdToString(0, get.reply.nid, 0, 0));
         request_items(get.reply.nid);
         break;
       case sev_eMsgType_HistItems:
-        errh_Info(
-            "Itemlist received %s", cdh_NodeIdToString(0, get.reply.nid, 0, 0));
+        errh_Info("Itemlist received %s", cdh_NodeIdToString(0, get.reply.nid, 0, 0));
         check_histitems((sev_sMsgHistItems*)mp, get.size);
         m_stat.items_msg_cnt++;
         break;
@@ -694,8 +725,7 @@ int sev_server::mainloop()
         send_server_status(get.reply);
         break;
       case sev_eMsgType_HistObjectDataGetRequest:
-        send_objecthistdata(
-            get.reply, (sev_sMsgHistDataGetRequest*)mp, get.size);
+        send_objecthistdata(get.reply, (sev_sMsgHistDataGetRequest*)mp, get.size);
         m_stat.dataget_msg_cnt++;
         // Don't free the message now
         continue;
@@ -714,12 +744,14 @@ int sev_server::mainloop()
       default:;
       }
       break;
-    case qcom_eBtype_event: {
+    case qcom_eBtype_event:
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.terminate) {
+      if (new_event.b.terminate)
+      {
         delete m_db;
         exit(0);
       }
@@ -752,7 +784,8 @@ int sev_server::check_histitems(sev_sMsgHistItems* msg, unsigned int size)
   sev_sRefid* succ_rp;
   thread_MutexLock(&m_refid_mutex);
   sev_sRefid* rp = (sev_sRefid*)tree_Minimum(&sts, m_refid);
-  while (rp) {
+  while (rp)
+  {
     succ_rp = (sev_sRefid*)tree_Successor(&sts, m_refid, rp);
     if (rp->id.nid == nid)
       tree_Remove(&sts, m_refid, &rp->id);
@@ -760,22 +793,26 @@ int sev_server::check_histitems(sev_sMsgHistItems* msg, unsigned int size)
   }
   thread_MutexUnlock(&m_refid_mutex);
 
-  for (int i = 0; i < item_cnt; i++) {
-    if (msg->Items[i].attrnum > 0) {
+  for (int i = 0; i < item_cnt; i++)
+  {
+    if (msg->Items[i].attrnum > 0)
+    {
       // Deadband requires id variable
       if (msg->Items[i].options & pwr_mSevOptionsMask_UseDeadBand &&
-	  !(msg->Items[i].options & pwr_mSevOptionsMask_DeadBandLinearRegr))
+          !(msg->Items[i].options & pwr_mSevOptionsMask_DeadBandLinearRegr))
         msg->Items[i].options |= pwr_mSevOptionsMask_ReadOptimized;
 
       // printf( "Received: %s.%s\n", msg->Items[i].oname,
       // msg->Items[i].attr[0].aname);
       storagetime = net_NetTimeToDeltaTime(&msg->Items[i].storagetime);
 
-      if (msg->Items[i].attrnum > 1) {
+      if (msg->Items[i].attrnum > 1)
+      {
         // printf( "Received: %s.%s AttrNum:%d\n", msg->Items[i].oname,
         // msg->Items[i].attr[0].aname, msg->Items[i].attrnum);
         sev_sHistItem* buffP = &msg->Items[i];
-        while ((char*)buffP < (char*)msg + size) {
+        while ((char*)buffP < (char*)msg + size)
+        {
           // for(size_t j = 0; j < buffP->attrnum; j++) {
           //  printf( "Received: %s.%s\n", buffP->oname, buffP->attr[j].aname);
           //}
@@ -786,24 +823,25 @@ int sev_server::check_histitems(sev_sMsgHistItems* msg, unsigned int size)
           strcpy(tmpStr, buffP->oname);
           // Point out attribute name
           s = strchr(tmpStr, '.');
-          if (s) {
+          if (s)
+          {
             *s = 0;
             strcpy(attributeName, s + 1);
-          } else
+          }
+          else
             attributeName[0] = '\0';
 
           storagetime = net_NetTimeToDeltaTime(&buffP->storagetime);
           sprintf(tablename,
-              "HiaHia"); // Dummy-name, real name created in add_objectitem
+                  "HiaHia"); // Dummy-name, real name created in add_objectitem
           bool newobject = false;
-          if (!m_db->check_objectitem(&m_sts, tablename, buffP->oid,
-                  buffP->oname, attributeName, storagetime, buffP->description,
-                  buffP->scantime, buffP->deadband, buffP->options,
-                  buffP->attrnum, buffP->attr, &idx)) {
-            m_db->add_objectitem(&m_sts, tablename, buffP->oid, buffP->oname,
-                attributeName, storagetime, buffP->description, buffP->scantime,
-                buffP->deadband, buffP->options, buffP->attrnum, buffP->attr,
-                &idx);
+          if (!m_db->check_objectitem(&m_sts, tablename, buffP->oid, buffP->oname, attributeName, storagetime,
+                                      buffP->description, buffP->scantime, buffP->deadband, buffP->options,
+                                      buffP->attrnum, buffP->attr, &idx))
+          {
+            m_db->add_objectitem(&m_sts, tablename, buffP->oid, buffP->oname, attributeName, storagetime,
+                                 buffP->description, buffP->scantime, buffP->deadband, buffP->options,
+                                 buffP->attrnum, buffP->attr, &idx);
             if (EVEN(m_sts))
               return m_sts;
             newobject = true;
@@ -814,7 +852,8 @@ int sev_server::check_histitems(sev_sMsgHistItems* msg, unsigned int size)
           m_db->m_items[idx].value_size = 0;
           // Check if any new attributes is found if so add column
           bool tableChange = false;
-          for (size_t j = 0; j < buffP->attrnum; j++) {
+          for (size_t j = 0; j < buffP->attrnum; j++)
+          {
             // printf( "Received: %s.%s\n", buffP->oname, buffP->attr[j].aname);
             sev_attr newattr;
             strncpy(newattr.aname, buffP->attr[j].aname, sizeof(newattr.aname));
@@ -824,9 +863,9 @@ int sev_server::check_histitems(sev_sMsgHistItems* msg, unsigned int size)
             newattr.elem = 0;
             newattrVec.push_back(newattr);
 
-            if (!m_db->check_objectitemattr(&m_sts, tablename, buffP->oid,
-                    buffP->attr[j].aname, buffP->oname, buffP->attr[j].type,
-                    buffP->attr[j].size, &idx)) {
+            if (!m_db->check_objectitemattr(&m_sts, tablename, buffP->oid, buffP->attr[j].aname, buffP->oname,
+                                            buffP->attr[j].type, buffP->attr[j].size, &idx))
+            {
               tableChange = true;
             }
           }
@@ -837,7 +876,8 @@ int sev_server::check_histitems(sev_sMsgHistItems* msg, unsigned int size)
           m_db->m_items[idx].attr = newattrVec;
           m_db->m_items[idx].attrnum = newattrVec.size();
 
-          if (tableChange) {
+          if (tableChange)
+          {
             // Either an attribute has changed type or size or we have a new
             // attribute
             // rename the table to something and create a new one.
@@ -857,14 +897,15 @@ int sev_server::check_histitems(sev_sMsgHistItems* msg, unsigned int size)
 
           // If something was wrong during checking of attributes we ignore this
           // object
-          if (ODD(m_sts)) {
+          if (ODD(m_sts))
+          {
             // Create space for the old values used if we have deadband active
-            if (m_db->m_items[idx].old_value != 0) {
+            if (m_db->m_items[idx].old_value != 0)
+            {
               free(m_db->m_items[idx].old_value);
               m_db->m_items[idx].old_value = 0;
             }
-            m_db->m_items[idx].old_value
-                = malloc(m_db->m_items[idx].value_size);
+            m_db->m_items[idx].old_value = malloc(m_db->m_items[idx].value_size);
 
             m_db->m_items[idx].sevid = buffP->sevid;
 
@@ -880,33 +921,32 @@ int sev_server::check_histitems(sev_sMsgHistItems* msg, unsigned int size)
 
           int numberOfAttributes = buffP->attrnum;
           // buffP points after the last attribute written
-          if (numberOfAttributes == 0) {
-            printf("Something is very strange at line:%d in file:%s\n",
-                __LINE__, __FUNCTION__);
+          if (numberOfAttributes == 0)
+          {
+            printf("Something is very strange at line:%d in file:%s\n", __LINE__, __FUNCTION__);
             break;
           }
           buffP = (sev_sHistItem*)&buffP->attr[numberOfAttributes];
         }
         break;
       }
-      if (!m_db->check_item(&m_sts, msg->Items[i].oid, msg->Items[i].oname,
-              msg->Items[i].attr[0].aname, storagetime,
-              msg->Items[i].attr[0].type, msg->Items[i].attr[0].size,
-              msg->Items[i].description, msg->Items[i].attr[0].unit,
-              msg->Items[i].scantime, msg->Items[i].deadband,
-              msg->Items[i].options, &idx)) {
-        m_db->add_item(&m_sts, msg->Items[i].oid, msg->Items[i].oname,
-            msg->Items[i].attr[0].aname, storagetime,
-            msg->Items[i].attr[0].type, msg->Items[i].attr[0].size,
-            msg->Items[i].description, msg->Items[i].attr[0].unit,
-            msg->Items[i].scantime, msg->Items[i].deadband,
-            msg->Items[i].options, &idx);
+      if (!m_db->check_item(&m_sts, msg->Items[i].oid, msg->Items[i].oname, msg->Items[i].attr[0].aname,
+                            storagetime, msg->Items[i].attr[0].type, msg->Items[i].attr[0].size,
+                            msg->Items[i].description, msg->Items[i].attr[0].unit, msg->Items[i].scantime,
+                            msg->Items[i].deadband, msg->Items[i].options, &idx))
+      {
+        m_db->add_item(&m_sts, msg->Items[i].oid, msg->Items[i].oname, msg->Items[i].attr[0].aname,
+                       storagetime, msg->Items[i].attr[0].type, msg->Items[i].attr[0].size,
+                       msg->Items[i].description, msg->Items[i].attr[0].unit, msg->Items[i].scantime,
+                       msg->Items[i].deadband, msg->Items[i].options, &idx);
         if (EVEN(m_sts))
           return m_sts;
       }
-      if (ODD(m_sts)) {
+      if (ODD(m_sts))
+      {
         // Create space for the old values used if we have deadband active
-        if (m_db->m_items[idx].old_value != 0) {
+        if (m_db->m_items[idx].old_value != 0)
+        {
           free(m_db->m_items[idx].old_value);
           m_db->m_items[idx].old_value = 0;
         }
@@ -929,26 +969,28 @@ int sev_server::check_histitems(sev_sMsgHistItems* msg, unsigned int size)
         rp->idx = idx;
         thread_MutexUnlock(&m_refid_mutex);
       }
-    } else {
+    }
+    else
+    {
       // SevHistEvents item
 
       storagetime = net_NetTimeToDeltaTime(&msg->Items[i].storagetime);
 
-      if (!m_db->check_item(&m_sts, msg->Items[i].oid, msg->Items[i].oname,
-              (char*)"Events", storagetime, (pwr_eType)0, 0,
-              msg->Items[i].description, (char*)"", msg->Items[i].scantime, 0,
-              msg->Items[i].options, &idx)) {
-        m_db->add_item(&m_sts, msg->Items[i].oid, msg->Items[i].oname,
-            (char*)"Events", storagetime, (pwr_eType)0, 0,
-            msg->Items[i].description, (char*)"", msg->Items[i].scantime, 0,
-            msg->Items[i].options, &idx);
+      if (!m_db->check_item(&m_sts, msg->Items[i].oid, msg->Items[i].oname, (char*)"Events", storagetime,
+                            (pwr_eType)0, 0, msg->Items[i].description, (char*)"", msg->Items[i].scantime, 0,
+                            msg->Items[i].options, &idx))
+      {
+        m_db->add_item(&m_sts, msg->Items[i].oid, msg->Items[i].oname, (char*)"Events", storagetime,
+                       (pwr_eType)0, 0, msg->Items[i].description, (char*)"", msg->Items[i].scantime, 0,
+                       msg->Items[i].options, &idx);
         if (EVEN(m_sts))
           return m_sts;
       }
     }
   }
 
-  if (!m_noneth) {
+  if (!m_noneth)
+  {
     m_sts = m_db->tree_update();
     if (EVEN(m_sts))
       printf("Tree error %d\n", m_sts);
@@ -958,8 +1000,7 @@ int sev_server::check_histitems(sev_sMsgHistItems* msg, unsigned int size)
   return 1;
 }
 
-int sev_server::receive_histdata(
-    sev_sMsgHistDataStore* msg, unsigned int size, pwr_tNid nid)
+int sev_server::receive_histdata(sev_sMsgHistDataStore* msg, unsigned int size, pwr_tNid nid)
 {
   pwr_tStatus sts;
   sev_sHistData* dp;
@@ -967,21 +1008,26 @@ int sev_server::receive_histdata(
   pwr_tUInt32 server_thread;
   int data_size;
 
-  if (msg->Version == 0) {
+  if (msg->Version == 0)
+  {
     // Server thread was added in version 1
     dp = (sev_sHistData*)&((sev_sMsgHistDataStoreV0*)msg)->Data;
     data_size = size - (sizeof(sev_sMsgHistDataStoreV0) - sizeof(msg->Data));
     server_thread = 0;
-  } else {
+  }
+  else
+  {
     dp = (sev_sHistData*)&msg->Data;
     data_size = size - (sizeof(*msg) - sizeof(msg->Data));
     server_thread = msg->ServerThread;
   }
 
-  if (!m_config->UseServerThreads) {
+  if (!m_config->UseServerThreads)
+  {
     m_db->begin_transaction(0);
 
-    while ((char*)dp - (char*)msg < (int)size) {
+    while ((char*)dp - (char*)msg < (int)size)
+    {
       sev_sRefid* rp;
       pwr_tRefId rk = dp->sevid;
 
@@ -989,9 +1035,9 @@ int sev_server::receive_histdata(
       rp = (sev_sRefid*)tree_Find(&sts, m_refid, &rk);
       thread_MutexUnlock(&m_refid_mutex);
 
-      if (!rp) {
-        dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data)
-            + dp->size);
+      if (!rp)
+      {
+        dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data) + dp->size);
         continue;
       }
       unsigned int idx = rp->idx;
@@ -1001,12 +1047,13 @@ int sev_server::receive_histdata(
       m_storage_cnt++;
       m_write_cnt++;
 
-      dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data)
-          + dp->size);
+      dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data) + dp->size);
     }
 
     m_db->commit_transaction(0);
-  } else {
+  }
+  else
+  {
     sev_sThread* th;
     sev_sQMsgHistData* qmsg;
     int qmsg_size;
@@ -1018,7 +1065,8 @@ int sev_server::receive_histdata(
       key = server_thread;
 
     th = find_thread(key);
-    if (!th) {
+    if (!th)
+    {
       th = create_thread(key);
       printf("sev_server, new thread %d\n", key);
     }
@@ -1026,9 +1074,9 @@ int sev_server::receive_histdata(
     // Create a queue message
     qmsg_size = data_size + (sizeof(*qmsg) - sizeof(qmsg->data));
 
-    if ((int)(th->alloc + qmsg_size) > (int)m_config->ThreadQueueLimit
-        || (int)(m_total_queue_cnt + qmsg_size)
-            > (int)m_config->TotalQueueLimit) {
+    if ((int)(th->alloc + qmsg_size) > (int)m_config->ThreadQueueLimit ||
+        (int)(m_total_queue_cnt + qmsg_size) > (int)m_config->TotalQueueLimit)
+    {
       // Queue maxlimit exceeded, discard message
       m_config->ServerThreads[th->conf_idx].LostCnt++;
       return 1;
@@ -1048,7 +1096,8 @@ int sev_server::receive_histdata(
     thread_MutexUnlock(&m_alloc_mutex);
 
     m_config->TotalQueueCnt = m_total_queue_cnt;
-    if (th->conf_idx >= 0) {
+    if (th->conf_idx >= 0)
+    {
       m_config->ServerThreads[th->conf_idx].QueueAlloc = th->alloc;
       m_config->ServerThreads[th->conf_idx].DataStoreMsgCnt++;
     }
@@ -1057,8 +1106,7 @@ int sev_server::receive_histdata(
   return 1;
 }
 
-int sev_server::send_histdata(
-    qcom_sQid tgt, sev_sMsgHistDataGetRequest* rmsg, unsigned int size)
+int sev_server::send_histdata(qcom_sQid tgt, sev_sMsgHistDataGetRequest* rmsg, unsigned int size)
 {
   pthread_t thread;
   pthread_attr_t attr;
@@ -1070,7 +1118,8 @@ int sev_server::send_histdata(
   arg->rmsg = rmsg;
   arg->size = size;
 
-  if (m_read_threads) {
+  if (m_read_threads)
+  {
     static int pcnt = 0;
     printf("New read thread %d\n", pcnt++);
     pthread_attr_init(&attr);
@@ -1078,7 +1127,9 @@ int sev_server::send_histdata(
     sts = pthread_create(&thread, &attr, send_histdata_thread, arg);
     if (sts != 0)
       printf("pthread_create error %d\n", sts);
-  } else {
+  }
+  else
+  {
     send_histdata_thread(arg);
   }
   return 1;
@@ -1112,32 +1163,28 @@ void* sev_server::send_histdata_thread(void* arg)
   else
     sev->m_db->get_item_idx(&sts, &item_idx, rmsg->Oid, rmsg->AName);
 
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     if (sev->m_read_threads)
       thread = sev->m_db->new_thread();
 
     time_GetTime(&before);
-    sev->m_db->get_values(&sts, thread,
-        sev->m_db->m_items[item_idx].oid,
-        sev->m_db->m_items[item_idx].options,
-        sev->m_db->m_items[item_idx].deadband,
-        sev->m_db->m_items[item_idx].attr[0].aname,
-        sev->m_db->m_items[item_idx].attr[0].type,
-        sev->m_db->m_items[item_idx].attr[0].size,
-        sev->m_db->m_items[item_idx].scantime,
-        &sev->m_db->m_items[item_idx].creatime, &starttime, &endtime,
+    sev->m_db->get_values(
+        &sts, thread, sev->m_db->m_items[item_idx].oid, sev->m_db->m_items[item_idx].options,
+        sev->m_db->m_items[item_idx].deadband, sev->m_db->m_items[item_idx].attr[0].aname,
+        sev->m_db->m_items[item_idx].attr[0].type, sev->m_db->m_items[item_idx].attr[0].size,
+        sev->m_db->m_items[item_idx].scantime, &sev->m_db->m_items[item_idx].creatime, &starttime, &endtime,
         rmsg->NumPoints, &tbuf, &vbuf, &rows);
     if (ODD(sts) && rows != 0)
-      msize
-          = rows * (sizeof(pwr_tTime) + sev->m_db->m_items[item_idx].attr[0].size)
-          + sizeof(*msg) - sizeof(msg->Data);
+      msize = rows * (sizeof(pwr_tTime) + sev->m_db->m_items[item_idx].attr[0].size) + sizeof(*msg) -
+              sizeof(msg->Data);
     else
       msize = sizeof(*msg);
 
     time_GetTime(&after);
     sev->m_config->Stat.LastGetMsgTime = time_AdiffToFloat(&after, &before);
   }
-  else 
+  else
     msize = sizeof(*msg);
 
   put.reply.nid = sev->m_nodes[0].nid;
@@ -1155,7 +1202,8 @@ void* sev_server::send_histdata_thread(void* arg)
   msg->Version = sev_cNetVersion;
   msg->Oid = rmsg->Oid;
   strncpy(msg->AName, rmsg->AName, sizeof(msg->AName));
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     msg->NumPoints = rows;
     msg->VType = sev->m_db->m_items[item_idx].attr[0].type;
     msg->VSize = sev->m_db->m_items[item_idx].attr[0].size;
@@ -1164,28 +1212,31 @@ void* sev_server::send_histdata_thread(void* arg)
 
   msg->Status = sts;
 
-  if (ODD(sts) && rows) {
+  if (ODD(sts) && rows)
+  {
     memcpy(&msg->Data, tbuf, sizeof(pwr_tTime) * rows);
     memcpy((char*)&msg->Data + sizeof(pwr_tTime) * rows, vbuf,
-        sev->m_db->m_items[item_idx].attr[0].size * rows);
+           sev->m_db->m_items[item_idx].attr[0].size * rows);
   }
-  if (!qcom_Put(&lsts, &tgt, &put)) {
+  if (!qcom_Put(&lsts, &tgt, &put))
+  {
     qcom_Free(&lsts, put.data);
   }
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     free(tbuf);
     free(vbuf);
   }
 
-  if (sev->m_read_threads) {
+  if (sev->m_read_threads)
+  {
     sev->m_db->delete_thread(thread);
-    pthread_exit( (void *) 1);
+    pthread_exit((void*)1);
   }
   return (void*)1;
 }
 
-int sev_server::send_objecthistdata(
-    qcom_sQid tgt, sev_sMsgHistDataGetRequest* rmsg, unsigned int size)
+int sev_server::send_objecthistdata(qcom_sQid tgt, sev_sMsgHistDataGetRequest* rmsg, unsigned int size)
 {
   pthread_t thread;
   int sts;
@@ -1196,12 +1247,15 @@ int sev_server::send_objecthistdata(
   arg->rmsg = rmsg;
   arg->size = size;
 
-  if (m_read_threads) {
+  if (m_read_threads)
+  {
     printf("New read thread\n");
     sts = pthread_create(&thread, NULL, send_objecthistdata_thread, arg);
     if (sts != 0)
       printf("pthread_create error %d\n", sts);
-  } else {
+  }
+  else
+  {
     send_objecthistdata_thread(arg);
   }
   return 1;
@@ -1233,15 +1287,18 @@ void* sev_server::send_objecthistdata_thread(void* arg)
     thread = sev->m_db->new_thread();
 
   sev->m_db->get_objectitem(&sev->m_sts, thread, &item, rmsg->Oid, rmsg->AName);
-  if (ODD(sev->m_sts)) {
-    sev->m_db->get_objectvalues(&sev->m_sts, thread, &item, item.value_size,
-        &starttime, &endtime, rmsg->NumPoints, &tbuf, &vbuf, &rows);
+  if (ODD(sev->m_sts))
+  {
+    sev->m_db->get_objectvalues(&sev->m_sts, thread, &item, item.value_size, &starttime, &endtime,
+                                rmsg->NumPoints, &tbuf, &vbuf, &rows);
   }
-  if (ODD(sev->m_sts) && rows != 0) {
+  if (ODD(sev->m_sts) && rows != 0)
+  {
     msize = rows * (sizeof(pwr_tTime) + item.value_size);
     msize += item.attr.size() * sizeof(msg->Attr);
     msize += sizeof(*msg) - sizeof(msg->Data) - sizeof(msg->Attr);
-  } else
+  }
+  else
     msize = sizeof(*msg);
 
   put.reply.nid = sev->m_nodes[0].nid;
@@ -1262,28 +1319,30 @@ void* sev_server::send_objecthistdata_thread(void* arg)
   msg->Status = sev->m_sts;
   msg->NumPoints = 0;
   msg->NumAttributes = 0;
-  if (ODD(sev->m_sts) && rows != 0) {
+  if (ODD(sev->m_sts) && rows != 0)
+  {
     msg->NumPoints = rows;
     msg->NumAttributes = item.attr.size();
     msg->TotalDataSize = rows * (sizeof(pwr_tTime) + item.value_size);
-    for (size_t i = 0; i < item.attr.size(); i++) {
-      strncpy(
-          msg->Attr[i].aname, item.attr[i].aname, sizeof(msg->Attr[0].aname));
+    for (size_t i = 0; i < item.attr.size(); i++)
+    {
+      strncpy(msg->Attr[i].aname, item.attr[i].aname, sizeof(msg->Attr[0].aname));
       msg->Attr[i].elem = 1; // Not used
       msg->Attr[i].size = item.attr[i].size;
       msg->Attr[i].type = item.attr[i].type;
     }
-    if (rows) {
+    if (rows)
+    {
       void* ptr = &msg->Attr[item.attr.size()];
       memcpy(ptr, tbuf, sizeof(pwr_tTime) * rows);
-      memcpy(
-          (char*)ptr + sizeof(pwr_tTime) * rows, vbuf, item.value_size * rows);
+      memcpy((char*)ptr + sizeof(pwr_tTime) * rows, vbuf, item.value_size * rows);
     }
   }
 
   qcom_Free(&lsts, rmsg);
 
-  if (!qcom_Put(&sts, &tgt, &put)) {
+  if (!qcom_Put(&sts, &tgt, &put))
+  {
     qcom_Free(&sts, put.data);
   }
 
@@ -1293,8 +1352,7 @@ void* sev_server::send_objecthistdata_thread(void* arg)
   return (void*)1;
 }
 
-int sev_server::send_events(
-    qcom_sQid tgt, sev_sMsgEventsGetRequest* rmsg, unsigned int size)
+int sev_server::send_events(qcom_sQid tgt, sev_sMsgEventsGetRequest* rmsg, unsigned int size)
 {
   pthread_t thread;
   pthread_attr_t attr;
@@ -1306,7 +1364,8 @@ int sev_server::send_events(
   arg->rmsg = rmsg;
   arg->size = size;
 
-  if (m_read_threads) {
+  if (m_read_threads)
+  {
     static int pcnt = 0;
     printf("New read thread %d\n", pcnt++);
     pthread_attr_init(&attr);
@@ -1314,7 +1373,9 @@ int sev_server::send_events(
     sts = pthread_create(&thread, &attr, send_events_thread, arg);
     if (sts != 0)
       printf("pthread_create error %d\n", sts);
-  } else {
+  }
+  else
+  {
     send_events_thread(arg);
   }
   return 1;
@@ -1340,15 +1401,15 @@ void* sev_server::send_events_thread(void* arg)
   starttime = net_NetTimeToTime(&rmsg->StartTime);
   endtime = net_NetTimeToTime(&rmsg->EndTime);
 
-  sev->m_db->get_item_idx(&sts, &item_idx, rmsg->Oid, (char *)"Events");
-  if (ODD(sts)) {
+  sev->m_db->get_item_idx(&sts, &item_idx, rmsg->Oid, (char*)"Events");
+  if (ODD(sts))
+  {
     if (sev->m_read_threads)
       thread = sev->m_db->new_thread();
 
-    sev->m_db->get_events(&sts, thread, rmsg->Oid,
-			  sev->m_db->m_items[item_idx].options, rmsg->EventTypeMask, 
-			  rmsg->EventPrioMask, rmsg->EventText, rmsg->EventName,
-			  &starttime, &endtime, rmsg->MaxEvents, list);
+    sev->m_db->get_events(&sts, thread, rmsg->Oid, sev->m_db->m_items[item_idx].options, rmsg->EventTypeMask,
+                          rmsg->EventPrioMask, rmsg->EventText, rmsg->EventName, &starttime, &endtime,
+                          rmsg->MaxEvents, list);
   }
   if (ODD(sts) && list.size() != 0)
     msize = sizeof(*msg) + (list.size() - 1) * sizeof(sev_sEvents);
@@ -1369,16 +1430,19 @@ void* sev_server::send_events_thread(void* arg)
   msg->Type = sev_eMsgType_EventsGet;
   msg->Version = sev_cNetVersion;
   msg->Oid = rmsg->Oid;
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     msg->NumEvents = list.size();
   }
   qcom_Free(&lsts, rmsg);
 
   msg->Status = sts;
 
-  if (ODD(sts) && list.size()) {
-    sev_sEvents *mp = msg->Events;
-    for (int i = 0; i < list.size(); i++) {
+  if (ODD(sts) && list.size())
+  {
+    sev_sEvents* mp = msg->Events;
+    for (int i = 0; i < list.size(); i++)
+    {
       mp->Time = net_TimeToNetTime(&list[i].time);
       mp->EventType = list[i].type;
       mp->EventPrio = list[i].eventprio;
@@ -1392,28 +1456,32 @@ void* sev_server::send_events_thread(void* arg)
       mp++;
     }
   }
-  if (!qcom_Put(&sts, &tgt, &put)) {
+  if (!qcom_Put(&sts, &tgt, &put))
+  {
     qcom_Free(&sts, put.data);
   }
 
-  if (sev->m_read_threads) {
+  if (sev->m_read_threads)
+  {
     sev->m_db->delete_thread(thread);
-    pthread_exit( (void *) 1);
+    pthread_exit((void*)1);
   }
   return (void*)1;
 }
 
-int sev_server::receive_events(
-    sev_sMsgEventsStore* msg, unsigned int size, pwr_tNodeId nid)
+int sev_server::receive_events(sev_sMsgEventsStore* msg, unsigned int size, pwr_tNodeId nid)
 {
   sev_sEvent* ep;
   pwr_tUInt32 server_thread;
 
-  if (msg->Version == 0) {
+  if (msg->Version == 0)
+  {
     // Server thread was added in version 1
     ep = (sev_sEvent*)&((sev_sMsgEventsStoreV0*)msg)->Events;
     server_thread = 0;
-  } else {
+  }
+  else
+  {
     ep = (sev_sEvent*)&msg->Events[0];
     server_thread = msg->ServerThread;
   }
@@ -1421,23 +1489,27 @@ int sev_server::receive_events(
   // Get index
   int idx = 0;
   int found = 0;
-  for (unsigned int i = 0; i < m_db->m_items.size(); i++) {
+  for (unsigned int i = 0; i < m_db->m_items.size(); i++)
+  {
     if (m_db->m_items[i].deleted)
       continue;
-    if (cdh_ObjidIsEqual(m_db->m_items[i].oid, msg->Oid)) {
+    if (cdh_ObjidIsEqual(m_db->m_items[i].oid, msg->Oid))
+    {
       idx = i;
       found = 1;
       break;
     }
   }
-  if (!found) {
-    errh_Error(
-        "Unknown event table, objid (%d,%d)", msg->Oid.vid, msg->Oid.oix);
+  if (!found)
+  {
+    errh_Error("Unknown event table, objid (%d,%d)", msg->Oid.vid, msg->Oid.oix);
     return 1;
   }
 
-  if (!m_config->UseServerThreads) {
-    for (unsigned int i = 0; i < msg->NumEvents; i++) {
+  if (!m_config->UseServerThreads)
+  {
+    for (unsigned int i = 0; i < msg->NumEvents; i++)
+    {
       sev_event ev;
 
       ev.type = ep->type;
@@ -1454,18 +1526,20 @@ int sev_server::receive_events(
       ev.supobject.Offset = ep->sup_aref_offset;
       ev.supobject.Size = ep->sup_aref_size;
       if (msg->Version < 2)
-	ev.eventstatus = 0;
-      else 
-	ev.eventstatus = ep->eventstatus;
+        ev.eventstatus = 0;
+      else
+        ev.eventstatus = ep->eventstatus;
       m_db->store_event(&m_sts, 0, idx, &ev);
       if (msg->Version == 0)
-	ep = (sev_sEvent *)((char *)ep + sizeof(sev_sEventV0)); 
+        ep = (sev_sEvent*)((char*)ep + sizeof(sev_sEventV0));
       else if (msg->Version == 1)
-	ep = (sev_sEvent *)((char *)ep + sizeof(sev_sEventV1));
+        ep = (sev_sEvent*)((char*)ep + sizeof(sev_sEventV1));
       else
-	ep++;
+        ep++;
     }
-  } else {
+  }
+  else
+  {
     sev_sThread* th;
     sev_sQMsgEvent* qmsg;
     pwr_tUInt32 key;
@@ -1477,16 +1551,16 @@ int sev_server::receive_events(
       key = server_thread;
 
     th = find_thread(key);
-    if (!th) {
+    if (!th)
+    {
       th = create_thread(key);
       printf("sev_server, new thread %d\n", key);
     }
 
     // Create a queue message
-    if ((int)(th->alloc + sizeof(*qmsg) - sizeof(qmsg->data) + size)
-            > (int)m_config->ThreadQueueLimit
-        || (int)(m_total_queue_cnt + sizeof(*qmsg) - sizeof(qmsg->data) + size)
-            > (int)m_config->TotalQueueLimit) {
+    if ((int)(th->alloc + sizeof(*qmsg) - sizeof(qmsg->data) + size) > (int)m_config->ThreadQueueLimit ||
+        (int)(m_total_queue_cnt + sizeof(*qmsg) - sizeof(qmsg->data) + size) > (int)m_config->TotalQueueLimit)
+    {
       // Queue maxlimit exceeded, discard message
       m_config->ServerThreads[th->conf_idx].LostCnt++;
       return 1;
@@ -1507,7 +1581,8 @@ int sev_server::receive_events(
     thread_MutexUnlock(&m_alloc_mutex);
 
     m_config->TotalQueueCnt = m_total_queue_cnt;
-    if (th->conf_idx >= 0) {
+    if (th->conf_idx >= 0)
+    {
       m_config->ServerThreads[th->conf_idx].QueueAlloc = th->alloc;
       m_config->ServerThreads[th->conf_idx].EventStoreMsgCnt++;
     }
@@ -1541,20 +1616,23 @@ void* sev_server::garbage_collector_thread(void* arg)
   time_GetTime(&currenttime);
   time_Aadd(&next_garco, &currenttime, &garco_interval);
 
-  while (1) {
+  while (1)
+  {
     sleep(1);
 
     time_GetTime(&currenttime);
-    if (time_Acomp(&currenttime, &next_garco) == 1) {
+    if (time_Acomp(&currenttime, &next_garco) == 1)
+    {
       sev->garbage_collector(thread);
-      if (sev->m_sts == SEV__NOCONNECTION) {
-	if ( reconnect_cnt < 50) {
-	  errh_Error("Database connection lost, thread garbage collector, reconnecting");
-	  thread = sev->m_db->new_thread();
-	  reconnect_cnt++;
-	}
+      if (sev->m_sts == SEV__NOCONNECTION)
+      {
+        if (reconnect_cnt < 50)
+        {
+          errh_Error("Database connection lost, thread garbage collector, reconnecting");
+          thread = sev->m_db->new_thread();
+          reconnect_cnt++;
+        }
       }
-	
 
       time_FloatToD(&garco_interval, sev->m_config->GarbageInterval);
       time_Aadd(&next_garco, &next_garco, &garco_interval);
@@ -1574,25 +1652,29 @@ void sev_server::garbage_collector(void* thread)
   if (item_size == 0)
     return;
 
-  items_per_scan
-      = ((float)m_config->GarbageInterval) * item_size / sev_cGarbageCycle;
+  items_per_scan = ((float)m_config->GarbageInterval) * item_size / sev_cGarbageCycle;
 
-  if (items_per_scan >= 1) {
-    for (i = 0; i < (int)items_per_scan; i++) {
+  if (items_per_scan >= 1)
+  {
+    for (i = 0; i < (int)items_per_scan; i++)
+    {
       garbage_item(thread, current);
       current++;
       if (current >= item_size)
         current = 0;
     }
-  } else {
+  }
+  else
+  {
     scan_per_items = (int)(1.0 / items_per_scan);
     scan_cnt++;
-    if (scan_cnt >= scan_per_items) {
+    if (scan_cnt >= scan_per_items)
+    {
       scan_cnt = 0;
 
       garbage_item(thread, current);
       if (m_sts == SEV__NOCONNECTION)
-	return;
+        return;
 
       current++;
       if (current >= item_size)
@@ -1614,34 +1696,32 @@ void sev_server::garbage_item(void* thread, int idx)
 
   time_Asub(&limit, &currenttime, &m_db->m_items[idx].storagetime);
 
-  if (m_db->m_items[idx].attrnum > 1) {
-    m_db->delete_old_objectdata(&m_sts, thread, m_db->m_items[idx].tablename,
-        m_db->m_items[idx].options, limit, m_db->m_items[idx].scantime,
-        (float)sev_cGarbageCycle);
-  } else {
-    m_db->delete_old_data(&m_sts, thread, m_db->m_items[idx].tablename,
-        m_db->m_items[idx].options, limit, m_db->m_items[idx].scantime,
-        (float)sev_cGarbageCycle);
+  if (m_db->m_items[idx].attrnum > 1)
+  {
+    m_db->delete_old_objectdata(&m_sts, thread, m_db->m_items[idx].tablename, m_db->m_items[idx].options,
+                                limit, m_db->m_items[idx].scantime, (float)sev_cGarbageCycle);
+  }
+  else
+  {
+    m_db->delete_old_data(&m_sts, thread, m_db->m_items[idx].tablename, m_db->m_items[idx].options, limit,
+                          m_db->m_items[idx].scantime, (float)sev_cGarbageCycle);
   }
 }
 
-sev_sThread* sev_server::find_thread(int key)
-{
-  return m_thread_list[key];
-}
+sev_sThread* sev_server::find_thread(int key) { return m_thread_list[key]; }
 
 void* sev_server::receive_histdata_thread(void* arg)
 {
   sev_server* sev = (sev_server*)((sev_sReceiveHistDataThread*)arg)->ctx;
   int tmo_item;
-  pwr_tDeltaTime tmo = { 1, 0 };
+  pwr_tDeltaTime tmo = {1, 0};
   sev_sThread* th = ((sev_sReceiveHistDataThread*)arg)->th;
   pwr_tStatus sts;
   pwr_tTime time;
   pwr_tTime currenttime;
   pwr_tTime next_stat;
   sev_sQMsgHeader* qmsg;
-  pwr_tDeltaTime stat_interval = { 0, 500000000 };
+  pwr_tDeltaTime stat_interval = {0, 500000000};
   pwr_tTime before_get;
   pwr_tDeltaTime busy = pwr_cNDeltaTime;
   pwr_tDeltaTime idle = pwr_cNDeltaTime;
@@ -1663,7 +1743,8 @@ void* sev_server::receive_histdata_thread(void* arg)
   time_GetTime(&currenttime);
   time_Aadd(&next_stat, &currenttime, &stat_interval);
 
-  while (1) {
+  while (1)
+  {
     time_GetTime(&before_get);
     time_Adiff(&dt, &before_get, &currenttime);
     time_Dadd(&busy, &busy, &dt);
@@ -1671,9 +1752,12 @@ void* sev_server::receive_histdata_thread(void* arg)
 
     qmsg = (sev_sQMsgHeader*)que_Get(NULL, &th->queue, &tmo, &tmo_item);
 
-    if ((int*)qmsg == &tmo_item) {
+    if ((int*)qmsg == &tmo_item)
+    {
       // printf( "Tmo %d\n", th->key);
-    } else {
+    }
+    else
+    {
       thread_MutexLock(&sev->m_alloc_mutex);
       th->alloc -= qmsg->size;
       // if ( th->alloc < 0)
@@ -1687,31 +1771,30 @@ void* sev_server::receive_histdata_thread(void* arg)
       time_Dadd(&idle, &idle, &dt);
       time_DToFloat(&fidle, &idle);
 
-      if (th->conf_idx >= 0 && time_Acomp(&currenttime, &next_stat) == 1) {
+      if (th->conf_idx >= 0 && time_Acomp(&currenttime, &next_stat) == 1)
+      {
         thread_conf->QueueAlloc = th->alloc;
         current_load = 100.0 * fbusy / (fbusy + fidle);
         if (feqf(thread_conf->MediumLoad, 0.0f))
           thread_conf->MediumLoad = current_load;
         else
-          thread_conf->MediumLoad
-              = a * thread_conf->MediumLoad + (1.0 - a) * current_load;
+          thread_conf->MediumLoad = a * thread_conf->MediumLoad + (1.0 - a) * current_load;
         thread_conf->StorageRate = (float)storage_cnt / (fbusy + fidle);
         if (feqf(thread_conf->MediumStorageRate, 0.0f))
           thread_conf->MediumStorageRate = thread_conf->StorageRate;
         else
-          thread_conf->MediumStorageRate = a * thread_conf->MediumStorageRate
-              + (1.0 - a) * thread_conf->StorageRate;
+          thread_conf->MediumStorageRate =
+              a * thread_conf->MediumStorageRate + (1.0 - a) * thread_conf->StorageRate;
         thread_conf->WriteRate = (float)write_cnt / (fbusy + fidle);
         if (feqf(thread_conf->MediumWriteRate, 0.0f))
           thread_conf->MediumWriteRate = thread_conf->WriteRate;
         else
-          thread_conf->MediumWriteRate = a * thread_conf->MediumWriteRate
-              + (1.0 - a) * thread_conf->WriteRate;
+          thread_conf->MediumWriteRate =
+              a * thread_conf->MediumWriteRate + (1.0 - a) * thread_conf->WriteRate;
         if (thread_conf->MediumStorageRate < FLT_EPSILON)
           thread_conf->WriteQuota = 0;
         else
-          thread_conf->WriteQuota = thread_conf->MediumWriteRate
-              / thread_conf->MediumStorageRate * 100;
+          thread_conf->WriteQuota = thread_conf->MediumWriteRate / thread_conf->MediumStorageRate * 100;
         storage_cnt = 0;
         write_cnt = 0;
 
@@ -1720,8 +1803,10 @@ void* sev_server::receive_histdata_thread(void* arg)
         idle = pwr_cNDeltaTime;
       }
 
-      switch (qmsg->type) {
-      case sev_eQMsgType_HistData: {
+      switch (qmsg->type)
+      {
+      case sev_eQMsgType_HistData:
+      {
         sev_sHistData* dp;
         sev_sQMsgHistData* msg = (sev_sQMsgHistData*)qmsg;
         int data_size = msg->h.size - (sizeof(*msg) - sizeof(msg->data));
@@ -1729,63 +1814,70 @@ void* sev_server::receive_histdata_thread(void* arg)
         dp = (sev_sHistData*)&msg->data;
 
         sts = sev->m_db->begin_transaction(th->db_ctx);
-	if (sts == SEV__NOCONNECTION) {
-	  if ( th->reconnect_cnt < 50) {
-	    errh_Error("Database connection lost, thread %d, reconnecting",th->key);
-	    th->db_ctx = sev->m_db->new_thread();
-	    th->reconnect_cnt++;
-	    sts = sev->m_db->begin_transaction(th->db_ctx);
-	  }
-	  if (EVEN(sts))
-	    break;
-	}
+        if (sts == SEV__NOCONNECTION)
+        {
+          if (th->reconnect_cnt < 50)
+          {
+            errh_Error("Database connection lost, thread %d, reconnecting", th->key);
+            th->db_ctx = sev->m_db->new_thread();
+            th->reconnect_cnt++;
+            sts = sev->m_db->begin_transaction(th->db_ctx);
+          }
+          if (EVEN(sts))
+            break;
+        }
 
-        while ((char*)dp - (char*)msg->data < data_size) {
+        while ((char*)dp - (char*)msg->data < data_size)
+        {
           sev_sRefid* rp;
           pwr_tRefId rk = dp->sevid;
 
           thread_MutexLock(&sev->m_refid_mutex);
           rp = (sev_sRefid*)tree_Find(&sts, sev->m_refid, &rk);
           thread_MutexUnlock(&sev->m_refid_mutex);
-          if (!rp) {
-            dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data)
-                + dp->size);
+          if (!rp)
+          {
+            dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data) + dp->size);
             continue;
           }
           unsigned int idx = rp->idx;
 
           time = net_NetTimeToTime(&msg->time);
-          sev->m_db->store_value(
-              &sev->m_sts, th->db_ctx, idx, 0, time, &dp->data, dp->size);
+          sev->m_db->store_value(&sev->m_sts, th->db_ctx, idx, 0, time, &dp->data, dp->size);
           sev->m_storage_cnt++;
           storage_cnt++;
-          if (ODD(sev->m_sts) && sev->m_sts != SEV__NOWRITE) {
+          if (ODD(sev->m_sts) && sev->m_sts != SEV__NOWRITE)
+          {
             sev->m_write_cnt++;
             write_cnt++;
           }
 
-          dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data)
-              + dp->size);
+          dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data) + dp->size);
         }
 
         sts = sev->m_db->commit_transaction(th->db_ctx);
-	if (sts == SEV__NOCONNECTION) {
-	  if ( th->reconnect_cnt < 50) {
-	    errh_Error("Database connection lost, thread %d, reconnecting",th->key);
-	    th->db_ctx = sev->m_db->new_thread();
-	    th->reconnect_cnt++;
-	  }
-	}
+        if (sts == SEV__NOCONNECTION)
+        {
+          if (th->reconnect_cnt < 50)
+          {
+            errh_Error("Database connection lost, thread %d, reconnecting", th->key);
+            th->db_ctx = sev->m_db->new_thread();
+            th->reconnect_cnt++;
+          }
+        }
         break;
       }
-      case sev_eQMsgType_Event: {
+      case sev_eQMsgType_Event:
+      {
         sev_sEvent* ep;
         sev_sQMsgEvent* msg = (sev_sQMsgEvent*)qmsg;
 
         ep = (sev_sEvent*)&msg->data;
 
-        if (msg->h.version > 0) {
-          for (int i = 0; i < msg->num_events; i++) {
+        if (msg->h.version > 0)
+        {
+          for (int i = 0; i < msg->num_events; i++)
+          {
             sev_event ev;
 
             ev.type = ep->type;
@@ -1801,18 +1893,21 @@ void* sev_server::receive_histdata_thread(void* arg)
             ev.supobject.Objid.oix = ep->sup_aref_oix;
             ev.supobject.Offset = ep->sup_aref_offset;
             ev.supobject.Size = ep->sup_aref_size;
-	    if (msg->h.version > 1)
-	      // Eventstatus added in version 2
-	      ev.eventstatus = ep->eventstatus;
-	    else
-	      ev.eventstatus = 0;
+            if (msg->h.version > 1)
+              // Eventstatus added in version 2
+              ev.eventstatus = ep->eventstatus;
+            else
+              ev.eventstatus = 0;
             sev->m_db->store_event(&sev->m_sts, th->db_ctx, msg->item_idx, &ev);
             ep++;
           }
-        } else {
+        }
+        else
+        {
           // Supobject was added in version 1
           sev_sEventV0* epV0 = (sev_sEventV0*)ep;
-          for (int i = 0; i < msg->num_events; i++) {
+          for (int i = 0; i < msg->num_events; i++)
+          {
             sev_event ev;
 
             ev.type = epV0->type;
@@ -1828,7 +1923,7 @@ void* sev_server::receive_histdata_thread(void* arg)
             ev.supobject.Objid.oix = 0;
             ev.supobject.Offset = 0;
             ev.supobject.Size = 0;
-	    ev.eventstatus = 0;
+            ev.eventstatus = 0;
             sev->m_db->store_event(&sev->m_sts, th->db_ctx, msg->item_idx, &ev);
             epV0++;
           }
@@ -1853,8 +1948,7 @@ sev_sThread* sev_server::create_thread(int key)
   th->key = key;
   que_Create(NULL, &th->queue);
   th->db_ctx = m_db->new_thread();
-  if (m_thread_cnt
-      < sizeof(m_config->ServerThreads) / sizeof(m_config->ServerThreads[0]))
+  if (m_thread_cnt < sizeof(m_config->ServerThreads) / sizeof(m_config->ServerThreads[0]))
     th->conf_idx = m_thread_cnt;
   else
     th->conf_idx = -1;
@@ -1862,8 +1956,7 @@ sev_sThread* sev_server::create_thread(int key)
 
   m_thread_list[key] = th;
 
-  sev_sReceiveHistDataThread* arg
-      = (sev_sReceiveHistDataThread*)malloc(sizeof(*arg));
+  sev_sReceiveHistDataThread* arg = (sev_sReceiveHistDataThread*)malloc(sizeof(*arg));
   arg->ctx = this;
   arg->th = th;
 
@@ -1871,7 +1964,8 @@ sev_sThread* sev_server::create_thread(int key)
   if (sts != 0)
     printf("sev_server: pthread_create error %d\n", sts);
 
-  if (th->conf_idx >= 0) {
+  if (th->conf_idx >= 0)
+  {
     m_config->ServerThreads[th->conf_idx].Occupied = 1;
     m_config->ServerThreads[th->conf_idx].Key = key;
   }
@@ -1893,8 +1987,8 @@ void sev_server::delete_thread(int key)
 
 sev_server::~sev_server()
 {
-  for (threadlist_iterator it = m_thread_list.begin();
-       it != m_thread_list.end();) {
+  for (threadlist_iterator it = m_thread_list.begin(); it != m_thread_list.end();)
+  {
     sev_sThread* th = it->second;
     m_thread_list.erase(it++);
     m_db->delete_thread(th->db_ctx);

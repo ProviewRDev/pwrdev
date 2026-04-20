@@ -53,7 +53,7 @@
 #define STX 2
 #define ETB 15
 #define ENQ 5
-//#define ACK 6
+// #define ACK 6
 #define UDP_MAX_SIZE 32768
 
 #define errh_Error printf
@@ -61,18 +61,20 @@
 
 fd_set fds; /* For select call */
 
-typedef struct {
+typedef struct
+{
   unsigned char protocol_id[2];
   unsigned short int msg_size;
   unsigned short int msg_id[2];
 } udp_header;
 
-int my_socket; /* My socket */
-struct sockaddr_in my_addr; /* My named socket description */
+int my_socket;                 /* My socket */
+struct sockaddr_in my_addr;    /* My named socket description */
 struct sockaddr_in their_addr; /* Remote socket description */
-struct sockaddr_in dual_addr; /* Maybe a dual socket description */
+struct sockaddr_in dual_addr;  /* Maybe a dual socket description */
 
-typedef struct {
+typedef struct
+{
   int LocalPort;
   int RemotePort;
   char RemoteHostName[32];
@@ -84,25 +86,19 @@ typedef struct {
   int Receive;
   int ErrCount;
   int Disable;
-} * udp_tCtx;
+}* udp_tCtx;
 
 static udp_tCtx udp_ctx = 0;
 
-void udp_Disable()
-{
-  udp_ctx->Disable = 1;
-}
+void udp_Disable() { udp_ctx->Disable = 1; }
 
-void udp_Enable()
-{
-  udp_ctx->Disable = 0;
-}
+void udp_Enable() { udp_ctx->Disable = 0; }
 
 static int CreateSocket(udp_tCtx ctx)
 {
   int sts;
   unsigned char badr[4];
-  int iadr[4] = { -1, -1, -1, -1 };
+  int iadr[4] = {-1, -1, -1, -1};
   struct hostent* he;
   struct sockaddr_in address;
   socklen_t address_len = sizeof(struct sockaddr_in);
@@ -110,23 +106,28 @@ static int CreateSocket(udp_tCtx ctx)
   /* Create a socket for UDP */
 
   my_socket = socket(AF_INET, SOCK_DGRAM, 0);
-  if (my_socket < 0) {
+  if (my_socket < 0)
+  {
     errh_Error("Socket, %d", my_socket);
     return 0;
   }
 
-  if (ctx->LocalPort != 0) {
+  if (ctx->LocalPort != 0)
+  {
     /* Set local port */
     my_addr.sin_family = AF_INET;
     my_addr.sin_port = htons(ctx->LocalPort);
 
     /* Bind the created socket */
     sts = bind(my_socket, (struct sockaddr*)&my_addr, sizeof(my_addr));
-    if (sts != 0) {
+    if (sts != 0)
+    {
       errh_Error("Bind, %d", sts);
       return 0;
     }
-  } else {
+  }
+  else
+  {
     getsockname(my_socket, (struct sockaddr*)&address, &address_len);
     ctx->LocalPort = ntohs(address.sin_port);
   }
@@ -135,23 +136,28 @@ static int CreateSocket(udp_tCtx ctx)
 
   their_addr.sin_family = AF_INET;
   their_addr.sin_port = htons(ctx->RemotePort);
-  sscanf((char*)&(ctx->RemoteAddress), "%d.%d.%d.%d", &iadr[0], &iadr[1],
-      &iadr[2], &iadr[3]);
+  sscanf((char*)&(ctx->RemoteAddress), "%d.%d.%d.%d", &iadr[0], &iadr[1], &iadr[2], &iadr[3]);
 
   /* If none or invalid ip-address is given, use hostname to get hostent struct,
      otherwise use the given ip address directly */
 
-  if ((iadr[0] < 0 || iadr[0] > 255) || (iadr[1] < 0 || iadr[1] > 255)
-      || (iadr[2] < 0 || iadr[2] > 255) || (iadr[3] < 0 || iadr[3] > 255)) {
+  if ((iadr[0] < 0 || iadr[0] > 255) || (iadr[1] < 0 || iadr[1] > 255) || (iadr[2] < 0 || iadr[2] > 255) ||
+      (iadr[3] < 0 || iadr[3] > 255))
+  {
     he = gethostbyname(ctx->RemoteHostName);
-    if (he) {
+    if (he)
+    {
       memcpy(&their_addr.sin_addr, he->h_addr, 4);
       sprintf(ctx->RemoteAddress, "%s", inet_ntoa(their_addr.sin_addr));
-    } else {
+    }
+    else
+    {
       errh_Error("Unknown host, %s", ctx->RemoteHostName);
       return 0;
     }
-  } else {
+  }
+  else
+  {
     badr[0] = (unsigned char)iadr[0];
     badr[1] = (unsigned char)iadr[1];
     badr[2] = (unsigned char)iadr[2];
@@ -165,17 +171,19 @@ static int CreateSocket(udp_tCtx ctx)
   return 1;
 }
 
-static pwr_tTime last_try = { 0, 0 };
+static pwr_tTime last_try = {0, 0};
 pwr_tStatus udp_CheckLink()
 {
-  if (!udp_ctx->LinkUp && last_try.tv_sec != 0) {
+  if (!udp_ctx->LinkUp && last_try.tv_sec != 0)
+  {
     /* Don't try again within 20 seconds */
     pwr_tTime current;
     pwr_tDeltaTime diff;
 
     time_GetTime(&current);
     time_Adiff(&diff, &current, &last_try);
-    if (time_DToFloat(0, &diff) < 30) {
+    if (time_DToFloat(0, &diff) < 30)
+    {
       // printf( "Reqest Dismissed\n");
       return REM__UDPNOCON;
     }
@@ -201,13 +209,15 @@ pwr_tStatus udp_Request(char* sendbuf, int sendbuf_size, char** rcvbuf)
   if (EVEN(sts))
     return sts;
 
-  for (i = 0; i < 4; i++) {
+  for (i = 0; i < 4; i++)
+  {
     sts = udp_Send(sendbuf, sendbuf_size);
     if (EVEN(sts))
       return sts;
 
     sts = udp_Receive(rcvbuf, tmo);
-    if (sts != REM__TIMEOUT) {
+    if (sts != REM__TIMEOUT)
+    {
       udp_ctx->LinkUp = 1;
       return sts;
     }
@@ -216,7 +226,8 @@ pwr_tStatus udp_Request(char* sendbuf, int sendbuf_size, char** rcvbuf)
 
   udp_LinkFailure();
 
-  if (udp_ctx->LinkUp) {
+  if (udp_ctx->LinkUp)
+  {
     printf("UDP link Down to node %s\n", udp_ctx->RemoteHostName);
     udp_ctx->LinkUp = 0;
   }
@@ -227,7 +238,8 @@ pwr_tStatus udp_Send(char* buf, int buf_size)
 {
   int status;
   udp_tCtx ctx = udp_ctx;
-  static struct message_s {
+  static struct message_s
+  {
     udp_header header;
     char data[UDP_MAX_SIZE];
   } message;
@@ -244,11 +256,11 @@ pwr_tStatus udp_Send(char* buf, int buf_size)
   memcpy(&message.data, buf, buf_size);
 
   if (ctx->DisableHeader)
-    status = sendto(my_socket, &message.data, buf_size, 0,
-        (struct sockaddr*)&their_addr, sizeof(struct sockaddr));
+    status =
+        sendto(my_socket, &message.data, buf_size, 0, (struct sockaddr*)&their_addr, sizeof(struct sockaddr));
   else
-    status = sendto(my_socket, &message, buf_size + sizeof(udp_header), 0,
-        (struct sockaddr*)&their_addr, sizeof(struct sockaddr));
+    status = sendto(my_socket, &message, buf_size + sizeof(udp_header), 0, (struct sockaddr*)&their_addr,
+                    sizeof(struct sockaddr));
 
   return REM__SUCCESS;
 }
@@ -277,7 +289,8 @@ pwr_tStatus udp_Receive(char** buff, int tmo)
   FD_ZERO(&fds);
   FD_SET(my_socket, &fds);
   sts = select(32, &fds, NULL, NULL, &tv);
-  switch (sts) {
+  switch (sts)
+  {
   case 0:
     /* Timeout */
     return REM__TIMEOUT;
@@ -291,17 +304,17 @@ pwr_tStatus udp_Receive(char** buff, int tmo)
 
   fromlen = sizeof(struct sockaddr);
 
-  size = recvfrom(
-      my_socket, &buf, sizeof(buf), 0, (struct sockaddr*)&from, &fromlen);
+  size = recvfrom(my_socket, &buf, sizeof(buf), 0, (struct sockaddr*)&from, &fromlen);
 
-  if (size < 0) { /* Definitly error */
+  if (size < 0)
+  { /* Definitly error */
     errh_Info("UDP Receive fail %s", ctx->RemoteHostName);
     ctx->ErrCount++;
     return (-1);
   }
 
-  if (memcmp(&from.sin_addr, &their_addr.sin_addr, sizeof(struct in_addr))
-      != 0) { /*from.sin_port != their_addr.sin_port*/
+  if (memcmp(&from.sin_addr, &their_addr.sin_addr, sizeof(struct in_addr)) != 0)
+  { /*from.sin_port != their_addr.sin_port*/
     memcpy(&badr, &from.sin_addr, 4);
     sprintf(unknown, "%d.%d.%d.%d", badr[0], badr[1], badr[2], badr[3]);
     errh_Info("UDP Receive from unknown source %s", unknown);
@@ -311,15 +324,19 @@ pwr_tStatus udp_Receive(char** buff, int tmo)
 
   /* Set link up */
 
-  if (ctx->LinkUp == 0) {
+  if (ctx->LinkUp == 0)
+  {
     errh_Info("UDP link up %s", ctx->RemoteHostName);
     ctx->LinkUp = 1;
   }
 
-  if (size > 0 && ctx->DisableHeader) {
+  if (size > 0 && ctx->DisableHeader)
+  {
     datapos = buf;
     datasize = sizeof(buf);
-  } else if (size >= 8) {
+  }
+  else if (size >= 8)
+  {
     memcpy(&header, &buf, sizeof(udp_header));
 
     /* Convert the header to host byte order */
@@ -327,36 +344,45 @@ pwr_tStatus udp_Receive(char** buff, int tmo)
     header.msg_id[0] = ntohs(header.msg_id[0]);
     header.msg_id[1] = ntohs(header.msg_id[1]);
 
-    if (header.protocol_id[0] == STX && size == header.msg_size) {
-      if (header.protocol_id[1] == ETB || header.protocol_id[1] == ENQ) {
-        if (header.msg_id[0] == 0 && header.msg_id[1] == 0) {
+    if (header.protocol_id[0] == STX && size == header.msg_size)
+    {
+      if (header.protocol_id[1] == ETB || header.protocol_id[1] == ENQ)
+      {
+        if (header.msg_id[0] == 0 && header.msg_id[1] == 0)
+        {
           /* Keepalive */
           ctx->KeepaliveDiff--;
-        } else {
+        }
+        else
+        {
           /* Data */
           datapos = ((char*)&buf) + sizeof(udp_header);
           datasize = header.msg_size - sizeof(udp_header);
           printf("%s", datapos);
         }
-      } else {
+      }
+      else
+      {
         /* Weird header */
         ctx->ErrCount++;
-        errh_Info("UDP receive weird header %s, %02x %02x %04x %04x %04x",
-            ctx->RemoteHostName, header.protocol_id[0], header.protocol_id[1],
-            header.msg_size, header.msg_id[0], header.msg_id[1]);
+        errh_Info("UDP receive weird header %s, %02x %02x %04x %04x %04x", ctx->RemoteHostName,
+                  header.protocol_id[0], header.protocol_id[1], header.msg_size, header.msg_id[0],
+                  header.msg_id[1]);
       }
     }
 
-    else {
+    else
+    {
       /* Weird header */
       ctx->ErrCount++;
-      errh_Info("UDP receive weird header %s, %02x %02x %04x %04x %04x",
-          ctx->RemoteHostName, header.protocol_id[0], header.protocol_id[1],
-          header.msg_size, header.msg_id[0], header.msg_id[1]);
+      errh_Info("UDP receive weird header %s, %02x %02x %04x %04x %04x", ctx->RemoteHostName,
+                header.protocol_id[0], header.protocol_id[1], header.msg_size, header.msg_id[0],
+                header.msg_id[1]);
     }
   }
 
-  else {
+  else
+  {
     /* Not a remtrans UPD message */
     ctx->ErrCount++;
     errh_Info("UDP receive weird message %s", ctx->RemoteHostName);

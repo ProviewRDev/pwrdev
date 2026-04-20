@@ -43,6 +43,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Templates for objects inheriting PnDevice are now fixed.
 - Animation bug in javascript ge graphs caused execution to stop in the browser.
 - Fix build scripts where some directories where not created as they should when using parallel build.
+- rt_plc_process: Fixed `PlcThreadObjects` remaining-slot clearing loop that used `>` instead of `<`, causing an out-of-bounds write past the 20-element array.
+- bcomp/simul: Fixed off-by-one in CompIMC_Fo delay reset loops (`i <= MAXCELLS` → `i < MAXCELLS`) that wrote one element past the 100-element `D[]` array, causing undefined behavior.
 - The "Alarm and event analyzer" would not start due to missing environmental variables.
 - Fix a bug that caused the operator graph to crash when an input lost focus.
 - Some aggregates for ABB and Eurotherm did not have their dynamic graphs generated correctly. They do now.

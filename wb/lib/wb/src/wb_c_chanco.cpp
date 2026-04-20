@@ -44,11 +44,10 @@
   Syntax check.
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus SyntaxCheck(
-    ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
-    int* ErrorCount, /* accumulated error count */
-    int* WarningCount /* accumulated waring count */
-    )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated waring count */
+)
 {
   return PWRB__SUCCESS;
 }
@@ -57,5 +56,4 @@ static pwr_tStatus SyntaxCheck(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(ChanCo)
-    = { pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(ChanCo) = {pwr_BindMethod(SyntaxCheck), pwr_NullMethod};

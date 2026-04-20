@@ -42,12 +42,14 @@
 #include "co_wow_msg.h"
 #include "co_lng.h"
 
-typedef enum {
+typedef enum
+{
   wow_eFileSelAction_Save,
   wow_eFileSelAction_Open
 } wow_eFileSelAction;
 
-typedef enum {
+typedef enum
+{
   wow_eFileSelType_,
   wow_eFileSelType_All,
   wow_eFileSelType_Dbs,
@@ -62,7 +64,8 @@ typedef enum {
   wow_eFileSelType__
 } wow_eFileSelType;
 
-typedef enum {
+typedef enum
+{
   wow_eModalDialogReturn_NYI,
   wow_eModalDialogReturn_Button1,
   wow_eModalDialogReturn_Button2,
@@ -71,7 +74,8 @@ typedef enum {
   wow_eModalDialogReturn_ReturnPressed
 } wow_eMotalDialogReturn;
 
-typedef enum {
+typedef enum
+{
   wow_eImage_No,
   wow_eImage_Error,
   wow_eImage_Warning,
@@ -79,21 +83,30 @@ typedef enum {
   wow_eImage_Question
 } wow_eImage;
 
-typedef enum { wow_ePixmap_No, wow_ePixmap_Graph, wow_ePixmap__ } wow_ePixmap;
-typedef enum {
+typedef enum
+{
+  wow_ePixmap_No,
+  wow_ePixmap_Graph,
+  wow_ePixmap__
+} wow_ePixmap;
+typedef enum
+{
   wow_eIconType_Rt,
   wow_eIconType_Wb
 } wow_eIconType;
 
-typedef struct {
+typedef struct
+{
   char input_str[200];
   int status;
 } wow_sModalInputDialog;
 
-class CoWowWidget {
+class CoWowWidget
+{
 };
 
-class CoWowTimer {
+class CoWowTimer
+{
 public:
   void (*m_callback)(void*);
   void* m_data;
@@ -104,7 +117,8 @@ public:
   virtual void remove();
 };
 
-class CoWowRecall {
+class CoWowRecall
+{
 public:
   static const int m_recall_size = 30;
   static const int m_line_size = 160;
@@ -122,7 +136,8 @@ public:
   CoWowRecall();
 };
 
-class CoWow {
+class CoWow
+{
 protected:
   static bool m_autoremove;
   static bool m_printdialog_disable;
@@ -137,58 +152,54 @@ public:
   virtual ~CoWow();
 
   virtual void DisplayQuestion(void* ctx, const char* title, const char* text,
-      void (*questionbox_ok)(void*, void*),
-      void (*questionbox_cancel)(void*, void*), void* data);
-  virtual void DisplayError(const char* title, const char* text,
-      lng_eCoding coding = lng_eCoding_ISO8859_1, int modal = 1);
-  virtual void DisplayText(
-      const char* title, const char* text, int width = 0, int height = 0,
-      wow_eImage image = wow_eImage_Info);
+                               void (*questionbox_ok)(void*, void*), void (*questionbox_cancel)(void*, void*),
+                               void* data);
+  virtual void DisplayError(const char* title, const char* text, lng_eCoding coding = lng_eCoding_ISO8859_1,
+                            int modal = 1);
+  virtual void DisplayText(const char* title, const char* text, int width = 0, int height = 0,
+                           wow_eImage image = wow_eImage_Info);
   virtual void CreateInputDialog(void* ctx, const char* title, const char* text,
-      void (*inputdialogbox_ok)(void*, void*, char*),
-      void (*inputdialogbox_cancel)(void*, void*), int input_length,
-      char* init_text, void* data);
+                                 void (*inputdialogbox_ok)(void*, void*, char*),
+                                 void (*inputdialogbox_cancel)(void*, void*), int input_length,
+                                 char* init_text, void* data);
   virtual void* CreateList(const char* title, const char* texts, int textsize,
-      void(action_cb)(void*, char*, int), void(cancel_cb)(void*), void* ctx,
-      int show_apply_button = 0);
+                           void(action_cb)(void*, char*, int), void(cancel_cb)(void*), void* ctx,
+                           int show_apply_button = 0);
   virtual void PopList(void* ctx);
   virtual void DeleteList(void* ctx);
   virtual void CreateFileSelDia(const char* title, void* parent_ctx,
-      void (*file_selected_cb)(void*, char*, wow_eFileSelType),
-				wow_eFileSelType file_type, wow_eFileSelAction action);
-  virtual int CreateModalDialog(const char* title, const char* text,
-      const char* button1, const char* button2, const char* button3,
-      const char* image);
-  virtual wow_sModalInputDialog* CreateModalInputDialog(const char* title,
-      const char* text, const char* button1, const char* button2,
-      const char* button3, const char* image, int input_length,
-      CoWowRecall* recall = 0);
+                                void (*file_selected_cb)(void*, char*, wow_eFileSelType),
+                                wow_eFileSelType file_type, wow_eFileSelAction action);
+  virtual int CreateModalDialog(const char* title, const char* text, const char* button1, const char* button2,
+                                const char* button3, const char* image);
+  virtual wow_sModalInputDialog* CreateModalInputDialog(const char* title, const char* text,
+                                                        const char* button1, const char* button2,
+                                                        const char* button3, const char* image,
+                                                        int input_length, CoWowRecall* recall = 0);
   virtual void Wait(float time);
 
   static int HideWarranty();
-  void* CreateFileList(const char* title, const char* dir, const char* pattern,
-      const char* type, void(action_cb)(void*, char*, int),
-      void(cancel_cb)(void*), void* ctx, int show_apply_button = 0);
+  void* CreateFileList(const char* title, const char* dir, const char* pattern, const char* type,
+                       void(action_cb)(void*, char*, int), void(cancel_cb)(void*), void* ctx,
+                       int show_apply_button = 0);
   virtual int DisplayWarranty();
   virtual void DisplayLicense();
   virtual CoWowTimer* timer_new();
-  virtual pwr_tStatus CreateMenuItem(
-      const char* name, void* menu, int pixmap, int append, void* w);
+  virtual pwr_tStatus CreateMenuItem(const char* name, void* menu, int pixmap, int append, void* w);
   virtual pwr_tStatus DeleteMenuItem(const char* name, void* menu);
-  virtual void CreateBrowPrintDialog(const char* title, void* brow_ctx,
-      int orientation, double scale, void* parent_widget, pwr_tStatus* sts);
-  virtual void CreateFlowPrintDialog(const char* title, void* flow_ctx,
-      int orientation, double scale, void* parent_widget, pwr_tStatus* sts);
+  virtual void CreateBrowPrintDialog(const char* title, void* brow_ctx, int orientation, double scale,
+                                     void* parent_widget, pwr_tStatus* sts);
+  virtual void CreateFlowPrintDialog(const char* title, void* flow_ctx, int orientation, double scale,
+                                     void* parent_widget, pwr_tStatus* sts);
   static void SetDefaultPrinter(const char* printer);
   static void DisablePrintDialog();
   static bool PrintDialogIsDisabled();
   static void SetAutoRemove(bool on);
   static void SetTransient(void* transient_wid);
   static void SetIconType(wow_eIconType type);
-  static int ColorTheme() {return m_color_theme;}
+  static int ColorTheme() { return m_color_theme; }
   static int SetColorTheme(int color_theme);
   static int DarkTheme();
-
 };
 
 #endif

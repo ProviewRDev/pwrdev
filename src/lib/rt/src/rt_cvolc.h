@@ -43,30 +43,29 @@
 
 /* Callable functions.  */
 
-void* cvolc_GetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np,
-    const pwr_sAttrRef* arp, gdb_sCclass* ccp, const pwr_sAttrRef* rarp,
-    pwr_tUInt32 ridx, mvol_sAttribute* ap, void* p, int size);
+void* cvolc_GetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np, const pwr_sAttrRef* arp, gdb_sCclass* ccp,
+                          const pwr_sAttrRef* rarp, pwr_tUInt32 ridx, mvol_sAttribute* ap, void* p, int size);
 
 void cvolc_LockObject(pwr_tStatus* sts, gdb_sObject* op);
 
-gdb_sObject* cvolc_NameToObject(pwr_tStatus* sts, gdb_sObject* p_op,
-    cdh_sParseName* pn, int index, pwr_tBitMask trans);
+gdb_sObject* cvolc_NameToObject(pwr_tStatus* sts, gdb_sObject* p_op, cdh_sParseName* pn, int index,
+                                pwr_tBitMask trans);
 
-gdb_sObject* cvolc_OidToObject(pwr_tStatus* sts, gdb_sVolume* vp,
-    pwr_tObjid oid, pwr_tBitMask trans, cvol_eHint hint);
+gdb_sObject* cvolc_OidToObject(pwr_tStatus* sts, gdb_sVolume* vp, pwr_tObjid oid, pwr_tBitMask trans,
+                               cvol_eHint hint);
 
-pwr_tBoolean cvolc_SetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np,
-    const pwr_sAttrRef* arp, const gdb_sCclass* ccp, const pwr_sAttrRef* rarp,
-    pwr_tUInt32 ridx, mvol_sAttribute* ap, const void* p, int size);
+pwr_tBoolean cvolc_SetObjectInfo(pwr_tStatus* sts, const gdb_sNode* np, const pwr_sAttrRef* arp,
+                                 const gdb_sCclass* ccp, const pwr_sAttrRef* rarp, pwr_tUInt32 ridx,
+                                 mvol_sAttribute* ap, const void* p, int size);
 
 void cvolc_TouchObject(gdb_sObject* op);
 
 void cvolc_UnlockObject(pwr_tStatus* sts, gdb_sObject* op);
 
-void cvolc_FileList(pwr_tStatus* sts, gdb_sObject* p_op, char* dir,
-    char* pattern, pwr_tString40* filelist[], int* filecnt);
+void cvolc_FileList(pwr_tStatus* sts, gdb_sObject* p_op, char* dir, char* pattern, pwr_tString40* filelist[],
+                    int* filecnt);
 
-void cvolc_ClassList(pwr_tStatus* sts, pwr_tNid nid, int cidcnt, pwr_tCid* cid,
-    int attrobjects, pwr_tAttrRef* classlist[], int* listcnt);
+void cvolc_ClassList(pwr_tStatus* sts, pwr_tNid nid, int cidcnt, pwr_tCid* cid, int attrobjects,
+                     pwr_tAttrRef* classlist[], int* listcnt);
 
 #endif

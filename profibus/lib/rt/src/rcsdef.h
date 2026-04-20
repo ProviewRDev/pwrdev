@@ -44,15 +44,16 @@
 #define __RCSDEF_H__
 
 #ifdef _cplusplus
-extern "C" {
+extern "C"
+{
 #endif /* _cplusplus */
 
 #define FIRMWARE_DOWNLOAD 1
 #define CONFIGURATION_DOWNLOAD 2
 
-/* ======================================================================== */
-/* Message definitions                                                      */
-/* ======================================================================== */
+  /* ======================================================================== */
+  /* Message definitions                                                      */
+  /* ======================================================================== */
 
 #define RCS_TASK 0x00 /* Number of RCS	*/
 #define PLC_TASK 0x02 /* Number for PLC_TASK	*/
@@ -61,9 +62,9 @@ extern "C" {
 
 #define RCS_B_TASK_STATE 4 // Task state
 
-/************************************************************************** */
-/* Genaral RCS commands                                                     */
-/************************************************************************** */
+  /************************************************************************** */
+  /* Genaral RCS commands                                                     */
+  /************************************************************************** */
 
 #define RCS_B_SYSFKT 1
 #define RCS_B_TASKFKT 2
@@ -73,9 +74,9 @@ extern "C" {
 #define RCS_B_LOADFKT 6
 #define RCS_B_DBMFKT 10
 
-/* ----------------------- */
-/* Message extension masks */
-/* ----------------------- */
+  /* ----------------------- */
+  /* Message extension masks */
+  /* ----------------------- */
 
 #define RCS_FIFO_MSK 0
 #define RCS_LIFO_MSK 1
@@ -87,9 +88,9 @@ extern "C" {
 #define RCS_LAST_MSK 0x0C
 #define RCS_SEQ_MSK 0x0C
 
-/* ------------------ */
-/* Mode definitions   */
-/* ------------------ */
+  /* ------------------ */
+  /* Mode definitions   */
+  /* ------------------ */
 
 #define MODE_NEUSTART 0          /* Command: B_SYSFKT */
 #define MODE_KALTSTART 1         /* Command: B_SYSFKT */
@@ -106,8 +107,8 @@ extern "C" {
 #define MODE_MODUL_MCL 13        /* Command: B_SYSFKT */
 #define MODE_MODUL_LIB 12        /* Command: B_SYSFKT */
 #define MODE_MODUL_MCL 13        /* Command: B_SYSFKT */
-#define MODE_DISTRIBUTOR_DRIVER                                                \
-  14                          /* Command: B_SYSFKT ->function 1 = insert       \
+#define MODE_DISTRIBUTOR_DRIVER                                                                              \
+  14                          /* Command: B_SYSFKT ->function 1 = insert                                     \
                                */
 #define MODE_PRINT_DRIVER 15  /* Command: B_SYSFKT */
 #define MODE_GET_RCS_ERROR 16 /* Command: B_SYSFKT */

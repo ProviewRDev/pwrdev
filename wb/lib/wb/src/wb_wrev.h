@@ -44,7 +44,8 @@
 class WRevNav;
 class CoWow;
 
-class WRev {
+class WRev
+{
 public:
   WRev(void* wa_parent_ctx, ldh_tSession wa_ldhses);
   virtual ~WRev();
@@ -68,24 +69,14 @@ public:
   void activate_zoom_reset();
   void next_name(char* name);
 
-  virtual void message(char severity, const char* message)
-  {
-  }
-  virtual void pop()
-  {
-  }
-  virtual void set_clock_cursor()
-  {
-  }
-  virtual void reset_cursor()
-  {
-  }
-  virtual void flush()
-  {
-  }
-  virtual void open_input_dialog(const char* text1, const char* text2,
-      const char* title, const char* init_text1, const char* init_text2,
-      void (*ok_cb)(WRev*, char*, char*))
+  virtual void message(char severity, const char* message) {}
+  virtual void pop() {}
+  virtual void set_clock_cursor() {}
+  virtual void reset_cursor() {}
+  virtual void flush() {}
+  virtual void open_input_dialog(const char* text1, const char* text2, const char* title,
+                                 const char* init_text1, const char* init_text2,
+                                 void (*ok_cb)(WRev*, char*, char*))
   {
   }
 

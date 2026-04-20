@@ -41,7 +41,8 @@
 
 class co_xml_parser;
 
-class co_xml_interpreter {
+class co_xml_interpreter
+{
 public:
   co_xml_interpreter();
   virtual ~co_xml_interpreter();
@@ -70,7 +71,8 @@ public:
   unsigned int object_stack_cnt;
 };
 
-class co_xml_parser {
+class co_xml_parser
+{
 public:
   co_xml_parser(co_xml_interpreter* i);
   ~co_xml_parser();
@@ -100,10 +102,8 @@ public:
   int suppress_msg;
 
   int read(const char* filename);
-  static int ostring_to_data(
-      unsigned char** data, const char* str, int size, int* rsize);
-  static int data_to_ostring(
-      unsigned char* data, int size, char* str, int strsize);
+  static int ostring_to_data(unsigned char** data, const char* str, int size, int* rsize);
+  static int data_to_ostring(unsigned char* data, int size, char* str, int strsize);
 
   bool next_token();
   bool is_space(const char c);

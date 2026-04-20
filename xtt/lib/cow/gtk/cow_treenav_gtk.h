@@ -44,14 +44,13 @@
 #include "cow_treenav.h"
 
 //! The navigation area of the attribute editor.
-class TreeNavGtk : public TreeNav {
+class TreeNavGtk : public TreeNav
+{
 public:
-  TreeNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-      pwr_tAttrRef* xn_itemlist, int xn_item_cnt, unsigned int xn_options,
-      pwr_tStatus (*xn_get_object_info)(
-          void*, pwr_tAttrRef*, char*, int, char*, char*, int),
-      pwr_tStatus (*xn_get_node_info)(void*, char*, char*, int), GtkWidget** w,
-      pwr_tStatus* status);
+  TreeNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, pwr_tAttrRef* xn_itemlist, int xn_item_cnt,
+             unsigned int xn_options,
+             pwr_tStatus (*xn_get_object_info)(void*, pwr_tAttrRef*, char*, int, char*, char*, int),
+             pwr_tStatus (*xn_get_node_info)(void*, char*, char*, int), GtkWidget** w, pwr_tStatus* status);
   ~TreeNavGtk();
 
   GtkWidget* parent_wid;

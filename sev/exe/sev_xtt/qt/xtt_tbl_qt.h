@@ -47,10 +47,10 @@
 
 class XttTblQtWidget;
 
-class XttTblQt : public XttTbl {
+class XttTblQt : public XttTbl
+{
 public:
-  XttTblQt(void* a_parent_ctx, sevcli_tCtx a_sevcli, sevcli_sHistItem* itemlist,
-      int item_cnt);
+  XttTblQt(void* a_parent_ctx, sevcli_tCtx a_sevcli, sevcli_sHistItem* itemlist, int item_cnt);
   ~XttTblQt();
 
   XttTblQtWidget* toplevel;
@@ -62,15 +62,15 @@ public:
   CoWowEntryQt* cmd_entry;
 
   void message(char severity, const char* message);
-  XttSevHist* sevhist_new(pwr_tOid* oidv, pwr_tOName* anamev,
-      pwr_tOName* onamev, bool* sevhistobjectv, pwr_tStatus* sts);
-  CoLogin* login_new(const char* wl_name, const char* wl_groupname,
-      void (*wl_bc_success)(void*), void (*wl_bc_cancel)(void*),
-      pwr_tStatus* status);
+  XttSevHist* sevhist_new(pwr_tOid* oidv, pwr_tOName* anamev, pwr_tOName* onamev, bool* sevhistobjectv,
+                          pwr_tStatus* sts);
+  CoLogin* login_new(const char* wl_name, const char* wl_groupname, void (*wl_bc_success)(void*),
+                     void (*wl_bc_cancel)(void*), pwr_tStatus* status);
   void set_prompt(const char* prompt);
 };
 
-class XttTblQtWidget : public QWidget {
+class XttTblQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

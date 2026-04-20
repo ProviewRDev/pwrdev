@@ -41,9 +41,12 @@
 
 int main(int argc, char* argv[])
 {
-  for (int i = 1; i < argc; i++) {
-    if (streq(argv[i], "-f")) {
-      if (i + 1 >= argc) {
+  for (int i = 1; i < argc; i++)
+  {
+    if (streq(argv[i], "-f"))
+    {
+      if (i + 1 >= argc)
+      {
         printf("\nUsage: wb_ge [-f windowmanager] [-l language] [graphname]\n");
         exit(0);
       }

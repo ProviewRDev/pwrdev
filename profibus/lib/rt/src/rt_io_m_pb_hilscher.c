@@ -131,14 +131,12 @@ typedef struct
 /* Table of known boards, consists of four fields according to the board type.
 The last entry must be a null termination (entry == 0).
 */
-boards known_boards[] = {
-    {1, {8, 50, 66, {'C', 'I', 'F'}}, 8, "Hilscher CIF 50-PB"}, {0, {}, 0, ""}};
+boards known_boards[] = {{1, {8, 50, 66, {'C', 'I', 'F'}}, 8, "Hilscher CIF 50-PB"}, {0, {}, 0, ""}};
 #endif /* FLASH_WRITE_ENABLE  */
 
 /* Initializes Profibus DP interface on the CIF board referred to by local.
 DRV_NO_ERROR is returned upon success.  */
-static short dpm_init_master(io_sAgentLocalHilscher* local,
-                             pwr_sClass_Pb_Hilscher* op, io_sAgent* ap)
+static short dpm_init_master(io_sAgentLocalHilscher* local, pwr_sClass_Pb_Hilscher* op, io_sAgent* ap)
 {
   short rv;
   DPM_PLC_PARAMETER prm;
@@ -167,8 +165,7 @@ static short dpm_init_master(io_sAgentLocalHilscher* local,
 
   /* Writes parameters to the board local->dev_number, task 2, size is
    * hardcoded to 16 as specified in dpm_pie.pdf, page 9.  */
-  if ((rv = DevPutTaskParameter(local->dev_number, 2, 16, &prm)) !=
-      DRV_NO_ERROR)
+  if ((rv = DevPutTaskParameter(local->dev_number, 2, 16, &prm)) != DRV_NO_ERROR)
   {
     errh_Error("Profibus DP Master %s - "
                " DevPutTaskParameter() failed with return code %d",
@@ -404,9 +401,10 @@ bytes will be written to add_tab.
 The function will also set up the required fields in op so that Proview
 may perform IO operations using the IoAgentRead() and IoAgentWrite() functions
 in this module.  */
-static void dpm_set_add_tab(pwr_sClass_Pb_DP_Slave* op, io_sAgent* ap,
-                            io_sRack* rp, DPM_SL_PRM_ADD_TAB* add_tab,
-                            int add_tab_len)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+static void dpm_set_add_tab(pwr_sClass_Pb_DP_Slave* op, io_sAgent* ap, io_sRack* rp,
+                            DPM_SL_PRM_ADD_TAB* add_tab, int add_tab_len)
 {
   io_sCard* cardp;
   short input_counter;
@@ -421,10 +419,8 @@ static void dpm_set_add_tab(pwr_sClass_Pb_DP_Slave* op, io_sAgent* ap,
   slaves/modules have occupied so far.  */
   unsigned short* input_size;
   unsigned short* output_size;
-  input_size =
-      (unsigned short*)&((io_sAgentLocalHilscher*)ap->Local)->input_size;
-  output_size =
-      (unsigned short*)&((io_sAgentLocalHilscher*)ap->Local)->output_size;
+  input_size = (unsigned short*)&((io_sAgentLocalHilscher*)ap->Local)->input_size;
+  output_size = (unsigned short*)&((io_sAgentLocalHilscher*)ap->Local)->output_size;
 
   /* This lets Proview find the IO-area for this module (in this case it is
   actually handled at the agent level, thus in this file).  The offsets
@@ -436,13 +432,10 @@ static void dpm_set_add_tab(pwr_sClass_Pb_DP_Slave* op, io_sAgent* ap,
   op->BytesOfOutput = 0;
 
   /* Finds our rack (slave).  */
-  for (sl = rp;
-       sl != NULL &&
-       ((pwr_sClass_Pb_DP_Slave*)sl->op)->SlaveAddress != op->SlaveAddress;
+  for (sl = rp; sl != NULL && ((pwr_sClass_Pb_DP_Slave*)sl->op)->SlaveAddress != op->SlaveAddress;
        sl = sl->next)
     ;
-  if (sl == NULL ||
-      ((pwr_sClass_Pb_DP_Slave*)sl->op)->SlaveAddress != op->SlaveAddress)
+  if (sl == NULL || ((pwr_sClass_Pb_DP_Slave*)sl->op)->SlaveAddress != op->SlaveAddress)
   {
     errh_Error("Profibus DP Master %s - "
                " Can't find rack for slave %d",
@@ -468,8 +461,7 @@ static void dpm_set_add_tab(pwr_sClass_Pb_DP_Slave* op, io_sAgent* ap,
       /* The MSB tells the Hilscher board whether to treat the address
       as a byte (set) or word (unset) offset
       (see dpm_pie.pdf, page 45).  */
-      add_tab->ausEA_Offset[add_tab->bInput_Count++] =
-          *input_size | EA_OFFSET_BYTE;
+      add_tab->ausEA_Offset[add_tab->bInput_Count++] = *input_size | EA_OFFSET_BYTE;
       *input_size += input_counter;
     }
   }
@@ -492,8 +484,7 @@ static void dpm_set_add_tab(pwr_sClass_Pb_DP_Slave* op, io_sAgent* ap,
       as a byte (set) or word (unset) offset
       (see dpm_pie.pdf, page 45).  */
       /* The input offsets precedes the output offsets.  */
-      add_tab->ausEA_Offset[add_tab->bInput_Count + add_tab->bOutput_Count++] =
-          *output_size | EA_OFFSET_BYTE;
+      add_tab->ausEA_Offset[add_tab->bInput_Count + add_tab->bOutput_Count++] = *output_size | EA_OFFSET_BYTE;
       *output_size += output_counter;
     }
   }
@@ -501,11 +492,11 @@ static void dpm_set_add_tab(pwr_sClass_Pb_DP_Slave* op, io_sAgent* ap,
   assert(add_tab->bInput_Count + add_tab->bOutput_Count <= MAX_EA_OFFSET_LEN);
 
   /* Updates the length of the add_tab struct.  */
-  add_tab->usAdd_Tab_Len =
-      sizeof(add_tab->usAdd_Tab_Len) + sizeof(add_tab->bInput_Count) +
-      sizeof(add_tab->bOutput_Count) + 2 * add_tab->bInput_Count +
-      2 * add_tab->bOutput_Count;
+  add_tab->usAdd_Tab_Len = sizeof(add_tab->usAdd_Tab_Len) + sizeof(add_tab->bInput_Count) +
+                           sizeof(add_tab->bOutput_Count) + 2 * add_tab->bInput_Count +
+                           2 * add_tab->bOutput_Count;
 }
+#pragma GCC diagnostic pop
 
 /* Writes instructions for reflashing the board to the error log.  */
 static void flashing_disabled_warning(io_sAgent* ap)
@@ -597,8 +588,8 @@ static void dpm_ddlm_answer_msg_print_error(RCS_MESSAGE* msg, io_sAgent* ap)
     default:
       return;
     }
-    errh_Info("Profibus DP Master %s - Station %d - DDLM Slave Diag: %s",
-              ap->Name, ((RCS_MESSAGETELEGRAM_10*)msg)->device_adr, s);
+    errh_Info("Profibus DP Master %s - Station %d - DDLM Slave Diag: %s", ap->Name,
+              ((RCS_MESSAGETELEGRAM_10*)msg)->device_adr, s);
     break;
 
   default:
@@ -612,8 +603,7 @@ destination address is passed in address, 0-125 to set slave bus parameters
 or 127 to set master bus parameters.  The bus parameters are read from
 the buffer prmdata and shall be of length prmlen.  DRV_NO_ERROR is returned
 if successful.  */
-static short dpm_ddlm_download(io_sAgentLocalHilscher* local,
-                               unsigned char address, unsigned int prmlen,
+static short dpm_ddlm_download(io_sAgentLocalHilscher* local, unsigned char address, unsigned int prmlen,
                                void* prmdata, io_sAgent* ap)
 {
   short rv;
@@ -645,8 +635,7 @@ static short dpm_ddlm_download(io_sAgentLocalHilscher* local,
   assert(prmlen <= 240);
   memcpy(&(msg.d[4]), prmdata, prmlen);
 
-  if ((rv = DevPutMessage(local->dev_number, (MSG_STRUC*)&msg, 5000)) !=
-      DRV_NO_ERROR)
+  if ((rv = DevPutMessage(local->dev_number, (MSG_STRUC*)&msg, 5000)) != DRV_NO_ERROR)
   {
     errh_Error("Profibus DP Master %s - DDLM_Download - DevPutMessage()"
                " returned %d",
@@ -657,16 +646,15 @@ static short dpm_ddlm_download(io_sAgentLocalHilscher* local,
   /* Checks confirmation message.  */
   while (!got_response)
   {
-    if ((rv = DevGetMessage(local->dev_number, sizeof(rcv_msg),
-                            (MSG_STRUC*)&rcv_msg, 5000)) != DRV_NO_ERROR)
+    if ((rv = DevGetMessage(local->dev_number, sizeof(rcv_msg), (MSG_STRUC*)&rcv_msg, 5000)) != DRV_NO_ERROR)
     {
       errh_Error("Profibus DP Master %s - DDLM_Download - DevGetMessage()"
                  " returned %d",
                  ap->Name, rv);
       return rv;
     }
-    else if (rcv_msg.nr != local->cif_msgcnt || rcv_msg.rx != 16 ||
-             rcv_msg.tx != 3 || rcv_msg.a != DDLM_Download)
+    else if (rcv_msg.nr != local->cif_msgcnt || rcv_msg.rx != 16 || rcv_msg.tx != 3 ||
+             rcv_msg.a != DDLM_Download)
     {
       /* Discards all messages prior to our response.  */
       memset(&rcv_msg, 0, sizeof(rcv_msg));
@@ -688,8 +676,7 @@ static short dpm_ddlm_download(io_sAgentLocalHilscher* local,
 
 /* Configures the master bus parameters of the board referred to by
 local, the struct containing the parameters should be passed in op.  */
-static short dpm_download_master_prm(io_sAgentLocalHilscher* local,
-                                     pwr_sClass_Pb_Hilscher* op, io_sAgent* ap)
+static short dpm_download_master_prm(io_sAgentLocalHilscher* local, pwr_sClass_Pb_Hilscher* op, io_sAgent* ap)
 {
   DPM_BUS_DP prm;
 
@@ -701,17 +688,12 @@ static short dpm_download_master_prm(io_sAgentLocalHilscher* local,
   prm.usBus_Para_Len = 32;
   /* The master's address is hardcoded to 0.  */
   prm.bFDL_Add = 0;
-  prm.bBaudrate =
-      ((op->BaudRate == 500)
-           ? (DP_BAUD_500)
-           : (op->BaudRate == 1500)
-                 ? (DP_BAUD_1500)
-                 : (op->BaudRate == 3000)
-                       ? (DP_BAUD_3000)
-                       : (op->BaudRate == 6000)
-                             ? (DP_BAUD_6000)
-                             : (op->BaudRate == 12000) ? (DP_BAUD_12000)
-                                                       : (DP_BAUD_1500));
+  prm.bBaudrate = ((op->BaudRate == 500)     ? (DP_BAUD_500)
+                   : (op->BaudRate == 1500)  ? (DP_BAUD_1500)
+                   : (op->BaudRate == 3000)  ? (DP_BAUD_3000)
+                   : (op->BaudRate == 6000)  ? (DP_BAUD_6000)
+                   : (op->BaudRate == 12000) ? (DP_BAUD_12000)
+                                             : (DP_BAUD_1500));
   prm.usTSL = op->Tsl;
   prm.usMin_TSDR = op->MinTsdr;
   prm.usMax_TSDR = op->MaxTsdr;
@@ -738,8 +720,9 @@ static short dpm_download_master_prm(io_sAgentLocalHilscher* local,
 is passed in local.  op holds the slave to configure, the corresponding
 agent pointer and rack pointer must be passed in ap and rp respectively.
 DRV_NO_ERROR will be returned upon success.  */
-static short dpm_download_slave_prm(io_sAgentLocalHilscher* local,
-                                    pwr_sClass_Pb_DP_Slave* op, io_sAgent* ap,
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+static short dpm_download_slave_prm(io_sAgentLocalHilscher* local, pwr_sClass_Pb_DP_Slave* op, io_sAgent* ap,
                                     io_sRack* rp)
 {
   unsigned char buf[DPM_MAX_LEN_DATA_UNIT];
@@ -829,13 +812,13 @@ static short dpm_download_slave_prm(io_sAgentLocalHilscher* local,
 
   return dpm_ddlm_download(local, op->SlaveAddress, bufcnt, buf, ap);
 }
+#pragma GCC diagnostic pop
 
 /* Requests diagnostics from the slave address, attached to the
 board referred to by local.  The function will return DRV_NO_ERROR if
 the request was sent without error, however, it tells us nothing
 about whether any diagnostics data was sent back.  */
-static short dpm_req_slave_diag(io_sAgentLocalHilscher* local,
-                                unsigned char address, io_sAgent* ap)
+static short dpm_req_slave_diag(io_sAgentLocalHilscher* local, unsigned char address, io_sAgent* ap)
 {
   short rv;
   RCS_MESSAGETELEGRAM_10 msg;
@@ -863,8 +846,7 @@ static short dpm_req_slave_diag(io_sAgentLocalHilscher* local,
   msg.function = TASK_TFC_READ;
 
   /* Requests diagnostic data from slave.  */
-  if ((rv = DevPutMessage(local->dev_number, (MSG_STRUC*)&msg, 0)) !=
-      DRV_NO_ERROR)
+  if ((rv = DevPutMessage(local->dev_number, (MSG_STRUC*)&msg, 0)) != DRV_NO_ERROR)
   {
     errh_Info("Profibus DP Master %s - DDLM_Slave_Diag - DevPutMessage()"
               " returned %d",
@@ -879,8 +861,7 @@ static short dpm_req_slave_diag(io_sAgentLocalHilscher* local,
 to gather diagnostics data asynchronously.  The desired agent's local
 struct is passed via local and the associated rack list (Profibus slaves) is
 passed in slave_list.  */
-static void dpm_update_slave_diag(io_sAgentLocalHilscher* local,
-                                  io_sRack* slave_list, io_sAgent* ap)
+static void dpm_update_slave_diag(io_sAgentLocalHilscher* local, io_sRack* slave_list, io_sAgent* ap)
 {
   short rv;
   RCS_MESSAGETELEGRAM_10 rcv_msg;
@@ -891,8 +872,7 @@ static void dpm_update_slave_diag(io_sAgentLocalHilscher* local,
   memset(&rcv_msg, 0, sizeof(rcv_msg));
 
   /* Gets pending diagnostic messages, discards all other messages.  */
-  while ((rv = DevGetMessage(local->dev_number, sizeof(rcv_msg),
-                             (MSG_STRUC*)&rcv_msg, 0)) == DRV_NO_ERROR)
+  while ((rv = DevGetMessage(local->dev_number, sizeof(rcv_msg), (MSG_STRUC*)&rcv_msg, 0)) == DRV_NO_ERROR)
   {
     if (rcv_msg.rx != 16 || rcv_msg.tx != 3 || rcv_msg.a != DDLM_Slave_Diag)
     {
@@ -942,8 +922,7 @@ static void dpm_update_slave_diag(io_sAgentLocalHilscher* local,
 
       if (!(sp->StationStatus1 & ~pwr_mPbStationStatus1Mask_ExternalDiag) &&
           !(sp->StationStatus2 &
-            ~(pwr_mPbStationStatus2Mask_Default |
-              pwr_mPbStationStatus2Mask_ResponseMonitoringOn)))
+            ~(pwr_mPbStationStatus2Mask_Default | pwr_mPbStationStatus2Mask_ResponseMonitoringOn)))
       {
         sp->Status = PB__NORMAL;
       }
@@ -951,10 +930,9 @@ static void dpm_update_slave_diag(io_sAgentLocalHilscher* local,
       {
         sp->Status = PB__NOCONN;
       }
-      else if ((sp->StationStatus1 & (pwr_mPbStationStatus1Mask_ConfigFault |
-                                      pwr_mPbStationStatus1Mask_ParamFault)) ||
-               (sp->StationStatus2 &
-                pwr_mPbStationStatus2Mask_NewParamsRequested))
+      else if ((sp->StationStatus1 &
+                (pwr_mPbStationStatus1Mask_ConfigFault | pwr_mPbStationStatus1Mask_ParamFault)) ||
+               (sp->StationStatus2 & pwr_mPbStationStatus2Mask_NewParamsRequested))
       {
         sp->Status = PB__CONFIGERR;
       }
@@ -1079,8 +1057,7 @@ static void dpm_print_diag(io_sAgent* ap, DPM_DIAGNOSTICS* diag)
     }
 
 #ifdef SLAVE_DIAG_VERBOSE
-    errh_Info("Profibus DP Master %s - Station %d - %s", ap->Name,
-              diag->tError.bErr_Rem_Adr, s);
+    errh_Info("Profibus DP Master %s - Station %d - %s", ap->Name, diag->tError.bErr_Rem_Adr, s);
 #endif /* SLAVE_DIAG_VERBOSE  */
     return;
   }
@@ -1102,11 +1079,9 @@ static short dpm_check_board_type(io_sAgentLocalHilscher* local, io_sAgent* ap,
   assert(DRV_NO_ERROR == 0);
 
   /* Gets device information from the board.  */
-  if ((rv = DevGetInfo(local->dev_number, GET_DEV_INFO, sizeof(info), &info)) !=
-      DRV_NO_ERROR)
+  if ((rv = DevGetInfo(local->dev_number, GET_DEV_INFO, sizeof(info), &info)) != DRV_NO_ERROR)
   {
-    errh_Error("Profibus DP Master %s - Error %d while checking board type.",
-               ap->Name, rv);
+    errh_Error("Profibus DP Master %s - Error %d while checking board type.", ap->Name, rv);
     return rv;
   }
 
@@ -1136,8 +1111,7 @@ static short dpm_check_board_type(io_sAgentLocalHilscher* local, io_sAgent* ap,
     errh_Error("in the above mentioned documentation.");
     errh_Error("{ 1, { %d, %d, %d, { '%c', '%c', '%c'} }, "
                "<db start segment>, \"<board name>\" },",
-               info.bDpmSize, info.bDevType, info.bDevModel,
-               info.abDevIdentifier[0], info.abDevIdentifier[1],
+               info.bDpmSize, info.bDevType, info.bDevModel, info.abDevIdentifier[0], info.abDevIdentifier[1],
                info.abDevIdentifier[2]);
     return BOARD_INIT_ERROR;
   }
@@ -1154,8 +1128,7 @@ static short dpm_check_board_type(io_sAgentLocalHilscher* local, io_sAgent* ap,
 
 /* Deletes the "PROFIBUS" protocol settings database from the card referred
 to by local, this procedure is described on page 32 -- 33 in dpm_pie.pdf.  */
-static short dpm_delete_flash_prmdb(io_sAgentLocalHilscher* local,
-                                    io_sAgent* ap)
+static short dpm_delete_flash_prmdb(io_sAgentLocalHilscher* local, io_sAgent* ap)
 {
   unsigned char db_startsegment;
   int s = 3;
@@ -1184,11 +1157,9 @@ static short dpm_delete_flash_prmdb(io_sAgentLocalHilscher* local,
   msg.d[0] = 4; /* mode = delete data base */
   msg.d[1] = db_startsegment;
 
-  errh_Info("Profibus DP Master %s - Sending delete database request...",
-            ap->Name);
+  errh_Info("Profibus DP Master %s - Sending delete database request...", ap->Name);
   /* Sends delete database request.  */
-  if ((rv = DevPutMessage(local->dev_number, (MSG_STRUC*)&msg, 5000)) !=
-      DRV_NO_ERROR)
+  if ((rv = DevPutMessage(local->dev_number, (MSG_STRUC*)&msg, 5000)) != DRV_NO_ERROR)
   {
     errh_Error("Profibus DP Master %s -"
                " DevPutMessage failed with return code %d",
@@ -1209,16 +1180,14 @@ static short dpm_delete_flash_prmdb(io_sAgentLocalHilscher* local,
   /* Gets response message.  */
   while (!got_response)
   {
-    if ((rv = DevGetMessage(local->dev_number, sizeof(msg), (MSG_STRUC*)&msg,
-                            10000)) != DRV_NO_ERROR)
+    if ((rv = DevGetMessage(local->dev_number, sizeof(msg), (MSG_STRUC*)&msg, 10000)) != DRV_NO_ERROR)
     {
       errh_Error("Profibus DP Master %s -"
                  " DevGetMessage failed with return code %d\n",
                  ap->Name, rv);
       return rv;
     }
-    else if (msg.nr != local->cif_msgcnt || msg.rx != 16 || msg.tx != 0 ||
-             msg.a != 6)
+    else if (msg.nr != local->cif_msgcnt || msg.rx != 16 || msg.tx != 0 || msg.a != 6)
     {
       /* Discards all messages prior to our response.  */
       memset(&msg, 0, sizeof(msg));
@@ -1249,8 +1218,7 @@ static short dpm_delete_flash_prmdb(io_sAgentLocalHilscher* local,
 
 /* Wrapper for dpm_init_master(), takes care of checking for (and optionally
 removing) the sycon database if present.  */
-static short dpm_init_master_check_sycon_db(io_sAgentLocalHilscher* local,
-                                            pwr_sClass_Pb_Hilscher* op,
+static short dpm_init_master_check_sycon_db(io_sAgentLocalHilscher* local, pwr_sClass_Pb_Hilscher* op,
                                             io_sAgent* ap)
 {
   short rv;
@@ -1263,8 +1231,7 @@ static short dpm_init_master_check_sycon_db(io_sAgentLocalHilscher* local,
   {
     return rv;
   }
-  else if ((rv = DevGetInfo(local->dev_number, GET_DRIVER_INFO, sizeof(di),
-                            &di)) != DRV_NO_ERROR)
+  else if ((rv = DevGetInfo(local->dev_number, GET_DRIVER_INFO, sizeof(di), &di)) != DRV_NO_ERROR)
   {
     errh_Error("Profibus DP Master %s -"
                " DevGetInfo failed with return code %d",
@@ -1274,8 +1241,7 @@ static short dpm_init_master_check_sycon_db(io_sAgentLocalHilscher* local,
   else if ((di.bHostFlags & (READY_FLAG | RUN_FLAG)) == (READY_FLAG | RUN_FLAG))
   {
     /* RUN and RDY bits set */
-    errh_Info("Profibus DP Master %s - Hostflags: 0x%X", ap->Name,
-              di.bHostFlags);
+    errh_Info("Profibus DP Master %s - Hostflags: 0x%X", ap->Name, di.bHostFlags);
     errh_Info("Device is configured by SyCon.");
 #ifdef FLASH_WRITE_ENABLE
     errh_Info("Deleting SyCon database from board's flash.");
@@ -1350,26 +1316,22 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   {
     /* Cannot open driver */
     op->Status = PB__INITFAIL;
-    errh_Error("ERROR config Profibus DP Master %s - %s", ap->Name,
-               "open device");
+    errh_Error("ERROR config Profibus DP Master %s - %s", ap->Name, "open device");
     ctx->Node->EmergBreakTrue = 1;
     return IO__ERRDEVICE;
   }
 
   /* If this is not the Profibus I/O process, return */
-  if ((op->Process & io_mProcess_Profibus) &&
-      (ctx->Process != io_mProcess_Profibus))
+  if ((op->Process & io_mProcess_Profibus) && (ctx->Process != io_mProcess_Profibus))
   {
     op->Status = PB__NOTINIT;
-    errh_Info("Init template I/O agent for Profibus DP Master %s, %d", ap->Name,
-              ctx->Process);
+    errh_Info("Init template I/O agent for Profibus DP Master %s, %d", ap->Name, ctx->Process);
     return IO__SUCCESS;
   }
 
   if (ctx->Node->Restarts > 0)
   {
-    errh_Info("Warm restart - Skipping config of Profibus DP Master %s",
-              ap->Name);
+    errh_Info("Warm restart - Skipping config of Profibus DP Master %s", ap->Name);
     op->Status = PB__NORMAL;
     return IO__SUCCESS;
   }
@@ -1380,7 +1342,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   {
     ok = FALSE;
     if (ctx->Node->Restarts == 0)
-    {      
+    {
       while (!ok)
       {
         op->Status = PB__NOTINIT;
@@ -1389,8 +1351,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
         if (dpm_init_master_check_sycon_db(local, op, ap) != DRV_NO_ERROR)
         {
           op->Status = PB__INITFAIL;
-          errh_Error("ERROR config Profibus DP Master %s - %s", ap->Name,
-                     "dp init master");
+          errh_Error("ERROR config Profibus DP Master %s - %s", ap->Name, "dp init master");
           return IO__ERRINIDEVICE;
         }
 
@@ -1403,21 +1364,19 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
           status = gdh_GetObjectClass(slave_objid, &slave_class);
 
           status = gdh_ObjidToPointer(slave_objid, (pwr_tAddress*)&sop);
-          status = gdh_ObjidToName(slave_objid, (char*)&name, sizeof(name),
-                                   cdh_mNName);
+          status = gdh_ObjidToName(slave_objid, (char*)&name, sizeof(name), cdh_mNName);
 
           errh_Info("Download Profibus DP Slave config - %s", name);
 
           /* Calculates IO offsets and configures the slave.  */
-          if (dpm_download_slave_prm(local, sop, ap, ap->racklist) !=
-              DRV_NO_ERROR)
+          if (dpm_download_slave_prm(local, sop, ap, ap->racklist) != DRV_NO_ERROR)
           {
             errh_Error("ERROR Init Profibus DP slave %s", name);
           }
           errh_Info("Profibus DP slave %d: in offs %d, input size %d,"
                     " out offs %d, out size %d",
-                    sop->SlaveAddress, sop->OffsetInputs, sop->BytesOfInput,
-                    sop->OffsetOutputs, sop->BytesOfOutput);
+                    sop->SlaveAddress, sop->OffsetInputs, sop->BytesOfInput, sop->OffsetOutputs,
+                    sop->BytesOfOutput);
           op->NumberSlaves++;
           status = gdh_GetNextSibling(slave_objid, &slave_objid);
         }
@@ -1427,15 +1386,14 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
         if (dpm_download_master_prm(local, op, ap) != DRV_NO_ERROR)
         {
           op->Status = PB__INITFAIL;
-          errh_Error("ERROR config Profibus DP Master %s - %s", ap->Name,
-                     "dp download bus");
+          errh_Error("ERROR config Profibus DP Master %s - %s", ap->Name, "dp download bus");
           return IO__ERRINIDEVICE;
         }
 
         ok = TRUE;
 
       } /* End - While !ok */
-    }   /* End - Initialization only if not restart   */
+    } /* End - Initialization only if not restart   */
   }
   else
     op->Status = PB__DISABLED;
@@ -1454,7 +1412,7 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
   io_sRack* slave_list;
 
   pwr_sClass_Pb_Hilscher* op;
-  
+
   int i;
   DPM_DIAGNOSTICS diag;
 
@@ -1467,20 +1425,17 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
   respective addresses.  This is really the responsibility of the rack level,
   however, keeping this code here enables us to confine all the Profibus
   board specific code at the agent level.  */
-  for (slave_list = ap->racklist; slave_list != NULL;
-       slave_list = slave_list->next)
+  for (slave_list = ap->racklist; slave_list != NULL; slave_list = slave_list->next)
   {
     sp = (pwr_sClass_Pb_DP_Slave*)slave_list->op;
     mp = (pwr_sClass_Pb_Hilscher*)ap->op;
 
-    if (sp->Status == PB__NORMAL && mp->Status == PB__NORMAL &&
-        sp->DisableSlave != 1 && mp->DisableBus != 1)
+    if (sp->Status == PB__NORMAL && mp->Status == PB__NORMAL && sp->DisableSlave != 1 && mp->DisableBus != 1)
     {
       /* Triggers the board's watchdog.  */
       DevTriggerWatchDog(local->dev_number, WATCHDOG_START, &local->watchdog);
       /* Reads process image from the slave.  */
-      DevExchangeIO(local->dev_number, 0, 0, NULL, sp->OffsetInputs,
-                         sp->BytesOfInput, sp->Inputs, 100);
+      DevExchangeIO(local->dev_number, 0, 0, NULL, sp->OffsetInputs, sp->BytesOfInput, sp->Inputs, 100);
     }
   }
 
@@ -1493,8 +1448,7 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
   Make a poll to see if there are diagnostics, the answer also tells us
   if there are any hardware faults.  */
 
-  if ((op->Process & io_mProcess_Profibus) &&
-      (ctx->Process != io_mProcess_Profibus))
+  if ((op->Process & io_mProcess_Profibus) && (ctx->Process != io_mProcess_Profibus))
     return IO__SUCCESS;
 
   if (op->DisableBus == 1)
@@ -1557,8 +1511,7 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
   some circumstances though.  E.g. if a slave is disconnected and reconnected
   before its watchdog times out the diagnostics would not be updated.  The
   following code covers that case, it is a bit ugly, but works.  */
-  for (slave_list = ap->racklist; slave_list != NULL;
-       slave_list = slave_list->next)
+  for (slave_list = ap->racklist; slave_list != NULL; slave_list = slave_list->next)
   {
     sp = (pwr_sClass_Pb_DP_Slave*)slave_list->op;
     /* The abSl_state has the same layout as the abSl_diag bitmap.  */
@@ -1589,23 +1542,20 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
   respective addresses.  This is really the rack level's responsibility,
   however, keeping this code here enables us to confine all the Profibus
   board specific code at the agent level.  */
-  for (slave_list = ap->racklist; slave_list != NULL;
-       slave_list = slave_list->next)
+  for (slave_list = ap->racklist; slave_list != NULL; slave_list = slave_list->next)
   {
     sp = (pwr_sClass_Pb_DP_Slave*)slave_list->op;
     mp = (pwr_sClass_Pb_Hilscher*)ap->op;
 
-    if ((sp->Status == PB__NORMAL || sp->Status == PB__NOCONN) &&
-        mp->Status == PB__NORMAL && (sp->DisableSlave != 1) &&
-        (mp->DisableBus != 1))
+    if ((sp->Status == PB__NORMAL || sp->Status == PB__NOCONN) && mp->Status == PB__NORMAL &&
+        (sp->DisableSlave != 1) && (mp->DisableBus != 1))
     {
       if (sp->BytesOfOutput > 0)
       {
         /* Trigger the board's watchdog.  */
         DevTriggerWatchDog(local->dev_number, WATCHDOG_START, &local->watchdog);
         /* Writes process image to the slave.  */
-        if (DevExchangeIO(local->dev_number, sp->OffsetOutputs,
-                          sp->BytesOfOutput, sp->Outputs, 0, 0, NULL,
+        if (DevExchangeIO(local->dev_number, sp->OffsetOutputs, sp->BytesOfOutput, sp->Outputs, 0, 0, NULL,
                           100) != DRV_NO_ERROR)
           sp->ErrorCount++;
       }
@@ -1634,7 +1584,6 @@ static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Pb_Hilscher) = {
-    pwr_BindIoMethod(IoAgentInit), pwr_BindIoMethod(IoAgentRead),
-    pwr_BindIoMethod(IoAgentWrite), pwr_BindIoMethod(IoAgentClose),
-    pwr_NullMethod};
+pwr_dExport pwr_BindIoMethods(Pb_Hilscher) = {pwr_BindIoMethod(IoAgentInit), pwr_BindIoMethod(IoAgentRead),
+                                              pwr_BindIoMethod(IoAgentWrite), pwr_BindIoMethod(IoAgentClose),
+                                              pwr_NullMethod};

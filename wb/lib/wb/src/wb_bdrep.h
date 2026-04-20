@@ -43,7 +43,8 @@ class wb_adrep;
 class wb_orep;
 class wb_merep;
 
-class wb_bdrep {
+class wb_bdrep
+{
   int m_nRef;
   wb_orep* m_orep;
   pwr_tStatus m_sts;
@@ -74,16 +75,10 @@ public:
   wb_adrep* adrep(pwr_tStatus* sts, const char* aname);
   wb_adrep* super(pwr_tStatus* sts);
 
-  pwr_tStatus sts()
-  {
-    return m_sts;
-  }
+  pwr_tStatus sts() { return m_sts; }
   pwr_tTime modTime();
   char* structName();
-  void merep(wb_merep* me)
-  {
-    m_merep = me;
-  }
+  void merep(wb_merep* me) { m_merep = me; }
 };
 
 #endif

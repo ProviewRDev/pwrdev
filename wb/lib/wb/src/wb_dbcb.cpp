@@ -58,17 +58,21 @@ pwr_tStatus dbcb_InsertPlcThreadObject(ldh_tSesContext ldhses, pwr_tOid object)
 
   // Get Process and PlcThreadObject from parent
   wb_object parent = o.parent();
-  if (parent) {
+  if (parent)
+  {
     wb_attribute a = sp->attribute(parent.oid(), "RtBody", "Process");
-    if (a) {
+    if (a)
+    {
       a.value(&process);
       if (a)
         process_found = 1;
     }
 
-    if (process_found && (process & pwr_mIoProcessMask_Plc)) {
+    if (process_found && (process & pwr_mIoProcessMask_Plc))
+    {
       a = sp->attribute(parent.oid(), "RtBody", "ThreadObject");
-      if (a) {
+      if (a)
+      {
         a.value(&thread_oid);
         if (a)
           thread_found = 1;
@@ -76,44 +80,55 @@ pwr_tStatus dbcb_InsertPlcThreadObject(ldh_tSesContext ldhses, pwr_tOid object)
     }
   }
 
-  if (process_found) {
+  if (process_found)
+  {
     wb_attribute a = sp->attribute(o.oid(), "RtBody", "Process");
-    if (a) {
+    if (a)
+    {
       sp->writeAttribute(a, &process, sizeof(process));
     }
   }
 
-  if (thread_found) {
+  if (thread_found)
+  {
     wb_attribute a = sp->attribute(o.oid(), "RtBody", "ThreadObject");
-    if (a) {
+    if (a)
+    {
       sp->writeAttribute(a, &thread_oid, sizeof(thread_oid));
     }
   }
 
-  if (!process_found && !thread_found) {
+  if (!process_found && !thread_found)
+  {
     wb_attribute a = sp->attribute(o.oid(), "RtBody", "Process");
-    if (a) {
+    if (a)
+    {
       a.value(&process);
       if (a)
         process_found = 1;
     }
 
-    if (process_found && (process & pwr_mIoProcessMask_Plc)) {
-      for (wb_object to = sp->object(pwr_cClass_PlcThread); to;
-           to = to.next()) {
+    if (process_found && (process & pwr_mIoProcessMask_Plc))
+    {
+      for (wb_object to = sp->object(pwr_cClass_PlcThread); to; to = to.next())
+      {
         wb_attribute at = sp->attribute(to.oid(), "RtBody", "ScanTime");
-        if (at) {
+        if (at)
+        {
           at.value(&scantime);
-          if (scantime < min_scantime) {
+          if (scantime < min_scantime)
+          {
             min_scantime = scantime;
             min_toid = to.oid();
             min_toid_found = 1;
           }
         }
       }
-      if (min_toid_found) {
+      if (min_toid_found)
+      {
         wb_attribute a = sp->attribute(o.oid(), "RtBody", "ThreadObject");
-        if (a) {
+        if (a)
+        {
           sp->writeAttribute(a, &min_toid, sizeof(min_toid));
         }
       }

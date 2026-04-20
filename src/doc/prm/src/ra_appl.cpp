@@ -40,18 +40,17 @@
  *
  * @see ra_appl.cpp
  */
-class ra_appl : public rt_appl {
+class ra_appl : public rt_appl
+{
 private:
   pwr_tSubid subid[20]; //! Array to store subscription identities
-  int subid_cnt; //! Number of stored subid's
-  pwr_tBoolean* dv1_p; //! Pointer to database value Dv1
-  pwr_tBoolean* dv2_p; //! Pointer to database value Dv2
+  int subid_cnt;        //! Number of stored subid's
+  pwr_tBoolean* dv1_p;  //! Pointer to database value Dv1
+  pwr_tBoolean* dv2_p;  //! Pointer to database value Dv2
   pwr_tBoolean dv2_old; //! Old value of Dv2 for edge detection
-  pwr_tFloat32* av1_p; //! Pointer to database value Av1
+  pwr_tFloat32* av1_p;  //! Pointer to database value Av1
 public:
-  ra_appl() : rt_appl("ra_appl", errh_eAnix_appl1), subid_cnt(0)
-  {
-  }
+  ra_appl() : rt_appl("ra_appl", errh_eAnix_appl1), subid_cnt(0) {}
   void open();
   void close();
   void scan();
@@ -64,27 +63,22 @@ void ra_appl::open()
   pwr_tStatus sts;
   pwr_tUInt32 active_messages;
 
-  sts = gdh_RefObjectInfo((char*)"H1-Dv1.ActualValue", (void**)&dv1_p,
-      &subid[subid_cnt++], sizeof(*dv1_p));
+  sts = gdh_RefObjectInfo((char*)"H1-Dv1.ActualValue", (void**)&dv1_p, &subid[subid_cnt++], sizeof(*dv1_p));
   if (EVEN(sts))
     throw co_error(sts);
 
-  sts = gdh_RefObjectInfo((char*)"H1-Dv2.ActualValue", (void**)&dv2_p,
-      &subid[subid_cnt++], sizeof(*dv2_p));
+  sts = gdh_RefObjectInfo((char*)"H1-Dv2.ActualValue", (void**)&dv2_p, &subid[subid_cnt++], sizeof(*dv2_p));
   if (EVEN(sts))
     throw co_error(sts);
 
-  sts = gdh_RefObjectInfo((char*)"H1-Av1.ActualValue", (void**)&av1_p,
-      &subid[subid_cnt++], sizeof(*av1_p));
+  sts = gdh_RefObjectInfo((char*)"H1-Av1.ActualValue", (void**)&av1_p, &subid[subid_cnt++], sizeof(*av1_p));
   if (EVEN(sts))
     throw co_error(sts);
 
   // Connect to message handler
-  sts = mh_ApplConnect(pwr_cNObjid, (mh_mApplFlags)0, "ra_appl aborted",
-      mh_eEvent_Info, mh_eEventPrio_A,
-      (mh_mEventFlags)(
-          mh_mEventFlags_Bell | mh_mEventFlags_Ack | mh_mEventFlags_Return),
-      "ra_appl aborted", &active_messages);
+  sts = mh_ApplConnect(pwr_cNObjid, (mh_mApplFlags)0, "ra_appl aborted", mh_eEvent_Info, mh_eEventPrio_A,
+                       (mh_mEventFlags)(mh_mEventFlags_Bell | mh_mEventFlags_Ack | mh_mEventFlags_Return),
+                       "ra_appl aborted", &active_messages);
   if (EVEN(sts))
     throw co_error(sts);
 }
@@ -125,8 +119,7 @@ int ra_appl::mh_send(const char* text, mh_eEventPrio prio)
   strncpy(msg.EventText, text, sizeof(msg.EventText));
   strcpy(msg.EventName, "from ra_appl");
   time_GetTime(&msg.EventTime);
-  msg.EventFlags = (mh_mEventFlags)(
-      mh_mEventFlags_Returned | mh_mEventFlags_NoObject | mh_mEventFlags_Bell);
+  msg.EventFlags = (mh_mEventFlags)(mh_mEventFlags_Returned | mh_mEventFlags_NoObject | mh_mEventFlags_Bell);
   msg.EventType = mh_eEvent_Alarm;
   msg.SupInfo.SupType = mh_eSupType_None;
 
@@ -141,12 +134,15 @@ int main()
 {
   ra_appl appl;
 
-  try {
+  try
+  {
     appl.init();
     appl.register_appl("Nodes-opg7-ra_appl");
 
     appl.mainloop();
-  } catch (co_error e) {
+  }
+  catch (co_error e)
+  {
     errh_Fatal("Application exception, %s", e.what().c_str());
     errh_SetStatus(PWR__APPLTERM);
     exit(0);

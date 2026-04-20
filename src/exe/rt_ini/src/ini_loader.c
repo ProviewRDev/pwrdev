@@ -50,13 +50,14 @@ void ini_StartApplications()
   /* Find the $Appl objects on this particular node */
 
   sts = gdh_GetClassList(pwr_eClass_Appl, &objid);
-  while (ODD(sts)) {
-    if (ODD(gdh_ObjidToPointer(objid, (pwr_tAddress*)&applp))) {
-/* Found an object on this node, load the program */
+  while (ODD(sts))
+  {
+    if (ODD(gdh_ObjidToPointer(objid, (pwr_tAddress*)&applp)))
+    {
+      /* Found an object on this node, load the program */
 
-      errh_Error("NYI. start %s \"%s\" %d %d \"%s\"", applp->FileName,
-          applp->ProgramName, applp->StartWithDebug, applp->JobPriority,
-          applp->Arg);
+      errh_Error("NYI. start %s \"%s\" %d %d \"%s\"", applp->FileName, applp->ProgramName,
+                 applp->StartWithDebug, applp->JobPriority, applp->Arg);
 
     } /* Local appl object */
 

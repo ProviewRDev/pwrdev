@@ -58,8 +58,7 @@ void tm_log(unsigned int level, const char* func, const char* str)
   printf("%s\n", logstr);
 }
 
-void tm_log_ss(
-    unsigned int level, const char* func, const char* str1, const char* str2)
+void tm_log_ss(unsigned int level, const char* func, const char* str1, const char* str2)
 {
   char logstr[200];
   int i;
@@ -74,8 +73,7 @@ void tm_log_ss(
   printf("%s\n", logstr);
 }
 
-void tm_log_sii(
-    unsigned int level, const char* func, const char* str, int i1, int i2)
+void tm_log_sii(unsigned int level, const char* func, const char* str, int i1, int i2)
 {
   char logstr[200];
   int i;

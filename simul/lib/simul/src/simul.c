@@ -75,11 +75,12 @@ void Sim_SigGen_exec(plc_sThread* tp, pwr_sClass_Sim_SigGen* plc_obj)
   plc_obj->wavei = CLAMP(plc_obj->wavei, 0, M_PI);
 
   plc_obj->wavei += (plc_obj->sign) ? incre : -incre;
-  plc_obj->sign = (plc_obj->sign && plc_obj->wavei >= M_PI)
-      ? 0
-      : (!plc_obj->sign && plc_obj->wavei <= 0) ? 1 : plc_obj->sign;
+  plc_obj->sign = (plc_obj->sign && plc_obj->wavei >= M_PI) ? 0
+                  : (!plc_obj->sign && plc_obj->wavei <= 0) ? 1
+                                                            : plc_obj->sign;
 
-  switch (plc_obj->Wave) {
+  switch (plc_obj->Wave)
+  {
   case pwr_eSim_GenType_Triangle:
     out = plc_obj->wavei / M_PI - 0.5;
     break;
@@ -95,11 +96,9 @@ void Sim_SigGen_exec(plc_sThread* tp, pwr_sClass_Sim_SigGen* plc_obj)
   default:
     out = 0.0;
   }
-  plc_obj->Out = *plc_obj->OffsetP
-      + *plc_obj->RangeP
-          * (out
-                + *plc_obj->NGainP
-                    * plc_obj->sf); // Adding noise & offset & set output range
+  plc_obj->Out =
+      *plc_obj->OffsetP +
+      *plc_obj->RangeP * (out + *plc_obj->NGainP * plc_obj->sf); // Adding noise & offset & set output range
 }
 
 /*_*
@@ -119,7 +118,8 @@ void Sim_SigGen_exec(plc_sThread* tp, pwr_sClass_Sim_SigGen* plc_obj)
 
 void Sim_Integrator_exec(plc_sThread* tp, pwr_sClass_Sim_Integrator* plc_obj)
 {
-  if (*plc_obj->DynGainP <= 0.0) {
+  if (*plc_obj->DynGainP <= 0.0)
+  {
     plc_obj->Out = *plc_obj->InP;
     return;
   }
@@ -146,7 +146,8 @@ void Sim_Integrator_exec(plc_sThread* tp, pwr_sClass_Sim_Integrator* plc_obj)
 
 void Sim_LagFilter_exec(plc_sThread* tp, pwr_sClass_Sim_LagFilter* plc_obj)
 {
-  if (*plc_obj->LagTimeP <= 0.0) {
+  if (*plc_obj->LagTimeP <= 0.0)
+  {
     plc_obj->Out = *plc_obj->InP;
     return;
   };
@@ -173,10 +174,10 @@ void Sim_LagFilter_exec(plc_sThread* tp, pwr_sClass_Sim_LagFilter* plc_obj)
   2016 - 04 - 11	Bruno: cleaning.
 */
 
-void Sim_LeadLagFilter_exec(
-    plc_sThread* tp, pwr_sClass_Sim_LeadLagFilter* plc_obj)
+void Sim_LeadLagFilter_exec(plc_sThread* tp, pwr_sClass_Sim_LeadLagFilter* plc_obj)
 {
-  if (*plc_obj->LagTimeP <= 0.0) {
+  if (*plc_obj->LagTimeP <= 0.0)
+  {
     plc_obj->Out = *plc_obj->InP;
     return;
   }
@@ -186,8 +187,7 @@ void Sim_LeadLagFilter_exec(
   pwr_tFloat32 kb = 1.0 + kc;
   pwr_tFloat32 out;
 
-  out = kd / ka * plc_obj->Out
-      + *plc_obj->GainP * (kb / ka * *plc_obj->InP - kc / ka * plc_obj->PrevIn);
+  out = kd / ka * plc_obj->Out + *plc_obj->GainP * (kb / ka * *plc_obj->InP - kc / ka * plc_obj->PrevIn);
   out = CLAMP(out, plc_obj->LL_OP, plc_obj->HL_OP);
   plc_obj->Out = out;
   plc_obj->PrevIn = *plc_obj->InP;
@@ -213,24 +213,21 @@ void Sim_LeadLagFilter_exec(
 
 void Sim_SouFilter_exec(plc_sThread* tp, pwr_sClass_Sim_SouFilter* plc_obj)
 {
-  if (*plc_obj->w0P <= 0.0) {
+  if (*plc_obj->w0P <= 0.0)
+  {
     plc_obj->Out = *plc_obj->InP;
     return;
   }
-  pwr_tFloat32 a0
-      = tp->ActualScanTime * tp->ActualScanTime * *plc_obj->w0P * *plc_obj->w0P
-      + 2.0 * *plc_obj->ksiP * tp->ActualScanTime * *plc_obj->w0P + 1.0;
-  pwr_tFloat32 a1
-      = 2.0 * (*plc_obj->ksiP * tp->ActualScanTime * *plc_obj->w0P + 1.0);
+  pwr_tFloat32 a0 = tp->ActualScanTime * tp->ActualScanTime * *plc_obj->w0P * *plc_obj->w0P +
+                    2.0 * *plc_obj->ksiP * tp->ActualScanTime * *plc_obj->w0P + 1.0;
+  pwr_tFloat32 a1 = 2.0 * (*plc_obj->ksiP * tp->ActualScanTime * *plc_obj->w0P + 1.0);
   pwr_tFloat32 a2 = -1.0;
-  pwr_tFloat32 b0
-      = tp->ActualScanTime * tp->ActualScanTime * *plc_obj->w0P * *plc_obj->w0P;
+  pwr_tFloat32 b0 = tp->ActualScanTime * tp->ActualScanTime * *plc_obj->w0P * *plc_obj->w0P;
   pwr_tFloat32 out;
 
   plc_obj->Outm2 = plc_obj->Outm1;
   plc_obj->Outm1 = plc_obj->Out;
-  out = a1 / a0 * plc_obj->Out + a2 / a0 * plc_obj->Outm2
-      + b0 / a0 * *plc_obj->InP * *plc_obj->GainP;
+  out = a1 / a0 * plc_obj->Out + a2 / a0 * plc_obj->Outm2 + b0 / a0 * *plc_obj->InP * *plc_obj->GainP;
   out = CLAMP(out, plc_obj->LL_OP, plc_obj->HL_OP);
   plc_obj->Out = out;
 }
@@ -253,38 +250,31 @@ void Sim_SouFilter_exec(plc_sThread* tp, pwr_sClass_Sim_SouFilter* plc_obj)
   2016 - 04 - 11	Bruno: cleaning.
 */
 
-void Sim_SouTOoFilter_exec(
-    plc_sThread* tp, pwr_sClass_Sim_SouTOoFilter* plc_obj)
+void Sim_SouTOoFilter_exec(plc_sThread* tp, pwr_sClass_Sim_SouTOoFilter* plc_obj)
 {
-  if (*plc_obj->w0P <= 0.0) {
+  if (*plc_obj->w0P <= 0.0)
+  {
     plc_obj->Out = *plc_obj->InP;
     return;
   }
-  pwr_tFloat32 b0
-      = tp->ActualScanTime * tp->ActualScanTime * *plc_obj->w0P * *plc_obj->w0P
-      + 2.0 * *plc_obj->ksiP * tp->ActualScanTime * *plc_obj->w0P + 1.0;
-  pwr_tFloat32 b1
-      = -2.0 * (*plc_obj->ksiP * tp->ActualScanTime * *plc_obj->w0P + 1.0);
+  pwr_tFloat32 b0 = tp->ActualScanTime * tp->ActualScanTime * *plc_obj->w0P * *plc_obj->w0P +
+                    2.0 * *plc_obj->ksiP * tp->ActualScanTime * *plc_obj->w0P + 1.0;
+  pwr_tFloat32 b1 = -2.0 * (*plc_obj->ksiP * tp->ActualScanTime * *plc_obj->w0P + 1.0);
   pwr_tFloat32 b2 = 1.0;
   pwr_tFloat32 a0;
-  pwr_tFloat32 a1 = *plc_obj->w0P * *plc_obj->w0P
-      * (2 * *plc_obj->LagTime1P * *plc_obj->LagTime2P
-            + tp->ActualScanTime * (*plc_obj->LagTime1P + *plc_obj->LagTime2P));
-  pwr_tFloat32 a2 = -*plc_obj->w0P * *plc_obj->w0P * *plc_obj->LagTime1P
-      * *plc_obj->LagTime2P;
+  pwr_tFloat32 a1 = *plc_obj->w0P * *plc_obj->w0P *
+                    (2 * *plc_obj->LagTime1P * *plc_obj->LagTime2P +
+                     tp->ActualScanTime * (*plc_obj->LagTime1P + *plc_obj->LagTime2P));
+  pwr_tFloat32 a2 = -*plc_obj->w0P * *plc_obj->w0P * *plc_obj->LagTime1P * *plc_obj->LagTime2P;
   pwr_tFloat32 out;
-  a0 = (*plc_obj->w0P > 0.0)
-      ? *plc_obj->w0P * *plc_obj->w0P
-          * (*plc_obj->LagTime1P + tp->ActualScanTime)
-          * (*plc_obj->LagTime2P + tp->ActualScanTime)
-      : 1.0;
+  a0 = (*plc_obj->w0P > 0.0) ? *plc_obj->w0P * *plc_obj->w0P * (*plc_obj->LagTime1P + tp->ActualScanTime) *
+                                   (*plc_obj->LagTime2P + tp->ActualScanTime)
+                             : 1.0;
 
   plc_obj->Outm2 = plc_obj->Outm1;
   plc_obj->Outm1 = plc_obj->Out;
-  out = a1 / a0 * plc_obj->Out + a2 / a0 * plc_obj->Outm2
-      + b0 / a0 * *plc_obj->InP * *plc_obj->GainP
-      + b1 / a0 * plc_obj->Inm1 * *plc_obj->GainP
-      + b2 / a0 * plc_obj->Inm2 * *plc_obj->GainP;
+  out = a1 / a0 * plc_obj->Out + a2 / a0 * plc_obj->Outm2 + b0 / a0 * *plc_obj->InP * *plc_obj->GainP +
+        b1 / a0 * plc_obj->Inm1 * *plc_obj->GainP + b2 / a0 * plc_obj->Inm2 * *plc_obj->GainP;
   out = CLAMP(out, plc_obj->LL_OP, plc_obj->HL_OP);
   plc_obj->Inm2 = plc_obj->Inm1;
   plc_obj->Inm1 = *plc_obj->InP;
@@ -309,7 +299,8 @@ void Sim_Delay_exec(plc_sThread* tp, pwr_sClass_Sim_Delay* plc_obj)
   pwr_tFloat32 OP = 0.0;
   int i, Ntime, Nscan;
 
-  if ((int)*plc_obj->DelayP < tp->ActualScanTime) {
+  if ((int)*plc_obj->DelayP < tp->ActualScanTime)
+  {
     plc_obj->Out = *plc_obj->InP;
     return;
   }
@@ -318,21 +309,24 @@ void Sim_Delay_exec(plc_sThread* tp, pwr_sClass_Sim_Delay* plc_obj)
       plc_obj->D[i] = *plc_obj->InP;
   plc_obj->PrevDelay = *plc_obj->DelayP;
   Nscan = (int)(0.5 + *plc_obj->DelayP / tp->ActualScanTime);
-  if (Nscan > MAXCELLS) {
-    Ntime = (int)(0.5
-        + *plc_obj->DelayP / (tp->ActualScanTime * (pwr_tFloat32)MAXCELLS));
+  if (Nscan > MAXCELLS)
+  {
+    Ntime = (int)(0.5 + *plc_obj->DelayP / (tp->ActualScanTime * (pwr_tFloat32)MAXCELLS));
     if (plc_obj->DtCtr == 0)
-      for (i = 0; i <= MAXCELLS; i++)
+      for (i = 0; i < MAXCELLS; i++)
         plc_obj->D[i] = *plc_obj->InP;
     OP = plc_obj->D[MAXCELLS - 1];
-    if (plc_obj->DtCtr >= Ntime) {
+    if (plc_obj->DtCtr >= Ntime)
+    {
       plc_obj->DtCtr = 0;
       for (i = MAXCELLS - 1; i > 0; i--)
         plc_obj->D[i] = plc_obj->D[i - 1];
       plc_obj->D[0] = *plc_obj->InP;
     }
     plc_obj->DtCtr++;
-  } else {
+  }
+  else
+  {
     OP = plc_obj->D[Nscan - 1];
     for (i = Nscan; i > 0; i--)
       plc_obj->D[i] = plc_obj->D[i - 1];
@@ -352,8 +346,7 @@ void Sim_Delay_exec(plc_sThread* tp, pwr_sClass_Sim_Delay* plc_obj)
   2016 - 04 - 11	Bruno: cleaning.
 */
 
-void Sim_SlewRateLimiter_exec(
-    plc_sThread* tp, pwr_sClass_Sim_SlewRateLimiter* plc_obj)
+void Sim_SlewRateLimiter_exec(plc_sThread* tp, pwr_sClass_Sim_SlewRateLimiter* plc_obj)
 {
   pwr_tFloat32 ka = *plc_obj->SlopeP * tp->ActualScanTime;
   pwr_tFloat32 in = *plc_obj->InP, out = plc_obj->Out;

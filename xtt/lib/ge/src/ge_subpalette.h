@@ -37,6 +37,8 @@
 #ifndef ge_subpalette_h
 #define ge_subpalette_h
 
+#include <iosfwd>
+
 #include "flow_browapi.h"
 
 /*! \file ge_subpalette.h
@@ -46,7 +48,8 @@
 
 #define SUBP_PIXMAPS_SIZE 259
 
-typedef struct subpalette_s_Menu {
+typedef struct subpalette_s_Menu
+{
   char title[80];
   int item_type;
   char file[120];
@@ -56,20 +59,23 @@ typedef struct subpalette_s_Menu {
   struct subpalette_s_Menu* next;
 } subpalette_sMenu;
 
-typedef enum {
+typedef enum
+{
   subpalette_eItemType_LocalSubGraphs,
   subpalette_eItemType_Menu,
   subpalette_eItemType_File
 } subpalette_eItemType;
 
-typedef enum {
+typedef enum
+{
   subpalette_mOpen_All = ~0,
   subpalette_mOpen_Children = 1 << 0,
   subpalette_mOpen_Attributes = 1 << 1,
   subpalette_mOpen_Crossref = 1 << 2
 } subpalette_mOpen;
 
-class SubPaletteBrow {
+class SubPaletteBrow
+{
 public:
   SubPaletteBrow(BrowCtx* brow_ctx, void* xn);
   ~SubPaletteBrow();
@@ -90,7 +96,8 @@ public:
 };
 
 //! Display the subgraph palette.
-class SubPalette {
+class SubPalette
+{
 public:
   SubPalette(void* xn_parent_ctx, const char* xn_name, pwr_tStatus* status);
   virtual ~SubPalette();
@@ -109,12 +116,8 @@ public:
   int path_cnt;
   int displayed;
 
-  virtual void set_inputfocus(int focus)
-  {
-  }
-  virtual void create_popup_menu(char* filename, int x, int y)
-  {
-  }
+  virtual void set_inputfocus(int focus) {}
+  virtual void create_popup_menu(char* filename, int x, int y) {}
 
   void message(char sev, char* text);
   int get_select(pwr_sAttrRef* attrref, int* is_attr);
@@ -122,8 +125,8 @@ public:
   int object_attr();
   int get_select(char* text, char* filename);
   void menu_tree_build(char* filename);
-  subpalette_sMenu* menu_tree_build_children(std::ifstream* fp, int* line_cnt,
-      char* filename, subpalette_sMenu* parent);
+  subpalette_sMenu* menu_tree_build_children(std::istream* fp, int* line_cnt, char* filename,
+                                             subpalette_sMenu* parent);
   void menu_tree_free();
   void menu_tree_free_children(subpalette_sMenu* first_child);
   void get_path(int* path_count, char** path_vect)
@@ -135,7 +138,8 @@ public:
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
 };
 
-class Item {
+class Item
+{
 public:
   Item(subpalette_eItemType item_type);
   virtual ~Item();
@@ -147,30 +151,32 @@ public:
   virtual int close(SubPalette* subpalette, double x, double y);
 };
 
-class ItemLocalSubGraphs : public Item {
+class ItemLocalSubGraphs : public Item
+{
 public:
-  ItemLocalSubGraphs(SubPalette* subpalette, char* item_name,
-      char* item_filename, brow_tNode dest, flow_eDest dest_code);
+  ItemLocalSubGraphs(SubPalette* subpalette, char* item_name, char* item_filename, brow_tNode dest,
+                     flow_eDest dest_code);
   char filename[120];
 
   int open_children(SubPalette* subpalette, double x, double y);
   int close(SubPalette* subpalette, double x, double y);
 };
 
-class ItemFile : public Item {
+class ItemFile : public Item
+{
 public:
-  ItemFile(SubPalette* subpalette, char* item_name, char* item_filename,
-      int item_pixmap, brow_tNode dest, flow_eDest dest_code);
+  ItemFile(SubPalette* subpalette, char* item_name, char* item_filename, int item_pixmap, brow_tNode dest,
+           flow_eDest dest_code);
   virtual ~ItemFile();
   char filename[120];
   int pixmap;
 };
 
-class ItemMenu : public Item {
+class ItemMenu : public Item
+{
 public:
-  ItemMenu(SubPalette* subpalette, const char* item_name, brow_tNode dest,
-      flow_eDest dest_code, subpalette_sMenu** item_child_list,
-      int item_is_root);
+  ItemMenu(SubPalette* subpalette, const char* item_name, brow_tNode dest, flow_eDest dest_code,
+           subpalette_sMenu** item_child_list, int item_is_root);
   subpalette_sMenu** child_list;
   int is_root;
   int open_children(SubPalette* subpalette, double x, double y);

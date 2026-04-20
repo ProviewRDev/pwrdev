@@ -47,11 +47,9 @@
 
 #define TOOLBAR_SPACING 0.2
 
-GrowToolbar::GrowToolbar(GrowCtx* glow_ctx, const char* name,
-    const char* nc_name, char* tools1, char* tools2, int tools1_cnt,
-    int tools2_cnt, double x, double y, int nodraw)
-    : GrowNode(glow_ctx, name, 0, x, y, nodraw, 0), hot_tool(0), tools1_mask(0),
-      tools2_mask(0)
+GrowToolbar::GrowToolbar(GrowCtx* glow_ctx, const char* name, const char* nc_name, char* tools1, char* tools2,
+                         int tools1_cnt, int tools2_cnt, double x, double y, int nodraw)
+    : GrowNode(glow_ctx, name, 0, x, y, nodraw, 0), hot_tool(0), tools1_mask(0), tools2_mask(0)
 {
   int sts;
 
@@ -60,7 +58,8 @@ GrowToolbar::GrowToolbar(GrowCtx* glow_ctx, const char* name,
     return;
 
   sts = ctx->find_nc_by_name(nc_name, (GlowArrayElem**)&nc);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Create the nodeclass
     nc = new GlowNodeClass(glow_ctx, name);
 
@@ -77,16 +76,14 @@ GrowToolbar::~GrowToolbar()
 
   ctx->set_defered_redraw();
   ctx->delete_node_cons(this);
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
   ctx->redraw_defered();
   if (hot)
     ctx->gdraw->set_cursor(&ctx->mw, glow_eDrawCursor_Normal);
@@ -94,14 +91,14 @@ GrowToolbar::~GrowToolbar()
 
 void GrowToolbar::copy_from(const GrowToolbar& n)
 {
-  memcpy((void *)this, (void *)&n, sizeof(n));
-  if (n.dynamicsize) {
+  memcpy((void*)this, (void*)&n, sizeof(n));
+  if (n.dynamicsize)
+  {
     dynamic = (char*)calloc(1, n.dynamicsize);
     memcpy(dynamic, n.nc->dynamic, n.dynamicsize);
   }
   if (ctx->userdata_copy_callback)
-    (ctx->userdata_copy_callback)(
-        this, user_data, &user_data, glow_eUserdataCbType_Node);
+    (ctx->userdata_copy_callback)(this, user_data, &user_data, glow_eUserdataCbType_Node);
 
   ctx->a_nc.remove(nc);
   ctx->nodeclass_insert(nc);
@@ -113,7 +110,7 @@ void GrowToolbar::ungroup()
   ((GlowNodeGroup*)nc)->ungroup(&trf);
 }
 
-void GrowToolbar::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowToolbar::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowToolbar) << '\n';
   fp << int(glow_eSave_GrowToolbar_grownode_part) << '\n';
@@ -123,21 +120,24 @@ void GrowToolbar::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowToolbar::open(std::ifstream& fp)
+void GrowToolbar::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowToolbar: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowToolbar:
       break;
     case glow_eSave_GrowToolbar_grownode_part:
@@ -163,10 +163,10 @@ int GrowToolbar::trace_scan()
 {
   int sts;
 
-  if (trace.p && ctx->trace_scan_func) {
+  if (trace.p && ctx->trace_scan_func)
+  {
     sts = ctx->trace_scan_func((void*)this, trace.p);
-    if (sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED
-        || sts == GLOW__SWAPTERMINATED)
+    if (sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED)
       return sts;
   }
   return nc->a.trace_scan();
@@ -195,13 +195,14 @@ GlowArrayElem* GrowToolbar::get_node_from_name(char* name)
 {
   int i;
 
-  for (i = 0; i < nc->a.a_size; i++) {
-    if ((nc->a.a[i]->type() == glow_eObjectType_Node
-            || nc->a.a[i]->type() == glow_eObjectType_GrowNode
-            || nc->a.a[i]->type() == glow_eObjectType_GrowConGlue)
-        && streq(((GlowNode*)nc->a.a[i])->n_name, name))
+  for (i = 0; i < nc->a.a_size; i++)
+  {
+    if ((nc->a.a[i]->type() == glow_eObjectType_Node || nc->a.a[i]->type() == glow_eObjectType_GrowNode ||
+         nc->a.a[i]->type() == glow_eObjectType_GrowConGlue) &&
+        streq(((GlowNode*)nc->a.a[i])->n_name, name))
       return nc->a.a[i];
-    else if (nc->a.a[i]->type() == glow_eObjectType_GrowToolbar) {
+    else if (nc->a.a[i]->type() == glow_eObjectType_GrowToolbar)
+    {
       GlowArrayElem* n = ((GrowToolbar*)nc->a.a[i])->get_node_from_name(name);
       if (n)
         return n;
@@ -214,28 +215,32 @@ void GrowToolbar::call_redraw_node_cons()
 {
   ctx->redraw_node_cons(this);
 
-  for (int i = 0; i < nc->a.a_size; i++) {
+  for (int i = 0; i < nc->a.a_size; i++)
+  {
     nc->a.a[i]->call_redraw_node_cons();
   }
 }
 
 void GrowToolbar::link_insert(void** start)
 {
-  for (int i = 0; i < nc->a.a_size; i++) {
-    if (nc->a[i]->type() == glow_eObjectType_Node
-        || nc->a[i]->type() == glow_eObjectType_GrowNode
-        || nc->a[i]->type() == glow_eObjectType_GrowToolbar)
+  for (int i = 0; i < nc->a.a_size; i++)
+  {
+    if (nc->a[i]->type() == glow_eObjectType_Node || nc->a[i]->type() == glow_eObjectType_GrowNode ||
+        nc->a[i]->type() == glow_eObjectType_GrowToolbar)
       nc->a.a[i]->link_insert(start);
   }
 }
 
 void GrowToolbar::convert(glow_eConvert version)
 {
-  switch (version) {
-  case glow_eConvert_V34: {
+  switch (version)
+  {
+  case glow_eConvert_V34:
+  {
     // Conversion of colors
     GrowNode::convert(version);
-    for (int i = 0; i < nc->a.a_size; i++) {
+    for (int i = 0; i < nc->a.a_size; i++)
+    {
       nc->a.a[i]->convert(version);
     }
 
@@ -244,13 +249,9 @@ void GrowToolbar::convert(glow_eConvert version)
   }
 }
 
-void GrowToolbar::set_rootnode(void* node)
-{
-  nc->a.set_rootnode(node);
-}
+void GrowToolbar::set_rootnode(void* node) { nc->a.set_rootnode(node); }
 
-int GrowToolbar::event_handler(
-    GlowWind* w, glow_eEvent event, double fx, double fy)
+int GrowToolbar::event_handler(GlowWind* w, glow_eEvent event, double fx, double fy)
 {
   double x, y;
   int sts;
@@ -263,7 +264,8 @@ int GrowToolbar::event_handler(
 
   trf.reverse(fx, fy, &x, &y);
   sts = nc->event_handler(w, event, x, y);
-  if (ctx->trace_started && sts) {
+  if (ctx->trace_started && sts)
+  {
     // Register group members with click action
     if (is_sensitive())
       ctx->register_callback_object(glow_eObjectType_Node, this);
@@ -271,8 +273,7 @@ int GrowToolbar::event_handler(
   return sts;
 }
 
-int GrowToolbar::event_handler(
-    GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
+int GrowToolbar::event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
 {
   int sts, lsts;
   int hot_type;
@@ -285,7 +286,8 @@ int GrowToolbar::event_handler(
   if (!ctx->trace_started)
     return GrowNode::event_handler(w, event, x, y, fx, fy);
 
-  switch (event) {
+  switch (event)
+  {
   case glow_eEvent_Key_Right:
   case glow_eEvent_Key_Left:
   case glow_eEvent_Key_BackSpace:
@@ -301,73 +303,94 @@ int GrowToolbar::event_handler(
   trf.reverse(fx, fy, &rx, &ry);
 
   sts = 0;
-  if (event == ctx->event_move_node) {
+  if (event == ctx->event_move_node)
+  {
     sts = nc->event_handler(w, event, rx, ry);
-    if (sts) {
+    if (sts)
+    {
       /* Register node for potential movement */
       ctx->move_insert(this);
       store_position();
     }
     return sts;
-  } else if (event == ctx->event_create_con) {
+  }
+  else if (event == ctx->event_create_con)
+  {
     return sts;
   }
-  switch (event) {
+  switch (event)
+  {
   case glow_eEvent_MB1Down:
-    if (ctx->trace_started) {
+    if (ctx->trace_started)
+    {
       sts = nc_event_handler(w, event, rx, ry, &idx);
       if (sts)
         ((GrowNode*)nc->a.a[idx])->set_color_inverse(1);
     }
     break;
   case glow_eEvent_MB1Up:
-    if (ctx->trace_started) {
+    if (ctx->trace_started)
+    {
       sts = nc_event_handler(w, event, rx, ry, &idx);
       if (sts)
         ((GrowNode*)nc->a.a[idx])->set_color_inverse(0);
     }
     break;
-  case glow_eEvent_CursorMotion: {
+  case glow_eEvent_CursorMotion:
+  {
     int redraw = 0;
 
-    if (ctx->hot_mode == glow_eHotMode_TraceAction) {
+    if (ctx->hot_mode == glow_eHotMode_TraceAction)
+    {
       if (ctx->hot_found)
         sts = 0;
-      else {
-        if (is_sensitive()) {
+      else
+      {
+        if (is_sensitive())
+        {
           sts = nc_event_handler(w, event, rx, ry, &idx);
-          if (sts) {
+          if (sts)
+          {
             ((GrowNode*)nc->a.a[idx])->set_hot(1);
             redraw = 1;
             ctx->hot_found = 1;
           }
         }
       }
-    } else {
+    }
+    else
+    {
       if (ctx->hot_found)
         sts = 0;
-      else {
+      else
+      {
         sts = nc_event_handler(w, event, rx, ry, &idx);
         if (sts)
           ctx->hot_found = 1;
       }
     }
-    if (sts && !hot
-        && !(ctx->node_movement_active || ctx->node_movement_paste_active)) {
-      if ((hot_type = ctx->send_hot_request(this))) {
-        if (!ctx->trace_started) {
+    if (sts && !hot && !(ctx->node_movement_active || ctx->node_movement_paste_active))
+    {
+      if ((hot_type = ctx->send_hot_request(this)))
+      {
+        if (!ctx->trace_started)
+        {
           ctx->gdraw->set_cursor(w, glow_eDrawCursor_CrossHair);
           hot = 1;
           redraw = 1;
           ctx->tiptext_event(this, x, y);
-        } else if (hot_type & glow_mHotType_CursorCrossHair) {
+        }
+        else if (hot_type & glow_mHotType_CursorCrossHair)
+        {
           ctx->gdraw->set_cursor(w, glow_eDrawCursor_CrossHair);
           hot_tool = idx + 1;
           lsts = get_mask_index(idx, &category, &mask_idx);
           if (ODD(lsts))
             ctx->tiptext_toolbar_event(this, x, y, category, mask_idx);
           redraw = 1;
-        } else if (hot_type & glow_mHotType_CursorHand) {
+        }
+        else if (hot_type & glow_mHotType_CursorHand)
+        {
           ctx->gdraw->set_cursor(w, glow_eDrawCursor_Hand);
           hot_tool = idx + 1;
           lsts = get_mask_index(idx, &category, &mask_idx);
@@ -377,8 +400,8 @@ int GrowToolbar::event_handler(
         }
       }
     }
-    if (!sts
-        && ((!ctx->trace_started && hot) || (ctx->trace_started && hot_tool))) {
+    if (!sts && ((!ctx->trace_started && hot) || (ctx->trace_started && hot_tool)))
+    {
       if (!ctx->hot_found)
         ctx->gdraw->set_cursor(w, glow_eDrawCursor_Normal);
       if (hot_tool)
@@ -388,18 +411,19 @@ int GrowToolbar::event_handler(
       redraw = 1;
       ctx->tiptext->remove_text(this);
     }
-    if (redraw) {
+    if (redraw)
+    {
       draw();
     }
     break;
   }
   case glow_eEvent_MB1Click:
     sts = nc_event_handler(w, event, rx, ry, &idx);
-    if (sts) {
+    if (sts)
+    {
       lsts = get_mask_index(idx, &category, &mask_idx);
       if (ODD(lsts))
-        ((GrowCtx*)ctx)
-            ->send_toolbar_callback(this, event, fx, fy, category, mask_idx);
+        ((GrowCtx*)ctx)->send_toolbar_callback(this, event, fx, fy, category, mask_idx);
     }
     break;
   default:
@@ -409,15 +433,16 @@ int GrowToolbar::event_handler(
   return sts;
 }
 
-int GrowToolbar::nc_event_handler(
-    GlowWind* w, glow_eEvent event, double x, double y, int* idx)
+int GrowToolbar::nc_event_handler(GlowWind* w, glow_eEvent event, double x, double y, int* idx)
 {
   int i;
   int sts;
 
-  for (i = 0; i < nc->a.a_size; i++) {
+  for (i = 0; i < nc->a.a_size; i++)
+  {
     sts = ((GrowNode*)nc->a.a[i])->event_handler(w, event, x, y);
-    if (sts) {
+    if (sts)
+    {
       *idx = i;
       return sts;
     }
@@ -425,9 +450,9 @@ int GrowToolbar::nc_event_handler(
   return 0;
 }
 
-void GrowToolbar::configure(char* tools1, char* tools2, int tools1_cnt,
-    int tools2_cnt, unsigned int show_mask1, unsigned int show_mask2,
-    unsigned int insensitive_mask1, unsigned int insensitive_mask2)
+void GrowToolbar::configure(char* tools1, char* tools2, int tools1_cnt, int tools2_cnt,
+                            unsigned int show_mask1, unsigned int show_mask2, unsigned int insensitive_mask1,
+                            unsigned int insensitive_mask2)
 {
   double x1, y1;
   double ll_x, ll_y, ur_x, ur_y;
@@ -441,7 +466,8 @@ void GrowToolbar::configure(char* tools1, char* tools2, int tools1_cnt,
   y1 = 0;
 
   // Clear nc
-  for (int i = 0; i < nc->a.size(); i++) {
+  for (int i = 0; i < nc->a.size(); i++)
+  {
     GlowArrayElem* e = nc->a.a[i];
     nc->a.remove(e);
     delete e;
@@ -450,9 +476,12 @@ void GrowToolbar::configure(char* tools1, char* tools2, int tools1_cnt,
 
   tools1_mask = 0;
   mask = 1;
-  for (int i = 0; i < tools1_cnt; i++) {
-    if (mask & show_mask1) {
-      if (streq(&tools1[i * 80], "")) {
+  for (int i = 0; i < tools1_cnt; i++)
+  {
+    if (mask & show_mask1)
+    {
+      if (streq(&tools1[i * 80], ""))
+      {
         mask = mask << 1;
         continue;
       }
@@ -460,14 +489,16 @@ void GrowToolbar::configure(char* tools1, char* tools2, int tools1_cnt,
       strcpy(subg_name, &tools1[i * 80]);
 
       sts = ctx->find_nc_by_name(subg_name, (GlowArrayElem**)&nc1);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         char fname[120];
         sprintf(fname, "$pwr_exe/%s.pwsg", subg_name);
         sts = ctx->open_subgraph(fname, glow_eSaveMode_SubGraph);
         if (ODD(sts))
           sts = ctx->find_nc_by_name(subg_name, (GlowArrayElem**)&nc1);
       }
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         GrowNode* n1;
         n1 = new GrowNode(ctx, subg_name, (GlowNodeClass*)nc1, x1, y1);
         n1->disable_callback();
@@ -488,9 +519,12 @@ void GrowToolbar::configure(char* tools1, char* tools2, int tools1_cnt,
 
   tools2_mask = 0;
   mask = 1;
-  for (int i = 0; i < tools2_cnt; i++) {
-    if (mask & show_mask2) {
-      if (streq(&tools2[i * 80], "")) {
+  for (int i = 0; i < tools2_cnt; i++)
+  {
+    if (mask & show_mask2)
+    {
+      if (streq(&tools2[i * 80], ""))
+      {
         mask = mask << 1;
         continue;
       }
@@ -498,14 +532,16 @@ void GrowToolbar::configure(char* tools1, char* tools2, int tools1_cnt,
       strcpy(subg_name, &tools2[i * 80]);
 
       sts = ctx->find_nc_by_name(subg_name, (GlowArrayElem**)&nc1);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         char fname[120];
         sprintf(fname, "$pwr_exe/%s.pwsg", subg_name);
         sts = ctx->open_subgraph(fname, glow_eSaveMode_SubGraph);
         if (ODD(sts))
           sts = ctx->find_nc_by_name(subg_name, (GlowArrayElem**)&nc1);
       }
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         GrowNode* n1;
         n1 = new GrowNode(ctx, subg_name, (GlowNodeClass*)nc1, x1, y1);
         n1->disable_callback();
@@ -538,14 +574,16 @@ int GrowToolbar::get_mask_index(int idx, int* category, int* mask_idx)
   unsigned int mask;
   int cnt = 0;
   int i;
-  for (i = 0; i < 64; i++) {
+  for (i = 0; i < 64; i++)
+  {
     if (i < 32)
       mask = 1 << i;
     else
       mask = 1 << (i - 32);
     if ((i < 32 && tools1_mask & mask) || (i >= 32 && tools2_mask & mask))
       cnt++;
-    if (cnt == idx + 1) {
+    if (cnt == idx + 1)
+    {
       *mask_idx = i % 32;
       *category = i / 32 + 1;
       return 1;
@@ -561,18 +599,14 @@ void GrowToolbar::scale()
   if (ctx->mw.window_width == 0)
     return;
 
-  if (x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x
-      > ctx->mw.window_width) {
-    scale = (ctx->mw.window_width
-                - (x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x) - 10)
-        / ((x_right - x_left) * ctx->mw.zoom_factor_x);
+  if (x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x > ctx->mw.window_width)
+  {
+    scale = (ctx->mw.window_width - (x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x) - 10) /
+            ((x_right - x_left) * ctx->mw.zoom_factor_x);
 
     trf.scale(scale, 1, x_left, y_low);
     get_node_borders();
   }
 }
 
-int GrowToolbar::export_script(GlowExportScript* es, void* o, void* m)
-{
-  return es->toolbar(this, o, m);
-}
+int GrowToolbar::export_script(GlowExportScript* es, void* o, void* m) { return es->toolbar(this, o, m); }

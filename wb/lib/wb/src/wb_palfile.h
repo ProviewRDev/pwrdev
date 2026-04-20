@@ -42,7 +42,8 @@
 #include <fstream>
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "wb_ldh.h"
@@ -50,50 +51,49 @@ extern "C" {
 #define pal_cPaletteFile "$pwr_exe/pwr_wb_palette.cnf"
 #define pal_cLocalPaletteFile "$pwrp_db/pwrp_cnf_palette.dat"
 
-typedef enum {
-  pal_eNameType_TopObjects,
-  pal_eNameType_Palette,
-  pal_eNameType_All
-} pal_eNameType;
+  typedef enum
+  {
+    pal_eNameType_TopObjects,
+    pal_eNameType_Palette,
+    pal_eNameType_All
+  } pal_eNameType;
 
-typedef enum {
-  pal_eMenuType_Menu,
-  pal_eMenuType_Class,
-  pal_eMenuType_ClassVolume,
-  pal_eMenuType_TopObjects,
-  pal_eMenuType_Palette
-} pal_eMenuType;
+  typedef enum
+  {
+    pal_eMenuType_Menu,
+    pal_eMenuType_Class,
+    pal_eMenuType_ClassVolume,
+    pal_eMenuType_TopObjects,
+    pal_eMenuType_Palette
+  } pal_eMenuType;
 
-class PalFileMenu {
-public:
-  PalFileMenu(
-      const char* menu_title, int menu_item_type, PalFileMenu* menu_parent);
+  class PalFileMenu
+  {
+  public:
+    PalFileMenu(const char* menu_title, int menu_item_type, PalFileMenu* menu_parent);
 
-  char title[80];
-  int item_type;
-  char file[120];
-  int pixmap;
-  PalFileMenu* child_list;
-  PalFileMenu* parent;
-  PalFileMenu* next;
-};
+    char title[80];
+    int item_type;
+    char file[120];
+    int pixmap;
+    PalFileMenu* child_list;
+    PalFileMenu* parent;
+    PalFileMenu* next;
+  };
 
-class PalFile {
-public:
-  static PalFileMenu* config_tree_build(ldh_tSession ldhses,
-      const char* filename, pal_eNameType keytype, const char* keyname,
-      PalFileMenu* menu);
-  static PalFileMenu* config_tree_build_children(ldh_tSession ldhses,
-      std::ifstream* fp, int* line_cnt, const char* filename,
-      PalFileMenu* parent);
-  static void config_tree_free(PalFileMenu* menu_tree);
-  static void config_tree_free_children(PalFileMenu* first_child);
-  static int check_volume(ldh_tSession ldhses, char* name);
-  static void config_tree_print(
-      const char* filename, PalFileMenu* menu_tree, pwr_tStatus* sts);
-  static void config_tree_print_item(
-      PalFileMenu* item, std::ofstream& fp, int level);
-};
+  class PalFile
+  {
+  public:
+    static PalFileMenu* config_tree_build(ldh_tSession ldhses, const char* filename, pal_eNameType keytype,
+                                          const char* keyname, PalFileMenu* menu);
+    static PalFileMenu* config_tree_build_children(ldh_tSession ldhses, std::ifstream* fp, int* line_cnt,
+                                                   const char* filename, PalFileMenu* parent);
+    static void config_tree_free(PalFileMenu* menu_tree);
+    static void config_tree_free_children(PalFileMenu* first_child);
+    static int check_volume(ldh_tSession ldhses, char* name);
+    static void config_tree_print(const char* filename, PalFileMenu* menu_tree, pwr_tStatus* sts);
+    static void config_tree_print_item(PalFileMenu* item, std::ofstream& fp, int level);
+  };
 
 #if defined __cplusplus
 }

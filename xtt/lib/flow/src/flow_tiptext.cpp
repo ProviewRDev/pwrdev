@@ -46,9 +46,9 @@ static void tiptext_timer_cb(FlowCtx* ctx)
   ctx->tiptext->timer_id = 0;
   ctx->tiptext->active = true;
 
-  ctx->draw(ctx->tiptext->text_x - 1, ctx->tiptext->text_y - 1, 
-      ctx->tiptext->text_x + ctx->tiptext->text_width + 1, 
-      ctx->tiptext->text_y + ctx->tiptext->text_height + 1);
+  ctx->draw(ctx->tiptext->text_x - 1, ctx->tiptext->text_y - 1,
+            ctx->tiptext->text_x + ctx->tiptext->text_width + 1,
+            ctx->tiptext->text_y + ctx->tiptext->text_height + 1);
 }
 FlowTipText::~FlowTipText()
 {
@@ -64,20 +64,25 @@ void FlowTipText::draw_text(FlowArrayElem* e, char* text, int x, int y)
 
   if (active)
     remove_text(text_object);
-  if (timer_id) {
+  if (timer_id)
+  {
     ctx->fdraw->cancel_timer(ctx, timer_id);
     timer_id = 0;
   }
 
   row = 0;
-  for (s = text, t = tiptext[0]; *s; s++) {
-    if (*s == 10) {
+  for (s = text, t = tiptext[0]; *s; s++)
+  {
+    if (*s == 10)
+    {
       *t = 0;
       row++;
       if (row >= TIPTEXT_ROWS)
         break;
       t = tiptext[row];
-    } else {
+    }
+    else
+    {
       *t = *s;
       t++;
       if (t - tiptext[0] >= (int)sizeof(tiptext))
@@ -92,10 +97,11 @@ void FlowTipText::draw_text(FlowArrayElem* e, char* text, int x, int y)
 
   text_width = 0;
   text_height = 0;
-  for (int i = 0; i < tiptext_rows; i++) {
-    ctx->fdraw->get_text_extent(ctx, tiptext[i], strlen(tiptext[i]),
-        flow_eDrawType_TextRoboto, text_size, &z_width, &z_height,
-        ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
+  for (int i = 0; i < tiptext_rows; i++)
+  {
+    ctx->fdraw->get_text_extent(ctx, tiptext[i], strlen(tiptext[i]), flow_eDrawType_TextRoboto, text_size,
+                                &z_width, &z_height,
+                                ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
     if (z_width > text_width)
       text_width = z_width;
     text_height += z_height + 3;
@@ -124,16 +130,15 @@ void FlowTipText::draw()
   if (!active || !tiptext_rows)
     return;
 
-  ctx->fdraw->fill_rect(
-      ctx, text_x, text_y, text_width, text_height, flow_eDrawType_LineErase);
-  ctx->fdraw->rect(ctx, text_x, text_y, text_width, text_height,
-      flow_eDrawType_Line, 0, 0, 0);
+  ctx->fdraw->fill_rect(ctx, text_x, text_y, text_width, text_height, flow_eDrawType_LineErase);
+  ctx->fdraw->rect(ctx, text_x, text_y, text_width, text_height, flow_eDrawType_Line, 0, 0, 0);
 
   int y = text_y + 4 + (text_height - 4) / tiptext_rows;
-  for (int i = 0; i < tiptext_rows; i++) {
-    ctx->fdraw->text(ctx, text_x + 6, y - text_descent - 2, tiptext[i],
-        strlen(tiptext[i]), flow_eDrawType_TextRoboto, text_size, 0, 0, 0,
-        ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
+  for (int i = 0; i < tiptext_rows; i++)
+  {
+    ctx->fdraw->text(ctx, text_x + 6, y - text_descent - 2, tiptext[i], strlen(tiptext[i]),
+                     flow_eDrawType_TextRoboto, text_size, 0, 0, 0,
+                     ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_size));
 
     y += (text_height - 3) / tiptext_rows;
   }
@@ -144,21 +149,24 @@ void FlowTipText::remove_text(FlowArrayElem* e)
   if (e != text_object)
     return;
 
-  if (timer_id) {
+  if (timer_id)
+  {
     ctx->fdraw->cancel_timer(ctx, timer_id);
     timer_id = 0;
     return;
   }
 
-  if (active) {
+  if (active)
+  {
     active = false;
-    ctx->draw(text_x -1 , text_y - 1, text_x + text_width + 1, text_y + text_height + 1);
+    ctx->draw(text_x - 1, text_y - 1, text_x + text_width + 1, text_y + text_height + 1);
   }
 }
 
 void FlowTipText::remove()
 {
-  if (timer_id) {
+  if (timer_id)
+  {
     ctx->fdraw->cancel_timer(ctx, timer_id);
     timer_id = 0;
   }

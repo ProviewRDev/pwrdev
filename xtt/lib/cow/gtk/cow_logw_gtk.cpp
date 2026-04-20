@@ -52,46 +52,36 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer logw)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-CoLogWGtk::CoLogWGtk(void* logw_parent_ctx, GtkWidget* logw_parent_wid,
-    const char* logw_name, int l_show_item, pwr_tStatus* status)
-    : CoLogW(logw_parent_ctx, logw_name, l_show_item, status),
-      parent_wid(logw_parent_wid)
+CoLogWGtk::CoLogWGtk(void* logw_parent_ctx, GtkWidget* logw_parent_wid, const char* logw_name,
+                     int l_show_item, pwr_tStatus* status)
+    : CoLogW(logw_parent_ctx, logw_name, l_show_item, status), parent_wid(logw_parent_wid)
 {
   const int window_width = 800;
   const int window_height = 600;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      window_height, "default-width", window_width, "title", logw_name, NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height, "default-width",
+                                      window_width, "title", logw_name, NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(toplevel, "focus-in-event",
-      G_CALLBACK(CoLogWGtk::action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(CoLogWGtk::action_inputfocus), this);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File Entry
-  GtkWidget* file_close
-      = gtk_menu_item_new_with_mnemonic("_Close");
-  g_signal_connect(
-      file_close, "activate", G_CALLBACK(CoLogWGtk::activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
+  g_signal_connect(file_close, "activate", G_CALLBACK(CoLogWGtk::activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_print
-      = gtk_menu_item_new_with_mnemonic("_Print");
-  g_signal_connect(
-      file_print, "activate", G_CALLBACK(CoLogWGtk::activate_print), this);
+  GtkWidget* file_print = gtk_menu_item_new_with_mnemonic("_Print");
+  g_signal_connect(file_print, "activate", G_CALLBACK(CoLogWGtk::activate_print), this);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_print);
@@ -103,20 +93,15 @@ CoLogWGtk::CoLogWGtk(void* logw_parent_ctx, GtkWidget* logw_parent_wid,
 
   // View menu
   GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic("Zoom _in");
-  g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(CoLogWGtk::activate_zoom_in), this);
-  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(CoLogWGtk::activate_zoom_in), this);
+  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic("Zoom _out");
-  g_signal_connect(view_zoom_out, "activate",
-      G_CALLBACK(CoLogWGtk::activate_zoom_out), this);
-  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_zoom_out, "activate", G_CALLBACK(CoLogWGtk::activate_zoom_out), this);
+  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic("Zoom _reset");
-  g_signal_connect(view_zoom_reset, "activate",
-      G_CALLBACK(CoLogWGtk::activate_zoom_reset), this);
+  g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(CoLogWGtk::activate_zoom_reset), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
@@ -157,16 +142,16 @@ void CoLogWGtk::print()
 {
   pwr_tStatus sts;
 
-  CoWowGtk::CreateBrowPrintDialogGtk(name, logwnav->brow->ctx,
-      flow_eOrientation_Portrait, 1.0, (void*)toplevel, &sts);
+  CoWowGtk::CreateBrowPrintDialogGtk(name, logwnav->brow->ctx, flow_eOrientation_Portrait, 1.0,
+                                     (void*)toplevel, &sts);
 }
 
-gboolean CoLogWGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean CoLogWGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   CoLogWGtk* logw = (CoLogWGtk*)data;
 
-  if (logw) {
+  if (logw)
+  {
     if (logw->focustimer.disabled())
       return FALSE;
 
@@ -213,6 +198,5 @@ void CoLogWGtk::activate_zoom_reset(GtkWidget* w, gpointer data)
 
 void CoLogWGtk::activate_help(GtkWidget* w, gpointer data)
 {
-  CoXHelp::dhelp("messagewindow_refman", 0, navh_eHelpFile_Other,
-      "$pwr_lang/man_dg.dat", true);
+  CoXHelp::dhelp("messagewindow_refman", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
 }

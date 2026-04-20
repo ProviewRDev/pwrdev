@@ -41,7 +41,8 @@
 
 #include "wb_vext.h"
 
-class wb_procom : public co_procom {
+class wb_procom : public co_procom
+{
   char m_key[200];
   int m_connected;
   int m_msgsndid;
@@ -50,8 +51,7 @@ class wb_procom : public co_procom {
   procom_eType m_type;
 
 public:
-  wb_procom(const char* key, co_provider* p, procom_eType type)
-      : co_procom(p), m_connected(0), m_type(type)
+  wb_procom(const char* key, co_provider* p, procom_eType type) : co_procom(p), m_connected(0), m_type(type)
   {
     strcpy(m_key, key);
   }
@@ -59,15 +59,13 @@ public:
   void receive(vext_sQMsg* msg, int size, pwr_tStatus* sts);
   void dispatch(vext_sQMsg* qmsg);
   void mainloop();
-  void provideObject(pwr_tStatus sts, pwr_tOix oix, pwr_tOix fthoix,
-      pwr_tOix bwsoix, pwr_tOix fwsoix, pwr_tOix fchoix, pwr_tOix lchoix,
-      pwr_tCid cid, const char* name, const char* longname);
+  void provideObject(pwr_tStatus sts, pwr_tOix oix, pwr_tOix fthoix, pwr_tOix bwsoix, pwr_tOix fwsoix,
+                     pwr_tOix fchoix, pwr_tOix lchoix, pwr_tCid cid, const char* name, const char* longname);
   void provideBody(pwr_tStatus sts, pwr_tOix oix, int size, void* body);
   void provideStatus(pwr_tStatus sts);
 
   int lmsgsnd(int msgid, const void* msg_ptr, size_t msg_sz, int msgflg);
-  int lmsgrcv(
-      int msgid, const void* msg_ptr, size_t msg_sz, int msgtype, int msgflg);
+  int lmsgrcv(int msgid, const void* msg_ptr, size_t msg_sz, int msgtype, int msgflg);
 };
 
 #endif

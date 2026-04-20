@@ -52,83 +52,53 @@
 
 #include "rt_xtt_cmd.h"
 
-xnav_sStartMenu XttCmd::alarm_menu[]
-    = { { "Alarm List", xnav_eItemType_Command, menu_ePixmap_List,
-            (void*)"show alarm" },
-        { "Event List", xnav_eItemType_Command, menu_ePixmap_List,
-            (void*)"show event" },
-        { "Blocked Alarms", xnav_eItemType_Command, menu_ePixmap_List,
-            (void*)"show block" },
-        { "Historical List", xnav_eItemType_Command, menu_ePixmap_List,
-            (void*)"show hist" },
-        { "", 0, 0, NULL } };
+xnav_sStartMenu XttCmd::alarm_menu[] = {
+    {"Alarm List", xnav_eItemType_Command, menu_ePixmap_List, (void*)"show alarm"},
+    {"Event List", xnav_eItemType_Command, menu_ePixmap_List, (void*)"show event"},
+    {"Blocked Alarms", xnav_eItemType_Command, menu_ePixmap_List, (void*)"show block"},
+    {"Historical List", xnav_eItemType_Command, menu_ePixmap_List, (void*)"show hist"},
+    {"", 0, 0, NULL}};
 
 xnav_sStartMenu XttCmd::nethandler_menu[] = {
-  { "Link", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show link" },
-  { "Subscription Client", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show subcli" },
-  { "Subscription Server", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show subsrv" },
-  { "", 0, 0, NULL }
-};
-xnav_sStartMenu XttCmd::communication_menu[]
-    = { { "RemNode", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show remnode" },
-        { "RemTrans", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show remtrans" },
-        { "", 0, 0, NULL } };
-xnav_sStartMenu XttCmd::logging_menu[]
-    = { { "Logging entry 1", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=1" },
-        { "Logging entry 2", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=2" },
-        { "Logging entry 3", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=3" },
-        { "Logging entry 4", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=4" },
-        { "Logging entry 5", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=5" },
-        { "Logging entry 6", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=6" },
-        { "Logging entry 7", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=7" },
-        { "Logging entry 8", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=8" },
-        { "Logging entry 9", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=9" },
-        { "Logging entry 10", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=10" },
-        { "", 0, 0, NULL } };
-xnav_sStartMenu XttCmd::system_menu[] = { { "Nethandler", xnav_eItemType_Menu,
-                                              menu_ePixmap_Map,
-                                              (void*)&XttCmd::nethandler_menu },
-  { "Communication", xnav_eItemType_Menu, menu_ePixmap_Map,
-      (void*)&XttCmd::communication_menu },
-  { "Device", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show device" },
-  { "PlcThread", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show plcthread" },
-  { "PlcPgm", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show plcpgm" },
-  { "Logging", xnav_eItemType_Menu, menu_ePixmap_Map,
-      (void*)&XttCmd::logging_menu },
-  { "System Messages", xnav_eItemType_Command, menu_ePixmap_List,
-      (void*)"open consolelog" },
-  { "System Status", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show nodeinfo" },
-  { "Nodes", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show nodeobjects" },
-  { "Volumes", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show volumes" },
-  { "", 0, 0, NULL } };
-xnav_sStartMenu XttCmd::root_menu[] = { { "Database", xnav_eItemType_Command,
-                                            menu_ePixmap_Map,
-                                            (void*)"show database" },
-  { "Alarm", xnav_eItemType_Menu, menu_ePixmap_Map,
-      (void*)&XttCmd::alarm_menu },
-  { "Store", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show file" },
-  { "System", xnav_eItemType_Menu, menu_ePixmap_Map,
-      (void*)&XttCmd::system_menu },
-  { "Close", xnav_eItemType_Command, menu_ePixmap_Leaf, (void*)"exit" },
-  { "", 0, 0, NULL } };
+    {"Link", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show link"},
+    {"Subscription Client", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show subcli"},
+    {"Subscription Server", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show subsrv"},
+    {"", 0, 0, NULL}};
+xnav_sStartMenu XttCmd::communication_menu[] = {
+    {"RemNode", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show remnode"},
+    {"RemTrans", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show remtrans"},
+    {"", 0, 0, NULL}};
+xnav_sStartMenu XttCmd::logging_menu[] = {
+    {"Logging entry 1", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=1"},
+    {"Logging entry 2", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=2"},
+    {"Logging entry 3", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=3"},
+    {"Logging entry 4", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=4"},
+    {"Logging entry 5", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=5"},
+    {"Logging entry 6", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=6"},
+    {"Logging entry 7", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=7"},
+    {"Logging entry 8", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=8"},
+    {"Logging entry 9", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=9"},
+    {"Logging entry 10", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=10"},
+    {"", 0, 0, NULL}};
+xnav_sStartMenu XttCmd::system_menu[] = {
+    {"Nethandler", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&XttCmd::nethandler_menu},
+    {"Communication", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&XttCmd::communication_menu},
+    {"Device", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show device"},
+    {"PlcThread", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show plcthread"},
+    {"PlcPgm", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show plcpgm"},
+    {"Logging", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&XttCmd::logging_menu},
+    {"System Messages", xnav_eItemType_Command, menu_ePixmap_List, (void*)"open consolelog"},
+    {"System Status", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show nodeinfo"},
+    {"Nodes", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show nodeobjects"},
+    {"Volumes", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show volumes"},
+    {"", 0, 0, NULL}};
+xnav_sStartMenu XttCmd::root_menu[] = {
+    {"Database", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show database"},
+    {"Alarm", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&XttCmd::alarm_menu},
+    {"Store", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show file"},
+    {"System", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&XttCmd::system_menu},
+    {"Close", xnav_eItemType_Command, menu_ePixmap_Leaf, (void*)"exit"},
+    {"", 0, 0, NULL}};
 
 void XttCmd::usage()
 {
@@ -164,6 +134,4 @@ void XttCmd::close_cb(void* ctx, int terminate)
   exit(0);
 }
 
-XttCmd::XttCmd() : xnav(0)
-{
-}
+XttCmd::XttCmd() : xnav(0) {}

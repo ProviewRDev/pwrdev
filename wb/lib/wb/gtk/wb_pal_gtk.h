@@ -39,11 +39,11 @@
 
 #include "wb_pal.h"
 
-class PalGtk : public Pal {
+class PalGtk : public Pal
+{
 public:
-  PalGtk(void* parent_ctx, GtkWidget* parent_wid, const char* name,
-      ldh_tSesContext ldhses, const char* root_name, GtkWidget** w,
-      pwr_tStatus* status);
+  PalGtk(void* parent_ctx, GtkWidget* parent_wid, const char* name, ldh_tSesContext ldhses,
+         const char* root_name, GtkWidget** w, pwr_tStatus* status);
   ~PalGtk();
 
   GtkWidget* parent_wid;

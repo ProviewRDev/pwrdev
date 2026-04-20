@@ -35,43 +35,42 @@
  */
 
 /************************************************************************
-*
-* Filename:		rs_ssabutil.c
-*
-*			Datum	Pgm.		Anm
-* Reviderad		920724	CS		Skapad.
-*
-* Beskrivning:
-*	Filen innehåller diverse rutiner för proview/R.
-*
-**************************************************************************/
+ *
+ * Filename:		rs_ssabutil.c
+ *
+ *			Datum	Pgm.		Anm
+ * Reviderad		920724	CS		Skapad.
+ *
+ * Beskrivning:
+ *	Filen innehåller diverse rutiner för proview/R.
+ *
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 
 #include <stdio.h>
 #include <string.h>
 
-#include "rt_gdh.h"
-#include "ssabox_ssabutil.h"
 #include "co_math.h"
 #include "co_time.h"
+#include "rt_gdh.h"
+#include "ssabox_ssabutil.h"
 
 /*************************************************************************
-*
-* Name:		ssabutil_lopnr_check()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Kontrollerar att checksiffran {r ok p} ett l|pnummer.
-*	Returnerar0 om ej ok, 1 om ok.
-*
-**************************************************************************/
+ *
+ * Name:		ssabutil_lopnr_check()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Kontrollerar att checksiffran {r ok p} ett l|pnummer.
+ *	Returnerar0 om ej ok, 1 om ok.
+ *
+ **************************************************************************/
 
-int ssabutil_lopnr_check(pwr_tInt32 lopnr)
-{
+int ssabutil_lopnr_check(pwr_tInt32 lopnr) {
   pwr_tInt32 tst_lopnr;
 
   tst_lopnr = lopnr / 10;
@@ -84,83 +83,81 @@ int ssabutil_lopnr_check(pwr_tInt32 lopnr)
 }
 
 /************************************************************************
-*
-* Namn:         ssabutil_chksum_lop
-*
-* Typ:          pwr_tInt32
-*
-* TYP           PARAMETER        IOGF   BESKRIVNING
-* pwr_tInt32    ssabutil_chksum_lop O      Löpnummer med checksiffra.
-* pwr_tInt32    lopnummer    	 I      Löpnumret som checksiffran skall
-*                                       beräknas ifrån.
-*
-* Beskrivning:  Rutinen beräknar checksiffra i löpnummer.
-*
-*************************************************************************/
-pwr_tInt32 ssabutil_chksum_lop(pwr_tInt32 lopnummer)
-{
-  static pwr_tInt16 lop_fig_weights[6] = { 1, 7, 3, 1, 7, 3 };
+ *
+ * Namn:         ssabutil_chksum_lop
+ *
+ * Typ:          pwr_tInt32
+ *
+ * TYP           PARAMETER        IOGF   BESKRIVNING
+ * pwr_tInt32    ssabutil_chksum_lop O      Löpnummer med checksiffra.
+ * pwr_tInt32    lopnummer    	 I      Löpnumret som checksiffran skall
+ *                                       beräknas ifrån.
+ *
+ * Beskrivning:  Rutinen beräknar checksiffra i löpnummer.
+ *
+ *************************************************************************/
+pwr_tInt32 ssabutil_chksum_lop(pwr_tInt32 lopnummer) {
+  static pwr_tInt16 lop_fig_weights[6] = {1, 7, 3, 1, 7, 3};
 
-  lopnummer = lopnummer * 10
-      + ssabutil_chksum_calculate(lopnummer, lop_fig_weights, 6);
+  lopnummer =
+      lopnummer * 10 + ssabutil_chksum_calculate(lopnummer, lop_fig_weights, 6);
 
   return (lopnummer);
 }
 /* END_OF ssabutil_chksum_lop */
 
 /************************************************************************
-*
-* Namn:         ssabutil_chksum_kupong
-*
-* Typ:          pwr_tInt32
-*
-* TYP           PARAMETER        IOGF   BESKRIVNING
-* pwr_tInt32    ssabutil_chksum_kupong O  Kupongnummer med checksiffra.
-* pwr_tInt32    kupong_nummer    I      Kupongnumret som checksiffran skall
-*                                       beräknas ifrån.
-*
-* Beskrivning:  Rutinen beräknar checksiffra i kupongnummer.
-*
-*************************************************************************/
-pwr_tInt32 ssabutil_chksum_kupong(pwr_tInt32 kupong_nummer)
-{
-  static pwr_tInt16 kupong_fig_weights[5] = { 1, 3, 9, 1, 7 };
+ *
+ * Namn:         ssabutil_chksum_kupong
+ *
+ * Typ:          pwr_tInt32
+ *
+ * TYP           PARAMETER        IOGF   BESKRIVNING
+ * pwr_tInt32    ssabutil_chksum_kupong O  Kupongnummer med checksiffra.
+ * pwr_tInt32    kupong_nummer    I      Kupongnumret som checksiffran skall
+ *                                       beräknas ifrån.
+ *
+ * Beskrivning:  Rutinen beräknar checksiffra i kupongnummer.
+ *
+ *************************************************************************/
+pwr_tInt32 ssabutil_chksum_kupong(pwr_tInt32 kupong_nummer) {
+  static pwr_tInt16 kupong_fig_weights[5] = {1, 3, 9, 1, 7};
 
-  kupong_nummer = kupong_nummer * 10
-      + ssabutil_chksum_calculate(kupong_nummer, kupong_fig_weights, 5);
+  kupong_nummer =
+      kupong_nummer * 10 +
+      ssabutil_chksum_calculate(kupong_nummer, kupong_fig_weights, 5);
 
   return (kupong_nummer);
 }
 /* END_OF ssabutil_chksum_kupong */
 
 /************************************************************************
-*
-* Namn:         ssabutil_chksum_calculate
-*
-* Typ:          pwr_tInt32
-*
-* TYP           PARAMETER        IOGF   BESKRIVNING
-* pwr_tInt32         ssabutil_chksum_
-*		calculate	 O      Beräknad checksiffra.
-* pwr_tInt32         value            I      Talet som checksiffran skall
-*beräknas
-*                                       ifrån.
-* pwr_tInt16	*weights         I      Pekare till viktvektor.
-* pwr_tInt16	num_figures      I      Antalet sifror i value.
-*
-*
-* Beskrivning:  Rutinen beräknar checksiffra i följande steg.
-*               1.  Varje siffra i value multipliceras med sin respektive
-*                   vikt.
-*               2.  Produkterna adderas.
-*               3.  Checksiffra = Skillnaden till närmast högre tiotal
-*
-*************************************************************************/
-pwr_tInt32 ssabutil_chksum_calculate(
-    pwr_tInt32 value, pwr_tInt16* weights, pwr_tInt16 num_figures)
-{
-  pwr_tInt16 sum; /* Arbetsvariabel */
-  pwr_tInt16* weightP; /* Pekar på vikter */
+ *
+ * Namn:         ssabutil_chksum_calculate
+ *
+ * Typ:          pwr_tInt32
+ *
+ * TYP           PARAMETER        IOGF   BESKRIVNING
+ * pwr_tInt32         ssabutil_chksum_
+ *		calculate	 O      Beräknad checksiffra.
+ * pwr_tInt32         value            I      Talet som checksiffran skall
+ *beräknas
+ *                                       ifrån.
+ * pwr_tInt16	*weights         I      Pekare till viktvektor.
+ * pwr_tInt16	num_figures      I      Antalet sifror i value.
+ *
+ *
+ * Beskrivning:  Rutinen beräknar checksiffra i följande steg.
+ *               1.  Varje siffra i value multipliceras med sin respektive
+ *                   vikt.
+ *               2.  Produkterna adderas.
+ *               3.  Checksiffra = Skillnaden till närmast högre tiotal
+ *
+ *************************************************************************/
+pwr_tInt32 ssabutil_chksum_calculate(pwr_tInt32 value, pwr_tInt16 *weights,
+                                     pwr_tInt16 num_figures) {
+  pwr_tInt16 sum;      /* Arbetsvariabel */
+  pwr_tInt16 *weightP; /* Pekar på vikter */
 
   /* Beräkna perkaren till entalssiffran */
 
@@ -183,8 +180,7 @@ pwr_tInt32 ssabutil_chksum_calculate(
 }
 /* END_OF ssabutil_chksum_calculate  */
 
-pwr_tStatus sutl_sleep(float time)
-{
+pwr_tStatus sutl_sleep(float time) {
 #if defined(OS_LINUX)
   pwr_tDeltaTime p_time;
   struct timespec p_time_ts;

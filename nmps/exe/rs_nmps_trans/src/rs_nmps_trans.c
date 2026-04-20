@@ -35,16 +35,16 @@
  */
 
 /*************************************************************************
-*
-* 	PROGRAM		rs_nmps_trans
-*
-*       Modifierad
-*		960522	Claes Sjöfors	Skapad
-*
-*
-*	Funktion:	Hanterar transar i NMps.
-*
-**************************************************************************/
+ *
+ * 	PROGRAM		rs_nmps_trans
+ *
+ *       Modifierad
+ *		960522	Claes Sjï¿½fors	Skapad
+ *
+ *
+ *	Funktion:	Hanterar transar i NMps.
+ *
+ **************************************************************************/
 
 /*_Include filer_________________________________________________________*/
 
@@ -75,7 +75,7 @@
 #define NMPS_REQUESTFUNC_ACCEPT 2
 #define NMPS_REQUESTFUNC_CELLINSERT 4
 #define NMPS_REQUESTFUNC_CHANGE 8
-//#define NMPS_REQUESTFUNC_ACCEPTBOTH 16
+// #define NMPS_REQUESTFUNC_ACCEPTBOTH 16
 #define NMPS_REQUESTFUNC_DISPLAYRESET 32
 #define NMPS_REQUESTFUNC_INTKEY 64
 #define NMPS_REQUESTFUNC_CHECKSUM 128
@@ -84,7 +84,7 @@
 #define NMPS_DATARCVFUNC_ACCEPT 2
 #define NMPS_DATARCVFUNC_CELLINSERT 4
 #define NMPS_DATARCVFUNC_ACK 8
-//#define NMPS_DATARCVFUNC_ACCEPTBOTH 16
+// #define NMPS_DATARCVFUNC_ACCEPTBOTH 16
 #define NMPS_DATARCVFUNC_DISPLAYRESET 32
 #define NMPS_DATARCVFUNC_HEADER 64
 #define NMPS_DATARCVFUNC_ACKOTHER 128
@@ -96,24 +96,26 @@
 #define NMPS_TRANSTYPE_LOC 0
 #define NMPS_TRANSTYPE_REM 1
 
-#define LogAndExit(status)                                     \
-  {                                                            \
-    errh_CErrLog(NMPS__BCKEXIT, errh_ErrArgMsg(status), NULL); \
-    exit(status);                                              \
+#define LogAndExit(status)                                                                                   \
+  {                                                                                                          \
+    errh_CErrLog(NMPS__BCKEXIT, errh_ErrArgMsg(status), NULL);                                               \
+    exit(status);                                                                                            \
   }
 
-#define LogAndReturn(status1, status2)                    \
-  {                                                       \
-    errh_CErrLog(status1, errh_ErrArgMsg(status2), NULL); \
-    return status2;                                       \
+#define LogAndReturn(status1, status2)                                                                       \
+  {                                                                                                          \
+    errh_CErrLog(status1, errh_ErrArgMsg(status2), NULL);                                                    \
+    return status2;                                                                                          \
   }
 
-typedef struct {
+typedef struct
+{
   char Key[40];
   pwr_tStatus Status;
 } nmpstrans_t_header;
 
-typedef struct s_translist {
+typedef struct s_translist
+{
   char Key[40];
   int Userdata;
   pwr_tTime InsertTime;
@@ -122,7 +124,8 @@ typedef struct s_translist {
   struct s_translist* prev_ptr;
 } translist_t_entry;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjid objid;
   pwr_sClass_DataRequest* req;
   gdh_tDlid subid;
@@ -155,7 +158,8 @@ typedef struct {
   int fatal_error;
 } nmpstrans_t_req_list;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjid objid;
   pwr_sClass_DataRcv* rcv;
   gdh_tDlid subid;
@@ -186,7 +190,8 @@ typedef struct {
   int fatal_error;
 } nmpstrans_t_rcv_list;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjid objid;
   pwr_sClass_DataSend* snd;
   gdh_tDlid subid;
@@ -209,7 +214,8 @@ typedef struct {
   int fatal_error;
 } nmpstrans_t_snd_list;
 
-typedef struct {
+typedef struct
+{
   int RequestObjectCount;
   pwr_tUInt32 LoopCount;
   pwr_sClass_NMpsTransConfig* transconfig;
@@ -223,68 +229,57 @@ typedef struct {
   translist_t_entry* req_translist;
   translist_t_entry* rcv_translist;
   translist_t_entry* snd_translist;
-} * trans_ctx;
+}* trans_ctx;
 
-static pwr_tStatus translist_delete(
-    translist_t_entry** translist_list, translist_t_entry* translist_ptr);
-static pwr_tStatus translist_insert(translist_t_entry** translist_list,
-    char* key, int userdata, float timeout_time,
-    translist_t_entry** translist_ptr);
+static pwr_tStatus translist_delete(translist_t_entry** translist_list, translist_t_entry* translist_ptr);
+static pwr_tStatus translist_insert(translist_t_entry** translist_list, char* key, int userdata,
+                                    float timeout_time, translist_t_entry** translist_ptr);
 static pwr_tStatus translist_find(translist_t_entry* translist_list, char* key,
-    translist_t_entry** found_translist_ptr);
-static int translist_timeout(
-    pwr_tTime* insert_time, pwr_tTime* current_time, float timeout);
-static pwr_tStatus translist_timeout_check(trans_ctx transctx,
-    translist_t_entry** translist_list, void (*action_func)());
-static void nmpstrans_request_timeout(
-    trans_ctx tranctx, char* key, int userdata);
-static void nmpstrans_datasend_timeout(
-    trans_ctx transctx, char* key, int userdata);
+                                  translist_t_entry** found_translist_ptr);
+static int translist_timeout(pwr_tTime* insert_time, pwr_tTime* current_time, float timeout);
+static pwr_tStatus translist_timeout_check(trans_ctx transctx, translist_t_entry** translist_list,
+                                           void (*action_func)());
+static void nmpstrans_request_timeout(trans_ctx tranctx, char* key, int userdata);
+static void nmpstrans_datasend_timeout(trans_ctx transctx, char* key, int userdata);
 static int nmpstrans_request_data(trans_ctx transctx, char* key, int position,
-    translist_t_entry** translist_list, nmpstrans_t_req_list* req_ptr);
+                                  translist_t_entry** translist_list, nmpstrans_t_req_list* req_ptr);
 static void nmpstrans_reqlist_close(trans_ctx transctx);
 static void nmpstrans_rcvlist_close(trans_ctx transctx);
 static void nmpstrans_sndlist_close(trans_ctx transctx);
-static pwr_tStatus nmpstrans_reqlist_add(trans_ctx transctx, pwr_tObjid objid,
-    nmpstrans_t_req_list** reqlist, int* reqlist_count);
-static pwr_tStatus nmpstrans_rcvlist_add(trans_ctx transctx, pwr_tObjid objid,
-    nmpstrans_t_rcv_list** rcvlist, int* rcvlist_count);
-static pwr_tStatus nmpstrans_sndlist_add(trans_ctx transctx, pwr_tObjid objid,
-    nmpstrans_t_snd_list** sndlist, int* sndlist_count);
+static pwr_tStatus nmpstrans_reqlist_add(trans_ctx transctx, pwr_tObjid objid, nmpstrans_t_req_list** reqlist,
+                                         int* reqlist_count);
+static pwr_tStatus nmpstrans_rcvlist_add(trans_ctx transctx, pwr_tObjid objid, nmpstrans_t_rcv_list** rcvlist,
+                                         int* rcvlist_count);
+static pwr_tStatus nmpstrans_sndlist_add(trans_ctx transctx, pwr_tObjid objid, nmpstrans_t_snd_list** sndlist,
+                                         int* sndlist_count);
 static pwr_tStatus nmps_get_transconfig(trans_ctx transctx);
 static pwr_tStatus nmpstrans_datareq_init(trans_ctx transctx);
 static pwr_tStatus nmpstrans_datarcv_init(trans_ctx transctx);
 static pwr_tStatus nmpstrans_datasend_init(trans_ctx transctx);
-static int nmpstrans_send_datasend(trans_ctx transctx, int position,
-    translist_t_entry** translist_list, nmpstrans_t_snd_list* snd_ptr);
+static int nmpstrans_send_datasend(trans_ctx transctx, int position, translist_t_entry** translist_list,
+                                   nmpstrans_t_snd_list* snd_ptr);
 static pwr_tStatus nmpstrans_trans_handler(trans_ctx transctx);
 static int nmpstrans_connect_alarm();
-static int nmpstrans_alarm_send(
-    char* alarm_text, char* alarm_name, int alarm_prio);
-static int nmpstrans_req_receive_data(trans_ctx transctx,
-    translist_t_entry** translist_list, nmpstrans_t_req_list* req_ptr);
-static int nmpstrans_req_accept_detected(
-    trans_ctx transctx, nmpstrans_t_req_list* req_ptr);
-static int nmpstrans_req_reset_detected(
-    trans_ctx transctx, nmpstrans_t_req_list* req_ptr);
+static int nmpstrans_alarm_send(char* alarm_text, char* alarm_name, int alarm_prio);
+static int nmpstrans_req_receive_data(trans_ctx transctx, translist_t_entry** translist_list,
+                                      nmpstrans_t_req_list* req_ptr);
+static int nmpstrans_req_accept_detected(trans_ctx transctx, nmpstrans_t_req_list* req_ptr);
+static int nmpstrans_req_reset_detected(trans_ctx transctx, nmpstrans_t_req_list* req_ptr);
 static int ssabutil_lopnr_check(pwr_tInt32 lopnr);
 
-int nmpstrans_check_checksum(int key)
-{
-  return ssabutil_lopnr_check(key);
-}
+int nmpstrans_check_checksum(int key) { return ssabutil_lopnr_check(key); }
 
 /****************************************************************************
-* Name:		nmpstrans_alarm_connect()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Connect to alarm handler.
-*
-**************************************************************************/
+ * Name:		nmpstrans_alarm_connect()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Connect to alarm handler.
+ *
+ **************************************************************************/
 static int nmpstrans_connect_alarm()
 {
   static int alarm_connected = 0;
@@ -299,10 +294,9 @@ static int nmpstrans_connect_alarm()
     /* We are already connected */
     return NMPS__SUCCESS;
 
-  sts = mh_ApplConnect(pwr_cNObjid, 0, AbortEventName, AbortEventType,
-      AbortEventPrio,
-      mh_mEventFlags_Bell | mh_mEventFlags_Ack | mh_mEventFlags_Return,
-      AbortEventText, &NoOfActMessages);
+  sts = mh_ApplConnect(pwr_cNObjid, 0, AbortEventName, AbortEventType, AbortEventPrio,
+                       mh_mEventFlags_Bell | mh_mEventFlags_Ack | mh_mEventFlags_Return, AbortEventText,
+                       &NoOfActMessages);
   if (EVEN(sts))
     return sts;
 
@@ -311,20 +305,19 @@ static int nmpstrans_connect_alarm()
 }
 
 /*************************************************************************
-*
-* Name:		nmpstrans_alarm_send()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Sends an alarm with the specified text.
-*
-**************************************************************************/
+ *
+ * Name:		nmpstrans_alarm_send()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Sends an alarm with the specified text.
+ *
+ **************************************************************************/
 
-static int nmpstrans_alarm_send(
-    char* alarm_text, char* alarm_name, int alarm_prio)
+static int nmpstrans_alarm_send(char* alarm_text, char* alarm_name, int alarm_prio)
 {
   mh_sApplMessage mh_msg;
   pwr_tUInt32 mh_id;
@@ -334,8 +327,7 @@ static int nmpstrans_alarm_send(
   if (EVEN(sts))
     return sts;
   mh_msg.Object = pwr_cNObjid;
-  mh_msg.EventFlags
-      = mh_mEventFlags_Returned | mh_mEventFlags_NoObject | mh_mEventFlags_Bell;
+  mh_msg.EventFlags = mh_mEventFlags_Returned | mh_mEventFlags_NoObject | mh_mEventFlags_Bell;
   time_GetTime(&mh_msg.EventTime);
 
   mh_msg.SupObject = pwr_cNObjid;
@@ -344,7 +336,8 @@ static int nmpstrans_alarm_send(
   strcpy(mh_msg.EventText, alarm_text);
   mh_msg.EventType = mh_eEvent_Alarm;
   mh_msg.SupInfo.SupType = mh_eSupType_None;
-  switch (alarm_prio) {
+  switch (alarm_prio)
+  {
   case 'A':
     mh_msg.EventPrio = mh_eEventPrio_A;
     break;
@@ -369,18 +362,17 @@ static int nmpstrans_alarm_send(
 }
 
 /****************************************************************************
-* Name:		translist_delete()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Delete an entry in the translist.
-*
-**************************************************************************/
-static pwr_tStatus translist_delete(
-    translist_t_entry** translist_list, translist_t_entry* translist_ptr)
+ * Name:		translist_delete()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Delete an entry in the translist.
+ *
+ **************************************************************************/
+static pwr_tStatus translist_delete(translist_t_entry** translist_list, translist_t_entry* translist_ptr)
 {
   if (translist_ptr == *translist_list)
     /* Change the root */
@@ -397,19 +389,18 @@ static pwr_tStatus translist_delete(
 }
 
 /****************************************************************************
-* Name:		nmpsmir_translist_insert()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Insert an entry in the translist.
-*
-**************************************************************************/
-static pwr_tStatus translist_insert(translist_t_entry** translist_list,
-    char* key, int userdata, float timeout_time,
-    translist_t_entry** translist_ptr)
+ * Name:		nmpsmir_translist_insert()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Insert an entry in the translist.
+ *
+ **************************************************************************/
+static pwr_tStatus translist_insert(translist_t_entry** translist_list, char* key, int userdata,
+                                    float timeout_time, translist_t_entry** translist_ptr)
 {
   translist_t_entry* next_ptr;
 
@@ -433,18 +424,18 @@ static pwr_tStatus translist_insert(translist_t_entry** translist_list,
 }
 
 /****************************************************************************
-* Name:		translist_find()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Find an entry in the translist.
-*
-**************************************************************************/
+ * Name:		translist_find()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Find an entry in the translist.
+ *
+ **************************************************************************/
 static pwr_tStatus translist_find(translist_t_entry* translist_list, char* key,
-    translist_t_entry** found_translist_ptr)
+                                  translist_t_entry** found_translist_ptr)
 {
   translist_t_entry* translist_ptr;
   int found;
@@ -452,8 +443,10 @@ static pwr_tStatus translist_find(translist_t_entry* translist_list, char* key,
   /* Loop through the list */
   found = 0;
   translist_ptr = translist_list;
-  while (translist_ptr != NULL) {
-    if (!strcmp(translist_ptr->Key, key)) {
+  while (translist_ptr != NULL)
+  {
+    if (!strcmp(translist_ptr->Key, key))
+    {
       *found_translist_ptr = translist_ptr;
       found = 1;
       break;
@@ -468,19 +461,18 @@ static pwr_tStatus translist_find(translist_t_entry* translist_list, char* key,
 }
 
 /****************************************************************************
-* Name:		translist_timeout()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Calculate if its time to remove an entry in translist.
-*		If the time since insert is greater than timeout, it's time.
-*
-**************************************************************************/
-static int translist_timeout(
-    pwr_tTime* insert_time, pwr_tTime* current_time, float timeout)
+ * Name:		translist_timeout()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Calculate if its time to remove an entry in translist.
+ *		If the time since insert is greater than timeout, it's time.
+ *
+ **************************************************************************/
+static int translist_timeout(pwr_tTime* insert_time, pwr_tTime* current_time, float timeout)
 {
   /**************
           pwr_tTime	diff_time;
@@ -500,18 +492,18 @@ static int translist_timeout(
 }
 
 /****************************************************************************
-* Name:		translist_timeout_check()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Find an entry in the translist.
-*
-**************************************************************************/
-static pwr_tStatus translist_timeout_check(trans_ctx transctx,
-    translist_t_entry** translist_list, void (*action_func)())
+ * Name:		translist_timeout_check()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Find an entry in the translist.
+ *
+ **************************************************************************/
+static pwr_tStatus translist_timeout_check(trans_ctx transctx, translist_t_entry** translist_list,
+                                           void (*action_func)())
 {
   translist_t_entry* translist_ptr;
   translist_t_entry* deletetrans_ptr;
@@ -524,10 +516,11 @@ static pwr_tStatus translist_timeout_check(trans_ctx transctx,
   found = 0;
   translist_ptr = *translist_list;
 
-  while (translist_ptr != NULL) {
+  while (translist_ptr != NULL)
+  {
     /* Check time since remove */
-    if (translist_timeout(&translist_ptr->InsertTime, &current_time,
-            translist_ptr->TimeoutTime)) {
+    if (translist_timeout(&translist_ptr->InsertTime, &current_time, translist_ptr->TimeoutTime))
+    {
       if (action_func != NULL)
         (action_func)(transctx, translist_ptr->Key, translist_ptr->Userdata);
       deletetrans_ptr = translist_ptr;
@@ -542,20 +535,19 @@ static pwr_tStatus translist_timeout_check(trans_ctx transctx,
 }
 
 /*************************************************************************
-*
-* Name:		nmpstrans_request_timeout
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	This function is called when a timeout is detected.
-*
-**************************************************************************/
+ *
+ * Name:		nmpstrans_request_timeout
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	This function is called when a timeout is detected.
+ *
+ **************************************************************************/
 
-static void nmpstrans_request_timeout(
-    trans_ctx transctx, char* key, int userdata)
+static void nmpstrans_request_timeout(trans_ctx transctx, char* key, int userdata)
 {
   nmpstrans_t_req_list* req_ptr;
   int sts;
@@ -563,9 +555,10 @@ static void nmpstrans_request_timeout(
   req_ptr = transctx->reqlist + userdata;
 
   /* Send an alarm, alarmtext idx 0, timeout */
-  if (req_ptr->req->AlarmText[0][0] != 0) {
+  if (req_ptr->req->AlarmText[0][0] != 0)
+  {
     char alarm_text[sizeof(req_ptr->req->AlarmText[0]) + 1 + sizeof(key) + 1];
-    sprintf(alarm_text, "%s %s", req_ptr->req->AlarmText[0], key);
+    snprintf(alarm_text, sizeof(alarm_text), "%s %s", req_ptr->req->AlarmText[0], key);
     sts = nmpstrans_alarm_send(alarm_text, "NMpsTrans", 'B');
   }
 
@@ -574,20 +567,19 @@ static void nmpstrans_request_timeout(
 }
 
 /*************************************************************************
-*
-* Name:		nmpstrans_datasend_timeout
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	This function is called when a timeout is detected.
-*
-**************************************************************************/
+ *
+ * Name:		nmpstrans_datasend_timeout
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	This function is called when a timeout is detected.
+ *
+ **************************************************************************/
 
-static void nmpstrans_datasend_timeout(
-    trans_ctx transctx, char* key, int userdata)
+static void nmpstrans_datasend_timeout(trans_ctx transctx, char* key, int userdata)
 {
   nmpstrans_t_snd_list* snd_ptr;
   int sts;
@@ -595,9 +587,10 @@ static void nmpstrans_datasend_timeout(
   snd_ptr = transctx->sndlist + userdata;
 
   /* Send an alarm, alarmtext idx 0, timeout */
-  if (snd_ptr->snd->AlarmText[0][0] != 0) {
+  if (snd_ptr->snd->AlarmText[0][0] != 0)
+  {
     char alarm_text[sizeof(snd_ptr->snd->AlarmText[0]) + 1 + sizeof(key) + 1];
-    sprintf(alarm_text, "%s %s", snd_ptr->snd->AlarmText[0], key);
+    snprintf(alarm_text, sizeof(alarm_text), "%s %s", snd_ptr->snd->AlarmText[0], key);
     sts = nmpstrans_alarm_send(alarm_text, "NMpsTrans", 'B');
   }
 
@@ -606,31 +599,36 @@ static void nmpstrans_datasend_timeout(
 }
 
 /*************************************************************************
-*
-* Name:		nmpstrans_request_data
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Send a request.
-*
-**************************************************************************/
+ *
+ * Name:		nmpstrans_request_data
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Send a request.
+ *
+ **************************************************************************/
 
 static int nmpstrans_request_data(trans_ctx transctx, char* key, int position,
-    translist_t_entry** translist_list, nmpstrans_t_req_list* req_ptr)
+                                  translist_t_entry** translist_list, nmpstrans_t_req_list* req_ptr)
 {
   translist_t_entry* translist_ptr;
   pwr_tStatus sts;
 
-  if (req_ptr->send_remtrans_type == NMPS_TRANSTYPE_REM) {
-    if (req_ptr->send_remtrans_ptr->DataValid == 1) {
+  if (req_ptr->send_remtrans_type == NMPS_TRANSTYPE_REM)
+  {
+    if (req_ptr->send_remtrans_ptr->DataValid == 1)
+    {
       /* Remtranscell is busy */
       return NMPS__REMTRANSBUSY;
     }
-  } else {
-    if (req_ptr->send_loctrans_ptr->DataValid == 1) {
+  }
+  else
+  {
+    if (req_ptr->send_loctrans_ptr->DataValid == 1)
+    {
       /* Remtranscell is busy */
       return NMPS__REMTRANSBUSY;
     }
@@ -646,35 +644,38 @@ static int nmpstrans_request_data(trans_ctx transctx, char* key, int position,
   /*...	transctx->transconfig->RequestSent++;*/
 
   /* Insert trans in translist */
-  sts = translist_insert(
-      translist_list, key, position, req_ptr->req->TimeoutTime, &translist_ptr);
+  sts = translist_insert(translist_list, key, position, req_ptr->req->TimeoutTime, &translist_ptr);
 
   return NMPS__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		nmpstrans_rcv_send_ack
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Send a request.
-*
-**************************************************************************/
+ *
+ * Name:		nmpstrans_rcv_send_ack
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Send a request.
+ *
+ **************************************************************************/
 
-static int nmpstrans_rcv_send_ack(
-    trans_ctx transctx, char* key, nmpstrans_t_rcv_list* rcv_ptr)
+static int nmpstrans_rcv_send_ack(trans_ctx transctx, char* key, nmpstrans_t_rcv_list* rcv_ptr)
 {
-  if (rcv_ptr->send_remtrans_type == NMPS_TRANSTYPE_REM) {
-    if (rcv_ptr->send_remtrans_ptr->DataValid == 1) {
+  if (rcv_ptr->send_remtrans_type == NMPS_TRANSTYPE_REM)
+  {
+    if (rcv_ptr->send_remtrans_ptr->DataValid == 1)
+    {
       /* Remtranscell is busy */
       return NMPS__REMTRANSBUSY;
     }
-  } else {
-    if (rcv_ptr->send_loctrans_ptr->DataValid == 1) {
+  }
+  else
+  {
+    if (rcv_ptr->send_loctrans_ptr->DataValid == 1)
+    {
       /* Remtranscell is busy */
       return NMPS__REMTRANSBUSY;
     }
@@ -693,20 +694,20 @@ static int nmpstrans_rcv_send_ack(
 }
 
 /*************************************************************************
-*
-* Name:		nmpstrans_send_datasend
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Send from a DataSend object.
-*
-**************************************************************************/
+ *
+ * Name:		nmpstrans_send_datasend
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Send from a DataSend object.
+ *
+ **************************************************************************/
 
-static int nmpstrans_send_datasend(trans_ctx transctx, int position,
-    translist_t_entry** translist_list, nmpstrans_t_snd_list* snd_ptr)
+static int nmpstrans_send_datasend(trans_ctx transctx, int position, translist_t_entry** translist_list,
+                                   nmpstrans_t_snd_list* snd_ptr)
 {
   translist_t_entry* translist_ptr;
   pwr_tStatus sts;
@@ -716,13 +717,18 @@ static int nmpstrans_send_datasend(trans_ctx transctx, int position,
   char* s;
   pwr_tOName name;
 
-  if (snd_ptr->send_remtrans_type == NMPS_TRANSTYPE_REM) {
-    if (snd_ptr->send_remtrans_ptr->DataValid == 1) {
+  if (snd_ptr->send_remtrans_type == NMPS_TRANSTYPE_REM)
+  {
+    if (snd_ptr->send_remtrans_ptr->DataValid == 1)
+    {
       /* Remtranscell is busy */
       return NMPS__REMTRANSBUSY;
     }
-  } else {
-    if (snd_ptr->send_loctrans_ptr->DataValid == 1) {
+  }
+  else
+  {
+    if (snd_ptr->send_loctrans_ptr->DataValid == 1)
+    {
       /* Remtranscell is busy */
       return NMPS__REMTRANSBUSY;
     }
@@ -753,16 +759,18 @@ static int nmpstrans_send_datasend(trans_ctx transctx, int position,
 
   data_ptr += snd_ptr->rtdb_offset;
 
-  if (snd_ptr->function & NMPS_DATASENDFUNC_HEADER) {
-    sts = cnv_ConvertData(snd_ptr->conv_table, snd_ptr->conv_table_count,
-        (char*)data_ptr,
-        (char*)snd_ptr->send_remtransbuff_ptr + sizeof(nmpstrans_t_header));
+  if (snd_ptr->function & NMPS_DATASENDFUNC_HEADER)
+  {
+    sts = cnv_ConvertData(snd_ptr->conv_table, snd_ptr->conv_table_count, (char*)data_ptr,
+                          (char*)snd_ptr->send_remtransbuff_ptr + sizeof(nmpstrans_t_header));
     strcpy(((nmpstrans_t_header*)snd_ptr->send_remtransbuff_ptr)->Key, key);
     ((nmpstrans_t_header*)snd_ptr->send_remtransbuff_ptr)->Status = 1;
-  } else {
+  }
+  else
+  {
     /* Convert data and fill the RemTrans buffer */
-    sts = cnv_ConvertData(snd_ptr->conv_table, snd_ptr->conv_table_count,
-        (char*)data_ptr, (char*)snd_ptr->send_remtransbuff_ptr);
+    sts = cnv_ConvertData(snd_ptr->conv_table, snd_ptr->conv_table_count, (char*)data_ptr,
+                          (char*)snd_ptr->send_remtransbuff_ptr);
   }
 
   if (snd_ptr->send_remtrans_type == NMPS_TRANSTYPE_REM)
@@ -772,11 +780,10 @@ static int nmpstrans_send_datasend(trans_ctx transctx, int position,
 
   /*...	transctx->transconfig->DataSendCount++;*/
 
-  if (snd_ptr->function & NMPS_DATASENDFUNC_ACK
-      || snd_ptr->function & NMPS_DATASENDFUNC_ACKOTHER) {
+  if (snd_ptr->function & NMPS_DATASENDFUNC_ACK || snd_ptr->function & NMPS_DATASENDFUNC_ACKOTHER)
+  {
     /* Insert trans in translist */
-    sts = translist_insert(translist_list, key, position,
-        snd_ptr->snd->TimeoutTime, &translist_ptr);
+    sts = translist_insert(translist_list, key, position, snd_ptr->snd->TimeoutTime, &translist_ptr);
   }
 
   if (!(snd_ptr->function & NMPS_DATASENDFUNC_ACK))
@@ -785,8 +792,8 @@ static int nmpstrans_send_datasend(trans_ctx transctx, int position,
   return NMPS__SUCCESS;
 }
 
-static int nmpstrans_req_create_data(
-    char* key, nmpstrans_t_req_list* req_ptr, pwr_tObjid* objid, void* objectp)
+static int nmpstrans_req_create_data(char* key, nmpstrans_t_req_list* req_ptr, pwr_tObjid* objid,
+                                     void* objectp)
 {
   char objname[80];
   int sts;
@@ -797,8 +804,8 @@ static int nmpstrans_req_create_data(
     strcat(objname, "-");
   strcat(objname, key);
 
-  sts = gdh_CreateObject(objname, cdh_ClassObjidToId(req_ptr->req->DataClass),
-      0, objid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts = gdh_CreateObject(objname, cdh_ClassObjidToId(req_ptr->req->DataClass), 0, objid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   if (EVEN(sts))
     return sts;
 
@@ -809,8 +816,8 @@ static int nmpstrans_req_create_data(
   return NMPS__SUCCESS;
 }
 
-static int nmpstrans_rcv_create_data(
-    char* key, nmpstrans_t_rcv_list* rcv_ptr, pwr_tObjid* objid, void* objectp)
+static int nmpstrans_rcv_create_data(char* key, nmpstrans_t_rcv_list* rcv_ptr, pwr_tObjid* objid,
+                                     void* objectp)
 {
   char objname[80];
   int sts;
@@ -821,8 +828,8 @@ static int nmpstrans_rcv_create_data(
     strcat(objname, "-");
   strcat(objname, key);
 
-  sts = gdh_CreateObject(objname, cdh_ClassObjidToId(rcv_ptr->rcv->DataClass),
-      0, objid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts = gdh_CreateObject(objname, cdh_ClassObjidToId(rcv_ptr->rcv->DataClass), 0, objid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   if (EVEN(sts))
     return sts;
 
@@ -833,8 +840,8 @@ static int nmpstrans_rcv_create_data(
   return NMPS__SUCCESS;
 }
 
-static int nmpstrans_req_receive_data(trans_ctx transctx,
-    translist_t_entry** translist_list, nmpstrans_t_req_list* req_ptr)
+static int nmpstrans_req_receive_data(trans_ctx transctx, translist_t_entry** translist_list,
+                                      nmpstrans_t_req_list* req_ptr)
 {
   void* objectp;
   pwr_tStatus sts, sts2;
@@ -851,9 +858,11 @@ static int nmpstrans_req_receive_data(trans_ctx transctx,
   else
     data_valid = req_ptr->rcv_loctrans_ptr->DataValid;
 
-  if (data_valid) {
-    if (req_ptr->function & NMPS_REQUESTFUNC_CELLINSERT
-        && !(req_ptr->function & NMPS_REQUESTFUNC_DISPLAYOBJECT)) {
+  if (data_valid)
+  {
+    if (req_ptr->function & NMPS_REQUESTFUNC_CELLINSERT &&
+        !(req_ptr->function & NMPS_REQUESTFUNC_DISPLAYOBJECT))
+    {
       /* Check that cell is not full */
       if (req_ptr->cell_ptr->CellFull)
         return NMPS__TRANSCELLFULL;
@@ -867,25 +876,29 @@ static int nmpstrans_req_receive_data(trans_ctx transctx,
 
     strncpy(key, ((nmpstrans_t_header*)msg)->Key, sizeof(key));
     sts = ((nmpstrans_t_header*)msg)->Status;
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       req_ptr->req->ErrorDetected = 1;
 
       /* Error message received */
       return_status_ok = 0;
-      for (i = 0; i < 10; i++) {
-        if (req_ptr->req->ReturnStatus[i] != 0
-            && sts == req_ptr->req->ReturnStatus[i]) {
+      for (i = 0; i < 10; i++)
+      {
+        if (req_ptr->req->ReturnStatus[i] != 0 && sts == req_ptr->req->ReturnStatus[i])
+        {
           char alarm_text[sizeof(req_ptr->req->ReturnStatusText[i]) + 1 + sizeof(key) + 1];
           sprintf(alarm_text, "%s %s", req_ptr->req->ReturnStatusText[i], key);
           sts2 = nmpstrans_alarm_send(alarm_text, "NMpsTrans", 'B');
           break;
         }
       }
-    } else
+    }
+    else
       return_status_ok = 1;
 
     sts = translist_find(*translist_list, key, &translist_ptr);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       if (req_ptr->rcv_remtrans_type == NMPS_TRANSTYPE_REM)
         req_ptr->rcv_remtrans_ptr->DataValid = 0;
       else
@@ -894,27 +907,35 @@ static int nmpstrans_req_receive_data(trans_ctx transctx,
       return NMPS__TRANSUNEXPECT;
     }
 
-    if (req_ptr->function & NMPS_REQUESTFUNC_DISPLAYOBJECT) {
-      if (return_status_ok) {
+    if (req_ptr->function & NMPS_REQUESTFUNC_DISPLAYOBJECT)
+    {
+      if (return_status_ok)
+      {
         /* Copy data to display object */
         sts = cnv_ConvertData(req_ptr->conv_table, req_ptr->conv_table_count,
-            (char*)msg + sizeof(nmpstrans_t_header),
-            (char*)req_ptr->display_object_ptr);
-        if (req_ptr->function & NMPS_REQUESTFUNC_ACCEPT) {
+                              (char*)msg + sizeof(nmpstrans_t_header), (char*)req_ptr->display_object_ptr);
+        if (req_ptr->function & NMPS_REQUESTFUNC_ACCEPT)
+        {
           req_ptr->wait_for_accept = 1;
           strcpy(req_ptr->display_object_key, key);
         }
         req_ptr->req->DataRcvDetected = 1;
-      } else
+      }
+      else
         memset(req_ptr->display_object_ptr, 0, req_ptr->display_object_size);
-    } else {
-      if (return_status_ok) {
+    }
+    else
+    {
+      if (return_status_ok)
+      {
         /* Create an object and copy data into the object */
         sts = nmpstrans_req_create_data(key, req_ptr, &objid, &objectp);
-        if (sts == GDH__DUPLNAME) {
+        if (sts == GDH__DUPLNAME)
+        {
           /* Object already exists */
           /* Send an alarm, alarmtext idx 4, object already exists */
-          if (req_ptr->req->AlarmText[4][0] != 0) {
+          if (req_ptr->req->AlarmText[4][0] != 0)
+          {
             char alarm_text[sizeof(req_ptr->req->AlarmText[4]) + 1 + sizeof(key) + 1];
             sprintf(alarm_text, "%s %s", req_ptr->req->AlarmText[4], key);
             sts2 = nmpstrans_alarm_send(alarm_text, "NMpsTrans", 'B');
@@ -927,7 +948,9 @@ static int nmpstrans_req_receive_data(trans_ctx transctx,
             req_ptr->rcv_loctrans_ptr->DataValid = 0;
           /*...	        transctx->transconfig->RequestReceived++;*/
           LogAndReturn(NMPS__TRANSCREAOBJ, sts);
-        } else if (EVEN(sts)) {
+        }
+        else if (EVEN(sts))
+        {
           if (req_ptr->rcv_remtrans_type == NMPS_TRANSTYPE_REM)
             req_ptr->rcv_remtrans_ptr->DataValid = 0;
           else
@@ -938,10 +961,11 @@ static int nmpstrans_req_receive_data(trans_ctx transctx,
         }
         /* Copy data with cnv */
         sts = cnv_ConvertData(req_ptr->conv_table, req_ptr->conv_table_count,
-            (char*)msg + sizeof(nmpstrans_t_header), (char*)objectp);
+                              (char*)msg + sizeof(nmpstrans_t_header), (char*)objectp);
 
         /* Put the data object into the cell */
-        if (req_ptr->function & NMPS_REQUESTFUNC_CELLINSERT) {
+        if (req_ptr->function & NMPS_REQUESTFUNC_CELLINSERT)
+        {
           /* Check that the cell is not busy... */
           req_ptr->cell_ptr->ExternObjId = objid;
           req_ptr->cell_ptr->ExternOpType = 0;
@@ -961,12 +985,12 @@ static int nmpstrans_req_receive_data(trans_ctx transctx,
   return NMPS__SUCCESS;
 }
 
-static int nmpstrans_rcv_receive_data(trans_ctx transctx,
-    translist_t_entry** translist_list, nmpstrans_t_rcv_list* rcv_ptr)
+static int nmpstrans_rcv_receive_data(trans_ctx transctx, translist_t_entry** translist_list,
+                                      nmpstrans_t_rcv_list* rcv_ptr)
 {
   void* objectp;
   pwr_tStatus sts, sts2;
-  translist_t_entry* translist_ptr;
+  translist_t_entry* translist_ptr = NULL;
   char key[40];
   void* msg;
   pwr_tObjid objid;
@@ -977,9 +1001,11 @@ static int nmpstrans_rcv_receive_data(trans_ctx transctx,
   else
     data_valid = rcv_ptr->rcv_loctrans_ptr->DataValid;
 
-  if (data_valid) {
-    if (rcv_ptr->function & NMPS_DATARCVFUNC_CELLINSERT
-        && !(rcv_ptr->function & NMPS_DATARCVFUNC_DISPLAYOBJECT)) {
+  if (data_valid)
+  {
+    if (rcv_ptr->function & NMPS_DATARCVFUNC_CELLINSERT &&
+        !(rcv_ptr->function & NMPS_DATARCVFUNC_DISPLAYOBJECT))
+    {
       /* Check that cell is not full */
       if (rcv_ptr->cell_ptr->CellFull)
         return NMPS__TRANSCELLFULL;
@@ -992,33 +1018,39 @@ static int nmpstrans_rcv_receive_data(trans_ctx transctx,
     msg = rcv_ptr->rcv_remtransbuff_ptr;
 
     /* The first word of the message is the key */
-    if (rcv_ptr->function & NMPS_DATARCVFUNC_HEADER) {
+    if (rcv_ptr->function & NMPS_DATARCVFUNC_HEADER)
+    {
       strncpy(key, ((nmpstrans_t_header*)msg)->Key, sizeof(key));
       sts = ((nmpstrans_t_header*)msg)->Status;
     }
 
-    if (rcv_ptr->function & NMPS_DATARCVFUNC_DISPLAYOBJECT) {
+    if (rcv_ptr->function & NMPS_DATARCVFUNC_DISPLAYOBJECT)
+    {
       /* Copy data to display object */
       if (rcv_ptr->function & NMPS_DATARCVFUNC_HEADER)
         sts = cnv_ConvertData(rcv_ptr->conv_table, rcv_ptr->conv_table_count,
-            (char*)msg + sizeof(nmpstrans_t_header),
-            (char*)rcv_ptr->display_object_ptr);
+                              (char*)msg + sizeof(nmpstrans_t_header), (char*)rcv_ptr->display_object_ptr);
       else
-        sts = cnv_ConvertData(rcv_ptr->conv_table, rcv_ptr->conv_table_count,
-            (char*)msg, (char*)rcv_ptr->display_object_ptr);
+        sts = cnv_ConvertData(rcv_ptr->conv_table, rcv_ptr->conv_table_count, (char*)msg,
+                              (char*)rcv_ptr->display_object_ptr);
 
-      if (rcv_ptr->function & NMPS_DATARCVFUNC_ACCEPT) {
+      if (rcv_ptr->function & NMPS_DATARCVFUNC_ACCEPT)
+      {
         rcv_ptr->wait_for_accept = 1;
         strcpy(rcv_ptr->display_object_key, key);
       }
       rcv_ptr->rcv->DataRcvDetected = 1;
-    } else {
+    }
+    else
+    {
       /* Create an object and copy data into the object */
       sts = nmpstrans_rcv_create_data(key, rcv_ptr, &objid, &objectp);
-      if (sts == GDH__DUPLNAME) {
+      if (sts == GDH__DUPLNAME)
+      {
         /* Object already exists */
         /* Send an alarm, alarmtext idx 4, object already exists */
-        if (rcv_ptr->rcv->AlarmText[4][0] != 0) {
+        if (rcv_ptr->rcv->AlarmText[4][0] != 0)
+        {
           char alarm_text[sizeof(rcv_ptr->rcv->AlarmText[4]) + 1 + sizeof(key) + 1];
           sprintf(alarm_text, "%s %s", rcv_ptr->rcv->AlarmText[4], key);
           sts2 = nmpstrans_alarm_send(alarm_text, "NMpsTrans", 'B');
@@ -1031,7 +1063,9 @@ static int nmpstrans_rcv_receive_data(trans_ctx transctx,
           rcv_ptr->rcv_loctrans_ptr->DataValid = 0;
         /*...	      transctx->transconfig->DataRcvReceived++;*/
         LogAndReturn(NMPS__TRANSCREAOBJ, sts);
-      } else if (EVEN(sts)) {
+      }
+      else if (EVEN(sts))
+      {
         if (rcv_ptr->rcv_remtrans_type == NMPS_TRANSTYPE_REM)
           rcv_ptr->rcv_remtrans_ptr->DataValid = 0;
         else
@@ -1043,13 +1077,13 @@ static int nmpstrans_rcv_receive_data(trans_ctx transctx,
       /* Copy data with cnv */
       if (rcv_ptr->function & NMPS_DATARCVFUNC_HEADER)
         sts = cnv_ConvertData(rcv_ptr->conv_table, rcv_ptr->conv_table_count,
-            (char*)msg + sizeof(nmpstrans_t_header), (char*)objectp);
+                              (char*)msg + sizeof(nmpstrans_t_header), (char*)objectp);
       else
-        sts = cnv_ConvertData(rcv_ptr->conv_table, rcv_ptr->conv_table_count,
-            (char*)msg, (char*)objectp);
+        sts = cnv_ConvertData(rcv_ptr->conv_table, rcv_ptr->conv_table_count, (char*)msg, (char*)objectp);
 
       /* Put the data object into the cell */
-      if (rcv_ptr->function & NMPS_DATARCVFUNC_CELLINSERT) {
+      if (rcv_ptr->function & NMPS_DATARCVFUNC_CELLINSERT)
+      {
         /* Check that the cell is not busy... */
         rcv_ptr->cell_ptr->ExternObjId = objid;
         rcv_ptr->cell_ptr->ExternOpType = 0;
@@ -1065,17 +1099,21 @@ static int nmpstrans_rcv_receive_data(trans_ctx transctx,
     /*...	  transctx->transconfig->DataRcvReceived++; */
 
     /* Send an acknowledgement */
-    if (rcv_ptr->function & NMPS_DATARCVFUNC_ACK) {
+    if (rcv_ptr->function & NMPS_DATARCVFUNC_ACK)
+    {
       sts = nmpstrans_rcv_send_ack(transctx, key, rcv_ptr);
-      if (sts == NMPS__REMTRANSBUSY) {
+      if (sts == NMPS__REMTRANSBUSY)
+      {
         /* Wait till next lap */
       }
     }
-    if (rcv_ptr->function & NMPS_DATARCVFUNC_ACKOTHER) {
+    if (rcv_ptr->function & NMPS_DATARCVFUNC_ACKOTHER)
+    {
       /* This is also an aknowlegement from a DataSend */
       /* Search for a stored trans in the send translist */
       sts = translist_find(transctx->snd_translist, key, &translist_ptr);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         if (rcv_ptr->rcv_remtrans_type == NMPS_TRANSTYPE_REM)
           rcv_ptr->rcv_remtrans_ptr->DataValid = 0;
         else
@@ -1089,8 +1127,8 @@ static int nmpstrans_rcv_receive_data(trans_ctx transctx,
   return NMPS__SUCCESS;
 }
 
-static int nmpstrans_datasend_ack(trans_ctx transctx,
-    translist_t_entry** translist_list, nmpstrans_t_snd_list* snd_ptr)
+static int nmpstrans_datasend_ack(trans_ctx transctx, translist_t_entry** translist_list,
+                                  nmpstrans_t_snd_list* snd_ptr)
 {
   pwr_tStatus sts;
   translist_t_entry* translist_ptr;
@@ -1106,12 +1144,14 @@ static int nmpstrans_datasend_ack(trans_ctx transctx,
   else
     data_valid = snd_ptr->rcv_loctrans_ptr->DataValid;
 
-  if (data_valid) {
+  if (data_valid)
+  {
     msg = snd_ptr->rcv_remtransbuff_ptr;
 
     strncpy(key, msg->Key, sizeof(key));
     sts = translist_find(*translist_list, key, &translist_ptr);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       if (snd_ptr->rcv_remtrans_type == NMPS_TRANSTYPE_REM)
         snd_ptr->rcv_remtrans_ptr->DataValid = 0;
       else
@@ -1129,7 +1169,8 @@ static int nmpstrans_datasend_ack(trans_ctx transctx,
       snd_ptr->rcv_loctrans_ptr->DataValid = 0;
 
     sts = msg->Status;
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       /* Error status received ... */
     }
     /*...	  transctx->transconfig->DataSendAcknowledged++; */
@@ -1138,8 +1179,7 @@ static int nmpstrans_datasend_ack(trans_ctx transctx,
   return NMPS__SUCCESS;
 }
 
-static int nmpstrans_req_accept_detected(
-    trans_ctx transctx, nmpstrans_t_req_list* req_ptr)
+static int nmpstrans_req_accept_detected(trans_ctx transctx, nmpstrans_t_req_list* req_ptr)
 {
   void* objectp;
   pwr_tStatus sts, sts2;
@@ -1149,38 +1189,44 @@ static int nmpstrans_req_accept_detected(
   if (!req_ptr->wait_for_accept)
     return NMPS__NOWAITACCEPT;
 
-  if (req_ptr->function & NMPS_REQUESTFUNC_CELLINSERT) {
+  if (req_ptr->function & NMPS_REQUESTFUNC_CELLINSERT)
+  {
     /* Check that cell is not full */
-    if (req_ptr->cell_ptr->CellFull) {
-      if (!req_ptr->cell_full_msg_sent) {
+    if (req_ptr->cell_ptr->CellFull)
+    {
+      if (!req_ptr->cell_full_msg_sent)
+      {
         req_ptr->cell_full_msg_sent = 1;
 
         /* Send an alarm, alarmtext idx 1, cell full */
-        if (req_ptr->req->AlarmText[1][0] != 0) {
+        if (req_ptr->req->AlarmText[1][0] != 0)
+        {
           sts = nmpstrans_alarm_send(req_ptr->req->AlarmText[1], "NMpsTrans", 'B');
         }
         req_ptr->req->ErrorDetected = 1;
       }
       return NMPS__TRANSCELLFULL;
-    } else
+    }
+    else
       req_ptr->cell_full_msg_sent = 0;
 
-    if (req_ptr->cell_ptr->ExternFlag) {
+    if (req_ptr->cell_ptr->ExternFlag)
+    {
       /* Cell is busy, wait until next scan */
       return NMPS__TRANSCELLBUSY;
     }
   }
 
   /* Create an object and copy data into the object */
-  sts = nmpstrans_req_create_data(
-      req_ptr->display_object_key, req_ptr, &objid, &objectp);
-  if (sts == GDH__DUPLNAME) {
+  sts = nmpstrans_req_create_data(req_ptr->display_object_key, req_ptr, &objid, &objectp);
+  if (sts == GDH__DUPLNAME)
+  {
     /* Object already exists */
     /* Send an alarm, alarmtext idx 4, object already exists */
-    if (req_ptr->req->AlarmText[4][0] != 0) {
+    if (req_ptr->req->AlarmText[4][0] != 0)
+    {
       char alarm_text[sizeof(req_ptr->req->AlarmText[4]) + 1 + sizeof(req_ptr->display_object_key) + 1];
-      sprintf(alarm_text, "%s %s", req_ptr->req->AlarmText[4],
-          req_ptr->display_object_key);
+      sprintf(alarm_text, "%s %s", req_ptr->req->AlarmText[4], req_ptr->display_object_key);
       sts2 = nmpstrans_alarm_send(alarm_text, "NMpsTrans", 'B');
     }
     req_ptr->req->ErrorDetected = 1;
@@ -1191,7 +1237,8 @@ static int nmpstrans_req_accept_detected(
       req_ptr->rcv_loctrans_ptr->DataValid = 0;
     return NMPS__TRANSCREAOBJ;
   }
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     if (req_ptr->rcv_remtrans_type == NMPS_TRANSTYPE_REM)
       req_ptr->rcv_remtrans_ptr->DataValid = 0;
     else
@@ -1205,14 +1252,14 @@ static int nmpstrans_req_accept_detected(
     memcpy(objectp, req_ptr->display_object_ptr, req_ptr->display_object_size);
 
   /* Put the data object into the cell */
-  if (req_ptr->function & NMPS_REQUESTFUNC_CELLINSERT) {
+  if (req_ptr->function & NMPS_REQUESTFUNC_CELLINSERT)
+  {
     /* Check that the cell is not busy... */
     req_ptr->cell_ptr->ExternObjId = objid;
     req_ptr->cell_ptr->ExternOpType = 0;
     req_ptr->cell_ptr->ExternFlag = 1;
   }
-  if (req_ptr->function & NMPS_REQUESTFUNC_DISPLAYRESET
-      && req_ptr->function & NMPS_REQUESTFUNC_DISPLAYOBJECT)
+  if (req_ptr->function & NMPS_REQUESTFUNC_DISPLAYRESET && req_ptr->function & NMPS_REQUESTFUNC_DISPLAYOBJECT)
     memset(req_ptr->display_object_ptr, 0, req_ptr->display_object_size);
   req_ptr->wait_for_accept = 0;
   if (req_ptr->function & NMPS_REQUESTFUNC_INTKEY)
@@ -1223,8 +1270,7 @@ static int nmpstrans_req_accept_detected(
   return NMPS__SUCCESS;
 }
 
-static int nmpstrans_rcv_accept_detected(
-    trans_ctx transctx, nmpstrans_t_rcv_list* rcv_ptr)
+static int nmpstrans_rcv_accept_detected(trans_ctx transctx, nmpstrans_t_rcv_list* rcv_ptr)
 {
   void* objectp;
   pwr_tStatus sts, sts2;
@@ -1234,38 +1280,44 @@ static int nmpstrans_rcv_accept_detected(
   if (!rcv_ptr->wait_for_accept)
     return NMPS__NOWAITACCEPT;
 
-  if (rcv_ptr->function & NMPS_DATARCVFUNC_CELLINSERT) {
+  if (rcv_ptr->function & NMPS_DATARCVFUNC_CELLINSERT)
+  {
     /* Check that cell is not full */
-    if (rcv_ptr->cell_ptr->CellFull) {
-      if (!rcv_ptr->cell_full_msg_sent) {
+    if (rcv_ptr->cell_ptr->CellFull)
+    {
+      if (!rcv_ptr->cell_full_msg_sent)
+      {
         rcv_ptr->cell_full_msg_sent = 1;
 
         /* Send an alarm, alarmtext idx 1, cell full */
-        if (rcv_ptr->rcv->AlarmText[1][0] != 0) {
+        if (rcv_ptr->rcv->AlarmText[1][0] != 0)
+        {
           sts = nmpstrans_alarm_send(rcv_ptr->rcv->AlarmText[1], "NMpsTrans", 'B');
         }
         rcv_ptr->rcv->ErrorDetected = 1;
       }
       return NMPS__TRANSCELLFULL;
-    } else
+    }
+    else
       rcv_ptr->cell_full_msg_sent = 0;
 
-    if (rcv_ptr->cell_ptr->ExternFlag) {
+    if (rcv_ptr->cell_ptr->ExternFlag)
+    {
       /* Cell is busy, wait until next scan */
       return NMPS__TRANSCELLBUSY;
     }
   }
 
   /* Create an object and copy data into the object */
-  sts = nmpstrans_rcv_create_data(
-      rcv_ptr->display_object_key, rcv_ptr, &objid, &objectp);
-  if (sts == GDH__DUPLNAME) {
+  sts = nmpstrans_rcv_create_data(rcv_ptr->display_object_key, rcv_ptr, &objid, &objectp);
+  if (sts == GDH__DUPLNAME)
+  {
     /* Object already exists */
     /* Send an alarm, alarmtext idx 4, object already exists */
-    if (rcv_ptr->rcv->AlarmText[4][0] != 0) {
+    if (rcv_ptr->rcv->AlarmText[4][0] != 0)
+    {
       char alarm_text[sizeof(rcv_ptr->rcv->AlarmText[4]) + 1 + sizeof(rcv_ptr->display_object_key) + 1];
-      sprintf(alarm_text, "%s %s", rcv_ptr->rcv->AlarmText[4],
-          rcv_ptr->display_object_key);
+      sprintf(alarm_text, "%s %s", rcv_ptr->rcv->AlarmText[4], rcv_ptr->display_object_key);
       sts2 = nmpstrans_alarm_send(alarm_text, "NMpsTrans", 'B');
     }
     rcv_ptr->rcv->ErrorDetected = 1;
@@ -1276,7 +1328,8 @@ static int nmpstrans_rcv_accept_detected(
       rcv_ptr->rcv_loctrans_ptr->DataValid = 0;
     return NMPS__TRANSCREAOBJ;
   }
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     if (rcv_ptr->rcv_remtrans_type == NMPS_TRANSTYPE_REM)
       rcv_ptr->rcv_remtrans_ptr->DataValid = 0;
     else
@@ -1290,25 +1343,23 @@ static int nmpstrans_rcv_accept_detected(
     memcpy(objectp, rcv_ptr->display_object_ptr, rcv_ptr->display_object_size);
 
   /* Put the data object into the cell */
-  if (rcv_ptr->function & NMPS_DATARCVFUNC_CELLINSERT) {
+  if (rcv_ptr->function & NMPS_DATARCVFUNC_CELLINSERT)
+  {
     /* Check that the cell is not busy... */
     rcv_ptr->cell_ptr->ExternObjId = objid;
     rcv_ptr->cell_ptr->ExternOpType = 0;
     rcv_ptr->cell_ptr->ExternFlag = 1;
   }
-  if (rcv_ptr->function & NMPS_DATARCVFUNC_DISPLAYRESET
-      && rcv_ptr->function & NMPS_DATARCVFUNC_DISPLAYOBJECT)
+  if (rcv_ptr->function & NMPS_DATARCVFUNC_DISPLAYRESET && rcv_ptr->function & NMPS_DATARCVFUNC_DISPLAYOBJECT)
     memset(rcv_ptr->display_object_ptr, 0, rcv_ptr->display_object_size);
   rcv_ptr->wait_for_accept = 0;
 
   return NMPS__SUCCESS;
 }
 
-static int nmpstrans_req_reset_detected(
-    trans_ctx transctx, nmpstrans_t_req_list* req_ptr)
+static int nmpstrans_req_reset_detected(trans_ctx transctx, nmpstrans_t_req_list* req_ptr)
 {
-  if (req_ptr->function & NMPS_REQUESTFUNC_DISPLAYRESET
-      && req_ptr->function & NMPS_REQUESTFUNC_DISPLAYOBJECT)
+  if (req_ptr->function & NMPS_REQUESTFUNC_DISPLAYRESET && req_ptr->function & NMPS_REQUESTFUNC_DISPLAYOBJECT)
     memset(req_ptr->display_object_ptr, 0, req_ptr->display_object_size);
   req_ptr->wait_for_accept = 0;
   if (req_ptr->function & NMPS_REQUESTFUNC_INTKEY)
@@ -1319,11 +1370,9 @@ static int nmpstrans_req_reset_detected(
   return NMPS__SUCCESS;
 }
 
-static int nmpstrans_rcv_reset_detected(
-    trans_ctx transctx, nmpstrans_t_rcv_list* rcv_ptr)
+static int nmpstrans_rcv_reset_detected(trans_ctx transctx, nmpstrans_t_rcv_list* rcv_ptr)
 {
-  if (rcv_ptr->function & NMPS_DATARCVFUNC_DISPLAYRESET
-      && rcv_ptr->function & NMPS_DATARCVFUNC_DISPLAYOBJECT)
+  if (rcv_ptr->function & NMPS_DATARCVFUNC_DISPLAYRESET && rcv_ptr->function & NMPS_DATARCVFUNC_DISPLAYOBJECT)
     memset(rcv_ptr->display_object_ptr, 0, rcv_ptr->display_object_size);
   rcv_ptr->wait_for_accept = 0;
 
@@ -1331,16 +1380,16 @@ static int nmpstrans_rcv_reset_detected(
 }
 
 /****************************************************************************
-* Name:		nmpstrans_reqlist_close()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Unref and free reqlist.
-*
-**************************************************************************/
+ * Name:		nmpstrans_reqlist_close()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Unref and free reqlist.
+ *
+ **************************************************************************/
 static void nmpstrans_reqlist_close(trans_ctx transctx)
 {
   nmpstrans_t_req_list* reqlist_ptr;
@@ -1348,7 +1397,8 @@ static void nmpstrans_reqlist_close(trans_ctx transctx)
   pwr_tStatus sts;
 
   reqlist_ptr = transctx->reqlist;
-  for (i = 0; i < transctx->req_count; i++) {
+  for (i = 0; i < transctx->req_count; i++)
+  {
     sts = gdh_DLUnrefObjectInfo(reqlist_ptr->subid);
     if (reqlist_ptr->req->Function & NMPS_REQUESTFUNC_DISPLAYOBJECT)
       sts = gdh_DLUnrefObjectInfo(reqlist_ptr->display_object_subid);
@@ -1368,18 +1418,18 @@ static void nmpstrans_reqlist_close(trans_ctx transctx)
 }
 
 /****************************************************************************
-* Name:		nmpstrans_reqlist_add()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Add a request object to the reqlist.
-*
-**************************************************************************/
-static pwr_tStatus nmpstrans_reqlist_add(trans_ctx transctx, pwr_tObjid objid,
-    nmpstrans_t_req_list** reqlist, int* reqlist_count)
+ * Name:		nmpstrans_reqlist_add()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Add a request object to the reqlist.
+ *
+ **************************************************************************/
+static pwr_tStatus nmpstrans_reqlist_add(trans_ctx transctx, pwr_tObjid objid, nmpstrans_t_req_list** reqlist,
+                                         int* reqlist_count)
 {
   nmpstrans_t_req_list* reqlist_ptr;
   nmpstrans_t_req_list* new_reqlist;
@@ -1393,16 +1443,18 @@ static pwr_tStatus nmpstrans_reqlist_add(trans_ctx transctx, pwr_tObjid objid,
   if (EVEN(sts))
     LogAndReturn(NMPS__REQOBJECT, sts);
 
-  if (*reqlist_count == 0) {
+  if (*reqlist_count == 0)
+  {
     *reqlist = calloc(1, sizeof(nmpstrans_t_req_list));
     if (*reqlist == 0)
       return NMPS__NOMEMORY;
-  } else {
+  }
+  else
+  {
     new_reqlist = calloc(*reqlist_count + 1, sizeof(nmpstrans_t_req_list));
     if (new_reqlist == 0)
       return NMPS__NOMEMORY;
-    memcpy(
-        new_reqlist, *reqlist, *reqlist_count * sizeof(nmpstrans_t_req_list));
+    memcpy(new_reqlist, *reqlist, *reqlist_count * sizeof(nmpstrans_t_req_list));
     free(*reqlist);
     *reqlist = new_reqlist;
   }
@@ -1412,22 +1464,20 @@ static pwr_tStatus nmpstrans_reqlist_add(trans_ctx transctx, pwr_tObjid objid,
 
   /* Direct link to the request object */
   attrref = cdh_ObjidToAref(objid);
-  sts = gdh_DLRefObjectInfoAttrref(
-      &attrref, (pwr_tAddress*)&reqlist_ptr->req, &reqlist_ptr->subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&reqlist_ptr->req, &reqlist_ptr->subid);
   if (EVEN(sts))
     LogAndReturn(NMPS__BCKCELL, sts);
 
-  if (reqlist_ptr->req->Function & NMPS_REQUESTFUNC_DISPLAYOBJECT) {
+  if (reqlist_ptr->req->Function & NMPS_REQUESTFUNC_DISPLAYOBJECT)
+  {
     /* Direct link to the  display object */
-    sts = gdh_GetObjectSize(
-        reqlist_ptr->req->DisplayObject, &reqlist_ptr->display_object_size);
+    sts = gdh_GetObjectSize(reqlist_ptr->req->DisplayObject, &reqlist_ptr->display_object_size);
     if (EVEN(sts))
       return NMPS__REQDISPLAYOBJECT;
 
     attrref = cdh_ObjidToAref(reqlist_ptr->req->DisplayObject);
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&reqlist_ptr->display_object_ptr,
-        &reqlist_ptr->display_object_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&reqlist_ptr->display_object_ptr,
+                                     &reqlist_ptr->display_object_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__REQDISPLAYOBJECT, sts);
   }
@@ -1438,21 +1488,23 @@ static pwr_tStatus nmpstrans_reqlist_add(trans_ctx transctx, pwr_tObjid objid,
   sts = gdh_GetObjectClass(attrref.Objid, &class);
   if (EVEN(sts))
     LogAndReturn(NMPS__REQSENDREMTRANS, sts);
-  if (class == pwr_cClass_RemTrans) {
+  if (class == pwr_cClass_RemTrans)
+  {
     reqlist_ptr->send_remtrans_type = NMPS_TRANSTYPE_REM;
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&reqlist_ptr->send_remtrans_ptr,
-        &reqlist_ptr->send_remtrans_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&reqlist_ptr->send_remtrans_ptr,
+                                     &reqlist_ptr->send_remtrans_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__REQSENDREMTRANS, sts);
-  } else if (class == pwr_cClass_LocTrans) {
+  }
+  else if (class == pwr_cClass_LocTrans)
+  {
     reqlist_ptr->send_remtrans_type = NMPS_TRANSTYPE_LOC;
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&reqlist_ptr->send_loctrans_ptr,
-        &reqlist_ptr->send_remtrans_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&reqlist_ptr->send_loctrans_ptr,
+                                     &reqlist_ptr->send_remtrans_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__REQSENDREMTRANS, sts);
-  } else
+  }
+  else
     LogAndReturn(NMPS__REQSENDREMTRANS, sts);
 
   /* Direct link to the SendRemTrans buffer object */
@@ -1460,9 +1512,8 @@ static pwr_tStatus nmpstrans_reqlist_add(trans_ctx transctx, pwr_tObjid objid,
   if (EVEN(sts))
     return NMPS__REQSENDREMTRANSBUF;
   attrref = cdh_ObjidToAref(buff_objid);
-  sts = gdh_DLRefObjectInfoAttrref(&attrref,
-      (pwr_tAddress*)&reqlist_ptr->send_remtransbuff_ptr,
-      &reqlist_ptr->send_remtransbuff_subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&reqlist_ptr->send_remtransbuff_ptr,
+                                   &reqlist_ptr->send_remtransbuff_subid);
   if (EVEN(sts))
     LogAndReturn(NMPS__REQSENDREMTRANSBUF, sts);
 
@@ -1472,21 +1523,23 @@ static pwr_tStatus nmpstrans_reqlist_add(trans_ctx transctx, pwr_tObjid objid,
   sts = gdh_GetObjectClass(attrref.Objid, &class);
   if (EVEN(sts))
     LogAndReturn(NMPS__REQRCVREMTRANS, sts);
-  if (class == pwr_cClass_RemTrans) {
+  if (class == pwr_cClass_RemTrans)
+  {
     reqlist_ptr->rcv_remtrans_type = NMPS_TRANSTYPE_REM;
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&reqlist_ptr->rcv_remtrans_ptr,
-        &reqlist_ptr->rcv_remtrans_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&reqlist_ptr->rcv_remtrans_ptr,
+                                     &reqlist_ptr->rcv_remtrans_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__REQRCVREMTRANS, sts);
-  } else if (class == pwr_cClass_LocTrans) {
+  }
+  else if (class == pwr_cClass_LocTrans)
+  {
     reqlist_ptr->rcv_remtrans_type = NMPS_TRANSTYPE_LOC;
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&reqlist_ptr->rcv_loctrans_ptr,
-        &reqlist_ptr->rcv_remtrans_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&reqlist_ptr->rcv_loctrans_ptr,
+                                     &reqlist_ptr->rcv_remtrans_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__REQRCVREMTRANS, sts);
-  } else
+  }
+  else
     LogAndReturn(NMPS__REQRCVREMTRANS, sts);
 
   /* Direct link to the RcvRemTrans buffer object */
@@ -1494,24 +1547,24 @@ static pwr_tStatus nmpstrans_reqlist_add(trans_ctx transctx, pwr_tObjid objid,
   if (EVEN(sts))
     return NMPS__REQRCVREMTRANSBUF;
   attrref = cdh_ObjidToAref(buff_objid);
-  sts = gdh_DLRefObjectInfoAttrref(&attrref,
-      (pwr_tAddress*)&reqlist_ptr->rcv_remtransbuff_ptr,
-      &reqlist_ptr->rcv_remtransbuff_subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&reqlist_ptr->rcv_remtransbuff_ptr,
+                                   &reqlist_ptr->rcv_remtransbuff_subid);
   if (EVEN(sts))
     LogAndReturn(NMPS__REQRCVREMTRANSBUF, sts);
 
-  if (reqlist_ptr->req->Function & NMPS_REQUESTFUNC_CELLINSERT) {
+  if (reqlist_ptr->req->Function & NMPS_REQUESTFUNC_CELLINSERT)
+  {
     /* Direct link to the Cell object */
     attrref = cdh_ObjidToAref(reqlist_ptr->req->CellObject);
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&reqlist_ptr->cell_ptr, &reqlist_ptr->cell_subid);
+    sts =
+        gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&reqlist_ptr->cell_ptr, &reqlist_ptr->cell_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__REQINCELL, sts);
   }
 
   /* Get the name of the data parent object */
   sts = gdh_ObjidToName(reqlist_ptr->req->DataParent, reqlist_ptr->parent_name,
-      sizeof(reqlist_ptr->parent_name), cdh_mName_volumeStrict);
+                        sizeof(reqlist_ptr->parent_name), cdh_mName_volumeStrict);
   if (EVEN(sts))
     LogAndReturn(NMPS__REQDATAPARENT, sts);
 
@@ -1524,11 +1577,10 @@ static pwr_tStatus nmpstrans_reqlist_add(trans_ctx transctx, pwr_tObjid objid,
     LogAndReturn(NMPS__REQDATACLASS, sts);
 
   /* Create a conversion table */
-  sts = cvn_ConvInit(reqlist_ptr->req->ToConvdefType,
-      reqlist_ptr->req->ToConvdef, reqlist_ptr->req->ToConvdefFile,
-      reqlist_ptr->req->FromConvdefType, reqlist_ptr->req->FromConvdef,
-      reqlist_ptr->req->FromConvdefFile, &reqlist_ptr->conv_table_count, 1,
-      (char**)&reqlist_ptr->conv_table);
+  sts = cvn_ConvInit(reqlist_ptr->req->ToConvdefType, reqlist_ptr->req->ToConvdef,
+                     reqlist_ptr->req->ToConvdefFile, reqlist_ptr->req->FromConvdefType,
+                     reqlist_ptr->req->FromConvdef, reqlist_ptr->req->FromConvdefFile,
+                     &reqlist_ptr->conv_table_count, 1, (char**)&reqlist_ptr->conv_table);
   if (EVEN(sts))
     LogAndReturn(NMPS__REQCONVTABLE, sts);
 
@@ -1536,24 +1588,23 @@ static pwr_tStatus nmpstrans_reqlist_add(trans_ctx transctx, pwr_tObjid objid,
   if (reqlist_ptr->function & NMPS_REQUESTFUNC_INTKEY)
     reqlist_ptr->old_key = reqlist_ptr->req->Key;
   else
-    strncpy(reqlist_ptr->old_key_str, reqlist_ptr->req->KeyStr,
-        sizeof(reqlist_ptr->old_key_str));
+    strncpy(reqlist_ptr->old_key_str, reqlist_ptr->req->KeyStr, sizeof(reqlist_ptr->old_key_str));
 
   (*reqlist_count)++;
   return NMPS__SUCCESS;
 }
 
 /****************************************************************************
-* Name:		nmpstrans_rcvlist_close()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Unref and free the rcvlist.
-*
-**************************************************************************/
+ * Name:		nmpstrans_rcvlist_close()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Unref and free the rcvlist.
+ *
+ **************************************************************************/
 static void nmpstrans_rcvlist_close(trans_ctx transctx)
 {
   nmpstrans_t_rcv_list* rcvlist_ptr;
@@ -1561,11 +1612,13 @@ static void nmpstrans_rcvlist_close(trans_ctx transctx)
   pwr_tStatus sts;
 
   rcvlist_ptr = transctx->rcvlist;
-  for (i = 0; i < transctx->rcv_count; i++) {
+  for (i = 0; i < transctx->rcv_count; i++)
+  {
     sts = gdh_DLUnrefObjectInfo(rcvlist_ptr->subid);
     if (rcvlist_ptr->rcv->Function & NMPS_DATARCVFUNC_DISPLAYOBJECT)
       sts = gdh_DLUnrefObjectInfo(rcvlist_ptr->display_object_subid);
-    if (rcvlist_ptr->rcv->Function & NMPS_DATARCVFUNC_ACK) {
+    if (rcvlist_ptr->rcv->Function & NMPS_DATARCVFUNC_ACK)
+    {
       sts = gdh_DLUnrefObjectInfo(rcvlist_ptr->send_remtrans_subid);
       sts = gdh_DLUnrefObjectInfo(rcvlist_ptr->send_remtransbuff_subid);
     }
@@ -1583,18 +1636,18 @@ static void nmpstrans_rcvlist_close(trans_ctx transctx)
 }
 
 /****************************************************************************
-* Name:		nmpstrans_rcvlist_add()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Add a DataRcv object to the rcvlist.
-*
-**************************************************************************/
-static pwr_tStatus nmpstrans_rcvlist_add(trans_ctx transctx, pwr_tObjid objid,
-    nmpstrans_t_rcv_list** rcvlist, int* rcvlist_count)
+ * Name:		nmpstrans_rcvlist_add()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Add a DataRcv object to the rcvlist.
+ *
+ **************************************************************************/
+static pwr_tStatus nmpstrans_rcvlist_add(trans_ctx transctx, pwr_tObjid objid, nmpstrans_t_rcv_list** rcvlist,
+                                         int* rcvlist_count)
 {
   nmpstrans_t_rcv_list* rcvlist_ptr;
   nmpstrans_t_rcv_list* new_rcvlist;
@@ -1608,16 +1661,18 @@ static pwr_tStatus nmpstrans_rcvlist_add(trans_ctx transctx, pwr_tObjid objid,
   if (EVEN(sts))
     LogAndReturn(NMPS__RCVOBJECT, sts);
 
-  if (*rcvlist_count == 0) {
+  if (*rcvlist_count == 0)
+  {
     *rcvlist = calloc(1, sizeof(nmpstrans_t_rcv_list));
     if (*rcvlist == 0)
       return NMPS__NOMEMORY;
-  } else {
+  }
+  else
+  {
     new_rcvlist = calloc(*rcvlist_count + 1, sizeof(nmpstrans_t_rcv_list));
     if (new_rcvlist == 0)
       return NMPS__NOMEMORY;
-    memcpy(
-        new_rcvlist, *rcvlist, *rcvlist_count * sizeof(nmpstrans_t_rcv_list));
+    memcpy(new_rcvlist, *rcvlist, *rcvlist_count * sizeof(nmpstrans_t_rcv_list));
     free(*rcvlist);
     *rcvlist = new_rcvlist;
   }
@@ -1627,48 +1682,49 @@ static pwr_tStatus nmpstrans_rcvlist_add(trans_ctx transctx, pwr_tObjid objid,
 
   /* Direct link to the DataRcv object */
   attrref = cdh_ObjidToAref(objid);
-  sts = gdh_DLRefObjectInfoAttrref(
-      &attrref, (pwr_tAddress*)&rcvlist_ptr->rcv, &rcvlist_ptr->subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&rcvlist_ptr->rcv, &rcvlist_ptr->subid);
   if (EVEN(sts))
     LogAndReturn(NMPS__BCKCELL, sts);
 
-  if (rcvlist_ptr->rcv->Function & NMPS_DATARCVFUNC_DISPLAYOBJECT) {
+  if (rcvlist_ptr->rcv->Function & NMPS_DATARCVFUNC_DISPLAYOBJECT)
+  {
     /* Direct link to the  display object */
-    sts = gdh_GetObjectSize(
-        rcvlist_ptr->rcv->DisplayObject, &rcvlist_ptr->display_object_size);
+    sts = gdh_GetObjectSize(rcvlist_ptr->rcv->DisplayObject, &rcvlist_ptr->display_object_size);
     if (EVEN(sts))
       return NMPS__RCVDISPLAYOBJECT;
 
     attrref = cdh_ObjidToAref(rcvlist_ptr->rcv->DisplayObject);
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&rcvlist_ptr->display_object_ptr,
-        &rcvlist_ptr->display_object_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&rcvlist_ptr->display_object_ptr,
+                                     &rcvlist_ptr->display_object_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__RCVDISPLAYOBJECT, sts);
   }
 
-  if (rcvlist_ptr->rcv->Function & NMPS_DATARCVFUNC_ACK) {
+  if (rcvlist_ptr->rcv->Function & NMPS_DATARCVFUNC_ACK)
+  {
     /* Direct link to the SendRemTrans object */
     attrref = cdh_ObjidToAref(rcvlist_ptr->rcv->SendRemTrans);
 
     sts = gdh_GetObjectClass(attrref.Objid, &class);
     if (EVEN(sts))
       LogAndReturn(NMPS__RCVSENDREMTRANS, sts);
-    if (class == pwr_cClass_RemTrans) {
+    if (class == pwr_cClass_RemTrans)
+    {
       rcvlist_ptr->send_remtrans_type = NMPS_TRANSTYPE_REM;
-      sts = gdh_DLRefObjectInfoAttrref(&attrref,
-          (pwr_tAddress*)&rcvlist_ptr->send_remtrans_ptr,
-          &rcvlist_ptr->send_remtrans_subid);
+      sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&rcvlist_ptr->send_remtrans_ptr,
+                                       &rcvlist_ptr->send_remtrans_subid);
       if (EVEN(sts))
         LogAndReturn(NMPS__RCVSENDREMTRANS, sts);
-    } else if (class == pwr_cClass_LocTrans) {
+    }
+    else if (class == pwr_cClass_LocTrans)
+    {
       rcvlist_ptr->send_remtrans_type = NMPS_TRANSTYPE_LOC;
-      sts = gdh_DLRefObjectInfoAttrref(&attrref,
-          (pwr_tAddress*)&rcvlist_ptr->send_loctrans_ptr,
-          &rcvlist_ptr->send_remtrans_subid);
+      sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&rcvlist_ptr->send_loctrans_ptr,
+                                       &rcvlist_ptr->send_remtrans_subid);
       if (EVEN(sts))
         LogAndReturn(NMPS__RCVSENDREMTRANS, sts);
-    } else
+    }
+    else
       LogAndReturn(NMPS__RCVSENDREMTRANS, sts);
 
     /* Direct link to the SendRemTrans buffer object */
@@ -1676,9 +1732,8 @@ static pwr_tStatus nmpstrans_rcvlist_add(trans_ctx transctx, pwr_tObjid objid,
     if (EVEN(sts))
       return NMPS__RCVSENDREMTRANSBUF;
     attrref = cdh_ObjidToAref(buff_objid);
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&rcvlist_ptr->send_remtransbuff_ptr,
-        &rcvlist_ptr->send_remtransbuff_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&rcvlist_ptr->send_remtransbuff_ptr,
+                                     &rcvlist_ptr->send_remtransbuff_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__RCVSENDREMTRANSBUF, sts);
   }
@@ -1689,21 +1744,23 @@ static pwr_tStatus nmpstrans_rcvlist_add(trans_ctx transctx, pwr_tObjid objid,
   sts = gdh_GetObjectClass(attrref.Objid, &class);
   if (EVEN(sts))
     LogAndReturn(NMPS__RCVRCVREMTRANS, sts);
-  if (class == pwr_cClass_RemTrans) {
+  if (class == pwr_cClass_RemTrans)
+  {
     rcvlist_ptr->rcv_remtrans_type = NMPS_TRANSTYPE_REM;
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&rcvlist_ptr->rcv_remtrans_ptr,
-        &rcvlist_ptr->rcv_remtrans_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&rcvlist_ptr->rcv_remtrans_ptr,
+                                     &rcvlist_ptr->rcv_remtrans_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__RCVRCVREMTRANS, sts);
-  } else if (class == pwr_cClass_LocTrans) {
+  }
+  else if (class == pwr_cClass_LocTrans)
+  {
     rcvlist_ptr->rcv_remtrans_type = NMPS_TRANSTYPE_LOC;
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&rcvlist_ptr->rcv_loctrans_ptr,
-        &rcvlist_ptr->rcv_remtrans_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&rcvlist_ptr->rcv_loctrans_ptr,
+                                     &rcvlist_ptr->rcv_remtrans_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__RCVRCVREMTRANS, sts);
-  } else
+  }
+  else
     LogAndReturn(NMPS__RCVRCVREMTRANS, sts);
 
   /* Direct link to the RcvRemTrans buffer object */
@@ -1711,24 +1768,24 @@ static pwr_tStatus nmpstrans_rcvlist_add(trans_ctx transctx, pwr_tObjid objid,
   if (EVEN(sts))
     return NMPS__RCVRCVREMTRANSBUF;
   attrref = cdh_ObjidToAref(buff_objid);
-  sts = gdh_DLRefObjectInfoAttrref(&attrref,
-      (pwr_tAddress*)&rcvlist_ptr->rcv_remtransbuff_ptr,
-      &rcvlist_ptr->rcv_remtransbuff_subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&rcvlist_ptr->rcv_remtransbuff_ptr,
+                                   &rcvlist_ptr->rcv_remtransbuff_subid);
   if (EVEN(sts))
     LogAndReturn(NMPS__RCVRCVREMTRANSBUF, sts);
 
-  if (rcvlist_ptr->rcv->Function & NMPS_DATARCVFUNC_CELLINSERT) {
+  if (rcvlist_ptr->rcv->Function & NMPS_DATARCVFUNC_CELLINSERT)
+  {
     /* Direct link to the Cell object */
     attrref = cdh_ObjidToAref(rcvlist_ptr->rcv->CellObject);
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&rcvlist_ptr->cell_ptr, &rcvlist_ptr->cell_subid);
+    sts =
+        gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&rcvlist_ptr->cell_ptr, &rcvlist_ptr->cell_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__RCVINCELL, sts);
   }
 
   /* Get the name of the data parent object */
   sts = gdh_ObjidToName(rcvlist_ptr->rcv->DataParent, rcvlist_ptr->parent_name,
-      sizeof(rcvlist_ptr->parent_name), cdh_mName_volumeStrict);
+                        sizeof(rcvlist_ptr->parent_name), cdh_mName_volumeStrict);
   if (EVEN(sts))
     LogAndReturn(NMPS__RCVDATAPARENT, sts);
 
@@ -1741,11 +1798,10 @@ static pwr_tStatus nmpstrans_rcvlist_add(trans_ctx transctx, pwr_tObjid objid,
     LogAndReturn(NMPS__RCVDATACLASS, sts);
 
   /* Create a conversion table */
-  sts = cvn_ConvInit(rcvlist_ptr->rcv->ToConvdefType,
-      rcvlist_ptr->rcv->ToConvdef, rcvlist_ptr->rcv->ToConvdefFile,
-      rcvlist_ptr->rcv->FromConvdefType, rcvlist_ptr->rcv->FromConvdef,
-      rcvlist_ptr->rcv->FromConvdefFile, &rcvlist_ptr->conv_table_count, 1,
-      (char**)&rcvlist_ptr->conv_table);
+  sts = cvn_ConvInit(rcvlist_ptr->rcv->ToConvdefType, rcvlist_ptr->rcv->ToConvdef,
+                     rcvlist_ptr->rcv->ToConvdefFile, rcvlist_ptr->rcv->FromConvdefType,
+                     rcvlist_ptr->rcv->FromConvdef, rcvlist_ptr->rcv->FromConvdefFile,
+                     &rcvlist_ptr->conv_table_count, 1, (char**)&rcvlist_ptr->conv_table);
   if (EVEN(sts))
     LogAndReturn(NMPS__RCVCONVTABLE, sts);
 
@@ -1756,16 +1812,16 @@ static pwr_tStatus nmpstrans_rcvlist_add(trans_ctx transctx, pwr_tObjid objid,
 }
 
 /****************************************************************************
-* Name:		nmpstrans_sndlist_close()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Unref and free the sndlist.
-*
-**************************************************************************/
+ * Name:		nmpstrans_sndlist_close()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Unref and free the sndlist.
+ *
+ **************************************************************************/
 static void nmpstrans_sndlist_close(trans_ctx transctx)
 {
   nmpstrans_t_snd_list* sndlist_ptr;
@@ -1773,11 +1829,13 @@ static void nmpstrans_sndlist_close(trans_ctx transctx)
   pwr_tStatus sts;
 
   sndlist_ptr = transctx->sndlist;
-  for (i = 0; i < transctx->snd_count; i++) {
+  for (i = 0; i < transctx->snd_count; i++)
+  {
     sts = gdh_DLUnrefObjectInfo(sndlist_ptr->subid);
     sts = gdh_DLUnrefObjectInfo(sndlist_ptr->send_remtrans_subid);
     sts = gdh_DLUnrefObjectInfo(sndlist_ptr->send_remtransbuff_subid);
-    if (sndlist_ptr->snd->Function & NMPS_DATASENDFUNC_ACK) {
+    if (sndlist_ptr->snd->Function & NMPS_DATASENDFUNC_ACK)
+    {
       sts = gdh_DLUnrefObjectInfo(sndlist_ptr->rcv_remtrans_subid);
       sts = gdh_DLUnrefObjectInfo(sndlist_ptr->rcv_remtransbuff_subid);
     }
@@ -1791,18 +1849,18 @@ static void nmpstrans_sndlist_close(trans_ctx transctx)
 }
 
 /****************************************************************************
-* Name:		nmpstrans_sndlist_add()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Add a request object to the reqlist.
-*
-**************************************************************************/
-static pwr_tStatus nmpstrans_sndlist_add(trans_ctx transctx, pwr_tObjid objid,
-    nmpstrans_t_snd_list** sndlist, int* sndlist_count)
+ * Name:		nmpstrans_sndlist_add()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Add a request object to the reqlist.
+ *
+ **************************************************************************/
+static pwr_tStatus nmpstrans_sndlist_add(trans_ctx transctx, pwr_tObjid objid, nmpstrans_t_snd_list** sndlist,
+                                         int* sndlist_count)
 {
   nmpstrans_t_snd_list* sndlist_ptr;
   nmpstrans_t_snd_list* new_sndlist;
@@ -1816,16 +1874,18 @@ static pwr_tStatus nmpstrans_sndlist_add(trans_ctx transctx, pwr_tObjid objid,
   if (EVEN(sts))
     LogAndReturn(NMPS__SNDOBJECT, sts);
 
-  if (*sndlist_count == 0) {
+  if (*sndlist_count == 0)
+  {
     *sndlist = calloc(1, sizeof(nmpstrans_t_snd_list));
     if (*sndlist == 0)
       return NMPS__NOMEMORY;
-  } else {
+  }
+  else
+  {
     new_sndlist = calloc(*sndlist_count + 1, sizeof(nmpstrans_t_snd_list));
     if (new_sndlist == 0)
       return NMPS__NOMEMORY;
-    memcpy(
-        new_sndlist, *sndlist, *sndlist_count * sizeof(nmpstrans_t_snd_list));
+    memcpy(new_sndlist, *sndlist, *sndlist_count * sizeof(nmpstrans_t_snd_list));
     free(*sndlist);
     *sndlist = new_sndlist;
   }
@@ -1835,8 +1895,7 @@ static pwr_tStatus nmpstrans_sndlist_add(trans_ctx transctx, pwr_tObjid objid,
 
   /* Direct link to the DataSend object */
   attrref = cdh_ObjidToAref(objid);
-  sts = gdh_DLRefObjectInfoAttrref(
-      &attrref, (pwr_tAddress*)&sndlist_ptr->snd, &sndlist_ptr->subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&sndlist_ptr->snd, &sndlist_ptr->subid);
   if (EVEN(sts))
     LogAndReturn(NMPS__BCKCELL, sts);
 
@@ -1846,21 +1905,23 @@ static pwr_tStatus nmpstrans_sndlist_add(trans_ctx transctx, pwr_tObjid objid,
   sts = gdh_GetObjectClass(attrref.Objid, &class);
   if (EVEN(sts))
     LogAndReturn(NMPS__SNDSENDREMTRANS, sts);
-  if (class == pwr_cClass_RemTrans) {
+  if (class == pwr_cClass_RemTrans)
+  {
     sndlist_ptr->send_remtrans_type = NMPS_TRANSTYPE_REM;
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&sndlist_ptr->send_remtrans_ptr,
-        &sndlist_ptr->send_remtrans_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&sndlist_ptr->send_remtrans_ptr,
+                                     &sndlist_ptr->send_remtrans_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__SNDSENDREMTRANS, sts);
-  } else if (class == pwr_cClass_LocTrans) {
+  }
+  else if (class == pwr_cClass_LocTrans)
+  {
     sndlist_ptr->send_remtrans_type = NMPS_TRANSTYPE_LOC;
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&sndlist_ptr->send_loctrans_ptr,
-        &sndlist_ptr->send_remtrans_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&sndlist_ptr->send_loctrans_ptr,
+                                     &sndlist_ptr->send_remtrans_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__SNDSENDREMTRANS, sts);
-  } else
+  }
+  else
     LogAndReturn(NMPS__SNDSENDREMTRANS, sts);
 
   /* Direct link to the SendRemTrans buffer object */
@@ -1868,34 +1929,36 @@ static pwr_tStatus nmpstrans_sndlist_add(trans_ctx transctx, pwr_tObjid objid,
   if (EVEN(sts))
     return NMPS__SNDSENDREMTRANSBUF;
   attrref = cdh_ObjidToAref(buff_objid);
-  sts = gdh_DLRefObjectInfoAttrref(&attrref,
-      (pwr_tAddress*)&sndlist_ptr->send_remtransbuff_ptr,
-      &sndlist_ptr->send_remtransbuff_subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&sndlist_ptr->send_remtransbuff_ptr,
+                                   &sndlist_ptr->send_remtransbuff_subid);
   if (EVEN(sts))
     LogAndReturn(NMPS__SNDSENDREMTRANSBUF, sts);
 
-  if (sndlist_ptr->snd->Function & NMPS_DATASENDFUNC_ACK) {
+  if (sndlist_ptr->snd->Function & NMPS_DATASENDFUNC_ACK)
+  {
     /* Direct link to the RcvRemTrans object */
     attrref = cdh_ObjidToAref(sndlist_ptr->snd->RcvRemTrans);
 
     sts = gdh_GetObjectClass(attrref.Objid, &class);
     if (EVEN(sts))
       LogAndReturn(NMPS__SNDRCVREMTRANS, sts);
-    if (class == pwr_cClass_RemTrans) {
+    if (class == pwr_cClass_RemTrans)
+    {
       sndlist_ptr->rcv_remtrans_type = NMPS_TRANSTYPE_REM;
-      sts = gdh_DLRefObjectInfoAttrref(&attrref,
-          (pwr_tAddress*)&sndlist_ptr->rcv_remtrans_ptr,
-          &sndlist_ptr->rcv_remtrans_subid);
+      sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&sndlist_ptr->rcv_remtrans_ptr,
+                                       &sndlist_ptr->rcv_remtrans_subid);
       if (EVEN(sts))
         LogAndReturn(NMPS__SNDRCVREMTRANS, sts);
-    } else if (class == pwr_cClass_LocTrans) {
+    }
+    else if (class == pwr_cClass_LocTrans)
+    {
       sndlist_ptr->rcv_remtrans_type = NMPS_TRANSTYPE_LOC;
-      sts = gdh_DLRefObjectInfoAttrref(&attrref,
-          (pwr_tAddress*)&sndlist_ptr->rcv_loctrans_ptr,
-          &sndlist_ptr->rcv_remtrans_subid);
+      sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&sndlist_ptr->rcv_loctrans_ptr,
+                                       &sndlist_ptr->rcv_remtrans_subid);
       if (EVEN(sts))
         LogAndReturn(NMPS__SNDRCVREMTRANS, sts);
-    } else
+    }
+    else
       LogAndReturn(NMPS__SNDRCVREMTRANS, sts);
 
     /* Direct link to the RcvRemTrans buffer object */
@@ -1903,19 +1966,17 @@ static pwr_tStatus nmpstrans_sndlist_add(trans_ctx transctx, pwr_tObjid objid,
     if (EVEN(sts))
       return NMPS__SNDRCVREMTRANSBUF;
     attrref = cdh_ObjidToAref(buff_objid);
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&sndlist_ptr->rcv_remtransbuff_ptr,
-        &sndlist_ptr->rcv_remtransbuff_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&sndlist_ptr->rcv_remtransbuff_ptr,
+                                     &sndlist_ptr->rcv_remtransbuff_subid);
     if (EVEN(sts))
       LogAndReturn(NMPS__SNDRCVREMTRANSBUF, sts);
   }
 
   /* Create a conversion table */
-  sts = cvn_ConvInit(sndlist_ptr->snd->ToConvdefType,
-      sndlist_ptr->snd->ToConvdef, sndlist_ptr->snd->ToConvdefFile,
-      sndlist_ptr->snd->FromConvdefType, sndlist_ptr->snd->FromConvdef,
-      sndlist_ptr->snd->FromConvdefFile, &sndlist_ptr->conv_table_count, 1,
-      (char**)&sndlist_ptr->conv_table);
+  sts = cvn_ConvInit(sndlist_ptr->snd->ToConvdefType, sndlist_ptr->snd->ToConvdef,
+                     sndlist_ptr->snd->ToConvdefFile, sndlist_ptr->snd->FromConvdefType,
+                     sndlist_ptr->snd->FromConvdef, sndlist_ptr->snd->FromConvdefFile,
+                     &sndlist_ptr->conv_table_count, 1, (char**)&sndlist_ptr->conv_table);
   if (EVEN(sts))
     LogAndReturn(NMPS__SNDCONVTABLE, sts);
 
@@ -1923,25 +1984,24 @@ static pwr_tStatus nmpstrans_sndlist_add(trans_ctx transctx, pwr_tObjid objid,
 
   /* Get the difference in offset to rtdb, to make it possible
      to get the Da pointer */
-  sndlist_ptr->rtdb_offset
-      = (char*)&sndlist_ptr->snd->Dummy - (char*)sndlist_ptr->snd->DummyP;
+  sndlist_ptr->rtdb_offset = (char*)&sndlist_ptr->snd->Dummy - (char*)sndlist_ptr->snd->DummyP;
 
   (*sndlist_count)++;
   return NMPS__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		nmps_get_transconfig
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Hämta pekare till backup konfig objektet.
-*
-**************************************************************************/
+ *
+ * Name:		nmps_get_transconfig
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Hï¿½mta pekare till backup konfig objektet.
+ *
+ **************************************************************************/
 
 static pwr_tStatus nmps_get_transconfig(trans_ctx transctx)
 {
@@ -1956,25 +2016,25 @@ static pwr_tStatus nmps_get_transconfig(trans_ctx transctx)
 
   /* Direct link to the cell */
   attrref = cdh_ObjidToAref(objid);
-  sts = gdh_DLRefObjectInfoAttrref(&attrref,
-      (pwr_tAddress*)&transctx->transconfig, &transctx->transconfig_dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&transctx->transconfig,
+                                   &transctx->transconfig_dlid);
   if (EVEN(sts))
     return sts;
   return NMPS__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		nmpstrans_datareq_init
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Initiering av request funktionen.
-*
-**************************************************************************/
+ *
+ * Name:		nmpstrans_datareq_init
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Initiering av request funktionen.
+ *
+ **************************************************************************/
 
 static pwr_tStatus nmpstrans_datareq_init(trans_ctx transctx)
 {
@@ -1983,10 +2043,10 @@ static pwr_tStatus nmpstrans_datareq_init(trans_ctx transctx)
 
   /* Get the cell objects on this node */
   sts = gdh_GetClassList(pwr_cClass_DataRequest, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Store and direct link the cells */
-    sts = nmpstrans_reqlist_add(
-        transctx, objid, &transctx->reqlist, &transctx->req_count);
+    sts = nmpstrans_reqlist_add(transctx, objid, &transctx->reqlist, &transctx->req_count);
     if (EVEN(sts))
       return sts;
 
@@ -1999,17 +2059,17 @@ static pwr_tStatus nmpstrans_datareq_init(trans_ctx transctx)
 }
 
 /*************************************************************************
-*
-* Name:		nmps_datarcv_init
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Initiering av request funktionen.
-*
-**************************************************************************/
+ *
+ * Name:		nmps_datarcv_init
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Initiering av request funktionen.
+ *
+ **************************************************************************/
 
 static pwr_tStatus nmpstrans_datarcv_init(trans_ctx transctx)
 {
@@ -2018,10 +2078,10 @@ static pwr_tStatus nmpstrans_datarcv_init(trans_ctx transctx)
 
   /* Get the cell objects on this node */
   sts = gdh_GetClassList(pwr_cClass_DataRcv, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Store and direct link the cells */
-    sts = nmpstrans_rcvlist_add(
-        transctx, objid, &transctx->rcvlist, &transctx->rcv_count);
+    sts = nmpstrans_rcvlist_add(transctx, objid, &transctx->rcvlist, &transctx->rcv_count);
     if (EVEN(sts))
       return sts;
 
@@ -2029,22 +2089,22 @@ static pwr_tStatus nmpstrans_datarcv_init(trans_ctx transctx)
   }
 
   /*	transctx->transconfig->DataRcvObjects = transctx->rcv_count;
-  */
+   */
   return NMPS__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		nmpstrans_datasend_init
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Initialization of datasend object.
-*
-**************************************************************************/
+ *
+ * Name:		nmpstrans_datasend_init
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Initialization of datasend object.
+ *
+ **************************************************************************/
 
 static pwr_tStatus nmpstrans_datasend_init(trans_ctx transctx)
 {
@@ -2053,10 +2113,10 @@ static pwr_tStatus nmpstrans_datasend_init(trans_ctx transctx)
 
   /* Get the cell objects on this node */
   sts = gdh_GetClassList(pwr_cClass_DataSend, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Store and direct link the cells */
-    sts = nmpstrans_sndlist_add(
-        transctx, objid, &transctx->sndlist, &transctx->snd_count);
+    sts = nmpstrans_sndlist_add(transctx, objid, &transctx->sndlist, &transctx->snd_count);
     if (EVEN(sts))
       return sts;
 
@@ -2070,17 +2130,17 @@ static pwr_tStatus nmpstrans_datasend_init(trans_ctx transctx)
 }
 
 /*************************************************************************
-*
-* Name:		nmpstrans_trans_handler
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	This is the trans handler.
-*
-**************************************************************************/
+ *
+ * Name:		nmpstrans_trans_handler
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	This is the trans handler.
+ *
+ **************************************************************************/
 
 static pwr_tStatus nmpstrans_trans_handler(trans_ctx transctx)
 {
@@ -2097,69 +2157,97 @@ static pwr_tStatus nmpstrans_trans_handler(trans_ctx transctx)
 
   /* Loop through the req objects */
   req_ptr = transctx->reqlist;
-  for (i = 0; i < transctx->req_count; i++) {
+  for (i = 0; i < transctx->req_count; i++)
+  {
     trigg_change = 0;
     trigg_detect = 0;
     /* Is there a trigg or a change in key value */
-    if (req_ptr->function & NMPS_REQUESTFUNC_CHANGE) {
-      if (req_ptr->function & NMPS_REQUESTFUNC_INTKEY) {
-        if (req_ptr->old_key != req_ptr->req->Key) {
-          if (req_ptr->req->Key != 0) {
+    if (req_ptr->function & NMPS_REQUESTFUNC_CHANGE)
+    {
+      if (req_ptr->function & NMPS_REQUESTFUNC_INTKEY)
+      {
+        if (req_ptr->old_key != req_ptr->req->Key)
+        {
+          if (req_ptr->req->Key != 0)
+          {
             trigg_change = 1;
             sprintf(key, "%d", req_ptr->req->Key);
-          } else
+          }
+          else
             req_ptr->old_key = req_ptr->req->Key;
         }
-      } else {
-        if (strcmp(req_ptr->old_key_str, req_ptr->req->KeyStr)) {
-          if (strcmp(req_ptr->req->KeyStr, "")) {
+      }
+      else
+      {
+        if (strcmp(req_ptr->old_key_str, req_ptr->req->KeyStr))
+        {
+          if (strcmp(req_ptr->req->KeyStr, ""))
+          {
             trigg_change = 1;
             strncpy(key, req_ptr->req->KeyStr, sizeof(key));
-          } else
-            strncpy(req_ptr->old_key_str, req_ptr->req->KeyStr,
-                sizeof(req_ptr->old_key_str));
+          }
+          else
+            strncpy(req_ptr->old_key_str, req_ptr->req->KeyStr, sizeof(req_ptr->old_key_str));
         }
       }
-    } else {
-      if (req_ptr->function & NMPS_REQUESTFUNC_INTKEY) {
-        if (req_ptr->req->TriggDetected) {
-          if (req_ptr->req->Key != 0) {
+    }
+    else
+    {
+      if (req_ptr->function & NMPS_REQUESTFUNC_INTKEY)
+      {
+        if (req_ptr->req->TriggDetected)
+        {
+          if (req_ptr->req->Key != 0)
+          {
             trigg_detect = 1;
             sprintf(key, "%d", req_ptr->req->Key);
-          } else
+          }
+          else
             req_ptr->req->TriggDetected = 0;
         }
-      } else {
-        if (req_ptr->req->TriggDetected) {
-          if (strcmp(req_ptr->req->KeyStr, "")) {
+      }
+      else
+      {
+        if (req_ptr->req->TriggDetected)
+        {
+          if (strcmp(req_ptr->req->KeyStr, ""))
+          {
             trigg_detect = 1;
             strncpy(key, req_ptr->req->KeyStr, sizeof(key));
-          } else
+          }
+          else
             req_ptr->req->TriggDetected = 0;
         }
       }
     }
-    if (trigg_change || trigg_detect) {
+    if (trigg_change || trigg_detect)
+    {
       /* Time to send a request */
       reset_trigg = 0;
       keep_key = 0;
 
-      if (req_ptr->function & NMPS_REQUESTFUNC_CHECKSUM) {
+      if (req_ptr->function & NMPS_REQUESTFUNC_CHECKSUM)
+      {
         /* Check if valid checksum */
         int int_key, valid_key;
 
-        if (req_ptr->function & NMPS_REQUESTFUNC_INTKEY) {
+        if (req_ptr->function & NMPS_REQUESTFUNC_INTKEY)
+        {
           int_key = req_ptr->req->Key;
           valid_key = 1;
-        } else {
+        }
+        else
+        {
           sts = sscanf(req_ptr->req->KeyStr, "%d", &int_key);
           valid_key = (sts == 1);
         }
         if (valid_key)
           sts = nmpstrans_check_checksum(int_key);
-        if (!valid_key || EVEN(sts)) {
+        if (!valid_key || EVEN(sts))
+        {
           /* Checksum is not ok */
-          if (req_ptr->req->AlarmText[1][0] != 0) {
+          if (req_ptr->req->AlarmText[1][0] != 0)
+          {
             char alarm_text[sizeof("Checksum error") + 1 + sizeof(key) + 1];
             sprintf(alarm_text, "%s %s", "Checksum error", key);
             sts = nmpstrans_alarm_send(alarm_text, "NMpsTrans", 'B');
@@ -2170,11 +2258,12 @@ static pwr_tStatus nmpstrans_trans_handler(trans_ctx transctx)
       }
 
       /* Check that the Cell is not full */
-      if (req_ptr->function & NMPS_REQUESTFUNC_CELLINSERT
-          && !(req_ptr->function & NMPS_REQUESTFUNC_DISPLAYOBJECT)
-          && req_ptr->cell_ptr->CellFull) {
+      if (req_ptr->function & NMPS_REQUESTFUNC_CELLINSERT &&
+          !(req_ptr->function & NMPS_REQUESTFUNC_DISPLAYOBJECT) && req_ptr->cell_ptr->CellFull)
+      {
         /* Send an alarm, alarmtext idx 1, cell full */
-        if (req_ptr->req->AlarmText[1][0] != 0) {
+        if (req_ptr->req->AlarmText[1][0] != 0)
+        {
           char alarm_text[sizeof(req_ptr->req->AlarmText[1]) + 1 + sizeof(key) + 1];
           sprintf(alarm_text, "%s %s", req_ptr->req->AlarmText[1], key);
           sts = nmpstrans_alarm_send(alarm_text, "NMpsTrans", 'B');
@@ -2183,43 +2272,52 @@ static pwr_tStatus nmpstrans_trans_handler(trans_ctx transctx)
         reset_trigg = 1;
         keep_key = 0;
       }
-      if (reset_trigg) {
+      if (reset_trigg)
+      {
         /* Reset trigg */
-        if (req_ptr->function & NMPS_REQUESTFUNC_INTKEY) {
+        if (req_ptr->function & NMPS_REQUESTFUNC_INTKEY)
+        {
           if (!keep_key)
             req_ptr->req->Key = 0;
           if (trigg_change)
             req_ptr->old_key = req_ptr->req->Key;
           else if (trigg_detect)
             req_ptr->req->TriggDetected = 0;
-        } else {
+        }
+        else
+        {
           if (!keep_key)
             strcpy(req_ptr->req->KeyStr, "");
           if (trigg_change)
-            strncpy(req_ptr->old_key_str, req_ptr->req->KeyStr,
-                sizeof(req_ptr->old_key_str));
+            strncpy(req_ptr->old_key_str, req_ptr->req->KeyStr, sizeof(req_ptr->old_key_str));
           else if (trigg_detect)
             req_ptr->req->TriggDetected = 0;
         }
-        if (req_ptr->function & NMPS_DATARCVFUNC_DISPLAYRESET
-            && req_ptr->function & NMPS_DATARCVFUNC_DISPLAYOBJECT)
+        if (req_ptr->function & NMPS_DATARCVFUNC_DISPLAYRESET &&
+            req_ptr->function & NMPS_DATARCVFUNC_DISPLAYOBJECT)
           memset(req_ptr->display_object_ptr, 0, req_ptr->display_object_size);
-      } else {
-        sts = nmpstrans_request_data(
-            transctx, key, i, &transctx->req_translist, req_ptr);
-        if (sts == NMPS__REMTRANSBUSY) {
+      }
+      else
+      {
+        sts = nmpstrans_request_data(transctx, key, i, &transctx->req_translist, req_ptr);
+        if (sts == NMPS__REMTRANSBUSY)
+        {
           /* Wait till next scan */
-        } else {
+        }
+        else
+        {
           /* Reset trigg */
-          if (req_ptr->function & NMPS_REQUESTFUNC_INTKEY) {
+          if (req_ptr->function & NMPS_REQUESTFUNC_INTKEY)
+          {
             if (trigg_change)
               req_ptr->old_key = req_ptr->req->Key;
             else if (trigg_detect)
               req_ptr->req->TriggDetected = 0;
-          } else {
+          }
+          else
+          {
             if (trigg_change)
-              strncpy(req_ptr->old_key_str, req_ptr->req->KeyStr,
-                  sizeof(req_ptr->old_key_str));
+              strncpy(req_ptr->old_key_str, req_ptr->req->KeyStr, sizeof(req_ptr->old_key_str));
             else if (trigg_detect)
               req_ptr->req->TriggDetected = 0;
           }
@@ -2227,42 +2325,51 @@ static pwr_tStatus nmpstrans_trans_handler(trans_ctx transctx)
       }
     }
 
-    if (req_ptr->req->AcceptDetected) {
+    if (req_ptr->req->AcceptDetected)
+    {
       sts = nmpstrans_req_accept_detected(transctx, req_ptr);
-      if (sts == NMPS__NOWAITACCEPT) {
+      if (sts == NMPS__NOWAITACCEPT)
+      {
         /* Nothing to wait for */
         /* Send an alarm, alarmtext idx 2, No accept wait status */
-        if (req_ptr->req->AlarmText[2][0] != 0) {
+        if (req_ptr->req->AlarmText[2][0] != 0)
+        {
           sts = nmpstrans_alarm_send(req_ptr->req->AlarmText[2], "NMpsTrans", 'B');
         }
       }
       req_ptr->req->AcceptDetected = 0;
     }
 
-    if (req_ptr->req->ResetDetected) {
+    if (req_ptr->req->ResetDetected)
+    {
       sts = nmpstrans_req_reset_detected(transctx, req_ptr);
       req_ptr->req->ResetDetected = 0;
     }
 
     /* Is there anything to receive ? */
-    sts = nmpstrans_req_receive_data(
-        transctx, &transctx->req_translist, req_ptr);
-    if (sts == NMPS__TRANSCELLFULL) {
-      if (!req_ptr->cell_full_msg_sent) {
+    sts = nmpstrans_req_receive_data(transctx, &transctx->req_translist, req_ptr);
+    if (sts == NMPS__TRANSCELLFULL)
+    {
+      if (!req_ptr->cell_full_msg_sent)
+      {
         req_ptr->cell_full_msg_sent = 1;
 
         /* Send an alarm, alarmtext idx 1, cell full */
-        if (req_ptr->req->AlarmText[1][0] != 0) {
+        if (req_ptr->req->AlarmText[1][0] != 0)
+        {
           sts = nmpstrans_alarm_send(req_ptr->req->AlarmText[1], "NMpsTrans", 'B');
         }
         req_ptr->req->ErrorDetected = 1;
-      } else
+      }
+      else
         req_ptr->cell_full_msg_sent = 0;
     }
 
-    if (req_ptr->fatal_error) {
+    if (req_ptr->fatal_error)
+    {
       /* Send an alarm, alarmtext idx 3, fatal error */
-      if (req_ptr->req->AlarmText[3][0] != 0) {
+      if (req_ptr->req->AlarmText[3][0] != 0)
+      {
         sts = nmpstrans_alarm_send(req_ptr->req->AlarmText[3], "NMpsTrans", 'B');
       }
       req_ptr->req->ErrorDetected = 1;
@@ -2273,43 +2380,53 @@ static pwr_tStatus nmpstrans_trans_handler(trans_ctx transctx)
 
   /* Loop through the rcv objects */
   rcv_ptr = transctx->rcvlist;
-  for (i = 0; i < transctx->rcv_count; i++) {
-    if (rcv_ptr->rcv->AcceptDetected) {
+  for (i = 0; i < transctx->rcv_count; i++)
+  {
+    if (rcv_ptr->rcv->AcceptDetected)
+    {
       sts = nmpstrans_rcv_accept_detected(transctx, rcv_ptr);
-      if (sts == NMPS__NOWAITACCEPT) {
+      if (sts == NMPS__NOWAITACCEPT)
+      {
         /* Nothing to wait for */
         /* Send an alarm, alarmtext idx 2, No accept wait status */
-        if (rcv_ptr->rcv->AlarmText[2][0] != 0) {
+        if (rcv_ptr->rcv->AlarmText[2][0] != 0)
+        {
           sts = nmpstrans_alarm_send(rcv_ptr->rcv->AlarmText[2], "NMpsTrans", 'B');
         }
       }
       rcv_ptr->rcv->AcceptDetected = 0;
     }
 
-    if (rcv_ptr->rcv->ResetDetected) {
+    if (rcv_ptr->rcv->ResetDetected)
+    {
       sts = nmpstrans_rcv_reset_detected(transctx, rcv_ptr);
       rcv_ptr->rcv->ResetDetected = 0;
     }
 
     /* Is there anything to receive ? */
-    sts = nmpstrans_rcv_receive_data(
-        transctx, &transctx->rcv_translist, rcv_ptr);
-    if (sts == NMPS__TRANSCELLFULL) {
-      if (!rcv_ptr->cell_full_msg_sent) {
+    sts = nmpstrans_rcv_receive_data(transctx, &transctx->rcv_translist, rcv_ptr);
+    if (sts == NMPS__TRANSCELLFULL)
+    {
+      if (!rcv_ptr->cell_full_msg_sent)
+      {
         rcv_ptr->cell_full_msg_sent = 1;
 
         /* Send an alarm, alarmtext idx 1, cell full */
-        if (rcv_ptr->rcv->AlarmText[1][0] != 0) {
+        if (rcv_ptr->rcv->AlarmText[1][0] != 0)
+        {
           sts = nmpstrans_alarm_send(rcv_ptr->rcv->AlarmText[1], "NMpsTrans", 'B');
         }
         rcv_ptr->rcv->ErrorDetected = 1;
-      } else
+      }
+      else
         rcv_ptr->cell_full_msg_sent = 0;
     }
 
-    if (rcv_ptr->fatal_error) {
+    if (rcv_ptr->fatal_error)
+    {
       /* Send an alarm, alarmtext idx 3, fatal error */
-      if (rcv_ptr->rcv->AlarmText[3][0] != 0) {
+      if (rcv_ptr->rcv->AlarmText[3][0] != 0)
+      {
         sts = nmpstrans_alarm_send(rcv_ptr->rcv->AlarmText[3], "NMpsTrans", 'B');
       }
       rcv_ptr->rcv->ErrorDetected = 1;
@@ -2320,30 +2437,38 @@ static pwr_tStatus nmpstrans_trans_handler(trans_ctx transctx)
 
   /* Loop through the snd objects */
   snd_ptr = transctx->sndlist;
-  for (i = 0; i < transctx->snd_count; i++) {
-    if (snd_ptr->snd->TriggDetected) {
+  for (i = 0; i < transctx->snd_count; i++)
+  {
+    if (snd_ptr->snd->TriggDetected)
+    {
       /* Time to send some data */
-      sts = nmpstrans_send_datasend(
-          transctx, i, &transctx->snd_translist, snd_ptr);
-      if (sts == NMPS__REMTRANSBUSY) {
+      sts = nmpstrans_send_datasend(transctx, i, &transctx->snd_translist, snd_ptr);
+      if (sts == NMPS__REMTRANSBUSY)
+      {
         /* Wait till next scan */
-      } else if (sts == NMPS__SNDNODATA) {
+      }
+      else if (sts == NMPS__SNDNODATA)
+      {
         /* Send an alarm, alarmtext idx 1, no data to send */
-        if (snd_ptr->snd->AlarmText[1][0] != 0) {
+        if (snd_ptr->snd->AlarmText[1][0] != 0)
+        {
           sts = nmpstrans_alarm_send(snd_ptr->snd->AlarmText[1], "NMpsTrans", 'B');
         }
         snd_ptr->snd->ErrorDetected = 1;
         snd_ptr->snd->TriggDetected = 0;
-      } else
+      }
+      else
         snd_ptr->snd->TriggDetected = 0;
     }
 
     /* Look for acknowledge message */
     sts = nmpstrans_datasend_ack(transctx, &transctx->snd_translist, snd_ptr);
 
-    if (snd_ptr->fatal_error) {
+    if (snd_ptr->fatal_error)
+    {
       /* Send an alarm, alarmtext idx 3, fatal error */
-      if (snd_ptr->snd->AlarmText[3][0] != 0) {
+      if (snd_ptr->snd->AlarmText[3][0] != 0)
+      {
         sts = nmpstrans_alarm_send(snd_ptr->snd->AlarmText[3], "NMpsTrans", 'B');
       }
       snd_ptr->snd->ErrorDetected = 1;
@@ -2353,11 +2478,9 @@ static pwr_tStatus nmpstrans_trans_handler(trans_ctx transctx)
     snd_ptr++;
   }
 
-  sts = translist_timeout_check(
-      transctx, &transctx->req_translist, nmpstrans_request_timeout);
+  sts = translist_timeout_check(transctx, &transctx->req_translist, nmpstrans_request_timeout);
 
-  sts = translist_timeout_check(
-      transctx, &transctx->snd_translist, nmpstrans_datasend_timeout);
+  sts = translist_timeout_check(transctx, &transctx->snd_translist, nmpstrans_datasend_timeout);
 
   return NMPS__SUCCESS;
 }
@@ -2380,20 +2503,23 @@ int main()
     LogAndExit(sts);
 
   /* Init qcom and bind event que */
-  if (!qcom_Init(&sts, 0, "rs_nmps_trans")) {
+  if (!qcom_Init(&sts, 0, "rs_nmps_trans"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     exit(sts);
   }
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, &qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, &qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     exit(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, &qid, &qini)) {
+  if (!qcom_Bind(&sts, &qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     exit(-1);
   }
@@ -2423,28 +2549,36 @@ int main()
 
   tmo = 1000 * transctx->transconfig->CycleTime - 1;
 
-  for (;;) {
+  for (;;)
+  {
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &qid, &get, tmo);
-    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
-      if (!swap) {
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+    {
+      if (!swap)
+      {
         sts = nmpstrans_trans_handler(transctx);
         if (EVEN(sts))
           LogAndExit(sts);
         transctx->transconfig->LoopCount++;
       }
-    } else {
+    }
+    else
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop && !swap) {
+      if (new_event.b.oldPlcStop && !swap)
+      {
         swap = 1;
         nmpstrans_reqlist_close(transctx);
         nmpstrans_rcvlist_close(transctx);
         nmpstrans_sndlist_close(transctx);
-      } else if (new_event.b.swapDone && swap) {
+      }
+      else if (new_event.b.swapDone && swap)
+      {
         swap = 0;
 
         sts = nmpstrans_datareq_init(transctx);
@@ -2460,30 +2594,32 @@ int main()
           LogAndExit(sts);
 
         errh_Info("Warm restart completed");
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         exit(0);
       }
     }
   }
 }
 
-static pwr_tInt32 ssabutil_chksum_calculate(
-    pwr_tInt32 value, pwr_tInt16* weights, pwr_tInt16 num_figures)
+static pwr_tInt32 ssabutil_chksum_calculate(pwr_tInt32 value, pwr_tInt16* weights, pwr_tInt16 num_figures)
 {
-  pwr_tInt16 sum; /* Arbetsvariabel */
-  pwr_tInt16* weightP; /* Pekar på vikter */
+  pwr_tInt16 sum;      /* Arbetsvariabel */
+  pwr_tInt16* weightP; /* Pekar pï¿½ vikter */
 
-  /* Beräkna perkaren till entalssiffran */
+  /* Berï¿½kna perkaren till entalssiffran */
 
   weightP = weights + num_figures - 1;
 
-  /* Beräkna den viktade summan av siffrorona i talet */
-  for (sum = 0; num_figures > 0; num_figures--) {
+  /* Berï¿½kna den viktade summan av siffrorona i talet */
+  for (sum = 0; num_figures > 0; num_figures--)
+  {
     sum += (value % 10) * (*weightP--);
     value /= 10;
   }
 
-  /* Beräkna skillnaden till närmast högre tiotal */
+  /* Berï¿½kna skillnaden till nï¿½rmast hï¿½gre tiotal */
   sum = ((sum / 10) + 1) * 10 - sum;
   if (sum == 10)
     sum = 0;
@@ -2493,10 +2629,9 @@ static pwr_tInt32 ssabutil_chksum_calculate(
 
 static pwr_tInt32 ssabutil_chksum_lop(pwr_tInt32 lopnummer)
 {
-  static pwr_tInt16 lop_fig_weights[6] = { 1, 7, 3, 1, 7, 3 };
+  static pwr_tInt16 lop_fig_weights[6] = {1, 7, 3, 1, 7, 3};
 
-  lopnummer = lopnummer * 10
-      + ssabutil_chksum_calculate(lopnummer, lop_fig_weights, 6);
+  lopnummer = lopnummer * 10 + ssabutil_chksum_calculate(lopnummer, lop_fig_weights, 6);
 
   return (lopnummer);
 }

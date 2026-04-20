@@ -46,13 +46,15 @@
 
 #include "flow_browapi.h"
 
-typedef enum { msglist_eItemType_Msg } msglist_eItemType;
+typedef enum
+{
+  msglist_eItemType_Msg
+} msglist_eItemType;
 
-class MsgListBrow {
+class MsgListBrow
+{
 public:
-  MsgListBrow(BrowCtx* brow_ctx, void* msgl) : ctx(brow_ctx), msglist(msgl)
-  {
-  }
+  MsgListBrow(BrowCtx* brow_ctx, void* msgl) : ctx(brow_ctx), msglist(msgl) {}
   ~MsgListBrow();
 
   BrowCtx* ctx;
@@ -71,7 +73,8 @@ public:
   void brow_setup();
 };
 
-class MsgList {
+class MsgList
+{
 public:
   MsgList(void* ev_parent_ctx);
   virtual ~MsgList();
@@ -82,9 +85,7 @@ public:
   void (*find_plc_cb)(void*, pwr_tObjid);
   void (*find_ge_cb)(void*, char*, void*);
 
-  virtual void set_input_focus()
-  {
-  }
+  virtual void set_input_focus() {}
 
   void zoom(double zoom_factor);
   void unzoom();
@@ -97,10 +98,11 @@ public:
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
 };
 
-class ItemMsg {
+class ItemMsg
+{
 public:
-  ItemMsg(MsgList* msglist, const char* item_name, char* item_text,
-      int item_severity, brow_tNode dest, flow_eDest dest_code);
+  ItemMsg(MsgList* msglist, const char* item_name, char* item_text, int item_severity, brow_tNode dest,
+          flow_eDest dest_code);
   virtual ~ItemMsg();
 
   msglist_eItemType type;
@@ -113,33 +115,33 @@ public:
   virtual void find();
 };
 
-class ItemMsgObject : public ItemMsg {
+class ItemMsgObject : public ItemMsg
+{
 public:
-  ItemMsgObject(MsgList* msglist, const char* item_name, char* item_text,
-      int item_severity, pwr_tOid item_oid, brow_tNode dest,
-      flow_eDest dest_code);
+  ItemMsgObject(MsgList* msglist, const char* item_name, char* item_text, int item_severity,
+                pwr_tOid item_oid, brow_tNode dest, flow_eDest dest_code);
 
   pwr_tOid oid;
 
   void find();
 };
 
-class ItemMsgObjectPlc : public ItemMsg {
+class ItemMsgObjectPlc : public ItemMsg
+{
 public:
-  ItemMsgObjectPlc(MsgList* msglist, const char* item_name, char* item_text,
-      int item_severity, pwr_tOid item_oid, brow_tNode dest,
-      flow_eDest dest_code);
+  ItemMsgObjectPlc(MsgList* msglist, const char* item_name, char* item_text, int item_severity,
+                   pwr_tOid item_oid, brow_tNode dest, flow_eDest dest_code);
 
   pwr_tOid oid;
 
   void find();
 };
 
-class ItemMsgObjectGe : public ItemMsg {
+class ItemMsgObjectGe : public ItemMsg
+{
 public:
-  ItemMsgObjectGe(MsgList* msglist, const char* item_name, char* item_text,
-      int item_severity, char* item_object, void* item_utility, brow_tNode dest,
-      flow_eDest dest_code);
+  ItemMsgObjectGe(MsgList* msglist, const char* item_name, char* item_text, int item_severity,
+                  char* item_object, void* item_utility, brow_tNode dest, flow_eDest dest_code);
 
   char object[200];
   void* utility;

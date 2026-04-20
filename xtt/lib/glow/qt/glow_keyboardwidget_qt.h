@@ -38,5 +38,4 @@
 
 #include <QWidget>
 
-QWidget* keyboardwidgetqt_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data);
+QWidget* keyboardwidgetqt_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data);

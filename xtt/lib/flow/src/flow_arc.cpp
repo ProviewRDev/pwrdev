@@ -68,8 +68,8 @@ void FlowArc::print(void* pos, void* node, int highlight)
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   ctx->current_print->arc(ll.print_z_x + ((FlowPoint*)pos)->print_z_x,
-      ll.print_z_y + ((FlowPoint*)pos)->print_z_y, ur.print_z_x - ll.print_z_x,
-      ur.print_z_y - ll.print_z_y, angle1, angle2, draw_type, idx, highlight);
+                          ll.print_z_y + ((FlowPoint*)pos)->print_z_y, ur.print_z_x - ll.print_z_x,
+                          ur.print_z_y - ll.print_z_y, angle1, angle2, draw_type, idx, highlight);
 }
 
 void FlowArc::save(std::ofstream& fp, flow_eSaveMode mode)
@@ -93,9 +93,11 @@ void FlowArc::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
+  for (;;)
+  {
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case flow_eSave_Arc:
       break;
     case flow_eSave_Arc_draw_type:
@@ -136,8 +138,8 @@ void FlowArc::draw(void* pos, int highlight, int dimmed, int hot, void* node)
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   ctx->fdraw->arc(ctx, ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-      ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x,
-      ur.z_y - ll.z_y, angle1, angle2, draw_type, idx, highlight, dimmed);
+                  ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x, ur.z_y - ll.z_y, angle1,
+                  angle2, draw_type, idx, highlight, dimmed);
 }
 
 void FlowArc::erase(void* pos, int hot, void* node)
@@ -147,8 +149,8 @@ void FlowArc::erase(void* pos, int hot, void* node)
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   ctx->fdraw->arc_erase(ctx, ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-      ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x,
-      ur.z_y - ll.z_y, angle1, angle2, idx);
+                        ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x, ur.z_y - ll.z_y,
+                        angle1, angle2, idx);
 }
 
 void FlowArc::nav_draw(void* pos, int highlight, void* node)
@@ -156,11 +158,9 @@ void FlowArc::nav_draw(void* pos, int highlight, void* node)
   int idx = int(ctx->nav_zoom_factor / ctx->base_zoom_factor * line_width - 1);
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  ctx->fdraw->nav_arc(ctx,
-      ll.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
-      ll.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y,
-      ur.nav_z_x - ll.nav_z_x, ur.nav_z_y - ll.nav_z_y, angle1, angle2,
-      draw_type, idx, highlight);
+  ctx->fdraw->nav_arc(ctx, ll.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
+                      ll.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y, ur.nav_z_x - ll.nav_z_x,
+                      ur.nav_z_y - ll.nav_z_y, angle1, angle2, draw_type, idx, highlight);
 }
 
 void FlowArc::nav_erase(void* pos, void* node)
@@ -168,29 +168,29 @@ void FlowArc::nav_erase(void* pos, void* node)
   int idx = int(ctx->nav_zoom_factor / ctx->base_zoom_factor * line_width - 1);
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  ctx->fdraw->nav_arc_erase(ctx,
-      ll.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
-      ll.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y,
-      ur.nav_z_x - ll.nav_z_x, ur.nav_z_y - ll.nav_z_y, angle1, angle2, idx);
+  ctx->fdraw->nav_arc_erase(ctx, ll.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
+                            ll.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y,
+                            ur.nav_z_x - ll.nav_z_x, ur.nav_z_y - ll.nav_z_y, angle1, angle2, idx);
 }
 
-int FlowArc::event_handler(
-    void* pos, flow_eEvent event, int x, int y, void* node)
+int FlowArc::event_handler(void* pos, flow_eEvent event, int x, int y, void* node)
 {
   FlowPoint* p;
 
   p = (FlowPoint*)pos;
-  if (angle2 == 360 && ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x <= x
-      && x <= ur.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x
-      && ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y <= y
-      && y <= ur.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y) {
+  if (angle2 == 360 && ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x <= x &&
+      x <= ur.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x &&
+      ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y <= y &&
+      y <= ur.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y)
+  {
     return 1;
-  } else
+  }
+  else
     return 0;
 }
 
-void FlowArc::get_borders(double pos_x, double pos_y, double* x_right,
-    double* x_left, double* y_high, double* y_low, void* node)
+void FlowArc::get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                          double* y_low, void* node)
 {
   if (pos_x + ll.x < *x_left)
     *x_left = pos_x + ll.x;
@@ -202,8 +202,8 @@ void FlowArc::get_borders(double pos_x, double pos_y, double* x_right,
     *y_high = pos_y + ur.y;
 }
 
-void FlowArc::move(void* pos, double x1, double y1, double x2, double y2,
-    int ang1, int ang2, int highlight, int dimmed, int hot)
+void FlowArc::move(void* pos, double x1, double y1, double x2, double y2, int ang1, int ang2, int highlight,
+                   int dimmed, int hot)
 {
   ll.x = x1;
   ll.y = y1;
@@ -215,8 +215,7 @@ void FlowArc::move(void* pos, double x1, double y1, double x2, double y2,
   nav_zoom();
 }
 
-void FlowArc::shift(void* pos, double delta_x, double delta_y, int highlight,
-    int dimmed, int hot)
+void FlowArc::shift(void* pos, double delta_x, double delta_y, int highlight, int dimmed, int hot)
 {
   ll.x += delta_x;
   ll.y += delta_y;
@@ -228,8 +227,7 @@ void FlowArc::shift(void* pos, double delta_x, double delta_y, int highlight,
 
 std::ostream& operator<<(std::ostream& o, const FlowArc a)
 {
-  o << '(' << a.ll.x << ',' << a.ll.y << ')' << '(' << a.ur.x << ',' << a.ur.y
-    << ')' << '[' << a.ll.z_x << ',' << a.ll.z_y << ']' << '[' << a.ur.z_x
-    << ',' << a.ur.z_y << ']';
+  o << '(' << a.ll.x << ',' << a.ll.y << ')' << '(' << a.ur.x << ',' << a.ur.y << ')' << '[' << a.ll.z_x
+    << ',' << a.ll.z_y << ']' << '[' << a.ur.z_x << ',' << a.ur.z_y << ']';
   return o;
 }

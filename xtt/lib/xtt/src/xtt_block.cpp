@@ -45,12 +45,9 @@
 
 #include "xtt_block.h"
 
-Block::~Block()
-{
-}
+Block::~Block() {}
 
-Block::Block(void* b_parent_ctx, pwr_sAttrRef* b_oar, char* name,
-    unsigned int priv, pwr_tStatus* sts)
+Block::Block(void* b_parent_ctx, pwr_sAttrRef* b_oar, char* name, unsigned int priv, pwr_tStatus* sts)
     : parent_ctx(b_parent_ctx), oar(*b_oar)
 {
   *sts = 1;

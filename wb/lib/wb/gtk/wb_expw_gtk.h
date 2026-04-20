@@ -43,10 +43,11 @@
 
 #include "wb_expw.h"
 
-class WbExpWGtk : public WbExpW {
+class WbExpWGtk : public WbExpW
+{
 public:
-  WbExpWGtk(void* l_parent_ctx, GtkWidget* l_parent_wid, ldh_tSession l_ldhses,
-      const char* l_name, int type, int l_editmode, pwr_tStatus* status);
+  WbExpWGtk(void* l_parent_ctx, GtkWidget* l_parent_wid, ldh_tSession l_ldhses, const char* l_name, int type,
+            int l_editmode, pwr_tStatus* status);
   ~WbExpWGtk();
 
   GtkWidget* parent_wid;
@@ -64,8 +65,7 @@ public:
   void print();
   void set_title(char* title);
 
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_export(GtkWidget* w, gpointer data);
   static void activate_update(GtkWidget* w, gpointer data);

@@ -45,8 +45,13 @@
 
 typedef sKey datatyp; /* Exempelvis */
 
-typedef struct twolink {
-  enum { head, lank } kind;
+typedef struct twolink
+{
+  enum
+  {
+    head,
+    lank
+  } kind;
   struct twolink *befo, *next;
   datatyp data;
 } headtyp, linktyp;

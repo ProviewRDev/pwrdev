@@ -47,7 +47,8 @@
 #define C0 0x400000
 #define C1 0x800000
 
-typedef struct {
+typedef struct
+{
   unsigned int CtrlStatus;
   unsigned int reserved1;
   unsigned int BusData;
@@ -73,7 +74,8 @@ int main()
   fp = open("/dev/qbus", O_RDWR);
 
   address = start_address;
-  for (;;) {
+  for (;;)
+  {
     /* Read */
     rb.Address = address;
     sts = read(fp, &rb, sizeof(rb));

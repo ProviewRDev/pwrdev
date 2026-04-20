@@ -41,7 +41,8 @@
 
 #include "wb_ldh.h"
 
-typedef enum {
+typedef enum
+{
   bck_eType_,
   bck_eType_WbDiff,
   bck_eType_FileDiff,
@@ -49,7 +50,8 @@ typedef enum {
   bck_eType_File
 } bck_eType;
 
-typedef struct sBckItem {
+typedef struct sBckItem
+{
   pwr_tAttrRef aref;
   unsigned int size;
   void* valuep;
@@ -58,7 +60,8 @@ typedef struct sBckItem {
   struct sBckItem* next;
 } bck_sItem;
 
-class wb_bck_list {
+class wb_bck_list
+{
 private:
   bck_sItem* m_first;
   bck_sItem* m_last;
@@ -77,23 +80,14 @@ public:
     dcli_translate_filename(m_filename, filename);
   }
   ~wb_bck_list();
-  bck_eType type()
-  {
-    return m_type;
-  }
+  bck_eType type() { return m_type; }
   pwr_tStatus read();
   pwr_tStatus read_db(wb_bck_list* lp);
   pwr_tStatus print(char* outfile);
   pwr_tStatus diff(wb_bck_list* lp, char* outfile);
   pwr_tStatus diff(wb_bck_list* lp, wb_bck_list* outlp);
-  bck_sItem* first()
-  {
-    return m_first;
-  }
-  bck_sItem* next(bck_sItem* item)
-  {
-    return item->next;
-  }
+  bck_sItem* first() { return m_first; }
+  bck_sItem* next(bck_sItem* item) { return item->next; }
 };
 
 pwr_tStatus bck_dump(ldh_tSession ldhses, char* filename, char* out);

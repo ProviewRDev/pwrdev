@@ -44,7 +44,8 @@ class wb_mvrep;
 class wb_tdrep;
 class wb_orep;
 
-class wb_tdef : public wb_status {
+class wb_tdef : public wb_status
+{
 public:
   wb_tdrep* m_tdrep;
 
@@ -56,10 +57,7 @@ public:
   wb_tdef& operator=(const wb_tdef&);
   ~wb_tdef();
 
-  operator bool() const
-  {
-    return m_tdrep != 0;
-  }
+  operator bool() const { return m_tdrep != 0; }
   operator wb_tdrep*() const;
   bool operator==(wb_tdef&);
 

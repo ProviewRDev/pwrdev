@@ -71,19 +71,22 @@ static std::string pkg_log_excerpt(const char* log_file, size_t max_size = 4000)
   if (!fp)
     return "";
 
-  if (fseek(fp, 0, SEEK_END) != 0) {
+  if (fseek(fp, 0, SEEK_END) != 0)
+  {
     fclose(fp);
     return "";
   }
 
   long size = ftell(fp);
-  if (size <= 0) {
+  if (size <= 0)
+  {
     fclose(fp);
     return "";
   }
 
   long start = size > (long)max_size ? size - (long)max_size : 0;
-  if (fseek(fp, start, SEEK_SET) != 0) {
+  if (fseek(fp, start, SEEK_SET) != 0)
+  {
     fclose(fp);
     return "";
   }
@@ -97,7 +100,8 @@ static std::string pkg_log_excerpt(const char* log_file, size_t max_size = 4000)
   if (text.empty())
     return text;
 
-  if (start > 0) {
+  if (start > 0)
+  {
     size_t nl = text.find('\n');
     if (nl != std::string::npos)
       text.erase(0, nl + 1);
@@ -112,8 +116,8 @@ static std::string pkg_log_excerpt(const char* log_file, size_t max_size = 4000)
 
 static std::string pkg_distribute_error(const char* bootnode, const char* pack_log, int sts)
 {
-  std::string msg = std::string("Distribute command failed for boot node \"")
-      + bootnode + "\" (status " + std::to_string(sts) + "), see " + pack_log;
+  std::string msg = std::string("Distribute command failed for boot node \"") + bootnode + "\" (status " +
+                    std::to_string(sts) + "), see " + pack_log;
   std::string excerpt = pkg_log_excerpt(pack_log);
 
   if (!excerpt.empty())
@@ -811,7 +815,7 @@ void pkg_node::fetchFiles(bool distribute)
 
   // Get temporary directory
   sprintf(m_tmpdir, "/tmp/pwrpkg%06u", pkg_random());
-  sprintf(m_blddir, "%s/pkg_build", m_tmpdir);
+  snprintf(m_blddir, sizeof(m_blddir), "%s/pkg_build", m_tmpdir);
 
   // Add volumes to pattern
   for (int i = 0; i < (int)m_volumelist.size(); i++)
@@ -1038,9 +1042,9 @@ void pkg_node::copyPackage(char* pkg_name)
   {
     sprintf(pack_fname, "$pwrp_tmp/pkg_pack_%s.sh", m_name);
     dcli_translate_filename(pack_fname, pack_fname);
-    sprintf(pack_log, "$pwrp_tmp/pkg_copy_%s_%s.log", m_name, bootnodes[i]);
+    snprintf(pack_log, sizeof(pack_log), "$pwrp_tmp/pkg_copy_%s_%s.log", m_name, bootnodes[i]);
     dcli_translate_filename(pack_log, pack_log);
-    sprintf(pack_fifo, "$pwrp_tmp/pkg_copy_%s_%s.fifo", m_name, bootnodes[i]);
+    snprintf(pack_fifo, sizeof(pack_fifo), "$pwrp_tmp/pkg_copy_%s_%s.fifo", m_name, bootnodes[i]);
     dcli_translate_filename(pack_fifo, pack_fifo);
     std::ofstream of(pack_fname);
     if (!of)
@@ -1079,8 +1083,7 @@ void pkg_node::copyPackage(char* pkg_name)
     {
       char log_msg[320];
 
-      snprintf(log_msg, sizeof(log_msg), "%s via SSH to %s (log %s)", pkg_name,
-          bootnodes[i], pack_log);
+      snprintf(log_msg, sizeof(log_msg), "%s via SSH to %s (log %s)", pkg_name, bootnodes[i], pack_log);
       wb_log::log(wlog_eCategory_CopyPackage, m_name, log_msg);
     }
   }

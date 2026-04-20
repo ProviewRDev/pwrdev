@@ -44,19 +44,22 @@
 
 class sev_import;
 
-class sev_node {
+class sev_node
+{
 public:
   pwr_tNodeId nid;
   char name[80];
 };
 
-typedef struct {
+typedef struct
+{
   tree_sNode node;
   pwr_tRefId id;
   int idx;
 } sev_sRefid;
 
-class sev_exportitem {
+class sev_exportitem
+{
 public:
   sev_exportitem();
   sev_exportitem(const sev_exportitem& x);
@@ -81,10 +84,10 @@ public:
   int variance_cnt;
 };
 
-class sev_import {
+class sev_import
+{
 public:
-  sev_import()
-    : m_refid(0), m_msg_id(0), m_config(0) {}
+  sev_import() : m_refid(0), m_msg_id(0), m_config(0) {}
 
   ~sev_import();
   pwr_tStatus m_sts;
@@ -103,8 +106,7 @@ public:
   int mainloop(void);
   int check_exportitems(sev_sMsgExportItems* msg, unsigned int size);
   int tree_update(void);
-  int receive_exportdata( sev_sMsgExportData* msg, unsigned int size, 
-			  pwr_tNid nid);
-  int store_value(int item_idx, pwr_tTime time, void *buf, int size);
+  int receive_exportdata(sev_sMsgExportData* msg, unsigned int size, pwr_tNid nid);
+  int store_value(int item_idx, pwr_tTime time, void* buf, int size);
 };
 #endif

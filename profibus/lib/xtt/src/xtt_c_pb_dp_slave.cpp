@@ -80,8 +80,7 @@ static pwr_tStatus xtt_pb_dp_slave_load_modules(xtt_slave_sCtx* ctx)
   int sts;
   pwr_tAttrRef maref, aaref;
 
-  for (sts = gdh_GetChild(ctx->aref.Objid, &oid); ODD(sts);
-       sts = gdh_GetNextSibling(oid, &oid))
+  for (sts = gdh_GetChild(ctx->aref.Objid, &oid); ODD(sts); sts = gdh_GetNextSibling(oid, &oid))
   {
     // Check that this is a module
     sts = gdh_GetObjectClass(oid, &cid);
@@ -165,8 +164,7 @@ static pwr_tStatus xtt_pb_dp_slave_load_modules(xtt_slave_sCtx* ctx)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_GetObjectInfoAttrref(&aaref, &prm_user_data_len,
-                                 sizeof(prm_user_data_len));
+  sts = gdh_GetObjectInfoAttrref(&aaref, &prm_user_data_len, sizeof(prm_user_data_len));
   if (EVEN(sts))
     return sts;
 
@@ -180,8 +178,7 @@ static pwr_tStatus xtt_pb_dp_slave_load_modules(xtt_slave_sCtx* ctx)
   return 1;
 }
 
-pwr_tStatus xtt_pb_dp_slave_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
-                                       xtt_slave_sCtx** ctxp)
+pwr_tStatus xtt_pb_dp_slave_create_ctx(pwr_tAttrRef aref, void* editor_ctx, xtt_slave_sCtx** ctxp)
 {
   pwr_tAName name;
   pwr_tString80 gsdfile;
@@ -215,8 +212,7 @@ pwr_tStatus xtt_pb_dp_slave_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
 
   // Count modules
   module_cnt = 0;
-  for (sts = gdh_GetChild(aref.Objid, &oid); ODD(sts);
-       sts = gdh_GetNextSibling(oid, &oid))
+  for (sts = gdh_GetChild(aref.Objid, &oid); ODD(sts); sts = gdh_GetNextSibling(oid, &oid))
   {
     module_cnt++;
   }
@@ -226,8 +222,8 @@ pwr_tStatus xtt_pb_dp_slave_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
   ctx->editor_ctx = editor_ctx;
 
   ctx->mc[0].cid = pwr_cClass_Pb_Module;
-  sts = gdh_ObjidToName(cdh_ClassIdToObjid(ctx->mc[0].cid), ctx->mc[0].name,
-                        sizeof(ctx->mc[0].name), cdh_mName_object);
+  sts = gdh_ObjidToName(cdh_ClassIdToObjid(ctx->mc[0].cid), ctx->mc[0].name, sizeof(ctx->mc[0].name),
+                        cdh_mName_object);
   if (EVEN(sts))
   {
     free(ctx);
@@ -235,8 +231,7 @@ pwr_tStatus xtt_pb_dp_slave_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
   }
   mc_cnt++;
 
-  for (sts = gdh_GetChild(aref.Objid, &oid); ODD(sts);
-       sts = gdh_GetNextSibling(oid, &oid))
+  for (sts = gdh_GetChild(aref.Objid, &oid); ODD(sts); sts = gdh_GetNextSibling(oid, &oid))
   {
     sts = gdh_GetObjectClass(oid, &cid);
     if (EVEN(sts))
@@ -258,8 +253,8 @@ pwr_tStatus xtt_pb_dp_slave_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
       continue;
 
     ctx->mc[mc_cnt].cid = cid;
-    sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid), ctx->mc[mc_cnt].name,
-                          sizeof(ctx->mc[0].name), cdh_mName_object);
+    sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid), ctx->mc[mc_cnt].name, sizeof(ctx->mc[0].name),
+                          cdh_mName_object);
     if (EVEN(sts))
     {
       free(ctx);

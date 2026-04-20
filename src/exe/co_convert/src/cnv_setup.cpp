@@ -34,7 +34,8 @@
  * General Public License plus this exception.
  */
 
-extern "C" {
+extern "C"
+{
 #include "co_dcli.h"
 #include "co_cdh.h"
 }
@@ -55,11 +56,13 @@ int CnvSetup::setup(char* filename)
   if (!fp)
     return 0;
 
-  while (1) {
+  while (1)
+  {
     sts = CnvCtx::read_line(line, sizeof(line), fp);
     if (!sts)
       break;
-    else {
+    else
+    {
       line_cnt++;
       str_trim(line, line);
       if (streq(line, ""))
@@ -68,18 +71,19 @@ int CnvSetup::setup(char* filename)
       if (line[0] == '!' || line[0] == '#')
         continue;
 
-      nr = dcli_parse(line, " 	=", "", (char*)line_part,
-          sizeof(line_part) / sizeof(line_part[0]), sizeof(line_part[0]), 0);
+      nr = dcli_parse(line, " 	=", "", (char*)line_part, sizeof(line_part) / sizeof(line_part[0]),
+                      sizeof(line_part[0]), 0);
 
-      if (streq(CnvCtx::low(line_part[0]), "group")) {
-        if (nr < 2) {
-          printf("** Setup syntax error in file %s, line %d\n", filename,
-              line_cnt);
+      if (streq(CnvCtx::low(line_part[0]), "group"))
+      {
+        if (nr < 2)
+        {
+          printf("** Setup syntax error in file %s, line %d\n", filename, line_cnt);
           continue;
         }
-        if (group_cnt >= (int)(sizeof(groups) / sizeof(groups[0]))) {
-          printf("** Max number of groups exceeded in file %s, line %d\n",
-              filename, line_cnt);
+        if (group_cnt >= (int)(sizeof(groups) / sizeof(groups[0])))
+        {
+          printf("** Max number of groups exceeded in file %s, line %d\n", filename, line_cnt);
           continue;
         }
         strcpy(groups[group_cnt], line_part[1]);

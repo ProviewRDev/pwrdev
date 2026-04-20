@@ -181,7 +181,7 @@ void GsdAttr::activate_zoom_reset() { attrnav->unzoom(); }
 void GsdAttr::activate_print()
 {
   char filename[80] = "pwrp_tmp:wnav.ps";
-  char cmd[200];  
+  char cmd[200];
 
   dcli_translate_filename(filename, filename);
   attrnav->print(filename);

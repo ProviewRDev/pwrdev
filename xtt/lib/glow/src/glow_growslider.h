@@ -37,6 +37,8 @@
 #ifndef glow_growslider_h
 #define glow_growslider_h
 
+#include <iosfwd>
+
 #include "glow_grownode.h"
 
 /*! \file glow_growslider.h
@@ -54,7 +56,8 @@
   events when the
   object is clicked on, moved etc.
 */
-class GrowSlider : public GrowNode {
+class GrowSlider : public GrowNode
+{
 public:
   //! Constuctor
   /*!
@@ -66,11 +69,11 @@ public:
     \param nodraw	Don't draw the object now.
     \param rel_annot_pos Not used.
   */
-  GrowSlider(GrowCtx* glow_ctx, const char* name, GlowNodeClass* node_class,
-      double x1, double y1, int nodraw = 0, int rel_annot_pos = 0);
+  GrowSlider(GrowCtx* glow_ctx, const char* name, GlowNodeClass* node_class, double x1, double y1,
+             int nodraw = 0, int rel_annot_pos = 0);
 
   //! Noargs constructor
-  GrowSlider(){}
+  GrowSlider() {}
 
   //! Make this object a copy of another image object.
   /*!
@@ -82,23 +85,20 @@ public:
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowSlider;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowSlider; }
 
   //! Save the content of the object to file.
   /*!
     \param fp	Ouput file.
     \param mode	Save as graph or subgraph.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Set range of the slider value.
   /*!
@@ -115,8 +115,8 @@ public:
     \param max_position	Coordinate of the max position.
     \param min_position	Coordinate of the min position.
   */
-  void get_info(glow_eDirection* dir, double* max_val, double* min_val,
-      double* max_position, double* min_position);
+  void get_info(glow_eDirection* dir, double* max_val, double* min_val, double* max_position,
+                double* min_position);
   //! Get the zero position of the slider.
   /*!
     \param direction	Direction of the slider.
@@ -140,8 +140,8 @@ public:
     \param max_position	Coordinate of the max position.
     \param min_position	Coordinate of the min position.
   */
-  void set_info(glow_eDirection dir, double max_val, double min_val,
-      double max_position, double min_position);
+  void set_info(glow_eDirection dir, double max_val, double min_val, double max_position,
+                double min_position);
 
   //! Export the object as a java bean.
   /*!
@@ -159,8 +159,8 @@ public:
     used to generate
     java code for the java bean.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ostream& fp);
 
   //! Get slider info with positions in pixel.
   /*!
@@ -169,14 +169,13 @@ public:
     \param min_position	Coordinate of the min position.
     \param bg_dyn_type	Dyntype of the background object to the slider.
   */
-  void get_info_pixel(glow_eDirection* dir, double* max_position,
-      double* min_position, int bg_dyn_type);
+  void get_info_pixel(glow_eDirection* dir, double* max_position, double* min_position, int bg_dyn_type);
 
   glow_eDirection direction; //!< Direction of the slider.
-  double max_value; //!< Max value of the slider value.
-  double min_value; //!< Min value of the slider value.
-  double max_pos; //!< End position of the slider.
-  double min_pos; //!< End position of the slider.
+  double max_value;          //!< Max value of the slider value.
+  double min_value;          //!< Min value of the slider value.
+  double max_pos;            //!< End position of the slider.
+  double min_pos;            //!< End position of the slider.
 };
 
 /*@}*/

@@ -59,8 +59,7 @@
 /*----------------------------------------------------------------------------*\
    Init method for the Modbus module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocalMsg* local;
   pwr_sClass_Modbus_RTU_Module* op;
@@ -69,7 +68,8 @@ static pwr_tStatus IoCardInit(
   op = (pwr_sClass_Modbus_RTU_Module*)cp->op;
   local = ((io_sCardLocal*)cp->Local)->msg;
 
-  for (i = 0; i < IO_MAXCHAN; i++) {
+  for (i = 0; i < IO_MAXCHAN; i++)
+  {
     local->scancount[i] = 0;
   }
 
@@ -81,8 +81,7 @@ static pwr_tStatus IoCardInit(
 /*----------------------------------------------------------------------------*\
    Read method for the Modbus RTU module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocalMsg* local;
   io_sRackLocal* local_rack = (io_sRackLocal*)rp->Local;
@@ -96,9 +95,11 @@ static pwr_tStatus IoCardRead(
   local = ((io_sCardLocal*)cp->Local)->msg;
   slave = (pwr_sClass_Modbus_RTU_Slave*)rp->op;
 
-  if (op->ScanInterval > 1) {
+  if (op->ScanInterval > 1)
+  {
     local->has_read_method = 1;
-    if (local->interval_cnt != 0) {
+    if (local->interval_cnt != 0)
+    {
       local->interval_cnt++;
       if (local->interval_cnt >= op->ScanInterval)
         local->interval_cnt = 0;
@@ -107,9 +108,10 @@ static pwr_tStatus IoCardRead(
     local->interval_cnt++;
   }
 
-  if (slave->Status == MB__NORMAL || local_rack->reset_inputs) {
-    io_bus_card_read(ctx, rp, cp, slave->Inputs, NULL,
-        pwr_eByteOrderingEnum_BigEndian, pwr_eFloatRepEnum_FloatIntel);
+  if (slave->Status == MB__NORMAL || local_rack->reset_inputs)
+  {
+    io_bus_card_read(ctx, rp, cp, slave->Inputs, NULL, pwr_eByteOrderingEnum_BigEndian,
+                     pwr_eFloatRepEnum_FloatIntel);
   }
   //  printf("Method Modbus_RTU_Module-IoCardRead\n");
   return IO__SUCCESS;
@@ -118,8 +120,7 @@ static pwr_tStatus IoCardRead(
 /*----------------------------------------------------------------------------*\
    Write method for the Modbus RTU module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocalMsg* local;
   pwr_sClass_Modbus_RTU_Module* op;
@@ -133,22 +134,26 @@ static pwr_tStatus IoCardWrite(
   local = ((io_sCardLocal*)cp->Local)->msg;
   slave = (pwr_sClass_Modbus_RTU_Slave*)rp->op;
 
-  if (op->ScanInterval > 1) {
-    if (!local->has_read_method) {
-      if (local->interval_cnt != 0) {
+  if (op->ScanInterval > 1)
+  {
+    if (!local->has_read_method)
+    {
+      if (local->interval_cnt != 0)
+      {
         local->interval_cnt++;
         if (local->interval_cnt >= op->ScanInterval)
           local->interval_cnt = 0;
         return IO__SUCCESS;
       }
       local->interval_cnt++;
-    } else if (local->interval_cnt != 1)
+    }
+    else if (local->interval_cnt != 1)
       return IO__SUCCESS;
   }
 
-  if (slave->Status == MB__NORMAL) {
-    io_bus_card_write(ctx, cp, slave->Outputs, pwr_eByteOrderingEnum_BigEndian,
-        pwr_eFloatRepEnum_FloatIntel);
+  if (slave->Status == MB__NORMAL)
+  {
+    io_bus_card_write(ctx, cp, slave->Outputs, pwr_eByteOrderingEnum_BigEndian, pwr_eFloatRepEnum_FloatIntel);
   }
   //  printf("Method Modbus_RTU_Module-IoCardWrite\n");
   return IO__SUCCESS;
@@ -158,6 +163,6 @@ static pwr_tStatus IoCardWrite(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Modbus_RTU_Module)
-    = { pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardRead),
-        pwr_BindIoMethod(IoCardWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Modbus_RTU_Module) = {pwr_BindIoMethod(IoCardInit),
+                                                    pwr_BindIoMethod(IoCardRead),
+                                                    pwr_BindIoMethod(IoCardWrite), pwr_NullMethod};

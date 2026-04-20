@@ -37,6 +37,8 @@
 #ifndef glow_growbar_h
 #define glow_growbar_h
 
+#include <iosfwd>
+
 #include "glow_growrect.h"
 
 /*! \file glow_growbar.h
@@ -54,7 +56,8 @@
   object is clicked on, moved etc.
 */
 
-class GrowBar : public GrowRect {
+class GrowBar : public GrowRect
+{
 public:
   //! Constuctor
   /*!
@@ -72,12 +75,10 @@ public:
     \param fill_d_type	Fill color.
     \param nodraw	Don't draw the object now.
   */
-  GrowBar(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0,
-      double w = 0, double h = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int fill_rect = 0,
-      int display_border = 1, glow_eDrawType fill_d_type = glow_eDrawType_Line,
-      int nodraw = 0);
+  GrowBar(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0, double w = 0, double h = 0,
+          glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
+          glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int fill_rect = 0, int display_border = 1,
+          glow_eDrawType fill_d_type = glow_eDrawType_Line, int nodraw = 0);
 
   //! Destructor
   /*! Remove the object from context, and erase it from the screen.
@@ -89,13 +90,13 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Draw the objects if any part is inside the drawing area.
   /*!
@@ -130,23 +131,19 @@ public:
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowBar;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowBar; }
 
-  void set_trace_attr(GlowTraceData* attr); //!< Obsolete
+  void set_trace_attr(GlowTraceData* attr);  //!< Obsolete
   void get_trace_attr(GlowTraceData** attr); //!< Obsolete
 
-  double max_value; //!< Max value for bar value
-  double min_value; //!< Min value for bar value
-  double bar_value; //!< Bar value
-  glow_eDrawType bar_drawtype; //!< Color the bar is drawn with.
-  glow_eDrawType
-      bar_bordercolor; //!< Color the border of the bar is drawn with.
-  int bar_borderwidth; //!< With of the border of the bar.
-  GlowTraceData trace; //!< Obsolete
-  void* user_data; //!< User data.
+  double max_value;               //!< Max value for bar value
+  double min_value;               //!< Min value for bar value
+  double bar_value;               //!< Bar value
+  glow_eDrawType bar_drawtype;    //!< Color the bar is drawn with.
+  glow_eDrawType bar_bordercolor; //!< Color the border of the bar is drawn with.
+  int bar_borderwidth;            //!< With of the border of the bar.
+  GlowTraceData trace;            //!< Obsolete
+  void* user_data;                //!< User data.
 
   //! Draw the object.
   /*!
@@ -162,8 +159,8 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();
@@ -190,10 +187,12 @@ public:
   void set_value(double value)
   {
     bar_value = value;
-    if (!parent) {
+    if (!parent)
+    {
       draw();
     }
-    else {
+    else
+    {
       parent->draw();
     }
   }
@@ -211,7 +210,7 @@ public:
     \param min		Min value.
     \param max		Max value.
   */
-  void get_range(double *min, double *max);
+  void get_range(double* min, double* max);
 
   //! Set the range for the bar value
   /*!
@@ -224,19 +223,13 @@ public:
   /*!
     \param data User data.
   */
-  void set_user_data(void* data)
-  {
-    user_data = data;
-  }
+  void set_user_data(void* data) { user_data = data; }
 
   //! Get user data.
   /*!
     \param data User data.
   */
-  void get_user_data(void** data)
-  {
-    *data = user_data;
-  }
+  void get_user_data(void** data) { *data = user_data; }
 
   //! Set parameters for the bar.
   /*!
@@ -266,8 +259,8 @@ public:
     used to generate
     java code for the bean.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ostream& fp);
 
   int export_script(GlowExportScript* es, void* o, void* m);
 

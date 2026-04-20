@@ -61,12 +61,14 @@ int main(int argc, char* argv[])
     exit(0);
   strncpy(fname, argv[1], sizeof(fname));
 
-  try {
+  try
+  {
     // Create wb env
     wb_erep* erep = new wb_erep();
 
     wb_volume v2(erep->volume(&sts));
-    while (v2.oddSts()) {
+    while (v2.oddSts())
+    {
       std::cout << "Volume loaded: " << v2.vid() << '\n';
       v2 = v2.next();
     }
@@ -127,7 +129,9 @@ int main(int argc, char* argv[])
     erep->removeExtern(&sts, wbl);
     delete ses;
     // delete wbl;
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     std::cout << "Exception: " << e.what() << '\n';
   }
 }

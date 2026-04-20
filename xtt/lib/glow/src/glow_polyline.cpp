@@ -41,57 +41,41 @@
 
 #include "glow_polyline.h"
 
-GlowPolyLine::GlowPolyLine(GrowCtx* glow_ctx, glow_sPoint* pointarray,
-    int point_cnt, glow_eDrawType d_type, int line_w, int fix_line_w,
-    int line_fill, int closed)
-    : GlowArrayElem(glow_ctx), a_points(10, 10), points(0), draw_type(d_type),
-      line_width(line_w), fix_line_width(fix_line_w), fill(line_fill),
-      closed_line(closed)
+GlowPolyLine::GlowPolyLine(GrowCtx* glow_ctx, glow_sPoint* pointarray, int point_cnt, glow_eDrawType d_type,
+                           int line_w, int fix_line_w, int line_fill, int closed)
+    : GlowArrayElem(glow_ctx), a_points(10, 10), points(0), draw_type(d_type), line_width(line_w),
+      fix_line_width(fix_line_w), fill(line_fill), closed_line(closed)
 {
   int i;
 
   points = (glow_sPointX*)calloc(point_cnt, sizeof(glow_sPointX));
-  for (i = 0; i < point_cnt; i++) {
+  for (i = 0; i < point_cnt; i++)
+  {
     GlowPoint* p = new GlowPoint(ctx, pointarray[i].x, pointarray[i].y);
     a_points.insert(p);
   }
 }
 
-GlowPolyLine::~GlowPolyLine()
-{
-  free((char*)points);
-}
+GlowPolyLine::~GlowPolyLine() { free((char*)points); }
 
 GlowPolyLine::GlowPolyLine(const GlowPolyLine& c) : GlowArrayElem(c)
 {
-  memcpy((void *)this, (void *)&c, sizeof(c));
+  memcpy((void*)this, (void*)&c, sizeof(c));
 
   a_points.new_array(c.a_points);
   a_points.copy_from(c.a_points);
   points = (glow_sPointX*)calloc(a_points.a_size, sizeof(glow_sPointX));
 }
 
-void GlowPolyLine::zoom()
-{
-  a_points.zoom();
-}
+void GlowPolyLine::zoom() { a_points.zoom(); }
 
-void GlowPolyLine::nav_zoom()
-{
-  a_points.nav_zoom();
-}
+void GlowPolyLine::nav_zoom() { a_points.nav_zoom(); }
 
-void GlowPolyLine::print_zoom()
-{
-  a_points.print_zoom();
-}
+void GlowPolyLine::print_zoom() { a_points.print_zoom(); }
 
-void GlowPolyLine::traverse(int x, int y)
-{
-  a_points.traverse(x, y);
-}
+void GlowPolyLine::traverse(int x, int y) { a_points.traverse(x, y); }
 
-void GlowPolyLine::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowPolyLine::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_PolyLine) << '\n';
   fp << int(glow_eSave_PolyLine_draw_type) << FSPACE << int(draw_type) << '\n';
@@ -103,7 +87,7 @@ void GlowPolyLine::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowPolyLine::open(std::ifstream& fp)
+void GlowPolyLine::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -113,15 +97,18 @@ void GlowPolyLine::open(std::ifstream& fp)
   if (a_points.size())
     a_points.delete_all();
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GlowPolyLine: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_PolyLine:
       break;
     case glow_eSave_PolyLine_draw_type:
@@ -155,12 +142,13 @@ void GlowPolyLine::open(std::ifstream& fp)
   points = (glow_sPointX*)calloc(a_points.a_size, sizeof(glow_sPointX));
 }
 
-void GlowPolyLine::get_borders(double pos_x, double pos_y, double* x_right,
-    double* x_left, double* y_high, double* y_low, void* node)
+void GlowPolyLine::get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                               double* y_low, void* node)
 {
   int i;
 
-  for (i = 0; i < a_points.a_size - 1; i++) {
+  for (i = 0; i < a_points.a_size - 1; i++)
+  {
     if (pos_x + ((GlowPoint*)a_points[i])->x < *x_left)
       *x_left = pos_x + ((GlowPoint*)a_points[i])->x;
     if (pos_x + ((GlowPoint*)a_points[i + 1])->x < *x_left)
@@ -180,19 +168,19 @@ void GlowPolyLine::get_borders(double pos_x, double pos_y, double* x_right,
   }
 }
 
-void GlowPolyLine::add_points(
-    void* pos, glow_sPoint* pointarray, int point_cnt, int highlight, int hot)
+void GlowPolyLine::add_points(void* pos, glow_sPoint* pointarray, int point_cnt, int highlight, int hot)
 {
   int i;
 
-  if (points) {
+  if (points)
+  {
     // erase( pos, hot, NULL);
     // nav_erase( pos, NULL);
     free((char*)points);
   }
-  points = (glow_sPointX*)calloc(
-      a_points.a_size + point_cnt, sizeof(glow_sPointX));
-  for (i = 0; i < point_cnt; i++) {
+  points = (glow_sPointX*)calloc(a_points.a_size + point_cnt, sizeof(glow_sPointX));
+  for (i = 0; i < point_cnt; i++)
+  {
     GlowPoint* p = new GlowPoint(ctx, pointarray[i].x, pointarray[i].y);
     a_points.insert(p);
   }

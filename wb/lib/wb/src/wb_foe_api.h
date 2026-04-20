@@ -41,17 +41,18 @@
    This module contains the api for the Functional Object Editor (PLC).  */
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "wb_ldh.h"
 
-typedef void* foe_tContext;
+  typedef void* foe_tContext;
 
-foe_tContext foe_Open(void* ParentEditorContext, void* ParentWindowContext,
-    ldh_tSesContext SessCtx, pwr_tObjDId PlcPgmObject);
+  foe_tContext foe_Open(void* ParentEditorContext, void* ParentWindowContext, ldh_tSesContext SessCtx,
+                        pwr_tObjDId PlcPgmObject);
 
-void foe_Close(foe_tContext FoeContext);
+  void foe_Close(foe_tContext FoeContext);
 
 #if defined __cplusplus
 }

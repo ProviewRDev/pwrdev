@@ -39,8 +39,7 @@
 
 #include "wb_ldh.h"
 
-pwr_tStatus exp_window(ldh_tWBContext ldhwb, ldh_tSesContext ldhses,
-    char* window_str, char* output);
+pwr_tStatus exp_window(ldh_tWBContext ldhwb, ldh_tSesContext ldhses, char* window_str, char* output);
 pwr_tStatus exp_plcpgm(ldh_tSesContext ldhses, char* plcpgm_str, char* output);
 
 #endif

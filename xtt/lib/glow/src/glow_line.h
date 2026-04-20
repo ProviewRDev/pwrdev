@@ -37,6 +37,8 @@
 #ifndef glow_line_h
 #define glow_line_h
 
+#include <iosfwd>
+
 #include "glow_growctx.h"
 
 /*! \file glow_line.h
@@ -49,10 +51,11 @@
   The GlowLine class is still used by GlowCon, when drawing connections.
 */
 
-class GlowLine : public GlowArrayElem {
+class GlowLine : public GlowArrayElem
+{
 public:
   //! Noargs constructor.
-  GlowLine(){}
+  GlowLine() {}
 
   //! Constuctor
   /*!
@@ -65,11 +68,10 @@ public:
     \param line_w	Linewidth.
     \param fix_line_w	Linewidth independent of scale.
   */
-  GlowLine(GrowCtx* glow_ctx, double x1 = 0, double y1 = 0, double x2 = 0,
-      double y2 = 0, glow_eDrawType d_type = glow_eDrawType_Line,
-      int line_w = 1, int fix_line_w = 0)
-      : GlowArrayElem(glow_ctx), p1(glow_ctx, x1, y1), p2(glow_ctx, x2, y2),
-        draw_type(d_type), line_width(line_w), fix_line_width(fix_line_w)
+  GlowLine(GrowCtx* glow_ctx, double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0,
+           glow_eDrawType d_type = glow_eDrawType_Line, int line_w = 1, int fix_line_w = 0)
+      : GlowArrayElem(glow_ctx), p1(glow_ctx, x1, y1), p2(glow_ctx, x2, y2), draw_type(d_type),
+        line_width(line_w), fix_line_width(fix_line_w)
   {
   }
 
@@ -81,7 +83,7 @@ public:
   //! Adjust pixel coordinates for navigaion window to current zoom factor.
   void nav_zoom();
 
-  void print_zoom(); //!< Not used
+  void print_zoom();           //!< Not used
   void traverse(int x, int y); //!< Not used
 
   //! Event handler
@@ -95,24 +97,23 @@ public:
 
     Detects if the object is hit by the event.
   */
-  int event_handler(
-      GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
+  int event_handler(GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
 
   //! Not implemented
-  void conpoint_select(void* pos, int x, int y, double* distance, void** cp){}
+  void conpoint_select(void* pos, int x, int y, double* distance, void** cp) {}
 
   //! Save the content of the object to file.
   /*!
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Draw the object.
   /*!
@@ -163,8 +164,8 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left,
-      double* y_high, double* y_low, void* node);
+  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,
+                   void* node);
 
   //! Move the line to the specified coordinates.
   /*!
@@ -180,8 +181,7 @@ public:
     line can
     be entirely different.
   */
-  void move(void* pos, double x1, double y1, double x2, double y2,
-      int highlight, int hot);
+  void move(void* pos, double x1, double y1, double x2, double y2, int highlight, int hot);
 
   //! Move the line to the specified coordinates without erase.
   /*!
@@ -196,8 +196,7 @@ public:
     Both endpoints are given new coordinates, so the direction and length of the
     line can be entirely different.
   */
-  void move_noerase(void* pos, double x1, double y1, double x2, double y2,
-      int highlight, int hot);
+  void move_noerase(void* pos, double x1, double y1, double x2, double y2, int highlight, int hot);
 
   //! Move the line.
   /*!
@@ -209,38 +208,26 @@ public:
   */
   void shift(void* pos, double delta_x, double delta_y, int highlight, int hot);
 
-  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir)
-  {
-    return 0;
-  }
+  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir) { return 0; }
 
   //! Get the object type
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_Line;
-  }
+  glow_eObjectType type() { return glow_eObjectType_Line; }
 
   //! Set the color.
   /*!
     \param drawtype	Color.
   */
-  void set_drawtype(glow_eDrawType drawtype)
-  {
-    draw_type = drawtype;
-  }
+  void set_drawtype(glow_eDrawType drawtype) { draw_type = drawtype; }
 
   //! Set the linewidth.
   /*!
     \param linewidth	Linewidth in range 0 to 8. 0 gives a linewidth of 1
     pixel at original zoom. 1 -> 2 pixel etc.
   */
-  void set_linewidth(int linewidth)
-  {
-    line_width = linewidth;
-  }
+  void set_linewidth(int linewidth) { line_width = linewidth; }
 
   //! Export the object as a java shape.
   /*!
@@ -258,8 +245,8 @@ public:
     used to generate
     java code for the shape.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ostream& fp);
 
   //! Export the shadow of the object as a java shape.
   /*!
@@ -279,9 +266,8 @@ public:
     used to generate
     java code for the shape.
   */
-  void export_javabean_shadow(GlowTransform* t, void* node,
-      glow_eExportPass pass, int* shape_cnt, int node_cnt, int in_nc,
-      std::ofstream& fp, int shadow, int border);
+  void export_javabean_shadow(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
+                              int node_cnt, int in_nc, std::ostream& fp, int shadow, int border);
 
   //! Conversion between different versions of Glow
   /*!
@@ -289,11 +275,11 @@ public:
   */
   void convert(glow_eConvert version);
 
-  GlowPoint p1; //!< First endpoint of line.
-  GlowPoint p2; //!< Second endpoint of line.
+  GlowPoint p1;             //!< First endpoint of line.
+  GlowPoint p2;             //!< Second endpoint of line.
   glow_eDrawType draw_type; //!< Line color.
-  int line_width; //!< Line width.
-  int fix_line_width; //!< Line width is independent of zoom factor.
+  int line_width;           //!< Line width.
+  int fix_line_width;       //!< Line width is independent of zoom factor.
 };
 
 /*@}*/

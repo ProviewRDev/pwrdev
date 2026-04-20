@@ -41,10 +41,11 @@
 
 #include "xtt_block.h"
 
-class BlockGtk : public Block {
+class BlockGtk : public Block
+{
 public:
-  BlockGtk(void* b_parent_ctx, GtkWidget* b_parent_wid, pwr_sAttrRef* b_oar,
-      char* name, unsigned int priv, pwr_tStatus* status);
+  BlockGtk(void* b_parent_ctx, GtkWidget* b_parent_wid, pwr_sAttrRef* b_oar, char* name, unsigned int priv,
+           pwr_tStatus* status);
   ~BlockGtk();
   int execute();
   void update();

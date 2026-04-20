@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/shm.h> // for shared memory
+#include <sys/shm.h>  // for shared memory
 #include <sys/stat.h> // for "S_IRWXU" etc.
 
 #include "rt_sect.h"
@@ -57,7 +57,8 @@ static void segName(sect_sHead* shp, char* name)
 {
   static int doinit = 1;
   static char buf[4];
-  if (doinit) {
+  if (doinit)
+  {
     char* str = getenv(pwr_dEnvBusId);
     strncpy(buf, (str ? str : "XXX"), 3);
     buf[3] = '\0';
@@ -69,8 +70,8 @@ static void segName(sect_sHead* shp, char* name)
    Name must not be more than 15 characters because of $ASCEFC.
    Returns the virtual address of the newly mapped (created) section.  */
 
-sect_sHead* sect_Alloc(pwr_tStatus* sts, pwr_tBoolean* created, sect_sHead* shp,
-    size_t size, char* name, unsigned int flags)
+sect_sHead* sect_Alloc(pwr_tStatus* sts, pwr_tBoolean* created, sect_sHead* shp, size_t size, char* name,
+                       unsigned int flags)
 {
   pwr_tStatus lsts = 1;
   sect_sHead* lshp = NULL;
@@ -80,8 +81,10 @@ sect_sHead* sect_Alloc(pwr_tStatus* sts, pwr_tBoolean* created, sect_sHead* shp,
   if (shp == NULL)
     pwr_Return(NULL, sts, 2 /*SECT__VIRMEM*/);
 
-  do {
-    if (shp->flags.b.mapped) {
+  do
+  {
+    if (shp->flags.b.mapped)
+    {
       lsts = 2 /*SECT__WASMAPPED*/;
       break;
     }
@@ -100,42 +103,50 @@ sect_sHead* sect_Alloc(pwr_tStatus* sts, pwr_tBoolean* created, sect_sHead* shp,
       /* Create unique key */
       shm_fd = open(shp->name, shMemFlags, shMemMode);
 
-      if (sect_must_create && shm_fd != -1) { /* Do we need to check errno ? */
-        errh_Info(
-            "sect_Alloc: %s already exists. It will be unlinked and created\n",
-            shp->name);
-        if (unlink(shp->name) == -1) {
+      if (sect_must_create && shm_fd != -1)
+      { /* Do we need to check errno ? */
+        errh_Info("sect_Alloc: %s already exists. It will be unlinked and created\n", shp->name);
+        if (unlink(shp->name) == -1)
+        {
           lsts = 2;
-          errh_Error(
-              "sect_Alloc: unlink failed on !%s! errno: %d", shp->name, errno);
+          errh_Error("sect_Alloc: unlink failed on !%s! errno: %d", shp->name, errno);
           break;
         }
         shMemFlags |= O_CREAT | O_EXCL;
         shm_fd = open(shp->name, shMemFlags, shMemMode);
-        if (shm_fd == -1) {
+        if (shm_fd == -1)
+        {
           lsts = 2;
           errh_Error("sect_Alloc: open O_CREATE failed errno: %d", errno);
           break;
         }
         *created = 1;
-      } else if (shm_fd == -1) {
-        if (errno == ENOENT) { /* It didn't exist */
-          if (!(flags & sect_mFlags_Create)) {
+      }
+      else if (shm_fd == -1)
+      {
+        if (errno == ENOENT)
+        { /* It didn't exist */
+          if (!(flags & sect_mFlags_Create))
+          {
             lsts = 2;
             errh_Error("sect_Alloc: Couldn't attach shm section size");
             break;
           }
           shMemFlags |= O_CREAT | O_EXCL;
           shm_fd = open(shp->name, shMemFlags, shMemMode);
-          if (shm_fd == -1) {
+          if (shm_fd == -1)
+          {
             lsts = 2;
-            errh_Error(
-                "sect_Alloc: open O_CREATE | O_EXCL failed errno: %d", errno);
+            errh_Error("sect_Alloc: open O_CREATE | O_EXCL failed errno: %d", errno);
             break;
-          } else {
+          }
+          else
+          {
             *created = 1;
           }
-        } else {
+        }
+        else
+        {
           lsts = 2;
           errh_Error("sect_Alloc: open failed errno: %d", errno);
           break;
@@ -148,16 +159,18 @@ sect_sHead* sect_Alloc(pwr_tStatus* sts, pwr_tBoolean* created, sect_sHead* shp,
 
       /* Create shm section */
       shm_id = shmget(shm_key, size, IPC_CREAT | 0660);
-      if (shm_id == -1) {
+      if (shm_id == -1)
+      {
         lsts = 2;
         errh_Error("sect_Alloc: Couldn't attach/create shm section size: %d. "
                    "Check shmmax.",
-            size);
+                   size);
         break;
       }
 
       shp->base = shmat(shm_id, (void*)NULL, 0);
-      if (shp->base == (void*)-1) {
+      if (shp->base == (void*)-1)
+      {
         if (*created)
           unlink(shp->name);
         lsts = 2;
@@ -171,8 +184,7 @@ sect_sHead* sect_Alloc(pwr_tStatus* sts, pwr_tBoolean* created, sect_sHead* shp,
     }
 
     if (*created)
-      errh_Info(
-          "Mapped %s, base: %x, size: %d", shp->name, shp->base, shp->size);
+      errh_Info("Mapped %s, base: %x, size: %d", shp->name, shp->base, shp->size);
 
     pwr_Return(shp, sts, lsts);
   } while (0);
@@ -207,7 +219,8 @@ pwr_tBoolean sect_InitLock(pwr_tStatus* sts, sect_sHead* shp, sect_sMutex* mp)
 {
   pwr_tStatus lsts = 1;
 
-  if (posix_sem_init_shared(mp, ftok(shp->name, 'P'), 1) != 0) {
+  if (posix_sem_init_shared(mp, ftok(shp->name, 'P'), 1) != 0)
+  {
     errh_Error("sect_InitLock: sem_init(%s), errno: %d", shp->name, errno);
     lsts = 2;
   }
@@ -221,9 +234,12 @@ pwr_tBoolean sect_Lock(pwr_tStatus* sts, sect_sHead* shp, sect_sMutex* mp)
 {
   pwr_tStatus lsts = 1;
 
-  while (posix_sem_wait(mp) != 0) {
-    if (errno != EINTR) {
-      if (errno == EINVAL) {
+  while (posix_sem_wait(mp) != 0)
+  {
+    if (errno != EINTR)
+    {
+      if (errno == EINVAL)
+      {
         _exit(-1);
       }
       perror("sect_Lock: sem_wait ");
@@ -241,7 +257,8 @@ pwr_tBoolean sect_Unlock(pwr_tStatus* sts, sect_sHead* shp, sect_sMutex* mp)
 {
   pwr_tStatus lsts = 1;
 
-  if (posix_sem_post(mp) != 0) {
+  if (posix_sem_post(mp) != 0)
+  {
     perror("sect_Unlock: sem_signal ");
     lsts = 2;
   }

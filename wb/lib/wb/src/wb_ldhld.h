@@ -49,6 +49,6 @@
 // Fix
 pwr_tStatus ldhld_CreateLoadFile(ldh_tSession Session);
 
-pwr_tStatus ldhld_Diff(char* NodeName, pwr_tProjVersion NewDnoVersion,
-    char* DiffFileName, char* DECnetNodeName);
+pwr_tStatus ldhld_Diff(char* NodeName, pwr_tProjVersion NewDnoVersion, char* DiffFileName,
+                       char* DECnetNodeName);
 #endif

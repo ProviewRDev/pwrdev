@@ -56,14 +56,14 @@
 **********************************************************************/
 
 #include <stddef.h>
-#include <time.h>
 #include <sys/time.h>
+#include <time.h>
 
-#include "rt_plc.h"
 #include "co_time.h"
+#include "rt_plc.h"
 
 #include "ssabox_as_ode_solvers.h"
 
-void Ssab_AntiSway_init(pwr_sClass_Ssab_AntiSway* object);
+void Ssab_AntiSway_init(pwr_sClass_Ssab_AntiSway *object);
 
-void Ssab_AntiSway_exec(plc_sThread* tp, pwr_sClass_Ssab_AntiSway* object);
+void Ssab_AntiSway_exec(plc_sThread *tp, pwr_sClass_Ssab_AntiSway *object);

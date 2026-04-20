@@ -57,17 +57,17 @@
 #include "rt_pwr_msg.h"
 #include "pwr_baseclasses.h"
 
-
-
 static int debug = 0;
 
-typedef enum {
+typedef enum
+{
   mqtt_eCon_NotConnected = 0,
   mqtt_eCon_Connected = 1,
   mqtt_eCon_WaitConnect = 2
 } mqtt_eCon;
 
-typedef enum {
+typedef enum
+{
   mEventOpt_Time = 1,
   mEventOpt_Type = 2,
   mEventOpt_Prio = 4,
@@ -76,36 +76,42 @@ typedef enum {
   mEventOpt_Id = 32
 } mEventOpt;
 
-class Sub {
+class Sub
+{
 public:
   pwr_tStatus sts;
   pwr_tAName attribute;
   char reply[80];
   float cycle;
   float duration;
-  void *valp;
+  void* valp;
   pwr_tRefId refid;
   unsigned int size;
   pwr_tTypeId tid;
   unsigned int cnt;
   int subref;
-  
-  Sub() : sts(0), cycle(0), duration(0), valp(0), refid(pwr_cNRefId), size(0), tid(0), cnt(0), subref(0) {
+
+  Sub() : sts(0), cycle(0), duration(0), valp(0), refid(pwr_cNRefId), size(0), tid(0), cnt(0), subref(0)
+  {
     strcpy(attribute, "");
     strcpy(reply, "");
   }
-  Sub(const Sub& x) : sts(x.sts), cycle(x.cycle), duration(x.duration), valp(x.valp),
-      refid(x.refid), size(x.size), tid(x.tid), cnt(x.cnt), subref(x.subref) {
+  Sub(const Sub& x)
+      : sts(x.sts), cycle(x.cycle), duration(x.duration), valp(x.valp), refid(x.refid), size(x.size),
+        tid(x.tid), cnt(x.cnt), subref(x.subref)
+  {
     strcpy(attribute, x.attribute);
     strcpy(reply, x.reply);
   }
-  void unref() {
+  void unref()
+  {
     if (debug)
       printf("Unref (%d,%d)\n", refid.nid, refid.rix);
     if (refid.nid != 0)
       gdh_UnrefObjectInfo(refid);
   }
-  pwr_tStatus ref() {
+  pwr_tStatus ref()
+  {
     pwr_tStatus sts;
     sts = gdh_RefObjectInfo(attribute, &valp, &refid, size);
     if (debug)
@@ -114,30 +120,32 @@ public:
   }
 };
 
-class SublistSub {
+class SublistSub
+{
 public:
   pwr_tStatus sts;
   pwr_tAName attribute;
   int idx;
-  void *valp;
+  void* valp;
   pwr_tRefId refid;
   unsigned int size;
   pwr_tTypeId tid;
-  
-  SublistSub() : sts(0), idx(0), valp(0), refid(pwr_cNRefId), size(0), tid(0) {
-    strcpy(attribute, "");
-  }    
-  SublistSub(const SublistSub& x) : sts(x.sts), idx(x.idx), valp(x.valp),
-      refid(x.refid), size(x.size), tid(x.tid) {
+
+  SublistSub() : sts(0), idx(0), valp(0), refid(pwr_cNRefId), size(0), tid(0) { strcpy(attribute, ""); }
+  SublistSub(const SublistSub& x)
+      : sts(x.sts), idx(x.idx), valp(x.valp), refid(x.refid), size(x.size), tid(x.tid)
+  {
     strcpy(attribute, x.attribute);
   }
-  void unref() {
+  void unref()
+  {
     if (debug)
       printf("Unref (%d,%d)\n", refid.nid, refid.rix);
     if (refid.nid != 0)
       gdh_UnrefObjectInfo(refid);
   }
-  pwr_tStatus ref() {
+  pwr_tStatus ref()
+  {
     pwr_tStatus sts;
     sts = gdh_RefObjectInfo(attribute, &valp, &refid, size);
     if (debug)
@@ -146,7 +154,8 @@ public:
   }
 };
 
-class Sublist {
+class Sublist
+{
 public:
   pwr_tStatus sts;
   std::vector<SublistSub> slist;
@@ -155,28 +164,30 @@ public:
   float duration;
   unsigned int cnt;
   int subref;
-  
-  Sublist() : sts(0), cycle(0), duration(0), cnt(0), subref(0) {
-    strcpy(reply, "");
-  }
-  Sublist(const Sublist& x) : sts(x.sts), slist(x.slist), cycle(x.cycle), duration(x.duration),
-      cnt(x.cnt), subref(x.subref) {
+
+  Sublist() : sts(0), cycle(0), duration(0), cnt(0), subref(0) { strcpy(reply, ""); }
+  Sublist(const Sublist& x)
+      : sts(x.sts), slist(x.slist), cycle(x.cycle), duration(x.duration), cnt(x.cnt), subref(x.subref)
+  {
     strcpy(reply, x.reply);
   }
-  void unref() {
+  void unref()
+  {
     for (int i = 0; i < slist.size(); i++)
       slist[i].unref();
   }
-  void ref() {
+  void ref()
+  {
     for (int i = 0; i < slist.size(); i++)
       slist[i].sts = slist[i].ref();
   }
 };
 
-class MqttServer {
+class MqttServer
+{
 public:
-  pwr_sClass_MqttServer *conf;
-  struct mosquitto *mosq;
+  pwr_sClass_MqttServer* conf;
+  struct mosquitto* mosq;
   mqtt_eCon connected;
   pthread_t loop_thread;
   sevcli_tCtx sevclictx;
@@ -184,25 +195,27 @@ public:
   std::vector<Sub> subs;
   std::vector<Sublist> sublists;
 
-  MqttServer() : conf(0), mosq(0), connected(mqtt_eCon_NotConnected),
-		 loop_thread(0), sevclictx(0), next_subref(1) {}
+  MqttServer()
+      : conf(0), mosq(0), connected(mqtt_eCon_NotConnected), loop_thread(0), sevclictx(0), next_subref(1)
+  {
+  }
   void init(qcom_sQid* qid);
   int open(int restart);
   void close();
   int mqtt_connect();
-  void *loop();
+  void* loop();
 
   static void* mqtt_loop(void* arg);
 };
 
-static MqttServer *srv;
-
+static MqttServer* srv;
 
 static pwr_tStatus mqtt_error_to_sts(int err)
 {
   pwr_tStatus sts = 0;
 
-  switch (err) {
+  switch (err)
+  {
   case MOSQ_ERR_CONN_PENDING:
     sts = REM__TT_CONN_PENDING;
     break;
@@ -273,10 +286,10 @@ static pwr_tStatus mqtt_error_to_sts(int err)
   return sts;
 }
 
-static int json_find(char *msg, const char *name, char *value, int size, int is_string)
+static int json_find(char* msg, const char* name, char* value, int size, int is_string)
 {
-  char *s;
-  char *mvalue;
+  char* s;
+  char* mvalue;
   int colon_found = 0;
   int value_found = 0;
   int parcnt = 0;
@@ -285,24 +298,29 @@ static int json_find(char *msg, const char *name, char *value, int size, int is_
   if (!s)
     return 0;
 
-  mvalue = (char *)malloc(size);
+  mvalue = (char*)malloc(size);
 
   s += strlen(name);
-  while (*s) {
-    if (*s == ' ' || *s == '	') {
+  while (*s)
+  {
+    if (*s == ' ' || *s == '	')
+    {
       s++;
       continue;
     }
-    if (*s == ':') {
-      if (colon_found) {
-	free(mvalue);
-	return 0;
+    if (*s == ':')
+    {
+      if (colon_found)
+      {
+        free(mvalue);
+        return 0;
       }
       colon_found = 1;
       s++;
       continue;
     }
-    if (colon_found && !value_found) {
+    if (colon_found && !value_found)
+    {
       strncpy(mvalue, s, size);
       value_found = 1;
       break;
@@ -311,39 +329,48 @@ static int json_find(char *msg, const char *name, char *value, int size, int is_
       break;
     s++;
   }
-  if (!colon_found || !value_found) {
+  if (!colon_found || !value_found)
+  {
     free(mvalue);
     return 0;
   }
   s = mvalue;
-  while (*s) {
+  while (*s)
+  {
     if (*s == '{' || *s == '[')
       parcnt++;
-    else if (*s == '}' || *s == ']') {
-      if (parcnt == 0) {
-	*s = 0;
-	break;
-      } else {
-	parcnt--;
-	if (parcnt == 0) {
-	  if (mvalue[0] == '\"' && *(s+1) == '\"')
-	    *(s + 2) = 0;
-	  else
-	    *(s + 1) = 0;
-	  break;
-	}
+    else if (*s == '}' || *s == ']')
+    {
+      if (parcnt == 0)
+      {
+        *s = 0;
+        break;
+      }
+      else
+      {
+        parcnt--;
+        if (parcnt == 0)
+        {
+          if (mvalue[0] == '\"' && *(s + 1) == '\"')
+            *(s + 2) = 0;
+          else
+            *(s + 1) = 0;
+          break;
+        }
       }
     }
-    else if (*s == 0 || (*s == ',' && parcnt == 0)) {
+    else if (*s == 0 || (*s == ',' && parcnt == 0))
+    {
       *s = 0;
       break;
     }
     s++;
   }
   str_trim(mvalue, mvalue);
-  if (is_string && mvalue[0] == '\"' && mvalue[strlen(mvalue)-1] == '\"') {
+  if (is_string && mvalue[0] == '\"' && mvalue[strlen(mvalue) - 1] == '\"')
+  {
     strcpy(value, &mvalue[1]);
-    value[strlen(value)-1] = 0;
+    value[strlen(value) - 1] = 0;
   }
   else
     strcpy(value, mvalue);
@@ -351,25 +378,26 @@ static int json_find(char *msg, const char *name, char *value, int size, int is_
   return 1;
 }
 
-static void message_cb(struct mosquitto *mosq, void *obj, 
-    const struct mosquitto_message *msg)
+static void message_cb(struct mosquitto* mosq, void* obj, const struct mosquitto_message* msg)
 {
-  if (msg->payloadlen > 0) {
+  if (msg->payloadlen > 0)
+  {
     int sts;
     char action[100];
     char reply[200];
 
     if (debug)
-      printf("Msg:\"%s\"\n", (char *)msg->payload);
+      printf("Msg:\"%s\"\n", (char*)msg->payload);
 
-    sts = json_find((char *)msg->payload, "\"action\"", action, sizeof(action), 1);
-    
-    if (streq(action, "get")) {
+    sts = json_find((char*)msg->payload, "\"action\"", action, sizeof(action), 1);
+
+    if (streq(action, "get"))
+    {
       char attribute[500];
 
-      sts = json_find((char *)msg->payload, "\"attribute\"", attribute, sizeof(attribute), 1);
+      sts = json_find((char*)msg->payload, "\"attribute\"", attribute, sizeof(attribute), 1);
 
-      sts = json_find((char *)msg->payload, "\"reply\"", reply, sizeof(reply), 1);
+      sts = json_find((char*)msg->payload, "\"reply\"", reply, sizeof(reply), 1);
 
       char buf[1000];
       char str[1000];
@@ -381,40 +409,43 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 
       sts = gdh_GetAttributeCharacteristics(attribute, &atype, &asize, 0, 0);
       if (ODD(sts))
-	sts = gdh_GetObjectInfo(attribute, &buf, sizeof(buf));
+        sts = gdh_GetObjectInfo(attribute, &buf, sizeof(buf));
       if (ODD(sts))
-	sts = gdh_AttrValueToString((pwr_eType)atype, 0, buf, str, sizeof(str), &len, 0);
-      if (EVEN(sts)) {
-	sprintf(rmsg, "{\"status\":%u}", sts);
-      } else {
-	switch (atype) {
-	case pwr_eType_String:
-	case pwr_eType_Text:
-	case pwr_eType_Objid:
-	case pwr_eType_AttrRef:
-	case pwr_eType_Time:
-	case pwr_eType_DeltaTime:
-	  sprintf(rmsg, "{\"status\":%u,\"value\":\"%s\"}", sts, str);
-	  break;
-	default:
-	  sprintf(rmsg, "{\"status\":%u,\"value\":%s}", sts, str);
-	}
+        sts = gdh_AttrValueToString((pwr_eType)atype, 0, buf, str, sizeof(str), &len, 0);
+      if (EVEN(sts))
+      {
+        sprintf(rmsg, "{\"status\":%u}", sts);
       }
-      rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), 
-	  rmsg, 1, 0);
+      else
+      {
+        switch (atype)
+        {
+        case pwr_eType_String:
+        case pwr_eType_Text:
+        case pwr_eType_Objid:
+        case pwr_eType_AttrRef:
+        case pwr_eType_Time:
+        case pwr_eType_DeltaTime:
+          sprintf(rmsg, "{\"status\":%u,\"value\":\"%s\"}", sts, str);
+          break;
+        default:
+          sprintf(rmsg, "{\"status\":%u,\"value\":%s}", sts, str);
+        }
+      }
+      rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), rmsg, 1, 0);
       if (debug)
-	printf("get: %d %s\n", rc, rmsg);
-	
+        printf("get: %d %s\n", rc, rmsg);
     }
-    else if (streq(action, "set")) {
+    else if (streq(action, "set"))
+    {
       char attribute[500];
       char valstr[1000];
 
-      sts = json_find((char *)msg->payload, "\"attribute\"", attribute, sizeof(attribute), 1);
+      sts = json_find((char*)msg->payload, "\"attribute\"", attribute, sizeof(attribute), 1);
 
-      sts = json_find((char *)msg->payload, "\"reply\"", reply, sizeof(reply), 1);
+      sts = json_find((char*)msg->payload, "\"reply\"", reply, sizeof(reply), 1);
 
-      sts = json_find((char *)msg->payload, "\"value\"", valstr, sizeof(valstr), 1);
+      sts = json_find((char*)msg->payload, "\"value\"", valstr, sizeof(valstr), 1);
 
       char rmsg[100];
       int rc;
@@ -424,32 +455,31 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 
       sts = gdh_GetAttributeCharacteristics(attribute, &atype, &asize, 0, 0);
       if (ODD(sts))
-	sts = gdh_AttrStringToValue(atype, valstr, buf, sizeof(buf), asize);
+        sts = gdh_AttrStringToValue(atype, valstr, buf, sizeof(buf), asize);
       if (ODD(sts))
-	sts = gdh_SetObjectInfo(attribute, buf, asize);
+        sts = gdh_SetObjectInfo(attribute, buf, asize);
 
       sprintf(rmsg, "{\"status\":%u}", sts);
-      rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), 
-	  rmsg, 1, 0);
+      rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), rmsg, 1, 0);
       if (debug)
-	printf("set: %d %s %s\n", rc, reply, rmsg);	
+        printf("set: %d %s %s\n", rc, reply, rmsg);
     }
-    else if (streq(action, "subscribe")) {
+    else if (streq(action, "subscribe"))
+    {
       char attribute[500];
       char cyclestr[20];
       char durationstr[20];
 
-      sts = json_find((char *)msg->payload, "\"attribute\"", attribute, sizeof(attribute), 1);
+      sts = json_find((char*)msg->payload, "\"attribute\"", attribute, sizeof(attribute), 1);
 
       if (ODD(sts))
-	sts = json_find((char *)msg->payload, "\"reply\"", reply, sizeof(reply), 1);
+        sts = json_find((char*)msg->payload, "\"reply\"", reply, sizeof(reply), 1);
 
       if (ODD(sts))
-	sts = json_find((char *)msg->payload, "\"cycle\"", cyclestr, sizeof(cyclestr), 1);
+        sts = json_find((char*)msg->payload, "\"cycle\"", cyclestr, sizeof(cyclestr), 1);
 
       if (ODD(sts))
-	sts = json_find((char *)msg->payload, "\"duration\"", durationstr, 
-	    sizeof(durationstr), 1);
+        sts = json_find((char*)msg->payload, "\"duration\"", durationstr, sizeof(durationstr), 1);
 
       pwr_tFloat32 cycle;
       pwr_tFloat32 duration;
@@ -458,63 +488,67 @@ static void message_cb(struct mosquitto *mosq, void *obj,
       int n;
       pwr_tUInt32 size;
       pwr_tRefId refid;
-      void *refp;
+      void* refp;
       pwr_tTid tid;
 
-      if (ODD(sts)) {
-	n = sscanf(cyclestr, "%g", &cycle);
-	if (n != 1)
-	  sts = 0;
-      }
-      if (ODD(sts)) {
-	n = sscanf(durationstr, "%g", &duration);
-	if (n != 1)
-	  sts = 0;
+      if (ODD(sts))
+      {
+        n = sscanf(cyclestr, "%g", &cycle);
+        if (n != 1)
+          sts = 0;
       }
       if (ODD(sts))
-	sts = gdh_GetAttributeCharacteristics(attribute, &tid, &size, 0, 0);
-      if (ODD(sts))
-	sts = gdh_RefObjectInfo(attribute, &refp, &refid, size);
-      if (EVEN(sts)) {
-	sprintf(rmsg, "{\"status\":%u}", sts);
-	rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), 
-	    rmsg, 1, 0);
-	if (debug)
-	  printf("subscribe: %d %s\n", rc, rmsg);	
+      {
+        n = sscanf(durationstr, "%g", &duration);
+        if (n != 1)
+          sts = 0;
       }
-      else {
-	Sub sub;
-	strcpy(sub.attribute, attribute);
-	strcpy(sub.reply, reply);
-	sub.cycle = cycle;
-	sub.duration = duration;
-	sub.valp = refp;
-	sub.refid = refid;
-	sub.size = size;
-	sub.tid = tid;
-	sub.sts = sts;
-	sub.subref = srv->next_subref++;
-	srv->subs.push_back(sub);
+      if (ODD(sts))
+        sts = gdh_GetAttributeCharacteristics(attribute, &tid, &size, 0, 0);
+      if (ODD(sts))
+        sts = gdh_RefObjectInfo(attribute, &refp, &refid, size);
+      if (EVEN(sts))
+      {
+        sprintf(rmsg, "{\"status\":%u}", sts);
+        rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), rmsg, 1, 0);
+        if (debug)
+          printf("subscribe: %d %s\n", rc, rmsg);
+      }
+      else
+      {
+        Sub sub;
+        strcpy(sub.attribute, attribute);
+        strcpy(sub.reply, reply);
+        sub.cycle = cycle;
+        sub.duration = duration;
+        sub.valp = refp;
+        sub.refid = refid;
+        sub.size = size;
+        sub.tid = tid;
+        sub.sts = sts;
+        sub.subref = srv->next_subref++;
+        srv->subs.push_back(sub);
       }
     }
-    else if (streq(action, "sublist")) {
-      char *attribute;
+    else if (streq(action, "sublist"))
+    {
+      char* attribute;
       char cyclestr[20];
       char durationstr[20];
       Sublist sl;
       int len = msg->payloadlen;
 
-      attribute = (char *)malloc(len);
-      sts = json_find((char *)msg->payload, "\"attribute\"", attribute, len, 1);
+      attribute = (char*)malloc(len);
+      sts = json_find((char*)msg->payload, "\"attribute\"", attribute, len, 1);
 
       if (ODD(sts))
-	sts = json_find((char *)msg->payload, "\"reply\"", reply, sizeof(reply), 1);
+        sts = json_find((char*)msg->payload, "\"reply\"", reply, sizeof(reply), 1);
 
       if (ODD(sts))
-	sts = json_find((char *)msg->payload, "\"cycle\"", cyclestr, sizeof(cyclestr), 1);
+        sts = json_find((char*)msg->payload, "\"cycle\"", cyclestr, sizeof(cyclestr), 1);
 
       if (ODD(sts))
-	sts = json_find((char *)msg->payload, "\"duration\"", durationstr, sizeof(durationstr), 1);
+        sts = json_find((char*)msg->payload, "\"duration\"", durationstr, sizeof(durationstr), 1);
 
       pwr_tFloat32 cycle;
       pwr_tFloat32 duration;
@@ -523,89 +557,104 @@ static void message_cb(struct mosquitto *mosq, void *obj,
       int n;
       pwr_tUInt32 size;
       pwr_tRefId refid;
-      void *refp;
+      void* refp;
       pwr_tTid tid;
 
-      if (ODD(sts)) {
-	n = sscanf(cyclestr, "%g", &cycle);
-	if (n != 1)
-	  sts = 0;
+      if (ODD(sts))
+      {
+        n = sscanf(cyclestr, "%g", &cycle);
+        if (n != 1)
+          sts = 0;
       }
-      if (ODD(sts)) {
-	n = sscanf(durationstr, "%g", &duration);
-	if (n != 1)
-	  sts = 0;
+      if (ODD(sts))
+      {
+        n = sscanf(durationstr, "%g", &duration);
+        if (n != 1)
+          sts = 0;
       }
-      if (ODD(sts)) {
-	int num;
-	int idx;
-	pwr_tAName attr;
-	int parcnt = 0;
-	int sqrparcnt = 0;
-	char *s1;
-	char *s = attribute;
-	while (*s) {
-	  if (*s == '[') {
-	    sqrparcnt++;
-	  }
-	  if (*s == ']') {
-	    sqrparcnt--;
-	    if (sqrparcnt == 0)
-	      break;
-	  }
-	  if (*s == '{') {
-	    parcnt++;
-	    if (parcnt == 1) {
-	      // New sub
-	      num = sscanf(s+1, "%d", &idx);
-	      if (num != 1) {
-		sts = 0;
-		break;
-	      }
-	    }
-	  }
-	  else if (*s == '}') {
-	    parcnt--;
-	    if (parcnt == 0) {
-	      // Sub end
-	      SublistSub sub;
+      if (ODD(sts))
+      {
+        int num;
+        int idx;
+        pwr_tAName attr;
+        int parcnt = 0;
+        int sqrparcnt = 0;
+        char* s1;
+        char* s = attribute;
+        while (*s)
+        {
+          if (*s == '[')
+          {
+            sqrparcnt++;
+          }
+          if (*s == ']')
+          {
+            sqrparcnt--;
+            if (sqrparcnt == 0)
+              break;
+          }
+          if (*s == '{')
+          {
+            parcnt++;
+            if (parcnt == 1)
+            {
+              // New sub
+              num = sscanf(s + 1, "%d", &idx);
+              if (num != 1)
+              {
+                sts = 0;
+                break;
+              }
+            }
+          }
+          else if (*s == '}')
+          {
+            parcnt--;
+            if (parcnt == 0)
+            {
+              // Sub end
+              SublistSub sub;
 
-	      sts = gdh_GetAttributeCharacteristics(attr, &tid, &size, 0, 0);
-	      if (ODD(sts))
-		sts = gdh_RefObjectInfo(attr, &refp, &refid, size);
-	      if (ODD(sts)) {
-		strcpy(sub.attribute, attr);
-		sub.idx = idx;
-		sub.valp = refp;
-		sub.refid = refid;
-		sub.size = size;
-		sub.tid = tid;
-		sl.slist.push_back(sub);
-	      }
-	    }
-	  }
-	  else if (*s == ',') {
-	    if (parcnt == 1) {
-	      s++;
-	      if (*s == '\"') {
-		s++;
-		s1 = s;
-		while (*s && *s != '\"')
-		  s++;
-		strncpy(attr, s1, s - s1);
-		attr[s - s1] = 0;
-	      }
-	    }
-	  }
-	  s++;
-	}
+              sts = gdh_GetAttributeCharacteristics(attr, &tid, &size, 0, 0);
+              if (ODD(sts))
+                sts = gdh_RefObjectInfo(attr, &refp, &refid, size);
+              if (ODD(sts))
+              {
+                strcpy(sub.attribute, attr);
+                sub.idx = idx;
+                sub.valp = refp;
+                sub.refid = refid;
+                sub.size = size;
+                sub.tid = tid;
+                sl.slist.push_back(sub);
+              }
+            }
+          }
+          else if (*s == ',')
+          {
+            if (parcnt == 1)
+            {
+              s++;
+              if (*s == '\"')
+              {
+                s++;
+                s1 = s;
+                while (*s && *s != '\"')
+                  s++;
+                strncpy(attr, s1, s - s1);
+                attr[s - s1] = 0;
+              }
+            }
+          }
+          s++;
+        }
       }
-      if (EVEN(sts)) {
-	sprintf(rmsg, "{\"status\":%u}", sts);
-	rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), 
-	    rmsg, 1, 0);
-	if (debug)
-	  printf("sublist %d %s\n", rc, rmsg);	
+      if (EVEN(sts))
+      {
+        sprintf(rmsg, "{\"status\":%u}", sts);
+        rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), rmsg, 1, 0);
+        if (debug)
+          printf("sublist %d %s\n", rc, rmsg);
       }
       strcpy(sl.reply, reply);
       sl.cycle = cycle;
@@ -614,59 +663,72 @@ static void message_cb(struct mosquitto *mosq, void *obj,
       srv->sublists.push_back(sl);
       free(attribute);
     }
-    else if (streq(action, "closesub")) {
+    else if (streq(action, "closesub"))
+    {
       char subrefstr[40];
       int subref;
       int n;
 
-      sts = json_find((char *)msg->payload, "\"subref\"", subrefstr, sizeof(subrefstr), 1);
-      if (ODD(sts)) {
-	n = sscanf(subrefstr, "%d", &subref);
-	if (n != 1)
-	  sts = 0;
+      sts = json_find((char*)msg->payload, "\"subref\"", subrefstr, sizeof(subrefstr), 1);
+      if (ODD(sts))
+      {
+        n = sscanf(subrefstr, "%d", &subref);
+        if (n != 1)
+          sts = 0;
       }
-      if (ODD(sts)) {
-	for (int i = 0; i < srv->subs.size(); i++) {
-	  if (subref == srv->subs[i].subref) {
-	    if (debug)
-	      printf("Unref subref %d\n", srv->subs[i].subref);
-	    srv->subs[i].unref();
-	    srv->subs.erase(srv->subs.begin() + i);
-	  }
-	}
+      if (ODD(sts))
+      {
+        for (int i = 0; i < srv->subs.size(); i++)
+        {
+          if (subref == srv->subs[i].subref)
+          {
+            if (debug)
+              printf("Unref subref %d\n", srv->subs[i].subref);
+            srv->subs[i].unref();
+            srv->subs.erase(srv->subs.begin() + i);
+          }
+        }
       }
-      else {
-	if (debug)
-	  printf("closesub: sts %d\n", sts);
+      else
+      {
+        if (debug)
+          printf("closesub: sts %d\n", sts);
       }
     }
-    else if (streq(action, "closesublist")) {
+    else if (streq(action, "closesublist"))
+    {
       char subrefstr[40];
       int subref;
       int n;
 
-      sts = json_find((char *)msg->payload, "\"subref\"", subrefstr, sizeof(subrefstr), 1);
-      if (ODD(sts)) {
-	n = sscanf(subrefstr, "%d", &subref);
-	if (n != 1)
-	  sts = 0;
+      sts = json_find((char*)msg->payload, "\"subref\"", subrefstr, sizeof(subrefstr), 1);
+      if (ODD(sts))
+      {
+        n = sscanf(subrefstr, "%d", &subref);
+        if (n != 1)
+          sts = 0;
       }
-      if (ODD(sts)) {
-	for (int i = 0; i < srv->sublists.size(); i++) {
-	  if (subref == srv->sublists[i].subref) {
-	    if (debug)
-	      printf("closesublist subref %d\n", srv->sublists[i].subref);
-	    srv->sublists[i].unref();
-	    srv->sublists.erase(srv->sublists.begin() + i);
-	  }
-	}
+      if (ODD(sts))
+      {
+        for (int i = 0; i < srv->sublists.size(); i++)
+        {
+          if (subref == srv->sublists[i].subref)
+          {
+            if (debug)
+              printf("closesublist subref %d\n", srv->sublists[i].subref);
+            srv->sublists[i].unref();
+            srv->sublists.erase(srv->sublists.begin() + i);
+          }
+        }
       }
-      else {
-	if (debug)
-	  printf("closesub: sts %d\n", sts);
+      else
+      {
+        if (debug)
+          printf("closesub: sts %d\n", sts);
       }
     }
-    else if (streq(action, "history")) {
+    else if (streq(action, "history"))
+    {
       pwr_tOName object;
       pwr_tOName attribute;
       char server[80];
@@ -676,12 +738,12 @@ static void message_cb(struct mosquitto *mosq, void *obj,
       int maxrows;
       pwr_tTime to, from;
       pwr_tDeltaTime fromdelta;
-      char *rmsg;
+      char* rmsg;
       int msize;
       int rc;
       int n;
-      pwr_tTime *tbuf;
-      void *vbuf;
+      pwr_tTime* tbuf;
+      void* vbuf;
       int rows;
       pwr_eType vtype;
       unsigned int vsize;
@@ -689,176 +751,192 @@ static void message_cb(struct mosquitto *mosq, void *obj,
       pwr_tOid oid;
       int nyi = 0;
 
-      while (1) {
-	sts = json_find((char *)msg->payload, "\"server\"", server, sizeof(server), 1);
-	if (EVEN(sts))
-	  break;
+      while (1)
+      {
+        sts = json_find((char*)msg->payload, "\"server\"", server, sizeof(server), 1);
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"object\"", object, sizeof(object), 1);
-	if (EVEN(sts))
-	  break;
+        sts = json_find((char*)msg->payload, "\"object\"", object, sizeof(object), 1);
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"attribute\"", attribute, sizeof(attribute), 1);
-	if (EVEN(sts))
-	  break;
+        sts = json_find((char*)msg->payload, "\"attribute\"", attribute, sizeof(attribute), 1);
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"reply\"", reply, sizeof(reply), 1);
-	if (EVEN(sts))
-	  break;
+        sts = json_find((char*)msg->payload, "\"reply\"", reply, sizeof(reply), 1);
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"from\"", fromstr, sizeof(fromstr), 1);
-	if (EVEN(sts))
-	  break;
+        sts = json_find((char*)msg->payload, "\"from\"", fromstr, sizeof(fromstr), 1);
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"to\"", tostr, sizeof(tostr), 1);
-	if (EVEN(sts))
-	  break;
+        sts = json_find((char*)msg->payload, "\"to\"", tostr, sizeof(tostr), 1);
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"maxrows\"", maxrowsstr, sizeof(maxrowsstr), 1);
-	if (EVEN(sts)) {
-	  maxrows = 1000;
-	  sts = 1;
-	}
-	else {
-	  n = sscanf(maxrowsstr, "%d", &maxrows);
-	  if (n != 1) {
-	    sts = 0;
-	    break;
-	  }
-	}
-	
-	if ( strncmp("_O", object, 2) == 0) 
-	  sts = cdh_StringToObjid(object, &oid);
-	else
-	  sts = gdh_NameToObjid(object, &oid);
-	if (EVEN(sts))
-	  break;
-      
+        sts = json_find((char*)msg->payload, "\"maxrows\"", maxrowsstr, sizeof(maxrowsstr), 1);
+        if (EVEN(sts))
+        {
+          maxrows = 1000;
+          sts = 1;
+        }
+        else
+        {
+          n = sscanf(maxrowsstr, "%d", &maxrows);
+          if (n != 1)
+          {
+            sts = 0;
+            break;
+          }
+        }
 
-	if ( strcmp(tostr, "now") == 0) {
-	  /* fromstr is a deltatime */
-	  sts = time_AsciiToD(fromstr, &fromdelta);
-	  if ( EVEN(sts))
-	    break;
+        if (strncmp("_O", object, 2) == 0)
+          sts = cdh_StringToObjid(object, &oid);
+        else
+          sts = gdh_NameToObjid(object, &oid);
+        if (EVEN(sts))
+          break;
 
-	  time_GetTime(&to);
-	  time_Asub(&from, &to, &fromdelta);
-	}
-	else {
-	  sts = time_AsciiToA(fromstr, &from);
-	  if ( EVEN(sts))
-	    break;
+        if (strcmp(tostr, "now") == 0)
+        {
+          /* fromstr is a deltatime */
+          sts = time_AsciiToD(fromstr, &fromdelta);
+          if (EVEN(sts))
+            break;
 
-	  sts = time_AsciiToA(tostr, &to);
-	  if ( EVEN(sts))
-	    break;
-	}
+          time_GetTime(&to);
+          time_Asub(&from, &to, &fromdelta);
+        }
+        else
+        {
+          sts = time_AsciiToA(fromstr, &from);
+          if (EVEN(sts))
+            break;
 
-	if (!srv->sevclictx) {
-	  sevcli_init( &sts, &srv->sevclictx);
-	  if ( EVEN(sts))
-	    break;
-	}
+          sts = time_AsciiToA(tostr, &to);
+          if (EVEN(sts))
+            break;
+        }
 
-	sevcli_set_servernode( &sts, srv->sevclictx, server);
-	if ( EVEN(sts))
-	  break;
+        if (!srv->sevclictx)
+        {
+          sevcli_init(&sts, &srv->sevclictx);
+          if (EVEN(sts))
+            break;
+        }
 
-	sevcli_get_itemdata( &sts, srv->sevclictx, oid, attribute, from, to, maxrows, &tbuf, &vbuf,
-  		       &rows, &vtype, &vsize);
-	if (EVEN(sts))
-	  break;
+        sevcli_set_servernode(&sts, srv->sevclictx, server);
+        if (EVEN(sts))
+          break;
 
-	switch (vtype) {
-	case pwr_eType_Float32:
-	  msize = rows * (13 + 23 + 4) + 32;
-	  break;
-	case pwr_eType_Boolean:
-	  msize = rows * (1 + 23 + 4) + 32;
-	  break;
-	case pwr_eType_Int32:
-	case pwr_eType_UInt32:
-	  msize = rows * (13 + 23 + 4) + 32;
-	  break;
-	default:
-	  nyi = 1;
-	}
-	msize += 500;
-	if (nyi) {
-	  sts = PWR__NYI;
-	  break;
-	}
+        sevcli_get_itemdata(&sts, srv->sevclictx, oid, attribute, from, to, maxrows, &tbuf, &vbuf, &rows,
+                            &vtype, &vsize);
+        if (EVEN(sts))
+          break;
 
-	rmsg = (char *)calloc(1, msize);
+        switch (vtype)
+        {
+        case pwr_eType_Float32:
+          msize = rows * (13 + 23 + 4) + 32;
+          break;
+        case pwr_eType_Boolean:
+          msize = rows * (1 + 23 + 4) + 32;
+          break;
+        case pwr_eType_Int32:
+        case pwr_eType_UInt32:
+          msize = rows * (13 + 23 + 4) + 32;
+          break;
+        default:
+          nyi = 1;
+        }
+        msize += 500;
+        if (nyi)
+        {
+          sts = PWR__NYI;
+          break;
+        }
 
-	n = 0;
-	n = sprintf(rmsg, "{\"status\":%u,\"values\":[", sts);
-	for (int i = 0; i < rows; i++) {
-	  switch (vtype) {
-	  case pwr_eType_Float32:
-	    n += sprintf(&rmsg[n], "%e", ((pwr_tFloat32 *)vbuf)[i]);
-	    break;
-	  case pwr_eType_Int32:
-	    n += sprintf(&rmsg[n], "%d", ((pwr_tInt32 *)vbuf)[i]);
-	    break;
-	  case pwr_eType_Boolean:
-	  case pwr_eType_UInt32:
-	    n += sprintf(&rmsg[n], "%u", ((pwr_tUInt32 *)vbuf)[i]);
-	    break;
-	  default:;
-	  }
-	  if (i == rows - 1) {
-	    strcat(rmsg, "],\"time\":[");
-	    n += 10;
-	  }
-	  else {
-	    strcat(rmsg, ",");
-	    n += 1;
-	  }
-	}
+        rmsg = (char*)calloc(1, msize);
 
-	for (int i = 0; i < rows; i++) {
-	  time_AtoAscii( &tbuf[i], time_eFormat_DateAndTime, timstr, sizeof(timstr));
-	  strcat(rmsg, "\"");
-	  strcat(rmsg, timstr);
-	  strcat(rmsg, "\"");
-	  n += strlen(timstr) + 2;
-	  if (i == rows - 1) {
-	    strcat(rmsg, "]}");
-	    n += 2;
-	  }
-	  else {
-	    strcat(rmsg, ",");
-	    n += 1;
-	  }
-	}
-	if (debug)
-	  printf("size %d %d %d\n", msize, n, (int)strlen(rmsg));
+        n = 0;
+        n = sprintf(rmsg, "{\"status\":%u,\"values\":[", sts);
+        for (int i = 0; i < rows; i++)
+        {
+          switch (vtype)
+          {
+          case pwr_eType_Float32:
+            n += sprintf(&rmsg[n], "%e", ((pwr_tFloat32*)vbuf)[i]);
+            break;
+          case pwr_eType_Int32:
+            n += sprintf(&rmsg[n], "%d", ((pwr_tInt32*)vbuf)[i]);
+            break;
+          case pwr_eType_Boolean:
+          case pwr_eType_UInt32:
+            n += sprintf(&rmsg[n], "%u", ((pwr_tUInt32*)vbuf)[i]);
+            break;
+          default:;
+          }
+          if (i == rows - 1)
+          {
+            strcat(rmsg, "],\"time\":[");
+            n += 10;
+          }
+          else
+          {
+            strcat(rmsg, ",");
+            n += 1;
+          }
+        }
 
-	rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), 
-	    rmsg, 1, 0);
+        for (int i = 0; i < rows; i++)
+        {
+          time_AtoAscii(&tbuf[i], time_eFormat_DateAndTime, timstr, sizeof(timstr));
+          strcat(rmsg, "\"");
+          strcat(rmsg, timstr);
+          strcat(rmsg, "\"");
+          n += strlen(timstr) + 2;
+          if (i == rows - 1)
+          {
+            strcat(rmsg, "]}");
+            n += 2;
+          }
+          else
+          {
+            strcat(rmsg, ",");
+            n += 1;
+          }
+        }
+        if (debug)
+          printf("size %d %d %d\n", msize, n, (int)strlen(rmsg));
 
-	if (debug) {
-	  char txt[100];
-	  strncat(txt, rmsg,99);
-	  txt[99] = 0;
-	  printf("history %d %s...\n", rc, txt);
-	}
-	free(rmsg);
+        rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), rmsg, 1, 0);
 
-	break;
+        if (debug)
+        {
+          char txt[100];
+          strncat(txt, rmsg, 99);
+          txt[99] = 0;
+          printf("history %d %s...\n", rc, txt);
+        }
+        free(rmsg);
+
+        break;
       }
-      if (EVEN(sts)) {
-	rmsg = (char *)calloc(1, 40);
-	sprintf(rmsg, "{\"status\":%u}", sts);
-	rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), 
-	    rmsg, 1, 0);
-	if (debug)
-	  printf("history %d %s\n", rc, rmsg);	
-	free(rmsg);
+      if (EVEN(sts))
+      {
+        rmsg = (char*)calloc(1, 40);
+        sprintf(rmsg, "{\"status\":%u}", sts);
+        rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), rmsg, 1, 0);
+        if (debug)
+          printf("history %d %s\n", rc, rmsg);
+        free(rmsg);
       }
     }
-    else if (streq(action, "eventhist")) {
+    else if (streq(action, "eventhist"))
+    {
       pwr_tOName object;
       char server[80];
       char optionsstr[20];
@@ -875,314 +953,348 @@ static void message_cb(struct mosquitto *mosq, void *obj,
       int maxrows;
       pwr_tTime to, from;
       pwr_tDeltaTime fromdelta;
-      sevcli_sEvents *list;
+      sevcli_sEvents* list;
       unsigned int listcnt;
-      char *rmsg;
+      char* rmsg;
       int msize;
       int rc;
       int n;
       char timstr[30];
       pwr_tOid oid;
 
-      while (1) {
-	sts = json_find((char *)msg->payload, "\"server\"", server, sizeof(server), 1);
-	if (EVEN(sts))
-	  break;
+      while (1)
+      {
+        sts = json_find((char*)msg->payload, "\"server\"", server, sizeof(server), 1);
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"object\"", object, sizeof(object), 1);
-	if (EVEN(sts))
-	  break;
+        sts = json_find((char*)msg->payload, "\"object\"", object, sizeof(object), 1);
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"options\"", optionsstr, sizeof(optionsstr), 1);
-	if (EVEN(sts)) {
-	  options = mEventOpt_Time | mEventOpt_Type | mEventOpt_Text;
-	  sts = 1;
-	}
-	else {
-	  n = sscanf(optionsstr, "%u", &options);
-	  if (n != 1) {
-	    sts = 0;
-	    break;
-	  }
-	}
-	if (EVEN(sts))
-	  break;
+        sts = json_find((char*)msg->payload, "\"options\"", optionsstr, sizeof(optionsstr), 1);
+        if (EVEN(sts))
+        {
+          options = mEventOpt_Time | mEventOpt_Type | mEventOpt_Text;
+          sts = 1;
+        }
+        else
+        {
+          n = sscanf(optionsstr, "%u", &options);
+          if (n != 1)
+          {
+            sts = 0;
+            break;
+          }
+        }
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"eventtype\"", eventtypestr, sizeof(eventtypestr), 1);
-	if (EVEN(sts)) {
-	  eventtypemask = 0;
-	  sts = 1;
-	}
-	else {
-	  n = sscanf(eventtypestr, "%u", &eventtypemask);
-	  if (n != 1) {
-	    sts = 0;
-	    break;
-	  }
-	}
-	if (EVEN(sts))
-	  break;
+        sts = json_find((char*)msg->payload, "\"eventtype\"", eventtypestr, sizeof(eventtypestr), 1);
+        if (EVEN(sts))
+        {
+          eventtypemask = 0;
+          sts = 1;
+        }
+        else
+        {
+          n = sscanf(eventtypestr, "%u", &eventtypemask);
+          if (n != 1)
+          {
+            sts = 0;
+            break;
+          }
+        }
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"eventprio\"", eventpriostr, sizeof(eventpriostr), 1);
-	if (EVEN(sts)) {
-	  eventpriomask = 0;
-	  sts = 1;
-	}
-	else {
-	  n = sscanf(eventpriostr, "%u", &eventpriomask);
-	  if (n != 1) {
-	    sts = 0;
-	    break;
-	  }
-	}
-	if (EVEN(sts))
-	  break;
+        sts = json_find((char*)msg->payload, "\"eventprio\"", eventpriostr, sizeof(eventpriostr), 1);
+        if (EVEN(sts))
+        {
+          eventpriomask = 0;
+          sts = 1;
+        }
+        else
+        {
+          n = sscanf(eventpriostr, "%u", &eventpriomask);
+          if (n != 1)
+          {
+            sts = 0;
+            break;
+          }
+        }
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"eventtext\"", eventtext, sizeof(eventtext), 1);
-	if (EVEN(sts))
-	  strcpy(eventtext, "");
+        sts = json_find((char*)msg->payload, "\"eventtext\"", eventtext, sizeof(eventtext), 1);
+        if (EVEN(sts))
+          strcpy(eventtext, "");
 
-	sts = json_find((char *)msg->payload, "\"eventname\"", eventname, sizeof(eventname), 1);
-	if (EVEN(sts))
-	  strcpy(eventname, "");
+        sts = json_find((char*)msg->payload, "\"eventname\"", eventname, sizeof(eventname), 1);
+        if (EVEN(sts))
+          strcpy(eventname, "");
 
-	sts = json_find((char *)msg->payload, "\"reply\"", reply, sizeof(reply), 1);
-	if (EVEN(sts))
-	  break;
+        sts = json_find((char*)msg->payload, "\"reply\"", reply, sizeof(reply), 1);
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"from\"", fromstr, sizeof(fromstr), 1);
-	if (EVEN(sts))
-	  break;
+        sts = json_find((char*)msg->payload, "\"from\"", fromstr, sizeof(fromstr), 1);
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"to\"", tostr, sizeof(tostr), 1);
-	if (EVEN(sts))
-	  break;
+        sts = json_find((char*)msg->payload, "\"to\"", tostr, sizeof(tostr), 1);
+        if (EVEN(sts))
+          break;
 
-	sts = json_find((char *)msg->payload, "\"maxrows\"", maxrowsstr, sizeof(maxrowsstr), 1);
-	if (EVEN(sts)) {
-	  maxrows = 1000;
-	  sts = 1;
-	}
-	else {
-	  n = sscanf(maxrowsstr, "%d", &maxrows);
-	  if (n != 1) {
-	    sts = 0;
-	    break;
-	  }
-	}
-	
-	if ( strncmp("_O", object, 2) == 0) 
-	  sts = cdh_StringToObjid(object, &oid);
-	else
-	  sts = gdh_NameToObjid(object, &oid);
-	if (EVEN(sts))
-	  break;
-      
+        sts = json_find((char*)msg->payload, "\"maxrows\"", maxrowsstr, sizeof(maxrowsstr), 1);
+        if (EVEN(sts))
+        {
+          maxrows = 1000;
+          sts = 1;
+        }
+        else
+        {
+          n = sscanf(maxrowsstr, "%d", &maxrows);
+          if (n != 1)
+          {
+            sts = 0;
+            break;
+          }
+        }
 
-	if ( strcmp(tostr, "now") == 0) {
-	  /* fromstr is a deltatime */
-	  sts = time_AsciiToD(fromstr, &fromdelta);
-	  if ( EVEN(sts))
-	    break;
+        if (strncmp("_O", object, 2) == 0)
+          sts = cdh_StringToObjid(object, &oid);
+        else
+          sts = gdh_NameToObjid(object, &oid);
+        if (EVEN(sts))
+          break;
 
-	  time_GetTime(&to);
-	  time_Asub(&from, &to, &fromdelta);
-	}
-	else {
-	  sts = time_AsciiToA(fromstr, &from);
-	  if ( EVEN(sts))
-	    break;
+        if (strcmp(tostr, "now") == 0)
+        {
+          /* fromstr is a deltatime */
+          sts = time_AsciiToD(fromstr, &fromdelta);
+          if (EVEN(sts))
+            break;
 
-	  sts = time_AsciiToA(tostr, &to);
-	  if ( EVEN(sts))
-	    break;
-	}
+          time_GetTime(&to);
+          time_Asub(&from, &to, &fromdelta);
+        }
+        else
+        {
+          sts = time_AsciiToA(fromstr, &from);
+          if (EVEN(sts))
+            break;
 
-	if (!srv->sevclictx) {
-	  sevcli_init( &sts, &srv->sevclictx);
-	  if ( EVEN(sts))
-	    break;
-	}
+          sts = time_AsciiToA(tostr, &to);
+          if (EVEN(sts))
+            break;
+        }
 
-	sevcli_set_servernode( &sts, srv->sevclictx, server);
-	if ( EVEN(sts))
-	  break;
+        if (!srv->sevclictx)
+        {
+          sevcli_init(&sts, &srv->sevclictx);
+          if (EVEN(sts))
+            break;
+        }
 
-	sevcli_get_events( &sts, srv->sevclictx, oid, from, to, eventtypemask, eventpriomask,
-			   eventtext, eventname, maxrows, &list, &listcnt);
-	if (EVEN(sts))
-	  break;
+        sevcli_set_servernode(&sts, srv->sevclictx, server);
+        if (EVEN(sts))
+          break;
 
-	msize = 100;
-	msize += 20 + 10 + 10 + 10 + 10 + 10 + 1;
-	for (int i = 0; i < listcnt; i++) {
-	  if (options & mEventOpt_Time)
-	    msize += 23 + 3;
-	  if (options & mEventOpt_Type)
-	    msize += 11;
-	  if (options & mEventOpt_Prio)
-	    msize += 3;
-	  if (options & mEventOpt_Text)
-	    msize += strlen(list[i].EventText) + 3;
-	  if (options & mEventOpt_Name)
-	    msize += strlen(list[i].EventName) + 3;  
-	  if (options & mEventOpt_Id)
-	    msize += 11;
-	}
-	rmsg = (char *)calloc(1, msize);
+        sevcli_get_events(&sts, srv->sevclictx, oid, from, to, eventtypemask, eventpriomask, eventtext,
+                          eventname, maxrows, &list, &listcnt);
+        if (EVEN(sts))
+          break;
 
-	n = 0;
-	n += sprintf(rmsg, "{\"status\":%u", sts);
-	if (options & mEventOpt_Time) {
-	  n += sprintf(&rmsg[strlen(rmsg)], ",\"time\":[");
-	  for (int i = 0; i < listcnt; i++) {
-	    time_AtoAscii( &list[i].Time, time_eFormat_DateAndTime, timstr, sizeof(timstr));
-	    strcat(rmsg, "\"");
-	    strcat(rmsg, timstr);
-	    strcat(rmsg, "\"");
-	    n += strlen(timstr) + 2;
-	    if (i == listcnt - 1)
-	      strcat(rmsg, "]");
-	    else
-	      strcat(rmsg, ",");
-	    n += 1;
-	  }
-	}
-	if (options & mEventOpt_Type) {
-	  strcat(rmsg, ",\"type\":[");
-	  n += 9;
-	  for (int i = 0; i < listcnt; i++) {
-	    n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventType);
-	    if (i == listcnt - 1)
-	      strcat(rmsg, "]");
-	    else
-	      strcat(rmsg, ",");
-	    n += 1;
-	  }
-	}
-	if (options & mEventOpt_Prio) {
-	  strcat(rmsg, ",\"prio\":[");
-	  n += 8;
-	  for (int i = 0; i < listcnt; i++) {
-	    n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventPrio);
-	    if (i == listcnt - 1)
-	      strcat(rmsg, "]");
-	    else
-	      strcat(rmsg, ",");
-	    n += 1;
-	  }
-	}
-	if (options & mEventOpt_Prio) {
-	  strcat(rmsg, ",\"prio\":[");
-	  n += 8;
-	  for (int i = 0; i < listcnt; i++) {
-	    n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventPrio);
-	    if (i == listcnt - 1)
-	      strcat(rmsg, "]");
-	    else
-	      strcat(rmsg, ",");
-	    n += 1;
-	  }
-	}
-	if (options & mEventOpt_Text) {
-	  strcat(rmsg, ",\"text\":[");
-	  n += 9;
-	  for (int i = 0; i < listcnt; i++) {
-	    strcat(rmsg, "\"");
-	    strcat(rmsg, list[i].EventText);
-	    strcat(rmsg, "\"");
-	    n += strlen(list[i].EventText) + 2;
-	    if (i == listcnt - 1)
-	      strcat(rmsg, "]");
-	    else
-	      strcat(rmsg, ",");
-	    n += 1;
-	  }
-	}
-	if (options & mEventOpt_Name) {
-	  strcat(rmsg, ",\"name\":[");
-	  n += 9;
-	  for (int i = 0; i < listcnt; i++) {
-	    strcat(rmsg, "\"");
-	    strcat(rmsg, list[i].EventName);
-	    strcat(rmsg, "\"");
-	    n += strlen(list[i].EventName) + 2;
-	    if (i == listcnt - 1)
-	      strcat(rmsg, "]");
-	    else
-	      strcat(rmsg, ",");
-	    n += 1;
-	  }
-	}
-	if (options & mEventOpt_Id) {
-	  strcat(rmsg, ",\"id_nix\":[");
-	  n += 8;
-	  for (int i = 0; i < listcnt; i++) {
-	    n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventId.Nix);
-	    if (i == listcnt - 1)
-	      strcat(rmsg, "]");
-	    else
-	      strcat(rmsg, ",");
-	    n += 1;
-	  }
-	  strcat(rmsg, ",\"id_idx\":[");
-	  n += 8;
-	  for (int i = 0; i < listcnt; i++) {
-	    n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventId.Idx);
-	    if (i == listcnt - 1)
-	      strcat(rmsg, "]");
-	    else
-	      strcat(rmsg, ",");
-	    n += 1;
-	  }
-	}
-	strcat(rmsg, "}");
-	n += 1;
+        msize = 100;
+        msize += 20 + 10 + 10 + 10 + 10 + 10 + 1;
+        for (int i = 0; i < listcnt; i++)
+        {
+          if (options & mEventOpt_Time)
+            msize += 23 + 3;
+          if (options & mEventOpt_Type)
+            msize += 11;
+          if (options & mEventOpt_Prio)
+            msize += 3;
+          if (options & mEventOpt_Text)
+            msize += strlen(list[i].EventText) + 3;
+          if (options & mEventOpt_Name)
+            msize += strlen(list[i].EventName) + 3;
+          if (options & mEventOpt_Id)
+            msize += 11;
+        }
+        rmsg = (char*)calloc(1, msize);
 
-	if (debug)
-	  printf("size %d %d %d\n", msize, n, (int)strlen(rmsg));
+        n = 0;
+        n += sprintf(rmsg, "{\"status\":%u", sts);
+        if (options & mEventOpt_Time)
+        {
+          n += sprintf(&rmsg[strlen(rmsg)], ",\"time\":[");
+          for (int i = 0; i < listcnt; i++)
+          {
+            time_AtoAscii(&list[i].Time, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+            strcat(rmsg, "\"");
+            strcat(rmsg, timstr);
+            strcat(rmsg, "\"");
+            n += strlen(timstr) + 2;
+            if (i == listcnt - 1)
+              strcat(rmsg, "]");
+            else
+              strcat(rmsg, ",");
+            n += 1;
+          }
+        }
+        if (options & mEventOpt_Type)
+        {
+          strcat(rmsg, ",\"type\":[");
+          n += 9;
+          for (int i = 0; i < listcnt; i++)
+          {
+            n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventType);
+            if (i == listcnt - 1)
+              strcat(rmsg, "]");
+            else
+              strcat(rmsg, ",");
+            n += 1;
+          }
+        }
+        if (options & mEventOpt_Prio)
+        {
+          strcat(rmsg, ",\"prio\":[");
+          n += 8;
+          for (int i = 0; i < listcnt; i++)
+          {
+            n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventPrio);
+            if (i == listcnt - 1)
+              strcat(rmsg, "]");
+            else
+              strcat(rmsg, ",");
+            n += 1;
+          }
+        }
+        if (options & mEventOpt_Prio)
+        {
+          strcat(rmsg, ",\"prio\":[");
+          n += 8;
+          for (int i = 0; i < listcnt; i++)
+          {
+            n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventPrio);
+            if (i == listcnt - 1)
+              strcat(rmsg, "]");
+            else
+              strcat(rmsg, ",");
+            n += 1;
+          }
+        }
+        if (options & mEventOpt_Text)
+        {
+          strcat(rmsg, ",\"text\":[");
+          n += 9;
+          for (int i = 0; i < listcnt; i++)
+          {
+            strcat(rmsg, "\"");
+            strcat(rmsg, list[i].EventText);
+            strcat(rmsg, "\"");
+            n += strlen(list[i].EventText) + 2;
+            if (i == listcnt - 1)
+              strcat(rmsg, "]");
+            else
+              strcat(rmsg, ",");
+            n += 1;
+          }
+        }
+        if (options & mEventOpt_Name)
+        {
+          strcat(rmsg, ",\"name\":[");
+          n += 9;
+          for (int i = 0; i < listcnt; i++)
+          {
+            strcat(rmsg, "\"");
+            strcat(rmsg, list[i].EventName);
+            strcat(rmsg, "\"");
+            n += strlen(list[i].EventName) + 2;
+            if (i == listcnt - 1)
+              strcat(rmsg, "]");
+            else
+              strcat(rmsg, ",");
+            n += 1;
+          }
+        }
+        if (options & mEventOpt_Id)
+        {
+          strcat(rmsg, ",\"id_nix\":[");
+          n += 8;
+          for (int i = 0; i < listcnt; i++)
+          {
+            n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventId.Nix);
+            if (i == listcnt - 1)
+              strcat(rmsg, "]");
+            else
+              strcat(rmsg, ",");
+            n += 1;
+          }
+          strcat(rmsg, ",\"id_idx\":[");
+          n += 8;
+          for (int i = 0; i < listcnt; i++)
+          {
+            n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventId.Idx);
+            if (i == listcnt - 1)
+              strcat(rmsg, "]");
+            else
+              strcat(rmsg, ",");
+            n += 1;
+          }
+        }
+        strcat(rmsg, "}");
+        n += 1;
 
-	rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), 
-	    rmsg, 1, 0);
+        if (debug)
+          printf("size %d %d %d\n", msize, n, (int)strlen(rmsg));
 
-	if (debug) {
-	  char txt[100];
-	  strncat(txt, rmsg, 99);
-	  txt[99] = 0;
-	  printf("eventhist %d %s...\n", rc, txt);
-	}
-	free(rmsg);
+        rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), rmsg, 1, 0);
 
-	break;
+        if (debug)
+        {
+          char txt[100];
+          strncat(txt, rmsg, 99);
+          txt[99] = 0;
+          printf("eventhist %d %s...\n", rc, txt);
+        }
+        free(rmsg);
+
+        break;
       }
-      if (EVEN(sts)) {
-	rmsg = (char *)calloc(1, 40);
-	sprintf(rmsg, "{\"status\":%u}", sts);
-	rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), 
-	    rmsg, 1, 0);
-	if (debug)
-	  printf("eventhist %d %s\n", rc, rmsg);	
-	free(rmsg);
+      if (EVEN(sts))
+      {
+        rmsg = (char*)calloc(1, 40);
+        sprintf(rmsg, "{\"status\":%u}", sts);
+        rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), rmsg, 1, 0);
+        if (debug)
+          printf("eventhist %d %s\n", rc, rmsg);
+        free(rmsg);
       }
     }
   }
 }
 
-static void connect_cb(struct mosquitto *mosq, void *obj, int result)
+static void connect_cb(struct mosquitto* mosq, void* obj, int result)
 {
   if (debug)
     printf("connect_cb result %d\n", result);
-  if(result){
+  if (result)
+  {
     srv->conf->Status = mqtt_error_to_sts(result);
     if (debug)
       printf("%s\n", mosquitto_connack_string(result));
     srv->connected = mqtt_eCon_NotConnected;
-    if (result == MOSQ_ERR_CONN_REFUSED) {
+    if (result == MOSQ_ERR_CONN_REFUSED)
+    {
       printf("Remote mqtt terminated, %s", mosquitto_connack_string(result));
       exit(0);
     }
   }
-  else {
+  else
+  {
     mosquitto_subscribe(srv->mosq, NULL, srv->conf->SubscribeTopic, 0);
     srv->conf->Status = 1;
     srv->connected = mqtt_eCon_Connected;
@@ -1194,10 +1306,11 @@ int MqttServer::mqtt_connect()
   int rc;
   char id[40];
 
-  if (!mosq) {
+  if (!mosq)
+  {
     sprintf(id, "ProviewR%u", getpid());
     mosq = mosquitto_new(id, true, this);
-  
+
     mosquitto_connect_callback_set(mosq, connect_cb);
     mosquitto_message_callback_set(mosq, message_cb);
 
@@ -1206,15 +1319,18 @@ int MqttServer::mqtt_connect()
     // mosquitto_tls_set(mosq, "ca-cert.pem", NULL, NULL, NULL, NULL);
 
     rc = mosquitto_connect(mosq, conf->Server, conf->Port, 60);
-    if (rc) {
+    if (rc)
+    {
       conf->Status = mqtt_error_to_sts(rc);
       return conf->Status;
     }
     connected = mqtt_eCon_WaitConnect;
   }
-  else {
+  else
+  {
     rc = mosquitto_reconnect(mosq);
-    if (rc) {
+    if (rc)
+    {
       conf->Status = mqtt_error_to_sts(rc);
       return conf->Status;
     }
@@ -1222,150 +1338,155 @@ int MqttServer::mqtt_connect()
   return 1;
 }
 
-void* MqttServer::mqtt_loop(void* arg)
-{
-  return srv->loop();
-}
+void* MqttServer::mqtt_loop(void* arg) { return srv->loop(); }
 
-void *MqttServer::loop()
+void* MqttServer::loop()
 {
-  int rc;
+  int rc = 0;
   pwr_tTime now, last;
   pwr_tFloat32 dtf;
   pwr_tFloat32 scan_time = 1.0;
 
   time_GetTimeMonotonic(&last);
-  while(1) {
-    while (1) {
+  while (1)
+  {
+    while (1)
+    {
       time_GetTimeMonotonic(&now);
       dtf = time_AdiffToFloat(&now, &last);
-      if (dtf >= scan_time) {
-	last = now;
-	break;
+      if (dtf >= scan_time)
+      {
+        last = now;
+        break;
       }
-      rc = mosquitto_loop(mosq, 1000*(scan_time - dtf), 1);
+      rc = mosquitto_loop(mosq, 1000 * (scan_time - dtf), 1);
       if (rc)
-	break;
+        break;
     }
-    if (rc) {
+    if (rc)
+    {
       printf("Error %d\n", rc);
       sleep(10);
       mosquitto_reconnect(mosq);
     }
-    else {
+    else
+    {
 
-      for (int i = 0; i < subs.size(); i++) {
-	char rmsg[1100];
-	char str[1000];
-	int len;
-	pwr_tStatus sts;
+      for (int i = 0; i < subs.size(); i++)
+      {
+        char rmsg[1100];
+        char str[1000];
+        int len;
+        pwr_tStatus sts;
 
-	sts = gdh_AttrValueToString((pwr_eType)subs[i].tid, 0, subs[i].valp, 
-				    str, sizeof(str), &len, 0);
-	if (EVEN(sts)) {
-	  subs[i].sts = sts;
-	  sprintf(rmsg, "{\"subref\":%d,\"status\":%u}", 
-	      subs[i].subref, sts);
-	}
-	else {
-	  switch (subs[i].tid) {
-	  case pwr_eType_String:
-	  case pwr_eType_Text:
-	  case pwr_eType_Objid:
-	  case pwr_eType_AttrRef:
-	  case pwr_eType_Time:
-	  case pwr_eType_DeltaTime:
-	    sprintf(rmsg, "{\"subref\":%d,\"status\":%u,\"value\":\"%s\"}", 
-		    subs[i].subref, subs[i].sts, str);
-	    break;
-	  default:
-	    sprintf(rmsg, "{\"subref\":%d,\"status\":%u,\"value\":%s}", 
-		    subs[i].subref, subs[i].sts, str);
-	  }
-	}
-	if (debug)
-	  printf("sub: %s %s\n", subs[i].reply, rmsg);
-	rc = mosquitto_publish(mosq, NULL, subs[i].reply, strlen(rmsg), 
-	    rmsg, 1, 0);
-	subs[i].cnt++;
-	if (subs[i].cnt > subs[i].duration) {
-	  if (debug)
-	    printf("Remove sub %s\n", subs[i].attribute);
-	  subs[i].unref();
-	  subs.erase(subs.begin() + i);
-	  i--;
-	}
+        sts = gdh_AttrValueToString((pwr_eType)subs[i].tid, 0, subs[i].valp, str, sizeof(str), &len, 0);
+        if (EVEN(sts))
+        {
+          subs[i].sts = sts;
+          sprintf(rmsg, "{\"subref\":%d,\"status\":%u}", subs[i].subref, sts);
+        }
+        else
+        {
+          switch (subs[i].tid)
+          {
+          case pwr_eType_String:
+          case pwr_eType_Text:
+          case pwr_eType_Objid:
+          case pwr_eType_AttrRef:
+          case pwr_eType_Time:
+          case pwr_eType_DeltaTime:
+            sprintf(rmsg, "{\"subref\":%d,\"status\":%u,\"value\":\"%s\"}", subs[i].subref, subs[i].sts, str);
+            break;
+          default:
+            sprintf(rmsg, "{\"subref\":%d,\"status\":%u,\"value\":%s}", subs[i].subref, subs[i].sts, str);
+          }
+        }
+        if (debug)
+          printf("sub: %s %s\n", subs[i].reply, rmsg);
+        rc = mosquitto_publish(mosq, NULL, subs[i].reply, strlen(rmsg), rmsg, 1, 0);
+        subs[i].cnt++;
+        if (subs[i].cnt > subs[i].duration)
+        {
+          if (debug)
+            printf("Remove sub %s\n", subs[i].attribute);
+          subs[i].unref();
+          subs.erase(subs.begin() + i);
+          i--;
+        }
       }
-      for (int i = 0; i < sublists.size(); i++) {
-	int msize;
-	char *rmsg;
-	int n = 0;
-	char str[1000];
-	int len;
-	pwr_tStatus sts;
-  
-	msize = 17;
-	for (int j = 0; j < sublists[i].slist.size(); j++) {
-	  sts = gdh_AttrValueToString((pwr_eType)sublists[i].slist[j].tid, 0, 
-	       sublists[i].slist[j].valp, str, sizeof(str), &len, 0);
-	  msize += 20 + len;
-	  switch (sublists[i].slist[j].tid) {	    
-	  case pwr_eType_String:
-	  case pwr_eType_Text:
-	  case pwr_eType_Objid:
-	  case pwr_eType_AttrRef:
-	  case pwr_eType_Time:
-	  case pwr_eType_DeltaTime:
-	    msize += 2;
-	    break;
-	  default: 
-	    ;
-	  }
-	}
-	rmsg = (char *)calloc(1, msize);
+      for (int i = 0; i < sublists.size(); i++)
+      {
+        int msize;
+        char* rmsg;
+        int n = 0;
+        char str[1000];
+        int len;
+        pwr_tStatus sts;
 
-	n += sprintf(rmsg, "{\"subref\":%d,\"a\":[", sublists[i].subref);
-	for (int j = 0; j < sublists[i].slist.size(); j++) {
-	  sts = gdh_AttrValueToString((pwr_eType)sublists[i].slist[j].tid, 0, 
-	       sublists[i].slist[j].valp, str, sizeof(str), &len, 0);
+        msize = 17;
+        for (int j = 0; j < sublists[i].slist.size(); j++)
+        {
+          sts = gdh_AttrValueToString((pwr_eType)sublists[i].slist[j].tid, 0, sublists[i].slist[j].valp, str,
+                                      sizeof(str), &len, 0);
+          msize += 20 + len;
+          switch (sublists[i].slist[j].tid)
+          {
+          case pwr_eType_String:
+          case pwr_eType_Text:
+          case pwr_eType_Objid:
+          case pwr_eType_AttrRef:
+          case pwr_eType_Time:
+          case pwr_eType_DeltaTime:
+            msize += 2;
+            break;
+          default:;
+          }
+        }
+        rmsg = (char*)calloc(1, msize);
 
-	  switch (sublists[i].slist[j].tid) {
-	  case pwr_eType_String:
-	  case pwr_eType_Text:
-	  case pwr_eType_Objid:
-	  case pwr_eType_AttrRef:
-	  case pwr_eType_Time:
-	  case pwr_eType_DeltaTime:
-	    n += sprintf(&rmsg[strlen(rmsg)], "{\"idx\":%u,\"value\":\"%s\"}", 
-		sublists[i].slist[j].idx, str);
-	    break;
-	  default:
-	    n += sprintf(&rmsg[strlen(rmsg)], "{\"idx\":%u,\"value\":%s}", 
-		sublists[i].slist[j].idx, str);
-	  }
-	  if (j != sublists[i].slist.size() - 1) {
-	    strcat(rmsg, ",");
-	    n += 1;
-	  }
-	}
-	strcat(rmsg, "]}");
-	n += 2;
-	if (debug)
-	  printf("sublist: %s %s\n", sublists[i].reply, rmsg);
-	if (debug)
-	  printf("msize: %d %d %d\n", msize, n, (int)strlen(rmsg));
-	rc = mosquitto_publish(mosq, NULL, sublists[i].reply, strlen(rmsg), 
-				 rmsg, 1, 0);
-	sublists[i].cnt++;
-	free(rmsg);
+        n += sprintf(rmsg, "{\"subref\":%d,\"a\":[", sublists[i].subref);
+        for (int j = 0; j < sublists[i].slist.size(); j++)
+        {
+          sts = gdh_AttrValueToString((pwr_eType)sublists[i].slist[j].tid, 0, sublists[i].slist[j].valp, str,
+                                      sizeof(str), &len, 0);
 
-	if (sublists[i].cnt > sublists[i].duration) {
-	  if (debug)
-	    printf("Remove sublist %s\n", sublists[i].reply);
-	  sublists[i].unref();
-	  sublists.erase(sublists.begin() + i);
-	  i--;
-	}
+          switch (sublists[i].slist[j].tid)
+          {
+          case pwr_eType_String:
+          case pwr_eType_Text:
+          case pwr_eType_Objid:
+          case pwr_eType_AttrRef:
+          case pwr_eType_Time:
+          case pwr_eType_DeltaTime:
+            n += sprintf(&rmsg[strlen(rmsg)], "{\"idx\":%u,\"value\":\"%s\"}", sublists[i].slist[j].idx, str);
+            break;
+          default:
+            n += sprintf(&rmsg[strlen(rmsg)], "{\"idx\":%u,\"value\":%s}", sublists[i].slist[j].idx, str);
+          }
+          if (j != sublists[i].slist.size() - 1)
+          {
+            strcat(rmsg, ",");
+            n += 1;
+          }
+        }
+        strcat(rmsg, "]}");
+        n += 2;
+        if (debug)
+          printf("sublist: %s %s\n", sublists[i].reply, rmsg);
+        if (debug)
+          printf("msize: %d %d %d\n", msize, n, (int)strlen(rmsg));
+        rc = mosquitto_publish(mosq, NULL, sublists[i].reply, strlen(rmsg), rmsg, 1, 0);
+        sublists[i].cnt++;
+        free(rmsg);
+
+        if (sublists[i].cnt > sublists[i].duration)
+        {
+          if (debug)
+            printf("Remove sublist %s\n", sublists[i].reply);
+          sublists[i].unref();
+          sublists.erase(sublists.begin() + i);
+          i--;
+        }
       }
     }
   }
@@ -1380,15 +1501,17 @@ int MqttServer::open(int restart)
   int rc;
 
   sts = gdh_GetClassList(pwr_cClass_MqttServer, &confoid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Info("Not configured, terminating");
     exit(0);
   }
-  sts = gdh_ObjidToPointer(confoid, (void **)&srv->conf);
+  sts = gdh_ObjidToPointer(confoid, (void**)&srv->conf);
   if (EVEN(sts))
     return sts;
-  
-  if (!restart) {
+
+  if (!restart)
+  {
     if (strcmp(srv->conf->Server, "") == 0)
       strcpy(srv->conf->Server, "localhost");
 
@@ -1400,7 +1523,8 @@ int MqttServer::open(int restart)
     if (rc)
       return 0;
   }
-  else {
+  else
+  {
     // Setup new subscriptions
     for (int i = 0; i < subs.size(); i++)
       subs[i].sts = subs[i].ref();
@@ -1420,7 +1544,6 @@ void MqttServer::close()
     sublists[i].unref();
 }
 
-
 void MqttServer::init(qcom_sQid* qid)
 {
   qcom_sQid qini;
@@ -1428,7 +1551,8 @@ void MqttServer::init(qcom_sQid* qid)
   pwr_tStatus sts;
 
   sts = gdh_Init("rt_mqtt_server");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     exit(sts);
   }
@@ -1436,7 +1560,8 @@ void MqttServer::init(qcom_sQid* qid)
   errh_Init("pwr_mqtt_server", errh_eAnix_mqtt_server);
   errh_SetStatus(PWR__SRVSTARTUP);
 
-  if (!qcom_Init(&sts, 0, "pwr_mqtt_server")) {
+  if (!qcom_Init(&sts, 0, "pwr_mqtt_server"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -1444,14 +1569,16 @@ void MqttServer::init(qcom_sQid* qid)
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, qid, &qini)) {
+  if (!qcom_Bind(&sts, qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
@@ -1473,7 +1600,8 @@ int main()
   srv->init(&qid);
 
   sts = srv->open(0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("Open error, %m", sts);
     errh_Fatal("rt_mqtt_server aborting");
     errh_SetStatus(PWR__SRVTERM);
@@ -1484,30 +1612,38 @@ int main()
   errh_SetStatus(PWR__SRUN);
 
   first_scan = true;
-  for (;;) {
-    if (first_scan) {
+  for (;;)
+  {
+    if (first_scan)
+    {
       tmo = (int)(scantime * 1000 - 1);
     }
 
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &qid, &get, tmo);
-    if (!(sts == QCOM__TMO || sts == QCOM__QEMPTY)) {
+    if (!(sts == QCOM__TMO || sts == QCOM__QEMPTY))
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop && !swap) {
+      if (new_event.b.oldPlcStop && !swap)
+      {
         errh_SetStatus(PWR__SRVRESTART);
         srv->conf->Status = PWR__SRVRESTART;
         swap = 1;
         srv->close();
-      } else if (new_event.b.swapDone && swap) {
+      }
+      else if (new_event.b.swapDone && swap)
+      {
         swap = 0;
         srv->open(1);
         errh_SetStatus(PWR__SRUN);
         srv->conf->Status = PWR__SRUN;
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         exit(0);
       }
     }
@@ -1519,8 +1655,5 @@ int main()
 #else
 #include <stdio.h>
 
-int main() 
-{
-  printf("rt_mqtt_server: Release is not built with MQTT\n");
-}
+int main() { printf("rt_mqtt_server: Release is not built with MQTT\n"); }
 #endif

@@ -41,12 +41,14 @@
 
 class XttMethodToolbarGtk;
 
-typedef struct {
+typedef struct
+{
   XttMethodToolbarGtk* mt;
   int idx;
 } xtt_sMethodButtonCb;
 
-class XttMethodToolbarGtk : public XttMethodToolbar {
+class XttMethodToolbarGtk : public XttMethodToolbar
+{
 public:
   GtkWidget* m_toolbar_w;
   GtkToolItem* m_op_button_w[32];
@@ -54,8 +56,8 @@ public:
   xtt_sMethodButtonCb m_cb[64];
   gint m_timerid;
 
-  XttMethodToolbarGtk(void* parent_ctx, void* xnav, unsigned int op_method_mask,
-      unsigned int mnt_method_mask, const char* tooltip_suffix);
+  XttMethodToolbarGtk(void* parent_ctx, void* xnav, unsigned int op_method_mask, unsigned int mnt_method_mask,
+                      const char* tooltip_suffix);
   ~XttMethodToolbarGtk();
   GtkWidget* build();
   void set_sensitive();

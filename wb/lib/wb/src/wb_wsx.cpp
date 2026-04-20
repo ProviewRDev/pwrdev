@@ -53,21 +53,20 @@
 #include "wb_wsx.h"
 #include "wb_wsx_msg.h"
 
-static int wsx_object_count(pwr_tAttrRef* aref, void* count, void* dum1,
-    void* dum2, void* dum3, void* dum4);
+static int wsx_object_count(pwr_tAttrRef* aref, void* count, void* dum1, void* dum2, void* dum3, void* dum4);
 
 /*_define _______________________________________________________*/
 
 /*_Local procedues_______________________________________________________*/
 
-static int wsx_object_count(pwr_tAttrRef* aref, void* count, void* dum1,
-    void* dum2, void* dum3, void* dum4)
+static int wsx_object_count(pwr_tAttrRef* aref, void* count, void* dum1, void* dum2, void* dum3, void* dum4)
 {
   (*(int*)count)++;
   return WSX__SUCCESS;
 }
 
-struct wsx_sArefKey {
+struct wsx_sArefKey
+{
   pwr_tVid vid;
   pwr_tOix oix;
   pwr_tUInt32 offset;
@@ -85,10 +84,10 @@ struct wsx_sArefKey {
   }
 };
 
-static pwr_tStatus wsx_check_signal_connection(ldh_tSesContext sesctx,
-    pwr_tAttrRef* aref, pwr_tCid chan_cid1, pwr_tCid chan_cid2,
-    int chand_type, std::map<wsx_sArefKey, pwr_tAttrRef>& connected,
-    int* errorcount, int* warningcount)
+static pwr_tStatus wsx_check_signal_connection(ldh_tSesContext sesctx, pwr_tAttrRef* aref, pwr_tCid chan_cid1,
+                                               pwr_tCid chan_cid2, int chand_type,
+                                               std::map<wsx_sArefKey, pwr_tAttrRef>& connected,
+                                               int* errorcount, int* warningcount)
 {
   pwr_tStatus sts;
   pwr_tCid con_cid;
@@ -96,35 +95,39 @@ static pwr_tStatus wsx_check_signal_connection(ldh_tSesContext sesctx,
   pwr_tEnum* type_p;
   int size;
 
-  sts = ldh_GetAttrObjectPar(
-      sesctx, aref, "RtBody", "SigChanCon", (char**)&con_aref, &size);
+  sts = ldh_GetAttrObjectPar(sesctx, aref, "RtBody", "SigChanCon", (char**)&con_aref, &size);
   if (EVEN(sts))
     return sts;
 
-  if (cdh_ObjidIsNull(con_aref->Objid)) {
+  if (cdh_ObjidIsNull(con_aref->Objid))
+  {
     free((char*)con_aref);
     return WSX__SUCCESS;
   }
 
   sts = ldh_GetAttrRefTid(sesctx, con_aref, &con_cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     free((char*)con_aref);
     return WSX__SUCCESS;
   }
 
-  if (!(con_cid == chan_cid1 || (chan_cid2 != pwr_cNCid && con_cid == chan_cid2))) {
+  if (!(con_cid == chan_cid1 || (chan_cid2 != pwr_cNCid && con_cid == chan_cid2)))
+  {
     free((char*)con_aref);
     return WSX__SUCCESS;
   }
 
-  if (con_cid == pwr_cClass_ChanD && chand_type != -1) {
-    sts = ldh_GetAttrObjectPar(
-        sesctx, con_aref, "RtBody", "Type", (char**)&type_p, &size);
-    if (EVEN(sts)) {
+  if (con_cid == pwr_cClass_ChanD && chand_type != -1)
+  {
+    sts = ldh_GetAttrObjectPar(sesctx, con_aref, "RtBody", "Type", (char**)&type_p, &size);
+    if (EVEN(sts))
+    {
       free((char*)con_aref);
       return sts;
     }
-    if (*type_p != chand_type) {
+    if (*type_p != chand_type)
+    {
       free((char*)type_p);
       free((char*)con_aref);
       return WSX__SUCCESS;
@@ -141,7 +144,8 @@ static pwr_tStatus wsx_check_signal_connection(ldh_tSesContext sesctx,
   std::map<wsx_sArefKey, pwr_tAttrRef>::iterator it = connected.find(key);
   if (it == connected.end())
     connected[key] = *aref;
-  else {
+  else
+  {
     int size;
     char* namep;
     pwr_tAName name;
@@ -149,21 +153,24 @@ static pwr_tStatus wsx_check_signal_connection(ldh_tSesContext sesctx,
     char msg[2 * sizeof(pwr_tAName) + 80];
 
     sts = ldh_AttrRefToName(sesctx, aref, cdh_mNName, &namep, &size);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       strncpy(name, namep, sizeof(name));
       name[sizeof(name) - 1] = 0;
-    } else
+    }
+    else
       strcpy(name, "<unknown>");
 
     sts = ldh_AttrRefToName(sesctx, &it->second, cdh_mNName, &namep, &size);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       strncpy(oldname, namep, sizeof(oldname));
       oldname[sizeof(oldname) - 1] = 0;
-    } else
+    }
+    else
       strcpy(oldname, "<unknown>");
 
-    snprintf(msg, sizeof(msg), "Double signal connection '%s' and '%s'",
-        name, oldname);
+    snprintf(msg, sizeof(msg), "Double signal connection '%s' and '%s'", name, oldname);
     wsx_error_msg_str(sesctx, msg, *aref, 'E', errorcount, warningcount);
     it->second = *aref;
   }
@@ -172,19 +179,20 @@ static pwr_tStatus wsx_check_signal_connection(ldh_tSesContext sesctx,
   return WSX__SUCCESS;
 }
 
-static pwr_tStatus wsx_check_signal_class(ldh_tSesContext sesctx,
-    pwr_tCid signal_cid, pwr_tCid chan_cid1, pwr_tCid chan_cid2,
-    int chand_type, std::map<wsx_sArefKey, pwr_tAttrRef>& connected,
-    int* errorcount, int* warningcount)
+static pwr_tStatus wsx_check_signal_class(ldh_tSesContext sesctx, pwr_tCid signal_cid, pwr_tCid chan_cid1,
+                                          pwr_tCid chan_cid2, int chand_type,
+                                          std::map<wsx_sArefKey, pwr_tAttrRef>& connected, int* errorcount,
+                                          int* warningcount)
 {
   pwr_tStatus sts;
   pwr_tStatus lsts = WSX__SUCCESS;
   pwr_tAttrRef aref;
 
   sts = ldh_GetClassListAttrRef(sesctx, signal_cid, &aref);
-  while (ODD(sts)) {
-    lsts = wsx_check_signal_connection(sesctx, &aref, chan_cid1, chan_cid2,
-        chand_type, connected, errorcount, warningcount);
+  while (ODD(sts))
+  {
+    lsts = wsx_check_signal_connection(sesctx, &aref, chan_cid1, chan_cid2, chand_type, connected, errorcount,
+                                       warningcount);
     if (EVEN(lsts))
       return lsts;
 
@@ -193,19 +201,20 @@ static pwr_tStatus wsx_check_signal_class(ldh_tSesContext sesctx,
   return WSX__SUCCESS;
 }
 
-static pwr_tStatus wsx_check_signal_subclasses(ldh_tSesContext sesctx,
-    pwr_tCid super_cid, pwr_tCid chan_cid1, pwr_tCid chan_cid2,
-    std::map<wsx_sArefKey, pwr_tAttrRef>& connected, int* errorcount,
-    int* warningcount)
+static pwr_tStatus wsx_check_signal_subclasses(ldh_tSesContext sesctx, pwr_tCid super_cid, pwr_tCid chan_cid1,
+                                               pwr_tCid chan_cid2,
+                                               std::map<wsx_sArefKey, pwr_tAttrRef>& connected,
+                                               int* errorcount, int* warningcount)
 {
   pwr_tStatus sts = WSX__SUCCESS;
   pwr_tCid subcid;
   wb_volume* volume = (wb_volume*)sesctx;
 
   volume->subClass(super_cid, pwr_cNCid, &subcid);
-  while (volume->oddSts()) {
-    sts = wsx_check_signal_class(sesctx, subcid, chan_cid1, chan_cid2, -1,
-        connected, errorcount, warningcount);
+  while (volume->oddSts())
+  {
+    sts =
+        wsx_check_signal_class(sesctx, subcid, chan_cid1, chan_cid2, -1, connected, errorcount, warningcount);
     if (EVEN(sts))
       return sts;
 
@@ -223,21 +232,21 @@ static pwr_tStatus wsx_check_signal_subclasses(ldh_tSesContext sesctx,
 /*_Methods defined for this module_______________________________________*/
 
 /*************************************************************************
-*
-* Name:		wsx_error_msg()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Prints a error or warning message for an object and increments the
-*	errorcount or warningcount.
-*
-**************************************************************************/
+ *
+ * Name:		wsx_error_msg()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Prints a error or warning message for an object and increments the
+ *	errorcount or warningcount.
+ *
+ **************************************************************************/
 
-pwr_tStatus wsx_error_msg(ldh_tSesContext sesctx, pwr_tStatus sts,
-    pwr_tAttrRef aref, int* errorcount, int* warningcount)
+pwr_tStatus wsx_error_msg(ldh_tSesContext sesctx, pwr_tStatus sts, pwr_tAttrRef aref, int* errorcount,
+                          int* warningcount)
 {
   static char msg[256];
   int status, size;
@@ -247,7 +256,8 @@ pwr_tStatus wsx_error_msg(ldh_tSesContext sesctx, pwr_tStatus sts,
 
   logfile = NULL;
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     msg_GetMsg(sts, msg, sizeof(msg));
 
     if (logfile != NULL)
@@ -256,7 +266,8 @@ pwr_tStatus wsx_error_msg(ldh_tSesContext sesctx, pwr_tStatus sts,
       printf("%s\n", msg);
     if (cdh_ObjidIsNull(aref.Objid))
       MsgWindow::message(co_error(sts), 0, 0);
-    else {
+    else
+    {
       /* Get the full hierarchy name for the node */
       status = ldh_AttrRefToName(sesctx, &aref, cdh_mNName, &namep, &size);
       if (EVEN(status))
@@ -277,8 +288,8 @@ pwr_tStatus wsx_error_msg(ldh_tSesContext sesctx, pwr_tStatus sts,
   return WSX__SUCCESS;
 }
 
-pwr_tStatus wsx_error_msg_object(ldh_tSesContext sesctx, pwr_tStatus sts,
-    pwr_tOid oid, int* errorcount, int* warningcount)
+pwr_tStatus wsx_error_msg_object(ldh_tSesContext sesctx, pwr_tStatus sts, pwr_tOid oid, int* errorcount,
+                                 int* warningcount)
 {
   static char msg[256];
   int status, size;
@@ -287,7 +298,8 @@ pwr_tStatus wsx_error_msg_object(ldh_tSesContext sesctx, pwr_tStatus sts,
 
   logfile = NULL;
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     msg_GetMsg(sts, msg, sizeof(msg));
 
     if (logfile != NULL)
@@ -296,10 +308,10 @@ pwr_tStatus wsx_error_msg_object(ldh_tSesContext sesctx, pwr_tStatus sts,
       printf("%s\n", msg);
     if (cdh_ObjidIsNull(oid))
       MsgWindow::message(co_error(sts), 0, 0);
-    else {
+    else
+    {
       /* Get the full hierarchy name for the node */
-      status = ldh_ObjidToName(sesctx, oid, cdh_mName_pathStrict, name, 
-          sizeof(name), &size);
+      status = ldh_ObjidToName(sesctx, oid, cdh_mName_pathStrict, name, sizeof(name), &size);
       if (EVEN(status))
         return status;
 
@@ -317,8 +329,8 @@ pwr_tStatus wsx_error_msg_object(ldh_tSesContext sesctx, pwr_tStatus sts,
   return WSX__SUCCESS;
 }
 
-pwr_tStatus wsx_error_msg_str(ldh_tSesContext sesctx, const char* str,
-    pwr_tAttrRef aref, int severity, int* errorcount, int* warningcount)
+pwr_tStatus wsx_error_msg_str(ldh_tSesContext sesctx, const char* str, pwr_tAttrRef aref, int severity,
+                              int* errorcount, int* warningcount)
 {
   int status, size;
   pwr_tAName name;
@@ -336,7 +348,8 @@ pwr_tStatus wsx_error_msg_str(ldh_tSesContext sesctx, const char* str,
 
   if (cdh_ObjidIsNull(aref.Objid))
     MsgWindow::message(severity, msg, "", 0);
-  else {
+  else
+  {
     /* Get the full hierarchy name for the node */
     status = ldh_AttrRefToName(sesctx, &aref, cdh_mNName, &namep, &size);
     if (EVEN(status))
@@ -358,21 +371,21 @@ pwr_tStatus wsx_error_msg_str(ldh_tSesContext sesctx, const char* str,
 }
 
 /*************************************************************************
-*
-* Name:		wsx_CheckCard()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext sesctx	I	ldh session context.
-* pwr_tObjid	objid		I	card objid.
-*
-* Description:
-*	Check the syntax of a card.
-**************************************************************************/
+ *
+ * Name:		wsx_CheckCard()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext sesctx	I	ldh session context.
+ * pwr_tObjid	objid		I	card objid.
+ *
+ * Description:
+ *	Check the syntax of a card.
+ **************************************************************************/
 
-pwr_tStatus wsx_CheckCard(ldh_tSesContext sesctx, pwr_tAttrRef aref,
-    int* errorcount, int* warningcount, wsx_mCardOption options)
+pwr_tStatus wsx_CheckCard(ldh_tSesContext sesctx, pwr_tAttrRef aref, int* errorcount, int* warningcount,
+                          wsx_mCardOption options)
 {
   int sts;
   int size;
@@ -385,8 +398,7 @@ pwr_tStatus wsx_CheckCard(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   pwr_tClassId cid;
 
   /* Check ErrorSoftLimit */
-  sts = ldh_GetAttrObjectPar(
-      sesctx, &aref, "RtBody", "ErrorSoftLimit", (char**)&buf_ptr, &size);
+  sts = ldh_GetAttrObjectPar(sesctx, &aref, "RtBody", "ErrorSoftLimit", (char**)&buf_ptr, &size);
   if (EVEN(sts))
     return sts;
   if (*(int*)buf_ptr == 0)
@@ -394,8 +406,7 @@ pwr_tStatus wsx_CheckCard(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   free((char*)buf_ptr);
 
   /* Check ErrorHardLimit */
-  sts = ldh_GetAttrObjectPar(
-      sesctx, &aref, "RtBody", "ErrorHardLimit", (char**)&buf_ptr, &size);
+  sts = ldh_GetAttrObjectPar(sesctx, &aref, "RtBody", "ErrorHardLimit", (char**)&buf_ptr, &size);
   if (EVEN(sts))
     return sts;
   if (*(int*)buf_ptr == 0)
@@ -403,15 +414,15 @@ pwr_tStatus wsx_CheckCard(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   free((char*)buf_ptr);
 
   /* Get MaxNoOfChannels */
-  sts = ldh_GetAttrObjectPar(
-      sesctx, &aref, "RtBody", "MaxNoOfChannels", (char**)&buf_ptr, &size);
+  sts = ldh_GetAttrObjectPar(sesctx, &aref, "RtBody", "MaxNoOfChannels", (char**)&buf_ptr, &size);
   if (EVEN(sts))
     return sts;
 
   chan_max = *(pwr_tUInt16*)buf_ptr;
   free((char*)buf_ptr);
 
-  if (chan_max > 256) {
+  if (chan_max > 256)
+  {
     wsx_error_msg(sesctx, WSX__MAXCHAN, aref, errorcount, warningcount);
     return WSX__SUCCESS;
   }
@@ -419,33 +430,33 @@ pwr_tStatus wsx_CheckCard(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   memset(chan_number_array, 0, sizeof(chan_number_array));
   chan_count = 0;
   sts = ldh_GetChild(sesctx, aref.Objid, &chan_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetObjectClass(sesctx, chan_objid, &cid);
     if (EVEN(sts))
       return sts;
-    switch (cid) {
+    switch (cid)
+    {
     case pwr_cClass_ChanDi:
     case pwr_cClass_ChanDo:
     case pwr_cClass_ChanAi:
     case pwr_cClass_ChanAit:
     case pwr_cClass_ChanAo:
       chan_count++;
-      sts = ldh_GetObjectPar(
-          sesctx, chan_objid, "RtBody", "Number", (char**)&buf_ptr, &size);
+      sts = ldh_GetObjectPar(sesctx, chan_objid, "RtBody", "Number", (char**)&buf_ptr, &size);
       if (EVEN(sts))
         return sts;
       number = *(pwr_tUInt16*)buf_ptr;
       free((char*)buf_ptr);
       /* Check than number is within limits */
-      if (number >= chan_max) {
-        wsx_error_msg(sesctx, WSX__NUMRANGE, cdh_ObjidToAref(chan_objid),
-            errorcount, warningcount);
+      if (number >= chan_max)
+      {
+        wsx_error_msg(sesctx, WSX__NUMRANGE, cdh_ObjidToAref(chan_objid), errorcount, warningcount);
         break;
       }
       if (chan_number_array[number])
         /* Number is occupied */
-        wsx_error_msg(sesctx, WSX__NUMNOTUNIQUE, cdh_ObjidToAref(chan_objid),
-            errorcount, warningcount);
+        wsx_error_msg(sesctx, WSX__NUMNOTUNIQUE, cdh_ObjidToAref(chan_objid), errorcount, warningcount);
       else
         chan_number_array[number] = 1;
       break;
@@ -461,21 +472,20 @@ pwr_tStatus wsx_CheckCard(ldh_tSesContext sesctx, pwr_tAttrRef aref,
 }
 
 /*************************************************************************
-*
-* Name:		wsx_CheckCoCard()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext sesctx	I	ldh session context.
-* pwr_tObjid	objid		I	card objid.
-*
-* Description:
-*	Check the syntax of a co card.
-**************************************************************************/
+ *
+ * Name:		wsx_CheckCoCard()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext sesctx	I	ldh session context.
+ * pwr_tObjid	objid		I	card objid.
+ *
+ * Description:
+ *	Check the syntax of a co card.
+ **************************************************************************/
 
-pwr_tStatus wsx_CheckCoCard(ldh_tSesContext sesctx, pwr_tAttrRef aref,
-    int* errorcount, int* warningcount)
+pwr_tStatus wsx_CheckCoCard(ldh_tSesContext sesctx, pwr_tAttrRef aref, int* errorcount, int* warningcount)
 {
   int sts;
   int size;
@@ -486,8 +496,7 @@ pwr_tStatus wsx_CheckCoCard(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   pwr_tClassId cid;
 
   /* Check ErrorSoftLimit */
-  sts = ldh_GetAttrObjectPar(
-      sesctx, &aref, "RtBody", "ErrorSoftLimit", (char**)&buf_ptr, &size);
+  sts = ldh_GetAttrObjectPar(sesctx, &aref, "RtBody", "ErrorSoftLimit", (char**)&buf_ptr, &size);
   if (EVEN(sts))
     return sts;
   if (*(int*)buf_ptr == 0)
@@ -495,8 +504,7 @@ pwr_tStatus wsx_CheckCoCard(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   free((char*)buf_ptr);
 
   /* Check ErrorHardLimit */
-  sts = ldh_GetAttrObjectPar(
-      sesctx, &aref, "RtBody", "ErrorHardLimit", (char**)&buf_ptr, &size);
+  sts = ldh_GetAttrObjectPar(sesctx, &aref, "RtBody", "ErrorHardLimit", (char**)&buf_ptr, &size);
   if (EVEN(sts))
     return sts;
   if (*(int*)buf_ptr == 0)
@@ -504,8 +512,7 @@ pwr_tStatus wsx_CheckCoCard(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   free((char*)buf_ptr);
 
   /* Get MaxNoOfChannels */
-  sts = ldh_GetAttrObjectPar(
-      sesctx, &aref, "RtBody", "MaxNoOfCounters", (char**)&buf_ptr, &size);
+  sts = ldh_GetAttrObjectPar(sesctx, &aref, "RtBody", "MaxNoOfCounters", (char**)&buf_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -514,11 +521,13 @@ pwr_tStatus wsx_CheckCoCard(ldh_tSesContext sesctx, pwr_tAttrRef aref,
 
   chan_count = 0;
   sts = ldh_GetChild(sesctx, aref.Objid, &chan_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetObjectClass(sesctx, chan_objid, &cid);
     if (EVEN(sts))
       return sts;
-    switch (cid) {
+    switch (cid)
+    {
     case pwr_cClass_ChanCo:
       chan_count++;
       break;
@@ -533,8 +542,8 @@ pwr_tStatus wsx_CheckCoCard(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   return WSX__SUCCESS;
 }
 
-pwr_tStatus wsx_CheckIoDevice(ldh_tSesContext sesctx, pwr_tAttrRef aref,
-    int* errorcount, int* warningcount, wsx_mCardOption options)
+pwr_tStatus wsx_CheckIoDevice(ldh_tSesContext sesctx, pwr_tAttrRef aref, int* errorcount, int* warningcount,
+                              wsx_mCardOption options)
 {
   wb_session* sp = (wb_session*)sesctx;
   pwr_tMask process;
@@ -553,9 +562,9 @@ pwr_tStatus wsx_CheckIoDevice(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   if (!process_a)
     return process_a.sts();
   if (process == 0)
-    wsx_error_msg_str(sesctx, "Process is not specified", aref, 'W', errorcount,
-        warningcount);
-  else if (process == 1) {
+    wsx_error_msg_str(sesctx, "Process is not specified", aref, 'W', errorcount, warningcount);
+  else if (process == 1)
+  {
     // Check thread object
     wb_attribute thread_a(a, 0, "ThreadObject");
     if (!thread_a)
@@ -565,20 +574,19 @@ pwr_tStatus wsx_CheckIoDevice(ldh_tSesContext sesctx, pwr_tAttrRef aref,
     if (!thread_a)
       return thread_a.sts();
     if (cdh_ObjidIsNull(thread))
-      wsx_error_msg_str(sesctx, "ThreadObject is not specified", aref, 'E',
-          errorcount, warningcount);
-    else {
+      wsx_error_msg_str(sesctx, "ThreadObject is not specified", aref, 'E', errorcount, warningcount);
+    else
+    {
       wb_object thread_o = sp->object(thread);
       if (!thread_o)
-        wsx_error_msg_str(sesctx, "Undefined ThreadObject", aref, 'E',
-            errorcount, warningcount);
+        wsx_error_msg_str(sesctx, "Undefined ThreadObject", aref, 'E', errorcount, warningcount);
       else if (thread_o.cid() != pwr_cClass_PlcThread)
-        wsx_error_msg_str(sesctx, "Error in ThreadObject class", aref, 'E',
-            errorcount, warningcount);
+        wsx_error_msg_str(sesctx, "Error in ThreadObject class", aref, 'E', errorcount, warningcount);
     }
   }
 
-  if (options & wsx_mCardOption_ErrorLimits) {
+  if (options & wsx_mCardOption_ErrorLimits)
+  {
     pwr_tUInt32 limit;
 
     // Check SoftLimit
@@ -590,8 +598,7 @@ pwr_tStatus wsx_CheckIoDevice(ldh_tSesContext sesctx, pwr_tAttrRef aref,
     if (!softlimit_a)
       return softlimit_a.sts();
     if (limit == 0)
-      wsx_error_msg_str(sesctx, "ErrorSoftLimit is not specified", aref, 'W',
-          errorcount, warningcount);
+      wsx_error_msg_str(sesctx, "ErrorSoftLimit is not specified", aref, 'W', errorcount, warningcount);
 
     // Check HardLimit
     wb_attribute hardlimit_a(a, 0, "ErrorHardLimit");
@@ -602,28 +609,26 @@ pwr_tStatus wsx_CheckIoDevice(ldh_tSesContext sesctx, pwr_tAttrRef aref,
     if (!hardlimit_a)
       return hardlimit_a.sts();
     if (limit == 0)
-      wsx_error_msg_str(sesctx, "ErrorHardLimit is not specified", aref, 'E',
-          errorcount, warningcount);
+      wsx_error_msg_str(sesctx, "ErrorHardLimit is not specified", aref, 'E', errorcount, warningcount);
   }
   return WSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		wsx_CheckSigChanCon()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext sesctx	I	ldh session context.
-* pwr_tObjid	objid		I	card objid.
-*
-* Description:
-*	Check SigChanCon in a signal or a channel.
-**************************************************************************/
+ *
+ * Name:		wsx_CheckSigChanCon()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext sesctx	I	ldh session context.
+ * pwr_tObjid	objid		I	card objid.
+ *
+ * Description:
+ *	Check SigChanCon in a signal or a channel.
+ **************************************************************************/
 
-pwr_tStatus wsx_CheckSigChanCon(ldh_tSesContext sesctx, pwr_tAttrRef aref,
-    int* errorcount, int* warningcount)
+pwr_tStatus wsx_CheckSigChanCon(ldh_tSesContext sesctx, pwr_tAttrRef aref, int* errorcount, int* warningcount)
 {
   int sts;
   int size;
@@ -637,12 +642,12 @@ pwr_tStatus wsx_CheckSigChanCon(ldh_tSesContext sesctx, pwr_tAttrRef aref,
     return sts;
 
   /* Check SigChanCon */
-  sts = ldh_GetAttrObjectPar(
-      sesctx, &aref, "RtBody", "SigChanCon", (char**)&con_ptr, &size);
+  sts = ldh_GetAttrObjectPar(sesctx, &aref, "RtBody", "SigChanCon", (char**)&con_ptr, &size);
   if (EVEN(sts))
     return sts;
 
-  if (cdh_ObjidIsNull(con_ptr->Objid)) {
+  if (cdh_ObjidIsNull(con_ptr->Objid))
+  {
     wsx_error_msg(sesctx, WSX__SIGCHANCON, aref, errorcount, warningcount);
     free((char*)con_ptr);
     return WSX__SUCCESS;
@@ -650,13 +655,15 @@ pwr_tStatus wsx_CheckSigChanCon(ldh_tSesContext sesctx, pwr_tAttrRef aref,
 
   /* Check object class of connected object */
   sts = ldh_GetAttrRefTid(sesctx, con_ptr, &con_class);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     wsx_error_msg(sesctx, WSX__SIGCHANCON, aref, errorcount, warningcount);
     free((char*)con_ptr);
     return WSX__SUCCESS;
   }
   class_error = 0;
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_Di:
     if (con_class != pwr_cClass_ChanDi)
       class_error = 1;
@@ -699,7 +706,8 @@ pwr_tStatus wsx_CheckSigChanCon(ldh_tSesContext sesctx, pwr_tAttrRef aref,
     break;
   }
 
-  if (class_error) {
+  if (class_error)
+  {
     wsx_error_msg(sesctx, WSX__SIGCHANCONCLASS, aref, errorcount, warningcount);
     free((char*)con_ptr);
     return WSX__SUCCESS;
@@ -709,69 +717,66 @@ pwr_tStatus wsx_CheckSigChanCon(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   return WSX__SUCCESS;
 }
 
-pwr_tStatus wsx_CheckSignalConnections(ldh_tSesContext sesctx,
-    int* errorcount, int* warningcount)
+pwr_tStatus wsx_CheckSignalConnections(ldh_tSesContext sesctx, int* errorcount, int* warningcount)
 {
   pwr_tStatus sts;
   std::map<wsx_sArefKey, pwr_tAttrRef> connected;
 
-  sts = wsx_check_signal_class(sesctx, pwr_cClass_Ai, pwr_cClass_ChanAi,
-      pwr_cClass_ChanAit, -1, connected, errorcount, warningcount);
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Ai, pwr_cClass_ChanAi, pwr_cClass_ChanAit, -1, connected,
+                               errorcount, warningcount);
   if (EVEN(sts))
     return sts;
 
   connected.clear();
-  sts = wsx_check_signal_class(sesctx, pwr_cClass_Ao, pwr_cClass_ChanAo,
-      pwr_cNCid, -1, connected, errorcount, warningcount);
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Ao, pwr_cClass_ChanAo, pwr_cNCid, -1, connected, errorcount,
+                               warningcount);
   if (EVEN(sts))
     return sts;
 
   connected.clear();
-  sts = wsx_check_signal_class(sesctx, pwr_cClass_Di, pwr_cClass_ChanDi,
-      pwr_cClass_ChanD, pwr_eDChanTypeEnum_Di, connected, errorcount,
-      warningcount);
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Di, pwr_cClass_ChanDi, pwr_cClass_ChanD,
+                               pwr_eDChanTypeEnum_Di, connected, errorcount, warningcount);
   if (EVEN(sts))
     return sts;
 
   connected.clear();
-  sts = wsx_check_signal_class(sesctx, pwr_cClass_Do, pwr_cClass_ChanDo,
-      pwr_cClass_ChanD, pwr_eDChanTypeEnum_Do, connected, errorcount,
-      warningcount);
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Do, pwr_cClass_ChanDo, pwr_cClass_ChanD,
+                               pwr_eDChanTypeEnum_Do, connected, errorcount, warningcount);
   if (EVEN(sts))
     return sts;
 
-  sts = wsx_check_signal_class(sesctx, pwr_cClass_Po, pwr_cClass_ChanDo,
-      pwr_cNCid, -1, connected, errorcount, warningcount);
-  if (EVEN(sts))
-    return sts;
-
-  connected.clear();
-  sts = wsx_check_signal_class(sesctx, pwr_cClass_Co, pwr_cClass_ChanCo,
-      pwr_cNCid, -1, connected, errorcount, warningcount);
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Po, pwr_cClass_ChanDo, pwr_cNCid, -1, connected, errorcount,
+                               warningcount);
   if (EVEN(sts))
     return sts;
 
   connected.clear();
-  sts = wsx_check_signal_class(sesctx, pwr_cClass_Ii, pwr_cClass_ChanIi,
-      pwr_cNCid, -1, connected, errorcount, warningcount);
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Co, pwr_cClass_ChanCo, pwr_cNCid, -1, connected, errorcount,
+                               warningcount);
   if (EVEN(sts))
     return sts;
 
   connected.clear();
-  sts = wsx_check_signal_class(sesctx, pwr_cClass_Io, pwr_cClass_ChanIo,
-      pwr_cNCid, -1, connected, errorcount, warningcount);
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Ii, pwr_cClass_ChanIi, pwr_cNCid, -1, connected, errorcount,
+                               warningcount);
   if (EVEN(sts))
     return sts;
 
   connected.clear();
-  sts = wsx_check_signal_subclasses(sesctx, pwr_cClass_Bi, pwr_cClass_ChanBi,
-      pwr_cNCid, connected, errorcount, warningcount);
+  sts = wsx_check_signal_class(sesctx, pwr_cClass_Io, pwr_cClass_ChanIo, pwr_cNCid, -1, connected, errorcount,
+                               warningcount);
   if (EVEN(sts))
     return sts;
 
   connected.clear();
-  sts = wsx_check_signal_subclasses(sesctx, pwr_cClass_Bo, pwr_cClass_ChanBo,
-      pwr_cNCid, connected, errorcount, warningcount);
+  sts = wsx_check_signal_subclasses(sesctx, pwr_cClass_Bi, pwr_cClass_ChanBi, pwr_cNCid, connected,
+                                    errorcount, warningcount);
+  if (EVEN(sts))
+    return sts;
+
+  connected.clear();
+  sts = wsx_check_signal_subclasses(sesctx, pwr_cClass_Bo, pwr_cClass_ChanBo, pwr_cNCid, connected,
+                                    errorcount, warningcount);
   if (EVEN(sts))
     return sts;
 
@@ -782,9 +787,8 @@ pwr_tStatus wsx_CheckSignalConnections(ldh_tSesContext sesctx,
 // Check if an attrref attribute contains an invalid attrref
 //
 
-pwr_tStatus wsx_CheckAttrRef(ldh_tSesContext sesctx, pwr_tAttrRef aref,
-    const pwr_tObjName attribute, pwr_tCid* cid_vect, int null_is_ok,
-    int* errorcount, int* warningcount)
+pwr_tStatus wsx_CheckAttrRef(ldh_tSesContext sesctx, pwr_tAttrRef aref, const pwr_tObjName attribute,
+                             pwr_tCid* cid_vect, int null_is_ok, int* errorcount, int* warningcount)
 {
   pwr_tAttrRef value;
   wb_session* sp = (wb_session*)sesctx;
@@ -801,30 +805,37 @@ pwr_tStatus wsx_CheckAttrRef(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   if (!a_attr)
     return a_attr.sts();
 
-  if (!null_is_ok && cdh_ObjidIsNull(value.Objid)) {
+  if (!null_is_ok && cdh_ObjidIsNull(value.Objid))
+  {
     char msg[80];
     sprintf(msg, "Attribute reference is null in \"%s\"", attribute);
     wsx_error_msg_str(sesctx, msg, aref, 'E', errorcount, warningcount);
   }
-  if (cdh_ObjidIsNotNull(value.Objid)) {
+  if (cdh_ObjidIsNotNull(value.Objid))
+  {
     wb_attribute a_value = sp->attribute(&value);
-    if (!a_value) {
+    if (!a_value)
+    {
       char msg[80];
       sprintf(msg, "Undefined attribute reference in \"%s\"", attribute);
       wsx_error_msg_str(sesctx, msg, aref, 'E', errorcount, warningcount);
-    } else if (cid_vect) {
+    }
+    else if (cid_vect)
+    {
       // Check attribute reference class
       bool found = false;
-      for (int i = 0; cid_vect[i]; i++) {
-        if (cid_vect[i] == a_value.tid()) {
+      for (int i = 0; cid_vect[i]; i++)
+      {
+        if (cid_vect[i] == a_value.tid())
+        {
           found = true;
           break;
         }
       }
-      if (!found) {
+      if (!found)
+      {
         char msg[80];
-        sprintf(
-            msg, "Invalid class of attribute reference in \"%s\"", attribute);
+        sprintf(msg, "Invalid class of attribute reference in \"%s\"", attribute);
         wsx_error_msg_str(sesctx, msg, aref, 'E', errorcount, warningcount);
       }
     }
@@ -836,9 +847,9 @@ pwr_tStatus wsx_CheckAttrRef(ldh_tSesContext sesctx, pwr_tAttrRef aref,
 // Check if an Z attrref attribute contains an invalid attrref and points back
 //
 
-pwr_tStatus wsx_CheckXAttrRef(ldh_tSesContext sesctx, pwr_tAttrRef aref,
-    const pwr_tObjName attribute, const pwr_tObjName back_attribute,
-    pwr_tCid* cid_vect, int null_is_ok, int* errorcount, int* warningcount)
+pwr_tStatus wsx_CheckXAttrRef(ldh_tSesContext sesctx, pwr_tAttrRef aref, const pwr_tObjName attribute,
+                              const pwr_tObjName back_attribute, pwr_tCid* cid_vect, int null_is_ok,
+                              int* errorcount, int* warningcount)
 {
   pwr_tAttrRef value;
   pwr_tAttrRef back_aref;
@@ -856,32 +867,38 @@ pwr_tStatus wsx_CheckXAttrRef(ldh_tSesContext sesctx, pwr_tAttrRef aref,
   if (!a_attr)
     return a_attr.sts();
 
-  if (!null_is_ok && cdh_ObjidIsNull(value.Objid)) {
+  if (!null_is_ok && cdh_ObjidIsNull(value.Objid))
+  {
     char msg[80];
     sprintf(msg, "Attribute reference is null in \"%s\"", attribute);
     wsx_error_msg_str(sesctx, msg, aref, 'E', errorcount, warningcount);
   }
-  if (cdh_ObjidIsNotNull(value.Objid)) {
+  if (cdh_ObjidIsNotNull(value.Objid))
+  {
     wb_attribute a_value = sp->attribute(&value);
-    if (!a_value) {
+    if (!a_value)
+    {
       char msg[80];
       sprintf(msg, "Undefined attribute reference in \"%s\"", attribute);
       wsx_error_msg_str(sesctx, msg, aref, 'E', errorcount, warningcount);
       return WSX__SUCCESS;
     }
-    if (cid_vect) {
+    if (cid_vect)
+    {
       // Check attribute reference class
       bool found = false;
-      for (int i = 0; cid_vect[i]; i++) {
-        if (cid_vect[i] == a_value.tid()) {
+      for (int i = 0; cid_vect[i]; i++)
+      {
+        if (cid_vect[i] == a_value.tid())
+        {
           found = true;
           break;
         }
       }
-      if (!found) {
+      if (!found)
+      {
         char msg[80];
-        sprintf(
-            msg, "Invalid class of attribute reference in \"%s\"", attribute);
+        sprintf(msg, "Invalid class of attribute reference in \"%s\"", attribute);
         wsx_error_msg_str(sesctx, msg, aref, 'E', errorcount, warningcount);
         return WSX__SUCCESS;
       }
@@ -896,8 +913,8 @@ pwr_tStatus wsx_CheckXAttrRef(ldh_tSesContext sesctx, pwr_tAttrRef aref,
     if (!a_back)
       return a_back.sts();
 
-    if (!(cdh_ObjidIsEqual(back_aref.Objid, aref.Objid)
-            && back_aref.Offset == aref.Offset)) {
+    if (!(cdh_ObjidIsEqual(back_aref.Objid, aref.Objid) && back_aref.Offset == aref.Offset))
+    {
       char msg[80];
       sprintf(msg, "Reference is not mutual \"%s\"", attribute);
       wsx_error_msg_str(sesctx, msg, aref, 'E', errorcount, warningcount);
@@ -908,21 +925,20 @@ pwr_tStatus wsx_CheckXAttrRef(ldh_tSesContext sesctx, pwr_tAttrRef aref,
 }
 
 /*************************************************************************
-*
-* Name:		wsx_CheckVolume()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext sesctx	I	ldh session context.
-* pwr_tObjid	objid		I	card objid.
-*
-* Description:
-*	Check the syntax of a volume.
-**************************************************************************/
+ *
+ * Name:		wsx_CheckVolume()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext sesctx	I	ldh session context.
+ * pwr_tObjid	objid		I	card objid.
+ *
+ * Description:
+ *	Check the syntax of a volume.
+ **************************************************************************/
 
-pwr_tStatus wsx_CheckVolume(ldh_tSesContext sesctx, pwr_tObjid objid,
-    int* errorcount, int* warningcount)
+pwr_tStatus wsx_CheckVolume(ldh_tSesContext sesctx, pwr_tObjid objid, int* errorcount, int* warningcount)
 {
   pwr_tStatus sts;
   pwr_tUInt32* opsys_ptr;
@@ -942,33 +958,35 @@ pwr_tStatus wsx_CheckVolume(ldh_tSesContext sesctx, pwr_tObjid objid,
   class_vect[0] = pwr_cClass_Node;
   class_vect[1] = 0;
   node_object_count = 0;
-  sts = trv_get_objects_hier_class_name(sesctx, pwr_cNObjid, class_vect, NULL,
-      &wsx_object_count, &node_object_count, 0, 0, 0, 0);
+  sts = trv_get_objects_hier_class_name(sesctx, pwr_cNObjid, class_vect, NULL, &wsx_object_count,
+                                        &node_object_count, 0, 0, 0, 0);
   if (EVEN(sts))
     return sts;
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_RootVolume:
   case pwr_cClass_SubVolume:
 
-    if (cid == pwr_cClass_RootVolume) {
+    if (cid == pwr_cClass_RootVolume)
+    {
       if (node_object_count != 1)
-        wsx_error_msg(sesctx, WSX__NODECOUNT, cdh_ObjidToAref(objid),
-            errorcount, warningcount);
-    } else {
+        wsx_error_msg(sesctx, WSX__NODECOUNT, cdh_ObjidToAref(objid), errorcount, warningcount);
+    }
+    else
+    {
       if (node_object_count != 0)
-        wsx_error_msg(sesctx, WSX__NODECOUNT, cdh_ObjidToAref(objid),
-            errorcount, warningcount);
+        wsx_error_msg(sesctx, WSX__NODECOUNT, cdh_ObjidToAref(objid), errorcount, warningcount);
     }
 
     /* Check OperatingSystem */
-    sts = ldh_GetObjectPar(
-        sesctx, objid, "SysBody", "OperatingSystem", (char**)&opsys_ptr, &size);
+    sts = ldh_GetObjectPar(sesctx, objid, "SysBody", "OperatingSystem", (char**)&opsys_ptr, &size);
     if (EVEN(sts))
       return sts;
 
     opsys_sum = 0;
-    for (i = 0;; i++) {
+    for (i = 0;; i++)
+    {
       opsys = 1 << i;
       opsys_sum |= opsys;
       if (opsys >= pwr_mOpSys_)
@@ -976,16 +994,14 @@ pwr_tStatus wsx_CheckVolume(ldh_tSesContext sesctx, pwr_tObjid objid,
     }
 
     if (*opsys_ptr & ~opsys_sum)
-      wsx_error_msg(sesctx, WSX__OSINVALID, cdh_ObjidToAref(objid), errorcount,
-          warningcount);
+      wsx_error_msg(sesctx, WSX__OSINVALID, cdh_ObjidToAref(objid), errorcount, warningcount);
 
     free((char*)opsys_ptr);
     break;
 
   default:
     if (node_object_count != 0)
-      wsx_error_msg(sesctx, WSX__NODECOUNT, cdh_ObjidToAref(objid), errorcount,
-          warningcount);
+      wsx_error_msg(sesctx, WSX__NODECOUNT, cdh_ObjidToAref(objid), errorcount, warningcount);
   }
   return WSX__SUCCESS;
 }

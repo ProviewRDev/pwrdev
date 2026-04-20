@@ -45,41 +45,38 @@
 
 #include "wb_expw.h"
 
-WbExpW::WbExpW(void* l_parent_ctx, ldh_tSesContext l_ldhses,
-    const char* expw_name, int l_type, int l_editmode, pwr_tStatus* status)
-    : parent_ctx(l_parent_ctx), ldhses(l_ldhses), expwnav(NULL), size(0),
-      max_size(500), type(l_type), editmode(l_editmode), wow(0)
+WbExpW::WbExpW(void* l_parent_ctx, ldh_tSesContext l_ldhses, const char* expw_name, int l_type,
+               int l_editmode, pwr_tStatus* status)
+    : parent_ctx(l_parent_ctx), ldhses(l_ldhses), expwnav(NULL), size(0), max_size(500), type(l_type),
+      editmode(l_editmode), wow(0)
 {
   *status = 1;
   strcpy(name, expw_name);
-  if (type == expw_eType_Export) {
+  if (type == expw_eType_Export)
+  {
     strcpy(action, "Export files");
     strcpy(btext, "_Export files");
     strcpy(typetext, "export");
-  } else if (type == expw_eType_Import) {
+  }
+  else if (type == expw_eType_Import)
+  {
     strcpy(action, "Import files");
     strcpy(btext, "_Import files");
     strcpy(typetext, "import");
-  } else if (type == expw_eType_BuildDirectories) {
+  }
+  else if (type == expw_eType_BuildDirectories)
+  {
     strcpy(action, "Build Directories");
     strcpy(btext, "_Build Directories");
     strcpy(typetext, "build");
   }
 }
 
-WbExpW::~WbExpW()
-{
-}
+WbExpW::~WbExpW() {}
 
-void WbExpW::show()
-{
-  expwnav->show();
-}
+void WbExpW::show() { expwnav->show(); }
 
-void WbExpW::update()
-{
-  expwnav->update();
-}
+void WbExpW::update() { expwnav->update(); }
 
 void WbExpW::activate_export()
 {

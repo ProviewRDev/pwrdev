@@ -1010,6 +1010,7 @@ void io_bus_card_read(io_tCtx ctx, io_sRack* rp, io_sCard* cp, void* input_area,
               *(pwr_tInt32*)top = data8;
               fromp += 1;
               top += 4;
+            /* fall through */
             case pwr_eDataRepEnum_UInt8:
               memcpy(&udata8, fromp, 1);
               *(pwr_tUInt32*)top = udata8;

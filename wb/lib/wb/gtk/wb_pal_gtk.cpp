@@ -38,7 +38,8 @@
 
 #include <string.h>
 
-extern "C" {
+extern "C"
+{
 #include "pwr_baseclasses.h"
 #include "co_dcli.h"
 }
@@ -49,34 +50,28 @@ extern "C" {
 #include "cow_wutl_gtk.h"
 #include "wb_pal_gtk.h"
 
-static void pal_sel_lose_cb(
-    GtkWidget* w, GdkEventSelection* event, gpointer data);
-static void pal_sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
-    guint info, guint time_stamp, gpointer data);
+static void pal_sel_lose_cb(GtkWidget* w, GdkEventSelection* event, gpointer data);
+static void pal_sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data, guint info, guint time_stamp,
+                               gpointer data);
 
 //
 // Create the palette widgets
 //
-PalGtk::PalGtk(void* pal_parent_ctx, GtkWidget* pal_parent_wid,
-    const char* pal_name, ldh_tSesContext pal_ldhses, const char* pal_root_name,
-    GtkWidget** w, pwr_tStatus* status)
-    : Pal(pal_parent_ctx, pal_name, pal_ldhses, pal_root_name, status),
-      parent_wid(pal_parent_wid)
+PalGtk::PalGtk(void* pal_parent_ctx, GtkWidget* pal_parent_wid, const char* pal_name,
+               ldh_tSesContext pal_ldhses, const char* pal_root_name, GtkWidget** w, pwr_tStatus* status)
+    : Pal(pal_parent_ctx, pal_name, pal_ldhses, pal_root_name, status), parent_wid(pal_parent_wid)
 {
-  GtkWidget* scrolledbrow
-      = scrolledbrowwidgetgtk_new(Pal::init_brow_cb, this, &brow_widget);
+  GtkWidget* scrolledbrow = scrolledbrowwidgetgtk_new(Pal::init_brow_cb, this, &brow_widget);
 
   form_widget = gtk_frame_new(NULL);
   gtk_container_add(GTK_CONTAINER(form_widget), scrolledbrow);
   gtk_container_set_border_width(GTK_CONTAINER(scrolledbrow), 3);
 
   selection_widget = gtk_invisible_new();
-  gtk_selection_add_target(
-      selection_widget, GDK_SELECTION_PRIMARY, GDK_SELECTION_TYPE_STRING, 1);
-  g_signal_connect(
-      selection_widget, "selection-get", G_CALLBACK(pal_sel_convert_cb), this);
-  sel_lose_id = g_signal_connect(selection_widget, "selection-clear-event",
-      G_CALLBACK(pal_sel_lose_cb), this);
+  gtk_selection_add_target(selection_widget, GDK_SELECTION_PRIMARY, GDK_SELECTION_TYPE_STRING, 1);
+  g_signal_connect(selection_widget, "selection-get", G_CALLBACK(pal_sel_convert_cb), this);
+  sel_lose_id =
+      g_signal_connect(selection_widget, "selection-clear-event", G_CALLBACK(pal_sel_lose_cb), this);
   gtk_widget_show_all(brow_widget);
 
   set_inputfocus(0);
@@ -97,19 +92,19 @@ PalGtk::~PalGtk()
   gtk_widget_destroy(form_widget);
 }
 
-void PalGtk::create_popup_menu(pwr_tCid cid, int x, int y)
-{
-  (create_popup_menu_cb)(parent_ctx, cid, x, y);
-}
+void PalGtk::create_popup_menu(pwr_tCid cid, int x, int y) { (create_popup_menu_cb)(parent_ctx, cid, x, y); }
 
 void PalGtk::set_inputfocus(int focus)
 {
   if (!displayed)
     return;
 
-  if (!focus) {
+  if (!focus)
+  {
     wutl_widget_name_suffix_sub(form_widget);
-  } else {
+  }
+  else
+  {
     wutl_widget_name_suffix_add(form_widget, "focus");
     gtk_widget_grab_focus(brow_widget);
   }
@@ -119,9 +114,9 @@ void PalGtk::set_selection_owner()
 {
   gboolean sts;
 
-  sts = gtk_selection_owner_set(
-      selection_widget, GDK_SELECTION_PRIMARY, gtk_get_current_event_time());
-  if (!sts) {
+  sts = gtk_selection_owner_set(selection_widget, GDK_SELECTION_PRIMARY, gtk_get_current_event_time());
+  if (!sts)
+  {
     brow_SelectClear(brow_ctx);
     return;
   }
@@ -129,8 +124,8 @@ void PalGtk::set_selection_owner()
   brow_SetInverseColor(brow_ctx, flow_eDrawType_Line);
 }
 
-static void pal_sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
-    guint info, guint time_stamp, gpointer data)
+static void pal_sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data, guint info, guint time_stamp,
+                               gpointer data)
 {
   PalGtk* pal = (PalGtk*)data;
   char name[200];
@@ -142,12 +137,16 @@ static void pal_sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
     return;
 
   brow_GetSelectedNodes(pal->brow_ctx, &node_list, &node_count);
-  if (!node_count) {
+  if (!node_count)
+  {
     strcpy(name, "");
-  } else {
+  }
+  else
+  {
     brow_GetUserData(node_list[0], (void**)&item);
 
-    switch (item->type) {
+    switch (item->type)
+    {
     case pal_ePalItemType_ClassVolume:
     case pal_ePalItemType_Class:
     case pal_ePalItemType_Object:
@@ -156,12 +155,10 @@ static void pal_sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
       free(node_list);
     }
   }
-  gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8,
-      (const guchar*)name, strlen(name));
+  gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8, (const guchar*)name, strlen(name));
 }
 
-static void pal_sel_lose_cb(
-    GtkWidget* w, GdkEventSelection* event, gpointer data)
+static void pal_sel_lose_cb(GtkWidget* w, GdkEventSelection* event, gpointer data)
 {
   PalGtk* pal = (PalGtk*)data;
 

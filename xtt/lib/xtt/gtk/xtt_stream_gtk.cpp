@@ -61,8 +61,7 @@
 
 int XttStreamGtk::gst_initialized = 0;
 
-static GstBusSyncReply bus_sync_handler(
-    GstBus* bus, GstMessage* message, gpointer data)
+static GstBusSyncReply bus_sync_handler(GstBus* bus, GstMessage* message, gpointer data)
 {
   return GST_BUS_PASS;
 }
@@ -87,15 +86,13 @@ void XttStreamGtk::realize_cb(GtkWidget* widget, void* data)
 
   window_handle = GDK_WINDOW_XID(window);
 #if GST_CHECK_VERSION(1, 0, 0)
-  gst_video_overlay_set_window_handle(
-      GST_VIDEO_OVERLAY(videosink), window_handle);
+  gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(videosink), window_handle);
 #else
   gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(videosink), window_handle);
 #endif
 }
 
-void XttStreamGtk::source_setup_cb(
-    GstElement* playbin2, GstElement* src, gpointer data)
+void XttStreamGtk::source_setup_cb(GstElement* playbin2, GstElement* src, gpointer data)
 {
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
@@ -110,13 +107,13 @@ void XttStreamGtk::source_setup_cb(
   GstElement* videosink;
   guintptr window_handle;
   g_object_get(strm->playbin2, "video-sink", &videosink, NULL);
-  if (videosink) {
+  if (videosink)
+  {
     GdkWindow* window = gtk_widget_get_window(strm->video_form);
 
     window_handle = GDK_WINDOW_XID(window);
 #if GST_CHECK_VERSION(1, 0, 0)
-    gst_video_overlay_set_window_handle(
-        GST_VIDEO_OVERLAY(videosink), window_handle);
+    gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(videosink), window_handle);
 #else
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(videosink), window_handle);
 #endif
@@ -148,8 +145,7 @@ void XttStreamGtk::stop_cb(GtkButton* button, void* data)
 }
 
 /* This function is called when the main window is closed */
-void XttStreamGtk::delete_event_cb(
-    GtkWidget* widget, GdkEvent* event, void* data)
+void XttStreamGtk::delete_event_cb(GtkWidget* widget, GdkEvent* event, void* data)
 {
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
@@ -165,12 +161,12 @@ void XttStreamGtk::delete_event_cb(
  * rescaling, etc). GStreamer takes care of this in the PAUSED and PLAYING
  * states, otherwise,
  * we simply draw a black rectangle to avoid garbage showing up. */
-gboolean XttStreamGtk::expose_cb(
-    GtkWidget* widget, GdkEventExpose* event, void* data)
+gboolean XttStreamGtk::expose_cb(GtkWidget* widget, GdkEventExpose* event, void* data)
 {
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
-  if (strm->state < GST_STATE_PAUSED) {
+  if (strm->state < GST_STATE_PAUSED)
+  {
     strm->erase_window();
   }
 
@@ -186,8 +182,8 @@ void XttStreamGtk::slider_cb(GtkRange* range, void* data)
 
   gdouble value = gtk_range_get_value(GTK_RANGE(strm->slider));
   gst_element_seek_simple(strm->playbin2, GST_FORMAT_TIME,
-      GstSeekFlags(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT),
-      (gint64)(value * GST_SECOND));
+                          GstSeekFlags(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT),
+                          (gint64)(value * GST_SECOND));
 }
 
 /* This function is called periodically to refresh the GUI */
@@ -196,8 +192,7 @@ void XttStreamGtk::refresh_ui(XttStreamGtk* strm)
   GstFormat fmt = GST_FORMAT_TIME;
   gint64 current = -1;
 
-  if (!(strm->options & strm_mOptions_VideoControlPanel
-          && strm->options & strm_mOptions_VideoProgressBar))
+  if (!(strm->options & strm_mOptions_VideoControlPanel && strm->options & strm_mOptions_VideoProgressBar))
     return;
 
   /* We do not want to update anything unless we are in the PAUSED or PLAYING
@@ -206,25 +201,31 @@ void XttStreamGtk::refresh_ui(XttStreamGtk* strm)
     return;
 
   /* If we didn't know it yet, query the stream duration */
-  if (!GST_CLOCK_TIME_IS_VALID(strm->duration)) {
+  if (!GST_CLOCK_TIME_IS_VALID(strm->duration))
+  {
 #if GST_CHECK_VERSION(1, 0, 0)
-    if (!gst_element_query_duration(strm->playbin2, fmt, &strm->duration)) {
+    if (!gst_element_query_duration(strm->playbin2, fmt, &strm->duration))
+    {
 #else
-    if (!gst_element_query_duration(strm->playbin2, &fmt, &strm->duration)) {
+    if (!gst_element_query_duration(strm->playbin2, &fmt, &strm->duration))
+    {
 #endif
       g_printerr("Could not query current duration.\n");
-    } else {
+    }
+    else
+    {
       /* Set the range of the slider to the clip duration, in SECONDS */
       if (GST_CLOCK_TIME_IS_VALID(strm->duration))
-        gtk_range_set_range(
-            GTK_RANGE(strm->slider), 0, (gdouble)strm->duration / GST_SECOND);
+        gtk_range_set_range(GTK_RANGE(strm->slider), 0, (gdouble)strm->duration / GST_SECOND);
     }
   }
 
 #if GST_CHECK_VERSION(1, 0, 0)
-  if (gst_element_query_position(strm->playbin2, fmt, &current)) {
+  if (gst_element_query_position(strm->playbin2, fmt, &current))
+  {
 #else
-  if (gst_element_query_position(strm->playbin2, &fmt, &current)) {
+  if (gst_element_query_position(strm->playbin2, &fmt, &current))
+  {
 #endif
     /* Block the "value-changed" signal, so the slider_cb function is not called
      * (which would trigger a seek the user has not requested) */
@@ -243,7 +244,7 @@ void XttStreamGtk::erase_window()
   GdkWindow* window = gtk_widget_get_window(video_form);
   cairo_region_t* region;
   cairo_t* cr;
-  GdkDrawingContext *dctx;
+  GdkDrawingContext* dctx;
 
   /* Cairo is a 2D graphics library which we use here to clean the video window.
    * It is used by GStreamer for other reasons, so it will always be available
@@ -273,8 +274,7 @@ void XttStreamGtk::reconnect(void* data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   GstState state, async;
-  GstStateChangeReturn ch
-      = gst_element_get_state(strm->playbin2, &state, &async, 0);
+  GstStateChangeReturn ch = gst_element_get_state(strm->playbin2, &state, &async, 0);
 
   printf("Try to reconnect %d %d %d\n", state, async, ch);
 
@@ -283,17 +283,18 @@ void XttStreamGtk::reconnect(void* data)
 
   printf("Adding reconnect\n");
   strm->reconnect_timerid->remove();
-  strm->reconnect_timerid->add(
-      int(strm->reconnect_time * 1000), reconnect, strm);
+  strm->reconnect_timerid->add(int(strm->reconnect_time * 1000), reconnect, strm);
 
-  if (strm->no_uri) {
+  if (strm->no_uri)
+  {
     printf("Reconnect no URI\n");
     strm->no_uri = 0;
     char luri[250];
     char* s;
-    if (strm->options & strm_mOptions_HttpBasicAuthentication) {
-      if (!streq(strm->user, "") && !streq(strm->password, "")
-          && (s = strstr(strm->uri, "://"))) {
+    if (strm->options & strm_mOptions_HttpBasicAuthentication)
+    {
+      if (!streq(strm->user, "") && !streq(strm->password, "") && (s = strstr(strm->uri, "://")))
+      {
         unsigned long int offs = s - (char*)strm->uri + 3;
         strncpy(luri, strm->uri, offs);
         luri[offs] = 0;
@@ -302,16 +303,18 @@ void XttStreamGtk::reconnect(void* data)
         strcat(luri, strm->password);
         strcat(luri, "@");
         strcat(luri, &strm->uri[offs]);
-      } else
+      }
+      else
         strcpy(luri, strm->uri);
-    } else if (strm->options & strm_mOptions_CgiParameterAuthentication)
-      snprintf(luri, sizeof(luri), "%s?user=%s&pwd=%s", strm->uri, strm->user,
-          strm->password);
+    }
+    else if (strm->options & strm_mOptions_CgiParameterAuthentication)
+      snprintf(luri, sizeof(luri), "%s?user=%s&pwd=%s", strm->uri, strm->user, strm->password);
     else
       strcpy(luri, strm->uri);
 
     g_object_set(strm->playbin2, "uri", luri, NULL);
-  } else
+  }
+  else
     gst_element_set_state(strm->playbin2, GST_STATE_PLAYING);
 }
 
@@ -320,12 +323,11 @@ void XttStreamGtk::tags_cb(GstElement* playbin2, gint stream, void* data)
 {
   /* We are possibly in a GStreamer working thread, so we notify the main
    * thread of this event through a message in the bus */
-  gst_element_post_message(
-      playbin2, gst_message_new_application(GST_OBJECT(playbin2),
+  gst_element_post_message(playbin2, gst_message_new_application(GST_OBJECT(playbin2),
 #if GST_CHECK_VERSION(1, 0, 0)
-                    gst_structure_new_empty("tags-changed")));
+                                                                 gst_structure_new_empty("tags-changed")));
 #else
-                    gst_structure_new("tags-changed", NULL)));
+                                                                 gst_structure_new("tags-changed", NULL)));
 #endif
 }
 
@@ -334,16 +336,17 @@ void XttStreamGtk::error_cb(GstBus* bus, GstMessage* msg, void* data)
 {
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
-  switch (GST_MESSAGE_TYPE(msg)) {
-  case GST_MESSAGE_ERROR: {
+  switch (GST_MESSAGE_TYPE(msg))
+  {
+  case GST_MESSAGE_ERROR:
+  {
     GError* err;
     gchar* debug_info;
 
     printf("Message %d\n", GST_MESSAGE_TYPE(msg));
     /* Print error details on the screen */
     gst_message_parse_error(msg, &err, &debug_info);
-    printf("Error received from element %s: %s\n", GST_OBJECT_NAME(msg->src),
-        err->message);
+    printf("Error received from element %s: %s\n", GST_OBJECT_NAME(msg->src), err->message);
     printf("Debugging information: %s\n", debug_info ? debug_info : "none");
 
     if (streq(err->message, "No URI set"))
@@ -360,18 +363,19 @@ void XttStreamGtk::error_cb(GstBus* bus, GstMessage* msg, void* data)
 
     // Try to reconnect
     strm->reconnect_timerid->remove();
-    strm->reconnect_timerid->add(
-        int(strm->reconnect_time * 1000), reconnect, strm);
+    strm->reconnect_timerid->add(int(strm->reconnect_time * 1000), reconnect, strm);
 
     break;
   }
-  case GST_MESSAGE_BUFFERING: {
+  case GST_MESSAGE_BUFFERING:
+  {
     if (strm->is_live)
       break;
 
     break;
   }
-  case GST_MESSAGE_CLOCK_LOST: {
+  case GST_MESSAGE_CLOCK_LOST:
+  {
     printf("Clock lost\n");
     // Get a new clock
     gst_element_set_state(strm->playbin2, GST_STATE_PAUSED);
@@ -402,10 +406,12 @@ void XttStreamGtk::state_changed_cb(GstBus* bus, GstMessage* msg, void* data)
 
   GstState old_state, new_state, pending_state;
   gst_message_parse_state_changed(msg, &old_state, &new_state, &pending_state);
-  if (GST_MESSAGE_SRC(msg) == GST_OBJECT(strm->playbin2)) {
+  if (GST_MESSAGE_SRC(msg) == GST_OBJECT(strm->playbin2))
+  {
     strm->state = new_state;
     // g_print( "State set to %s\n", gst_element_state_get_name( new_state));
-    if (old_state == GST_STATE_READY && new_state == GST_STATE_PAUSED) {
+    if (old_state == GST_STATE_READY && new_state == GST_STATE_PAUSED)
+    {
       /* For extra responsiveness, we refresh the GUI as soon as we reach the
        * PAUSED state */
       strm->refresh_ui(strm);
@@ -415,21 +421,18 @@ void XttStreamGtk::state_changed_cb(GstBus* bus, GstMessage* msg, void* data)
 
 /* Extract metadata from all the streams and write it to the text widget in the
  * GUI */
-static void analyze_streams(void* data)
-{
-  printf("Analyze stream\n");
-}
+static void analyze_streams(void* data) { printf("Analyze stream\n"); }
 
 /* This function is called when an "application" message is posted on the bus.
  * Here we retrieve the message posted by the tags_cb callback */
 void XttStreamGtk::application_cb(GstBus* bus, GstMessage* msg, void* data)
 {
 #if GST_CHECK_VERSION(1, 0, 0)
-  if (g_strcmp0(gst_structure_get_name(gst_message_get_structure(msg)),
-          "tags-changed")
-      == 0) {
+  if (g_strcmp0(gst_structure_get_name(gst_message_get_structure(msg)), "tags-changed") == 0)
+  {
 #else
-  if (g_strcmp0(gst_structure_get_name(msg->structure), "tags-changed") == 0) {
+  if (g_strcmp0(gst_structure_get_name(msg->structure), "tags-changed") == 0)
+  {
 #endif
     /* If the message is the "tags-changed" (only one we are currently issuing),
      * update
@@ -438,25 +441,25 @@ void XttStreamGtk::application_cb(GstBus* bus, GstMessage* msg, void* data)
   }
 }
 
-void XttStreamGtk::resize_cb(
-    GtkWidget* w, GtkAllocation* allocation, gpointer data)
+void XttStreamGtk::resize_cb(GtkWidget* w, GtkAllocation* allocation, gpointer data)
 {
   XttStream* strm = (XttStream*)data;
 
   strm->width = allocation->width;
   strm->height = allocation->height;
-  if (strm->width > strm->height * strm->stream_ratio) {
+  if (strm->width > strm->height * strm->stream_ratio)
+  {
     strm->x_offset = (strm->width - strm->height * strm->stream_ratio) / 2;
     strm->y_offset = 0;
-  } else {
+  }
+  else
+  {
     strm->x_offset = 0;
-    strm->y_offset
-        = (strm->height - ((float)strm->width) / strm->stream_ratio) / 2;
+    strm->y_offset = (strm->height - ((float)strm->width) / strm->stream_ratio) / 2;
   }
 }
 
-gboolean XttStreamGtk::mousebutton_cb(
-    GtkWidget* widget, GdkEvent* event, void* data)
+gboolean XttStreamGtk::mousebutton_cb(GtkWidget* widget, GdkEvent* event, void* data)
 {
   XttStreamGtk* strm = (XttStreamGtk*)data;
   GtkAllocation alloc;
@@ -464,37 +467,41 @@ gboolean XttStreamGtk::mousebutton_cb(
   // Calculate offset for video image
   gtk_widget_get_allocation(strm->video_form, &alloc);
 
-  if (alloc.width == 0 || alloc.height == 0 || strm->width == 0
-      || strm->height == 0)
+  if (alloc.width == 0 || alloc.height == 0 || strm->width == 0 || strm->height == 0)
     return TRUE;
 
   int offset_x, offset_y;
 
-  if ((double)alloc.width / alloc.height > (double)strm->width / strm->height) {
-    offset_x
-        = (alloc.width - (double)strm->width / strm->height * alloc.height) / 2;
+  if ((double)alloc.width / alloc.height > (double)strm->width / strm->height)
+  {
+    offset_x = (alloc.width - (double)strm->width / strm->height * alloc.height) / 2;
     offset_y = 0;
-  } else {
+  }
+  else
+  {
     offset_x = 0;
-    offset_y
-        = (alloc.height - (double)strm->height / strm->width * alloc.width) / 2;
+    offset_y = (alloc.height - (double)strm->height / strm->width * alloc.width) / 2;
   }
 
-  switch (event->type) {
+  switch (event->type)
+  {
   case GDK_BUTTON_PRESS:
-    switch (event->button.button) {
+    switch (event->button.button)
+    {
     case 1:
       time_GetTime(&strm->mb_press_time);
       strm->mb_press_x = event->button.x;
       strm->mb_press_y = event->button.y;
       break;
-    case 3: {
+    case 3:
+    {
       int x1, y1;
       int x = event->button.x + 8;
       int y = event->button.y;
       CoWowGtk::PopupPosition(strm->video_form, x, y, &x1, &y1);
       strm->action_mb3click(x1, y1);
-      if (strm->ptz_box_displayed) {
+      if (strm->ptz_box_displayed)
+      {
         g_object_set(strm->ptz_box, "visible", FALSE, NULL);
         strm->ptz_box_displayed = 0;
       }
@@ -503,8 +510,10 @@ gboolean XttStreamGtk::mousebutton_cb(
     }
     break;
   case GDK_BUTTON_RELEASE:
-    switch (event->button.button) {
-    case 1: {
+    switch (event->button.button)
+    {
+    case 1:
+    {
       pwr_tTime now;
       pwr_tDeltaTime dt;
       pwr_tFloat32 dft;
@@ -512,30 +521,34 @@ gboolean XttStreamGtk::mousebutton_cb(
       time_GetTime(&now);
       time_Adiff(&dt, &now, &strm->mb_press_time);
       dft = time_DToFloat(&dft, &dt);
-      if (dft < 0.5 && ABS(event->button.x - strm->mb_press_x) < 10
-          && ABS(event->button.y - strm->mb_press_y) < 10) {
-        strm->action_click(
-            event->button.x - offset_x, event->button.y - offset_y);
-        if (strm->ptz_box_displayed) {
+      if (dft < 0.5 && ABS(event->button.x - strm->mb_press_x) < 10 &&
+          ABS(event->button.y - strm->mb_press_y) < 10)
+      {
+        strm->action_click(event->button.x - offset_x, event->button.y - offset_y);
+        if (strm->ptz_box_displayed)
+        {
           g_object_set(strm->ptz_box, "visible", FALSE, NULL);
           strm->ptz_box_displayed = 0;
         }
-      } else if (ABS(event->button.x - strm->mb_press_x) > 20
-          && abs(event->button.y - strm->mb_press_y) > 20) {
+      }
+      else if (ABS(event->button.x - strm->mb_press_x) > 20 && abs(event->button.y - strm->mb_press_y) > 20)
+      {
         int x = MIN(event->button.x, strm->mb_press_x) - offset_x;
         int y = MIN(event->button.y, strm->mb_press_y) - offset_y;
         int w = ABS(event->button.x - strm->mb_press_x);
         int h = ABS(event->button.y - strm->mb_press_y);
         printf("Mb zoom (%d,%d) rect %d,%d\n", x, y, w, h);
         strm->action_areaselect(x, y, w, h);
-        if (strm->ptz_box_displayed) {
+        if (strm->ptz_box_displayed)
+        {
           g_object_set(strm->ptz_box, "visible", FALSE, NULL);
           strm->ptz_box_displayed = 0;
         }
       }
       break;
     }
-    case 2: {
+    case 2:
+    {
       int x = MIN(event->button.x, strm->mb_press_x) - offset_x;
       int y = MIN(event->button.y, strm->mb_press_y) - offset_y;
       strm->action_mb2click(x, y);
@@ -548,7 +561,7 @@ gboolean XttStreamGtk::mousebutton_cb(
     strm->scroll_timerid->add(600, strm->scroll_cb, strm);
     // strm->action_scroll(  event->scroll.direction == GDK_SCROLL_UP ? 1 : 0,
     //			  event->button.x - offset_x, event->button.y -
-    //offset_y);
+    // offset_y);
     strm->scroll_direction = event->scroll.direction == GDK_SCROLL_UP ? 1 : 0;
     strm->scroll_x = event->button.x - offset_x;
     strm->scroll_y = event->button.y - offset_y;
@@ -562,28 +575,27 @@ gboolean XttStreamGtk::mousebutton_cb(
 void XttStreamGtk::scroll_cb(void* data)
 {
   XttStreamGtk* strm = (XttStreamGtk*)data;
-  strm->action_scroll(
-      strm->scroll_direction, strm->scroll_x, strm->scroll_y, strm->scroll_cnt);
+  strm->action_scroll(strm->scroll_direction, strm->scroll_x, strm->scroll_y, strm->scroll_cnt);
   strm->scroll_cnt = 0;
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
 }
 
-XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
-    const char* name, const char* st_uri, int width, int height, int x, int y,
-    double scan_time, unsigned int st_options, int st_embedded,
-    pwr_tAttrRef* st_arp, pwr_tStatus* sts)
-    : XttStream(st_parent_ctx, name, st_uri, width, height, x, y, scan_time,
-          st_options, st_embedded, st_arp),
-      scroll_cnt(0), ptz_box_displayed(0), is_live(0), buftime(pwr_cNTime),
-      parent_wid(st_parent_wid), ptz_box(0), reconnect_timerid(0), no_uri(0)
+XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx, const char* name,
+                           const char* st_uri, int width, int height, int x, int y, double scan_time,
+                           unsigned int st_options, int st_embedded, pwr_tAttrRef* st_arp, pwr_tStatus* sts)
+    : XttStream(st_parent_ctx, name, st_uri, width, height, x, y, scan_time, st_options, st_embedded, st_arp),
+      scroll_cnt(0), ptz_box_displayed(0), is_live(0), buftime(pwr_cNTime), parent_wid(st_parent_wid),
+      ptz_box(0), reconnect_timerid(0), no_uri(0)
 {
   GstStateChangeReturn ret;
   GstBus* bus;
 
-  if (!gst_initialized) {
+  if (!gst_initialized)
+  {
     // Initialize gstreamer
     int argc = 0;
     char** argv;
@@ -592,7 +604,8 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
     gst_initialized = 1;
   }
 
-  if (width == 0 || height == 0) {
+  if (width == 0 || height == 0)
+  {
     width = 640;
     height = 480;
   }
@@ -606,7 +619,8 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
   playbin2 = gst_element_factory_make("playbin2", "playbin2");
 #endif
 
-  if (!playbin2) {
+  if (!playbin2)
+  {
     g_printerr("Not all elements could be created.\n");
     *sts = 0;
     return;
@@ -615,9 +629,10 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
   /* Set the URI to play, eg "http://192.168.67.248/mjpg/video.mjpg" */
   char luri[250];
   char* s;
-  if (options & strm_mOptions_HttpBasicAuthentication) {
-    if (!streq(user, "") && !streq(password, "")
-        && (s = strstr(uri, "://"))) {
+  if (options & strm_mOptions_HttpBasicAuthentication)
+  {
+    if (!streq(user, "") && !streq(password, "") && (s = strstr(uri, "://")))
+    {
       unsigned long int offs = s - (char*)uri + 3;
       strncpy(luri, uri, offs);
       luri[offs] = 0;
@@ -626,9 +641,11 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
       strcat(luri, password);
       strcat(luri, "@");
       strcat(luri, &uri[offs]);
-    } else
+    }
+    else
       strcpy(luri, uri);
-  } else if (options & strm_mOptions_CgiParameterAuthentication)
+  }
+  else if (options & strm_mOptions_CgiParameterAuthentication)
     snprintf(luri, sizeof(luri), "%s?user=%s&pwd=%s", uri, user, password);
   else
     strcpy(luri, uri);
@@ -636,73 +653,66 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
   g_object_set(playbin2, "uri", luri, NULL);
 
   /* Connect to interesting signals in playbin2 */
-  g_signal_connect(
-      G_OBJECT(playbin2), "video-tags-changed", (GCallback)tags_cb, this);
-  g_signal_connect(
-      G_OBJECT(playbin2), "audio-tags-changed", (GCallback)tags_cb, this);
-  g_signal_connect(
-      G_OBJECT(playbin2), "text-tags-changed", (GCallback)tags_cb, this);
+  g_signal_connect(G_OBJECT(playbin2), "video-tags-changed", (GCallback)tags_cb, this);
+  g_signal_connect(G_OBJECT(playbin2), "audio-tags-changed", (GCallback)tags_cb, this);
+  g_signal_connect(G_OBJECT(playbin2), "text-tags-changed", (GCallback)tags_cb, this);
 
   // g_signal_connect( G_OBJECT( playbin2), "source-setup",( GCallback)
   // source_setup_cb, this);
-  g_signal_connect(
-      G_OBJECT(playbin2), "notify::source", (GCallback)source_setup_cb, this);
+  g_signal_connect(G_OBJECT(playbin2), "notify::source", (GCallback)source_setup_cb, this);
 
-  if (!embedded) {
+  if (!embedded)
+  {
     toplevel = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    g_signal_connect(
-        G_OBJECT(toplevel), "delete-event", G_CALLBACK(delete_event_cb), this);
+    g_signal_connect(G_OBJECT(toplevel), "delete-event", G_CALLBACK(delete_event_cb), this);
 
-    char* titleutf8
-        = g_convert(name, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+    char* titleutf8 = g_convert(name, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
     gtk_window_set_title(GTK_WINDOW(toplevel), titleutf8);
     g_free(titleutf8);
 
     CoWowGtk::SetWindowIcon(toplevel);
-  } else
+  }
+  else
     toplevel = parent_wid;
 
   GstElement* x_overlay = gst_element_factory_make("xvimagesink", "videosink");
   g_object_set(G_OBJECT(playbin2), "video-sink", x_overlay, NULL);
 
   video_form = gtk_drawing_area_new();
-  //gtk_widget_set_double_buffered(video_form, FALSE);
+  // gtk_widget_set_double_buffered(video_form, FALSE);
   g_signal_connect(video_form, "realize", G_CALLBACK(realize_cb), this);
   g_signal_connect(video_form, "expose_event", G_CALLBACK(expose_cb), this);
-  g_signal_connect(
-      video_form, "button_press_event", G_CALLBACK(mousebutton_cb), this);
-  g_signal_connect(
-      video_form, "button_release_event", G_CALLBACK(mousebutton_cb), this);
-  g_signal_connect(
-      video_form, "scroll_event", G_CALLBACK(mousebutton_cb), this);
+  g_signal_connect(video_form, "button_press_event", G_CALLBACK(mousebutton_cb), this);
+  g_signal_connect(video_form, "button_release_event", G_CALLBACK(mousebutton_cb), this);
+  g_signal_connect(video_form, "scroll_event", G_CALLBACK(mousebutton_cb), this);
   g_signal_connect(video_form, "size_allocate", G_CALLBACK(resize_cb), this);
 
-  gtk_widget_add_events(video_form,
-      GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_SCROLL_MASK);
+  gtk_widget_add_events(video_form, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_SCROLL_MASK);
 
   // GtkWidget *controls;
   GtkWidget* hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  if (options & strm_mOptions_VideoControlPanel) {
+  if (options & strm_mOptions_VideoControlPanel)
+  {
     GtkToolbar* controlbuttons;
     controlbuttons = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-    wutl_tools_item(GTK_TOOLBAR(controlbuttons), "$pwr_exe/xtt_play.png", G_CALLBACK(play_cb), 
-      "Play", this, 0, 1);
+    wutl_tools_item(GTK_TOOLBAR(controlbuttons), "$pwr_exe/xtt_play.png", G_CALLBACK(play_cb), "Play", this,
+                    0, 1);
 
-    wutl_tools_item(GTK_TOOLBAR(controlbuttons), "$pwr_exe/xtt_pause.png", G_CALLBACK(pause_cb), 
-      "Pause", this, 0, 1);
+    wutl_tools_item(GTK_TOOLBAR(controlbuttons), "$pwr_exe/xtt_pause.png", G_CALLBACK(pause_cb), "Pause",
+                    this, 0, 1);
 
-    wutl_tools_item(GTK_TOOLBAR(controlbuttons), "$pwr_exe/xtt_stop.png", G_CALLBACK(stop_cb), 
-      "Stop", this, 0, 1);
+    wutl_tools_item(GTK_TOOLBAR(controlbuttons), "$pwr_exe/xtt_stop.png", G_CALLBACK(stop_cb), "Stop", this,
+                    0, 1);
 
-    gtk_box_pack_start(
-        GTK_BOX(hbox), GTK_WIDGET(controlbuttons), FALSE, FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(hbox), GTK_WIDGET(controlbuttons), FALSE, FALSE, 2);
 
-    if (options & strm_mOptions_VideoProgressBar) {
+    if (options & strm_mOptions_VideoProgressBar)
+    {
       slider = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0, 100, 1);
       gtk_scale_set_draw_value(GTK_SCALE(slider), 0);
-      slider_update_signal_id = g_signal_connect(
-          G_OBJECT(slider), "value-changed", G_CALLBACK(slider_cb), this);
+      slider_update_signal_id =
+          g_signal_connect(G_OBJECT(slider), "value-changed", G_CALLBACK(slider_cb), this);
       gtk_box_pack_start(GTK_BOX(hbox), slider, TRUE, TRUE, 2);
     }
   }
@@ -711,43 +721,44 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
   gtk_toolbar_set_style(GTK_TOOLBAR(tools), GTK_TOOLBAR_ICONS);
 
   GtkWidget* tools_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  if (control_protocol != pwr_eCameraControlEnum_No) {
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoomin), 
-      "Zoom in", this, 0, 1);
+  if (control_protocol != pwr_eCameraControlEnum_No)
+  {
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoomin), "Zoom in",
+                    this, 0, 1);
 
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoomout), 
-      "Zoom out", this, 0, 1);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoomout), "Zoom out",
+                    this, 0, 1);
 
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoomreset), 
-      "Zoom reset", this, 0, 1);
-
-    gtk_toolbar_insert(GTK_TOOLBAR(tools), gtk_separator_tool_item_new(), -1);
-
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_page_left.png", G_CALLBACK(activate_page_left), 
-      "Page left", this, 0, 1);
-
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_scroll_left.png", G_CALLBACK(activate_scroll_left), 
-      "Left", this, 0, 1);
-
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_scroll_right.png", G_CALLBACK(activate_scroll_right), 
-      "Right", this, 0, 1);
-
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_page_right.png", G_CALLBACK(activate_page_right), 
-      "Page right", this, 0, 1);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoomreset),
+                    "Zoom reset", this, 0, 1);
 
     gtk_toolbar_insert(GTK_TOOLBAR(tools), gtk_separator_tool_item_new(), -1);
 
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_page_down.png", G_CALLBACK(activate_page_down), 
-      "Page down", this, 0, 1);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_page_left.png", G_CALLBACK(activate_page_left),
+                    "Page left", this, 0, 1);
 
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_scroll_down.png", G_CALLBACK(activate_scroll_down), 
-      "Down", this, 0, 1);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_scroll_left.png", G_CALLBACK(activate_scroll_left),
+                    "Left", this, 0, 1);
 
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_scroll_up.png", G_CALLBACK(activate_scroll_up), 
-      "Up", this, 0, 1);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_scroll_right.png", G_CALLBACK(activate_scroll_right),
+                    "Right", this, 0, 1);
 
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_page_up.png", G_CALLBACK(activate_page_up), 
-      "Page up", this, 0, 1);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_page_right.png", G_CALLBACK(activate_page_right),
+                    "Page right", this, 0, 1);
+
+    gtk_toolbar_insert(GTK_TOOLBAR(tools), gtk_separator_tool_item_new(), -1);
+
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_page_down.png", G_CALLBACK(activate_page_down),
+                    "Page down", this, 0, 1);
+
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_scroll_down.png", G_CALLBACK(activate_scroll_down),
+                    "Down", this, 0, 1);
+
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_scroll_up.png", G_CALLBACK(activate_scroll_up), "Up",
+                    this, 0, 1);
+
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_page_up.png", G_CALLBACK(activate_page_up), "Page up",
+                    this, 0, 1);
 
     gtk_toolbar_insert(GTK_TOOLBAR(tools), gtk_separator_tool_item_new(), -1);
 
@@ -761,125 +772,135 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
       lsts = gdh_GetObjectInfoAttrref(&aaref, tooltiptext, sizeof(tooltiptext));
     if (ODD(lsts) && !streq(tooltiptext, ""))
       translate = 0;
-    else {
+    else
+    {
       strcpy(tooltiptext, "Preset position 1");
       translate = 1;
     }
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos1.png", G_CALLBACK(activate_preset_position1), 
-      tooltiptext, this, 0, translate);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos1.png", G_CALLBACK(activate_preset_position1),
+                    tooltiptext, this, 0, translate);
 
     lsts = gdh_ArefANameToAref(&aref, "PresetPosition[1].Description", &aaref);
     if (ODD(lsts))
       lsts = gdh_GetObjectInfoAttrref(&aaref, tooltiptext, sizeof(tooltiptext));
     if (ODD(lsts) && !streq(tooltiptext, ""))
       translate = 0;
-    else {
+    else
+    {
       strcpy(tooltiptext, "Preset position 2");
       translate = 1;
     }
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos2.png", G_CALLBACK(activate_preset_position2), 
-      tooltiptext, this, 0, translate);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos2.png", G_CALLBACK(activate_preset_position2),
+                    tooltiptext, this, 0, translate);
 
     lsts = gdh_ArefANameToAref(&aref, "PresetPosition[2].Description", &aaref);
     if (ODD(lsts))
       lsts = gdh_GetObjectInfoAttrref(&aaref, tooltiptext, sizeof(tooltiptext));
     if (ODD(lsts) && !streq(tooltiptext, ""))
       translate = 0;
-    else {
+    else
+    {
       strcpy(tooltiptext, "Preset position 3");
       translate = 1;
     }
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos3.png", G_CALLBACK(activate_preset_position3), 
-      tooltiptext, this, 0, translate);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos3.png", G_CALLBACK(activate_preset_position3),
+                    tooltiptext, this, 0, translate);
 
     lsts = gdh_ArefANameToAref(&aref, "PresetPosition[3].Description", &aaref);
     if (ODD(lsts))
       lsts = gdh_GetObjectInfoAttrref(&aaref, tooltiptext, sizeof(tooltiptext));
     if (ODD(lsts) && !streq(tooltiptext, ""))
       translate = 0;
-    else {
+    else
+    {
       strcpy(tooltiptext, "Preset position 4");
       translate = 1;
     }
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos4.png", G_CALLBACK(activate_preset_position4), 
-      tooltiptext, this, 0, translate);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos4.png", G_CALLBACK(activate_preset_position4),
+                    tooltiptext, this, 0, translate);
 
     lsts = gdh_ArefANameToAref(&aref, "PresetPosition[4].Description", &aaref);
     if (ODD(lsts))
       lsts = gdh_GetObjectInfoAttrref(&aaref, tooltiptext, sizeof(tooltiptext));
     if (ODD(lsts) && !streq(tooltiptext, ""))
       translate = 0;
-    else {
+    else
+    {
       strcpy(tooltiptext, "Preset position 5");
       translate = 1;
     }
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos5.png", G_CALLBACK(activate_preset_position5), 
-      tooltiptext, this, 0, translate);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos5.png", G_CALLBACK(activate_preset_position5),
+                    tooltiptext, this, 0, translate);
 
     lsts = gdh_ArefANameToAref(&aref, "PresetPosition[5].Description", &aaref);
     if (ODD(lsts))
       lsts = gdh_GetObjectInfoAttrref(&aaref, tooltiptext, sizeof(tooltiptext));
     if (ODD(lsts) && !streq(tooltiptext, ""))
       translate = 0;
-    else {
+    else
+    {
       strcpy(tooltiptext, "Preset position 6");
       translate = 1;
     }
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos6.png", G_CALLBACK(activate_preset_position6), 
-      tooltiptext, this, 0, translate);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos6.png", G_CALLBACK(activate_preset_position6),
+                    tooltiptext, this, 0, translate);
 
     lsts = gdh_ArefANameToAref(&aref, "PresetPosition[6].Description", &aaref);
     if (ODD(lsts))
       lsts = gdh_GetObjectInfoAttrref(&aaref, tooltiptext, sizeof(tooltiptext));
     if (ODD(lsts) && !streq(tooltiptext, ""))
       translate = 0;
-    else {
+    else
+    {
       strcpy(tooltiptext, "Preset position 7");
       translate = 1;
     }
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos7.png", G_CALLBACK(activate_preset_position7), 
-      tooltiptext, this, 0, translate);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos7.png", G_CALLBACK(activate_preset_position7),
+                    tooltiptext, this, 0, translate);
 
     lsts = gdh_ArefANameToAref(&aref, "PresetPosition[7].Description", &aaref);
     if (ODD(lsts))
       lsts = gdh_GetObjectInfoAttrref(&aaref, tooltiptext, sizeof(tooltiptext));
     if (ODD(lsts) && !streq(tooltiptext, ""))
       translate = 0;
-    else {
+    else
+    {
       strcpy(tooltiptext, "Preset position 8");
       translate = 1;
     }
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos8.png", G_CALLBACK(activate_preset_position8), 
-      tooltiptext, this, 0, translate);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos8.png", G_CALLBACK(activate_preset_position8),
+                    tooltiptext, this, 0, translate);
 
     lsts = gdh_ArefANameToAref(&aref, "PresetPosition[8].Description", &aaref);
     if (ODD(lsts))
       lsts = gdh_GetObjectInfoAttrref(&aaref, tooltiptext, sizeof(tooltiptext));
     if (ODD(lsts) && !streq(tooltiptext, ""))
       translate = 0;
-    else {
+    else
+    {
       strcpy(tooltiptext, "Preset position 9");
       translate = 1;
     }
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos9.png", G_CALLBACK(activate_preset_position9), 
-      tooltiptext, this, 0, translate);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos9.png", G_CALLBACK(activate_preset_position9),
+                    tooltiptext, this, 0, translate);
 
     lsts = gdh_ArefANameToAref(&aref, "PresetPosition[9].Description", &aaref);
     if (ODD(lsts))
       lsts = gdh_GetObjectInfoAttrref(&aaref, tooltiptext, sizeof(tooltiptext));
     if (ODD(lsts) && !streq(tooltiptext, ""))
       translate = 0;
-    else {
+    else
+    {
       strcpy(tooltiptext, "Preset position 10");
       translate = 1;
     }
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos10.png", G_CALLBACK(activate_preset_position10), 
-      tooltiptext, this, 0, translate);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_pos10.png", G_CALLBACK(activate_preset_position10),
+                    tooltiptext, this, 0, translate);
 
     gtk_toolbar_insert(GTK_TOOLBAR(tools), gtk_separator_tool_item_new(), -1);
 
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_get_pos.png", G_CALLBACK(activate_get_position), 
-      "Get position", this, 0, 1);
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_get_pos.png", G_CALLBACK(activate_get_position),
+                    "Get position", this, 0, 1);
 
     GtkWidget* ptz_pan_label = gtk_label_new("Pan");
     ptz_pan = gtk_label_new("0");
@@ -889,23 +910,22 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
     ptz_zoom = gtk_label_new("0");
 
     ptz_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_box_pack_start(
-        GTK_BOX(ptz_box), GTK_WIDGET(ptz_pan_label), FALSE, FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(ptz_box), GTK_WIDGET(ptz_pan_label), FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(ptz_box), GTK_WIDGET(ptz_pan), FALSE, FALSE, 5);
-    gtk_box_pack_start(
-        GTK_BOX(ptz_box), GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_VERTICAL)), FALSE, FALSE, 5);
-    gtk_box_pack_start(
-        GTK_BOX(ptz_box), GTK_WIDGET(ptz_tilt_label), FALSE, FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(ptz_box), GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_VERTICAL)), FALSE,
+                       FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(ptz_box), GTK_WIDGET(ptz_tilt_label), FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(ptz_box), GTK_WIDGET(ptz_tilt), FALSE, FALSE, 5);
-    gtk_box_pack_start(
-        GTK_BOX(ptz_box), GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_VERTICAL)), FALSE, FALSE, 5);
-    gtk_box_pack_start(
-        GTK_BOX(ptz_box), GTK_WIDGET(ptz_zoom_label), FALSE, FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(ptz_box), GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_VERTICAL)), FALSE,
+                       FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(ptz_box), GTK_WIDGET(ptz_zoom_label), FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(ptz_box), GTK_WIDGET(ptz_zoom), FALSE, FALSE, 5);
 
     gtk_box_pack_start(GTK_BOX(tools_box), GTK_WIDGET(tools), TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(tools_box), ptz_box, FALSE, FALSE, 0);
-  } else {
+  }
+  else
+  {
     // Empty toolbar
     gtk_widget_set_size_request(tools, -1, 32);
     gtk_box_pack_start(GTK_BOX(tools_box), GTK_WIDGET(tools), TRUE, TRUE, 0);
@@ -917,7 +937,8 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
   if (options & strm_mOptions_VideoControlPanel)
     gtk_box_pack_start(GTK_BOX(main_box), GTK_WIDGET(hbox), FALSE, FALSE, 0);
 
-  if (!embedded) {
+  if (!embedded)
+  {
     gtk_container_add(GTK_CONTAINER(toplevel), main_box);
     gtk_window_set_default_size(GTK_WINDOW(toplevel), width, height);
 
@@ -936,7 +957,9 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
       gtk_window_maximize(GTK_WINDOW(toplevel));
     else if (options & strm_mOptions_Iconify)
       gtk_window_iconify(GTK_WINDOW(toplevel));
-  } else {
+  }
+  else
+  {
     gtk_widget_set_size_request(main_box, width, height);
     if (ptz_box)
       g_object_set(ptz_box, "visible", FALSE, NULL);
@@ -950,10 +973,8 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
   gst_bus_add_signal_watch(bus);
   g_signal_connect(G_OBJECT(bus), "message", (GCallback)error_cb, this);
   g_signal_connect(G_OBJECT(bus), "message::eos", (GCallback)eos_cb, this);
-  g_signal_connect(G_OBJECT(bus), "message::state-changed",
-      (GCallback)state_changed_cb, this);
-  g_signal_connect(
-      G_OBJECT(bus), "message::application", (GCallback)application_cb, this);
+  g_signal_connect(G_OBJECT(bus), "message::state-changed", (GCallback)state_changed_cb, this);
+  g_signal_connect(G_OBJECT(bus), "message::application", (GCallback)application_cb, this);
 
 #if GST_CHECK_VERSION(1, 0, 0)
   gst_bus_set_sync_handler(bus, (GstBusSyncHandler)bus_sync_handler, this, 0);
@@ -964,12 +985,15 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
 
   /* Start playing */
   ret = gst_element_set_state(playbin2, GST_STATE_PLAYING);
-  if (ret == GST_STATE_CHANGE_FAILURE) {
+  if (ret == GST_STATE_CHANGE_FAILURE)
+  {
     g_printerr("Unable to set the pipeline to the playing state.\n");
     gst_object_unref(playbin2);
     *sts = 0;
     return;
-  } else if (ret == GST_STATE_CHANGE_NO_PREROLL) {
+  }
+  else if (ret == GST_STATE_CHANGE_NO_PREROLL)
+  {
     is_live = 1;
   }
 
@@ -998,15 +1022,9 @@ XttStreamGtk::~XttStreamGtk()
     gtk_widget_destroy(toplevel);
 }
 
-void XttStreamGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void XttStreamGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
-void XttStreamGtk::set_size(int width, int height)
-{
-  gtk_window_resize(GTK_WINDOW(toplevel), width, height);
-}
+void XttStreamGtk::set_size(int width, int height) { gtk_window_resize(GTK_WINDOW(toplevel), width, height); }
 
 void XttStreamGtk::setup()
 {
@@ -1020,8 +1038,7 @@ void XttStreamGtk::create_popup_menu(int x, int y)
 {
   GtkMenu* menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
 
-  GtkWidget* w
-      = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("Zoom reset"));
+  GtkWidget* w = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("Zoom reset"));
   g_signal_connect(w, "activate", G_CALLBACK(activate_zoomreset), this);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), w);
   gtk_widget_show(w);
@@ -1036,8 +1053,7 @@ void XttStreamGtk::create_popup_menu(int x, int y)
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), w);
   gtk_widget_show(w);
 
-  GtkWidget* preset_store
-      = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("Preset store"));
+  GtkWidget* preset_store = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("Preset store"));
   GtkMenu* menu_preset_store = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
 
   w = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("Position 1"));
@@ -1086,13 +1102,11 @@ void XttStreamGtk::create_popup_menu(int x, int y)
   gtk_widget_show(w);
 
   w = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("Position 10"));
-  g_signal_connect(
-      w, "activate", G_CALLBACK(activate_preset_store_pos10), this);
+  g_signal_connect(w, "activate", G_CALLBACK(activate_preset_store_pos10), this);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_preset_store), w);
   gtk_widget_show(w);
 
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(preset_store), GTK_WIDGET(menu_preset_store));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(preset_store), GTK_WIDGET(menu_preset_store));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), GTK_WIDGET(preset_store));
   gtk_widget_show(preset_store);
 
@@ -1108,8 +1122,7 @@ void XttStreamGtk::create_popup_menu(int x, int y)
   gtk_menu_popup_at_pointer(menu, &ev);
 }
 
-void XttStreamGtk::menu_position_func(
-    GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data)
+void XttStreamGtk::menu_position_func(GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data)
 {
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
@@ -1126,7 +1139,8 @@ void XttStreamGtk::activate_zoomreset(GtkWidget* w, gpointer data)
     return;
 
   strm->camera_control->zoom_absolute(0);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1140,7 +1154,8 @@ void XttStreamGtk::activate_zoomin(GtkWidget* w, gpointer data)
     return;
 
   strm->camera_control->zoom_relative(5);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1154,7 +1169,8 @@ void XttStreamGtk::activate_zoomout(GtkWidget* w, gpointer data)
     return;
 
   strm->camera_control->zoom_relative(-5);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1168,7 +1184,8 @@ void XttStreamGtk::activate_scroll_left(GtkWidget* w, gpointer data)
     return;
 
   strm->camera_control->pan_relative(-3);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1182,7 +1199,8 @@ void XttStreamGtk::activate_scroll_right(GtkWidget* w, gpointer data)
     return;
 
   strm->camera_control->pan_relative(3);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1196,7 +1214,8 @@ void XttStreamGtk::activate_page_left(GtkWidget* w, gpointer data)
     return;
 
   strm->camera_control->pan_relative(-15);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1210,7 +1229,8 @@ void XttStreamGtk::activate_page_right(GtkWidget* w, gpointer data)
     return;
 
   strm->camera_control->pan_relative(15);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1224,7 +1244,8 @@ void XttStreamGtk::activate_scroll_down(GtkWidget* w, gpointer data)
     return;
 
   strm->camera_control->tilt_relative(-3);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1238,7 +1259,8 @@ void XttStreamGtk::activate_scroll_up(GtkWidget* w, gpointer data)
     return;
 
   strm->camera_control->tilt_relative(3);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1252,7 +1274,8 @@ void XttStreamGtk::activate_page_down(GtkWidget* w, gpointer data)
     return;
 
   strm->camera_control->tilt_relative(-15);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1266,7 +1289,8 @@ void XttStreamGtk::activate_page_up(GtkWidget* w, gpointer data)
     return;
 
   strm->camera_control->tilt_relative(15);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1277,7 +1301,8 @@ void XttStreamGtk::activate_preset_position1(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_position(0);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1288,7 +1313,8 @@ void XttStreamGtk::activate_preset_position2(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_position(1);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1299,7 +1325,8 @@ void XttStreamGtk::activate_preset_position3(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_position(2);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1310,7 +1337,8 @@ void XttStreamGtk::activate_preset_position4(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_position(3);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1321,7 +1349,8 @@ void XttStreamGtk::activate_preset_position5(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_position(4);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1332,7 +1361,8 @@ void XttStreamGtk::activate_preset_position6(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_position(5);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1343,7 +1373,8 @@ void XttStreamGtk::activate_preset_position7(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_position(6);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1354,7 +1385,8 @@ void XttStreamGtk::activate_preset_position8(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_position(7);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1365,7 +1397,8 @@ void XttStreamGtk::activate_preset_position9(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_position(8);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1376,7 +1409,8 @@ void XttStreamGtk::activate_preset_position10(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_position(9);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1387,7 +1421,8 @@ void XttStreamGtk::activate_preset_store_pos1(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_store_pos(0);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1398,7 +1433,8 @@ void XttStreamGtk::activate_preset_store_pos2(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_store_pos(1);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1409,7 +1445,8 @@ void XttStreamGtk::activate_preset_store_pos3(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_store_pos(2);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1420,7 +1457,8 @@ void XttStreamGtk::activate_preset_store_pos4(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_store_pos(3);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1431,7 +1469,8 @@ void XttStreamGtk::activate_preset_store_pos5(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_store_pos(4);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1442,7 +1481,8 @@ void XttStreamGtk::activate_preset_store_pos6(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_store_pos(5);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1453,7 +1493,8 @@ void XttStreamGtk::activate_preset_store_pos7(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_store_pos(6);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1464,7 +1505,8 @@ void XttStreamGtk::activate_preset_store_pos8(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_store_pos(7);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1475,7 +1517,8 @@ void XttStreamGtk::activate_preset_store_pos9(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_store_pos(8);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1486,7 +1529,8 @@ void XttStreamGtk::activate_preset_store_pos10(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
 
   strm->activate_preset_store_pos(9);
-  if (strm->ptz_box_displayed) {
+  if (strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", FALSE, NULL);
     strm->ptz_box_displayed = 0;
   }
@@ -1513,7 +1557,8 @@ void XttStreamGtk::activate_get_position(GtkWidget* w, gpointer data)
   gtk_label_set_text(GTK_LABEL(strm->ptz_tilt), tilt_str);
   gtk_label_set_text(GTK_LABEL(strm->ptz_zoom), zoom_str);
 
-  if (!strm->ptz_box_displayed) {
+  if (!strm->ptz_box_displayed)
+  {
     g_object_set(strm->ptz_box, "visible", TRUE, NULL);
     strm->ptz_box_displayed = 1;
   }
@@ -1525,18 +1570,14 @@ void XttStreamGtk::activate_get_position(GtkWidget* w, gpointer data)
 #include "cow_gtk.h"
 #include "xtt_stream_gtk.h"
 
-XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
-    const char* name, const char* st_uri, int width, int height, int x, int y,
-    double scan_time, unsigned int st_options, int st_embedded,
-    pwr_tAttrRef* arp, pwr_tStatus* sts)
-    : XttStream(st_parent_ctx, name, st_uri, width, height, x, y, scan_time,
-          st_options, st_embedded, arp)
+XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx, const char* name,
+                           const char* st_uri, int width, int height, int x, int y, double scan_time,
+                           unsigned int st_options, int st_embedded, pwr_tAttrRef* arp, pwr_tStatus* sts)
+    : XttStream(st_parent_ctx, name, st_uri, width, height, x, y, scan_time, st_options, st_embedded, arp)
 {
   *sts = 0;
 }
 
-XttStreamGtk::~XttStreamGtk()
-{
-}
+XttStreamGtk::~XttStreamGtk() {}
 
 #endif

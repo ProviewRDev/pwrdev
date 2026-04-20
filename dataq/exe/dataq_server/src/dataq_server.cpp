@@ -15,16 +15,17 @@
 #include "rs_dataq_msg.h"
 #include "dataq_server.h"
 #include "dataq_net.h"
-      
+
 static int debug = 0;
 
 unsigned int qsrv_data_converter::feedback_size()
 {
   unsigned int size = 0;
-  for (unsigned int j = 0; j < conv.size(); j++) {
+  for (unsigned int j = 0; j < conv.size(); j++)
+  {
     if (conv[j].feedback)
       size++;
-  }  
+  }
   return size;
 }
 
@@ -34,7 +35,7 @@ unsigned int qsrv_data_converter::feedback_size()
 pwr_tStatus qsrv_data_converter::create_table(pwr_tCid target_cid, pwr_tCid source_cid)
 {
   pwr_tStatus sts;
-  gdh_sAttrDef *target_bd;
+  gdh_sAttrDef* target_bd;
   int target_rows;
   pwr_tAttrRef aref;
   pwr_tTime now;
@@ -46,12 +47,15 @@ pwr_tStatus qsrv_data_converter::create_table(pwr_tCid target_cid, pwr_tCid sour
   if (EVEN(sts))
     return sts;
 
-  for (int j = 0; j < target_rows; j++) {
-    if (target_bd[j].attrClass == pwr_eClass_TargetAttribute) {
+  for (int j = 0; j < target_rows; j++)
+  {
+    if (target_bd[j].attrClass == pwr_eClass_TargetAttribute)
+    {
       aref = target_bd[j].attr->TargetAttribute.SourceAttr;
-      if (aref.Objid.oix != source_cid) {
-	free(target_bd);	
-	return DATAQ__SOURCEMISMATCH;
+      if (aref.Objid.oix != source_cid)
+      {
+        free(target_bd);
+        return DATAQ__SOURCEMISMATCH;
       }
       qsrv_convert_table ct;
       conv.push_back(ct);
@@ -70,12 +74,13 @@ pwr_tStatus qsrv_data_converter::create_table(pwr_tCid target_cid, pwr_tCid sour
 //
 //  Write conversion table and data attributes to message
 //
-void qsrv_data_converter::table_and_data_to_msg(char *mp, char *sourcep, unsigned int *msize)
+void qsrv_data_converter::table_and_data_to_msg(char* mp, char* sourcep, unsigned int* msize)
 {
-  char *ap;
+  char* ap;
 
   *msize = 0;
-  for (unsigned int j = 0; j < conv.size(); j++) {
+  for (unsigned int j = 0; j < conv.size(); j++)
+  {
     ((dataq_sMsgDataAttr*)mp)->TypeId = conv[j].tid;
     ((dataq_sMsgDataAttr*)mp)->Feedback = conv[j].feedback;
     ((dataq_sMsgDataAttr*)mp)->TargetOffset = conv[j].target_offset;
@@ -92,10 +97,11 @@ void qsrv_data_converter::table_and_data_to_msg(char *mp, char *sourcep, unsigne
 //
 //  Write conversion table to message
 //
-void qsrv_data_converter::table_to_msg(char *mp, unsigned int *msize)
+void qsrv_data_converter::table_to_msg(char* mp, unsigned int* msize)
 {
   *msize = 0;
-  for (unsigned int j = 0; j < conv.size(); j++) {
+  for (unsigned int j = 0; j < conv.size(); j++)
+  {
     ((dataq_sMsgDataAttr*)mp)->TypeId = conv[j].tid;
     ((dataq_sMsgDataAttr*)mp)->Feedback = conv[j].feedback;
     ((dataq_sMsgDataAttr*)mp)->TargetOffset = conv[j].target_offset;
@@ -114,7 +120,7 @@ unsigned int qsrv_data_converter::table_and_data_msg_size()
   unsigned int msize = 0;
   for (unsigned int j = 0; j < conv.size(); j++)
     msize += sizeof(dataq_sMsgDataAttr) + conv[j].size;
-  
+
   return msize;
 }
 
@@ -126,7 +132,7 @@ unsigned int qsrv_data_converter::data_msg_size()
   unsigned int msize = 0;
   for (unsigned int j = 0; j < conv.size(); j++)
     msize += conv[j].size;
-  
+
   return msize;
 }
 
@@ -136,19 +142,21 @@ unsigned int qsrv_data_converter::data_msg_size()
 unsigned int qsrv_data_converter::feedback_data_msg_size()
 {
   unsigned int msize = 0;
-  for (unsigned int j = 0; j < conv.size(); j++) {
+  for (unsigned int j = 0; j < conv.size(); j++)
+  {
     if (conv[j].feedback)
       msize += conv[j].size;
-  }  
+  }
   return msize;
 }
 
 //
 //  Create conversion table from message
 //
-void qsrv_data_converter::msg_to_table(char *mp, unsigned int attr_num, unsigned int *msize)
+void qsrv_data_converter::msg_to_table(char* mp, unsigned int attr_num, unsigned int* msize)
 {
-  for (unsigned int i = 0; i < attr_num; i++) {
+  for (unsigned int i = 0; i < attr_num; i++)
+  {
     qsrv_convert_table ct;
     conv.push_back(ct);
     conv[i].source_offset = ((dataq_sMsgDataAttr*)mp)->SourceOffset;
@@ -162,66 +170,74 @@ void qsrv_data_converter::msg_to_table(char *mp, unsigned int attr_num, unsigned
   *msize = attr_num * sizeof(dataq_sMsgDataAttr);
 }
 
-void qsrv_data_converter::msg_to_target_data(char *mp, char *op, unsigned int *msize)
+void qsrv_data_converter::msg_to_target_data(char* mp, char* op, unsigned int* msize)
 {
   *msize = 0;
-  for (unsigned int i = 0; i < conv.size(); i++) {
-    memcpy(op + conv[i].target_offset, mp, conv[i].size); 
+  for (unsigned int i = 0; i < conv.size(); i++)
+  {
+    memcpy(op + conv[i].target_offset, mp, conv[i].size);
     mp += conv[i].size;
     *msize += conv[i].size;
   }
 }
 
-void qsrv_data_converter::msg_to_feedback_data(char *mp, char *op, unsigned int *msize)
+void qsrv_data_converter::msg_to_feedback_data(char* mp, char* op, unsigned int* msize)
 {
   *msize = 0;
-  for (unsigned int i = 0; i < conv.size(); i++) {
-    if (conv[i].feedback) {
-      memcpy(op + conv[i].source_offset, mp, conv[i].size); 
+  for (unsigned int i = 0; i < conv.size(); i++)
+  {
+    if (conv[i].feedback)
+    {
+      memcpy(op + conv[i].source_offset, mp, conv[i].size);
       mp += conv[i].size;
       *msize += conv[i].size;
     }
   }
 }
 
-void qsrv_data_converter::source_data_to_msg(char *mp, char *op, unsigned int *msize)
+void qsrv_data_converter::source_data_to_msg(char* mp, char* op, unsigned int* msize)
 {
   *msize = 0;
-  for (unsigned int i = 0; i < conv.size(); i++) {
-    memcpy(mp, op + conv[i].source_offset, conv[i].size); 
+  for (unsigned int i = 0; i < conv.size(); i++)
+  {
+    memcpy(mp, op + conv[i].source_offset, conv[i].size);
     mp += conv[i].size;
     *msize += conv[i].size;
   }
 }
 
-void qsrv_data_converter::feedback_data_to_msg(char *mp, char *op, unsigned int *msize)
+void qsrv_data_converter::feedback_data_to_msg(char* mp, char* op, unsigned int* msize)
 {
   *msize = 0;
-  for (unsigned int i = 0; i < conv.size(); i++) {
-    if (conv[i].feedback) {
-      memcpy(mp, op + conv[i].target_offset, conv[i].size); 
+  for (unsigned int i = 0; i < conv.size(); i++)
+  {
+    if (conv[i].feedback)
+    {
+      memcpy(mp, op + conv[i].target_offset, conv[i].size);
       mp += conv[i].size;
       *msize += conv[i].size;
     }
   }
 }
 
-pwr_tStatus dataq_server::remote_name(char* source_name, char* format, char *remote_name, 
-    unsigned int size)
+pwr_tStatus dataq_server::remote_name(char* source_name, char* format, char* remote_name, unsigned int size)
 {
   int num;
   int name_number;
-  char *s;
+  char* s;
   int found;
 
   found = 0;
-  for (s = source_name; *s; s++) {
-    if (isdigit(*s)) {
+  for (s = source_name; *s; s++)
+  {
+    if (isdigit(*s))
+    {
       found = 1;
       break;
     }
   }
-  if (found) {
+  if (found)
+  {
     num = sscanf(s, "%d", &name_number);
     if (num != 1)
       return DATAQ__INVALIDNAME;
@@ -256,7 +272,8 @@ pwr_tStatus dataq_server::node_up(pwr_tNid nid)
   put.data = msg;
   put.allocate = 0;
 
-  if (!qcom_Put(&sts, &tgt, &put)) {
+  if (!qcom_Put(&sts, &tgt, &put))
+  {
     qcom_Free(&sts, put.data);
   }
 
@@ -265,8 +282,10 @@ pwr_tStatus dataq_server::node_up(pwr_tNid nid)
 
 pwr_tStatus dataq_server::node_up_reply(pwr_tNid nid)
 {
-  for (unsigned int i = 0; i < m_nodes.size(); i++) {
-    if (m_nodes[i].nid == nid) {
+  for (unsigned int i = 0; i < m_nodes.size(); i++)
+  {
+    if (m_nodes[i].nid == nid)
+    {
       m_nodes[i].connection = pwr_eUpDownEnum_Up;
       break;
     }
@@ -281,14 +300,16 @@ pwr_tStatus dataq_server::rdataq_init_msg(dataq_sMsgRDataQInit* mp, int size, pw
 
   int tix;
   int found;
-  char *dp;
+  char* dp;
   pwr_tStatus sts;
   unsigned int msize;
 
   found = 0;
-  for (int i = 0; i < m_tdataq.size(); i++) {
+  for (int i = 0; i < m_tdataq.size(); i++)
+  {
     if (cdh_ObjidIsEqual(mp->RDataQ.Objid, m_tdataq[i].rdataq.Objid) &&
-	mp->RDataQ.Offset == m_tdataq[i].rdataq.Offset) {
+        mp->RDataQ.Offset == m_tdataq[i].rdataq.Offset)
+    {
       tix = i;
       m_tdataq[tix].dc.conv.clear();
       m_tdataq[tix].targetq.clear();
@@ -296,7 +317,8 @@ pwr_tStatus dataq_server::rdataq_init_msg(dataq_sMsgRDataQInit* mp, int size, pw
     }
   }
 
-  if (!found) {
+  if (!found)
+  {
     qsrv_tdataq tdataq;
     m_tdataq.push_back(tdataq);
     tix = m_tdataq.size() - 1;
@@ -308,7 +330,8 @@ pwr_tStatus dataq_server::rdataq_init_msg(dataq_sMsgRDataQInit* mp, int size, pw
 
   dp = (char*)&mp->Data;
 
-  for (unsigned int i = 0; i < mp->RemoteQNum; i++) {
+  for (unsigned int i = 0; i < mp->RemoteQNum; i++)
+  {
     qsrv_tdataq_targetq targetq;
     m_tdataq[tix].targetq.push_back(targetq);
     m_tdataq[tix].targetq[i].aref = ((dataq_sMsgRDataQ_RemoteQ*)dp)->Aref;
@@ -317,16 +340,18 @@ pwr_tStatus dataq_server::rdataq_init_msg(dataq_sMsgRDataQInit* mp, int size, pw
     m_tdataq[tix].targetq[i].end = ((dataq_sMsgRDataQ_RemoteQ*)dp)->End;
 
     // Direct link to targetq object
-    sts = gdh_DLRefObjectInfoAttrref(&m_tdataq[tix].targetq[i].aref, 
-	(pwr_tAddress*)&m_tdataq[tix].targetq[i].op, &m_tdataq[tix].targetq[i].dlid);
-    if (EVEN(sts)) {
+    sts = gdh_DLRefObjectInfoAttrref(&m_tdataq[tix].targetq[i].aref,
+                                     (pwr_tAddress*)&m_tdataq[tix].targetq[i].op,
+                                     &m_tdataq[tix].targetq[i].dlid);
+    if (EVEN(sts))
+    {
       errh_Error("RemoteDataQ target queue error, %m, %s", sts);
       m_tdataq[tix].targetq.pop_back();
       continue;
     }
     m_tdataq[tix].targetq[i].op->Super.Intern.RQStatus |= pwr_mRemoteDataQStatusMask_IsTarget;
     if (m_tdataq[tix].targetq[i].options & pwr_mTargetDataQOptionsMask_SendFeedback ||
-	m_tdataq[tix].targetq[i].options & pwr_mTargetDataQOptionsMask_TriggerFeedback)
+        m_tdataq[tix].targetq[i].options & pwr_mTargetDataQOptionsMask_TriggerFeedback)
       m_tdataq[tix].targetq[i].op->Super.Intern.RQStatus |= pwr_mRemoteDataQStatusMask_IsFeedbackTarget;
 
     dp += sizeof(dataq_sMsgRDataQ_RemoteQ);
@@ -339,13 +364,12 @@ pwr_tStatus dataq_server::rdataq_init_msg(dataq_sMsgRDataQInit* mp, int size, pw
   return DATAQ__SUCCESS;
 }
 
-pwr_tStatus dataq_server::rdataq_feedback(dataq_sMsgRDataQFeedback* mp, 
-    int size, pwr_tNid reply_nid)
+pwr_tStatus dataq_server::rdataq_feedback(dataq_sMsgRDataQFeedback* mp, int size, pwr_tNid reply_nid)
 {
   pwr_tStatus sts;
   int found;
   int rix;
-  char *op;
+  char* op;
   unsigned int msize;
 
   if (debug)
@@ -353,8 +377,10 @@ pwr_tStatus dataq_server::rdataq_feedback(dataq_sMsgRDataQFeedback* mp,
 
   // Find source RDataQ
   found = 0;
-  for (unsigned int i = 0; i < m_rdataq.size(); i++) {
-    if (cdh_ObjidIsEqual(mp->RDataQ.Objid, m_rdataq[i].aref.Objid)) {
+  for (unsigned int i = 0; i < m_rdataq.size(); i++)
+  {
+    if (cdh_ObjidIsEqual(mp->RDataQ.Objid, m_rdataq[i].aref.Objid))
+    {
       rix = i;
       found = 1;
       break;
@@ -366,9 +392,11 @@ pwr_tStatus dataq_server::rdataq_feedback(dataq_sMsgRDataQFeedback* mp,
   if (m_rdataq[rix].dc.version != mp->TableVersion)
     return 0;
 
-  if (mp->FeedbackData) {
-    sts = gdh_NameToPointer(mp->DataName, (void **)&op);
-    if (EVEN(sts)) {
+  if (mp->FeedbackData)
+  {
+    sts = gdh_NameToPointer(mp->DataName, (void**)&op);
+    if (EVEN(sts))
+    {
       m_rdataq[rix].op->MsgStatus = sts;
       return sts;
     }
@@ -381,20 +409,22 @@ pwr_tStatus dataq_server::rdataq_feedback(dataq_sMsgRDataQFeedback* mp,
   return DATAQ__SUCCESS;
 }
 
-pwr_tStatus dataq_server::rdataq_reset(dataq_sMsgRDataQReset* mp, 
-    int size, pwr_tNid reply_nid)
+pwr_tStatus dataq_server::rdataq_reset(dataq_sMsgRDataQReset* mp, int size, pwr_tNid reply_nid)
 {
   int found;
 
   if (debug)
     printf("RDataQReset received %d\n", size);
 
-  for (unsigned int i = 0; i < m_tdataq.size(); i++) {
+  for (unsigned int i = 0; i < m_tdataq.size(); i++)
+  {
     if (cdh_ObjidIsEqual(mp->RemoteDataQ.Objid, m_tdataq[i].rdataq.Objid) &&
-	mp->RemoteDataQ.Offset == m_tdataq[i].rdataq.Offset) {
+        mp->RemoteDataQ.Offset == m_tdataq[i].rdataq.Offset)
+    {
       found = 1;
-      for (unsigned int j = 0; j < m_tdataq[i].targetq.size(); j++) {
-	m_tdataq[i].targetq[j].op->Super.Intern.QReset = 1;
+      for (unsigned int j = 0; j < m_tdataq[i].targetq.size(); j++)
+      {
+        m_tdataq[i].targetq[j].op->Super.Intern.QReset = 1;
       }
     }
   }
@@ -416,12 +446,14 @@ pwr_tStatus dataq_server::rdataq(dataq_sMsgRDataQ* mp, int size, pwr_tNid reply_
   pwr_tStatus sts;
   pwr_tCid cid;
   pwr_tOid oid;
-  char *op;
+  char* op;
   unsigned int msize;
 
   found = 0;
-  for (int i = 0; i < m_tdataq.size(); i++) {
-    if (cdh_ObjidIsEqual(mp->RDataQ.Objid, m_tdataq[i].rdataq.Objid)) {
+  for (int i = 0; i < m_tdataq.size(); i++)
+  {
+    if (cdh_ObjidIsEqual(mp->RDataQ.Objid, m_tdataq[i].rdataq.Objid))
+    {
       found = 1;
       tix = i;
       break;
@@ -433,32 +465,37 @@ pwr_tStatus dataq_server::rdataq(dataq_sMsgRDataQ* mp, int size, pwr_tNid reply_
   if (m_tdataq[tix].dc.version != mp->TableVersion)
     return 0;
 
-  if (/* NewData */ 1) {
-    if (mp->Options & pwr_mRemoteDataQOptionsMask_AttachData) {
+  if (/* NewData */ 1)
+  {
+    if (mp->Options & pwr_mRemoteDataQOptionsMask_AttachData)
+    {
       sts = gdh_NameToObjid(mp->DataName, &oid);
       if (ODD(sts))
-	sts = gdh_GetObjectClass(oid, &cid);
+        sts = gdh_GetObjectClass(oid, &cid);
       if (ODD(sts) && cid != mp->DataClass)
-	sts = DATAQ__DATACLASS;
-    } else {
+        sts = DATAQ__DATACLASS;
+    }
+    else
+    {
       // Create data object
-      sts = gdh_CreateObject(mp->DataName, mp->DataClass, 0, &oid, 
-	  pwr_cNOid, 0, pwr_cNOid);
-      if (sts == GDH__DUPLNAME && 
-	  mp->Options & pwr_mRemoteDataQOptionsMask_AttachOrCreateData) {
-	sts = gdh_NameToObjid(mp->DataName, &oid);
-	if (ODD(sts))
-	  sts = gdh_GetObjectClass(oid, &cid);
-	if (ODD(sts) && cid != mp->DataClass)
-	  sts = DATAQ__DATACLASS;
+      sts = gdh_CreateObject(mp->DataName, mp->DataClass, 0, &oid, pwr_cNOid, 0, pwr_cNOid);
+      if (sts == GDH__DUPLNAME && mp->Options & pwr_mRemoteDataQOptionsMask_AttachOrCreateData)
+      {
+        sts = gdh_NameToObjid(mp->DataName, &oid);
+        if (ODD(sts))
+          sts = gdh_GetObjectClass(oid, &cid);
+        if (ODD(sts) && cid != mp->DataClass)
+          sts = DATAQ__DATACLASS;
       }
     }
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_Error("Target queue create object error, %m", sts);
       return sts;
     }
-    sts = gdh_ObjidToPointer(oid, (void **)&op);
-    if (EVEN(sts)) {
+    sts = gdh_ObjidToPointer(oid, (void**)&op);
+    if (EVEN(sts))
+    {
       errh_Error("Target queue attach object error, %m", sts);
       return sts;
     }
@@ -467,11 +504,13 @@ pwr_tStatus dataq_server::rdataq(dataq_sMsgRDataQ* mp, int size, pwr_tNid reply_
 
     // Insert data object into target queue
     found = 0;
-    for (int j = 0; j < m_tdataq[tix].targetq.size(); j++) {
-      if (m_tdataq[tix].targetq[j].start) {
-	found = 1;
-	qix = j;
-	break;
+    for (int j = 0; j < m_tdataq[tix].targetq.size(); j++)
+    {
+      if (m_tdataq[tix].targetq[j].start)
+      {
+        found = 1;
+        qix = j;
+        break;
       }
     }
     if (!found)
@@ -480,7 +519,6 @@ pwr_tStatus dataq_server::rdataq(dataq_sMsgRDataQ* mp, int size, pwr_tNid reply_
     m_tdataq[tix].targetq[qix].op->Super.Control.Objid = oid;
     m_tdataq[tix].targetq[qix].op->Super.Control.Operation = pwr_eDataQCtlEnum_Insert;
     m_tdataq[tix].targetq[qix].op->Super.Control.Commit = 1;
-    
   }
   return DATAQ__SUCCESS;
 }
@@ -500,8 +538,10 @@ pwr_tStatus dataq_server::rorder_init_msg(dataq_sMsgROrderInit* mp, int size, pw
 
   // Find target order
   found = 0;
-  for (unsigned int i = 0; i < m_torder.size(); i++) {
-    if (cdh_ObjidIsEqual(mp->Target, m_torder[i].oid)) {
+  for (unsigned int i = 0; i < m_torder.size(); i++)
+  {
+    if (cdh_ObjidIsEqual(mp->Target, m_torder[i].oid))
+    {
       tix = i;
       found = 1;
     }
@@ -517,7 +557,7 @@ pwr_tStatus dataq_server::rorder_init_msg(dataq_sMsgROrderInit* mp, int size, pw
   m_torder[tix].dc.msg_to_table((char*)&mp->Data[0], mp->AttrNum, &msize);
 
   m_torder[tix].dc.version = mp->TableVersion;
-  
+
   m_torder[tix].op->MsgStatus = DATAQ__SUCCESS;
   return DATAQ__SUCCESS;
 }
@@ -529,7 +569,7 @@ pwr_tStatus dataq_server::rorder(dataq_sMsgROrder* mp, int size, pwr_tNid reply_
   pwr_tCid cid;
   int found;
   int tix;
-  char *op;
+  char* op;
   unsigned int msize;
 
   if (debug)
@@ -537,8 +577,10 @@ pwr_tStatus dataq_server::rorder(dataq_sMsgROrder* mp, int size, pwr_tNid reply_
 
   // Find target order
   found = 0;
-  for (unsigned int i = 0; i < m_torder.size(); i++) {
-    if (cdh_ObjidIsEqual(mp->Target, m_torder[i].oid)) {
+  for (unsigned int i = 0; i < m_torder.size(); i++)
+  {
+    if (cdh_ObjidIsEqual(mp->Target, m_torder[i].oid))
+    {
       tix = i;
       found = 1;
     }
@@ -546,39 +588,45 @@ pwr_tStatus dataq_server::rorder(dataq_sMsgROrder* mp, int size, pwr_tNid reply_
   if (!found)
     return 0;
 
-  if (mp->Type == dataq_eMsgType_ROrderStatusReset) {
+  if (mp->Type == dataq_eMsgType_ROrderStatusReset)
+  {
     if (m_torder[tix].op->Out.Status)
       m_torder[tix].op->QTStatusReset = 1;
   }
-  else if (mp->Type == dataq_eMsgType_ROrder) {
+  else if (mp->Type == dataq_eMsgType_ROrder)
+  {
     if (m_torder[tix].dc.version != mp->TableVersion)
       return 0;
 
-    if (m_torder[tix].options & pwr_mQRemoteOrderOptionsMask_AttachData) {
+    if (m_torder[tix].options & pwr_mQRemoteOrderOptionsMask_AttachData)
+    {
       sts = gdh_NameToObjid(mp->DataName, &oid);
       if (ODD(sts))
-	sts = gdh_GetObjectClass(oid, &cid);
+        sts = gdh_GetObjectClass(oid, &cid);
       if (ODD(sts) && cid != mp->DataClass)
-	sts = DATAQ__DATACLASS;
-    } else {
+        sts = DATAQ__DATACLASS;
+    }
+    else
+    {
       // Create data object
-      sts = gdh_CreateObject(mp->DataName, mp->DataClass, 0, &oid, 
-	  pwr_cNOid, 0, pwr_cNOid);
-      if (sts == GDH__DUPLNAME && 
-	  m_torder[tix].options & pwr_mQRemoteOrderOptionsMask_AttachOrCreateData) {
-	sts = gdh_NameToObjid(mp->DataName, &oid);
-	if (ODD(sts))
-	  sts = gdh_GetObjectClass(oid, &cid);
-	if (ODD(sts) && cid != mp->DataClass)
-	  sts = DATAQ__DATACLASS;
+      sts = gdh_CreateObject(mp->DataName, mp->DataClass, 0, &oid, pwr_cNOid, 0, pwr_cNOid);
+      if (sts == GDH__DUPLNAME && m_torder[tix].options & pwr_mQRemoteOrderOptionsMask_AttachOrCreateData)
+      {
+        sts = gdh_NameToObjid(mp->DataName, &oid);
+        if (ODD(sts))
+          sts = gdh_GetObjectClass(oid, &cid);
+        if (ODD(sts) && cid != mp->DataClass)
+          sts = DATAQ__DATACLASS;
       }
     }
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       m_torder[tix].op->MsgStatus = sts;
       return sts;
     }
-    sts = gdh_ObjidToPointer(oid, (void **)&op);
-    if (EVEN(sts)) {
+    sts = gdh_ObjidToPointer(oid, (void**)&op);
+    if (EVEN(sts))
+    {
       m_torder[tix].op->MsgStatus = sts;
       return sts;
     }
@@ -588,19 +636,18 @@ pwr_tStatus dataq_server::rorder(dataq_sMsgROrder* mp, int size, pwr_tNid reply_
     m_torder[tix].op->DataObject = oid;
     m_torder[tix].op->New = 1;
     m_torder[tix].reply_source = mp->DataSource;
-    
+
     m_torder[tix].op->MsgStatus = DATAQ__SUCCESS;
   }
   return DATAQ__SUCCESS;
 }
 
-pwr_tStatus dataq_server::rorder_feedback(dataq_sMsgROrderFeedback* mp, 
-    int size, pwr_tNid reply_nid)
+pwr_tStatus dataq_server::rorder_feedback(dataq_sMsgROrderFeedback* mp, int size, pwr_tNid reply_nid)
 {
   pwr_tStatus sts;
   int found;
   int rix;
-  char *op;
+  char* op;
   unsigned int msize;
 
   if (debug)
@@ -608,8 +655,10 @@ pwr_tStatus dataq_server::rorder_feedback(dataq_sMsgROrderFeedback* mp,
 
   // Find source order
   found = 0;
-  for (unsigned int i = 0; i < m_rorder.size(); i++) {
-    if (cdh_ObjidIsEqual(mp->ROrder, m_rorder[i].oid)) {
+  for (unsigned int i = 0; i < m_rorder.size(); i++)
+  {
+    if (cdh_ObjidIsEqual(mp->ROrder, m_rorder[i].oid))
+    {
       rix = i;
       found = 1;
       break;
@@ -622,12 +671,14 @@ pwr_tStatus dataq_server::rorder_feedback(dataq_sMsgROrderFeedback* mp,
     return 0;
 
   // Check data object
-  if (cdh_ObjidIsNotEqual(mp->DataObject, m_rorder[rix].op->Out.Data.Aref.Objid)) {
+  if (cdh_ObjidIsNotEqual(mp->DataObject, m_rorder[rix].op->Out.Data.Aref.Objid))
+  {
     m_rorder[rix].op->MsgStatus = DATAQ__DATAREMOVED;
     // return DATAQ__DATAREMOVED;
   }
-  sts = gdh_ObjidToPointer(mp->DataObject, (void **)&op);
-  if (EVEN(sts)) {
+  sts = gdh_ObjidToPointer(mp->DataObject, (void**)&op);
+  if (EVEN(sts))
+  {
     m_rorder[rix].op->MsgStatus = sts;
     return sts;
   }
@@ -641,7 +692,8 @@ pwr_tStatus dataq_server::rorder_feedback(dataq_sMsgROrderFeedback* mp,
 
 void dataq_server::rdataq_close()
 {
-  for (unsigned int i = 0; i < m_rdataq.size(); i++) {
+  for (unsigned int i = 0; i < m_rdataq.size(); i++)
+  {
     if (m_rdataq[i].dlid.nid != 0)
       gdh_DLUnrefObjectInfo(m_rdataq[i].dlid);
   }
@@ -654,9 +706,9 @@ pwr_tStatus dataq_server::rdataq_init()
   int i;
   pwr_tOName name;
 
-  for (sts = gdh_GetClassListAttrRef(pwr_cClass_RemoteDataQ, &aref);
-       ODD(sts);
-       sts = gdh_GetNextAttrRef(pwr_cClass_RemoteDataQ, &aref, &aref)) {
+  for (sts = gdh_GetClassListAttrRef(pwr_cClass_RemoteDataQ, &aref); ODD(sts);
+       sts = gdh_GetNextAttrRef(pwr_cClass_RemoteDataQ, &aref, &aref))
+  {
     qsrv_rdataq rdataq;
 
     m_rdataq.push_back(rdataq);
@@ -664,42 +716,41 @@ pwr_tStatus dataq_server::rdataq_init()
     m_rdataq[i].aref = aref;
 
     // Direct link to rdataq object
-    sts = gdh_DLRefObjectInfoAttrref(&aref, (pwr_tAddress*)&m_rdataq[i].op, 
-        &m_rdataq[i].dlid);
-    if (EVEN(sts)) 
+    sts = gdh_DLRefObjectInfoAttrref(&aref, (pwr_tAddress*)&m_rdataq[i].op, &m_rdataq[i].dlid);
+    if (EVEN(sts))
       return sts;
 
     // Direct link to source dataq object
-    sts = gdh_DLRefObjectInfoAttrref(&m_rdataq[i].op->SourceDataQ, 
-	(pwr_tAddress*)&m_rdataq[i].src_op, &m_rdataq[i].src_dlid);
-    if (EVEN(sts)) 
+    sts = gdh_DLRefObjectInfoAttrref(&m_rdataq[i].op->SourceDataQ, (pwr_tAddress*)&m_rdataq[i].src_op,
+                                     &m_rdataq[i].src_dlid);
+    if (EVEN(sts))
       return sts;
 
-    for (int j = 0; 
-	 j < sizeof(m_rdataq[i].op->TargetDataQ)/sizeof(m_rdataq[i].op->TargetDataQ[0]); 
-	 j++) {
+    for (int j = 0; j < sizeof(m_rdataq[i].op->TargetDataQ) / sizeof(m_rdataq[i].op->TargetDataQ[0]); j++)
+    {
       qsrv_rdataq_remoteq remoteq;
 
       if (cdh_ObjidIsNull(m_rdataq[i].op->TargetDataQ[j].TargetDataQ.Objid))
-	break;
+        break;
       m_rdataq[i].remoteq.push_back(remoteq);
       m_rdataq[i].remoteq[j].aref = m_rdataq[i].op->TargetDataQ[j].TargetDataQ;
       m_rdataq[i].remoteq[j].options = m_rdataq[i].op->TargetDataQ[j].Options;
       if (j == 0)
-	m_rdataq[i].remoteq[j].start = 1;	
+        m_rdataq[i].remoteq[j].start = 1;
     }
-    if (m_rdataq[i].remoteq.size() == 0) {
+    if (m_rdataq[i].remoteq.size() == 0)
+    {
       m_rdataq[i].op->MsgStatus = DATAQ__INIT;
       m_rdataq.pop_back();
       errh_Error("RemoteDataQ error, no remote queues found, %s", name);
       continue;
-    }    
+    }
 
     m_rdataq[i].remoteq[m_rdataq[i].remoteq.size() - 1].end = 1;
 
-    sts = m_rdataq[i].dc.create_table(m_rdataq[i].op->RemoteDataClass, 
-        m_rdataq[i].op->DataClass);
-    if (EVEN(sts)) {
+    sts = m_rdataq[i].dc.create_table(m_rdataq[i].op->RemoteDataClass, m_rdataq[i].op->DataClass);
+    if (EVEN(sts))
+    {
       m_rorder[i].op->MsgStatus = DATAQ__INIT;
       m_rorder.pop_back();
       errh_Error("RemoteDataClass error, %m, %s", sts, name);
@@ -710,19 +761,22 @@ pwr_tStatus dataq_server::rdataq_init()
     pwr_tNodeId nid;
     sts = gdh_GetObjectNodeIndex(m_rdataq[i].remoteq[0].aref.Objid, &nid);
     int found = 0;
-    for (unsigned int m = 0; m < m_nodes.size(); m++) {
-      if (m_nodes[m].nid == nid) {
-	m_rdataq[i].node_idx = m;
-	found = 1;
-	break;
+    for (unsigned int m = 0; m < m_nodes.size(); m++)
+    {
+      if (m_nodes[m].nid == nid)
+      {
+        m_rdataq[i].node_idx = m;
+        found = 1;
+        break;
       }
     }
-    if (!found) {
+    if (!found)
+    {
       m_rdataq[i].op->MsgStatus = DATAQ__INIT;
       m_rdataq.pop_back();
       errh_Error("RemoteDataClass error, invalid target node, %s", name);
       continue;
-    }    
+    }
     m_rdataq[i].src_op->Super.Intern.RQStatus |= pwr_mRemoteDataQStatusMask_HasRemote;
     m_rdataq[i].op->MsgStatus = DATAQ__SUCCESS;
   }
@@ -731,7 +785,8 @@ pwr_tStatus dataq_server::rdataq_init()
 
 void dataq_server::rorder_close()
 {
-  for (unsigned int i = 0; i < m_rorder.size(); i++) {
+  for (unsigned int i = 0; i < m_rorder.size(); i++)
+  {
     if (m_rorder[i].dlid.nid != 0)
       gdh_DLUnrefObjectInfo(m_rorder[i].dlid);
   }
@@ -745,9 +800,8 @@ pwr_tStatus dataq_server::rorder_init()
   int i;
   pwr_tOName name;
 
-  for (sts = gdh_GetClassList(pwr_cClass_QRemoteOrder, &oid);
-       ODD(sts);
-       sts = gdh_GetNextObject(oid, &oid)) {
+  for (sts = gdh_GetClassList(pwr_cClass_QRemoteOrder, &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+  {
     qsrv_rorder rorder;
 
     m_rorder.push_back(rorder);
@@ -760,14 +814,13 @@ pwr_tStatus dataq_server::rorder_init()
 
     // Direct link to order object
     aref = cdh_ObjidToAref(oid);
-    sts = gdh_DLRefObjectInfoAttrref(&aref, (pwr_tAddress*)&m_rorder[i].op, 
-        &m_rorder[i].dlid);
-    if (EVEN(sts)) 
+    sts = gdh_DLRefObjectInfoAttrref(&aref, (pwr_tAddress*)&m_rorder[i].op, &m_rorder[i].dlid);
+    if (EVEN(sts))
       return sts;
 
-    sts = m_rorder[i].dc.create_table(m_rorder[i].op->RemoteDataClass, 
-        m_rorder[i].op->DataClass);
-    if (EVEN(sts)) {
+    sts = m_rorder[i].dc.create_table(m_rorder[i].op->RemoteDataClass, m_rorder[i].op->DataClass);
+    if (EVEN(sts))
+    {
       m_rorder[i].op->MsgStatus = DATAQ__INIT;
       m_rorder.pop_back();
       errh_Error("RemoteDataClass error, %m, %s", sts, name);
@@ -775,23 +828,25 @@ pwr_tStatus dataq_server::rorder_init()
     }
     m_rorder[i].msg_size = m_rorder[i].dc.table_and_data_msg_size();
 
-
     pwr_tNodeId nid;
     sts = gdh_GetObjectNodeIndex(m_rorder[i].op->Target, &nid);
     int found = 0;
-    for (unsigned int m = 0; m < m_nodes.size(); m++) {
-      if (m_nodes[m].nid == nid) {
-	m_rorder[i].node_idx = m;
-	found = 1;
-	break;
+    for (unsigned int m = 0; m < m_nodes.size(); m++)
+    {
+      if (m_nodes[m].nid == nid)
+      {
+        m_rorder[i].node_idx = m;
+        found = 1;
+        break;
       }
     }
-    if (!found) {
+    if (!found)
+    {
       m_rorder[i].op->MsgStatus = DATAQ__INIT;
       m_rorder.pop_back();
       errh_Error("RemoteDataClass error, invalid target node, %s", name);
       continue;
-    }    
+    }
   }
 
   return DATAQ__SUCCESS;
@@ -799,7 +854,8 @@ pwr_tStatus dataq_server::rorder_init()
 
 void dataq_server::torder_close()
 {
-  for (unsigned int i = 0; i < m_torder.size(); i++) {
+  for (unsigned int i = 0; i < m_torder.size(); i++)
+  {
     if (m_torder[i].dlid.nid != 0)
       gdh_DLUnrefObjectInfo(m_torder[i].dlid);
   }
@@ -812,9 +868,8 @@ pwr_tStatus dataq_server::torder_init()
   pwr_tOid oid;
   int i;
 
-  for (sts = gdh_GetClassList(pwr_cClass_QTargetOrder, &oid);
-       ODD(sts);
-       sts = gdh_GetNextObject(oid, &oid)) {
+  for (sts = gdh_GetClassList(pwr_cClass_QTargetOrder, &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+  {
     qsrv_torder torder;
 
     m_torder.push_back(torder);
@@ -824,9 +879,8 @@ pwr_tStatus dataq_server::torder_init()
 
     // Direct link to order object
     aref = cdh_ObjidToAref(oid);
-    sts = gdh_DLRefObjectInfoAttrref(&aref, (pwr_tAddress*)&m_torder[i].op, 
-        &m_torder[i].dlid);
-    if (EVEN(sts)) 
+    sts = gdh_DLRefObjectInfoAttrref(&aref, (pwr_tAddress*)&m_torder[i].op, &m_torder[i].dlid);
+    if (EVEN(sts))
       return sts;
   }
 
@@ -837,61 +891,64 @@ pwr_tStatus dataq_server::send_rdataq_init(pwr_tNid nid)
 {
   qcom_sQid tgt;
   qcom_sPut put;
-  pwr_tStatus sts, lsts;  
+  pwr_tStatus sts, lsts;
 
   // Send init remote dataq
-  for (unsigned int i = 0; i < m_rdataq.size(); i++) {
+  for (unsigned int i = 0; i < m_rdataq.size(); i++)
+  {
     dataq_sMsgRDataQInit* msg;
     unsigned int size;
 
     //    if (nid != m_nodes[m_rdataq[i].node_idx].nid) {
 
-      tgt.nid = m_nodes[m_rdataq[i].node_idx].nid;
-      tgt.qix = dataq_cProcServer;
+    tgt.nid = m_nodes[m_rdataq[i].node_idx].nid;
+    tgt.qix = dataq_cProcServer;
 
-      put.reply.nid = m_nodes[0].nid;
-      put.reply.qix = dataq_cProcServer;
-      put.type.b = (qcom_eBtype)dataq_cMsgClass;
-      put.type.s = (qcom_eStype)dataq_eMsgType_RDataQInit;
-      put.msg_id = m_msg_id++;
-      put.size = sizeof(dataq_sMsgRDataQInit) - sizeof(int) + 
-          m_rdataq[i].remoteq.size() * sizeof(dataq_sMsgRDataQ_RemoteQ) +
-          m_rdataq[i].dc.conv.size() * sizeof(dataq_sMsgDataAttr);
-      msg = (dataq_sMsgRDataQInit*)qcom_Alloc(&lsts, put.size);
-      
-      msg->Type = dataq_eMsgType_RDataQInit;
-      msg->Version = dataq_cNetVersion;
-      msg->RDataQ = m_rdataq[i].aref;
-      strncpy(msg->SourceDataName, m_rdataq[i].op->DataName, sizeof(msg->SourceDataName));
-      msg->DataClass = m_rdataq[i].op->RemoteDataClass;
-      msg->Options = m_rdataq[i].op->Options;
-      msg->TableVersion = m_rdataq[i].dc.version;
-      msg->RemoteQNum = m_rdataq[i].remoteq.size();
-      msg->AttrNum = m_rdataq[i].dc.conv.size();
-    
-      char *dp = (char*)&msg->Data;
-      for (unsigned int j = 0; j < m_rdataq[i].remoteq.size(); j++) {
-	((dataq_sMsgRDataQ_RemoteQ*)dp)->Aref = m_rdataq[i].remoteq[j].aref;
-	((dataq_sMsgRDataQ_RemoteQ*)dp)->Options = m_rdataq[i].remoteq[j].options;
-	((dataq_sMsgRDataQ_RemoteQ*)dp)->Start = m_rdataq[i].remoteq[j].start;
-	((dataq_sMsgRDataQ_RemoteQ*)dp)->End = m_rdataq[i].remoteq[j].end;
-	dp += sizeof(dataq_sMsgRDataQ_RemoteQ);
-      }
+    put.reply.nid = m_nodes[0].nid;
+    put.reply.qix = dataq_cProcServer;
+    put.type.b = (qcom_eBtype)dataq_cMsgClass;
+    put.type.s = (qcom_eStype)dataq_eMsgType_RDataQInit;
+    put.msg_id = m_msg_id++;
+    put.size = sizeof(dataq_sMsgRDataQInit) - sizeof(int) +
+               m_rdataq[i].remoteq.size() * sizeof(dataq_sMsgRDataQ_RemoteQ) +
+               m_rdataq[i].dc.conv.size() * sizeof(dataq_sMsgDataAttr);
+    msg = (dataq_sMsgRDataQInit*)qcom_Alloc(&lsts, put.size);
 
-      m_rdataq[i].dc.table_to_msg(dp, &size);
+    msg->Type = dataq_eMsgType_RDataQInit;
+    msg->Version = dataq_cNetVersion;
+    msg->RDataQ = m_rdataq[i].aref;
+    strncpy(msg->SourceDataName, m_rdataq[i].op->DataName, sizeof(msg->SourceDataName));
+    msg->DataClass = m_rdataq[i].op->RemoteDataClass;
+    msg->Options = m_rdataq[i].op->Options;
+    msg->TableVersion = m_rdataq[i].dc.version;
+    msg->RemoteQNum = m_rdataq[i].remoteq.size();
+    msg->AttrNum = m_rdataq[i].dc.conv.size();
 
-      put.data = msg;
-      put.allocate = 0;
-
-      if (!qcom_Put(&sts, &tgt, &put)) {
-	qcom_Free(&sts, put.data);
-	errh_Info("No connection to %s (%s)", m_nodes[i].name,
-	    cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
-      } else
-	errh_Info("Remote DataQ init sent to %s (%s)", m_nodes[i].name,
-            cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+    char* dp = (char*)&msg->Data;
+    for (unsigned int j = 0; j < m_rdataq[i].remoteq.size(); j++)
+    {
+      ((dataq_sMsgRDataQ_RemoteQ*)dp)->Aref = m_rdataq[i].remoteq[j].aref;
+      ((dataq_sMsgRDataQ_RemoteQ*)dp)->Options = m_rdataq[i].remoteq[j].options;
+      ((dataq_sMsgRDataQ_RemoteQ*)dp)->Start = m_rdataq[i].remoteq[j].start;
+      ((dataq_sMsgRDataQ_RemoteQ*)dp)->End = m_rdataq[i].remoteq[j].end;
+      dp += sizeof(dataq_sMsgRDataQ_RemoteQ);
     }
-//}
+
+    m_rdataq[i].dc.table_to_msg(dp, &size);
+
+    put.data = msg;
+    put.allocate = 0;
+
+    if (!qcom_Put(&sts, &tgt, &put))
+    {
+      qcom_Free(&sts, put.data);
+      errh_Info("No connection to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+    }
+    else
+      errh_Info("Remote DataQ init sent to %s (%s)", m_nodes[i].name,
+                cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+  }
+  //}
   return DATAQ__SUCCESS;
 }
 
@@ -899,10 +956,11 @@ pwr_tStatus dataq_server::send_rorder_init(pwr_tNid nid)
 {
   qcom_sQid tgt;
   qcom_sPut put;
-  pwr_tStatus sts, lsts;  
+  pwr_tStatus sts, lsts;
 
   // Send init remote order
-  for (unsigned int i = 0; i < m_rorder.size(); i++) {
+  for (unsigned int i = 0; i < m_rorder.size(); i++)
+  {
     dataq_sMsgROrderInit* msg;
     unsigned int size;
 
@@ -916,10 +974,10 @@ pwr_tStatus dataq_server::send_rorder_init(pwr_tNid nid)
     put.type.b = (qcom_eBtype)dataq_cMsgClass;
     put.type.s = (qcom_eStype)dataq_eMsgType_ROrderInit;
     put.msg_id = m_msg_id++;
-    put.size = sizeof(dataq_sMsgROrderInit) - sizeof(int) + 
-        m_rorder[i].dc.conv.size() * sizeof(dataq_sMsgDataAttr);
+    put.size =
+        sizeof(dataq_sMsgROrderInit) - sizeof(int) + m_rorder[i].dc.conv.size() * sizeof(dataq_sMsgDataAttr);
     msg = (dataq_sMsgROrderInit*)qcom_Alloc(&lsts, put.size);
-      
+
     msg->Type = dataq_eMsgType_ROrderInit;
     msg->Version = dataq_cNetVersion;
     msg->ROrder = m_rorder[i].oid;
@@ -934,13 +992,14 @@ pwr_tStatus dataq_server::send_rorder_init(pwr_tNid nid)
     put.data = msg;
     put.allocate = 0;
 
-    if (!qcom_Put(&sts, &tgt, &put)) {
+    if (!qcom_Put(&sts, &tgt, &put))
+    {
       qcom_Free(&sts, put.data);
-      errh_Info("No connection to %s (%s)", m_nodes[i].name,
-	  cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
-    } else
+      errh_Info("No connection to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+    }
+    else
       errh_Info("Remote order init sent to %s (%s)", m_nodes[i].name,
-          cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+                cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
   }
 
   return DATAQ__SUCCESS;
@@ -950,75 +1009,81 @@ pwr_tStatus dataq_server::trans_handler()
 {
   qcom_sQid tgt;
   qcom_sPut put;
-  pwr_tStatus sts, lsts;  
+  pwr_tStatus sts, lsts;
 
   // Examine target dataq
-  for (unsigned int i = 0; i < m_tdataq.size(); i++) {
-    for (unsigned int j = 0; j < m_tdataq[i].targetq.size(); j++) {
-      if (m_tdataq[i].targetq[j].op->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewFeedback) {
-	printf("Send feedback...\n");
+  for (unsigned int i = 0; i < m_tdataq.size(); i++)
+  {
+    for (unsigned int j = 0; j < m_tdataq[i].targetq.size(); j++)
+    {
+      if (m_tdataq[i].targetq[j].op->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewFeedback)
+      {
+        printf("Send feedback...\n");
 
-	pwr_tOid oid;
-	pwr_tOName name;
-	pwr_tOName dataname;
-	dataq_sMsgRDataQFeedback* msg;
-	char *targetp;
-	unsigned int msize;
-      
-	tgt.nid = m_tdataq[i].reply_nid;
-	tgt.qix = dataq_cProcServer;
+        pwr_tOid oid;
+        pwr_tOName name;
+        pwr_tOName dataname;
+        dataq_sMsgRDataQFeedback* msg;
+        char* targetp;
+        unsigned int msize;
 
+        tgt.nid = m_tdataq[i].reply_nid;
+        tgt.qix = dataq_cProcServer;
 
-	oid = m_tdataq[i].targetq[j].op->Data[0].Data.Aref.Objid;
-	sts = gdh_ObjidToPointer(oid, (void **)&targetp); 
-	if (EVEN(sts)) {
-	  m_tdataq[i].targetq[j].op->Super.Intern.RQStatus &= ~pwr_mRemoteDataQStatusMask_NewFeedback;
-	  continue;
-	}
-	sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_object);
-	if (EVEN(sts)) {
-	  m_tdataq[i].targetq[j].op->Super.Intern.RQStatus &= ~pwr_mRemoteDataQStatusMask_NewFeedback;
-	  continue;
-	}
-      
-	sts = remote_name(name, m_tdataq[i].source_dataname, dataname, sizeof(dataname));
-	if (EVEN(sts)) {
-	  m_tdataq[i].targetq[j].op->Super.Intern.RQStatus &= ~pwr_mRemoteDataQStatusMask_NewFeedback;
-	  continue;	
-	}
+        oid = m_tdataq[i].targetq[j].op->Data[0].Data.Aref.Objid;
+        sts = gdh_ObjidToPointer(oid, (void**)&targetp);
+        if (EVEN(sts))
+        {
+          m_tdataq[i].targetq[j].op->Super.Intern.RQStatus &= ~pwr_mRemoteDataQStatusMask_NewFeedback;
+          continue;
+        }
+        sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_object);
+        if (EVEN(sts))
+        {
+          m_tdataq[i].targetq[j].op->Super.Intern.RQStatus &= ~pwr_mRemoteDataQStatusMask_NewFeedback;
+          continue;
+        }
 
-	put.reply.nid = m_nodes[0].nid;
-	put.reply.qix = dataq_cProcServer;
-	put.type.b = (qcom_eBtype)dataq_cMsgClass;
-	put.type.s = (qcom_eStype)dataq_eMsgType_RDataQFeedback;
-	put.msg_id = m_msg_id++;
-	put.size = sizeof(dataq_sMsgRDataQFeedback) - sizeof(int) + m_tdataq[i].dc.feedback_data_msg_size();
-	msg = (dataq_sMsgRDataQFeedback*)qcom_Alloc(&lsts, put.size);
-      
-	msg->Type = dataq_eMsgType_RDataQFeedback;
-	msg->Version = dataq_cNetVersion;
-	msg->RDataQ = m_tdataq[i].rdataq;
-	msg->TableVersion = m_tdataq[i].dc.version;
-	if (m_tdataq[i].targetq[j].options & pwr_mTargetDataQOptionsMask_SendFeedback) {
-	  msg->FeedbackData = 1;
-	  strncpy(msg->DataName, dataname, sizeof(msg->DataName));
-	  msg->AttrNum = m_tdataq[i].dc.feedback_size();	
-	
-	  m_tdataq[i].dc.feedback_data_to_msg((char*)&msg->Data, targetp, &msize);
-	}
-	if (m_tdataq[i].targetq[j].options & pwr_mTargetDataQOptionsMask_TriggerFeedback)
-	  msg->FeedbackTrigger = 1;
-	  
-	put.data = msg;
-	put.allocate = 0;
+        sts = remote_name(name, m_tdataq[i].source_dataname, dataname, sizeof(dataname));
+        if (EVEN(sts))
+        {
+          m_tdataq[i].targetq[j].op->Super.Intern.RQStatus &= ~pwr_mRemoteDataQStatusMask_NewFeedback;
+          continue;
+        }
 
-	if (!qcom_Put(&sts, &tgt, &put)) {
-	  qcom_Free(&sts, put.data);
-	  errh_Info("No connection to %s (%s)", m_nodes[i].name,
-	      cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
-	} else
-	  errh_Info("Connect sent to %s (%s)", m_nodes[i].name,
-              cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+        put.reply.nid = m_nodes[0].nid;
+        put.reply.qix = dataq_cProcServer;
+        put.type.b = (qcom_eBtype)dataq_cMsgClass;
+        put.type.s = (qcom_eStype)dataq_eMsgType_RDataQFeedback;
+        put.msg_id = m_msg_id++;
+        put.size = sizeof(dataq_sMsgRDataQFeedback) - sizeof(int) + m_tdataq[i].dc.feedback_data_msg_size();
+        msg = (dataq_sMsgRDataQFeedback*)qcom_Alloc(&lsts, put.size);
+
+        msg->Type = dataq_eMsgType_RDataQFeedback;
+        msg->Version = dataq_cNetVersion;
+        msg->RDataQ = m_tdataq[i].rdataq;
+        msg->TableVersion = m_tdataq[i].dc.version;
+        if (m_tdataq[i].targetq[j].options & pwr_mTargetDataQOptionsMask_SendFeedback)
+        {
+          msg->FeedbackData = 1;
+          strncpy(msg->DataName, dataname, sizeof(msg->DataName));
+          msg->AttrNum = m_tdataq[i].dc.feedback_size();
+
+          m_tdataq[i].dc.feedback_data_to_msg((char*)&msg->Data, targetp, &msize);
+        }
+        if (m_tdataq[i].targetq[j].options & pwr_mTargetDataQOptionsMask_TriggerFeedback)
+          msg->FeedbackTrigger = 1;
+
+        put.data = msg;
+        put.allocate = 0;
+
+        if (!qcom_Put(&sts, &tgt, &put))
+        {
+          qcom_Free(&sts, put.data);
+          errh_Info("No connection to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+        }
+        else
+          errh_Info("Connect sent to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
 
 #if 0
 	if (m_torder[i].options & pwr_mRemoteDataQOptionsMask_DeleteData) {
@@ -1029,35 +1094,37 @@ pwr_tStatus dataq_server::trans_handler()
 	  }
 	}
 #endif
-	m_tdataq[i].targetq[j].op->Super.Intern.RQStatus &= ~pwr_mRemoteDataQStatusMask_NewFeedback;
+        m_tdataq[i].targetq[j].op->Super.Intern.RQStatus &= ~pwr_mRemoteDataQStatusMask_NewFeedback;
       }
     }
   }
 
   // Examine remote dataq
-  for (unsigned int i = 0; i < m_rdataq.size(); i++) {
-    if (m_rdataq[i].src_op->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewData) {
+  for (unsigned int i = 0; i < m_rdataq.size(); i++)
+  {
+    if (m_rdataq[i].src_op->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewData)
+    {
       // Send new data object to first remote queue
       pwr_tOid oid;
       pwr_tObjName name;
       pwr_tOName dataname;
       dataq_sMsgRDataQ* msg;
-      char *sourcep;
+      char* sourcep;
       unsigned int msize;
 
       // Link to data object
       oid = m_rdataq[i].src_op->Data[0].Data.Aref.Objid;
-      sts = gdh_ObjidToPointer(oid, (void **)&sourcep); 
+      sts = gdh_ObjidToPointer(oid, (void**)&sourcep);
       if (EVEN(sts))
-	continue;
+        continue;
 
       sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_object);
       if (EVEN(sts))
-	continue;
-      
+        continue;
+
       sts = remote_name(name, m_rdataq[i].op->RemoteDataName, dataname, sizeof(dataname));
       if (EVEN(sts))
-	continue;
+        continue;
 
       tgt.nid = m_nodes[m_rdataq[i].node_idx].nid;
       tgt.qix = dataq_cProcServer;
@@ -1069,7 +1136,7 @@ pwr_tStatus dataq_server::trans_handler()
       put.msg_id = m_msg_id++;
       put.size = sizeof(dataq_sMsgRDataQ) - sizeof(int) + m_rdataq[i].msg_size;
       msg = (dataq_sMsgRDataQ*)qcom_Alloc(&lsts, put.size);
-      
+
       msg->Type = dataq_eMsgType_RDataQ;
       msg->Version = dataq_cNetVersion;
       strncpy(msg->DataName, dataname, sizeof(msg->DataName));
@@ -1086,18 +1153,19 @@ pwr_tStatus dataq_server::trans_handler()
       put.data = msg;
       put.allocate = 0;
 
-      if (!qcom_Put(&sts, &tgt, &put)) {
-	qcom_Free(&sts, put.data);
-	errh_Info("No connection to %s (%s)", m_nodes[i].name,
-	   cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
-      } else
-	errh_Info("Connect sent to %s (%s)", m_nodes[i].name,
-          cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      if (!qcom_Put(&sts, &tgt, &put))
+      {
+        qcom_Free(&sts, put.data);
+        errh_Info("No connection to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      }
+      else
+        errh_Info("Connect sent to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
 
       m_rdataq[i].src_op->Super.Intern.RQStatus &= ~pwr_mRemoteDataQStatusMask_NewData;
     }
 
-    if (m_rdataq[i].src_op->Super.Intern.RQReset) {
+    if (m_rdataq[i].src_op->Super.Intern.RQReset)
+    {
       dataq_sMsgRDataQReset* msg;
 
       // Send reset order to all remote queues
@@ -1112,10 +1180,10 @@ pwr_tStatus dataq_server::trans_handler()
       put.type.b = (qcom_eBtype)dataq_cMsgClass;
       put.type.s = (qcom_eStype)dataq_eMsgType_RDataQReset;
       put.msg_id = m_msg_id++;
-      put.size = sizeof(dataq_sMsgRDataQReset) - sizeof(int) + 
-          m_rdataq[i].remoteq.size() * sizeof(pwr_tAttrRef);
+      put.size =
+          sizeof(dataq_sMsgRDataQReset) - sizeof(int) + m_rdataq[i].remoteq.size() * sizeof(pwr_tAttrRef);
       msg = (dataq_sMsgRDataQReset*)qcom_Alloc(&lsts, put.size);
-      
+
       msg->Type = dataq_eMsgType_RDataQReset;
       msg->Version = dataq_cNetVersion;
       msg->RemoteDataQ = m_rdataq[i].aref;
@@ -1123,40 +1191,44 @@ pwr_tStatus dataq_server::trans_handler()
       put.data = msg;
       put.allocate = 0;
 
-      if (!qcom_Put(&sts, &tgt, &put)) {
-	qcom_Free(&sts, put.data);
-	errh_Info("No connection to %s (%s)", m_nodes[i].name,
-	    cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
-      } else if (debug) {
-	printf("Remote DataQ reset sent %s (%s)", m_nodes[i].name,
-            cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      if (!qcom_Put(&sts, &tgt, &put))
+      {
+        qcom_Free(&sts, put.data);
+        errh_Info("No connection to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      }
+      else if (debug)
+      {
+        printf("Remote DataQ reset sent %s (%s)", m_nodes[i].name,
+               cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
       }
     }
   }
 
   // Examine remote orders
-  for (unsigned int i = 0; i < m_rorder.size(); i++) {
-    if (m_rorder[i].op->QRStatus) {
+  for (unsigned int i = 0; i < m_rorder.size(); i++)
+  {
+    if (m_rorder[i].op->QRStatus)
+    {
       pwr_tOid oid;
       pwr_tOName name;
       pwr_tOName dataname;
       dataq_sMsgROrder* msg;
       unsigned int size;
-      char *sourcep;
+      char* sourcep;
 
       // Link to data object
       oid = m_rorder[i].op->Out.Data.Aref.Objid;
-      sts = gdh_ObjidToPointer(oid, (void **)&sourcep); 
+      sts = gdh_ObjidToPointer(oid, (void**)&sourcep);
       if (EVEN(sts))
-	continue;
+        continue;
 
       sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_object);
       if (EVEN(sts))
-	continue;
-      
+        continue;
+
       sts = remote_name(name, m_rorder[i].op->RemoteDataName, dataname, sizeof(dataname));
       if (EVEN(sts))
-	continue;
+        continue;
 
       tgt.nid = m_nodes[m_rorder[i].node_idx].nid;
       tgt.qix = dataq_cProcServer;
@@ -1168,7 +1240,7 @@ pwr_tStatus dataq_server::trans_handler()
       put.msg_id = m_msg_id++;
       put.size = sizeof(dataq_sMsgROrder) - sizeof(int) + m_rorder[i].msg_size;
       msg = (dataq_sMsgROrder*)qcom_Alloc(&lsts, put.size);
-      
+
       msg->Type = dataq_eMsgType_ROrder;
       msg->Version = dataq_cNetVersion;
       strncpy(msg->DataName, dataname, sizeof(msg->DataName));
@@ -1184,17 +1256,19 @@ pwr_tStatus dataq_server::trans_handler()
       put.data = msg;
       put.allocate = 0;
 
-      if (!qcom_Put(&sts, &tgt, &put)) {
-	qcom_Free(&sts, put.data);
-	errh_Info("No connection to %s (%s)", m_nodes[i].name,
-	   cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
-      } else
-	errh_Info("Remote order sent to %s (%s)", m_nodes[i].name,
-          cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      if (!qcom_Put(&sts, &tgt, &put))
+      {
+        qcom_Free(&sts, put.data);
+        errh_Info("No connection to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      }
+      else
+        errh_Info("Remote order sent to %s (%s)", m_nodes[i].name,
+                  cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
 
       m_rorder[i].op->QRStatus = 0;
     }
-    else if (m_rorder[i].op->QRStatusReset) {
+    else if (m_rorder[i].op->QRStatusReset)
+    {
       dataq_sMsgROrder* msg;
 
       tgt.nid = m_nodes[m_rorder[i].node_idx].nid;
@@ -1207,7 +1281,7 @@ pwr_tStatus dataq_server::trans_handler()
       put.msg_id = m_msg_id++;
       put.size = sizeof(dataq_sMsgROrder) - sizeof(int) + m_rorder[i].msg_size;
       msg = (dataq_sMsgROrder*)qcom_Alloc(&lsts, put.size);
-      
+
       msg->Type = dataq_eMsgType_ROrderStatusReset;
       msg->Version = dataq_cNetVersion;
       msg->DataSource = pwr_cNOid;
@@ -1220,37 +1294,39 @@ pwr_tStatus dataq_server::trans_handler()
       put.data = msg;
       put.allocate = 0;
 
-      if (!qcom_Put(&sts, &tgt, &put)) {
-	qcom_Free(&sts, put.data);
-	errh_Info("No connection to %s (%s)", m_nodes[i].name,
-	   cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
-      } else
-	errh_Info("Connect sent to %s (%s)", m_nodes[i].name,
-          cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      if (!qcom_Put(&sts, &tgt, &put))
+      {
+        qcom_Free(&sts, put.data);
+        errh_Info("No connection to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      }
+      else
+        errh_Info("Connect sent to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
 
       m_rorder[i].op->QRStatusReset = 0;
     }
   }
 
   // Examine target orders
-  for (unsigned int i = 0; i < m_torder.size(); i++) {
-    if (m_torder[i].op->QTFeedback) {
+  for (unsigned int i = 0; i < m_torder.size(); i++)
+  {
+    if (m_torder[i].op->QTFeedback)
+    {
       pwr_tOid oid;
       pwr_tOName name;
       dataq_sMsgROrderFeedback* msg;
-      char *targetp;
+      char* targetp;
       unsigned int msize;
 
       // Link to data object
       oid = m_torder[i].op->Out.Data.Aref.Objid;
-      sts = gdh_ObjidToPointer(oid, (void **)&targetp); 
+      sts = gdh_ObjidToPointer(oid, (void**)&targetp);
       if (EVEN(sts))
-	continue;
+        continue;
 
       sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_object);
       if (EVEN(sts))
-	continue;
-      
+        continue;
+
       tgt.nid = m_torder[i].reply_nid;
       tgt.qix = dataq_cProcServer;
 
@@ -1261,7 +1337,7 @@ pwr_tStatus dataq_server::trans_handler()
       put.msg_id = m_msg_id++;
       put.size = sizeof(dataq_sMsgROrderFeedback) - sizeof(int) + m_torder[i].dc.feedback_data_msg_size();
       msg = (dataq_sMsgROrderFeedback*)qcom_Alloc(&lsts, put.size);
-      
+
       msg->Type = dataq_eMsgType_ROrderFeedback;
       msg->Version = dataq_cNetVersion;
       msg->ROrder = m_torder[i].rorder;
@@ -1274,18 +1350,19 @@ pwr_tStatus dataq_server::trans_handler()
       put.data = msg;
       put.allocate = 0;
 
-      if (!qcom_Put(&sts, &tgt, &put)) {
-	qcom_Free(&sts, put.data);
-	errh_Info("No connection to %s (%s)", m_nodes[i].name,
-	   cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
-      } else
-	errh_Info("Connect sent to %s (%s)", m_nodes[i].name,
-          cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      if (!qcom_Put(&sts, &tgt, &put))
+      {
+        qcom_Free(&sts, put.data);
+        errh_Info("No connection to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      }
+      else
+        errh_Info("Connect sent to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
 
-      if (m_torder[i].options & pwr_mQRemoteOrderOptionsMask_DeleteData) {
-	sts = gdh_DeleteObject(oid);
-	if (EVEN(sts))
-	  return sts;
+      if (m_torder[i].options & pwr_mQRemoteOrderOptionsMask_DeleteData)
+      {
+        sts = gdh_DeleteObject(oid);
+        if (EVEN(sts))
+          return sts;
       }
 
       m_torder[i].op->QTFeedback = 0;
@@ -1304,7 +1381,8 @@ pwr_tStatus dataq_server::connect()
   // Wait for qmon to start
   sleep(5);
 
-  for (unsigned int i = 1; i < m_nodes.size(); i++) {
+  for (unsigned int i = 1; i < m_nodes.size(); i++)
+  {
     tgt.nid = m_nodes[i].nid;
     tgt.qix = dataq_cProcServer;
 
@@ -1321,13 +1399,13 @@ pwr_tStatus dataq_server::connect()
     put.data = msg;
     put.allocate = 0;
 
-    if (!qcom_Put(&sts, &tgt, &put)) {
+    if (!qcom_Put(&sts, &tgt, &put))
+    {
       qcom_Free(&sts, put.data);
-      errh_Info("No connection to %s (%s)", m_nodes[i].name,
-          cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
-    } else
-      errh_Info("Connect sent to %s (%s)", m_nodes[i].name,
-          cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      errh_Info("No connection to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+    }
+    else
+      errh_Info("Connect sent to %s (%s)", m_nodes[i].name, cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
   }
 
   return DATAQ__SUCCESS;
@@ -1346,8 +1424,7 @@ pwr_tStatus dataq_server::get_config()
 
   /* Direct link to the cell */
   aref = cdh_ObjidToAref(oid);
-  sts = gdh_DLRefObjectInfoAttrref(&aref, (pwr_tAddress*)&m_config, 
-      &m_config_dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&aref, (pwr_tAddress*)&m_config, &m_config_dlid);
   if (EVEN(sts))
     return sts;
   return DATAQ__SUCCESS;
@@ -1363,13 +1440,15 @@ pwr_tStatus dataq_server::init()
 
   // Init gdh
   sts = gdh_Init("dataq_server");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     exit(sts);
   }
 
   // Init qcom and bind event que
-  if (!qcom_Init(&sts, 0, "dataq_server")) {
+  if (!qcom_Init(&sts, 0, "dataq_server"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     exit(sts);
   }
@@ -1378,26 +1457,32 @@ pwr_tStatus dataq_server::init()
   qid.nid = 0;
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 200;
-  if (!qcom_CreateQ(&sts, &qid, &qAttr, "DataQServer")) {
-    if (sts == QCOM__QALLREXIST) {
-      if (!qcom_AttachQ(&sts, &qid)) {
+  if (!qcom_CreateQ(&sts, &qid, &qAttr, "DataQServer"))
+  {
+    if (sts == QCOM__QALLREXIST)
+    {
+      if (!qcom_AttachQ(&sts, &qid))
+      {
         if (!qcom_DeleteQ(&sts, &qid))
           throw co_error(sts);
         if (!qcom_CreateQ(&sts, &qid, &qAttr, "DataQServer"))
           throw co_error(sts);
       }
-    } else
+    }
+    else
       throw co_error(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, &qid, &qini)) {
+  if (!qcom_Bind(&sts, &qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     exit(-1);
   }
 
   sts = get_config();
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Info("Not configured");
     exit(0);
   }
@@ -1413,7 +1498,8 @@ pwr_tStatus dataq_server::init()
   myn.connection = pwr_eUpDownEnum_Up;
   m_nodes.push_back(myn);
 
-  for (pwr_tNid nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid) {
+  for (pwr_tNid nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid)
+  {
     qsrv_node n;
 
     n.nid = node.nid;
@@ -1422,24 +1508,26 @@ pwr_tStatus dataq_server::init()
     m_nodes.push_back(n);
   }
 
-
   // Wait for the plcpgm has flagged initizated
   plc_UtlWaitForPlc();
 
   sts = rdataq_init();
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("Init remote dataq error, %m", sts);
     exit(0);
   }
 
   sts = rorder_init();
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("Init remote order error, %m", sts);
     exit(0);
   }
 
   sts = torder_init();
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("Init target order error, %m", sts);
     exit(0);
   }
@@ -1465,25 +1553,31 @@ pwr_tStatus dataq_server::mainloop()
 
   tmo = 1000 * m_config->ScanTime - 1;
 
-  for (;;) {
+  for (;;)
+  {
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &qid, &get, tmo);
-    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
-      if (!swap) {
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+    {
+      if (!swap)
+      {
         sts = trans_handler();
-        if (EVEN(sts)) {
-	  errh_Error("Trans handler error, %m", sts);
-	  exit(0);
-	}
+        if (EVEN(sts))
+        {
+          errh_Error("Trans handler error, %m", sts);
+          exit(0);
+        }
       }
       continue;
-    } 
-    switch ((int)get.type.b) {
+    }
+    switch ((int)get.type.b)
+    {
     case dataq_cMsgClass:
       if (debug)
-	printf("Message recevied %d\n", (int)get.type.s);
-      switch ((int)get.type.s) {
+        printf("Message recevied %d\n", (int)get.type.s);
+      switch ((int)get.type.s)
+      {
       case dataq_eMsgType_NodeUp:
         errh_Info("Node up %s", cdh_NodeIdToString(0, get.reply.nid, 0, 0));
         node_up(get.reply.nid);
@@ -1518,38 +1612,47 @@ pwr_tStatus dataq_server::mainloop()
         break;
       }
       break;
-    case qcom_eBtype_event: {
+    case qcom_eBtype_event:
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop && !swap) {
+      if (new_event.b.oldPlcStop && !swap)
+      {
         swap = 1;
-	rdataq_close();
-	rorder_close();
-	torder_close();
-      } else if (new_event.b.swapDone && swap) {
+        rdataq_close();
+        rorder_close();
+        torder_close();
+      }
+      else if (new_event.b.swapDone && swap)
+      {
         swap = 0;
-	
-	sts = rdataq_init();
-	if (EVEN(sts)) {
-	  errh_Error("Init remote dataq error, %m", sts);
-	  exit(0);
-	}
+
+        sts = rdataq_init();
+        if (EVEN(sts))
+        {
+          errh_Error("Init remote dataq error, %m", sts);
+          exit(0);
+        }
 
         sts = rorder_init();
-        if (EVEN(sts)) {
-	  errh_Error("Init remote order error, %m", sts);
-	  exit(0);
-	}
-	
-	sts = torder_init();
-	if (EVEN(sts)) {
-	  errh_Error("Init target order error, %m", sts);
-	  exit(0);
-	}
+        if (EVEN(sts))
+        {
+          errh_Error("Init remote order error, %m", sts);
+          exit(0);
+        }
+
+        sts = torder_init();
+        if (EVEN(sts))
+        {
+          errh_Error("Init target order error, %m", sts);
+          exit(0);
+        }
         errh_Info("Warm restart completed");
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         exit(0);
       }
       break;

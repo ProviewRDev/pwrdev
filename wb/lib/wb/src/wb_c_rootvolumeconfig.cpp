@@ -54,17 +54,18 @@ static pwr_tStatus OpenDb(ldh_sMenuCall* ip)
   pwr_tFileName filename;
   char cmd[430];
 
-  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Object,
-      volume_name, sizeof(volume_name), &size);
+  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Object, volume_name,
+                        sizeof(volume_name), &size);
   if (EVEN(sts))
     return sts;
 
   dcli_translate_filename(filename, "$pwr_exe/wb_open_db.sh");
-  sprintf(cmd, "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename,
-      CoLogin::username(), CoLogin::ucpassword(), volume_name, volume_name);
+  snprintf(cmd, sizeof(cmd), "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename, CoLogin::username(), CoLogin::ucpassword(),
+          volume_name, volume_name);
 
   sts = system(cmd);
-  if (sts == -1 || sts == 127) {
+  if (sts == -1 || sts == 127)
+  {
     printf("-- Error when creating process.\n");
     return sts;
   }
@@ -75,9 +76,6 @@ static pwr_tStatus OpenDb(ldh_sMenuCall* ip)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(RootVolumeConfig)
-    = { pwr_BindMethod(OpenDb), pwr_NullMethod };
-pwr_dExport pwr_BindMethods(SubVolumeConfig)
-    = { pwr_BindMethod(OpenDb), pwr_NullMethod };
-pwr_dExport pwr_BindMethods(SharedVolumeConfig)
-    = { pwr_BindMethod(OpenDb), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(RootVolumeConfig) = {pwr_BindMethod(OpenDb), pwr_NullMethod};
+pwr_dExport pwr_BindMethods(SubVolumeConfig) = {pwr_BindMethod(OpenDb), pwr_NullMethod};
+pwr_dExport pwr_BindMethods(SharedVolumeConfig) = {pwr_BindMethod(OpenDb), pwr_NullMethod};

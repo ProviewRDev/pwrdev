@@ -36,36 +36,22 @@
 
 #include "co_procom.h"
 
-co_procom::co_procom(co_provider* p) : m_provider(p)
+co_procom::co_procom(co_provider* p) : m_provider(p) {}
+
+co_procom::~co_procom() {}
+
+void co_procom::provideObjects(pwr_tStatus, std::vector<procom_obj>&) {}
+
+void co_procom::provideObject(pwr_tStatus sts, pwr_tOix oix, pwr_tOix fthoix, pwr_tOix bwsoix,
+                              pwr_tOix fwsoix, pwr_tOix fchoix, pwr_tOix lchoix, pwr_tCid cid,
+                              const char* name, const char* longname)
 {
 }
 
-co_procom::~co_procom()
-{
-}
+void co_procom::provideBody(pwr_tStatus sts, pwr_tOix oix, int size, void* body) {}
 
-void co_procom::provideObjects(pwr_tStatus, std::vector<procom_obj>&)
-{
-}
+void co_procom::provideAttr(pwr_tStatus sts, pwr_tOix oix, int size, void* buff) {}
 
-void co_procom::provideObject(pwr_tStatus sts, pwr_tOix oix, pwr_tOix fthoix,
-    pwr_tOix bwsoix, pwr_tOix fwsoix, pwr_tOix fchoix, pwr_tOix lchoix,
-    pwr_tCid cid, const char* name, const char* longname)
-{
-}
+void co_procom::provideStatus(pwr_tStatus sts) {}
 
-void co_procom::provideBody(pwr_tStatus sts, pwr_tOix oix, int size, void* body)
-{
-}
-
-void co_procom::provideAttr(pwr_tStatus sts, pwr_tOix oix, int size, void* buff)
-{
-}
-
-void co_procom::provideStatus(pwr_tStatus sts)
-{
-}
-
-void co_procom::flushNodes()
-{
-}
+void co_procom::flushNodes() {}

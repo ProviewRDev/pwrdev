@@ -62,7 +62,8 @@
 #define BEEP rtt_printf("%c", '\7');
 
 typedef union alau_Event ala_uEvent;
-union alau_Event {
+union alau_Event
+{
   mh_sMsgInfo Info;
   mh_sAck Ack;
   mh_sMessage Msg;
@@ -94,19 +95,17 @@ static int rtt_appl_connect_alarm();
 static int rtt_menu_alarm_configure(menu_ctx ctx, int reconfigure);
 static int rtt_alarm_get_previous_page(menu_ctx ctx);
 static int rtt_alarm_get_next_page(menu_ctx ctx);
-static int rtt_menu_alarm_list_add(rtt_t_menu_alarm** menulist, int* index,
-    int maxindex, char* text, int (*func)(), int (*func2)(), int (*func3)(),
-    pwr_tObjid argoi, void* arg1, void* arg2, void* arg3, void* arg4,
-    mh_sMessage* MsgP, int type);
-static int rtt_menu_alarm_list_add_malloc(
-    rtt_t_menu_alarm** menulist, int index);
-static int rtt_menu_item_alarm_delete(
-    rtt_t_menu_alarm* menu_ptr, int item, int* numberof_items);
+static int rtt_menu_alarm_list_add(rtt_t_menu_alarm** menulist, int* index, int maxindex, char* text,
+                                   int (*func)(), int (*func2)(), int (*func3)(), pwr_tObjid argoi,
+                                   void* arg1, void* arg2, void* arg3, void* arg4, mh_sMessage* MsgP,
+                                   int type);
+static int rtt_menu_alarm_list_add_malloc(rtt_t_menu_alarm** menulist, int index);
+static int rtt_menu_item_alarm_delete(rtt_t_menu_alarm* menu_ptr, int item, int* numberof_items);
 static int rtt_menu_alarm_draw(menu_ctx ctx, int noerase);
 static int rtt_event_item_text(rtt_t_menu_alarm* menu_ptr, int index);
 int rtt_alarm_item_text(rtt_t_menu_alarm* menu_ptr, int index);
-static int rtt_event_print_text(rtt_t_menu_alarm* menu_ptr, int index,
-    char* text, int size, int notext, int noname);
+static int rtt_event_print_text(rtt_t_menu_alarm* menu_ptr, int index, char* text, int size, int notext,
+                                int noname);
 static int rtt_alarm_get_index(mh_sEventId* id, int* alarm_index);
 static int rtt_timestring(pwr_tTime* time, char* timestr);
 static int rtt_alarm_beep();
@@ -114,16 +113,16 @@ static int rtt_alarm_last_message();
 static int rtt_alarmlog_log(char* type, rtt_t_menu_alarm* menu_ptr);
 
 /****************************************************************************
-* Name:		rtt_appl_alarm_connect()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Connect to alarm handler.
-*
-**************************************************************************/
+ * Name:		rtt_appl_alarm_connect()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Connect to alarm handler.
+ *
+ **************************************************************************/
 static int rtt_appl_connect_alarm()
 {
   int sts;
@@ -135,10 +134,9 @@ static int rtt_appl_connect_alarm()
     /* We are already connected */
     return RTT__SUCCESS;
 
-  sts = mh_ApplConnect(pwr_cNObjid, 0, AbortEventName, mh_eEvent_Info,
-      mh_eEventPrio_D,
-      mh_mEventFlags_Bell | mh_mEventFlags_Ack | mh_mEventFlags_Return,
-      AbortEventText, &NoOfActMessages);
+  sts = mh_ApplConnect(pwr_cNObjid, 0, AbortEventName, mh_eEvent_Info, mh_eEventPrio_D,
+                       mh_mEventFlags_Bell | mh_mEventFlags_Ack | mh_mEventFlags_Return, AbortEventText,
+                       &NoOfActMessages);
   if (EVEN(sts))
     return sts;
 
@@ -147,17 +145,17 @@ static int rtt_appl_connect_alarm()
 }
 
 /*************************************************************************
-*
-* Name:		rtt_alarm_send()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Sends an alarm with the specified text.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_alarm_send()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Sends an alarm with the specified text.
+ *
+ **************************************************************************/
 
 int rtt_alarm_send(char* alarm_text, int alarm_prio)
 {
@@ -169,8 +167,7 @@ int rtt_alarm_send(char* alarm_text, int alarm_prio)
   if (EVEN(sts))
     return sts;
   mh_msg.Object = pwr_cNObjid;
-  mh_msg.EventFlags
-      = mh_mEventFlags_Returned | mh_mEventFlags_NoObject | mh_mEventFlags_Bell;
+  mh_msg.EventFlags = mh_mEventFlags_Returned | mh_mEventFlags_NoObject | mh_mEventFlags_Bell;
   time_GetTime(&mh_msg.EventTime);
   mh_msg.SupObject = pwr_cNObjid;
   mh_msg.Outunit = pwr_cNObjid;
@@ -178,7 +175,8 @@ int rtt_alarm_send(char* alarm_text, int alarm_prio)
   strcpy(mh_msg.EventText, alarm_text);
   mh_msg.EventType = mh_eEvent_Alarm;
   mh_msg.SupInfo.SupType = mh_eSupType_None;
-  switch (alarm_prio) {
+  switch (alarm_prio)
+  {
   case 'A':
     mh_msg.EventPrio = mh_eEventPrio_A;
     break;
@@ -215,16 +213,16 @@ int rtt_alarm_send(char* alarm_text, int alarm_prio)
 /****   OUTUNIT ARE IMPLEMENTED FOR VMS ONLY !!! ************/
 
 /****************************************************************************
-* Name:		rtt_mh_info_bc()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Backcall from mh.
-*
-**************************************************************************/
+ * Name:		rtt_mh_info_bc()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Backcall from mh.
+ *
+ **************************************************************************/
 static pwr_tStatus rtt_mh_info_bc(mh_sMessage* MsgP)
 {
   int sts;
@@ -237,30 +235,28 @@ static pwr_tStatus rtt_mh_info_bc(mh_sMessage* MsgP)
   */
   {
     /* Insert in event list */
-    sts = rtt_menu_alarm_list_add((rtt_t_menu_alarm**)&rtt_event_ctx->menu,
-        &rtt_eventlist_index, rtt_eventlist_maxindex, "", 0, 0, 0, pwr_cNObjid,
-        0, 0, 0, 0, MsgP, RTT_ALARMTYPE_INFO);
+    sts = rtt_menu_alarm_list_add((rtt_t_menu_alarm**)&rtt_event_ctx->menu, &rtt_eventlist_index,
+                                  rtt_eventlist_maxindex, "", 0, 0, 0, pwr_cNObjid, 0, 0, 0, 0, MsgP,
+                                  RTT_ALARMTYPE_INFO);
     if (EVEN(sts))
       return sts;
 
-    sts = rtt_event_item_text(
-        (rtt_t_menu_alarm*)rtt_event_ctx->menu, rtt_eventlist_index - 1);
+    sts = rtt_event_item_text((rtt_t_menu_alarm*)rtt_event_ctx->menu, rtt_eventlist_index - 1);
 
     if (rtt_event_ctx != 0)
       rtt_event_ctx->update_init = 1;
   }
 
-  if ((MsgP->Status & mh_mEventStatus_NotAck)
-      || (MsgP->Status & mh_mEventStatus_NotRet)) {
+  if ((MsgP->Status & mh_mEventStatus_NotAck) || (MsgP->Status & mh_mEventStatus_NotRet))
+  {
     /* Insert in alarm list */
-    sts = rtt_menu_alarm_list_add((rtt_t_menu_alarm**)&(rtt_alarm_ctx->menu),
-        &rtt_alarmlist_index, rtt_alarmlist_maxindex, "", 0, 0, 0, pwr_cNObjid,
-        0, 0, 0, 0, MsgP, RTT_ALARMTYPE_INFO);
+    sts = rtt_menu_alarm_list_add((rtt_t_menu_alarm**)&(rtt_alarm_ctx->menu), &rtt_alarmlist_index,
+                                  rtt_alarmlist_maxindex, "", 0, 0, 0, pwr_cNObjid, 0, 0, 0, 0, MsgP,
+                                  RTT_ALARMTYPE_INFO);
     if (EVEN(sts))
       return sts;
 
-    sts = rtt_alarm_item_text(
-        (rtt_t_menu_alarm*)rtt_alarm_ctx->menu, rtt_alarmlist_index - 1);
+    sts = rtt_alarm_item_text((rtt_t_menu_alarm*)rtt_alarm_ctx->menu, rtt_alarmlist_index - 1);
 
     if (rtt_alarm_ctx != 0)
       rtt_alarm_ctx->update_init = 1;
@@ -271,16 +267,16 @@ static pwr_tStatus rtt_mh_info_bc(mh_sMessage* MsgP)
 }
 
 /****************************************************************************
-* Name:		rtt_mh_alarm_bc()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Backcall from mh.
-*
-**************************************************************************/
+ * Name:		rtt_mh_alarm_bc()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Backcall from mh.
+ *
+ **************************************************************************/
 static pwr_tStatus rtt_mh_alarm_bc(mh_sMessage* MsgP)
 {
   int sts;
@@ -293,30 +289,28 @@ static pwr_tStatus rtt_mh_alarm_bc(mh_sMessage* MsgP)
   */
   {
     /* Insert in event list */
-    sts = rtt_menu_alarm_list_add((rtt_t_menu_alarm**)&rtt_event_ctx->menu,
-        &rtt_eventlist_index, rtt_eventlist_maxindex, "", 0, 0, 0, pwr_cNObjid,
-        0, 0, 0, 0, MsgP, RTT_ALARMTYPE_ALARM);
+    sts = rtt_menu_alarm_list_add((rtt_t_menu_alarm**)&rtt_event_ctx->menu, &rtt_eventlist_index,
+                                  rtt_eventlist_maxindex, "", 0, 0, 0, pwr_cNObjid, 0, 0, 0, 0, MsgP,
+                                  RTT_ALARMTYPE_ALARM);
     if (EVEN(sts))
       return sts;
 
-    sts = rtt_event_item_text(
-        (rtt_t_menu_alarm*)rtt_event_ctx->menu, rtt_eventlist_index - 1);
+    sts = rtt_event_item_text((rtt_t_menu_alarm*)rtt_event_ctx->menu, rtt_eventlist_index - 1);
 
     if (rtt_event_ctx != 0)
       rtt_event_ctx->update_init = 1;
   }
 
-  if ((MsgP->Status & mh_mEventStatus_NotAck)
-      || (MsgP->Status & mh_mEventStatus_NotRet)) {
+  if ((MsgP->Status & mh_mEventStatus_NotAck) || (MsgP->Status & mh_mEventStatus_NotRet))
+  {
     /* Insert in alarm list */
-    sts = rtt_menu_alarm_list_add((rtt_t_menu_alarm**)&rtt_alarm_ctx->menu,
-        &rtt_alarmlist_index, rtt_alarmlist_maxindex, "", 0, 0, 0, pwr_cNObjid,
-        0, 0, 0, 0, MsgP, RTT_ALARMTYPE_ALARM);
+    sts = rtt_menu_alarm_list_add((rtt_t_menu_alarm**)&rtt_alarm_ctx->menu, &rtt_alarmlist_index,
+                                  rtt_alarmlist_maxindex, "", 0, 0, 0, pwr_cNObjid, 0, 0, 0, 0, MsgP,
+                                  RTT_ALARMTYPE_ALARM);
     if (EVEN(sts))
       return sts;
 
-    sts = rtt_alarm_item_text(
-        (rtt_t_menu_alarm*)rtt_alarm_ctx->menu, rtt_alarmlist_index - 1);
+    sts = rtt_alarm_item_text((rtt_t_menu_alarm*)rtt_alarm_ctx->menu, rtt_alarmlist_index - 1);
 
     if (rtt_alarm_ctx != 0)
       rtt_alarm_ctx->update_init = 1;
@@ -327,16 +321,16 @@ static pwr_tStatus rtt_mh_alarm_bc(mh_sMessage* MsgP)
 }
 
 /****************************************************************************
-* Name:		rtt_mh_ack_bc()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Backcall from mh.
-*
-**************************************************************************/
+ * Name:		rtt_mh_ack_bc()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Backcall from mh.
+ *
+ **************************************************************************/
 static pwr_tStatus rtt_mh_ack_bc(mh_sAck* MsgP)
 {
   int sts;
@@ -346,32 +340,35 @@ static pwr_tStatus rtt_mh_ack_bc(mh_sAck* MsgP)
 
   EventP = (ala_uEvent*)MsgP;
 
-  if (rtt_AlarmAck) {
+  if (rtt_AlarmAck)
+  {
     /* Insert in event list */
-    sts = rtt_menu_alarm_list_add((rtt_t_menu_alarm**)&rtt_event_ctx->menu,
-        &rtt_eventlist_index, rtt_eventlist_maxindex, "", 0, 0, 0, pwr_cNObjid,
-        0, 0, 0, 0, (mh_sMessage*)MsgP, RTT_ALARMTYPE_ACK);
+    sts = rtt_menu_alarm_list_add((rtt_t_menu_alarm**)&rtt_event_ctx->menu, &rtt_eventlist_index,
+                                  rtt_eventlist_maxindex, "", 0, 0, 0, pwr_cNObjid, 0, 0, 0, 0,
+                                  (mh_sMessage*)MsgP, RTT_ALARMTYPE_ACK);
     if (EVEN(sts))
       return sts;
 
-    sts = rtt_event_item_text(
-        (rtt_t_menu_alarm*)rtt_event_ctx->menu, rtt_eventlist_index - 1);
+    sts = rtt_event_item_text((rtt_t_menu_alarm*)rtt_event_ctx->menu, rtt_eventlist_index - 1);
 
     if (rtt_event_ctx != 0)
       rtt_event_ctx->update_init = 1;
   }
 
   sts = rtt_alarm_get_index(&MsgP->TargetId, &alarm_item);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     menu_ptr = (rtt_t_menu_alarm*)rtt_alarm_ctx->menu;
     menu_ptr += alarm_item;
-    if (!(menu_ptr->status & mh_mEventStatus_NotRet)) {
-      sts = rtt_menu_item_alarm_delete((rtt_t_menu_alarm*)rtt_alarm_ctx->menu,
-          alarm_item, &rtt_alarmlist_index);
-    } else {
+    if (!(menu_ptr->status & mh_mEventStatus_NotRet))
+    {
+      sts = rtt_menu_item_alarm_delete((rtt_t_menu_alarm*)rtt_alarm_ctx->menu, alarm_item,
+                                       &rtt_alarmlist_index);
+    }
+    else
+    {
       menu_ptr->status &= ~mh_mEventStatus_NotAck;
-      sts = rtt_alarm_item_text(
-          (rtt_t_menu_alarm*)rtt_alarm_ctx->menu, alarm_item);
+      sts = rtt_alarm_item_text((rtt_t_menu_alarm*)rtt_alarm_ctx->menu, alarm_item);
     }
   }
   if (rtt_alarm_ctx != 0)
@@ -382,16 +379,16 @@ static pwr_tStatus rtt_mh_ack_bc(mh_sAck* MsgP)
 }
 
 /****************************************************************************
-* Name:		rtt_mh_return_bc()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Backcall from mh.
-*
-**************************************************************************/
+ * Name:		rtt_mh_return_bc()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Backcall from mh.
+ *
+ **************************************************************************/
 static pwr_tStatus rtt_mh_return_bc(mh_sReturn* MsgP)
 {
   int sts;
@@ -401,33 +398,36 @@ static pwr_tStatus rtt_mh_return_bc(mh_sReturn* MsgP)
 
   EventP = (ala_uEvent*)MsgP;
 
-  if (rtt_AlarmReturn) {
+  if (rtt_AlarmReturn)
+  {
     /* Insert in event list */
-    sts = rtt_menu_alarm_list_add((rtt_t_menu_alarm**)&rtt_event_ctx->menu,
-        &rtt_eventlist_index, rtt_eventlist_maxindex, "", 0, 0, 0, pwr_cNObjid,
-        0, 0, 0, 0, (mh_sMessage*)MsgP, RTT_ALARMTYPE_RETURN);
+    sts = rtt_menu_alarm_list_add((rtt_t_menu_alarm**)&rtt_event_ctx->menu, &rtt_eventlist_index,
+                                  rtt_eventlist_maxindex, "", 0, 0, 0, pwr_cNObjid, 0, 0, 0, 0,
+                                  (mh_sMessage*)MsgP, RTT_ALARMTYPE_RETURN);
     if (EVEN(sts))
       return sts;
 
-    sts = rtt_event_item_text(
-        (rtt_t_menu_alarm*)rtt_event_ctx->menu, rtt_eventlist_index - 1);
+    sts = rtt_event_item_text((rtt_t_menu_alarm*)rtt_event_ctx->menu, rtt_eventlist_index - 1);
 
     if (rtt_event_ctx != 0)
       rtt_event_ctx->update_init = 1;
   }
 
   sts = rtt_alarm_get_index(&MsgP->TargetId, &alarm_item);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     menu_ptr = (rtt_t_menu_alarm*)rtt_alarm_ctx->menu;
     menu_ptr += alarm_item;
-    if (!(menu_ptr->status & mh_mEventStatus_NotAck)) {
-      sts = rtt_menu_item_alarm_delete((rtt_t_menu_alarm*)rtt_alarm_ctx->menu,
-          alarm_item, &rtt_alarmlist_index);
-    } else {
+    if (!(menu_ptr->status & mh_mEventStatus_NotAck))
+    {
+      sts = rtt_menu_item_alarm_delete((rtt_t_menu_alarm*)rtt_alarm_ctx->menu, alarm_item,
+                                       &rtt_alarmlist_index);
+    }
+    else
+    {
       menu_ptr->status &= ~mh_mEventStatus_NotRet;
       /* Remove the returned marks in the item text */
-      sts = rtt_alarm_item_text(
-          (rtt_t_menu_alarm*)rtt_alarm_ctx->menu, alarm_item);
+      sts = rtt_alarm_item_text((rtt_t_menu_alarm*)rtt_alarm_ctx->menu, alarm_item);
     }
     if (rtt_alarm_ctx != 0)
       rtt_alarm_ctx->update_init = 1;
@@ -438,16 +438,16 @@ static pwr_tStatus rtt_mh_return_bc(mh_sReturn* MsgP)
 }
 
 /****************************************************************************
-* Name:		rtt_mh_cancel_bc()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Backcall from mh.
-*
-**************************************************************************/
+ * Name:		rtt_mh_cancel_bc()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Backcall from mh.
+ *
+ **************************************************************************/
 static pwr_tStatus rtt_mh_cancel_bc(mh_sReturn* MsgP)
 {
   int sts;
@@ -458,11 +458,12 @@ static pwr_tStatus rtt_mh_cancel_bc(mh_sReturn* MsgP)
   EventP = (ala_uEvent*)MsgP;
 
   sts = rtt_alarm_get_index(&MsgP->TargetId, &alarm_item);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     menu_ptr = (rtt_t_menu_alarm*)rtt_alarm_ctx->menu;
     menu_ptr += alarm_item;
-    sts = rtt_menu_item_alarm_delete((rtt_t_menu_alarm*)rtt_alarm_ctx->menu,
-        alarm_item, &rtt_alarmlist_index);
+    sts =
+        rtt_menu_item_alarm_delete((rtt_t_menu_alarm*)rtt_alarm_ctx->menu, alarm_item, &rtt_alarmlist_index);
     if (rtt_alarm_ctx != 0)
       rtt_alarm_ctx->update_init = 1;
   }
@@ -489,16 +490,16 @@ static pwr_tStatus rtt_mh_clear_blocklist_bc(pwr_tNodeIndex nix)
 }
 
 /****************************************************************************
-* Name:		rtt_alarm_connect()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Connect to alarm handler.
-*
-**************************************************************************/
+ * Name:		rtt_alarm_connect()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Connect to alarm handler.
+ *
+ **************************************************************************/
 int rtt_alarm_disconnect()
 {
   int sts;
@@ -511,18 +512,18 @@ int rtt_alarm_disconnect()
 }
 
 /****************************************************************************
-* Name:		rtt_alarm_connect()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Connect to alarm handler.
-*
-**************************************************************************/
-int rtt_alarm_connect(pwr_tObjid UserObject, int maxalarm, int maxevent,
-    int acknowledge, int returned, int beep)
+ * Name:		rtt_alarm_connect()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Connect to alarm handler.
+ *
+ **************************************************************************/
+int rtt_alarm_connect(pwr_tObjid UserObject, int maxalarm, int maxevent, int acknowledge, int returned,
+                      int beep)
 {
   int sts;
   pwr_tObjid Objid;
@@ -532,12 +533,15 @@ int rtt_alarm_connect(pwr_tObjid UserObject, int maxalarm, int maxevent,
   if (rtt_alarm_connected != 0)
     return RTT__SUCCESS;
 
-  if (cdh_ObjidIsNull(UserObject)) {
+  if (cdh_ObjidIsNull(UserObject))
+  {
     if (cdh_ObjidIsNull(rtt_UserObject))
       return RTT__OBJNOTFOUND;
 
     Objid = rtt_UserObject;
-  } else {
+  }
+  else
+  {
     /* Userobject is supplied */
     Objid = UserObject;
   }
@@ -565,34 +569,29 @@ int rtt_alarm_connect(pwr_tObjid UserObject, int maxalarm, int maxevent,
   rtt_AlarmReturn = returned;
   rtt_AlarmBeep = beep;
   rtt_message('I', "Loading alarmlist...");
-  sts = mh_OutunitConnect(OutUnit, mh_eOutunitType_Operator, 0, rtt_mh_ack_bc,
-      rtt_mh_alarm_bc, rtt_mh_block_bc, rtt_mh_cancel_bc,
-      rtt_mh_clear_alarmlist_bc, rtt_mh_clear_blocklist_bc, rtt_mh_info_bc,
-      rtt_mh_return_bc, 0);
+  sts = mh_OutunitConnect(OutUnit, mh_eOutunitType_Operator, 0, rtt_mh_ack_bc, rtt_mh_alarm_bc,
+                          rtt_mh_block_bc, rtt_mh_cancel_bc, rtt_mh_clear_alarmlist_bc,
+                          rtt_mh_clear_blocklist_bc, rtt_mh_info_bc, rtt_mh_return_bc, 0);
 
   if (EVEN(sts))
     return sts;
 
   /* Allocate memory for the data structure och alarm and event lists */
 
-  sts = rtt_menu_create_ctx(
-      &rtt_alarm_ctx, 0, 0, "RTT ALARM LIST", RTT_MENUTYPE_ALARM);
+  sts = rtt_menu_create_ctx(&rtt_alarm_ctx, 0, 0, "RTT ALARM LIST", RTT_MENUTYPE_ALARM);
   if (EVEN(sts))
     return sts;
   rtt_ctx_pop();
 
-  sts = rtt_menu_create_ctx(
-      &rtt_event_ctx, 0, 0, "RTT EVENT LIST", RTT_MENUTYPE_ALARM);
+  sts = rtt_menu_create_ctx(&rtt_event_ctx, 0, 0, "RTT EVENT LIST", RTT_MENUTYPE_ALARM);
   if (EVEN(sts))
     return sts;
   rtt_ctx_pop();
 
-  sts = rtt_menu_alarm_list_add_malloc(
-      (rtt_t_menu_alarm**)&rtt_alarm_ctx->menu, rtt_alarmlist_maxindex);
+  sts = rtt_menu_alarm_list_add_malloc((rtt_t_menu_alarm**)&rtt_alarm_ctx->menu, rtt_alarmlist_maxindex);
   if (EVEN(sts))
     return sts;
-  sts = rtt_menu_alarm_list_add_malloc(
-      (rtt_t_menu_alarm**)&rtt_event_ctx->menu, rtt_eventlist_maxindex);
+  sts = rtt_menu_alarm_list_add_malloc((rtt_t_menu_alarm**)&rtt_event_ctx->menu, rtt_eventlist_maxindex);
   if (EVEN(sts))
     return sts;
 
@@ -604,17 +603,17 @@ int rtt_alarm_connect(pwr_tObjid UserObject, int maxalarm, int maxevent,
 }
 
 /****************************************************************************
-* Name:		rtt_alarm_update()
-*
-* Type		int
-*
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Connect to alarm handler.
-*
-**************************************************************************/
+ * Name:		rtt_alarm_update()
+ *
+ * Type		int
+ *
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Connect to alarm handler.
+ *
+ **************************************************************************/
 int rtt_alarm_update(menu_ctx ctx)
 {
   int sts;
@@ -624,13 +623,15 @@ int rtt_alarm_update(menu_ctx ctx)
     return RTT__SUCCESS;
 
   sts = mh_OutunitReceive();
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     beep_cnt = 0;
     sts = mh_OutunitReceive();
   }
 
   if (ctx != 0)
-    if (ctx->update_init == 1) {
+    if (ctx->update_init == 1)
+    {
       /* Redraw the event or alarm list */
       rtt_menu_alarm_configure(ctx, 1);
       rtt_menu_alarm_draw(ctx, 1);
@@ -638,7 +639,8 @@ int rtt_alarm_update(menu_ctx ctx)
       ctx->update_init = 0;
     }
 
-  if (rtt_AlarmBeep) {
+  if (rtt_AlarmBeep)
+  {
     if (!beep_cnt)
       rtt_alarm_beep();
 
@@ -651,19 +653,19 @@ int rtt_alarm_update(menu_ctx ctx)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_alarm_configure()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I
-*
-* Description:
-*	Configures a menu.
-*	Calculates number of pages, rows, columns etc.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_alarm_configure()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I
+ *
+ * Description:
+ *	Configures a menu.
+ *	Calculates number of pages, rows, columns etc.
+ *
+ **************************************************************************/
 
 static int rtt_menu_alarm_configure(menu_ctx ctx, int reconfigure)
 {
@@ -678,7 +680,8 @@ static int rtt_menu_alarm_configure(menu_ctx ctx, int reconfigure)
   if (menu_ptr == 0)
     return RTT__SUCCESS;
 
-  while (menu_ptr->text[0] != '\0') {
+  while (menu_ptr->text[0] != '\0')
+  {
     ctx->no_items++;
     item_size = strlen(menu_ptr->text);
     if (item_size > item_maxsize)
@@ -698,7 +701,8 @@ static int rtt_menu_alarm_configure(menu_ctx ctx, int reconfigure)
   ctx->left_margin = 0;
   ctx->up_margin = (RTT_MENU_MAXROWS - ctx->rows) / 2;
 
-  if (!reconfigure) {
+  if (!reconfigure)
+  {
     ctx->current_page = 0;
     ctx->current_item = 0;
     ctx->current_row = 0;
@@ -708,18 +712,18 @@ static int rtt_menu_alarm_configure(menu_ctx ctx, int reconfigure)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_alarm_get_previous_page()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I
-*
-* Description:
-*	Assign previous page to be current page.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_alarm_get_previous_page()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I
+ *
+ * Description:
+ *	Assign previous page to be current page.
+ *
+ **************************************************************************/
 
 static int rtt_alarm_get_previous_page(menu_ctx ctx)
 {
@@ -732,18 +736,18 @@ static int rtt_alarm_get_previous_page(menu_ctx ctx)
   return RTT__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		rtt_alarm_get_next_page()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I
-*
-* Description:
-*	Assign next page to be current page.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_alarm_get_next_page()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I
+ *
+ * Description:
+ *	Assign next page to be current page.
+ *
+ **************************************************************************/
 
 static int rtt_alarm_get_next_page(menu_ctx ctx)
 {
@@ -757,22 +761,22 @@ static int rtt_alarm_get_next_page(menu_ctx ctx)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_alarm_new()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	parent_ctx	I	parents rtt context.
-* rtt_t_menu_alarm **menu_p	I	menu list.
-* char		*title		I	menu title.
-* unsigned long	userdata	I	...
-* unsigned long	flag		I	menu type
-*
-* Description:
-*	Create a new alarm menu.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_alarm_new()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	parent_ctx	I	parents rtt context.
+ * rtt_t_menu_alarm **menu_p	I	menu list.
+ * char		*title		I	menu title.
+ * unsigned long	userdata	I	...
+ * unsigned long	flag		I	menu type
+ *
+ * Description:
+ *	Create a new alarm menu.
+ *
+ **************************************************************************/
 
 int rtt_menu_alarm_new(menu_ctx parent_ctx, menu_ctx ctx)
 {
@@ -797,13 +801,14 @@ int rtt_menu_alarm_new(menu_ctx parent_ctx, menu_ctx ctx)
 
   option = RTT_OPT_NORECALL | RTT_OPT_NOEDIT | RTT_OPT_NOECHO | RTT_OPT_TIMEOUT;
 
-  while (1) {
-    rtt_command_get_input_string((char*)&rtt_chn, input_str, &terminator,
-        maxlen, rtt_recallbuff, option, rtt_scantime, &rtt_scan, ctx, NULL,
-        RTT_COMMAND_PICTURE);
+  while (1)
+  {
+    rtt_command_get_input_string((char*)&rtt_chn, input_str, &terminator, maxlen, rtt_recallbuff, option,
+                                 rtt_scantime, &rtt_scan, ctx, NULL, RTT_COMMAND_PICTURE);
     rtt_message('S', "");
 
-    switch (terminator) {
+    switch (terminator)
+    {
     case RTT_K_ARROW_UP:
       rtt_menu_unselect(ctx);
       rtt_get_next_item_up(ctx);
@@ -827,7 +832,8 @@ int rtt_menu_alarm_new(menu_ctx parent_ctx, menu_ctx ctx)
     case RTT_K_NEXTPAGE:
       /* Next page */
       sts = rtt_alarm_get_next_page(ctx);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         rtt_menu_alarm_draw(ctx, 0);
         rtt_menu_select(ctx);
       }
@@ -835,41 +841,49 @@ int rtt_menu_alarm_new(menu_ctx parent_ctx, menu_ctx ctx)
     case RTT_K_PREVPAGE:
       /* Previous page */
       sts = rtt_alarm_get_previous_page(ctx);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         rtt_menu_alarm_draw(ctx, 0);
         rtt_menu_select(ctx);
       }
       break;
     case RTT_K_RETURN:
-      if ((menu_ptr + ctx->current_item)->func != NULL) {
-        sts = ((menu_ptr + ctx->current_item)->func)(ctx,
-            (menu_ptr + ctx->current_item)->argoi,
-            (menu_ptr + ctx->current_item)->arg1,
-            (menu_ptr + ctx->current_item)->arg2,
-            (menu_ptr + ctx->current_item)->arg3,
+      if ((menu_ptr + ctx->current_item)->func != NULL)
+      {
+        sts = ((menu_ptr + ctx->current_item)->func)(
+            ctx, (menu_ptr + ctx->current_item)->argoi, (menu_ptr + ctx->current_item)->arg1,
+            (menu_ptr + ctx->current_item)->arg2, (menu_ptr + ctx->current_item)->arg3,
             (menu_ptr + ctx->current_item)->arg4);
         if (EVEN(sts))
           return sts;
-        if (sts == RTT__FASTBACK) {
-          if (ctx->parent_ctx != 0) {
+        if (sts == RTT__FASTBACK)
+        {
+          if (ctx->parent_ctx != 0)
+          {
             rtt_menu_delete(ctx);
             return RTT__FASTBACK;
-          } else {
+          }
+          else
+          {
             ctx->current_page = 0;
             ctx->current_item = 0;
           }
         }
-        if (sts == RTT__BACKTOCOLLECT) {
-          if (ctx != rtt_collectionmenuctx) {
+        if (sts == RTT__BACKTOCOLLECT)
+        {
+          if (ctx != rtt_collectionmenuctx)
+          {
             rtt_menu_delete(ctx);
             return RTT__BACKTOCOLLECT;
           }
         }
-        if (sts != RTT__NOPICTURE) {
+        if (sts != RTT__NOPICTURE)
+        {
           rtt_menu_alarm_draw(ctx, 0);
           rtt_menu_select(ctx);
         }
-      } else
+      }
+      else
         rtt_message('E', "Function not defined");
       break;
     case RTT_K_PF1:
@@ -880,66 +894,83 @@ int rtt_menu_alarm_new(menu_ctx parent_ctx, menu_ctx ctx)
         *s = 0;
 
       sts = gdh_NameToObjid(eventobject, &objid);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         sts = rtt_show_obj_hier_class_name(ctx, 0, 0, eventobject, 1, 0);
-        if (sts == RTT__FASTBACK) {
-          if (ctx->parent_ctx != 0) {
+        if (sts == RTT__FASTBACK)
+        {
+          if (ctx->parent_ctx != 0)
+          {
             rtt_menu_delete(ctx);
             return RTT__FASTBACK;
-          } else {
+          }
+          else
+          {
             ctx->current_page = 0;
             ctx->current_item = 0;
           }
         }
-        if (sts == RTT__BACKTOCOLLECT) {
-          if (ctx != rtt_collectionmenuctx) {
+        if (sts == RTT__BACKTOCOLLECT)
+        {
+          if (ctx != rtt_collectionmenuctx)
+          {
             rtt_menu_delete(ctx);
             return RTT__BACKTOCOLLECT;
           }
         }
-        if (sts != RTT__NOPICTURE) {
+        if (sts != RTT__NOPICTURE)
+        {
           rtt_menu_alarm_draw(ctx, 0);
           rtt_menu_select(ctx);
         }
-      } else {
+      }
+      else
+      {
         /* Message the eventname */
         strcpy(eventobject, "Text: ");
         strncat(eventobject, (menu_ptr + ctx->current_item)->eventname,
-            sizeof(menu_ptr->eventname) - strlen(eventobject) - 1);
+                sizeof(menu_ptr->eventname) - strlen(eventobject) - 1);
         eventobject[sizeof(eventobject) - 1] = 0;
         rtt_message('I', eventobject);
       }
       break;
     case RTT_K_PF2:
-      if ((menu_ptr + ctx->current_item)->func3 != NULL) {
-        sts = ((menu_ptr + ctx->current_item)->func3)(ctx,
-            (menu_ptr + ctx->current_item)->argoi,
-            (menu_ptr + ctx->current_item)->arg1,
-            (menu_ptr + ctx->current_item)->arg2,
-            (menu_ptr + ctx->current_item)->arg3,
+      if ((menu_ptr + ctx->current_item)->func3 != NULL)
+      {
+        sts = ((menu_ptr + ctx->current_item)->func3)(
+            ctx, (menu_ptr + ctx->current_item)->argoi, (menu_ptr + ctx->current_item)->arg1,
+            (menu_ptr + ctx->current_item)->arg2, (menu_ptr + ctx->current_item)->arg3,
             (menu_ptr + ctx->current_item)->arg4);
         if (EVEN(sts))
           return sts;
-        if (sts == RTT__FASTBACK) {
-          if (ctx->parent_ctx != 0) {
+        if (sts == RTT__FASTBACK)
+        {
+          if (ctx->parent_ctx != 0)
+          {
             rtt_menu_delete(ctx);
             return RTT__FASTBACK;
-          } else {
+          }
+          else
+          {
             ctx->current_page = 0;
             ctx->current_item = 0;
           }
         }
-        if (sts == RTT__BACKTOCOLLECT) {
-          if (ctx != rtt_collectionmenuctx) {
+        if (sts == RTT__BACKTOCOLLECT)
+        {
+          if (ctx != rtt_collectionmenuctx)
+          {
             rtt_menu_delete(ctx);
             return RTT__BACKTOCOLLECT;
           }
         }
-        if (sts != RTT__NOPICTURE) {
+        if (sts != RTT__NOPICTURE)
+        {
           rtt_menu_alarm_draw(ctx, 0);
           rtt_menu_select(ctx);
         }
-      } else
+      }
+      else
         rtt_message('E', "Function not defined");
       break;
     case RTT_K_PF3:
@@ -976,12 +1007,14 @@ int rtt_menu_alarm_new(menu_ctx parent_ctx, menu_ctx ctx)
     case RTT_K_FAST_22:
       rtt_fastkey = terminator - RTT_K_FAST;
       sts = rtt_get_fastkey_type();
-      if (sts == RTT__NOPICTURE) {
+      if (sts == RTT__NOPICTURE)
+      {
         sts = rtt_get_fastkey_picture(ctx);
         if (EVEN(sts))
           return sts;
         break;
       }
+    /* fall through */
     case RTT_K_CTRLZ:
       rtt_menu_delete(ctx);
       return RTT__FASTBACK;
@@ -1009,13 +1042,18 @@ int rtt_menu_alarm_new(menu_ctx parent_ctx, menu_ctx ctx)
       sts = rtt_collect_show(ctx);
       if (EVEN(sts))
         return sts;
-      if (sts == RTT__BACKTOCOLLECT) {
-        if (ctx != rtt_collectionmenuctx) {
+      if (sts == RTT__BACKTOCOLLECT)
+      {
+        if (ctx != rtt_collectionmenuctx)
+        {
           rtt_menu_delete(ctx);
           return RTT__BACKTOCOLLECT;
         }
-      } else {
-        if (sts != RTT__NOPICTURE) {
+      }
+      else
+      {
+        if (sts != RTT__NOPICTURE)
+        {
           rtt_menu_alarm_draw(ctx, 0);
           rtt_menu_select(ctx);
         }
@@ -1024,34 +1062,43 @@ int rtt_menu_alarm_new(menu_ctx parent_ctx, menu_ctx ctx)
     case RTT_K_DELETE:
       break;
     case RTT_K_COMMAND:
-      sts = rtt_get_command(ctx, (char*)&rtt_chn, rtt_recallbuff, rtt_scantime,
-          &rtt_scan, ctx, "pwr_rtt> ", 0, RTT_ROW_COMMAND, rtt_command_table);
+      sts = rtt_get_command(ctx, (char*)&rtt_chn, rtt_recallbuff, rtt_scantime, &rtt_scan, ctx, "pwr_rtt> ",
+                            0, RTT_ROW_COMMAND, rtt_command_table);
       /* menu_ptr might have been changed */
       if (EVEN(sts))
         return sts;
       menu_ptr = (rtt_t_menu_alarm*)ctx->menu;
-      if (sts == RTT__FASTBACK) {
-        if (ctx->parent_ctx != 0) {
+      if (sts == RTT__FASTBACK)
+      {
+        if (ctx->parent_ctx != 0)
+        {
           rtt_menu_delete(ctx);
           return RTT__FASTBACK;
-        } else {
+        }
+        else
+        {
           ctx->current_page = 0;
           ctx->current_item = 0;
         }
       }
-      if (sts == RTT__BACK) {
-        if (ctx->parent_ctx != 0) {
+      if (sts == RTT__BACK)
+      {
+        if (ctx->parent_ctx != 0)
+        {
           rtt_menu_delete(ctx);
           return RTT__SUCCESS;
         }
       }
-      if (sts == RTT__BACKTOCOLLECT) {
-        if (ctx != rtt_collectionmenuctx) {
+      if (sts == RTT__BACKTOCOLLECT)
+      {
+        if (ctx != rtt_collectionmenuctx)
+        {
           rtt_menu_delete(ctx);
           return RTT__BACKTOCOLLECT;
         }
       }
-      if (sts != RTT__NOPICTURE) {
+      if (sts != RTT__NOPICTURE)
+      {
         rtt_menu_alarm_draw(ctx, 0);
         rtt_menu_select(ctx);
       }
@@ -1073,33 +1120,33 @@ int rtt_menu_alarm_new(menu_ctx parent_ctx, menu_ctx ctx)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_alarm_list_add()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* rtt_t_menu	**menulist	I	menulist.
-* int		*index		I	index in menulist
-* char		*text		I	menu text.
-* int		(* func) ()	I	function to be called at RETURN.
-* int		(* func2) ()	I	function to be called at PF1
-* int		(* func3) ()	I	function to be called at PF2
-* pwr_tObjid	argoi		I	argument passed to the functions
-* void		*arg1		I	argument passed to the functions
-* void		*arg2		I	argument passed to the functions
-* void		*arg3		I	argument passed to the functions
-* void		*arg4		I	argument passed to the functions
-*
-* Description:
-*	Adds an item to an alarm menu list.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_alarm_list_add()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * rtt_t_menu	**menulist	I	menulist.
+ * int		*index		I	index in menulist
+ * char		*text		I	menu text.
+ * int		(* func) ()	I	function to be called at RETURN.
+ * int		(* func2) ()	I	function to be called at PF1
+ * int		(* func3) ()	I	function to be called at PF2
+ * pwr_tObjid	argoi		I	argument passed to the functions
+ * void		*arg1		I	argument passed to the functions
+ * void		*arg2		I	argument passed to the functions
+ * void		*arg3		I	argument passed to the functions
+ * void		*arg4		I	argument passed to the functions
+ *
+ * Description:
+ *	Adds an item to an alarm menu list.
+ *
+ **************************************************************************/
 
-static int rtt_menu_alarm_list_add(rtt_t_menu_alarm** menulist, int* index,
-    int maxindex, char* text, int (*func)(), int (*func2)(), int (*func3)(),
-    pwr_tObjid argoi, void* arg1, void* arg2, void* arg3, void* arg4,
-    mh_sMessage* MsgP, int type)
+static int rtt_menu_alarm_list_add(rtt_t_menu_alarm** menulist, int* index, int maxindex, char* text,
+                                   int (*func)(), int (*func2)(), int (*func3)(), pwr_tObjid argoi,
+                                   void* arg1, void* arg2, void* arg3, void* arg4, mh_sMessage* MsgP,
+                                   int type)
 {
   rtt_t_menu_alarm* menu_ptr;
   ala_uEvent* EventP;
@@ -1110,7 +1157,8 @@ static int rtt_menu_alarm_list_add(rtt_t_menu_alarm** menulist, int* index,
   if (maxindex == 0)
     return RTT__SUCCESS;
 
-  if (*index >= maxindex) {
+  if (*index >= maxindex)
+  {
     /* Delete the first item first */
     sts = rtt_menu_item_alarm_delete(*menulist, 0, index);
   }
@@ -1126,10 +1174,10 @@ static int rtt_menu_alarm_list_add(rtt_t_menu_alarm** menulist, int* index,
   menu_ptr->arg3 = arg3;
   menu_ptr->arg4 = arg4;
   menu_ptr->time = net_NetTimeToTime(&EventP->Info.EventTime);
-  switch (EventP->Info.EventType) {
+  switch (EventP->Info.EventType)
+  {
   case mh_eEvent_Alarm:
-    strncpy(menu_ptr->eventname, EventP->Msg.EventName,
-        sizeof(menu_ptr->eventname));
+    strncpy(menu_ptr->eventname, EventP->Msg.EventName, sizeof(menu_ptr->eventname));
     menu_ptr->object = EventP->Msg.Object.Objid;
     break;
   default:;
@@ -1150,23 +1198,22 @@ static int rtt_menu_alarm_list_add(rtt_t_menu_alarm** menulist, int* index,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_list_add_malloc()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* rtt_t_menu	**menulist	I	menulist.
-* int		index		I	number of items to allocate memory.
-*
-* Description:
-*	Allocates memory for a menu list.
-*	Allocated memory is number of items + 1.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_list_add_malloc()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * rtt_t_menu	**menulist	I	menulist.
+ * int		index		I	number of items to allocate memory.
+ *
+ * Description:
+ *	Allocates memory for a menu list.
+ *	Allocated memory is number of items + 1.
+ *
+ **************************************************************************/
 
-static int rtt_menu_alarm_list_add_malloc(
-    rtt_t_menu_alarm** menulist, int index)
+static int rtt_menu_alarm_list_add_malloc(rtt_t_menu_alarm** menulist, int index)
 {
   *menulist = (rtt_t_menu_alarm*)calloc(index + 1, sizeof(rtt_t_menu_alarm));
   if (*menulist == 0)
@@ -1176,22 +1223,21 @@ static int rtt_menu_alarm_list_add_malloc(
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_alarm_item_delete()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I
-* int		item		I
-*
-* Description:
-*	Delete an item in a alarm menu.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_alarm_item_delete()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I
+ * int		item		I
+ *
+ * Description:
+ *	Delete an item in a alarm menu.
+ *
+ **************************************************************************/
 
-static int rtt_menu_item_alarm_delete(
-    rtt_t_menu_alarm* menu_ptr, int item, int* numberof_items)
+static int rtt_menu_item_alarm_delete(rtt_t_menu_alarm* menu_ptr, int item, int* numberof_items)
 {
   char* menu_charptr;
   char* menu_charptr_next;
@@ -1213,18 +1259,18 @@ static int rtt_menu_item_alarm_delete(
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_alarm_draw()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	menu ctx.
-*
-* Description:
-*	Draw a menu.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_alarm_draw()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	menu ctx.
+ *
+ * Description:
+ *	Draw a menu.
+ *
+ **************************************************************************/
 
 static int rtt_menu_alarm_draw(menu_ctx ctx, int noerase)
 {
@@ -1232,13 +1278,13 @@ static int rtt_menu_alarm_draw(menu_ctx ctx, int noerase)
   int i;
 
   /*	if ( !noerase)
-  */
+   */
   rtt_display_erase();
   rtt_menu_draw_title(ctx);
   menu_ptr = ctx->menu;
   for (i = ctx->current_page * ctx->page_len;
-       (i < ctx->no_items) && (i < (ctx->current_page + 1) * ctx->page_len);
-       i++) {
+       (i < ctx->no_items) && (i < (ctx->current_page + 1) * ctx->page_len); i++)
+  {
     rtt_menu_draw_item(ctx, i);
   }
   rtt_message('S', "");
@@ -1246,17 +1292,17 @@ static int rtt_menu_alarm_draw(menu_ctx ctx, int noerase)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_alarm_list_add()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Creates the text in the eventlist.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_alarm_list_add()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Creates the text in the eventlist.
+ *
+ **************************************************************************/
 
 static int rtt_event_item_text(rtt_t_menu_alarm* menu_ptr, int index)
 {
@@ -1264,7 +1310,8 @@ static int rtt_event_item_text(rtt_t_menu_alarm* menu_ptr, int index)
 
   menu_ptr += index;
 
-  switch (menu_ptr->type) {
+  switch (menu_ptr->type)
+  {
   case RTT_ALARMTYPE_INFO:
     strcpy(menu_ptr->text, " I ");
     break;
@@ -1275,7 +1322,8 @@ static int rtt_event_item_text(rtt_t_menu_alarm* menu_ptr, int index)
     strcpy(menu_ptr->text, " a ");
     break;
   case RTT_ALARMTYPE_ALARM:
-    switch (menu_ptr->eventprio) {
+    switch (menu_ptr->eventprio)
+    {
     case mh_eEventPrio_A:
       strcpy(menu_ptr->text, "*A ");
       break;
@@ -1298,10 +1346,12 @@ static int rtt_event_item_text(rtt_t_menu_alarm* menu_ptr, int index)
   strcat(menu_ptr->text, timestr);
 
   strcat(menu_ptr->text, "  ");
-  if ((menu_ptr->type == RTT_ALARMTYPE_INFO)
-      || (menu_ptr->type == RTT_ALARMTYPE_ALARM))
-    strncat(menu_ptr->text, menu_ptr->eventtext,
-        sizeof(menu_ptr->text) - strlen(menu_ptr->text));
+  if ((menu_ptr->type == RTT_ALARMTYPE_INFO) || (menu_ptr->type == RTT_ALARMTYPE_ALARM))
+  {
+    char evtxt[sizeof(menu_ptr->eventtext)];
+    memcpy(evtxt, menu_ptr->eventtext, sizeof(evtxt));
+    strncat(menu_ptr->text, evtxt, sizeof(menu_ptr->text) - strlen(menu_ptr->text));
+  }
 
   menu_ptr->text[79] = 0;
 
@@ -1312,17 +1362,17 @@ static int rtt_event_item_text(rtt_t_menu_alarm* menu_ptr, int index)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_alarm_item_text()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Creates the text in the alarmlist.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_alarm_item_text()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Creates the text in the alarmlist.
+ *
+ **************************************************************************/
 
 int rtt_alarm_item_text(rtt_t_menu_alarm* menu_ptr, int index)
 {
@@ -1339,12 +1389,14 @@ int rtt_alarm_item_text(rtt_t_menu_alarm* menu_ptr, int index)
   else
     strcat(menu_ptr->text, "  ");
 
-  switch (menu_ptr->type) {
+  switch (menu_ptr->type)
+  {
   case RTT_ALARMTYPE_INFO:
     strcat(menu_ptr->text, "I ");
     break;
   case RTT_ALARMTYPE_ALARM:
-    switch (menu_ptr->eventprio) {
+    switch (menu_ptr->eventprio)
+    {
     case mh_eEventPrio_A:
       strcat(menu_ptr->text, "A ");
       break;
@@ -1367,8 +1419,11 @@ int rtt_alarm_item_text(rtt_t_menu_alarm* menu_ptr, int index)
   strcat(menu_ptr->text, timestr);
 
   strcat(menu_ptr->text, "  ");
-  strncat(menu_ptr->text, menu_ptr->eventtext,
-      sizeof(menu_ptr->text) - strlen(menu_ptr->text));
+  {
+    char evtxt[sizeof(menu_ptr->eventtext)];
+    memcpy(evtxt, menu_ptr->eventtext, sizeof(evtxt));
+    strncat(menu_ptr->text, evtxt, sizeof(menu_ptr->text) - strlen(menu_ptr->text));
+  }
 
   menu_ptr->text[79] = 0;
 
@@ -1376,27 +1431,28 @@ int rtt_alarm_item_text(rtt_t_menu_alarm* menu_ptr, int index)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_event_print_text()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Creates the text in the file at a print command.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_event_print_text()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Creates the text in the file at a print command.
+ *
+ **************************************************************************/
 
-static int rtt_event_print_text(rtt_t_menu_alarm* menu_ptr, int index,
-    char* text, int size, int notext, int noname)
+static int rtt_event_print_text(rtt_t_menu_alarm* menu_ptr, int index, char* text, int size, int notext,
+                                int noname)
 {
   int i;
   char timestr[64];
 
   menu_ptr += index;
 
-  switch (menu_ptr->type) {
+  switch (menu_ptr->type)
+  {
   case RTT_ALARMTYPE_INFO:
     strcpy(text, " I ");
     break;
@@ -1407,7 +1463,8 @@ static int rtt_event_print_text(rtt_t_menu_alarm* menu_ptr, int index,
     strcpy(text, " a ");
     break;
   case RTT_ALARMTYPE_ALARM:
-    switch (menu_ptr->eventprio) {
+    switch (menu_ptr->eventprio)
+    {
     case mh_eEventPrio_A:
       strcpy(text, "*A ");
       break;
@@ -1431,9 +1488,9 @@ static int rtt_event_print_text(rtt_t_menu_alarm* menu_ptr, int index,
 
   strcat(text, "  ");
 
-  if (!notext) {
-    if ((menu_ptr->type == RTT_ALARMTYPE_INFO)
-        || (menu_ptr->type == RTT_ALARMTYPE_ALARM))
+  if (!notext)
+  {
+    if ((menu_ptr->type == RTT_ALARMTYPE_INFO) || (menu_ptr->type == RTT_ALARMTYPE_ALARM))
       strncat(text, menu_ptr->eventtext, size - strlen(text));
 
     *(text + 78) = 0;
@@ -1441,24 +1498,25 @@ static int rtt_event_print_text(rtt_t_menu_alarm* menu_ptr, int index,
       *(text + i) = ' ';
     *(text + i) = 0;
   }
-  if (!noname) {
+  if (!noname)
+  {
     strncat(text, menu_ptr->eventname, size - strlen(text));
   }
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		rtt_event_print()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Prints the event list on a file.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_event_print()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Prints the event list on a file.
+ *
+ **************************************************************************/
 
 int rtt_event_print(char* filename, int notext, int noname)
 {
@@ -1466,13 +1524,15 @@ int rtt_event_print(char* filename, int notext, int noname)
   FILE* file;
   int i;
 
-  if (rtt_event_ctx == 0) {
+  if (rtt_event_ctx == 0)
+  {
     rtt_message('E', "Eventlist not loaded");
     return RTT__NOPICTURE;
   }
 
   file = fopen(filename, "w");
-  if (file == 0) {
+  if (file == 0)
+  {
     char tmp[200];
     snprintf(tmp, 200, "Unable to open file \"%s\"", filename);
     rtt_message('E', tmp);
@@ -1481,9 +1541,9 @@ int rtt_event_print(char* filename, int notext, int noname)
 
   fprintf(file, "	EVENT LIST\n\n");
 
-  for (i = 0; i < rtt_eventlist_index; i++) {
-    rtt_event_print_text((rtt_t_menu_alarm*)rtt_event_ctx->menu, i, text,
-        sizeof(text), notext, noname);
+  for (i = 0; i < rtt_eventlist_index; i++)
+  {
+    rtt_event_print_text((rtt_t_menu_alarm*)rtt_event_ctx->menu, i, text, sizeof(text), notext, noname);
     fprintf(file, "%s\n", text);
   }
   fclose(file);
@@ -1493,17 +1553,17 @@ int rtt_event_print(char* filename, int notext, int noname)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_alarm_get_index()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get the index in alarmlist from eventid.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_alarm_get_index()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get the index in alarmlist from eventid.
+ *
+ **************************************************************************/
 
 static int rtt_alarm_get_index(mh_sEventId* id, int* alarm_index)
 {
@@ -1512,8 +1572,10 @@ static int rtt_alarm_get_index(mh_sEventId* id, int* alarm_index)
 
   menu_ptr = (rtt_t_menu_alarm*)rtt_alarm_ctx->menu;
 
-  for (i = 0; i < rtt_alarmlist_index; i++) {
-    if (!memcmp(id, &menu_ptr->eventid, sizeof(*id))) {
+  for (i = 0; i < rtt_alarmlist_index; i++)
+  {
+    if (!memcmp(id, &menu_ptr->eventid, sizeof(*id)))
+    {
       *alarm_index = i;
       return RTT__SUCCESS;
     }
@@ -1523,17 +1585,17 @@ static int rtt_alarm_get_index(mh_sEventId* id, int* alarm_index)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_alarm_ack()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get the index in alarmlist from eventid.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_alarm_ack()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get the index in alarmlist from eventid.
+ *
+ **************************************************************************/
 
 int rtt_alarm_ack(menu_ctx ctx)
 {
@@ -1547,9 +1609,11 @@ int rtt_alarm_ack(menu_ctx ctx)
 
   menustart_ptr = (rtt_t_menu_alarm*)rtt_alarm_ctx->menu;
 
-  for (i = 0; i < rtt_alarmlist_index; i++) {
+  for (i = 0; i < rtt_alarmlist_index; i++)
+  {
     menu_ptr = menustart_ptr + i;
-    if (menu_ptr->status & mh_mEventStatus_NotAck) {
+    if (menu_ptr->status & mh_mEventStatus_NotAck)
+    {
       menu_ptr->status &= ~mh_mEventStatus_NotAck;
 
       /* Ack should maybe be sent to mh here... */
@@ -1561,10 +1625,10 @@ int rtt_alarm_ack(menu_ctx ctx)
       if (menu_ptr->status & mh_mEventStatus_NotRet)
         /* Remove the not ack marks in the item text */
         sts = rtt_alarm_item_text((rtt_t_menu_alarm*)rtt_alarm_ctx->menu, i);
-      else {
+      else
+      {
         /* Detete the item from the alarm list */
-        rtt_menu_item_alarm_delete(
-            (rtt_t_menu_alarm*)rtt_alarm_ctx->menu, i, &rtt_alarmlist_index);
+        rtt_menu_item_alarm_delete((rtt_t_menu_alarm*)rtt_alarm_ctx->menu, i, &rtt_alarmlist_index);
         i--;
       }
     }
@@ -1573,17 +1637,17 @@ int rtt_alarm_ack(menu_ctx ctx)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_alarm_ack()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get the index in alarmlist from eventid.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_alarm_ack()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get the index in alarmlist from eventid.
+ *
+ **************************************************************************/
 
 int rtt_alarm_ack_last()
 {
@@ -1597,9 +1661,11 @@ int rtt_alarm_ack_last()
 
   menustart_ptr = (rtt_t_menu_alarm*)rtt_alarm_ctx->menu;
 
-  for (i = rtt_alarmlist_index - 1; i >= 0; i--) {
+  for (i = rtt_alarmlist_index - 1; i >= 0; i--)
+  {
     menu_ptr = menustart_ptr + i;
-    if (menu_ptr->status & mh_mEventStatus_NotAck) {
+    if (menu_ptr->status & mh_mEventStatus_NotAck)
+    {
       menu_ptr->status &= ~mh_mEventStatus_NotAck;
 
       /* Ack should maybe be sent to mh here... */
@@ -1611,10 +1677,10 @@ int rtt_alarm_ack_last()
       if (menu_ptr->status & mh_mEventStatus_NotRet)
         /* Remove the not ack marks in the item text */
         sts = rtt_alarm_item_text((rtt_t_menu_alarm*)rtt_alarm_ctx->menu, i);
-      else {
+      else
+      {
         /* Detete the item from the alarm list */
-        rtt_menu_item_alarm_delete(
-            (rtt_t_menu_alarm*)rtt_alarm_ctx->menu, i, &rtt_alarmlist_index);
+        rtt_menu_item_alarm_delete((rtt_t_menu_alarm*)rtt_alarm_ctx->menu, i, &rtt_alarmlist_index);
         i--;
       }
       rtt_alarm_last_message();
@@ -1625,17 +1691,17 @@ int rtt_alarm_ack_last()
 }
 
 /*************************************************************************
-*
-* Name:		rtt_timestring()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get the index in alarmlist from eventid.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_timestring()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get the index in alarmlist from eventid.
+ *
+ **************************************************************************/
 
 static int rtt_timestring(pwr_tTime* time, char* timestr)
 {
@@ -1649,17 +1715,17 @@ static int rtt_timestring(pwr_tTime* time, char* timestr)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_alarm_beep()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Beep it there is a unacked alarm in alarmlist.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_alarm_beep()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Beep it there is a unacked alarm in alarmlist.
+ *
+ **************************************************************************/
 
 static int rtt_alarm_beep()
 {
@@ -1667,8 +1733,10 @@ static int rtt_alarm_beep()
   int i;
 
   menu_ptr = (rtt_t_menu_alarm*)rtt_alarm_ctx->menu;
-  for (i = 0; i < rtt_alarmlist_index; i++) {
-    if (menu_ptr->status & mh_mEventStatus_NotAck) {
+  for (i = 0; i < rtt_alarmlist_index; i++)
+  {
+    if (menu_ptr->status & mh_mEventStatus_NotAck)
+    {
       BEEP;
       return RTT__SUCCESS;
     }
@@ -1679,17 +1747,17 @@ static int rtt_alarm_beep()
 }
 
 /*************************************************************************
-*
-* Name:		rtt_alarm_beep()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Print in rtt_AlarmLastMessage if there is a unacked alarm in alarmlis.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_alarm_beep()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Print in rtt_AlarmLastMessage if there is a unacked alarm in alarmlis.
+ *
+ **************************************************************************/
 
 static int rtt_alarm_last_message()
 {
@@ -1711,7 +1779,8 @@ static int rtt_alarm_last_message()
   rtt_AlarmText3[0] = 0;
   rtt_AlarmText4[0] = 0;
   rtt_AlarmText5[0] = 0;
-  for (i = 0; i < rtt_alarmlist_index; i++) {
+  for (i = 0; i < rtt_alarmlist_index; i++)
+  {
     if (i == rtt_alarmlist_index - 1)
       strcpy(rtt_AlarmText1, &menu_ptr->text[24]);
     else if (i == rtt_alarmlist_index - 2)
@@ -1728,22 +1797,23 @@ static int rtt_alarm_last_message()
       not_returned_alarms++;
     menu_ptr++;
   }
-  if (last_menu_ptr) {
-    strncpy(rtt_AlarmLastMessage, &last_menu_ptr->text[2],
-        sizeof(rtt_AlarmLastMessage) - 2);
+  if (last_menu_ptr)
+  {
+    strncpy(rtt_AlarmLastMessage, &last_menu_ptr->text[2], sizeof(rtt_AlarmLastMessage) - 2);
     rtt_AlarmLastMessage[79] = 0;
-    sprintf(
-        alarm_count_str, "%3d:%3d", not_returned_alarms, rtt_alarmlist_index);
-    if (strlen(rtt_AlarmLastMessage) < 72) {
+    snprintf(alarm_count_str, sizeof(alarm_count_str), "%3d:%3d", not_returned_alarms, rtt_alarmlist_index);
+    if (strlen(rtt_AlarmLastMessage) < 72)
+    {
       for (i = 0; i < 73; i++)
         strcat(rtt_AlarmLastMessage, " ");
       strcpy(&rtt_AlarmLastMessage[72], alarm_count_str);
     }
-  } else {
+  }
+  else
+  {
     strcpy(rtt_AlarmLastMessage, "                                             "
                                  "                         ");
-    sprintf(alarm_count_str, "%3d:%3d",
-        rtt_alarmlist_index - not_returned_alarms, rtt_alarmlist_index);
+    snprintf(alarm_count_str, sizeof(alarm_count_str), "%3d:%3d", rtt_alarmlist_index - not_returned_alarms, rtt_alarmlist_index);
     strcpy(&rtt_AlarmLastMessage[72], alarm_count_str);
   }
   rtt_message('S', "");
@@ -1752,30 +1822,32 @@ static int rtt_alarm_last_message()
 }
 
 /*************************************************************************
-*
-* Name:		rtt_alarmlog_start()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Start the rtt alarm log.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_alarmlog_start()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Start the rtt alarm log.
+ *
+ **************************************************************************/
 
 int rtt_alarmlog_start(char* filename)
 {
   pwr_tTime time;
   char timestr[80];
 
-  if (rtt_alarmlog_active) {
+  if (rtt_alarmlog_active)
+  {
     rtt_message('E', "Alarm log is already started");
     return RTT__NOPICTURE;
   }
 
   rtt_alarmlog_file = fopen(filename, "w");
-  if (rtt_alarmlog_file == 0) {
+  if (rtt_alarmlog_file == 0)
+  {
     char tmp[200];
     snprintf(tmp, 200, "Unable to open file \"%s\"", filename);
     rtt_message('E', tmp);
@@ -1791,24 +1863,25 @@ int rtt_alarmlog_start(char* filename)
   return RTT__NOPICTURE;
 }
 /*************************************************************************
-*
-* Name:		rtt_alarmlog_stop()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Stop the rtt alarm log.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_alarmlog_stop()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Stop the rtt alarm log.
+ *
+ **************************************************************************/
 
 int rtt_alarmlog_stop()
 {
   pwr_tTime time;
   char timestr[80];
 
-  if (!rtt_alarmlog_active) {
+  if (!rtt_alarmlog_active)
+  {
     rtt_message('E', "Alarm log is not started");
     return RTT__NOPICTURE;
   }
@@ -1824,17 +1897,17 @@ int rtt_alarmlog_stop()
 }
 
 /*************************************************************************
-*
-* Name:		rtt_alarmlog_stop()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Log event on rtt alarmlog.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_alarmlog_stop()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Log event on rtt alarmlog.
+ *
+ **************************************************************************/
 
 static int rtt_alarmlog_log(char* type, rtt_t_menu_alarm* menu_ptr)
 {

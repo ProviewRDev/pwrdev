@@ -59,7 +59,8 @@ typedef struct sAttribute sAttribute;
 typedef struct sObject sObject;
 typedef struct sSupObject sSupObject;
 
-struct sObject {
+struct sObject
+{
   tree_sNode tn;
   pwr_tObjid oid;
   int sup_c;
@@ -67,7 +68,8 @@ struct sObject {
   struct LstHead attr_l;
 };
 
-struct sAttribute {
+struct sAttribute
+{
   struct LstHead attr_l;
   pwr_sAttrRef aref;
   pwr_tClassId cid;
@@ -75,7 +77,8 @@ struct sAttribute {
   struct LstHead sup_l;
 };
 
-struct sSupObject {
+struct sSupObject
+{
   struct LstHead sup_l;
   pwr_tObjid oid;
   void* p;
@@ -88,8 +91,7 @@ static void init();
 static void event(qcom_sGet* get);
 static sAttribute* findAttribute(sObject*, pwr_sAttrRef*, pwr_tClassId);
 
-static alimsrv_sSupDataBuf* buildBuffer(
-    alimsrv_sRequest* rqp, unsigned int* size)
+static alimsrv_sSupDataBuf* buildBuffer(alimsrv_sRequest* rqp, unsigned int* size)
 {
   alimsrv_sSupDataBuf* bp = NULL;
   alimsrv_sAttrSupList* bap;
@@ -97,8 +99,8 @@ static alimsrv_sSupDataBuf* buildBuffer(
   sObject* op;
   sAttribute* ap;
   sSupObject* sp;
-  struct LstHead * al;
-  struct LstHead * sl;
+  struct LstHead* al;
+  struct LstHead* sl;
   pwr_tStatus sts;
 
   *size = 0;
@@ -109,9 +111,8 @@ static alimsrv_sSupDataBuf* buildBuffer(
   if (op->attr_c == 0)
     return NULL;
 
-  *size = sizeof(alimsrv_sSupDataBuf) - sizeof(alimsrv_sAttrSupList)
-      + op->attr_c * sizeof(alimsrv_sAttrSupList)
-      + (op->sup_c - op->attr_c) * sizeof(alimsrv_sSupObjEntry);
+  *size = sizeof(alimsrv_sSupDataBuf) - sizeof(alimsrv_sAttrSupList) +
+          op->attr_c * sizeof(alimsrv_sAttrSupList) + (op->sup_c - op->attr_c) * sizeof(alimsrv_sSupObjEntry);
 
   bp = (alimsrv_sSupDataBuf*)calloc(1, *size);
   if (bp == NULL)
@@ -120,17 +121,20 @@ static alimsrv_sSupDataBuf* buildBuffer(
   bp->NoOfSupAttr = op->attr_c;
   bap = bp->AttrSupList;
 
-  LstForEach(al, &op->attr_l) {
+  LstForEach(al, &op->attr_l)
+  {
     ap = LstEntry(al, sAttribute, attr_l);
     bap->SupAttr = ap->aref;
     bap->NoOfSupObjs = ap->sup_c;
     bap->SupClass = ap->cid;
     bsp = bap->SupList;
 
-    LstForEach(sl, &ap->sup_l) {
+    LstForEach(sl, &ap->sup_l)
+    {
       sp = LstEntry(sl, sSupObject, sup_l);
       bsp->SupObjid = sp->oid;
-      if (ap->cid == pwr_cClass_ASup) {
+      if (ap->cid == pwr_cClass_ASup)
+      {
         pwr_sClass_ASup* asup = (pwr_sClass_ASup*)sp->p;
 
         bsp->SupData.A.EvType = asup->EventType;
@@ -139,7 +143,9 @@ static alimsrv_sSupDataBuf* buildBuffer(
         bsp->SupData.A.Limit = asup->CtrlLimit;
         bsp->SupData.A.Hyst = asup->Hysteres;
         bsp->SupData.A.MsgOn = asup->DetectOn;
-      } else if (ap->cid == pwr_cClass_DSup) {
+      }
+      else if (ap->cid == pwr_cClass_DSup)
+      {
         pwr_sClass_DSup* dsup = (pwr_sClass_DSup*)sp->p;
 
         bsp->SupData.D.EvType = dsup->EventType;
@@ -154,20 +160,22 @@ static alimsrv_sSupDataBuf* buildBuffer(
   return bp;
 }
 
-static sAttribute* findAttribute(
-    sObject* op, pwr_sAttrRef* aref, pwr_tClassId cid)
+static sAttribute* findAttribute(sObject* op, pwr_sAttrRef* aref, pwr_tClassId cid)
 {
-  struct LstHead * al;
+  struct LstHead* al;
   sAttribute* ap = NULL;
 
-  LstForEach(al, &op->attr_l) {
-    if (aref->Offset == LstEntry(al, sAttribute, attr_l)->aref.Offset) {
+  LstForEach(al, &op->attr_l)
+  {
+    if (aref->Offset == LstEntry(al, sAttribute, attr_l)->aref.Offset)
+    {
       ap = LstEntry(al, sAttribute, attr_l);
       break;
     }
   }
 
-  if (ap == NULL) {
+  if (ap == NULL)
+  {
     ap = (sAttribute*)calloc(1, sizeof(*ap));
     if (ap == NULL)
       exit(2);
@@ -192,14 +200,16 @@ static void init()
   sSupObject* sp;
   pwr_tObjid oid;
 
-  ltp = tree_CreateTable(&sts, sizeof(pwr_tObjid), offsetof(sObject, oid),
-      sizeof(sObject), 200, tree_Comp_oid);
+  ltp =
+      tree_CreateTable(&sts, sizeof(pwr_tObjid), offsetof(sObject, oid), sizeof(sObject), 200, tree_Comp_oid);
 
   sts = gdh_GetClassList(pwr_cClass_ASup, &oid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(oid, (void**)&asp);
     op = tree_Find(&sts, ltp, &asp->Attribute.Objid);
-    if (op == NULL) {
+    if (op == NULL)
+    {
       op = tree_Insert(&sts, ltp, &asp->Attribute.Objid);
       LstInit(&op->attr_l);
     }
@@ -217,10 +227,12 @@ static void init()
   }
 
   sts = gdh_GetClassList(pwr_cClass_DSup, &oid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(oid, (void**)&dsp);
     op = tree_Find(&sts, ltp, &dsp->Attribute.Objid);
-    if (op == NULL) {
+    if (op == NULL)
+    {
       op = tree_Insert(&sts, ltp, &dsp->Attribute.Objid);
       LstInit(&op->attr_l);
     }
@@ -253,7 +265,8 @@ int main(int argc, char** argv)
   errh_Init("pwr_alim", errh_eAnix_alim);
   errh_SetStatus(PWR__SRVSTARTUP);
 
-  if (!qcom_Init(&sts, 0, "pwr_alim")) {
+  if (!qcom_Init(&sts, 0, "pwr_alim"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     exit(-1);
   }
@@ -262,19 +275,22 @@ int main(int argc, char** argv)
   myQId.nid = 0;
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, &myQId, &qAttr, "pwr_alim")) {
+  if (!qcom_CreateQ(&sts, &myQId, &qAttr, "pwr_alim"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
   }
-  if (!qcom_Bind(&sts, &myQId, &qcom_cQini)) {
+  if (!qcom_Bind(&sts, &myQId, &qcom_cQini))
+  {
     errh_Fatal("qcom_Bind, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
   }
 
   sts = gdh_Init("pwr_alim");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
@@ -286,27 +302,33 @@ int main(int argc, char** argv)
 
   /* Loop forever and receive objid's */
 
-  for (;;) {
-    do {
+  for (;;)
+  {
+    do
+    {
       get.maxSize = sizeof(request);
       get.data = (char*)&request;
       qcom_Get(&sts, &myQId, &get, qcom_cTmoEternal);
-      if (sts != QCOM__TMO && sts != QCOM__QEMPTY) {
-        if (get.type.b == qcom_eBtype_event) {
+      if (sts != QCOM__TMO && sts != QCOM__QEMPTY)
+      {
+        if (get.type.b == qcom_eBtype_event)
+        {
           event(&get);
         }
       }
-    } while (ODD(sts) && get.type.s != (int)alimsrv_eSubType_Request
-        && get.type.b != (int)alimsrv_cMsgType);
+    } while (ODD(sts) && get.type.s != (int)alimsrv_eSubType_Request && get.type.b != (int)alimsrv_cMsgType);
 
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_Error("qcom_Get, %m", sts);
       continue;
     }
 
-    if (request.Xdr) {
+    if (request.Xdr)
+    {
       xdrmem_create(&xdrs, (char*)&request, sizeof(request), XDR_DECODE);
-      if (!xdr_alimsrv_sRequest(&xdrs, &request)) {
+      if (!xdr_alimsrv_sRequest(&xdrs, &request))
+      {
         errh_Error("XDR Decode failed");
         continue;
       }
@@ -314,12 +336,16 @@ int main(int argc, char** argv)
 
     bp = buildBuffer(&request, &size);
 
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       bp->Xdr = TRUE;
       xdrmem_create(&xdrs, (char*)bp, size, XDR_ENCODE);
-      if (!xdr_alimsrv_sSupDataBuf(&xdrs, bp)) {
+      if (!xdr_alimsrv_sSupDataBuf(&xdrs, bp))
+      {
         errh_Error("XDR Encode failed");
-      } else {
+      }
+      else
+      {
         put.type.b = alimsrv_cMsgType;
         put.type.s = (qcom_eStype)alimsrv_eSubType_Answer;
         put.reply = myQId;
@@ -345,7 +371,8 @@ static void event(qcom_sGet* get)
     return;
 
   new_event.m = ep->mask;
-  if (new_event.b.terminate) {
+  if (new_event.b.terminate)
+  {
     exit(0);
   }
 }

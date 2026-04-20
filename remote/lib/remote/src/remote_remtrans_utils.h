@@ -35,18 +35,20 @@
  */
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-void RemTrans_Logg(remtrans_item* remtrans);
+  void RemTrans_Logg(remtrans_item* remtrans);
 
-pwr_tInt32 RemTrans_Init(remnode_item* remnode);
+  pwr_tInt32 RemTrans_Init(remnode_item* remnode);
 
-pwr_tInt32 RemTrans_Cyclic(remnode_item* remnode,
-    unsigned int (*remnode_send)(remnode_item* remnode,
-        pwr_sClass_RemTrans* remtrans, char* buf, int buf_size));
+  pwr_tInt32 RemTrans_Cyclic(remnode_item* remnode,
+                             unsigned int (*remnode_send)(remnode_item* remnode,
+                                                          pwr_sClass_RemTrans* remtrans, char* buf,
+                                                          int buf_size));
 
-pwr_tInt32 RemTrans_Receive(remtrans_item* remtrans, char* buffer, int size);
+  pwr_tInt32 RemTrans_Receive(remtrans_item* remtrans, char* buffer, int size);
 
 #if defined __cplusplus
 }

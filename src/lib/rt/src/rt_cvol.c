@@ -57,24 +57,27 @@ gdb_sObject* cvol_AllocObject(pwr_tStatus* sts, gdb_sNode* np, gdb_sVolume* vp)
 
   gdb_AssumeLocked;
 
-  do {
+  do
+  {
     int trimcount = 0;
 
     ol = pool_Qpred(sts, gdbroot->pool, &gdbroot->db->cacheFree.lh);
-    if (ol == NULL || ol == &gdbroot->db->cacheFree.lh) {
-      while (1) {
+    if (ol == NULL || ol == &gdbroot->db->cacheFree.lh)
+    {
+      while (1)
+      {
         pwr_Assert(trimcount < 2);
         trimcount++;
-        if (gdbroot->db->log.b.cacheTrim) {
-          printf("cacheFree is exhausted: %d < %d < %d, start trim...\n",
-              gdbroot->db->cacheFree.lc_min, gdbroot->db->cacheFree.lc,
-              gdbroot->db->cacheFree.lc_max);
+        if (gdbroot->db->log.b.cacheTrim)
+        {
+          printf("cacheFree is exhausted: %d < %d < %d, start trim...\n", gdbroot->db->cacheFree.lc_min,
+                 gdbroot->db->cacheFree.lc, gdbroot->db->cacheFree.lc_max);
         }
         cvolcm_TrimOld();
-        if (gdbroot->db->log.b.cacheTrim) {
-          printf("cacheFree trimmed %d < %d < %d\n",
-              gdbroot->db->cacheFree.lc_min, gdbroot->db->cacheFree.lc,
-              gdbroot->db->cacheFree.lc_max);
+        if (gdbroot->db->log.b.cacheTrim)
+        {
+          printf("cacheFree trimmed %d < %d < %d\n", gdbroot->db->cacheFree.lc_min, gdbroot->db->cacheFree.lc,
+                 gdbroot->db->cacheFree.lc_max);
         }
         if (gdbroot->db->cacheFree.lc > 0)
           break;
@@ -123,8 +126,7 @@ void cvol_FlushObject(gdb_sObject* op)
 
 /* .  */
 
-void cvol_FreeObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask link)
+void cvol_FreeObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask link)
 {
   gdb_sObject* pop = NULL;
 
@@ -135,18 +137,18 @@ void cvol_FreeObject(
   pwr_Assert(op->u.c.flags.m & gdb_mCo_inTouchList);
   pwr_Assert(pool_QisLinked(NULL, gdbroot->pool, &op->u.c.cache_ll));
 
-  if (op->u.c.nChild > 0) { /* We have children, move to cachePend.  */
+  if (op->u.c.nChild > 0)
+  { /* We have children, move to cachePend.  */
     if (gdbroot->db->log.b.cacheTrim)
-      printf("Object: %s %s, moved to cache pending\n", op->g.f.name.orig,
-          cdh_ObjidToString(op->g.oid, 0));
+      printf("Object: %s %s, moved to cache pending\n", op->g.f.name.orig, cdh_ObjidToString(op->g.oid, 0));
     cvol_QmoveSucc(op, cvol_Qget(op), &gdbroot->db->cachePend);
     return;
   }
 
   if (gdbroot->db->log.b.cacheTrim)
-    printf("Object: %s %s, removed from cache\n", op->g.f.name.orig,
-        cdh_ObjidToString(op->g.oid, 0));
-  if (op->l.por != pool_cNRef) {
+    printf("Object: %s %s, removed from cache\n", op->g.f.name.orig, cdh_ObjidToString(op->g.oid, 0));
+  if (op->l.por != pool_cNRef)
+  {
     pop = pool_Address(NULL, gdbroot->pool, op->l.por);
     pop->u.c.nChild--;
   }
@@ -158,15 +160,15 @@ void cvol_FreeObject(
 
   cvol_QmoveSucc(op, NULL, &gdbroot->db->cacheFree);
 
-  if (pop != NULL && pop->u.c.flags.b.cachePend && pop->u.c.nChild == 0) {
+  if (pop != NULL && pop->u.c.flags.b.cachePend && pop->u.c.nChild == 0)
+  {
     cvol_FreeObject(NULL, vp, pop, link);
   }
 }
 
 /* .  */
 
-gdb_sObject* cvol_LinkObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask link)
+gdb_sObject* cvol_LinkObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask link)
 {
   gdb_sObject* pop;
 
@@ -177,7 +179,8 @@ gdb_sObject* cvol_LinkObject(
   pwr_Assert(!(op->u.c.flags.m & gdb_mCo_inTouchList));
   pwr_Assert(!pool_QisLinked(NULL, gdbroot->pool, &op->u.c.cache_ll));
 
-  if (op->l.por != pool_cNRef) {
+  if (op->l.por != pool_cNRef)
+  {
     pop = pool_Address(NULL, gdbroot->pool, op->l.por);
     pop->u.c.nChild++;
   }
@@ -194,8 +197,7 @@ gdb_sObject* cvol_LinkObject(
    If the object already is in the cache, then this operation
    is a noop.  */
 
-gdb_sObject* cvol_LoadObject(
-    pwr_tStatus* sts, gdb_sNode* np, gdb_sVolume* vp, net_sGobject* gop)
+gdb_sObject* cvol_LoadObject(pwr_tStatus* sts, gdb_sNode* np, gdb_sVolume* vp, net_sGobject* gop)
 {
   gdb_sObject* op;
   pwr_tStatus lsts;
@@ -222,7 +224,8 @@ gdb_sObject* cvol_LoadObject(
   if (op == NULL)
     errh_Bugcheck(lsts, "cvol_LinkObject");
 
-  if (!np->cclassSupport) {
+  if (!np->cclassSupport)
+  {
     op->u.c.flags.b.classChecked = 1;
     op->u.c.flags.b.classEqual = 1;
   }
@@ -256,11 +259,11 @@ void cvol_QforcedTrim(gdb_sTouchQ* fqp)
     return;
 
   if (gdbroot->db->log.b.cacheTrim)
-    printf("Start forced trim %d, %d < %d < %d\n", fqp->flags.m, fqp->lc_min,
-        fqp->lc, fqp->lc_max);
+    printf("Start forced trim %d, %d < %d < %d\n", fqp->flags.m, fqp->lc_min, fqp->lc, fqp->lc_max);
   tqp = pool_Address(NULL, gdbroot->pool, fqp->next);
 
-  if (fqp->lc > 0) {
+  if (fqp->lc > 0)
+  {
     ol = pool_Qpred(NULL, gdbroot->pool, &fqp->lh);
     pwr_Assert(ol != &fqp->lh);
     op = pool_Qitem(ol, gdb_sObject, u.c.cache_ll);
@@ -270,8 +273,7 @@ void cvol_QforcedTrim(gdb_sTouchQ* fqp)
 
   cvol_QforcedTrim(tqp);
   if (gdbroot->db->log.b.cacheTrim)
-    printf("Stop forced trim %d, %d < %d < %d\n", fqp->flags.m, fqp->lc_min,
-        fqp->lc, fqp->lc_max);
+    printf("Stop forced trim %d, %d < %d < %d\n", fqp->flags.m, fqp->lc_min, fqp->lc, fqp->lc_max);
 }
 
 /* Return pointer to the cache queue an object is in.  */
@@ -283,27 +285,44 @@ gdb_sTouchQ* cvol_Qget(gdb_sObject* op)
 
   gdb_AssumeLocked;
 
-  if (op->u.c.flags.b.cacheVol) {
+  if (op->u.c.flags.b.cacheVol)
+  {
     vp = pool_Address(NULL, gdbroot->pool, op->l.vr);
     return &vp->u.c.cacheVol;
-  } else if (op->u.c.flags.b.cacheNode) {
+  }
+  else if (op->u.c.flags.b.cacheNode)
+  {
     vp = pool_Address(NULL, gdbroot->pool, op->l.vr);
     np = pool_Address(NULL, gdbroot->pool, vp->l.nr);
     return &np->cacheNode;
-  } else if (op->u.c.flags.b.cacheCom) {
+  }
+  else if (op->u.c.flags.b.cacheCom)
+  {
     return &gdbroot->db->cacheCom;
-  } else if (op->u.c.flags.b.cacheOld) {
+  }
+  else if (op->u.c.flags.b.cacheOld)
+  {
     return &gdbroot->db->cacheOld;
-  } else if (op->u.c.flags.b.cachePend) {
+  }
+  else if (op->u.c.flags.b.cachePend)
+  {
     return &gdbroot->db->cachePend;
-  } else if (op->u.c.flags.b.cacheNew) {
+  }
+  else if (op->u.c.flags.b.cacheNew)
+  {
     return &gdbroot->db->cacheNew;
-  } else if (op->u.c.flags.b.cacheFree) {
+  }
+  else if (op->u.c.flags.b.cacheFree)
+  {
     return &gdbroot->db->cacheFree;
-  } else if (op->u.c.flags.b.cacheLock) {
+  }
+  else if (op->u.c.flags.b.cacheLock)
+  {
     vp = pool_Address(NULL, gdbroot->pool, op->l.vr);
     return &vp->u.c.cacheLock;
-  } else {
+  }
+  else
+  {
     errh_Bugcheck(2, "Object cache queue inconsistency");
   }
 }
@@ -320,11 +339,14 @@ void cvol_QmovePred(gdb_sObject* op, gdb_sTouchQ* fqp, gdb_sTouchQ* tqp)
   if (!op->l.flags.b.isCached || op->u.c.flags.b.cacheLock)
     return;
 
-  if (fqp != NULL) {
+  if (fqp != NULL)
+  {
     pool_Qremove(NULL, gdbroot->pool, &op->u.c.cache_ll);
     fqp->lc--;
     op->u.c.flags.m &= ~fqp->flags.m; /* Remove bit for old que.  */
-  } else {
+  }
+  else
+  {
     pwr_Assert(!(op->u.c.flags.m & gdb_mCo_inTouchList));
   }
 
@@ -345,11 +367,14 @@ void cvol_QmoveSucc(gdb_sObject* op, gdb_sTouchQ* fqp, gdb_sTouchQ* tqp)
   if (!op->l.flags.b.isCached || op->u.c.flags.b.cacheLock)
     return;
 
-  if (fqp != NULL) {
+  if (fqp != NULL)
+  {
     pool_Qremove(NULL, gdbroot->pool, &op->u.c.cache_ll);
     fqp->lc--;
     op->u.c.flags.m &= ~fqp->flags.m; /* Remove bit for old que.  */
-  } else {
+  }
+  else
+  {
     pwr_Assert(!(op->u.c.flags.m & gdb_mCo_inTouchList));
   }
 
@@ -402,11 +427,11 @@ void cvol_Qtrim(gdb_sTouchQ* fqp)
     return;
 
   if (gdbroot->db->log.b.cacheTrim)
-    printf("Start trim %d, %d < %d < %d\n", fqp->flags.m, fqp->lc_min, fqp->lc,
-        fqp->lc_max);
+    printf("Start trim %d, %d < %d < %d\n", fqp->flags.m, fqp->lc_min, fqp->lc, fqp->lc_max);
   tqp = pool_Address(NULL, gdbroot->pool, fqp->next);
 
-  while (fqp->lc > fqp->lc_max) {
+  while (fqp->lc > fqp->lc_max)
+  {
     ol = pool_Qpred(NULL, gdbroot->pool, &fqp->lh);
     if (ol == &fqp->lh)
       break;
@@ -419,14 +444,12 @@ void cvol_Qtrim(gdb_sTouchQ* fqp)
 
   cvol_Qtrim(tqp);
   if (gdbroot->db->log.b.cacheTrim)
-    printf("Stop trim %d, %d < %d < %d\n", fqp->flags.m, fqp->lc_min, fqp->lc,
-        fqp->lc_max);
+    printf("Stop trim %d, %d < %d < %d\n", fqp->flags.m, fqp->lc_min, fqp->lc, fqp->lc_max);
 }
 
 /* .  */
 
-void cvol_UnlinkObject(
-    pwr_tStatus* sts, gdb_sVolume* pp, gdb_sObject* op, pwr_tBitMask link)
+void cvol_UnlinkObject(pwr_tStatus* sts, gdb_sVolume* pp, gdb_sObject* op, pwr_tBitMask link)
 {
   /* TODO */
   return;

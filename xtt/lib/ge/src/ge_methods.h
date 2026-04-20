@@ -40,7 +40,8 @@
 #include "pwr.h"
 #include "pwr_baseclasses.h"
 
-class GeMethods {
+class GeMethods
+{
 public:
   static const int opmeth_size = 12;
   static const int mntmeth_size = 32;
@@ -59,9 +60,8 @@ public:
   static pwr_tString80 mnt_method[mntmeth_size];
   static pwr_tString80 mnt_filter[mntmeth_size];
 
-  static int get_xm_mask(pwr_tAttrRef* arp, char* name,
-      pwr_sClass_XttMethodsMask* xm_mask, int* configured,
-      int(command_cb)(char* cmd, void* udata), void* udata);
+  static int get_xm_mask(pwr_tAttrRef* arp, char* name, pwr_sClass_XttMethodsMask* xm_mask, int* configured,
+                         int(command_cb)(char* cmd, void* udata), void* udata);
 };
 
 #endif

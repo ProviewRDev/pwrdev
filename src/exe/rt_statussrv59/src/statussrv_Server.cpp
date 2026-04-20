@@ -6,8 +6,7 @@
 */
 #include "statussrv_H.h"
 
-SOAP_SOURCE_STAMP(
-    "@(#) statussrv_Server.cpp ver 2.7.9d 2007-06-29 12:20:02 GMT")
+SOAP_SOURCE_STAMP("@(#) statussrv_Server.cpp ver 2.7.9d 2007-06-29 12:20:02 GMT")
 
 SOAP_FMAC5 int SOAP_FMAC6 soap_serve(struct soap* soap)
 {
@@ -15,9 +14,11 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_serve(struct soap* soap)
   unsigned int k = soap->max_keep_alive;
 #endif
 
-  do {
+  do
+  {
 #ifdef WITH_FASTCGI
-    if (FCGI_Accept() < 0) {
+    if (FCGI_Accept() < 0)
+    {
       soap->error = SOAP_EOF;
       return soap_send_fault(soap);
     }
@@ -30,8 +31,10 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_serve(struct soap* soap)
       soap->keep_alive = 0;
 #endif
 
-    if (soap_begin_recv(soap)) {
-      if (soap->error < SOAP_STOP) {
+    if (soap_begin_recv(soap))
+    {
+      if (soap->error < SOAP_STOP)
+      {
 #ifdef WITH_FASTCGI
         soap_send_fault(soap);
 #else
@@ -43,9 +46,9 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_serve(struct soap* soap)
       continue;
     }
 
-    if (soap_envelope_begin_in(soap) || soap_recv_header(soap)
-        || soap_body_begin_in(soap) || soap_serve_request(soap)
-        || (soap->fserveloop && soap->fserveloop(soap))) {
+    if (soap_envelope_begin_in(soap) || soap_recv_header(soap) || soap_body_begin_in(soap) ||
+        soap_serve_request(soap) || (soap->fserveloop && soap->fserveloop(soap)))
+    {
 #ifdef WITH_FASTCGI
       soap_send_fault(soap);
 #else
@@ -86,33 +89,28 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_serve___s0__GetStatus(struct soap* soap)
   s0__GetStatusResponse.soap_default(soap);
   soap_default___s0__GetStatus(soap, &soap_tmp___s0__GetStatus);
   soap->encodingStyle = NULL;
-  if (!soap_get___s0__GetStatus(
-          soap, &soap_tmp___s0__GetStatus, "-s0:GetStatus", NULL))
+  if (!soap_get___s0__GetStatus(soap, &soap_tmp___s0__GetStatus, "-s0:GetStatus", NULL))
     return soap->error;
-  if (soap_body_end_in(soap) || soap_envelope_end_in(soap)
-      || soap_end_recv(soap))
+  if (soap_body_end_in(soap) || soap_envelope_end_in(soap) || soap_end_recv(soap))
     return soap->error;
-  soap->error = __s0__GetStatus(
-      soap, soap_tmp___s0__GetStatus.s0__GetStatus, &s0__GetStatusResponse);
+  soap->error = __s0__GetStatus(soap, soap_tmp___s0__GetStatus.s0__GetStatus, &s0__GetStatusResponse);
   if (soap->error)
     return soap->error;
   soap_serializeheader(soap);
   s0__GetStatusResponse.soap_serialize(soap);
   if (soap_begin_count(soap))
     return soap->error;
-  if (soap->mode & SOAP_IO_LENGTH) {
-    if (soap_envelope_begin_out(soap) || soap_putheader(soap)
-        || soap_body_begin_out(soap)
-        || s0__GetStatusResponse.soap_put(soap, "s0:GetStatusResponse", "")
-        || soap_body_end_out(soap) || soap_envelope_end_out(soap))
+  if (soap->mode & SOAP_IO_LENGTH)
+  {
+    if (soap_envelope_begin_out(soap) || soap_putheader(soap) || soap_body_begin_out(soap) ||
+        s0__GetStatusResponse.soap_put(soap, "s0:GetStatusResponse", "") || soap_body_end_out(soap) ||
+        soap_envelope_end_out(soap))
       return soap->error;
   };
-  if (soap_end_count(soap) || soap_response(soap, SOAP_OK)
-      || soap_envelope_begin_out(soap) || soap_putheader(soap)
-      || soap_body_begin_out(soap)
-      || s0__GetStatusResponse.soap_put(soap, "s0:GetStatusResponse", "")
-      || soap_body_end_out(soap) || soap_envelope_end_out(soap)
-      || soap_end_send(soap))
+  if (soap_end_count(soap) || soap_response(soap, SOAP_OK) || soap_envelope_begin_out(soap) ||
+      soap_putheader(soap) || soap_body_begin_out(soap) ||
+      s0__GetStatusResponse.soap_put(soap, "s0:GetStatusResponse", "") || soap_body_end_out(soap) ||
+      soap_envelope_end_out(soap) || soap_end_send(soap))
     return soap->error;
   return soap_closesock(soap);
 }
@@ -124,34 +122,29 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_serve___s0__GetExtStatus(struct soap* soap)
   s0__GetExtStatusResponse.soap_default(soap);
   soap_default___s0__GetExtStatus(soap, &soap_tmp___s0__GetExtStatus);
   soap->encodingStyle = NULL;
-  if (!soap_get___s0__GetExtStatus(
-          soap, &soap_tmp___s0__GetExtStatus, "-s0:GetExtStatus", NULL))
+  if (!soap_get___s0__GetExtStatus(soap, &soap_tmp___s0__GetExtStatus, "-s0:GetExtStatus", NULL))
     return soap->error;
-  if (soap_body_end_in(soap) || soap_envelope_end_in(soap)
-      || soap_end_recv(soap))
+  if (soap_body_end_in(soap) || soap_envelope_end_in(soap) || soap_end_recv(soap))
     return soap->error;
-  soap->error = __s0__GetExtStatus(soap,
-      soap_tmp___s0__GetExtStatus.s0__GetExtStatus, &s0__GetExtStatusResponse);
+  soap->error =
+      __s0__GetExtStatus(soap, soap_tmp___s0__GetExtStatus.s0__GetExtStatus, &s0__GetExtStatusResponse);
   if (soap->error)
     return soap->error;
   soap_serializeheader(soap);
   s0__GetExtStatusResponse.soap_serialize(soap);
   if (soap_begin_count(soap))
     return soap->error;
-  if (soap->mode & SOAP_IO_LENGTH) {
-    if (soap_envelope_begin_out(soap) || soap_putheader(soap)
-        || soap_body_begin_out(soap)
-        || s0__GetExtStatusResponse.soap_put(
-               soap, "s0:GetExtStatusResponse", "")
-        || soap_body_end_out(soap) || soap_envelope_end_out(soap))
+  if (soap->mode & SOAP_IO_LENGTH)
+  {
+    if (soap_envelope_begin_out(soap) || soap_putheader(soap) || soap_body_begin_out(soap) ||
+        s0__GetExtStatusResponse.soap_put(soap, "s0:GetExtStatusResponse", "") || soap_body_end_out(soap) ||
+        soap_envelope_end_out(soap))
       return soap->error;
   };
-  if (soap_end_count(soap) || soap_response(soap, SOAP_OK)
-      || soap_envelope_begin_out(soap) || soap_putheader(soap)
-      || soap_body_begin_out(soap)
-      || s0__GetExtStatusResponse.soap_put(soap, "s0:GetExtStatusResponse", "")
-      || soap_body_end_out(soap) || soap_envelope_end_out(soap)
-      || soap_end_send(soap))
+  if (soap_end_count(soap) || soap_response(soap, SOAP_OK) || soap_envelope_begin_out(soap) ||
+      soap_putheader(soap) || soap_body_begin_out(soap) ||
+      s0__GetExtStatusResponse.soap_put(soap, "s0:GetExtStatusResponse", "") || soap_body_end_out(soap) ||
+      soap_envelope_end_out(soap) || soap_end_send(soap))
     return soap->error;
   return soap_closesock(soap);
 }
@@ -163,33 +156,28 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_serve___s0__Restart(struct soap* soap)
   s0__RestartResponse.soap_default(soap);
   soap_default___s0__Restart(soap, &soap_tmp___s0__Restart);
   soap->encodingStyle = NULL;
-  if (!soap_get___s0__Restart(
-          soap, &soap_tmp___s0__Restart, "-s0:Restart", NULL))
+  if (!soap_get___s0__Restart(soap, &soap_tmp___s0__Restart, "-s0:Restart", NULL))
     return soap->error;
-  if (soap_body_end_in(soap) || soap_envelope_end_in(soap)
-      || soap_end_recv(soap))
+  if (soap_body_end_in(soap) || soap_envelope_end_in(soap) || soap_end_recv(soap))
     return soap->error;
-  soap->error = __s0__Restart(
-      soap, soap_tmp___s0__Restart.s0__Restart, &s0__RestartResponse);
+  soap->error = __s0__Restart(soap, soap_tmp___s0__Restart.s0__Restart, &s0__RestartResponse);
   if (soap->error)
     return soap->error;
   soap_serializeheader(soap);
   s0__RestartResponse.soap_serialize(soap);
   if (soap_begin_count(soap))
     return soap->error;
-  if (soap->mode & SOAP_IO_LENGTH) {
-    if (soap_envelope_begin_out(soap) || soap_putheader(soap)
-        || soap_body_begin_out(soap)
-        || s0__RestartResponse.soap_put(soap, "s0:RestartResponse", "")
-        || soap_body_end_out(soap) || soap_envelope_end_out(soap))
+  if (soap->mode & SOAP_IO_LENGTH)
+  {
+    if (soap_envelope_begin_out(soap) || soap_putheader(soap) || soap_body_begin_out(soap) ||
+        s0__RestartResponse.soap_put(soap, "s0:RestartResponse", "") || soap_body_end_out(soap) ||
+        soap_envelope_end_out(soap))
       return soap->error;
   };
-  if (soap_end_count(soap) || soap_response(soap, SOAP_OK)
-      || soap_envelope_begin_out(soap) || soap_putheader(soap)
-      || soap_body_begin_out(soap)
-      || s0__RestartResponse.soap_put(soap, "s0:RestartResponse", "")
-      || soap_body_end_out(soap) || soap_envelope_end_out(soap)
-      || soap_end_send(soap))
+  if (soap_end_count(soap) || soap_response(soap, SOAP_OK) || soap_envelope_begin_out(soap) ||
+      soap_putheader(soap) || soap_body_begin_out(soap) ||
+      s0__RestartResponse.soap_put(soap, "s0:RestartResponse", "") || soap_body_end_out(soap) ||
+      soap_envelope_end_out(soap) || soap_end_send(soap))
     return soap->error;
   return soap_closesock(soap);
 }
@@ -201,33 +189,28 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_serve___s0__XttStart(struct soap* soap)
   s0__XttStartResponse.soap_default(soap);
   soap_default___s0__XttStart(soap, &soap_tmp___s0__XttStart);
   soap->encodingStyle = NULL;
-  if (!soap_get___s0__XttStart(
-          soap, &soap_tmp___s0__XttStart, "-s0:XttStart", NULL))
+  if (!soap_get___s0__XttStart(soap, &soap_tmp___s0__XttStart, "-s0:XttStart", NULL))
     return soap->error;
-  if (soap_body_end_in(soap) || soap_envelope_end_in(soap)
-      || soap_end_recv(soap))
+  if (soap_body_end_in(soap) || soap_envelope_end_in(soap) || soap_end_recv(soap))
     return soap->error;
-  soap->error = __s0__XttStart(
-      soap, soap_tmp___s0__XttStart.s0__XttStart, &s0__XttStartResponse);
+  soap->error = __s0__XttStart(soap, soap_tmp___s0__XttStart.s0__XttStart, &s0__XttStartResponse);
   if (soap->error)
     return soap->error;
   soap_serializeheader(soap);
   s0__XttStartResponse.soap_serialize(soap);
   if (soap_begin_count(soap))
     return soap->error;
-  if (soap->mode & SOAP_IO_LENGTH) {
-    if (soap_envelope_begin_out(soap) || soap_putheader(soap)
-        || soap_body_begin_out(soap)
-        || s0__XttStartResponse.soap_put(soap, "s0:XttStartResponse", "")
-        || soap_body_end_out(soap) || soap_envelope_end_out(soap))
+  if (soap->mode & SOAP_IO_LENGTH)
+  {
+    if (soap_envelope_begin_out(soap) || soap_putheader(soap) || soap_body_begin_out(soap) ||
+        s0__XttStartResponse.soap_put(soap, "s0:XttStartResponse", "") || soap_body_end_out(soap) ||
+        soap_envelope_end_out(soap))
       return soap->error;
   };
-  if (soap_end_count(soap) || soap_response(soap, SOAP_OK)
-      || soap_envelope_begin_out(soap) || soap_putheader(soap)
-      || soap_body_begin_out(soap)
-      || s0__XttStartResponse.soap_put(soap, "s0:XttStartResponse", "")
-      || soap_body_end_out(soap) || soap_envelope_end_out(soap)
-      || soap_end_send(soap))
+  if (soap_end_count(soap) || soap_response(soap, SOAP_OK) || soap_envelope_begin_out(soap) ||
+      soap_putheader(soap) || soap_body_begin_out(soap) ||
+      s0__XttStartResponse.soap_put(soap, "s0:XttStartResponse", "") || soap_body_end_out(soap) ||
+      soap_envelope_end_out(soap) || soap_end_send(soap))
     return soap->error;
   return soap_closesock(soap);
 }
@@ -239,33 +222,28 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_serve___s0__RtMonStart(struct soap* soap)
   s0__RtMonStartResponse.soap_default(soap);
   soap_default___s0__RtMonStart(soap, &soap_tmp___s0__RtMonStart);
   soap->encodingStyle = NULL;
-  if (!soap_get___s0__RtMonStart(
-          soap, &soap_tmp___s0__RtMonStart, "-s0:RtMonStart", NULL))
+  if (!soap_get___s0__RtMonStart(soap, &soap_tmp___s0__RtMonStart, "-s0:RtMonStart", NULL))
     return soap->error;
-  if (soap_body_end_in(soap) || soap_envelope_end_in(soap)
-      || soap_end_recv(soap))
+  if (soap_body_end_in(soap) || soap_envelope_end_in(soap) || soap_end_recv(soap))
     return soap->error;
-  soap->error = __s0__RtMonStart(
-      soap, soap_tmp___s0__RtMonStart.s0__RtMonStart, &s0__RtMonStartResponse);
+  soap->error = __s0__RtMonStart(soap, soap_tmp___s0__RtMonStart.s0__RtMonStart, &s0__RtMonStartResponse);
   if (soap->error)
     return soap->error;
   soap_serializeheader(soap);
   s0__RtMonStartResponse.soap_serialize(soap);
   if (soap_begin_count(soap))
     return soap->error;
-  if (soap->mode & SOAP_IO_LENGTH) {
-    if (soap_envelope_begin_out(soap) || soap_putheader(soap)
-        || soap_body_begin_out(soap)
-        || s0__RtMonStartResponse.soap_put(soap, "s0:RtMonStartResponse", "")
-        || soap_body_end_out(soap) || soap_envelope_end_out(soap))
+  if (soap->mode & SOAP_IO_LENGTH)
+  {
+    if (soap_envelope_begin_out(soap) || soap_putheader(soap) || soap_body_begin_out(soap) ||
+        s0__RtMonStartResponse.soap_put(soap, "s0:RtMonStartResponse", "") || soap_body_end_out(soap) ||
+        soap_envelope_end_out(soap))
       return soap->error;
   };
-  if (soap_end_count(soap) || soap_response(soap, SOAP_OK)
-      || soap_envelope_begin_out(soap) || soap_putheader(soap)
-      || soap_body_begin_out(soap)
-      || s0__RtMonStartResponse.soap_put(soap, "s0:RtMonStartResponse", "")
-      || soap_body_end_out(soap) || soap_envelope_end_out(soap)
-      || soap_end_send(soap))
+  if (soap_end_count(soap) || soap_response(soap, SOAP_OK) || soap_envelope_begin_out(soap) ||
+      soap_putheader(soap) || soap_body_begin_out(soap) ||
+      s0__RtMonStartResponse.soap_put(soap, "s0:RtMonStartResponse", "") || soap_body_end_out(soap) ||
+      soap_envelope_end_out(soap) || soap_end_send(soap))
     return soap->error;
   return soap_closesock(soap);
 }

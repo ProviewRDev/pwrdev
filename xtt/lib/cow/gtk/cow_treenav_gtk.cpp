@@ -51,18 +51,16 @@
 //
 // Create the navigator widget
 //
-TreeNavGtk::TreeNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-    pwr_tAttrRef* xn_itemlist, int xn_item_cnt, unsigned int xn_options,
-    pwr_tStatus (*xn_get_object_info)(
-        void*, pwr_tAttrRef*, char*, int, char*, char*, int),
-    pwr_tStatus (*xn_get_node_info)(void*, char*, char*, int), GtkWidget** w,
-    pwr_tStatus* status)
-    : TreeNav(xn_parent_ctx, xn_itemlist, xn_item_cnt, xn_options,
-          xn_get_object_info, xn_get_node_info, status),
+TreeNavGtk::TreeNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, pwr_tAttrRef* xn_itemlist,
+                       int xn_item_cnt, unsigned int xn_options,
+                       pwr_tStatus (*xn_get_object_info)(void*, pwr_tAttrRef*, char*, int, char*, char*, int),
+                       pwr_tStatus (*xn_get_node_info)(void*, char*, char*, int), GtkWidget** w,
+                       pwr_tStatus* status)
+    : TreeNav(xn_parent_ctx, xn_itemlist, xn_item_cnt, xn_options, xn_get_object_info, xn_get_node_info,
+              status),
       parent_wid(xn_parent_wid)
 {
-  form_widget
-      = scrolledbrowwidgetgtk_new(TreeNav::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetgtk_new(TreeNav::init_brow_cb, this, &brow_widget);
 
   gtk_widget_show_all(brow_widget);
 
@@ -81,7 +79,4 @@ TreeNavGtk::~TreeNavGtk()
   gtk_widget_destroy(form_widget);
 }
 
-void TreeNavGtk::set_inputfocus()
-{
-  gtk_widget_grab_focus(brow_widget);
-}
+void TreeNavGtk::set_inputfocus() { gtk_widget_grab_focus(brow_widget); }

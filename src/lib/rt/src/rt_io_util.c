@@ -45,8 +45,7 @@
 /*----------------------------------------------------------------------------*\
   Find classes belonging to an specific IO-type.
 \*----------------------------------------------------------------------------*/
-pwr_tStatus io_GetIoTypeClasses(
-    io_eType type, pwr_tClassId** classes, int* size)
+pwr_tStatus io_GetIoTypeClasses(io_eType type, pwr_tClassId** classes, int* size)
 {
   pwr_tStatus sts;
   pwr_sClassDef cdef;
@@ -57,15 +56,16 @@ pwr_tStatus io_GetIoTypeClasses(
   *size = 0;
   *classes = calloc(IO_CLASSES_SIZE, sizeof(pwr_tCid));
 
-  for (sts = gdh_GetClassList(pwr_eClass_ClassDef, &oid); ODD(sts);
-       sts = gdh_GetNextObject(oid, &oid)) {
+  for (sts = gdh_GetClassList(pwr_eClass_ClassDef, &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+  {
     aref = cdh_ObjidToAref(oid);
     sts = gdh_GetObjectInfoAttrref(&aref, &cdef, sizeof(cdef));
     if (EVEN(sts))
       return sts;
 
     add_class = 0;
-    switch (type) {
+    switch (type)
+    {
     case io_eType_Agent:
       if (cdef.Flags.b.IOAgent)
         add_class = 1;
@@ -82,7 +82,8 @@ pwr_tStatus io_GetIoTypeClasses(
       return IO__NOMETHOD;
     }
 
-    if (add_class) {
+    if (add_class)
+    {
       if (*size >= IO_CLASSES_SIZE)
         return IO__CLASSEXCEED;
 
@@ -107,7 +108,8 @@ int io_CheckClassIoType(io_eType type, pwr_tCid cid)
   if (EVEN(sts))
     return 0;
 
-  switch (type) {
+  switch (type)
+  {
   case io_eType_Agent:
     if (cdef.Flags.b.IOAgent)
       return 1;

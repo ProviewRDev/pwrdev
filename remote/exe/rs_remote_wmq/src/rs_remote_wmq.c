@@ -35,24 +35,24 @@
  */
 
 /*************************************************************************
-*		===============
-*                P r o v i e w
-*               ===============
-**************************************************************************
-*
-* Filename:             rs_remote_wmq.c
-*
-* Description:		Remote transport process for Websphere Message Queue
-*                       as a client
-*			For further information, please refer to Webspherer MQ
-*			documentation.
-*
-* Change log:		2010-12-08, Robert Karlsson
-*			First version introduced in 4.8.0-2
-*
-*
-**************************************************************************
-**************************************************************************/
+ *		===============
+ *                P r o v i e w
+ *               ===============
+ **************************************************************************
+ *
+ * Filename:             rs_remote_wmq.c
+ *
+ * Description:		Remote transport process for Websphere Message Queue
+ *                       as a client
+ *			For further information, please refer to Webspherer MQ
+ *			documentation.
+ *
+ * Change log:		2010-12-08, Robert Karlsson
+ *			First version introduced in 4.8.0-2
+ *
+ *
+ **************************************************************************
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 
@@ -96,9 +96,9 @@ char mgr_name[MQ_Q_MGR_NAME_LENGTH];
 MQHCONN Hconn;
 // MQCNO    Connect_options = {MQCNO_DEFAULT};
 // MQCD     ClientConn = {MQCD_CLIENT_CONN_DEFAULT};
-MQOD RcvObjDesc = { MQOD_DEFAULT };
+MQOD RcvObjDesc = {MQOD_DEFAULT};
 MQLONG RcvOpenOptions; // options that control the open-call
-MQOD SndObjDesc = { MQOD_DEFAULT };
+MQOD SndObjDesc = {MQOD_DEFAULT};
 MQLONG SndOpenOptions; // options that control the open-call
 char rcv_que_name[MQ_Q_NAME_LENGTH];
 char snd_que_name[MQ_Q_NAME_LENGTH];
@@ -145,7 +145,8 @@ unsigned int wmq_connectandopen()
 
   MQCONN(mgr_name, &Hconn, &CompCode, &Reason);
 
-  if ((CompCode != MQCC_OK) | (Reason != MQRC_NONE)) {
+  if ((CompCode != MQCC_OK) | (Reason != MQRC_NONE))
+  {
     //    errh_Fatal("MQCONN failed, queue mgr: %s, Code: %d, Reason: %d",
     //    mgr_name, CompCode, Reason);
     //    errh_SetStatus(PWR__SRVTERM);
@@ -157,9 +158,9 @@ unsigned int wmq_connectandopen()
 
   MQOPEN(Hconn, &RcvObjDesc, RcvOpenOptions, &RcvHobj, &CompCode, &Reason);
 
-  if ((CompCode != MQCC_OK) | (Reason != MQRC_NONE)) {
-    errh_Fatal("MQOPEN failed, queue: %s, Code: %d, Reason: %d", rcv_que_name,
-        CompCode, Reason);
+  if ((CompCode != MQCC_OK) | (Reason != MQRC_NONE))
+  {
+    errh_Fatal("MQOPEN failed, queue: %s, Code: %d, Reason: %d", rcv_que_name, CompCode, Reason);
     errh_SetStatus(PWR__SRVTERM);
     exit(0);
   }
@@ -168,9 +169,9 @@ unsigned int wmq_connectandopen()
 
   MQOPEN(Hconn, &SndObjDesc, SndOpenOptions, &SndHobj, &CompCode, &Reason);
 
-  if ((CompCode != MQCC_OK) | (Reason != MQRC_NONE)) {
-    errh_Fatal("MQOPEN failed, queue: %s, Code: %d, Reason: %d", snd_que_name,
-        CompCode, Reason);
+  if ((CompCode != MQCC_OK) | (Reason != MQRC_NONE))
+  {
+    errh_Fatal("MQOPEN failed, queue: %s, Code: %d, Reason: %d", snd_que_name, CompCode, Reason);
     errh_SetStatus(PWR__SRVTERM);
     exit(0);
   }
@@ -198,11 +199,11 @@ unsigned int wmq_receive()
   MQLONG CompCode;
   MQLONG Reason;
 
-  MQMD MsgDesc = { MQMD_DEFAULT };
+  MQMD MsgDesc = {MQMD_DEFAULT};
 
   MQLONG DataLength;
   MQCHAR Buffer[200000];
-  MQGMO GetMsgOpts = { MQGMO_DEFAULT };
+  MQGMO GetMsgOpts = {MQGMO_DEFAULT};
 
   MQLONG BufferLength = sizeof(Buffer);
 
@@ -220,21 +221,21 @@ unsigned int wmq_receive()
 
   /* Get message */
 
-  MQGET(Hconn, RcvHobj, &MsgDesc, &GetMsgOpts, BufferLength, Buffer,
-      &DataLength, &CompCode, &Reason);
+  MQGET(Hconn, RcvHobj, &MsgDesc, &GetMsgOpts, BufferLength, Buffer, &DataLength, &CompCode, &Reason);
 
-  if (CompCode != MQCC_FAILED) {
+  if (CompCode != MQCC_FAILED)
+  {
     if (debug)
       printf("Received message %d\n", (int)DataLength);
 
     search_remtrans = true;
 
     remtrans = rn.remtrans;
-    while (remtrans && search_remtrans) {
-      if ((strncmp(remtrans->objp->TransName, (char*)MsgDesc.CorrelId,
-               MQ_CORREL_ID_LENGTH)
-              == 0)
-          && (remtrans->objp->Direction == REMTRANS_IN)) {
+    while (remtrans && search_remtrans)
+    {
+      if ((strncmp(remtrans->objp->TransName, (char*)MsgDesc.CorrelId, MQ_CORREL_ID_LENGTH) == 0) &&
+          (remtrans->objp->Direction == REMTRANS_IN))
+      {
         search_remtrans = false;
         sts = RemTrans_Receive(remtrans, (char*)&Buffer, DataLength);
         if (sts != STATUS_OK && sts != STATUS_BUFF)
@@ -243,15 +244,19 @@ unsigned int wmq_receive()
       }
       remtrans = (remtrans_item*)remtrans->next;
     }
-    if (search_remtrans) {
+    if (search_remtrans)
+    {
       rn_wmq->ErrCount++;
       errh_Info("No remtrans for received message, msgid %s", MsgDesc.MsgId, 0);
     }
-  } else if (Reason != MQRC_NO_MSG_AVAILABLE) {
+  }
+  else if (Reason != MQRC_NO_MSG_AVAILABLE)
+  {
     rn_wmq->ErrCount++;
     errh_Error("Receive failed, reason %d", Reason, 0);
 
-    if (Reason == MQRC_CONNECTION_BROKEN) {
+    if (Reason == MQRC_CONNECTION_BROKEN)
+    {
       connected = 0;
     }
   }
@@ -273,16 +278,15 @@ unsigned int wmq_receive()
 **************************************************************************
 **************************************************************************/
 
-unsigned int wmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
-    char* buf, int buf_size)
+unsigned int wmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans, char* buf, int buf_size)
 
 {
   MQLONG CompCode;
   MQLONG Reason;
-  MQPMO pmo = { MQPMO_DEFAULT }; /* put message options           */
+  MQPMO pmo = {MQPMO_DEFAULT}; /* put message options           */
   //  MQOD     od = {MQOD_DEFAULT};    /* Object Descriptor             */
-  MQMD md = { MQMD_DEFAULT }; /* Message Descriptor            */
-  MQLONG messlen; /* message length                */
+  MQMD md = {MQMD_DEFAULT}; /* Message Descriptor            */
+  MQLONG messlen;           /* message length                */
 
   pmo.Options = MQPMO_NO_SYNCPOINT | MQPMO_FAIL_IF_QUIESCING;
 
@@ -292,36 +296,41 @@ unsigned int wmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
   strncpy((char*)md.CorrelId, remtrans->TransName, MQ_CORREL_ID_LENGTH);
   memcpy(md.MsgId, MQCI_NONE, sizeof(md.MsgId));
 
-  if ((remtrans->Address[0] <= MQPER_PERSISTENCE_AS_Q_DEF)
-      && ((pwr_tInt16)remtrans->Address[0] >= MQPER_NOT_PERSISTENT))
+  if ((remtrans->Address[0] <= MQPER_PERSISTENCE_AS_Q_DEF) &&
+      ((pwr_tInt16)remtrans->Address[0] >= MQPER_NOT_PERSISTENT))
     md.Persistence = remtrans->Address[0];
   else
     md.Persistence = MQPER_NOT_PERSISTENT; // | MQPRE_NOT_PERSISTENT
 
-  if (remtrans->Address[1] > 0) {
+  if (remtrans->Address[1] > 0)
+  {
     md.Expiry = remtrans->Address[1] * 10.0; // s to 1/10 s
-  } else {
+  }
+  else
+  {
     md.Expiry = MQEI_UNLIMITED;
   }
 
   messlen = buf_size;
 
-  MQPUT(Hconn, /* connection handle               */
-      SndHobj, /* object handle                   */
-      &md, /* message descriptor              */
-      &pmo, /* default options (datagram)      */
-      messlen, /* message length                  */
-      buf, /* message buffer                  */
-      &CompCode, /* completion code                 */
-      &Reason); /* reason code                     */
+  MQPUT(Hconn,     /* connection handle               */
+        SndHobj,   /* object handle                   */
+        &md,       /* message descriptor              */
+        &pmo,      /* default options (datagram)      */
+        messlen,   /* message length                  */
+        buf,       /* message buffer                  */
+        &CompCode, /* completion code                 */
+        &Reason);  /* reason code                     */
 
   /* report reason, if any */
-  if (Reason != MQRC_NONE) {
+  if (Reason != MQRC_NONE)
+  {
     remtrans->ErrCount++;
     //    errh_Error("Send failed, msgid %s, Reason %d", md.MsgId, Reason, 0);
     //    printf("MQPUT ended with reason code %d\n", (int) Reason);
 
-    if (Reason == MQRC_CONNECTION_BROKEN) {
+    if (Reason == MQRC_CONNECTION_BROKEN)
+    {
       connected = 0;
     }
   }
@@ -370,7 +379,8 @@ int main(int argc, char* argv[])
   if (debug)
     printf("Before gdh_init\n");
   sts = gdh_Init((char*)pname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -382,7 +392,8 @@ int main(int argc, char* argv[])
   sts = 0;
   if (argc >= 3)
     sts = cdh_StringToObjid(argv[2], &rn.objid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("cdh_StringToObjid, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -391,7 +402,8 @@ int main(int argc, char* argv[])
   /* Get pointer to RemnodeWMQ object and store locally */
 
   sts = gdh_ObjidToPointer(rn.objid, (pwr_tAddress*)&rn_wmq);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("cdh_ObjidToPointer, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -408,7 +420,8 @@ int main(int argc, char* argv[])
 
   sts = RemTrans_Init(&rn);
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("RemTrans_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -417,10 +430,10 @@ int main(int argc, char* argv[])
   /* Store remtrans objects objid in remnode_mq object */
   remtrans = rn.remtrans;
   i = 0;
-  while (remtrans) {
+  while (remtrans)
+  {
     rn_wmq->RemTransObjects[i++] = remtrans->objid;
-    if (i >= (int)(sizeof(rn_wmq->RemTransObjects)
-                 / sizeof(rn_wmq->RemTransObjects[0])))
+    if (i >= (int)(sizeof(rn_wmq->RemTransObjects) / sizeof(rn_wmq->RemTransObjects[0])))
       break;
     remtrans = (remtrans_item*)remtrans->next;
   }
@@ -468,8 +481,10 @@ int main(int argc, char* argv[])
 
   /* Loop forever */
 
-  while (!doomsday) {
-    if (rn_wmq->Disable == 1) {
+  while (!doomsday)
+  {
+    if (rn_wmq->Disable == 1)
+    {
       errh_Fatal("Disabled, exiting");
       errh_SetStatus(PWR__SRVTERM);
       exit(0);
@@ -482,10 +497,12 @@ int main(int argc, char* argv[])
     if (!connected)
       sts = wmq_connectandopen();
 
-    if (connected) {
+    if (connected)
+    {
       sts = wmq_receive();
 
-      if (time_since_scan >= rn_wmq->ScanTime) {
+      if (time_since_scan >= rn_wmq->ScanTime)
+      {
         sts = RemTrans_Cyclic(&rn, &wmq_send);
         time_since_scan = 0.0;
       }

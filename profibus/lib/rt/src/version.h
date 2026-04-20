@@ -34,8 +34,8 @@
 
 #include "buildnr.papi.h"
 
-#define SW_VERSION                                                             \
-  "5.26.1.00.release "                                                         \
+#define SW_VERSION                                                                                           \
+  "5.26.1.00.release "                                                                                       \
   "(Build " BUILD_NUMBER_STR ") "
 
 #endif

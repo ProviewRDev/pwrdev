@@ -38,26 +38,25 @@
 #define co_timelog_h
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-extern unsigned int tmlog;
+  extern unsigned int tmlog;
 
-#define timelog(level, str)                                                    \
-  if (tmlog & level)                                                           \
+#define timelog(level, str)                                                                                  \
+  if (tmlog & level)                                                                                         \
     tm_log(level, __func__, str);
-#define timelog_ss(level, str1, str2)                                          \
-  if (tmlog & level)                                                           \
+#define timelog_ss(level, str1, str2)                                                                        \
+  if (tmlog & level)                                                                                         \
     tm_log_ss(level, __func__, str1, str2);
-#define timelog_sii(level, str, i1, i2)                                        \
-  if (tmlog & level)                                                           \
+#define timelog_sii(level, str, i1, i2)                                                                      \
+  if (tmlog & level)                                                                                         \
     tm_log_sii(level, __func__, str, i1, i2);
 
-void tm_log(unsigned int level, const char* func, const char* str);
-void tm_log_ss(
-    unsigned int level, const char* func, const char* str1, const char* str2);
-void tm_log_sii(
-    unsigned int level, const char* func, const char* str, int i1, int i2);
+  void tm_log(unsigned int level, const char* func, const char* str);
+  void tm_log_ss(unsigned int level, const char* func, const char* str1, const char* str2);
+  void tm_log_sii(unsigned int level, const char* func, const char* str, int i1, int i2);
 
 #if defined __cplusplus
 }

@@ -44,110 +44,107 @@
 #include "wb_ldh.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-typedef enum {
-  lfu_mDistrOpt_NoRootVolume = 1 << 0
-} lfu_mDistrOpt;
+  typedef enum
+  {
+    lfu_mDistrOpt_NoRootVolume = 1 << 0
+  } lfu_mDistrOpt;
 
-typedef enum {
-  lfu_eAccessType_StdLgi = 0,
-  lfu_eAccessType_Proxy = 1,
-  lfu_eAccessType_Local = 2
-} lfu_eAccessType;
+  typedef enum
+  {
+    lfu_eAccessType_StdLgi = 0,
+    lfu_eAccessType_Proxy = 1,
+    lfu_eAccessType_Local = 2
+  } lfu_eAccessType;
 
-typedef struct {
-  pwr_tString40 volume_name;
-  pwr_tVolumeId volume_id;
-  pwr_tString40 p1;
-  pwr_tString40 p2;
-  pwr_tString40 p3;
-  pwr_tString40 p4;
-  pwr_tString40 p5;
-  pwr_tString40 p6;
-} lfu_t_volumelist;
+  typedef struct
+  {
+    pwr_tString40 volume_name;
+    pwr_tVolumeId volume_id;
+    pwr_tString40 p1;
+    pwr_tString40 p2;
+    pwr_tString40 p3;
+    pwr_tString40 p4;
+    pwr_tString40 p5;
+    pwr_tString40 p6;
+  } lfu_t_volumelist;
 
-typedef struct {
-  pwr_tVid vid;
-  pwr_tTime version;
-  char name[80];
-} lfu_t_volref;
+  typedef struct
+  {
+    pwr_tVid vid;
+    pwr_tTime version;
+    char name[80];
+  } lfu_t_volref;
 
-class lfu_volume_info {
-public:
-  pwr_tObjName name;
-  pwr_tVid vid;
-  pwr_tCid cid;
-  ldh_eVolRep volrep;
-  char server[80];
+  class lfu_volume_info
+  {
+  public:
+    pwr_tObjName name;
+    pwr_tVid vid;
+    pwr_tCid cid;
+    ldh_eVolRep volrep;
+    char server[80];
 
-  lfu_volume_info();
-  lfu_volume_info(const lfu_volume_info& x);
-};
+    lfu_volume_info();
+    lfu_volume_info(const lfu_volume_info& x);
+  };
 
-class lfu_boot_info {
-public:
-  pwr_tObjName node_name;
-  pwr_tString80 node_text;
-  pwr_tObjName volume_name;
-  pwr_tVid vid;
-  pwr_tUInt32 bus;
-  pwr_tOpSysEnum opsys;
-  int number;
+  class lfu_boot_info
+  {
+  public:
+    pwr_tObjName node_name;
+    pwr_tString80 node_text;
+    pwr_tObjName volume_name;
+    pwr_tVid vid;
+    pwr_tUInt32 bus;
+    pwr_tOpSysEnum opsys;
+    int number;
 
-  lfu_boot_info();
-  lfu_boot_info(const lfu_boot_info& x);
-};
+    lfu_boot_info();
+    lfu_boot_info(const lfu_boot_info& x);
+  };
 
-pwr_tStatus lfu_volumelist_load(
-    const char* filename, lfu_t_volumelist** vollist, int* volcount);
+  pwr_tStatus lfu_volumelist_load(const char* filename, lfu_t_volumelist** vollist, int* volcount);
 
-pwr_tStatus lfu_create_loadfile(ldh_tSesContext ldhses);
+  pwr_tStatus lfu_create_loadfile(ldh_tSesContext ldhses);
 
-pwr_tStatus lfu_create_bootfile(char* nodeconfigname, int nodetype,
-    lfu_t_volumelist* volumelist, int volumecount, int debug);
+  pwr_tStatus lfu_create_bootfile(char* nodeconfigname, int nodetype, lfu_t_volumelist* volumelist,
+                                  int volumecount, int debug);
 
-pwr_tStatus lfu_GetFileVersion(
-    char* pattern, int number_of_digits, int* version, pwr_tTime* date);
+  pwr_tStatus lfu_GetFileVersion(char* pattern, int number_of_digits, int* version, pwr_tTime* date);
 
-pwr_tStatus lfu_GetPlcFileVersion(
-    pwr_tVolumeId volumeid, int* version, pwr_tTime* date);
+  pwr_tStatus lfu_GetPlcFileVersion(pwr_tVolumeId volumeid, int* version, pwr_tTime* date);
 
-pwr_tStatus lfu_IncrementAndGetVersion(
-    char* filename, unsigned long* current_version);
+  pwr_tStatus lfu_IncrementAndGetVersion(char* filename, unsigned long* current_version);
 
-pwr_tStatus lfu_SaveDirectoryVolume(
-    ldh_tSesContext ldhses, CoWow* wow, int quiet);
+  pwr_tStatus lfu_SaveDirectoryVolume(ldh_tSesContext ldhses, CoWow* wow, int quiet);
 
-int lfu_create_bootfiles(char* nodestr, int debug, int allnodes);
+  int lfu_create_bootfiles(char* nodestr, int debug, int allnodes);
 
-pwr_tStatus lfu_ReadBootFile(char* filename, pwr_tTime* date, char* systemname,
-    char* systemgroup, pwr_tVolumeId** vollist, pwr_tString40** volnamelist,
-    int* volcount, pwr_tString80** plclist, int* plccount);
+  pwr_tStatus lfu_ReadBootFile(char* filename, pwr_tTime* date, char* systemname, char* systemgroup,
+                               pwr_tVolumeId** vollist, pwr_tString40** volnamelist, int* volcount,
+                               pwr_tString80** plclist, int* plccount);
 
-pwr_tStatus lfu_ReadSysObjectFile(char* SystemName, char* SystemGroup);
+  pwr_tStatus lfu_ReadSysObjectFile(char* SystemName, char* SystemGroup);
 
-pwr_tStatus lfu_WriteSysObjectFile(ldh_tSesContext ldhses);
+  pwr_tStatus lfu_WriteSysObjectFile(ldh_tSesContext ldhses);
 
-pwr_tStatus lfu_GetVolRef(
-    char* filename, lfu_t_volref** volref, int* volref_count);
-pwr_tStatus lfu_GetVolume(char* filename, char* name, pwr_tVid* vid,
-    pwr_tCid* cid, pwr_tTime* time, pwr_tUInt32* dvversion);
-pwr_tStatus lfu_GetVolumeCnf(char* name, pwr_tVid* vid, pwr_tCid* cid,
-    ldh_eVolRep* volrep, char* server);
+  pwr_tStatus lfu_GetVolRef(char* filename, lfu_t_volref** volref, int* volref_count);
+  pwr_tStatus lfu_GetVolume(char* filename, char* name, pwr_tVid* vid, pwr_tCid* cid, pwr_tTime* time,
+                            pwr_tUInt32* dvversion);
+  pwr_tStatus lfu_GetVolumeCnf(char* name, pwr_tVid* vid, pwr_tCid* cid, ldh_eVolRep* volrep, char* server);
 
-pwr_tStatus lfu_ParseDbmsServer(
-    char* server, char* user, char* passw, unsigned int* port, char* host);
+  pwr_tStatus lfu_ParseDbmsServer(char* server, char* user, char* passw, unsigned int* port, char* host);
 
-pwr_tStatus lfu_check_appl_file(
-    ldh_tSesContext ldhses, char* nodename, int bus_number);
-pwr_tStatus lfu_check_opt_file(
-    ldh_tSesContext ldhses, char* nodename, int bus_number, pwr_mOpSys opsys);
+  pwr_tStatus lfu_check_appl_file(ldh_tSesContext ldhses, char* nodename, int bus_number);
+  pwr_tStatus lfu_check_opt_file(ldh_tSesContext ldhses, char* nodename, int bus_number, pwr_mOpSys opsys);
 
-pwr_tStatus lfu_GetVolumeCnfAll(std::vector<lfu_volume_info>& vect);
+  pwr_tStatus lfu_GetVolumeCnfAll(std::vector<lfu_volume_info>& vect);
 
-pwr_tStatus lfu_GetBootList(std::vector<lfu_boot_info>& vect, int* nodes);
+  pwr_tStatus lfu_GetBootList(std::vector<lfu_boot_info>& vect, int* nodes);
 
 #ifdef __cplusplus
 }

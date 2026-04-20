@@ -52,12 +52,14 @@
 class CoWow;
 class XttMethodToolbar;
 
-typedef struct {
+typedef struct
+{
   char Object[120];
   char Alias[8];
 } ev_sAlias;
 
-typedef enum {
+typedef enum
+{
   ev_mAlaOptions_Embedded = 1 << 0,
   ev_mAlaOptions_FullScreen = 1 << 1,
   ev_mAlaOptions_Maximize = 1 << 2,
@@ -65,12 +67,12 @@ typedef enum {
   ev_mAlaOptions_Iconify = 1 << 4
 } ev_mAlaOptions;
 
-class Ev {
+class Ev
+{
 public:
-  Ev(void* ev_parent_ctx, char* eve_name, char* ala_name, char* blk_name,
-      pwr_tObjid ev_user, int display_ala, int display_eve, int display_blk,
-      int display_return, int display_ack, int ev_beep, pwr_tMask ev_pop_mask,
-      int ev_eventname_seg, pwr_tStatus* status);
+  Ev(void* ev_parent_ctx, char* eve_name, char* ala_name, char* blk_name, pwr_tObjid ev_user, int display_ala,
+     int display_eve, int display_blk, int display_return, int display_ack, int ev_beep,
+     pwr_tMask ev_pop_mask, int ev_eventname_seg, pwr_tStatus* status);
   virtual ~Ev();
 
   void* parent_ctx;
@@ -82,8 +84,7 @@ public:
   void (*display_in_xnav_cb)(void*, pwr_tAttrRef*);
   void (*update_info_cb)(void*);
   void (*help_cb)(void*, const char*);
-  void (*popup_menu_cb)(
-      void*, pwr_tAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  void (*popup_menu_cb)(void*, pwr_tAttrRef, unsigned long, unsigned long, char*, int x, int y);
   int (*sound_cb)(void*, pwr_tAttrRef*);
   void (*pop_cb)(void*);
   int (*is_authorized_cb)(void*, unsigned int);
@@ -113,73 +114,41 @@ public:
   int seve_cnt;
   int modified;
 
-  virtual void map_eve(unsigned int options)
-  {
-  }
-  virtual void map_ala(unsigned int options)
-  {
-  }
-  virtual void map_blk(unsigned int options)
-  {
-  }
-  virtual void unmap_eve()
-  {
-  }
-  virtual void unmap_ala()
-  {
-  }
-  virtual void unmap_blk()
-  {
-  }
-  virtual void set_transient_eve(void* basewidget)
-  {
-  }
-  virtual void set_transient_ala(void* basewidget)
-  {
-  }
-  virtual void set_transient_blk(void* basewidget)
-  {
-  }
-  virtual void set_title_ala(char* title)
-  {
-  }
-  virtual EvAla* open_alarmlist_satellite(const char* title, pwr_tStatus* sts,
-      int width, int height, int x, int y, pwr_tObjid view,
-      unsigned int options = 0, void* widget = 0)
+  virtual void map_eve(unsigned int options) {}
+  virtual void map_ala(unsigned int options) {}
+  virtual void map_blk(unsigned int options) {}
+  virtual void unmap_eve() {}
+  virtual void unmap_ala() {}
+  virtual void unmap_blk() {}
+  virtual void set_transient_eve(void* basewidget) {}
+  virtual void set_transient_ala(void* basewidget) {}
+  virtual void set_transient_blk(void* basewidget) {}
+  virtual void set_title_ala(char* title) {}
+  virtual EvAla* open_alarmlist_satellite(const char* title, pwr_tStatus* sts, int width, int height, int x,
+                                          int y, pwr_tObjid view, unsigned int options = 0, void* widget = 0)
   {
     return 0;
   }
-  virtual EvEve* open_eventlist_satellite(const char* title, pwr_tStatus* sts,
-      int width, int height, int x, int y, pwr_tObjid view,
-      unsigned int options = 0, void* widget = 0)
+  virtual EvEve* open_eventlist_satellite(const char* title, pwr_tStatus* sts, int width, int height, int x,
+                                          int y, pwr_tObjid view, unsigned int options = 0, void* widget = 0)
   {
     return 0;
   }
 
   int outunit_connect(pwr_tObjid user);
   void update(double scantime);
-  int is_mapped_eve()
-  {
-    return eve_displayed;
-  }
-  int is_mapped_ala()
-  {
-    return ala_displayed;
-  }
-  int is_mapped_blk()
-  {
-    return blk_displayed;
-  }
+  int is_mapped_eve() { return eve_displayed; }
+  int is_mapped_ala() { return ala_displayed; }
+  int is_mapped_blk() { return blk_displayed; }
   int get_alarm_info(evlist_sAlarmInfo* info, int backward, int alarmsize);
   void ack_last_prio(unsigned long type, unsigned long prio, int backward, int timecheck);
   void ack_all();
-  int get_last_not_acked_prio(
-      mh_sEventId** id, unsigned long type, unsigned long prio);
+  int get_last_not_acked_prio(mh_sEventId** id, unsigned long type, unsigned long prio);
   void create_aliaslist(void* up);
   char* name_to_alias(char* name);
   pwr_tStatus set_view(pwr_tOid view);
   void view_shift();
-  int eve_export_events(const char *filename);
+  int eve_export_events(const char* filename);
   void update_color_theme(int ct);
 
   void eve_activate_print();
@@ -203,8 +172,8 @@ public:
   static void eve_start_trace_cb(void* ctx, pwr_tObjid objid, char* name);
   static void ala_start_trace_cb(void* ctx, pwr_tObjid objid, char* name);
   static void blk_start_trace_cb(void* ctx, pwr_tObjid objid, char* name);
-  static void ev_popup_menu_cb(void* ctx, pwr_tAttrRef attrref,
-      unsigned long item_type, unsigned long utility, char* arg, int x, int y);
+  static void ev_popup_menu_cb(void* ctx, pwr_tAttrRef attrref, unsigned long item_type,
+                               unsigned long utility, char* arg, int x, int y);
   static int ev_sound_cb(void* ctx, pwr_tAttrRef* attrref);
   static void eve_selection_changed_cb(void* ctx);
   static void ala_selection_changed_cb(void* ctx);
@@ -217,7 +186,7 @@ public:
   static void seve_copy_list_cb(void* ctx, EvList* evl);
   static void seve_close_cb(void* ctx, EvEve* seve);
   static void help_event_cb(void* ctx, void* item);
-  static void eve_export_file_selected_cb(void *ctx, char *filename, wow_eFileSelType file_type);
+  static void eve_export_file_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type);
 
   static pwr_tStatus mh_ack_bc(mh_sAck* MsgP);
   static pwr_tStatus mh_return_bc(mh_sReturn* MsgP);

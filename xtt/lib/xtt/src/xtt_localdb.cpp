@@ -38,7 +38,8 @@
 
 #include <stdlib.h>
 
-extern "C" {
+extern "C"
+{
 #include "pwr.h"
 }
 
@@ -72,8 +73,10 @@ int XNavLdb::remove(char* name)
   xnav_sLdbEntry* entry_p = root;
   xnav_sLdbEntry* prev_p = NULL;
 
-  while (entry_p) {
-    if (streq(entry_p->name, name)) {
+  while (entry_p)
+  {
+    if (streq(entry_p->name, name))
+    {
       if (entry_p == NULL)
         root = entry_p->next;
       else
@@ -92,7 +95,8 @@ void XNavLdb::remove_all()
   xnav_sLdbEntry* entry_p = root;
   xnav_sLdbEntry* tmp_p;
 
-  while (entry_p) {
+  while (entry_p)
+  {
     tmp_p = entry_p->next;
     free(entry_p);
     entry_p = tmp_p;
@@ -103,8 +107,10 @@ int XNavLdb::get(char* name, xnav_eLdbType* type, void** value_p)
 {
   xnav_sLdbEntry* entry_p = root;
 
-  while (entry_p) {
-    if (streq(entry_p->name, name)) {
+  while (entry_p)
+  {
+    if (streq(entry_p->name, name))
+    {
       *type = entry_p->type;
       *value_p = entry_p->value_p;
       return 1;

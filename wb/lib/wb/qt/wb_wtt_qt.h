@@ -49,7 +49,8 @@
 
 class WttQt;
 
-class BootDialog : public QDialog {
+class BootDialog : public QDialog
+{
   Q_OBJECT
 
 public:
@@ -68,7 +69,8 @@ public slots:
   void boot_cancel_cb();
 };
 
-class OptionsDialog : public QDialog {
+class OptionsDialog : public QDialog
+{
   Q_OBJECT
 
 public:
@@ -88,11 +90,11 @@ public slots:
 
 class WttQtWidget;
 
-class WttQt : public Wtt {
+class WttQt : public Wtt
+{
 public:
-  WttQt(void* wt_parent_ctx, const char* wt_name, const char* iconname,
-      ldh_tWBContext wt_wbctx, pwr_tVolumeId wt_volid, ldh_tVolume wt_volctx,
-      wnav_sStartMenu* root_menu, pwr_tStatus* status);
+  WttQt(void* wt_parent_ctx, const char* wt_name, const char* iconname, ldh_tWBContext wt_wbctx,
+        pwr_tVolumeId wt_volid, ldh_tVolume wt_volctx, wnav_sStartMenu* root_menu, pwr_tStatus* status);
 
   WttQt() {}
   ~WttQt();
@@ -204,10 +206,9 @@ public:
   virtual wb_build* build_new();
   virtual void wpkg_new();
   virtual int ute_new(char* title);
-  virtual void open_input_dialog(const char* text, const char* title,
-      const char* init_text, void (*ok_cb)(Wtt*, char*));
-  virtual void open_confirm(const char* text, const char* title,
-      void (*ok_cb)(Wtt*), void (*no_cb)(Wtt*));
+  virtual void open_input_dialog(const char* text, const char* title, const char* init_text,
+                                 void (*ok_cb)(Wtt*, char*));
+  virtual void open_confirm(const char* text, const char* title, void (*ok_cb)(Wtt*), void (*no_cb)(Wtt*));
   virtual void open_boot_window();
   virtual void update_options_form();
   virtual void set_options();
@@ -221,7 +222,8 @@ private:
   WttQtWidget* toplevel;
 };
 
-class WttQtWidget : public QWidget {
+class WttQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

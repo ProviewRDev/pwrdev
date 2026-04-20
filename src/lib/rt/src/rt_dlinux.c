@@ -56,9 +56,11 @@
 
 */
 
-union vax_f_le {
+union vax_f_le
+{
   unsigned int i;
-  struct {
+  struct
+  {
     unsigned int f22_16 : 7;
     unsigned int exp : 8;
     unsigned int sign : 1;
@@ -86,9 +88,11 @@ union vax_f_le {
 
 */
 
-union vax_f_be {
+union vax_f_be
+{
   unsigned int i;
-  struct {
+  struct
+  {
     unsigned int f0_15 : 16;
     unsigned int sign : 1;
     unsigned int exp : 8;
@@ -108,14 +112,17 @@ union vax_f_be {
 
 */
 
-union i3e_s_le {
+union i3e_s_le
+{
   unsigned int i;
-  struct {
+  struct
+  {
     unsigned int f22_0 : 23;
     unsigned int exp : 8;
     unsigned int sign : 1;
   } b;
-  struct {
+  struct
+  {
     unsigned int f15_0 : 16;
     unsigned int f22_16 : 7;
     unsigned int exp : 8;
@@ -135,14 +142,17 @@ union i3e_s_le {
 
 */
 
-union i3e_s_be {
+union i3e_s_be
+{
   unsigned int i;
-  struct {
+  struct
+  {
     unsigned int sign : 1;
     unsigned int exp : 8;
     unsigned int f0_22 : 23;
   } b;
-  struct {
+  struct
+  {
     unsigned int sign : 1;
     unsigned int exp : 8;
     unsigned int f0_6 : 7;
@@ -158,10 +168,11 @@ union i3e_s_be {
 #define IBYTE2(i) ((i << 0x08) & 0x00ff0000)
 #define IBYTE3(i) ((i << 0x18) & 0xff000000)
 
-#define ENDIAN_SWAP_INT(t, s)                                                  \
-  {                                                                            \
-    int i = *(int*)s;                                                          \
-    *(int*)t = (IBYTE0(i) | IBYTE1(i) | IBYTE2(i) | IBYTE3(i));                \
+#undef ENDIAN_SWAP_INT
+#define ENDIAN_SWAP_INT(t, s)                                                                                \
+  {                                                                                                          \
+    int i = *(int*)s;                                                                                        \
+    *(int*)t = (IBYTE0(i) | IBYTE1(i) | IBYTE2(i) | IBYTE3(i));                                              \
   }
 
 #if (defined(OS_LINUX)) && (pwr_dHost_byteOrder == pwr_dBigEndian)
@@ -171,7 +182,8 @@ static pwr_tBoolean dlinux_sfloat(char* p, gdb_sAttribute* ap)
   union vax_f_le* vp;
   union i3e_s_le i3e;
 
-  for (i = ap->elem; i > 0; i--) {
+  for (i = ap->elem; i > 0; i--)
+  {
     vp = ((union vax_f_le*)tp);
     ENDIAN_SWAP_INT(&i3e.i, sp);
 
@@ -181,13 +193,18 @@ static pwr_tBoolean dlinux_sfloat(char* p, gdb_sAttribute* ap)
     if (i3e.i == 0x80000000)
       i3e.i = 0; /* Clear sign bit */
 
-    if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0xff) { /* High value.  */
+    if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0xff)
+    { /* High value.  */
       vp->b.f22_16 = 0x7f;
       vp->b.exp = 0xff;
       vp->b.f15_0 = 0xffff;
-    } else if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0x00) { /* Low value.  */
+    }
+    else if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0x00)
+    { /* Low value.  */
       vp->i = 0;
-    } else {
+    }
+    else
+    {
       vp->b.exp = i3e.v.exp - I3E_S_BIAS + VAX_F_BIAS;
       vp->b.f22_16 = i3e.v.f22_16;
       vp->b.f15_0 = i3e.v.f15_0;
@@ -203,8 +220,7 @@ static pwr_tBoolean dlinux_sfloat(char* p, gdb_sAttribute* ap)
   return TRUE;
 }
 
-#elif defined(OS_LINUX)                                                        \
-  && (defined(HW_X86) || defined(HW_X86_64) || defined(HW_ARM) || defined(HW_ARM64))
+#elif defined(OS_LINUX) && (defined(HW_X86) || defined(HW_X86_64) || defined(HW_ARM) || defined(HW_ARM64))
 
 static pwr_tBoolean dlinux_sfloat(char* p, int size)
 {
@@ -215,7 +231,8 @@ static pwr_tBoolean dlinux_sfloat(char* p, int size)
 
   elem = size / sizeof(float);
 
-  for (i = elem; i > 0; i--) {
+  for (i = elem; i > 0; i--)
+  {
     vp = ((union vax_f_le*)p);
     i3e = *(union i3e_s_le*)p;
 
@@ -225,13 +242,18 @@ static pwr_tBoolean dlinux_sfloat(char* p, int size)
     if (i3e.i == 0x80000000)
       i3e.i = 0; /* Clear sign bit */
 
-    if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0xff) { /* High value.  */
+    if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0xff)
+    { /* High value.  */
       vp->b.f22_16 = 0x7f;
       vp->b.exp = 0xff;
       vp->b.f15_0 = 0xffff;
-    } else if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0x00) { /* Low value.  */
+    }
+    else if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0x00)
+    { /* Low value.  */
       vp->i = 0;
-    } else {
+    }
+    else
+    {
       vp->b.exp = i3e.v.exp - I3E_S_BIAS + VAX_F_BIAS;
       vp->b.f22_16 = i3e.v.f22_16;
       vp->b.f15_0 = i3e.v.f15_0;
@@ -249,34 +271,34 @@ static pwr_tBoolean dlinux_sfloat(char* p, int size)
 #if defined(OS_LINUX)
 
 pwr_tBoolean (*dlinux[pwr_eTix_])() = {
-  NULL, /* pwr_eTix__		*/
-  NULL, /* pwr_eTix_Boolean	*/
-  dlinux_sfloat, /* pwr_eTix_Float32	*/
-  NULL, /* pwr_eTix_Float64	*/
-  NULL, /* pwr_eTix_Char	*/
-  NULL, /* pwr_eTix_Int8	*/
-  NULL, /* pwr_eTix_Int16	*/
-  NULL, /* pwr_eTix_Int32	*/
-  NULL, /* pwr_eTix_UInt8	*/
-  NULL, /* pwr_eTix_UInt16	*/
-  NULL, /* pwr_eTix_UInt32	*/
-  NULL, /* pwr_eTix_Objid	*/
-  NULL, /* pwr_eTix_Buffer	*/
-  NULL, /* pwr_eTix_String	*/
-  NULL, /* pwr_eTix_Enum	*/
-  NULL, /* pwr_eTix_Struct	*/
-  NULL, /* pwr_eTix_Mask	*/
-  NULL, /* pwr_eTix_Array	*/
-  NULL, /* pwr_eTix_Time	*/
-  NULL, /* pwr_eTix_Text	*/
-  NULL, /* pwr_eTix_AttrRef	*/
-  NULL, /* pwr_eTix_UInt64	*/
-  NULL, /* pwr_eTix_Int64	*/
-  NULL, /* pwr_eTix_ClassId	*/
-  NULL, /* pwr_eTix_TypeId	*/
-  NULL, /* pwr_eTix_VolumeId	*/
-  NULL, /* pwr_eTix_ObjectIx	*/
-  NULL, /* pwr_eTix_RefId	*/
+    NULL,          /* pwr_eTix__		*/
+    NULL,          /* pwr_eTix_Boolean	*/
+    dlinux_sfloat, /* pwr_eTix_Float32	*/
+    NULL,          /* pwr_eTix_Float64	*/
+    NULL,          /* pwr_eTix_Char	*/
+    NULL,          /* pwr_eTix_Int8	*/
+    NULL,          /* pwr_eTix_Int16	*/
+    NULL,          /* pwr_eTix_Int32	*/
+    NULL,          /* pwr_eTix_UInt8	*/
+    NULL,          /* pwr_eTix_UInt16	*/
+    NULL,          /* pwr_eTix_UInt32	*/
+    NULL,          /* pwr_eTix_Objid	*/
+    NULL,          /* pwr_eTix_Buffer	*/
+    NULL,          /* pwr_eTix_String	*/
+    NULL,          /* pwr_eTix_Enum	*/
+    NULL,          /* pwr_eTix_Struct	*/
+    NULL,          /* pwr_eTix_Mask	*/
+    NULL,          /* pwr_eTix_Array	*/
+    NULL,          /* pwr_eTix_Time	*/
+    NULL,          /* pwr_eTix_Text	*/
+    NULL,          /* pwr_eTix_AttrRef	*/
+    NULL,          /* pwr_eTix_UInt64	*/
+    NULL,          /* pwr_eTix_Int64	*/
+    NULL,          /* pwr_eTix_ClassId	*/
+    NULL,          /* pwr_eTix_TypeId	*/
+    NULL,          /* pwr_eTix_VolumeId	*/
+    NULL,          /* pwr_eTix_ObjectIx	*/
+    NULL,          /* pwr_eTix_RefId	*/
 };
 
 #endif

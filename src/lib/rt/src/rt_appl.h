@@ -49,14 +49,15 @@
 /*! rt_appl is a baseclass for applications, where the subclasses should
   implement the virtual functions open(), close() and scan().
 */
-class rt_appl {
+class rt_appl
+{
 public:
   //! Constructor.
-  rt_appl(const char* name, ///< Process name.
-      errh_eAnix anix, ///< Application index.
-      double scantime = 1.0, ///< Scantime for call of the scan() function.
-      qcom_sQid qid = qcom_cNQid ///< Qcom queue identity.
-      );
+  rt_appl(const char* name,          ///< Process name.
+          errh_eAnix anix,           ///< Application index.
+          double scantime = 1.0,     ///< Scantime for call of the scan() function.
+          qcom_sQid qid = qcom_cNQid ///< Qcom queue identity.
+  );
   void init();
 
   void register_appl(const char* name);

@@ -41,25 +41,21 @@
 
 #include "ge_graph.h"
 
-void gsc_MeasureObject(Graph* graph, grow_tObject id, double* ll_x, double* ll_y, 
-    double* ur_x, double *ur_y);
-void gsc_GetTextExtent(Graph* graph, char* text, int size, glow_eFont font, int bold,
-    double *width, double *height, double *descent);
-grow_tObject gsc_CreateText(Graph* graph, char *text, double x, double y, int size, 
-     glow_eFont font, int bold, glow_eDrawType color);
+void gsc_MeasureObject(Graph* graph, grow_tObject id, double* ll_x, double* ll_y, double* ur_x, double* ur_y);
+void gsc_GetTextExtent(Graph* graph, char* text, int size, glow_eFont font, int bold, double* width,
+                       double* height, double* descent);
+grow_tObject gsc_CreateText(Graph* graph, char* text, double x, double y, int size, glow_eFont font, int bold,
+                            glow_eDrawType color);
 int gsc_DashInsertObject(Graph* graph, grow_tObject dash, grow_tObject id);
-grow_tObject gsc_CreateBar(Graph* graph, double x1, double y1, double x2, double y2, 
-    int colortheme, glow_eDirection direction);
-grow_tObject gsc_CreateBarArc(Graph* graph, double x1, double y1, double x2, double y2, 
-    int colortheme);
-grow_tObject gsc_CreatePie(Graph* graph, double x1, double y1, double x2, double y2, 
-    int colortheme);
-int gsc_SetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, void* buff, 
-    int btype);
-int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, void* buff, 
-    int bsize, int btype);
-grow_tObject gsc_CreateObject(Graph* graph, const char *nodeclass, double x1, double y1, 
-    double x2, double y2);
+grow_tObject gsc_CreateBar(Graph* graph, double x1, double y1, double x2, double y2, int colortheme,
+                           glow_eDirection direction);
+grow_tObject gsc_CreateBarArc(Graph* graph, double x1, double y1, double x2, double y2, int colortheme);
+grow_tObject gsc_CreatePie(Graph* graph, double x1, double y1, double x2, double y2, int colortheme);
+int gsc_SetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, void* buff, int btype);
+int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, void* buff, int bsize,
+                           int btype);
+grow_tObject gsc_CreateObject(Graph* graph, const char* nodeclass, double x1, double y1, double x2,
+                              double y2);
 void gsc_SetObjectGradient(Graph* graph, grow_tObject id, glow_eGradient gradient);
 void gsc_SetObjectShadow(Graph* graph, grow_tObject id, int shadow);
 void gsc_SetObjectFillColor(Graph* graph, grow_tObject id, glow_eDrawType color);
@@ -69,21 +65,18 @@ void gsc_SetObjectFill(Graph* graph, grow_tObject id, int fill);
 void gsc_SetObjectBorder(Graph* graph, grow_tObject id, int border);
 void gsc_SelectAdd(Graph* graph, grow_tObject id);
 void gsc_SelectClear(Graph* graph);
-void gsc_SetSelectTextSize(Graph *graph, int size);
-void gsc_RotateSelected(Graph *graph, int angle, int rotation_point);
-grow_tObject gsc_CreateAxis(Graph *graph, double x1, double y1, double x2, double y2,
-    int colortheme, int dynamic, glow_eDirection direction);
-grow_tObject gsc_CreateAxisArc(Graph *graph, double x1, double y1, double x2, double y2,
-    int colortheme, int dynamic);
-grow_tObject gsc_CreateTrend(Graph *graph, double x1, double y1, double x2, double y2,
-    int colortheme);
-grow_tObject gsc_CreatePolyLine(Graph *graph, double x1, double y1, double x2, double y2);
-void gsc_CreatePolyLine(Graph *graph, grow_tObject oid, double x, double y);
-void gsc_PolyLineAdd(Graph *graph, grow_tObject oid, double x, double y);
-grow_tObject gsc_CreateArc(Graph *graph, double x1, double y1, double x2, double y2,
-    int angle1, int angle2);
-grow_tObject gsc_CreateRectangle(Graph *graph, double x1, double y1, double x2, double y2);
-grow_tObject gsc_CreateLine(Graph *graph, double x1, double y1, double x2, double y2);
+void gsc_SetSelectTextSize(Graph* graph, int size);
+void gsc_RotateSelected(Graph* graph, int angle, int rotation_point);
+grow_tObject gsc_CreateAxis(Graph* graph, double x1, double y1, double x2, double y2, int colortheme,
+                            int dynamic, glow_eDirection direction);
+grow_tObject gsc_CreateAxisArc(Graph* graph, double x1, double y1, double x2, double y2, int colortheme,
+                               int dynamic);
+grow_tObject gsc_CreateTrend(Graph* graph, double x1, double y1, double x2, double y2, int colortheme);
+grow_tObject gsc_CreatePolyLine(Graph* graph, double x1, double y1, double x2, double y2);
+void gsc_CreatePolyLine(Graph* graph, grow_tObject oid, double x, double y);
+void gsc_PolyLineAdd(Graph* graph, grow_tObject oid, double x, double y);
+grow_tObject gsc_CreateArc(Graph* graph, double x1, double y1, double x2, double y2, int angle1, int angle2);
+grow_tObject gsc_CreateRectangle(Graph* graph, double x1, double y1, double x2, double y2);
+grow_tObject gsc_CreateLine(Graph* graph, double x1, double y1, double x2, double y2);
 
 #endif
-

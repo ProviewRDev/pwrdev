@@ -44,7 +44,8 @@ int main()
   pwr_tStatus sts;
 
   sts = gdh_Init("pwr_hash_dump");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     exit(sts);
   }
 

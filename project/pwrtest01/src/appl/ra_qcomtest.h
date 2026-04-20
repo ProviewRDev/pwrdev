@@ -4,15 +4,15 @@
 #include "rt_qcom.h"
 #include "co_tst_log.h"
 
-class ra_qcomtest {
+class ra_qcomtest
+{
   pwr_tStatus m_sts;
-  tst_log *m_log;
+  tst_log* m_log;
 
-
- public:
+public:
   ra_qcomtest();
   ~ra_qcomtest();
-  tst_log *log() {return m_log;}
+  tst_log* log() { return m_log; }
 
   void AidCompare();
   void AidIsEqual();

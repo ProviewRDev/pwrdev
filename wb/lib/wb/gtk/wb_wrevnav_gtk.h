@@ -39,11 +39,11 @@
 
 #include "wb_wrevnav.h"
 
-class WRevNavGtk : public WRevNav {
+class WRevNavGtk : public WRevNav
+{
 public:
-  WRevNavGtk(void* wa_parent_ctx, GtkWidget* wa_parent_wid,
-      ldh_tSession wb_ldhses, const char* wa_name, wb_eUtility wa_utility,
-      GtkWidget** w, pwr_tStatus* status);
+  WRevNavGtk(void* wa_parent_ctx, GtkWidget* wa_parent_wid, ldh_tSession wb_ldhses, const char* wa_name,
+             wb_eUtility wa_utility, GtkWidget** w, pwr_tStatus* status);
   ~WRevNavGtk();
 
   GtkWidget* parent_wid;

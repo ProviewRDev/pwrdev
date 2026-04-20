@@ -37,22 +37,15 @@
 #include "glow_keyboardctx.h"
 #include "glow_keyboardapi.h"
 
-extern "C" void keyboard_EnableEvent(KeyboardCtx* ctx, glow_eEvent event,
-    glow_eEventType event_type,
-    int (*event_cb)(GlowCtx* ctx, glow_tEvent event))
+extern "C" void keyboard_EnableEvent(KeyboardCtx* ctx, glow_eEvent event, glow_eEventType event_type,
+                                     int (*event_cb)(GlowCtx* ctx, glow_tEvent event))
 {
   ctx->enable_event(event, event_type, event_cb);
 }
 
-void keyboard_DisableEvent(KeyboardCtx* ctx, glow_eEvent event)
-{
-  ctx->disable_event(event);
-}
+void keyboard_DisableEvent(KeyboardCtx* ctx, glow_eEvent event) { ctx->disable_event(event); }
 
-extern "C" void keyboard_DisableEventAll(KeyboardCtx* ctx)
-{
-  ctx->disable_event_all();
-}
+extern "C" void keyboard_DisableEventAll(KeyboardCtx* ctx) { ctx->disable_event_all(); }
 
 void keyboard_GetCtxUserData(keyboard_tCtx ctx, void** user_data)
 {
@@ -69,26 +62,14 @@ void keyboard_SetKeymap(keyboard_tCtx ctx, keyboard_eKeymap keymap)
   ((KeyboardCtx*)ctx)->set_keymap(keymap);
 }
 
-void keyboard_SetType(keyboard_tCtx ctx, keyboard_eType type)
-{
-  ((KeyboardCtx*)ctx)->set_type(type);
-}
+void keyboard_SetType(keyboard_tCtx ctx, keyboard_eType type) { ((KeyboardCtx*)ctx)->set_type(type); }
 void keyboard_SetDefaultConfig(keyboard_eKeymap keymap, keyboard_eType type)
 {
   KeyboardCtx::set_default_config(keymap, type);
 }
 
-void keyboard_GetSize(keyboard_tCtx ctx, int* width, int* height)
-{
-  ctx->get_size(width, height);
-}
+void keyboard_GetSize(keyboard_tCtx ctx, int* width, int* height) { ctx->get_size(width, height); }
 
-void keyboard_SetSize(keyboard_tCtx ctx, int width, int height)
-{
-  ctx->set_size(width, height);
-}
+void keyboard_SetSize(keyboard_tCtx ctx, int width, int height) { ctx->set_size(width, height); }
 
-void keyboard_SetShift(keyboard_tCtx ctx, int shift)
-{
-  ctx->set_shift(shift);
-}
+void keyboard_SetShift(keyboard_tCtx ctx, int shift) { ctx->set_shift(shift); }

@@ -35,22 +35,22 @@
  */
 
 /*************************************************************************
-*
-* 	PROGRAM		dataq_backup_dump
-*	SYSTEM		SSAB
-*
-*       Modifierad
-*		960205	Claes Sjöfors	Skapad
-*		230105	Claes Sjöfors	Converted to DataQ
-*
-*
-*
-*	Funktion:	Backup av DataQ objekt och data objekt.
-*
-*
-*
-**************************************************************************
-**************************************************************************/
+ *
+ * 	PROGRAM		dataq_backup_dump
+ *	SYSTEM		SSAB
+ *
+ *       Modifierad
+ *		960205	Claes Sjöfors	Skapad
+ *		230105	Claes Sjöfors	Converted to DataQ
+ *
+ *
+ *
+ *	Funktion:	Backup av DataQ objekt och data objekt.
+ *
+ *
+ *
+ **************************************************************************
+ **************************************************************************/
 
 #include <stdio.h>
 
@@ -60,27 +60,23 @@
 #include "co_cdh.h"
 #include "co_string.h"
 #include "co_time.h"
-#include "rt_gdh.h"
 #include "dataq_backup.h"
+#include "rt_gdh.h"
 
+#include "rs_dataq_msg.h"
 #include "rt_gdh_msg.h"
 #include "rt_hash_msg.h"
-#include "rs_dataq_msg.h"
-
 
 typedef struct {
-  pwr_sClass_DataQBackupConfig* bckconfig;
+  pwr_sClass_DataQBackupConfig *bckconfig;
   gdh_tDlid bckconfig_dlid;
-} * qbck_tCtx;
+} *qbck_tCtx;
 
-static pwr_tUInt32 qbck_fulltimestring(pwr_tTime* time, char* timestr)
-{
+static pwr_tUInt32 qbck_fulltimestring(pwr_tTime *time, char *timestr) {
   return time_AtoAscii(time, time_eFormat_DateAndTime, timestr, 80);
 }
 
-static pwr_tUInt32 qbck_print_recordheader(
-    qbck_tRecordHeader* recordheader)
-{
+static pwr_tUInt32 qbck_print_recordheader(qbck_tRecordHeader *recordheader) {
   char timestr[80];
 
   printf("Record header\n");
@@ -90,8 +86,7 @@ static pwr_tUInt32 qbck_print_recordheader(
   return DATAQ__SUCCESS;
 }
 
-static pwr_tUInt32 qbck_print_fileheader(qbck_tFileHeader* fileheader)
-{
+static pwr_tUInt32 qbck_print_fileheader(qbck_tFileHeader *fileheader) {
   char timestr[80];
 
   printf("File header\n");
@@ -101,8 +96,7 @@ static pwr_tUInt32 qbck_print_fileheader(qbck_tFileHeader* fileheader)
   return DATAQ__SUCCESS;
 }
 
-static pwr_tUInt32 qbck_print_queueheader(qbck_tQueueHeader* queueheader)
-{
+static pwr_tUInt32 qbck_print_queueheader(qbck_tQueueHeader *queueheader) {
   printf("Queue header\n");
   printf("	type:  %s\n", queueheader->type);
   printf("	objid: %s\n", cdh_ObjidToString(queueheader->objid, 0));
@@ -113,8 +107,7 @@ static pwr_tUInt32 qbck_print_queueheader(qbck_tQueueHeader* queueheader)
   return DATAQ__SUCCESS;
 }
 
-static pwr_tUInt32 qbck_print_dataheader(qbck_tDataHeader* dataheader)
-{
+static pwr_tUInt32 qbck_print_dataheader(qbck_tDataHeader *dataheader) {
   printf("Data header\n");
   printf("	type:  %s\n", dataheader->type);
   printf("	objid: %s\n", cdh_ObjidToString(dataheader->objid, 0));
@@ -125,8 +118,7 @@ static pwr_tUInt32 qbck_print_dataheader(qbck_tDataHeader* dataheader)
   }
   return DATAQ__SUCCESS;
 }
-static int qbck_timecmp(pwr_tTime* time_old, pwr_tTime* time_new)
-{
+static int qbck_timecmp(pwr_tTime *time_old, pwr_tTime *time_new) {
   int sts;
 
   sts = time_Acomp(time_new, time_old);
@@ -135,10 +127,9 @@ static int qbck_timecmp(pwr_tTime* time_old, pwr_tTime* time_new)
   return 1;
 }
 
-int qbck_get_filename(char* inname, char* outname, char* ext)
-{
-  char* s;
-  char* s2;
+int qbck_get_filename(char *inname, char *outname, char *ext) {
+  char *s;
+  char *s2;
 
   strcpy(outname, inname);
 
@@ -164,23 +155,23 @@ int qbck_get_filename(char* inname, char* outname, char* ext)
 }
 
 /*************************************************************************
-*
-* Name:		qbck_check_file
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Check the consistency of a backup file.
-*
-**************************************************************************/
+ *
+ * Name:		qbck_check_file
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Check the consistency of a backup file.
+ *
+ **************************************************************************/
 
-static pwr_tStatus qbck_check_file(qbck_tCtx bckctx, FILE* bckfile,
-    int* record_count, unsigned int* record_start, unsigned int* queuearea_start,
-    unsigned int* dataarea_start, pwr_tTime* first_record_time,
-    pwr_tTime* last_record_time, int time_only)
-{
+static pwr_tStatus
+qbck_check_file(qbck_tCtx bckctx, FILE *bckfile, int *record_count,
+                unsigned int *record_start, unsigned int *queuearea_start,
+                unsigned int *dataarea_start, pwr_tTime *first_record_time,
+                pwr_tTime *last_record_time, int time_only) {
   qbck_tFileHeader fileheader;
   qbck_tRecordHeader recordheader;
   qbck_tRecordHeader recordheaderend;
@@ -275,26 +266,26 @@ static pwr_tStatus qbck_check_file(qbck_tCtx bckctx, FILE* bckfile,
       case pwr_cClass_DataQ5:
       case pwr_cClass_DataQ30:
       case pwr_cClass_DataQ120: {
-        pwr_sClass_DataQ1* queue_ptr;
-        pwr_sClass_DataQBus* data_block_ptr;
+        pwr_sClass_DataQ1 *queue_ptr;
+        pwr_sClass_DataQBus *data_block_ptr;
 
-        queue_ptr = (pwr_sClass_DataQ1*)buffer;
+        queue_ptr = (pwr_sClass_DataQ1 *)buffer;
         data_block_ptr = &queue_ptr->Data[0];
         for (k = 0; k < queue_ptr->DataSize; k++) {
           /* Check if the objid already is in the data_db */
           printf("         Data%d: %s  %c %c %c\n", k,
-              cdh_ObjidToString(data_block_ptr->Data.Aref.Objid, 0),
-              data_block_ptr->Front ? 'F' : ' ',
-              data_block_ptr->Back ? 'B' : ' ',
-              data_block_ptr->Select ? 'S' : ' ');
+                 cdh_ObjidToString(data_block_ptr->Data.Aref.Objid, 0),
+                 data_block_ptr->Front ? 'F' : ' ',
+                 data_block_ptr->Back ? 'B' : ' ',
+                 data_block_ptr->Select ? 'S' : ' ');
           data_block_ptr++;
         }
         data_block_ptr = &queue_ptr->Super.Trp.DataL;
         printf("         DataL:  %s  %c %c %c\n",
-            cdh_ObjidToString(data_block_ptr->Data.Aref.Objid, 0),
-            data_block_ptr->Front ? 'F' : ' ',
-            data_block_ptr->Back ? 'B' : ' ',
-            data_block_ptr->Select ? 'S' : ' ');
+               cdh_ObjidToString(data_block_ptr->Data.Aref.Objid, 0),
+               data_block_ptr->Front ? 'F' : ' ',
+               data_block_ptr->Back ? 'B' : ' ',
+               data_block_ptr->Select ? 'S' : ' ');
         break;
       }
 #if 0
@@ -374,21 +365,20 @@ static pwr_tStatus qbck_check_file(qbck_tCtx bckctx, FILE* bckfile,
 }
 
 /*************************************************************************
-*
-* Name:		qbck_read
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Read the queue objects from backup file.
-*
-**************************************************************************/
+ *
+ * Name:		qbck_read
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Read the queue objects from backup file.
+ *
+ **************************************************************************/
 
-static pwr_tStatus qbck_read(qbck_tCtx bckctx)
-{
-  FILE* bckfile1;
+static pwr_tStatus qbck_read(qbck_tCtx bckctx) {
+  FILE *bckfile1;
   pwr_tUInt32 queuearea_start[QBCK_MAX_RECORDS];
   pwr_tUInt32 dataarea_start[QBCK_MAX_RECORDS];
   pwr_tUInt32 record_start[QBCK_MAX_RECORDS];
@@ -401,15 +391,14 @@ static pwr_tStatus qbck_read(qbck_tCtx bckctx)
   bckfile1 = fopen(bckctx->bckconfig->BackupFile, "r+");
   if (bckfile1 == NULL)
     bckfile1_sts = DATAQ__FILEREAD;
-  bckfile1_sts
-      = qbck_check_file(bckctx, bckfile1, &record_count, record_start,
-          queuearea_start, dataarea_start, &bckfile1_time, &last_record_time, 0);
+  bckfile1_sts = qbck_check_file(bckctx, bckfile1, &record_count, record_start,
+                                 queuearea_start, dataarea_start,
+                                 &bckfile1_time, &last_record_time, 0);
   fclose(bckfile1);
   return bckfile1_sts;
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
   qbck_tCtx bckctx;
   int sts;
   pwr_sClass_DataQBackupConfig bckconfig;

@@ -59,15 +59,17 @@ char* syi_HostName(pwr_tStatus* status, char* ibuffer, int isize)
 
 int syi_Busid(pwr_tStatus* sts)
 {
-  char *bus_str;
+  char* bus_str;
   int bus;
 
   bus_str = getenv("PWR_BUS_ID");
-  if (!bus_str) {
+  if (!bus_str)
+  {
     *sts = SYI__BUSID;
     return -1;
   }
-  if (sscanf(bus_str, "%d", &bus) != 1) {
+  if (sscanf(bus_str, "%d", &bus) != 1)
+  {
     *sts = SYI__BUSID;
     return -1;
   }
@@ -80,10 +82,14 @@ char* syi_NodeName(pwr_tStatus* status, char* ibuffer, int isize)
   char* cp;
   pwr_dStatus(sts, status, SYI__SUCCESS);
 
-  if (gethostname(ibuffer, isize) != 0) {
-    if (errno == EINVAL) {
+  if (gethostname(ibuffer, isize) != 0)
+  {
+    if (errno == EINVAL)
+    {
       *sts = SYI__TRUNCATED;
-    } else {
+    }
+    else
+    {
       *sts = errno_Status(errno);
       ibuffer = NULL;
     }
@@ -118,10 +124,7 @@ char* syi_HostSpec(pwr_tStatus* status, char* ibuffer, int size)
 /* Return true if node is booted locally or
    false if booted from remote node via network.  */
 
-pwr_tBoolean syi_LocalBoot(pwr_tStatus* status)
-{
-  return YES;
-}
+pwr_tBoolean syi_LocalBoot(pwr_tStatus* status) { return YES; }
 
 /* .  */
 
@@ -151,7 +154,8 @@ pwr_tStatus syi_UserName(char* user, int len)
   if (bufsize < 1024)
     bufsize = 1024;
 
-  while (1) {
+  while (1)
+  {
     buf = (char*)malloc(bufsize);
     if (!buf)
       return 0;
@@ -164,13 +168,15 @@ pwr_tStatus syi_UserName(char* user, int len)
     bufsize *= 2;
   }
 
-  if (sts || !result) {
+  if (sts || !result)
+  {
     free(buf);
     return 0;
   }
 
   p = result->pw_name;
-  if (!p) {
+  if (!p)
+  {
     free(buf);
     return 0;
   }
@@ -226,9 +232,9 @@ char* syi_ProcessId()
   return pidstr;
 }
 
-pwr_tStatus syi_GetSysctlInt(const char *var, int *val)
+pwr_tStatus syi_GetSysctlInt(const char* var, int* val)
 {
-  FILE *fp;
+  FILE* fp;
   int num;
   char fname[200] = "/proc/sys/";
   strcat(fname, var);

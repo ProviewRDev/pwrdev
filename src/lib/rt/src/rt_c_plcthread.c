@@ -54,8 +54,7 @@ pwr_sClass_PlcThread* pwrb_PlcThread_Init(pwr_tStatus* sts, plc_sThread* tp)
 {
   pwr_sClass_PlcThread* o;
 
-  *sts
-      = gdh_DLRefObjectInfoAttrref(&tp->aref, (void*)&tp->PlcThread, &tp->dlid);
+  *sts = gdh_DLRefObjectInfoAttrref(&tp->aref, (void*)&tp->PlcThread, &tp->dlid);
   if (EVEN(*sts))
     return NULL;
 
@@ -81,12 +80,13 @@ void pwrb_PlcThread_Exec(plc_sThread* tp)
   o->ActualScanTime = tp->ActualScanTime;
   meanCount = o->ScanTimeMeanCount;
 
-  if ((meanCount != 0) && (o->Count % meanCount == 0)) {
-    if (o->Count != 0) {
+  if ((meanCount != 0) && (o->Count % meanCount == 0))
+  {
+    if (o->Count != 0)
+    {
       double diff;
 
-      time_Dsub(&last, (pwr_tDeltaTime*)&tp->before_scan_abs,
-          (pwr_tDeltaTime*)&o->ScanTimeStart);
+      time_Dsub(&last, (pwr_tDeltaTime*)&tp->before_scan_abs, (pwr_tDeltaTime*)&o->ScanTimeStart);
       diff = last.tv_sec + last.tv_nsec * cNanoSec;
       o->ScanTimeMean = diff / meanCount;
     }
@@ -96,11 +96,11 @@ void pwrb_PlcThread_Exec(plc_sThread* tp)
 
   o->Count++;
 
-  if (o->Count != 1) {
+  if (o->Count != 1)
+  {
     double scanTime;
 
-    time_Dsub(&last, (pwr_tDeltaTime*)&tp->before_scan_abs,
-        (pwr_tDeltaTime*)&tp->one_before_scan_abs);
+    time_Dsub(&last, (pwr_tDeltaTime*)&tp->before_scan_abs, (pwr_tDeltaTime*)&tp->one_before_scan_abs);
     scanTime = last.tv_nsec * cNanoSec + last.tv_sec;
 
     if (scanTime < o->ScanTimeMin)
@@ -109,8 +109,7 @@ void pwrb_PlcThread_Exec(plc_sThread* tp)
       o->ScanTimeMax = scanTime;
   }
 
-  time_Dsub(&last, (pwr_tDeltaTime*)&tp->after_scan_abs,
-      (pwr_tDeltaTime*)&tp->before_scan_abs);
+  time_Dsub(&last, (pwr_tDeltaTime*)&tp->after_scan_abs, (pwr_tDeltaTime*)&tp->before_scan_abs);
   o->Last = last.tv_nsec * cNanoSec + last.tv_sec;
 
   if (o->Last < o->Min)

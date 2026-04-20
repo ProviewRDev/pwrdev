@@ -39,7 +39,7 @@
 #include "ssabox.h"
 
 /*      PIDX
-*/
+ */
 
 void PidX_exec(plc_sThread* tp, pwr_sClass_PidX* object)
 {

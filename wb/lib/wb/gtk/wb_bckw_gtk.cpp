@@ -52,32 +52,25 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer bckw)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
-    ldh_tSession bckw_ldhses, const char* bckw_name, wb_bck_list* l_list,
-    int l_editmode, pwr_tStatus* status)
-    : WbBckW(
-          bckw_parent_ctx, bckw_ldhses, bckw_name, l_list, l_editmode, status),
-      parent_wid(bckw_parent_wid)
+WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid, ldh_tSession bckw_ldhses,
+                     const char* bckw_name, wb_bck_list* l_list, int l_editmode, pwr_tStatus* status)
+    : WbBckW(bckw_parent_ctx, bckw_ldhses, bckw_name, l_list, l_editmode, status), parent_wid(bckw_parent_wid)
 {
   const int window_width = 1100;
   const int window_height = 600;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      window_height, "default-width", window_width, "title", bckw_name, NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height, "default-width",
+                                      window_width, "title", bckw_name, NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(toplevel, "focus-in-event",
-      G_CALLBACK(WbBckWGtk::action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(WbBckWGtk::action_inputfocus), this);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
@@ -85,33 +78,26 @@ WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
   // File Entry
   GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkWidget* file_print = gtk_menu_item_new_with_mnemonic("_Print");
   g_signal_connect(file_print, "activate", G_CALLBACK(activate_print), this);
 
   file_transfer_wb = gtk_menu_item_new_with_mnemonic("_Transfer to database");
-  g_signal_connect(file_transfer_wb, "activate",
-      G_CALLBACK(activate_transfer_wb), this);
+  g_signal_connect(file_transfer_wb, "activate", G_CALLBACK(activate_transfer_wb), this);
 
   GtkWidget* file_filter = gtk_menu_item_new_with_mnemonic("_Filter");
-  g_signal_connect(
-      file_filter, "activate", G_CALLBACK(activate_filter), this);
+  g_signal_connect(file_filter, "activate", G_CALLBACK(activate_filter), this);
 
   GtkWidget* file_open = gtk_menu_item_new_with_mnemonic("_Open");
-  g_signal_connect(
-      file_open, "activate", G_CALLBACK(activate_open), this);
+  g_signal_connect(file_open, "activate", G_CALLBACK(activate_open), this);
 
-  GtkWidget* file_diff
-      = gtk_menu_item_new_with_mnemonic("_Compare Backup File");
-  g_signal_connect(
-      file_diff, "activate", G_CALLBACK(activate_diff), this);
+  GtkWidget* file_diff = gtk_menu_item_new_with_mnemonic("_Compare Backup File");
+  g_signal_connect(file_diff, "activate", G_CALLBACK(activate_diff), this);
 
-  GtkWidget* file_diff_wb
-      = gtk_menu_item_new_with_mnemonic("C_ompare Database");
-  g_signal_connect(
-      file_diff_wb, "activate", G_CALLBACK(activate_diff_wb), this);
+  GtkWidget* file_diff_wb = gtk_menu_item_new_with_mnemonic("C_ompare Database");
+  g_signal_connect(file_diff_wb, "activate", G_CALLBACK(activate_diff_wb), this);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open);
@@ -128,12 +114,10 @@ WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
 
   // Edit menu
   edit_check_all = gtk_menu_item_new_with_mnemonic("_Check all");
-  g_signal_connect(edit_check_all, "activate",
-      G_CALLBACK(activate_check_all), this);
+  g_signal_connect(edit_check_all, "activate", G_CALLBACK(activate_check_all), this);
 
   edit_check_clear = gtk_menu_item_new_with_mnemonic("_Check clear");
-  g_signal_connect(edit_check_clear, "activate",
-      G_CALLBACK(activate_check_clear), this);
+  g_signal_connect(edit_check_clear, "activate", G_CALLBACK(activate_check_clear), this);
 
   GtkMenu* edit_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_check_all);
@@ -145,20 +129,15 @@ WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
 
   // View menu
   GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic("Zoom _In");
-  g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
-  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
+  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic("Zoom _Out");
-  g_signal_connect(
-      view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
-  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
+  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic("Zoom _Reset");
-  g_signal_connect(view_zoom_reset, "activate",
-      G_CALLBACK(activate_zoom_reset), this);
+  g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
@@ -171,10 +150,8 @@ WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
 
   // Help menu
   GtkWidget* help_backup = gtk_menu_item_new_with_mnemonic("_Help");
-  g_signal_connect(
-      help_backup, "activate", G_CALLBACK(activate_help), this);
-  gtk_widget_add_accelerator(help_backup, "activate", accel_g, 'h',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(help_backup, "activate", G_CALLBACK(activate_help), this);
+  gtk_widget_add_accelerator(help_backup, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_backup);
@@ -186,8 +163,7 @@ WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
   form = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Create bckwnav
-  bckwnav = new WbBckWNavGtk(
-      this, form, bckw_ldhses, l_list, l_editmode, &nav_widget);
+  bckwnav = new WbBckWNavGtk(this, form, bckw_ldhses, l_list, l_editmode, &nav_widget);
 
   gtk_box_pack_start(GTK_BOX(form), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(form), GTK_WIDGET(nav_widget), TRUE, TRUE, 0);
@@ -200,7 +176,8 @@ WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
 
   show();
 
-  if (list && list->type() != bck_eType_WbDiff) {
+  if (list && list->type() != bck_eType_WbDiff)
+  {
     g_object_set(file_transfer_wb, "visible", FALSE, NULL);
     g_object_set(edit_check_all, "visible", FALSE, NULL);
     g_object_set(edit_check_clear, "visible", FALSE, NULL);
@@ -222,16 +199,16 @@ void WbBckWGtk::print()
 {
   pwr_tStatus sts;
 
-  CoWowGtk::CreateBrowPrintDialogGtk(name, bckwnav->brow->ctx,
-      flow_eOrientation_Portrait, 1.0, (void*)toplevel, &sts);
+  CoWowGtk::CreateBrowPrintDialogGtk(name, bckwnav->brow->ctx, flow_eOrientation_Portrait, 1.0,
+                                     (void*)toplevel, &sts);
 }
 
-gboolean WbBckWGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean WbBckWGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   WbBckWGtk* bckw = (WbBckWGtk*)data;
 
-  if (bckw) {
+  if (bckw)
+  {
     if (bckw->focustimer.disabled())
       return FALSE;
 
@@ -243,8 +220,7 @@ gboolean WbBckWGtk::action_inputfocus(
 
 void WbBckWGtk::set_title(char* title)
 {
-  char* titleutf8
-      = g_convert(title, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  char* titleutf8 = g_convert(title, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
   gtk_window_set_title(GTK_WINDOW(toplevel), titleutf8);
   g_free(titleutf8);
 }
@@ -335,6 +311,5 @@ void WbBckWGtk::activate_zoom_reset(GtkWidget* w, gpointer data)
 
 void WbBckWGtk::activate_help(GtkWidget* w, gpointer data)
 {
-  CoXHelp::dhelp(
-      "backup_refman", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
+  CoXHelp::dhelp("backup_refman", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
 }

@@ -49,10 +49,11 @@
 
 class XColWindQtWidget;
 
-class XColWindQt : public XColWind {
+class XColWindQt : public XColWind
+{
 public:
-  XColWindQt(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, char* xa_title,
-      int xa_advanced_user, xcolwind_eType xa_type, int* xa_sts);
+  XColWindQt(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, char* xa_title, int xa_advanced_user,
+             xcolwind_eType xa_type, int* xa_sts);
   ~XColWindQt();
 
   QWidget* brow_widget;
@@ -81,7 +82,8 @@ private:
   XColWindQtWidget* toplevel;
 };
 
-class XColWindQtWidget : public QWidget {
+class XColWindQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

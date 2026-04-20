@@ -41,16 +41,16 @@
 
 #include "xtt_trend.h"
 
-class XttTrendGtk : public XttTrend {
+class XttTrendGtk : public XttTrend
+{
 public:
   GtkWidget* parent_widget;
 
-  XttTrendGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, char* xn_name,
-      GtkWidget** w, pwr_sAttrRef* objid, pwr_sAttrRef* plotgroup, int width,
-      int height, unsigned int options, int x_color_theme, void* basewidget,
-      int* sts);
-  XttOTree* tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt,
-      unsigned int layout, pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*));
+  XttTrendGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, char* xn_name, GtkWidget** w,
+              pwr_sAttrRef* objid, pwr_sAttrRef* plotgroup, int width, int height, unsigned int options,
+              int x_color_theme, void* basewidget, int* sts);
+  XttOTree* tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt, unsigned int layout,
+                     pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*));
   ~XttTrendGtk();
 };
 

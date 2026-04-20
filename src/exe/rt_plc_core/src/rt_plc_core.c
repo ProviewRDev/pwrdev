@@ -41,13 +41,9 @@
 #include "rt_plc.h"
 #include "rt_plc_proc.h"
 
-void plc_templ_init(int DirectLink, plc_sThread* tp)
-{
-}
-void plc_templ_exec(int DirectLink, plc_sThread* tp)
-{
-}
+void plc_templ_init(int DirectLink, plc_sThread* tp) {}
+void plc_templ_exec(int DirectLink, plc_sThread* tp) {}
 
-struct plc_proctbl plc_templ = { { 0, 0 }, plc_templ_init, plc_templ_exec };
+struct plc_proctbl plc_templ = {{0, 0}, plc_templ_init, plc_templ_exec};
 
-struct plc_proctbl* plc_proctbllist[] = { &plc_templ, (void*)0 };
+struct plc_proctbl* plc_proctbllist[] = {&plc_templ, (void*)0};

@@ -46,8 +46,7 @@
 #include "co_string.h"
 #include "co_time.h"
 
-pwr_tBoolean dbs_AlignedRead(
-    pwr_tStatus* sts, void* buf, pwr_tUInt32 size, const dbs_sEnv* ep)
+pwr_tBoolean dbs_AlignedRead(pwr_tStatus* sts, void* buf, pwr_tUInt32 size, const dbs_sEnv* ep)
 {
   int offset;
   *sts = DBS__SUCCESS;
@@ -62,17 +61,16 @@ pwr_tBoolean dbs_AlignedRead(
   return YES;
 }
 
-dbs_sVolRef* dbs_VolRef(
-    pwr_tStatus* sts, pwr_tUInt32 index, dbs_sVolRef* vp, const dbs_sEnv* ep)
+dbs_sVolRef* dbs_VolRef(pwr_tStatus* sts, pwr_tUInt32 index, dbs_sVolRef* vp, const dbs_sEnv* ep)
 {
   dbs_sSect sect;
 
   int nVolref = 0;
 
-  fseek(ep->f, ep->file.offset + (dbs_eSect_volref * dbs_dAlign(sizeof(sect))),
-      SEEK_SET);
+  fseek(ep->f, ep->file.offset + (dbs_eSect_volref * dbs_dAlign(sizeof(sect))), SEEK_SET);
 
-  if (fread(&sect, sizeof(sect), 1, ep->f) == 0) {
+  if (fread(&sect, sizeof(sect), 1, ep->f) == 0)
+  {
     *sts = errno_GetStatus();
     return NULL;
   }
@@ -83,7 +81,8 @@ dbs_sVolRef* dbs_VolRef(
 
   fseek(ep->f, sect.offset + (index * dbs_dAlign(sizeof(*vp))), SEEK_SET);
 
-  if (fread(vp, sizeof(*vp), 1, ep->f) == 0) {
+  if (fread(vp, sizeof(*vp), 1, ep->f) == 0)
+  {
     *sts = errno_GetStatus();
     return NULL;
   }
@@ -95,17 +94,18 @@ dbs_sVolume* dbs_Volume(pwr_tStatus* sts, dbs_sVolume* vp, const dbs_sEnv* ep)
 {
   dbs_sSect sect;
 
-  fseek(ep->f, ep->file.offset + (dbs_eSect_volume * dbs_dAlign(sizeof(sect))),
-      SEEK_SET);
+  fseek(ep->f, ep->file.offset + (dbs_eSect_volume * dbs_dAlign(sizeof(sect))), SEEK_SET);
 
-  if (fread(&sect, sizeof(sect), 1, ep->f) == 0) {
+  if (fread(&sect, sizeof(sect), 1, ep->f) == 0)
+  {
     *sts = errno_GetStatus();
     return NULL;
   }
 
   fseek(ep->f, sect.offset, SEEK_SET);
 
-  if (fread(vp, sizeof(*vp), 1, ep->f) == 0) {
+  if (fread(vp, sizeof(*vp), 1, ep->f) == 0)
+  {
     *sts = errno_GetStatus();
     return NULL;
   }
@@ -116,10 +116,13 @@ dbs_sVolume* dbs_Volume(pwr_tStatus* sts, dbs_sVolume* vp, const dbs_sEnv* ep)
 pwr_tBoolean dbs_Close(pwr_tStatus* sts, dbs_sEnv* ep)
 {
   *sts = DBS__SUCCESS;
-  if (ep->f != NULL) {
+  if (ep->f != NULL)
+  {
     fclose(ep->f);
     ep->f = NULL;
-  } else {
+  }
+  else
+  {
     printf("ERROR, dbs_Close, trying to close a non opened file\n");
   }
 
@@ -137,12 +140,14 @@ dbs_sEnv* dbs_Open(pwr_tStatus* sts, dbs_sEnv* ep, const char* filename)
   memset(ep, 0, sizeof(*ep));
 
   f = fopen(filename, "r");
-  if (f == NULL) {
+  if (f == NULL)
+  {
     *sts = errno_GetStatus();
     return NULL;
   }
 
-  if (fread(&ep->file, sizeof(ep->file), 1, f) == 0) {
+  if (fread(&ep->file, sizeof(ep->file), 1, f) == 0)
+  {
     *sts = errno_GetStatus();
     fclose(f);
     return NULL;
@@ -150,7 +155,8 @@ dbs_sEnv* dbs_Open(pwr_tStatus* sts, dbs_sEnv* ep, const char* filename)
 
   fseek(f, ep->file.offset, SEEK_SET);
 
-  if (fread(&sect, sizeof(sect), 1, f) == 0) {
+  if (fread(&sect, sizeof(sect), 1, f) == 0)
+  {
     *sts = errno_GetStatus();
     fclose(f);
     return NULL;
@@ -162,10 +168,11 @@ dbs_sEnv* dbs_Open(pwr_tStatus* sts, dbs_sEnv* ep, const char* filename)
 
   co_GetOwnFormat(&ownFormat);
 
-  if (srcFormat.m != ownFormat.m) {
-    pdrmem_create(
-        &pdrs, &ep->file, sizeof(ep->file), PDR_DECODE, srcFormat, ownFormat);
-    if (!pdr_dbs_sFile(&pdrs, &ep->file)) {
+  if (srcFormat.m != ownFormat.m)
+  {
+    pdrmem_create(&pdrs, &ep->file, sizeof(ep->file), PDR_DECODE, srcFormat, ownFormat);
+    if (!pdr_dbs_sFile(&pdrs, &ep->file))
+    {
       *sts = DBS__PDRFILE;
       fclose(f);
       return NULL;
@@ -178,25 +185,27 @@ dbs_sEnv* dbs_Open(pwr_tStatus* sts, dbs_sEnv* ep, const char* filename)
   return ep;
 }
 
-static pwr_tBoolean checkQ(const dbs_sVenv* vep, dbs_sQlink* item)
+static pwr_tBoolean __attribute__((unused)) checkQ(const dbs_sVenv* vep, dbs_sQlink* item)
 {
   dbs_sQlink* link;
 
-  if (item == NULL) {
+  if (item == NULL)
+  {
     printf("checkQ in volume: %s, item == NULL", "not known");
     return NO;
   }
-  if (item->self == dbs_cNref) {
-    printf("checkQ in volume: %s, item->self == dbs_cNref, item: %lu",
-        "not known", (unsigned long)item);
+  if (item->self == dbs_cNref)
+  {
+    printf("checkQ in volume: %s, item->self == dbs_cNref, item: %lu", "not known", (unsigned long)item);
     return NO;
   }
 
   link = dbs_Address(NULL, vep, item->self);
-  if (item != link) {
+  if (item != link)
+  {
     printf("checkQ in volume: %s, item != dbs_Address(NULL, ep, item->self),\n "
            "item: %lu != %lu",
-        "not known", (unsigned long)item, (unsigned long)link);
+           "not known", (unsigned long)item, (unsigned long)link);
     return NO;
   }
 
@@ -213,7 +222,8 @@ void* dbs_Address(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_tRef r)
   if (!vep->mp->flags.b.isMapped)
     pwr_Return(NULL, sts, DBS__NOTMAPPED);
 
-  if (vep->index != 0) {
+  if (vep->index != 0)
+  {
     /*printf("index: %d, name %s\n", vep->index, vep->vp->name)*/;
   }
 
@@ -228,8 +238,8 @@ void* dbs_Address(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_tRef r)
   return (void*)(vep->base + vep->sect[bits.b.sect].offset + bits.b.offs);
 }
 
-void* dbs_Bfind(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sBintab* tp,
-    void* key, int(comp)(void* key, void* record))
+void* dbs_Bfind(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sBintab* tp, void* key,
+                int(comp)(void* key, void* record))
 {
   char* p;
   int c;
@@ -237,14 +247,20 @@ void* dbs_Bfind(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sBintab* tp,
   char* end = dbs_Address(sts, vep, tp->end);
   int rsize = tp->rsize;
 
-  while (start <= end) {
+  while (start <= end)
+  {
     p = start + ((end - start) / (2 * rsize)) * rsize;
     c = comp(key, p);
-    if (c > 0) {
+    if (c > 0)
+    {
       start = p + rsize;
-    } else if (c < 0) {
+    }
+    else if (c < 0)
+    {
       end = p - rsize;
-    } else {
+    }
+    else
+    {
       return p;
     }
   }
@@ -252,8 +268,7 @@ void* dbs_Bfind(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sBintab* tp,
   return 0;
 }
 
-pwr_tBoolean dbs_QhasOne(
-    pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sQlink* item)
+pwr_tBoolean dbs_QhasOne(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sQlink* item)
 {
   dbs_sQlink* pred;
   dbs_sQlink* succ;
@@ -282,8 +297,7 @@ dbs_tRef dbs_Qinit(pwr_tStatus* sts, dbs_sQlink* item, dbs_tRef r)
   return r;
 }
 
-dbs_sQlink* dbs_Qinsert(
-    pwr_tStatus* sts, dbs_sQlink* pred, dbs_sQlink* item, dbs_sQlink* succ)
+dbs_sQlink* dbs_Qinsert(pwr_tStatus* sts, dbs_sQlink* pred, dbs_sQlink* item, dbs_sQlink* succ)
 {
   pwr_Assert(pred->succ == succ->self);
   pwr_Assert(succ->pred == pred->self);
@@ -295,8 +309,7 @@ dbs_sQlink* dbs_Qinsert(
   return item;
 }
 
-pwr_tBoolean dbs_QisEmpty(
-    pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sQlink* item)
+pwr_tBoolean dbs_QisEmpty(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sQlink* item)
 {
   dbs_sQlink* pred;
   dbs_sQlink* succ;
@@ -316,8 +329,7 @@ pwr_tBoolean dbs_QisEmpty(
   return item->succ == item->self;
 }
 
-pwr_tBoolean dbs_QisLinked(
-    pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sQlink* item)
+pwr_tBoolean dbs_QisLinked(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sQlink* item)
 {
   dbs_sQlink* pred;
   dbs_sQlink* succ;
@@ -337,13 +349,11 @@ pwr_tBoolean dbs_QisLinked(
   return item->succ != item->self;
 }
 
-pwr_tBoolean dbs_QisNull(
-    pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sQlink* item)
+pwr_tBoolean dbs_QisNull(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sQlink* item)
 {
   pwr_tBoolean nullQ;
 
-  nullQ = (item->self == dbs_cNref) || (item->pred == dbs_cNref)
-      || (item->succ == dbs_cNref);
+  nullQ = (item->self == dbs_cNref) || (item->pred == dbs_cNref) || (item->succ == dbs_cNref);
 
   pwr_Assert(item->pred == dbs_cNref);
   pwr_Assert(item->succ == dbs_cNref);
@@ -360,7 +370,8 @@ dbs_sQlink* dbs_Qpred(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sQlink* item)
 
   pred = dbs_Address(NULL, vep, item->pred);
 
-  if (pred != NULL) {
+  if (pred != NULL)
+  {
     pwr_Assert(checkQ(vep, pred));
     pwr_Assert(pred->succ == item->self);
     pwr_Assert(pred->self == item->pred);
@@ -377,7 +388,8 @@ dbs_sQlink* dbs_Qsucc(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sQlink* item)
 
   succ = dbs_Address(NULL, vep, item->succ);
 
-  if (succ != NULL) {
+  if (succ != NULL)
+  {
     pwr_Assert(checkQ(vep, succ));
     pwr_Assert(succ->pred == item->self);
     pwr_Assert(item->succ == succ->self);
@@ -422,7 +434,8 @@ dbs_sMenv* dbs_Map(pwr_tStatus* sts, const char* filename)
 
   *sts = DBS__SUCCESS;
 
-  if ((ret = stat(filename, &sb)) != 0) {
+  if ((ret = stat(filename, &sb)) != 0)
+  {
     *sts = errno_GetStatus();
     return NULL;
   }
@@ -430,7 +443,8 @@ dbs_sMenv* dbs_Map(pwr_tStatus* sts, const char* filename)
   fd = open(filename, O_RDWR);
   tfd = mkstemp(tfname);
 
-  while (1) {
+  while (1)
+  {
     int count;
 
     count = read(fd, buf, sizeof(buf));
@@ -444,7 +458,8 @@ dbs_sMenv* dbs_Map(pwr_tStatus* sts, const char* filename)
   errno = 0;
 
   base = mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, tfd, 0);
-  if (base == NULL) {
+  if (base == NULL)
+  {
     *sts = errno_GetStatus();
     perror("mmap");
     ret = close(tfd);
@@ -459,8 +474,7 @@ dbs_sMenv* dbs_Map(pwr_tStatus* sts, const char* filename)
   vrp = (dbs_sVolRef*)(base + sect[dbs_eSect_volref].offset);
   nVolRef = sect[dbs_eSect_volref].size / dbs_dAlign(sizeof(dbs_sVolRef));
 
-  mep = (dbs_sMenv*)calloc(
-      1, sizeof(dbs_sMenv) + (nVolRef * sizeof(dbs_sVenv)));
+  mep = (dbs_sMenv*)calloc(1, sizeof(dbs_sMenv) + (nVolRef * sizeof(dbs_sVenv)));
 
   mep->size = sb.st_size;
   mep->flags.b.isMapped = 1;
@@ -479,7 +493,8 @@ dbs_sMenv* dbs_Map(pwr_tStatus* sts, const char* filename)
   vep->oid_bt = &vep->vp->oid_bt;
   vep->class_bt = &vep->vp->class_bt;
 
-  for (i = 0; i < nVolRef; i++) {
+  for (i = 0; i < nVolRef; i++)
+  {
     vep = &mep->venv[i + 1];
 
     vep->mp = mep;
@@ -506,16 +521,14 @@ dbs_sVenv* dbs_Vmap(pwr_tStatus* sts, int index, dbs_sMenv* mep)
   return &mep->venv[index];
 }
 
-int dbs_nVolRef(pwr_tStatus* sts, const dbs_sMenv* mep)
-{
-  return mep->nVolRef;
-}
+int dbs_nVolRef(pwr_tStatus* sts, const dbs_sMenv* mep) { return mep->nVolRef; }
 
 void dbs_Split(pwr_tStatus* sts, dbs_sMenv* mep, char* dirName)
 {
   int i;
 
-  for (i = 0; i < mep->nVolRef; i++) {
+  for (i = 0; i < mep->nVolRef; i++)
+  {
     dbs_sVenv* vep;
     dbs_sVolRef* vrp;
     int n;
@@ -532,33 +545,40 @@ void dbs_Split(pwr_tStatus* sts, dbs_sMenv* mep, char* dirName)
     vrp = (dbs_sVolRef*)(vep->base + vep->sect[dbs_eSect_volref].offset);
     n = vep->sect[dbs_eSect_volref].size / sizeof(*vrp);
     printf("Write meta file %s, %d volrefs\n", vep->vp->name, n);
-    printf(
-        "  size %d, index %d, nSect %d\n", vep->size, vep->index, vep->nSect);
+    printf("  size %d, index %d, nSect %d\n", vep->size, vep->index, vep->nSect);
     size = offset = vep->size;
 
     sprintf(fileName, "%s/%s.dbs", dirName, vep->vp->name);
     str_ToLower(fileName, fileName);
 
     fp = fopen(fileName, "w+b");
-    if (fp == NULL) {
+    if (fp == NULL)
+    {
       printf("** Cannot open file: %s\n", fileName);
       perror("   Reason");
       return;
-    } else {
+    }
+    else
+    {
       printf("!! Opened file: %s\n", fileName);
     }
 
     p = vep->base;
 
-    while (size > 0) {
-      if (size > 512) {
+    while (size > 0)
+    {
+      if (size > 512)
+      {
         bytes = 512;
-      } else {
+      }
+      else
+      {
         bytes = size;
       }
       size -= bytes;
 
-      if (fwrite(p, bytes, 1, fp) < 1) {
+      if (fwrite(p, bytes, 1, fp) < 1)
+      {
         fclose(fp);
         return;
       }
@@ -567,7 +587,8 @@ void dbs_Split(pwr_tStatus* sts, dbs_sMenv* mep, char* dirName)
 
     fclose(fp);
 
-    for (j = 0; j < n; j++, vrp++) {
+    for (j = 0; j < n; j++, vrp++)
+    {
       offset += vrp->size;
     }
   }
@@ -576,14 +597,17 @@ void dbs_Split(pwr_tStatus* sts, dbs_sMenv* mep, char* dirName)
 pwr_tBoolean dbs_Unmap(pwr_tStatus* sts, dbs_sMenv* mep)
 {
   *sts = DBS__SUCCESS;
-  if (mep->flags.b.isMapped) {
+  if (mep->flags.b.isMapped)
+  {
     munmap(mep->base, mep->size);
     mep->flags.b.isMapped = 0;
 #if defined OS_CYGWIN
     unlink(mep->tfname);
 #endif
     return TRUE;
-  } else if (mep->f != NULL) {
+  }
+  else if (mep->f != NULL)
+  {
     printf("ERROR, dbs_Unmap, trying to unmap a non mapped file\n");
   }
 
@@ -595,14 +619,16 @@ static int comp_oid(void* key, void* record)
   pwr_tOid* k = (pwr_tOid*)key;
   dbs_sOid* o = (dbs_sOid*)record;
 
-  if (k->vid == o->oid.vid) {
+  if (k->vid == o->oid.vid)
+  {
     if (k->oix == o->oid.oix)
       return 0;
     else if (k->oix < o->oid.oix)
       return -1;
     else
       return 1;
-  } else if (k->vid < o->oid.vid)
+  }
+  else if (k->vid < o->oid.vid)
     return -1;
   else
     return 1;
@@ -634,8 +660,7 @@ static int comp_name(void* key, void* record)
     return 1;
 }
 
-dbs_sObject* dbs_OidToObject(
-    pwr_tStatus* sts, const dbs_sVenv* vep, pwr_tOid oid)
+dbs_sObject* dbs_OidToObject(pwr_tStatus* sts, const dbs_sVenv* vep, pwr_tOid oid)
 {
   dbs_sOid* oidp;
   dbs_sObject* op;
@@ -720,8 +745,7 @@ dbs_sObject* dbs_Last(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op)
   return dbs_Qitem(ol, dbs_sObject, sib_ll);
 }
 
-dbs_sObject* dbs_NameToObject(
-    pwr_tStatus* sts, const dbs_sVenv* vep, pwr_tOid oid, char* name)
+dbs_sObject* dbs_NameToObject(pwr_tStatus* sts, const dbs_sVenv* vep, pwr_tOid oid, char* name)
 {
   dbs_sOid* oidp;
   dbs_sObject* op;
@@ -748,16 +772,18 @@ dbs_sObject* dbs_NameToObject(
   return op;
 }
 
-static void objectName(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op,
-    char* name, int level)
+static void objectName(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op, char* name, int level)
 {
   if (op == NULL)
     return;
 
-  if (op->oid.oix == pwr_cNOix) {
+  if (op->oid.oix == pwr_cNOix)
+  {
     strcpy(name, op->name);
     strcat(name, ":");
-  } else {
+  }
+  else
+  {
     objectName(sts, vep, dbs_Address(sts, vep, op->pref), name, level + 1);
     strcat(name, op->name);
     if (level > 0)
@@ -765,14 +791,12 @@ static void objectName(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op,
   }
 }
 
-void dbs_ObjectToName(
-    pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op, char* name)
+void dbs_ObjectToName(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op, char* name)
 {
   objectName(sts, vep, op, name, 0);
 }
 
-dbs_sObject* dbs_Child(
-    pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op, char* name)
+dbs_sObject* dbs_Child(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op, char* name)
 {
   dbs_sName n;
   dbs_sName* np;
@@ -792,8 +816,7 @@ dbs_sObject* dbs_Child(
   return op;
 }
 
-dbs_sObject* dbs_ClassToObject(
-    pwr_tStatus* sts, const dbs_sVenv* vep, pwr_tCid cid)
+dbs_sObject* dbs_ClassToObject(pwr_tStatus* sts, const dbs_sVenv* vep, pwr_tCid cid)
 {
   dbs_sClass* cp;
   dbs_sQlink* ol;
@@ -827,8 +850,7 @@ dbs_sObject* dbs_Next(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op)
   return dbs_Qitem(ol, dbs_sObject, o_ll);
 }
 
-dbs_sObject* dbs_Previous(
-    pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op)
+dbs_sObject* dbs_Previous(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op)
 {
   dbs_sClass* cp;
   dbs_sQlink* ol;
@@ -845,10 +867,10 @@ dbs_sObject* dbs_Previous(
   return dbs_Qitem(ol, dbs_sObject, o_ll);
 }
 
-dbs_sObject* dbs_Ancestor(
-    pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op)
+dbs_sObject* dbs_Ancestor(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op)
 {
-  while (op != NULL) {
+  while (op != NULL)
+  {
     if (op->oid.oix == 1)
       return NULL;
     if (op->poid.oix == 1)
@@ -861,8 +883,7 @@ dbs_sObject* dbs_Ancestor(
 
 void dbs_GetVolumeName(pwr_tStatus* sts, dbs_sVenv* vep, char* name)
 {
-  dbs_sVolume* vp
-      = (dbs_sVolume*)(vep->base + vep->sect[dbs_eSect_volume].offset);
+  dbs_sVolume* vp = (dbs_sVolume*)(vep->base + vep->sect[dbs_eSect_volume].offset);
   strcpy(name, vp->name);
 }
 
@@ -879,12 +900,12 @@ dbs_sObject* dbs_Object(pwr_tStatus* sts, const dbs_sVenv* vep)
   return dbs_First(sts, vep, op);
 }
 
-void* dbs_Body(
-    pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op, pwr_eBix bix)
+void* dbs_Body(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op, pwr_eBix bix)
 {
   char* p = NULL;
 
-  switch (bix) {
+  switch (bix)
+  {
   case pwr_eBix_rt:
     p = dbs_Address(sts, vep, op->rbody.ref);
     break;
@@ -899,11 +920,10 @@ void* dbs_Body(
   return p;
 }
 
-dbs_sObject* dbs_NextHead(
-    pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op)
+dbs_sObject* dbs_NextHead(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sObject* op)
 {
-  dbs_sObject* eop = (dbs_sObject*)(vep->base
-      + vep->sect[dbs_eSect_object].offset + vep->sect[dbs_eSect_object].size);
+  dbs_sObject* eop =
+      (dbs_sObject*)(vep->base + vep->sect[dbs_eSect_object].offset + vep->sect[dbs_eSect_object].size);
 
   if (op == NULL)
     op = (dbs_sObject*)(vep->base + vep->sect[dbs_eSect_object].offset);
@@ -918,14 +938,13 @@ dbs_sObject* dbs_NextHead(
 
 dbs_sBody* dbs_NextRbody(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sBody* bp)
 {
-  dbs_sBody* ebp = (dbs_sBody*)(vep->base + vep->sect[dbs_eSect_rbody].offset
-      + vep->sect[dbs_eSect_rbody].size);
+  dbs_sBody* ebp =
+      (dbs_sBody*)(vep->base + vep->sect[dbs_eSect_rbody].offset + vep->sect[dbs_eSect_rbody].size);
 
   if (bp == NULL)
     bp = (dbs_sBody*)(vep->base + vep->sect[dbs_eSect_rbody].offset);
   else
-    bp = (dbs_sBody*)((char*)bp + dbs_dAlign(sizeof(dbs_sBody))
-        + dbs_dAlign(bp->size));
+    bp = (dbs_sBody*)((char*)bp + dbs_dAlign(sizeof(dbs_sBody)) + dbs_dAlign(bp->size));
 
   if (bp >= ebp)
     return NULL;
@@ -935,14 +954,13 @@ dbs_sBody* dbs_NextRbody(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sBody* bp)
 
 dbs_sBody* dbs_NextDbody(pwr_tStatus* sts, const dbs_sVenv* vep, dbs_sBody* bp)
 {
-  dbs_sBody* ebp = (dbs_sBody*)(vep->base + vep->sect[dbs_eSect_dbody].offset
-      + vep->sect[dbs_eSect_dbody].size);
+  dbs_sBody* ebp =
+      (dbs_sBody*)(vep->base + vep->sect[dbs_eSect_dbody].offset + vep->sect[dbs_eSect_dbody].size);
 
   if (bp == NULL)
     bp = (dbs_sBody*)(vep->base + vep->sect[dbs_eSect_dbody].offset);
   else
-    bp = (dbs_sBody*)((char*)bp + dbs_dAlign(sizeof(dbs_sBody))
-        + dbs_dAlign(bp->size));
+    bp = (dbs_sBody*)((char*)bp + dbs_dAlign(sizeof(dbs_sBody)) + dbs_dAlign(bp->size));
 
   if (bp >= ebp)
     return NULL;

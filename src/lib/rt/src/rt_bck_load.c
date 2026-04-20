@@ -51,8 +51,8 @@
 #include "co_dcli.h"
 #include "co_cdh.h"
 
-#define SET_ERRNO_STS                                                          \
-  perror("rt_bck_load");                                                       \
+#define SET_ERRNO_STS                                                                                        \
+  perror("rt_bck_load");                                                                                     \
   sts = 2
 #define A_MODE
 #define FGETNAME backup_confp->BackupFile
@@ -83,7 +83,8 @@ pwr_tStatus bck_LoadBackup()
   /* Find the local Backup_Conf object.  */
 
   sts = gdh_GetClassList(pwr_cClass_Backup_Conf, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&backup_confp);
     if (ODD(sts))
       break;
@@ -97,10 +98,10 @@ pwr_tStatus bck_LoadBackup()
 
   f = fopen(fname, "r+" A_MODE);
 
-  if (f == NULL) {
+  if (f == NULL)
+  {
     SET_ERRNO_STS;
-    errh_Error("Load Backup: Failed to open %s, errno = %d",
-        backup_confp->BackupFile, sts);
+    errh_Error("Load Backup: Failed to open %s, errno = %d", backup_confp->BackupFile, sts);
     return sts;
   }
 
@@ -111,63 +112,70 @@ pwr_tStatus bck_LoadBackup()
   /* Read the header.  */
 
   csts = fread(&fh, sizeof fh, 1, f);
-  if (csts == 0) {
+  if (csts == 0)
+  {
     SET_ERRNO_STS;
-  } else {
-    if (fh.version < BCK_FILE_VERSION - 1) {
+  }
+  else
+  {
+    if (fh.version < BCK_FILE_VERSION - 1)
+    {
       errh_Info("BACKUP Loading old file version : %d", fh.version);
       /* Read the cycle data.  */
 
       BCK_FILEHEAD_STRUCT_V6* fhp_v6 = (BCK_FILEHEAD_STRUCT_V6*)&fh;
 
-      for (c = 0; c < 2; c++) {
+      for (c = 0; c < 2; c++)
+      {
         fseek(f, fhp_v6->curdata[c], 0);
         fread(&ch_old, sizeof ch_old, 1, f);
 
         /* Work thru the data segments */
 
-        for (d = 0; d < ch_old.segments; d++) {
+        for (d = 0; d < ch_old.segments; d++)
+        {
           csts = fread(&dh_old, sizeof dh_old, 1, f);
-          if (csts != 0) {
+          if (csts != 0)
+          {
             datap = malloc(dh_old.attrref.Size);
             csts = fread(datap, dh_old.attrref.Size, 1, f);
           }
-          if (csts == 0) {
+          if (csts == 0)
+          {
             SET_ERRNO_STS;
             break;
           }
 
-          if (dh_old.valid) {
+          if (dh_old.valid)
+          {
             /* Find object */
 
-            if (dh_old.dynamic) {
-              strp
-                  = strchr(dh_old.dataname, '.'); /* always is a full object! */
+            if (dh_old.dynamic)
+            {
+              strp = strchr(dh_old.dataname, '.'); /* always is a full object! */
               if (strp != NULL)
                 *strp = '\0'; /* Just make sure... */
 
-              sts = gdh_CreateObject(dh_old.dataname, dh_old.cid,
-                  dh_old.attrref.Size, &objid, dh_old.attrref.Objid, 0,
-                  pwr_cNObjid);
+              sts = gdh_CreateObject(dh_old.dataname, dh_old.cid, dh_old.attrref.Size, &objid,
+                                     dh_old.attrref.Objid, 0, pwr_cNObjid);
 
               if (strp != NULL)
                 *strp = '.';
 
               if (ODD(sts))
-                sts = gdh_SetObjectInfo(
-                    dh_old.dataname, datap, dh_old.attrref.Size);
+                sts = gdh_SetObjectInfo(dh_old.dataname, datap, dh_old.attrref.Size);
             } /* Dynamic object */
-            else {
-              sts = gdh_SetObjectInfoAttrref(
-                  &dh_old.attrref, datap, dh_old.attrref.Size);
+            else
+            {
+              sts = gdh_SetObjectInfoAttrref(&dh_old.attrref, datap, dh_old.attrref.Size);
             }
           } /* valid segment */
 
           free(datap);
 
-          if (EVEN(sts)) {
-            errh_Error(
-                "BACKUP error reloading %s, reason:\n%m", dh_old.dataname, sts);
+          if (EVEN(sts))
+          {
+            errh_Error("BACKUP error reloading %s, reason:\n%m", dh_old.dataname, sts);
             sts = 1;
           }
 
@@ -175,43 +183,52 @@ pwr_tStatus bck_LoadBackup()
         if (EVEN(sts))
           break; /* Fatal! Get out! */
       } /* For each cycle */
-    } else if (fh.version == BCK_FILE_VERSION - 1) {
+    }
+    else if (fh.version == BCK_FILE_VERSION - 1)
+    {
       /* Read the cycle data.  */
       BCK_FILEHEAD_STRUCT_V6* fhp_v6 = (BCK_FILEHEAD_STRUCT_V6*)&fh;
       BCK_CYCLEHEAD_STRUCT_V6 ch_v6;
 
-      for (c = 0; c < 2; c++) {
+      for (c = 0; c < 2; c++)
+      {
         fseek(f, fhp_v6->curdata[c], 0);
         fread(&ch_v6, sizeof ch_v6, 1, f);
 
         /* Work thru the data segments */
 
-        for (d = 0; d < ch_v6.segments; d++) {
+        for (d = 0; d < ch_v6.segments; d++)
+        {
           csts = fread(&dh, sizeof dh, 1, f);
-          if (csts != 0) {
-            if (dh.namesize > 0) {
+          if (csts != 0)
+          {
+            if (dh.namesize > 0)
+            {
               namep = malloc(dh.namesize + 1);
               csts = fread(namep, dh.namesize + 1, 1, f);
-            } else
+            }
+            else
               namep = NULL;
             datap = malloc(dh.size);
             csts = fread(datap, dh.size, 1, f);
           }
-          if (csts == 0) {
+          if (csts == 0)
+          {
             SET_ERRNO_STS;
             break;
           }
 
-          if (dh.valid) {
+          if (dh.valid)
+          {
             /* Find object */
 
-            if (dh.dynamic) {
+            if (dh.dynamic)
+            {
               strp = strchr(namep, '.'); /* always is a full object! */
               if (strp != NULL)
                 *strp = '\0'; /* Just make sure... */
 
-              sts = gdh_CreateObject(
-                  namep, dh.cid, dh.size, &objid, dh.objid, 0, pwr_cNObjid);
+              sts = gdh_CreateObject(namep, dh.cid, dh.size, &objid, dh.objid, 0, pwr_cNObjid);
 
               if (strp != NULL)
                 *strp = '.';
@@ -221,19 +238,20 @@ pwr_tStatus bck_LoadBackup()
 
               strncpy(objectname, namep, pwr_cSizAName);
             } /* Dynamic object */
-            else {
-              sts = gdh_ObjidToName(
-                  dh.objid, objectname, sizeof(objectname), cdh_mNName);
-              if (ODD(sts)) {
+            else
+            {
+              sts = gdh_ObjidToName(dh.objid, objectname, sizeof(objectname), cdh_mNName);
+              if (ODD(sts))
+              {
                 strcat(objectname, namep);
                 sts = gdh_SetObjectInfo(objectname, datap, dh.size);
               }
             }
           } /* valid segment */
 
-          if (EVEN(sts)) {
-            errh_Error(
-                "BACKUP error reloading %s, reason:\n%m", objectname, sts);
+          if (EVEN(sts))
+          {
+            errh_Error("BACKUP error reloading %s, reason:\n%m", objectname, sts);
             sts = 1;
           }
 
@@ -244,42 +262,51 @@ pwr_tStatus bck_LoadBackup()
         if (EVEN(sts))
           break; /* Fatal! Get out! */
       } /* For each cycle */
-    } else if (fh.version == BCK_FILE_VERSION) {
+    }
+    else if (fh.version == BCK_FILE_VERSION)
+    {
       /* Read the cycle data.  */
 
-      for (c = 0; c < 2; c++) {
+      for (c = 0; c < 2; c++)
+      {
         fseek(f, fh.curdata[c], 0);
         fread(&ch, sizeof ch, 1, f);
 
         /* Work thru the data segments */
 
-        for (d = 0; d < ch.segments; d++) {
+        for (d = 0; d < ch.segments; d++)
+        {
           csts = fread(&dh, sizeof dh, 1, f);
-          if (csts != 0) {
-            if (dh.namesize > 0) {
+          if (csts != 0)
+          {
+            if (dh.namesize > 0)
+            {
               namep = malloc(dh.namesize + 1);
               csts = fread(namep, dh.namesize + 1, 1, f);
-            } else
+            }
+            else
               namep = NULL;
             datap = malloc(dh.size);
             csts = fread(datap, dh.size, 1, f);
           }
-          if (csts == 0) {
+          if (csts == 0)
+          {
             SET_ERRNO_STS;
             break;
           }
 
-          if (dh.valid) {
+          if (dh.valid)
+          {
             /* Find object */
             strcpy(objectname, "");
 
-            if (dh.dynamic) {
+            if (dh.dynamic)
+            {
               strp = strchr(namep, '.'); /* always is a full object! */
               if (strp != NULL)
                 *strp = '\0'; /* Just make sure... */
 
-              sts = gdh_CreateObject(
-                  namep, dh.cid, dh.size, &objid, dh.objid, 0, pwr_cNObjid);
+              sts = gdh_CreateObject(namep, dh.cid, dh.size, &objid, dh.objid, 0, pwr_cNObjid);
 
               if (strp != NULL)
                 *strp = '.';
@@ -289,20 +316,22 @@ pwr_tStatus bck_LoadBackup()
 
               strncpy(objectname, namep, pwr_cSizAName);
             } /* Dynamic object */
-            else {
-              sts = gdh_ObjidToName(
-                  dh.objid, objectname, sizeof(objectname), cdh_mNName);
-              if (ODD(sts)) {
+            else
+            {
+              sts = gdh_ObjidToName(dh.objid, objectname, sizeof(objectname), cdh_mNName);
+              if (ODD(sts))
+              {
                 strcat(objectname, namep);
                 sts = gdh_SetObjectInfo(objectname, datap, dh.size);
-              } else
+              }
+              else
                 cdh_OidToString(objectname, sizeof(objectname), dh.objid, 1);
             }
           } /* valid segment */
 
-          if (EVEN(sts)) {
-            errh_Error(
-                "BACKUP error reloading %s, reason:\n%m", objectname, sts);
+          if (EVEN(sts))
+          {
+            errh_Error("BACKUP error reloading %s, reason:\n%m", objectname, sts);
             sts = 1;
           }
 
@@ -314,7 +343,8 @@ pwr_tStatus bck_LoadBackup()
           break; /* Fatal! Get out! */
       } /* For each cycle */
     } /* File version format ok */
-    else {
+    else
+    {
       errh_Error("BACKUP Cannot load backup file with version %d", fh.version);
     }
   } /* Successful header read */

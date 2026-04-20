@@ -52,17 +52,14 @@
 #include "cow_xhelp.h"
 
 static int nodelist_ge_is_authorized_cb(void* xnav, unsigned int access);
-static int nodelist_ge_command_cb(void* ctx, char* command, char* script, 
-    char *scriptargs, void* caller);
+static int nodelist_ge_command_cb(void* ctx, char* command, char* script, char* scriptargs, void* caller);
 static void nodelist_ge_close_cb(void* xnl, void* ctx);
 static int nodelist_ge_extern_connect_cb(void* xnl, char* name, void** p, pwr_tRefId* id);
 
-
-Nodelist::Nodelist(void* nodelist_parent_ctx, const char* nodelist_name,
-    int nodelist_mode, nl_mLayout nodelist_layout, pwr_tStatus* status)
-    : parent_ctx(nodelist_parent_ctx), nodelistnav(NULL), nodelist_displayed(0),
-      help_cb(0), close_cb(0), mode(nodelist_mode),
-      layout(nodelist_layout), map_gectx(0), scriptmode(0), verify(0),
+Nodelist::Nodelist(void* nodelist_parent_ctx, const char* nodelist_name, int nodelist_mode,
+                   nl_mLayout nodelist_layout, pwr_tStatus* status)
+    : parent_ctx(nodelist_parent_ctx), nodelistnav(NULL), nodelist_displayed(0), help_cb(0), close_cb(0),
+      mode(nodelist_mode), layout(nodelist_layout), map_gectx(0), scriptmode(0), verify(0),
       ccm_func_registred(0), command_open(0)
 {
   strcpy(remote_gui, "");
@@ -72,14 +69,11 @@ Nodelist::Nodelist(void* nodelist_parent_ctx, const char* nodelist_name,
 //
 //  Delete nodelist
 //
-Nodelist::~Nodelist()
-{
-}
+Nodelist::~Nodelist() {}
 
 void Nodelist::activate_help()
 {
-  CoXHelp::dhelp("opg_statusmonitor", 0, navh_eHelpFile_Other,
-      "$pwr_lang/man_opg.dat", true);
+  CoXHelp::dhelp("opg_statusmonitor", 0, navh_eHelpFile_Other, "$pwr_lang/man_opg.dat", true);
 }
 
 void Nodelist::find_node_cb(void* ctx, pwr_tOid oid)
@@ -90,9 +84,8 @@ void Nodelist::find_node_cb(void* ctx, pwr_tOid oid)
     nodelist->pop();
 }
 
-void Nodelist::add_node_ok(
-    Nodelist* nodelist, char* node_name, char* address, char* busid, char* description, 
-    char* opplace)
+void Nodelist::add_node_ok(Nodelist* nodelist, char* node_name, char* address, char* busid, char* description,
+                           char* opplace)
 {
   int bus;
   sscanf(busid, "%d", &bus);
@@ -101,19 +94,16 @@ void Nodelist::add_node_ok(
 
 void Nodelist::activate_add_node()
 {
-  open_add_input_dialog(
-      "Node name", "Address", "Busid", "Description", "Operatorplace", 
-      "Add Node", "", add_node_ok);
+  open_add_input_dialog("Node name", "Address", "Busid", "Description", "Operatorplace", "Add Node", "",
+                        add_node_ok);
 }
 
-void Nodelist::mod_node_ok(
-    Nodelist* nodelist, char* node_name, char *address, char* busid, char* description, 
-    char* opplace)
+void Nodelist::mod_node_ok(Nodelist* nodelist, char* node_name, char* address, char* busid, char* description,
+                           char* opplace)
 {
   int bus;
   sscanf(busid, "%d", &bus);
-  nodelist->nodelistnav->set_node_data(nodelist->selected_idx, node_name, address,
-      bus, opplace, description);
+  nodelist->nodelistnav->set_node_data(nodelist->selected_idx, node_name, address, bus, opplace, description);
 }
 
 void Nodelist::activate_modify_node()
@@ -128,7 +118,8 @@ void Nodelist::activate_modify_node()
   char descr[80];
 
   sts = nodelistnav->get_selected_node(node_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     nodelistnav->wow->DisplayError("Remove Node", "Select a node");
     return;
   }
@@ -140,11 +131,11 @@ void Nodelist::activate_modify_node()
   if (EVEN(sts))
     return;
 
-  sprintf(busidstr, "%d", busid); 
+  sprintf(busidstr, "%d", busid);
   sprintf(title, "Modify node %s", node_name);
 
-  open_mod_input_dialog("Node", "Address", "Busid", "Description", "Operatorplace", title,
-			node_name, address, busidstr, descr, opplace, mod_node_ok);
+  open_mod_input_dialog("Node", "Address", "Busid", "Description", "Operatorplace", title, node_name, address,
+                        busidstr, descr, opplace, mod_node_ok);
 }
 
 void remove_node_ok(void* ctx, void* data)
@@ -158,15 +149,15 @@ void Nodelist::activate_remove_node()
 {
   static char node_name[80];
   int sts = nodelistnav->get_selected_node(node_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     nodelistnav->wow->DisplayError("Remove Node", "Select a node");
     return;
   }
   char msg[27 + sizeof(node_name) + 1];
   sprintf(msg, "Do you want to remove node %s", node_name);
 
-  nodelistnav->wow->DisplayQuestion(
-      this, "Remove Node", msg, remove_node_ok, NULL, node_name);
+  nodelistnav->wow->DisplayQuestion(this, "Remove Node", msg, remove_node_ok, NULL, node_name);
 }
 
 void Nodelist::activate_open_xtt()
@@ -175,7 +166,8 @@ void Nodelist::activate_open_xtt()
   int sts;
 
   sts = nodelistnav->get_selected_node(node_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     nodelistnav->wow->DisplayError("Open Xtt", "Select a node");
     return;
   }
@@ -193,7 +185,8 @@ void Nodelist::activate_open_opplace()
   pwr_tOName opplace;
 
   sts = nodelistnav->get_selected_node(node_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     nodelistnav->wow->DisplayError("Open Xtt", "Select a node");
     return;
   }
@@ -211,7 +204,8 @@ void Nodelist::activate_open_rtmon()
   int sts;
 
   sts = nodelistnav->get_selected_node(node_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     nodelistnav->wow->DisplayError("Open Runtime Monitor", "Select a node");
     return;
   }
@@ -224,9 +218,12 @@ void Nodelist::activate_open_rtmon()
 
 void Nodelist::activate_open_map()
 {
-  if (map_gectx) {
+  if (map_gectx)
+  {
     map_gectx->pop();
-  } else {
+  }
+  else
+  {
     pwr_tCmd cmd;
 
     sprintf(cmd, "open graph statusmon_map /title=Map");
@@ -234,13 +231,9 @@ void Nodelist::activate_open_map()
   }
 }
 
-static int nodelist_ge_is_authorized_cb(void* xnav, unsigned int access)
-{
-  return 1;
-}
+static int nodelist_ge_is_authorized_cb(void* xnav, unsigned int access) { return 1; }
 
-static int nodelist_ge_command_cb(
-    void* ctx, char* command, char* script, char *scriptargs, void* caller)
+static int nodelist_ge_command_cb(void* ctx, char* command, char* script, char* scriptargs, void* caller)
 {
   Nodelist* nl = (Nodelist*)ctx;
 
@@ -264,23 +257,25 @@ static int nodelist_ge_extern_connect_cb(void* xnl, char* name, void** p, pwr_tR
   Nodelist* nl = (Nodelist*)xnl;
   char node[160];
   char attr[80];
-  char *s;
+  char* s;
 
   strncpy(node, name, sizeof(node));
   s = strchr(node, '.');
   if (!s)
     return 0;
-  *s = 0;  
-  strncpy(attr, s+1, sizeof(attr));
-  
-  for (int i = 0; i < (int)nl->nodelistnav->node_list.size(); i++) {
-    if (streq(node, nl->nodelistnav->node_list[i].node_name)) {
+  *s = 0;
+  strncpy(attr, s + 1, sizeof(attr));
+
+  for (int i = 0; i < (int)nl->nodelistnav->node_list.size(); i++)
+  {
+    if (streq(node, nl->nodelistnav->node_list[i].node_name))
+    {
       if (streq(attr, "SystemStatus"))
-	*p = &nl->nodelistnav->node_list[i].item->data.SystemStatus;
+        *p = &nl->nodelistnav->node_list[i].item->data.SystemStatus;
       if (streq(attr, "CurrentStatus"))
-	*p = &nl->nodelistnav->node_list[i].item->data.CurrentStatus;
+        *p = &nl->nodelistnav->node_list[i].item->data.CurrentStatus;
       else if (streq(attr, "Description"))
-	*p = &nl->nodelistnav->node_list[i].description;
+        *p = &nl->nodelistnav->node_list[i].description;
       *id = pwr_cNRefId;
       return 1;
     }
@@ -290,28 +285,22 @@ static int nodelist_ge_extern_connect_cb(void* xnl, char* name, void** p, pwr_tR
   return 0;
 }
 
-void Nodelist::activate_save()
-{
-  nodelistnav->save();
-}
+void Nodelist::activate_save() { nodelistnav->save(); }
 
-void Nodelist::activate_reconnect()
-{
-  nodelistnav->reconnect();
-}
+void Nodelist::activate_reconnect() { nodelistnav->reconnect(); }
 
-void Nodelist::message(char severity, const char *msg)
-{
-  printf("SMON-%c, %s\n", severity, msg);
-}
+void Nodelist::message(char severity, const char* msg) { printf("SMON-%c, %s\n", severity, msg); }
 
-int Nodelist::open_graph(char *name, char *title, int width, int height)
+int Nodelist::open_graph(char* name, char* title, int width, int height)
 {
-  CowGe *gectx;
+  CowGe* gectx;
 
-  if ((gectx = appl.find(name)) ) {
+  if ((gectx = appl.find(name)))
+  {
     gectx->pop();
-  } else {
+  }
+  else
+  {
     pwr_tFileName fname;
     int width = 0;
     int height = 0;
@@ -323,22 +312,21 @@ int Nodelist::open_graph(char *name, char *title, int width, int height)
       title = name;
     if (strchr(name, '/'))
       strcpy(fname, name);
-    else {
+    else
+    {
       strcpy(fname, "$pwrp_exe/");
       strcat(fname, name);
     }
     if (strchr(name, ','))
       strcat(fname, ".pwg");
-	
-    gectx = ge_new(title, fname, 0, 0, 0, width,
-        height, x, y, scantime, 0, 0, ~0,
-	0, 0, 0, 0, 0, 
-        &nodelist_ge_command_cb, 0, 
-	&nodelist_ge_is_authorized_cb, 0, &nodelist_ge_extern_connect_cb);
+
+    gectx =
+        ge_new(title, fname, 0, 0, 0, width, height, x, y, scantime, 0, 0, ~0, 0, 0, 0, 0, 0,
+               &nodelist_ge_command_cb, 0, &nodelist_ge_is_authorized_cb, 0, &nodelist_ge_extern_connect_cb);
     gectx->close_cb = nodelist_ge_close_cb;
 
     NlApplListElem e;
-    strcpy(e.name,name);
+    strcpy(e.name, name);
     e.gectx = gectx;
     appl.add(e);
   }

@@ -57,26 +57,21 @@
 // Static pointer to Ev for mh callbacks
 Ev* Ev::ev = 0;
 
-Ev::Ev(void* ev_parent_ctx, char* eve_name, char* ala_name, char* blk_name,
-    pwr_tObjid ev_user, int display_ala, int display_eve, int display_blk,
-    int display_return, int display_ack, int ev_beep, pwr_tMask ev_pop_mask,
-    int ev_eventname_seg, pwr_tStatus* status)
+Ev::Ev(void* ev_parent_ctx, char* eve_name, char* ala_name, char* blk_name, pwr_tObjid ev_user,
+       int display_ala, int display_eve, int display_blk, int display_return, int display_ack, int ev_beep,
+       pwr_tMask ev_pop_mask, int ev_eventname_seg, pwr_tStatus* status)
     : parent_ctx(ev_parent_ctx), user(ev_user), eve_display_ack(display_ack),
-      eve_display_return(display_return), start_trace_cb(NULL),
-      display_in_xnav_cb(NULL), update_info_cb(NULL), help_cb(NULL),
-      popup_menu_cb(0), sound_cb(0), pop_cb(0), is_authorized_cb(0), eve(NULL),
-      ala(NULL), blk(0), connected(0), ala_displayed(0), eve_displayed(0),
-      beep(ev_beep), pop_mask(ev_pop_mask), eventname_seg(ev_eventname_seg),
-      sala_cnt(0), seve_cnt(0), modified(0)
+      eve_display_return(display_return), start_trace_cb(NULL), display_in_xnav_cb(NULL),
+      update_info_cb(NULL), help_cb(NULL), popup_menu_cb(0), sound_cb(0), pop_cb(0), is_authorized_cb(0),
+      eve(NULL), ala(NULL), blk(0), connected(0), ala_displayed(0), eve_displayed(0), beep(ev_beep),
+      pop_mask(ev_pop_mask), eventname_seg(ev_eventname_seg), sala_cnt(0), seve_cnt(0), modified(0)
 {
 }
 
 //
 //  Delete ev
 //
-Ev::~Ev()
-{
-}
+Ev::~Ev() {}
 
 void Ev::eve_start_trace_cb(void* ctx, pwr_tObjid objid, char* name)
 {
@@ -96,12 +91,11 @@ void Ev::blk_start_trace_cb(void* ctx, pwr_tObjid objid, char* name)
     ((Ev*)ctx)->start_trace_cb(((Ev*)ctx)->parent_ctx, objid, name);
 }
 
-void Ev::ev_popup_menu_cb(void* ctx, pwr_tAttrRef attrref,
-    unsigned long item_type, unsigned long utility, char* arg, int x, int y)
+void Ev::ev_popup_menu_cb(void* ctx, pwr_tAttrRef attrref, unsigned long item_type, unsigned long utility,
+                          char* arg, int x, int y)
 {
   if (((Ev*)ctx)->popup_menu_cb)
-    (((Ev*)ctx)->popup_menu_cb)(
-        ((Ev*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
+    (((Ev*)ctx)->popup_menu_cb)(((Ev*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
 }
 
 int Ev::ev_sound_cb(void* ctx, pwr_tAttrRef* attrref)
@@ -123,10 +117,7 @@ void Ev::ala_selection_changed_cb(void* ctx)
   ((Ev*)ctx)->ala_sup_methodtoolbar->set_sensitive();
 }
 
-char* Ev::ev_name_to_alias_cb(void* ctx, char* name)
-{
-  return ((Ev*)ctx)->name_to_alias(name);
-}
+char* Ev::ev_name_to_alias_cb(void* ctx, char* name) { return ((Ev*)ctx)->name_to_alias(name); }
 
 void Ev::eve_display_in_xnav_cb(void* ctx, pwr_tAttrRef* arp)
 {
@@ -186,7 +177,8 @@ void Ev::sala_close_cb(void* ctx, EvAla* sala)
   Ev* ev = (Ev*)ctx;
 
   bool found = false;
-  for (int i = 0; i < ev->sala_cnt; i++) {
+  for (int i = 0; i < ev->sala_cnt; i++)
+  {
     if (ev->sala[i] == sala)
       found = true;
     if (found && i != ev->sala_cnt - 1)
@@ -223,7 +215,8 @@ void Ev::seve_close_cb(void* ctx, EvEve* seve)
   Ev* ev = (Ev*)ctx;
 
   bool found = false;
-  for (int i = 0; i < ev->seve_cnt; i++) {
+  for (int i = 0; i < ev->seve_cnt; i++)
+  {
     if (ev->seve[i] == seve)
       found = true;
     if (found && i != ev->seve_cnt - 1)
@@ -237,7 +230,8 @@ void Ev::help_event_cb(void* ctx, void* item)
 {
   ItemAlarm* aitem = (ItemAlarm*)item;
 
-  switch (aitem->type) {
+  switch (aitem->type)
+  {
   case evlist_eItemType_Alarm:
     ((Ev*)ctx)->wow->DisplayText("Event MoreText", aitem->eventmoretext);
     break;
@@ -272,24 +266,24 @@ void Ev::blk_activate_print()
 
 void Ev::eve_activate_export()
 {
-  wow->CreateFileSelDia("Export", (void*)this,
-      eve_export_file_selected_cb, wow_eFileSelType_Tmp, wow_eFileSelAction_Save);
+  wow->CreateFileSelDia("Export", (void*)this, eve_export_file_selected_cb, wow_eFileSelType_Tmp,
+                        wow_eFileSelAction_Save);
 }
 
-void Ev::eve_export_file_selected_cb(void *ctx, char *filename, wow_eFileSelType file_type)
+void Ev::eve_export_file_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type)
 {
-  ((Ev *)ctx)->eve_export_events(filename);  
+  ((Ev*)ctx)->eve_export_events(filename);
 }
 
-int Ev::eve_export_events(const char *filename)
+int Ev::eve_export_events(const char* filename)
 {
-  brow_tObject *list;
+  brow_tObject* list;
   int list_cnt;
-  ItemAlarm *item;
+  ItemAlarm* item;
   char timstr[40];
   char supobjectstr[80];
   pwr_tFileName fname;
-  FILE *fp;
+  FILE* fp;
 
   dcli_translate_filename(fname, filename);
   fp = fopen(fname, "w");
@@ -297,16 +291,16 @@ int Ev::eve_export_events(const char *filename)
     return 0;
   fprintf(fp, "Time,Type,Prio,Text,Name,SupObject,Id,Status\n");
   brow_GetObjectList(eve->brow->ctx, &list, &list_cnt);
-  for (int i = list_cnt - 1; i >= 0; i--) {
-    brow_GetUserData(list[i], (void **)&item);
+  for (int i = list_cnt - 1; i >= 0; i--)
+  {
+    brow_GetUserData(list[i], (void**)&item);
     time_AtoAscii(&item->time, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
     strcpy(supobjectstr, cdh_ObjidToString(item->supobject.Objid, 1));
     if (item->supobject.Flags.b.ObjectAttr)
-      sprintf(&supobjectstr[strlen(supobjectstr)], "#%u:%u", item->supobject.Offset,
-	      item->supobject.Size);
-    fprintf(fp, "%s,%u,%lu,\"%s\",\"%s\",%s,\"(%u,%u)\",%u\n",
-	   timstr, item->eventtype, item->eventprio, item->eventtext, item->eventname, 
-	   supobjectstr, item->eventid.Nix, item->eventid.Idx, item->status);
+      sprintf(&supobjectstr[strlen(supobjectstr)], "#%u:%u", item->supobject.Offset, item->supobject.Size);
+    fprintf(fp, "%s,%u,%lu,\"%s\",\"%s\",%s,\"(%u,%u)\",%u\n", timstr, item->eventtype, item->eventprio,
+            item->eventtext, item->eventname, supobjectstr, item->eventid.Nix, item->eventid.Idx,
+            item->status);
   }
   fclose(fp);
   return 1;
@@ -314,7 +308,7 @@ int Ev::eve_export_events(const char *filename)
 
 void Ev::eve_activate_analyse()
 {
-  eve_export_events("$pwrp_tmp/pwr_eventlist.dat");  
+  eve_export_events("$pwrp_tmp/pwr_eventlist.dat");
   system("sev_eva.py -f $pwrp_tmp/pwr_eventlist.dat &");
 }
 
@@ -323,9 +317,7 @@ void Ev::eve_activate_ack_last()
   mh_sEventId* id;
   int sts;
 
-  if (is_authorized_cb
-      && !is_authorized_cb(
-             parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
+  if (is_authorized_cb && !is_authorized_cb(parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
     return;
 
   sts = ala->get_last_not_acked(&id);
@@ -350,17 +342,18 @@ void Ev::ala_activate_ack_last()
   mh_sEventId* id;
   int sts;
 
-  if (is_authorized_cb
-      && !is_authorized_cb(
-             parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
+  if (is_authorized_cb && !is_authorized_cb(parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
     return;
 
-  if (ala->brow == ala->browbase) {
+  if (ala->brow == ala->browbase)
+  {
     // Flat view, acknowledge last
     sts = ala->get_last_not_acked(&id);
     if (EVEN(sts))
       return;
-  } else {
+  }
+  else
+  {
     // Tree view, acknowledge selected
     ItemAlarm* item;
     pwr_tAName eventname;
@@ -369,7 +362,8 @@ void Ev::ala_activate_ack_last()
     if (EVEN(sts))
       return;
 
-    switch (item->type) {
+    switch (item->type)
+    {
     case evlist_eItemType_Alarm:
       id = &item->eventid;
       break;
@@ -393,9 +387,7 @@ void Ev::ala_activate_ack_last()
 
 void Ev::eve_activate_ack_all()
 {
-  if (is_authorized_cb
-      && !is_authorized_cb(
-             parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
+  if (is_authorized_cb && !is_authorized_cb(parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
     return;
 
   ack_all();
@@ -413,9 +405,11 @@ void Ev::eve_activate_helpevent()
   int sts;
   ItemAlarm* item;
 
-  if (help_cb) {
+  if (help_cb)
+  {
     sts = ev->eve->get_selected_event(eventname, &item);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       wow->DisplayText(eventname, item->eventmoretext);
     }
   }
@@ -433,9 +427,11 @@ void Ev::ala_activate_helpevent()
   int sts;
   ItemAlarm* item;
 
-  if (help_cb) {
+  if (help_cb)
+  {
     sts = ala->get_selected_event(eventname, &item);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       wow->DisplayText(eventname, item->eventmoretext);
     }
   }
@@ -459,9 +455,9 @@ int Ev::outunit_connect(pwr_tObjid user)
   // Wait for mh has flagged initizated
   mh_UtilWaitForMh();
 
-  sts = mh_OutunitConnect(user, mh_eOutunitType_Operator, 0, mh_ack_bc,
-      mh_alarm_bc, mh_block_bc, mh_cancel_bc, mh_clear_alarmlist_bc,
-      mh_clear_blocklist_bc, mh_info_bc, mh_return_bc, mh_alarmstatus_bc);
+  sts = mh_OutunitConnect(user, mh_eOutunitType_Operator, 0, mh_ack_bc, mh_alarm_bc, mh_block_bc,
+                          mh_cancel_bc, mh_clear_alarmlist_bc, mh_clear_blocklist_bc, mh_info_bc,
+                          mh_return_bc, mh_alarmstatus_bc);
   if (EVEN(sts))
     return sts;
 
@@ -476,8 +472,10 @@ void Ev::update(double scantime)
   int redraw = 0;
 
   sts = mh_OutunitReceive();
-  while (ODD(sts)) {
-    if (!nodraw_set) {
+  while (ODD(sts))
+  {
+    if (!nodraw_set)
+    {
       eve->set_nodraw();
       ala->set_nodraw();
       nodraw_set = 1;
@@ -485,11 +483,15 @@ void Ev::update(double scantime)
     sts = mh_OutunitReceive();
     redraw = redraw | ev->modified;
   }
-  if (nodraw_set) {
-    if (redraw) {
+  if (nodraw_set)
+  {
+    if (redraw)
+    {
       eve->reset_nodraw();
       ala->reset_nodraw();
-    } else {
+    }
+    else
+    {
       brow_ResetNodraw(eve->brow->ctx);
       brow_ResetNodraw(ala->brow->ctx);
     }
@@ -507,13 +509,12 @@ void Ev::ack_last_prio(unsigned long type, unsigned long prio, int backward, int
   mh_sEventId* id;
   int sts;
 
-  if (is_authorized_cb
-      && !is_authorized_cb(
-             parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
+  if (is_authorized_cb && !is_authorized_cb(parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
     return;
 
   sts = ala->get_last_not_acked_prio(&id, type, prio, backward, timecheck);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     mh_sEventId lid = *id;
 
     ala->ack(id);
@@ -536,9 +537,7 @@ void Ev::ack_all()
   int num;
   int idx;
 
-  if (is_authorized_cb
-      && !is_authorized_cb(
-             parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
+  if (is_authorized_cb && !is_authorized_cb(parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
     return;
 
   num = ala->get_num_not_acked();
@@ -549,7 +548,8 @@ void Ev::ack_all()
 
   idx = 0;
   sts = ala->get_last_not_acked(&id);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     mh_sEventId lid = *id;
     ala->ack(id);
     eve->ack(id);
@@ -571,8 +571,7 @@ void Ev::ack_all()
   free((char*)idv);
 }
 
-int Ev::get_last_not_acked_prio(
-    mh_sEventId** id, unsigned long type, unsigned long prio)
+int Ev::get_last_not_acked_prio(mh_sEventId** id, unsigned long type, unsigned long prio)
 {
   return ala->get_last_not_acked_prio(id, type, prio, 0, 0);
 }
@@ -585,18 +584,18 @@ void Ev::create_aliaslist(void* up)
   int alias_size;
   ev_sAlias dum;
   pwr_sClass_OpPlace* userp = (pwr_sClass_OpPlace*)up;
-  int listsize
-      = MIN(sizeof(userp->EventSelectList) / sizeof(userp->EventSelectList[0]),
-          sizeof(alias_list) / sizeof(alias_list[0]));
+  int listsize = MIN(sizeof(userp->EventSelectList) / sizeof(userp->EventSelectList[0]),
+                     sizeof(alias_list) / sizeof(alias_list[0]));
 
-  for (i = 0, j = 0; i < listsize; i++) {
+  for (i = 0, j = 0; i < listsize; i++)
+  {
     strcpy(alias_list[i].Alias, "");
     strcpy(alias_list[i].Object, "");
   }
-  for (i = 0, j = 0; i < listsize; i++) {
-    nr = dcli_parse(userp->EventSelectList[i], " 	", "",
-        (char*)alias_array, sizeof(alias_array) / sizeof(alias_array[0]),
-        sizeof(alias_array[0]), 0);
+  for (i = 0, j = 0; i < listsize; i++)
+  {
+    nr = dcli_parse(userp->EventSelectList[i], " 	", "", (char*)alias_array,
+                    sizeof(alias_array) / sizeof(alias_array[0]), sizeof(alias_array[0]), 0);
     if (nr < 2)
       continue;
 
@@ -608,9 +607,12 @@ void Ev::create_aliaslist(void* up)
   alias_size = j;
 
   // Order
-  for (i = alias_size - 1; i > 0; i--) {
-    for (j = 0; j < i; j++) {
-      if (strcmp(alias_list[j].Object, alias_list[j + 1].Object) <= 0) {
+  for (i = alias_size - 1; i > 0; i--)
+  {
+    for (j = 0; j < i; j++)
+    {
+      if (strcmp(alias_list[j].Object, alias_list[j + 1].Object) <= 0)
+      {
         memcpy(&dum, &alias_list[j + 1], sizeof(dum));
         memcpy(&alias_list[j + 1], &alias_list[j], sizeof(dum));
         memcpy(&alias_list[j], &dum, sizeof(dum));
@@ -626,11 +628,12 @@ char* Ev::name_to_alias(char* name)
 
   str_ToUpper(oname, name);
 
-  for (int i = 0; i < (int)(sizeof(alias_list) / sizeof(alias_list[0])); i++) {
+  for (int i = 0; i < (int)(sizeof(alias_list) / sizeof(alias_list[0])); i++)
+  {
     if (alias_list[i].Alias[0] == 0)
       break;
-    if (!streq(alias_list[i].Object, "")
-        && str_StartsWith(oname, alias_list[i].Object)) {
+    if (!streq(alias_list[i].Object, "") && str_StartsWith(oname, alias_list[i].Object))
+    {
       strcpy(alias, alias_list[i].Alias);
       return alias;
     }
@@ -641,7 +644,8 @@ char* Ev::name_to_alias(char* name)
 
 pwr_tStatus Ev::mh_ack_bc(mh_sAck* MsgP)
 {
-  if (ev->eve_display_ack) {
+  if (ev->eve_display_ack)
+  {
     // Insert in eve
     ev->eve->event_ack(MsgP);
     for (int i = 0; i < ev->seve_cnt; i++)
@@ -660,7 +664,8 @@ pwr_tStatus Ev::mh_ack_bc(mh_sAck* MsgP)
 
 pwr_tStatus Ev::mh_return_bc(mh_sReturn* MsgP)
 {
-  if (ev->eve_display_return) {
+  if (ev->eve_display_return)
+  {
     // Insert in eve
     ev->eve->event_return(MsgP);
     for (int i = 0; i < ev->seve_cnt; i++)
@@ -688,10 +693,12 @@ pwr_tStatus Ev::mh_alarm_bc(mh_sMessage* MsgP)
   if (ev->update_info_cb)
     ev->update_info_cb(ev->parent_ctx);
   ev->ala->fill_alarm_tables();
-  if (ev->pop_cb) {
+  if (ev->pop_cb)
+  {
     int pop = 0;
 
-    switch (((mh_sMsgInfo*)MsgP)->EventPrio) {
+    switch (((mh_sMsgInfo*)MsgP)->EventPrio)
+    {
     case mh_eEventPrio_A:
       if (ev->pop_mask & pwr_mOpWindPopMask_Aalarm)
         pop = 1;
@@ -796,9 +803,11 @@ pwr_tStatus Ev::mh_alarmstatus_bc(mh_sAlarmStatus* MsgP)
   ev->ala->size = object_cnt;
 
   // Reset check to find obsolete items
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case evlist_eItemType_Alarm:
       if (MsgP->Nix == item->eventid.Nix)
         item->check = 0;
@@ -806,17 +815,20 @@ pwr_tStatus Ev::mh_alarmstatus_bc(mh_sAlarmStatus* MsgP)
     default:;
     }
   }
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case evlist_eItemType_Alarm:
-      for (j = 0; j < MsgP->Count; j++) {
-        if (MsgP->Nix == item->eventid.Nix
-            && MsgP->Sts[j].Idx == item->eventid.Idx) {
+      for (j = 0; j < MsgP->Count; j++)
+      {
+        if (MsgP->Nix == item->eventid.Nix && MsgP->Sts[j].Idx == item->eventid.Idx)
+        {
           found[j] = 1;
           item->check = 1;
-          if (!(MsgP->Sts[j].Status & mh_mEventStatus_NotRet)
-              && (item->status & mh_mEventStatus_NotRet)) {
+          if (!(MsgP->Sts[j].Status & mh_mEventStatus_NotRet) && (item->status & mh_mEventStatus_NotRet))
+          {
             pwr_tUInt32 status = item->status;
             mh_sReturn retmsg;
             memset(&retmsg, 0, sizeof(retmsg));
@@ -826,15 +838,16 @@ pwr_tStatus Ev::mh_alarmstatus_bc(mh_sAlarmStatus* MsgP)
             for (int k = 0; k < ev->sala_cnt; k++)
               ev->sala[k]->mh_return(&retmsg);
             modified = 1;
-            if (!(status & mh_mEventStatus_NotAck)) {
+            if (!(status & mh_mEventStatus_NotAck))
+            {
               // Item was removed
               i--;
               object_cnt--;
               continue;
             }
           }
-          if (!(MsgP->Sts[j].Status & mh_mEventStatus_NotAck)
-              && (item->status & mh_mEventStatus_NotAck)) {
+          if (!(MsgP->Sts[j].Status & mh_mEventStatus_NotAck) && (item->status & mh_mEventStatus_NotAck))
+          {
             pwr_tUInt32 status = item->status;
             mh_sAck ackmsg;
             memset(&ackmsg, 0, sizeof(ackmsg));
@@ -844,7 +857,8 @@ pwr_tStatus Ev::mh_alarmstatus_bc(mh_sAlarmStatus* MsgP)
             for (int k = 0; k < ev->sala_cnt; k++)
               ev->sala[k]->mh_ack(&ackmsg);
             modified = 1;
-            if (!(status & mh_mEventStatus_NotRet)) {
+            if (!(status & mh_mEventStatus_NotRet))
+            {
               // Item was removed
               i--;
               object_cnt--;
@@ -860,11 +874,14 @@ pwr_tStatus Ev::mh_alarmstatus_bc(mh_sAlarmStatus* MsgP)
 
   // Find and remove the obsolete items
   brow_GetObjectList(ev->ala->browbase->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case evlist_eItemType_Alarm:
-      if (MsgP->Nix == item->eventid.Nix && !item->check) {
+      if (MsgP->Nix == item->eventid.Nix && !item->check)
+      {
         mh_sEventId eventid = item->eventid;
         ev->ala->event_delete(&item->eventid);
         // Note, item is now deleted
@@ -880,7 +897,8 @@ pwr_tStatus Ev::mh_alarmstatus_bc(mh_sAlarmStatus* MsgP)
     }
   }
 
-  if (modified) {
+  if (modified)
+  {
     if (ev->update_info_cb)
       ev->update_info_cb(ev->parent_ctx);
     ev->ala->fill_alarm_tables();
@@ -890,8 +908,10 @@ pwr_tStatus Ev::mh_alarmstatus_bc(mh_sAlarmStatus* MsgP)
 
   rmsg = (mh_sOutunitAlarmReq*)calloc(1, sizeof(*rmsg));
   rmsg->Nix = MsgP->Nix;
-  for (j = 0; j < MsgP->Count; j++) {
-    if (!found[j]) {
+  for (j = 0; j < MsgP->Count; j++)
+  {
+    if (!found[j])
+    {
       // Request info about this id
       rmsg->Idx[rmsg->Count] = MsgP->Sts[j].Idx;
       rmsg->Count++;
@@ -914,12 +934,16 @@ pwr_tStatus Ev::set_view(pwr_tOid view)
   pwr_tStatus sts;
 
   sts = ala->set_view(view);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     pwr_tString80 name;
 
-    if (cdh_ObjidIsNull(view)) {
+    if (cdh_ObjidIsNull(view))
+    {
       strcpy(name, "Alarm List");
-    } else {
+    }
+    else
+    {
       pwr_tAttrRef name_ar, ar;
 
       ar = cdh_ObjidToAref(view);
@@ -945,12 +969,16 @@ void Ev::view_shift()
   if (EVEN(sts))
     return;
 
-  if (cdh_ObjidIsNull(ala->current_view)) {
+  if (cdh_ObjidIsNull(ala->current_view))
+  {
     set_view(opp->AlarmViews[0]);
-  } else {
-    for (unsigned int i = 0;
-         i < sizeof(opp->AlarmViews) / sizeof(opp->AlarmViews[0]); i++) {
-      if (cdh_ObjidIsEqual(ala->current_view, opp->AlarmViews[i])) {
+  }
+  else
+  {
+    for (unsigned int i = 0; i < sizeof(opp->AlarmViews) / sizeof(opp->AlarmViews[0]); i++)
+    {
+      if (cdh_ObjidIsEqual(ala->current_view, opp->AlarmViews[i]))
+      {
         if (i == sizeof(opp->AlarmViews) / sizeof(opp->AlarmViews[0]) - 1)
           set_view(pwr_cNObjid);
         else

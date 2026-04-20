@@ -44,7 +44,8 @@
 
 #include "ini_rc.h"
 
-typedef struct {
+typedef struct
+{
   char* name;
   int* var;
   int val;
@@ -54,8 +55,10 @@ static pwr_tStatus setRcValue(ini_sRc* def_rc, char* name, int interval)
 {
   ini_sRc* rc;
 
-  for (rc = def_rc; rc && rc->name; rc++) {
-    if (streq(rc->name, name)) {
+  for (rc = def_rc; rc && rc->name; rc++)
+  {
+    if (streq(rc->name, name))
+    {
       *rc->var = interval;
       return 1;
     }
@@ -67,13 +70,12 @@ static pwr_tStatus setRcValue(ini_sRc* def_rc, char* name, int interval)
 
 pwr_tStatus ini_RcReadAndSet(const char* dir, const char* nodename, int busid)
 {
-  ini_sRc def_rc[]
-      = { { "cacheTrim", (int*)&gdbroot->db->cache_trim_int, 1000 },
-          { "sancAdd", (int*)&gdbroot->db->sanc_add_int, 1000 },
-          { "sancExpired", (int*)&gdbroot->db->sanc_exp_int, 60000 },
-          { "sansCheck", (int*)&gdbroot->db->sans_chk_int, 1500 },
-          { "subcCheck", (int*)&gdbroot->db->subc_chk_int, 3000 },
-          { NULL, NULL, 0 } };
+  ini_sRc def_rc[] = {{"cacheTrim", (int*)&gdbroot->db->cache_trim_int, 1000},
+                      {"sancAdd", (int*)&gdbroot->db->sanc_add_int, 1000},
+                      {"sancExpired", (int*)&gdbroot->db->sanc_exp_int, 60000},
+                      {"sansCheck", (int*)&gdbroot->db->sans_chk_int, 1500},
+                      {"subcCheck", (int*)&gdbroot->db->subc_chk_int, 3000},
+                      {NULL, NULL, 0}};
 
   FILE* fp;
   ini_sRc* rc;
@@ -94,8 +96,8 @@ pwr_tStatus ini_RcReadAndSet(const char* dir, const char* nodename, int busid)
     return 1;
 
   printf("-- Reading rc file %s\n", filename);
-  for (s = fgets(buf, sizeof(buf) - 1, fp); s != NULL;
-       s = fgets(buf, sizeof(buf) - 1, fp)) {
+  for (s = fgets(buf, sizeof(buf) - 1, fp); s != NULL; s = fgets(buf, sizeof(buf) - 1, fp))
+  {
     if (buf[0] == '#' || buf[0] == 0)
       continue;
     printf("-- %s", buf);

@@ -53,14 +53,11 @@
 #include "xtt_log.h"
 #include "xtt_lognav.h"
 
-XttLog::~XttLog()
-{
-}
+XttLog::~XttLog() {}
 
-XttLog::XttLog(void* xn_parent_ctx, LogNav_hier *xn_tree)
-    : parent_ctx(xn_parent_ctx), tree(xn_tree), cologin(0), command_open(0),
-      close_cb(0), base_priv(pwr_mPrv_System), priv(pwr_mPrv_System), verify(0),
-      ccm_func_registred(0), wow(0), quiet(0)
+XttLog::XttLog(void* xn_parent_ctx, LogNav_hier* xn_tree)
+    : parent_ctx(xn_parent_ctx), tree(xn_tree), cologin(0), command_open(0), close_cb(0),
+      base_priv(pwr_mPrv_System), priv(pwr_mPrv_System), verify(0), ccm_func_registred(0), wow(0), quiet(0)
 {
   char default_priv[80];
 
@@ -68,7 +65,8 @@ XttLog::XttLog(void* xn_parent_ctx, LogNav_hier *xn_tree)
   strcpy(user, "");
 
   // Get default privilete from proview.cnf
-  if (cnf_get_value("sevXttDefaultPriv", default_priv, sizeof(default_priv))) {
+  if (cnf_get_value("sevXttDefaultPriv", default_priv, sizeof(default_priv)))
+  {
     if (str_NoCaseStrcmp(default_priv, "READ") == 0)
       priv = pwr_mPrv_SevRead;
     else if (str_NoCaseStrcmp(default_priv, "ADMIN") == 0)
@@ -77,7 +75,8 @@ XttLog::XttLog(void* xn_parent_ctx, LogNav_hier *xn_tree)
       priv = 0;
     else
       priv = 0;
-  } else
+  }
+  else
     priv = 0;
 }
 
@@ -86,10 +85,7 @@ void XttLog::message(void* xttlog, char severity, const char* message)
   ((XttLog*)xttlog)->message(severity, message);
 }
 
-int XttLog::command_cb(void* ctx, char* cmd)
-{
-  return ((XttLog*)ctx)->command(cmd);
-}
+int XttLog::command_cb(void* ctx, char* cmd) { return ((XttLog*)ctx)->command(cmd); }
 
 int XttLog::is_authorized(void* ctx, unsigned int access, int msg)
 {
@@ -98,7 +94,8 @@ int XttLog::is_authorized(void* ctx, unsigned int access, int msg)
 
 int XttLog::is_authorized(unsigned int access, int msg)
 {
-  if (!(priv & access)) {
+  if (!(priv & access))
+  {
     if (msg)
       message('I', "Not authorized for this operation");
     return 0;
@@ -154,20 +151,11 @@ void XttLog::activate_zoom_out()
   lognav->zoom(1.0 / 1.18);
 }
 
-void XttLog::activate_zoom_reset()
-{
-  lognav->unzoom();
-}
+void XttLog::activate_zoom_reset() { lognav->unzoom(); }
 
-void XttLog::activate_help()
-{
-  CoXHelp::dhelp("overview", "", navh_eHelpFile_Base, NULL, 0);
-}
+void XttLog::activate_help() { CoXHelp::dhelp("overview", "", navh_eHelpFile_Base, NULL, 0); }
 
-void XttLog::activate_help_project()
-{
-  CoXHelp::dhelp("index", "", navh_eHelpFile_Project, NULL, 0);
-}
+void XttLog::activate_help_project() { CoXHelp::dhelp("index", "", navh_eHelpFile_Project, NULL, 0); }
 
 void XttLog::activate_help_proview()
 {
@@ -181,20 +169,22 @@ void XttLog::sevhist_help_cb(void* ctx, const char* key)
   CoXHelp::dhelp(key, "", navh_eHelpFile_Base, NULL, 0);
 }
 
-int XttLog::sevhist_get_select_cb(
-    void* ctx, pwr_tOid* oid, char* aname, char* oname)
+int XttLog::sevhist_get_select_cb(void* ctx, pwr_tOid* oid, char* aname, char* oname)
 {
   XttLog* xttlog = (XttLog*)ctx;
   ItemBase* item;
 
-  if (!xttlog->lognav->get_select(&item)) {
+  if (!xttlog->lognav->get_select(&item))
+  {
     xttlog->message('E', "Select an storage item");
     return 0;
   }
 
-  switch (item->type) {
+  switch (item->type)
+  {
   case lognav_eItemType_Hier:
-  case lognav_eItemType_Entry: {
+  case lognav_eItemType_Entry:
+  {
     break;
   }
   default:

@@ -41,10 +41,11 @@
 
 #include "wb_expwnav.h"
 
-class WbExpWNavGtk : public WbExpWNav {
+class WbExpWNavGtk : public WbExpWNav
+{
 public:
-  WbExpWNavGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
-      ldh_tSession expw_ldhses, int l_type, int l_editmode, GtkWidget** w);
+  WbExpWNavGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid, ldh_tSession expw_ldhses, int l_type,
+               int l_editmode, GtkWidget** w);
   ~WbExpWNavGtk();
 
   GtkWidget* parent_wid;

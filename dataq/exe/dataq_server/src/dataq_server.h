@@ -42,45 +42,49 @@
 #include "pwr_dataqclasses.h"
 #include "dataq_net.h"
 
-class qsrv_node {
- public:
+class qsrv_node
+{
+public:
   pwr_tNodeId nid;
   char name[80];
   int connection;
 };
 
-class qsrv_convert_table {
- public:
-  unsigned int target_offset;
-  unsigned int source_offset;
-  unsigned int size;
-  pwr_tTid tid;
-  unsigned int feedback;
+class qsrv_convert_table
+{
+public:
+  unsigned int target_offset = 0;
+  unsigned int source_offset = 0;
+  unsigned int size = 0;
+  pwr_tTid tid = 0;
+  unsigned int feedback = 0;
 };
 
-class qsrv_data_converter {
- public:
-  unsigned int version;
+class qsrv_data_converter
+{
+public:
+  unsigned int version = 0;
   std::vector<qsrv_convert_table> conv;
 
   pwr_tStatus create_table(pwr_tCid target_cid, pwr_tCid source_cid);
-  unsigned int size() { return conv.size();}
+  unsigned int size() { return conv.size(); }
   unsigned int feedback_size();
   unsigned int table_and_data_msg_size();
   unsigned int data_msg_size();
   unsigned int feedback_data_msg_size();
-  void table_and_data_to_msg(char *mp, char *sourcep, unsigned int *msize);
-  void table_to_msg(char *mp, unsigned int *msize);
-  void msg_to_table(char *mp, unsigned int attr_num, unsigned int *msize);
-  void msg_to_target_data(char *mp, char *op, unsigned int *msize);
-  void msg_to_feedback_data(char *mp, char *op, unsigned int *msize);
-  void source_data_to_msg(char *mp, char *op, unsigned int *msize);
-  void feedback_data_to_msg(char *mp, char *op, unsigned int *msize);
-  pwr_tStatus from_message(char *mp, char *target);
+  void table_and_data_to_msg(char* mp, char* sourcep, unsigned int* msize);
+  void table_to_msg(char* mp, unsigned int* msize);
+  void msg_to_table(char* mp, unsigned int attr_num, unsigned int* msize);
+  void msg_to_target_data(char* mp, char* op, unsigned int* msize);
+  void msg_to_feedback_data(char* mp, char* op, unsigned int* msize);
+  void source_data_to_msg(char* mp, char* op, unsigned int* msize);
+  void feedback_data_to_msg(char* mp, char* op, unsigned int* msize);
+  pwr_tStatus from_message(char* mp, char* target);
 };
 
-class qsrv_rdataq_remoteq {
- public:
+class qsrv_rdataq_remoteq
+{
+public:
   qsrv_rdataq_remoteq() : aref(pwr_cNAttrRef), options(0), start(0), end(0) {}
   pwr_tAttrRef aref;
   pwr_tMask options;
@@ -88,23 +92,24 @@ class qsrv_rdataq_remoteq {
   unsigned int end;
 };
 
-class qsrv_rdataq {
- public:
-  pwr_tAttrRef aref;
-  pwr_sClass_RemoteDataQ* op;
-  pwr_sClass_DataQ1* src_op;
-  pwr_tDlid dlid;
-  pwr_tDlid src_dlid;
-  int node_idx;
-  unsigned int msg_size;
+class qsrv_rdataq
+{
+public:
+  pwr_tAttrRef aref = {};
+  pwr_sClass_RemoteDataQ* op = 0;
+  pwr_sClass_DataQ1* src_op = 0;
+  pwr_tDlid dlid = {};
+  pwr_tDlid src_dlid = {};
+  int node_idx = 0;
+  unsigned int msg_size = 0;
   std::vector<qsrv_rdataq_remoteq> remoteq;
   qsrv_data_converter dc;
 };
 
-class qsrv_tdataq_targetq {
- public:
-  qsrv_tdataq_targetq() : aref(pwr_cNAttrRef), options(0),
-    start(0), end(0), source(pwr_cNOid), op(0) {}
+class qsrv_tdataq_targetq
+{
+public:
+  qsrv_tdataq_targetq() : aref(pwr_cNAttrRef), options(0), start(0), end(0), source(pwr_cNOid), op(0) {}
   pwr_tAttrRef aref;
   pwr_tMask options;
   unsigned int start;
@@ -114,19 +119,21 @@ class qsrv_tdataq_targetq {
   pwr_tDlid dlid;
 };
 
-class qsrv_tdataq {
- public:
-  int node_idx;
-  int reply_nid;
-  pwr_tAttrRef rdataq;
-  pwr_tOName source_dataname;
-  unsigned int msg_size;
+class qsrv_tdataq
+{
+public:
+  int node_idx = 0;
+  int reply_nid = 0;
+  pwr_tAttrRef rdataq = {};
+  pwr_tOName source_dataname = {};
+  unsigned int msg_size = 0;
   std::vector<qsrv_tdataq_targetq> targetq;
   qsrv_data_converter dc;
 };
 
-class qsrv_rorder_copy {
- public:
+class qsrv_rorder_copy
+{
+public:
   unsigned int target_offset;
   unsigned int source_offset;
   unsigned int size;
@@ -134,48 +141,50 @@ class qsrv_rorder_copy {
   unsigned int feedback;
 };
 
-class qsrv_rorder {
- public:
-  pwr_tObjid oid;
-  pwr_sClass_QRemoteOrder* op;
-  pwr_tDlid dlid;
-  int node_idx;
-  unsigned int msg_size;
+class qsrv_rorder
+{
+public:
+  pwr_tObjid oid = {};
+  pwr_sClass_QRemoteOrder* op = 0;
+  pwr_tDlid dlid = {};
+  int node_idx = 0;
+  unsigned int msg_size = 0;
   qsrv_data_converter dc;
 };
 
-class qsrv_torder_copy {
- public:
+class qsrv_torder_copy
+{
+public:
   unsigned int source_offset;
   unsigned int target_offset;
   unsigned int size;
   pwr_tTid tid;
 };
 
-class qsrv_torder {
- public:
-  pwr_tObjid oid;
-  pwr_sClass_QTargetOrder* op;
-  pwr_tDlid dlid;
-  pwr_tOid rorder;
-  pwr_tMask options;
-  pwr_tCid data_class;
-  int reply_nid;
-  pwr_tOid reply_source;
-  unsigned int msg_size;
-  int initialized;
+class qsrv_torder
+{
+public:
+  pwr_tObjid oid = {};
+  pwr_sClass_QTargetOrder* op = 0;
+  pwr_tDlid dlid = {};
+  pwr_tOid rorder = {};
+  pwr_tMask options = 0;
+  pwr_tCid data_class = 0;
+  int reply_nid = 0;
+  pwr_tOid reply_source = {};
+  unsigned int msg_size = 0;
+  int initialized = 0;
   qsrv_data_converter dc;
 };
 
-class dataq_server {
- public:
-  dataq_server(): m_sts(DATAQ__SUCCESS), m_config(0), m_config_dlid(pwr_cNDlid), 
-    m_msg_id(0) {
-  }
+class dataq_server
+{
+public:
+  dataq_server() : m_sts(DATAQ__SUCCESS), m_config(0), m_config_dlid(pwr_cNDlid), m_msg_id(0) {}
   ~dataq_server();
-  
+
   pwr_tStatus m_sts;
-  pwr_sClass_DataQServer *m_config;
+  pwr_sClass_DataQServer* m_config;
   pwr_tDlid m_config_dlid;
   std::vector<qsrv_node> m_nodes;
   std::vector<qsrv_rdataq> m_rdataq;
@@ -206,7 +215,7 @@ class dataq_server {
   pwr_tStatus init();
   pwr_tStatus connect();
   pwr_tStatus mainloop();
-  pwr_tStatus remote_name(char* source_name, char* format, char *remote_name, unsigned int size);
+  pwr_tStatus remote_name(char* source_name, char* format, char* remote_name, unsigned int size);
 };
 
 #endif

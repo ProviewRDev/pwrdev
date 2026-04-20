@@ -50,76 +50,98 @@
 
 const char nullstr[] = "";
 
-static pwr_tString32 str_dt[20] = { "xsd:string", "xsd:boolean", "xsd:float",
-  "xsd:double", "xsd:decimal", "xsd:long", "xsd:int", "xsd:short", "xsd:byte",
-  "xsd:unsignedLong", "xsd:unsignedInt", "xsd:unsignedShort",
-  "xsd:unsignedByte", "xsd:base64Binary", "xsd:dateTime", "xsd:time",
-  "xsd:date", "xsd:duration", "xsd:QName", "xsd:anyType" };
+static pwr_tString32 str_dt[20] = {
+    "xsd:string",      "xsd:boolean",       "xsd:float",        "xsd:double",       "xsd:decimal",
+    "xsd:long",        "xsd:int",           "xsd:short",        "xsd:byte",         "xsd:unsignedLong",
+    "xsd:unsignedInt", "xsd:unsignedShort", "xsd:unsignedByte", "xsd:base64Binary", "xsd:dateTime",
+    "xsd:time",        "xsd:date",          "xsd:duration",     "xsd:QName",        "xsd:anyType"};
 
-static char opc_PropertyNames[17][20]
-    = { "dataType", "value", "quality", "timestamp", "accessRights", "scanRate",
-        "euType", "euInfo", "engineeringUnits", "description", "highEU",
-        "lowEU", "highIR", "lowIR", "closeLabel", "openLabel", "timeZone" };
+static char opc_PropertyNames[17][20] = {
+    "dataType", "value",  "quality",          "timestamp",   "accessRights", "scanRate",
+    "euType",   "euInfo", "engineeringUnits", "description", "highEU",       "lowEU",
+    "highIR",   "lowIR",  "closeLabel",       "openLabel",   "timeZone"};
 
-static char opc_ResultCodes[24][32] = { "", "s0:S_CLAMP",
-  "s0:S_DATAQUEUEOVERFLOW", "s0:S_UNSUPPORTEDRATE", "s0:E_ACCESS_DENIED",
-  "s0:E_BUSY", "s0:E_FAIL", "s0:E_INVALIDCONTINUATIONPOINT",
-  "s0:E_INVALIDFILTER", "s0:E_INVALIDHOLDTIME", "s0:E_INVALIDITEMNAME",
-  "s0:E_INVALIDITEMPATH", "s0:E_INVALIDPID", "s0:E_NOSUBSCRIPTION",
-  "s0:E_NOTSUPPORTED", "s0:E_OUTOFMEMORY", "s0:E_RANGE", "s0:E_READONLY",
-  "s0:E_SERVERSTATE", "s0:E_TIMEDOUT", "s0:E_UNKNOWNITEMNAME",
-  "s0:E_UNKNOWNITEMPATH", "s0:E_WRITEONLY", "s0:E_BADTYPE" };
+static char opc_ResultCodes[24][32] = {"",
+                                       "s0:S_CLAMP",
+                                       "s0:S_DATAQUEUEOVERFLOW",
+                                       "s0:S_UNSUPPORTEDRATE",
+                                       "s0:E_ACCESS_DENIED",
+                                       "s0:E_BUSY",
+                                       "s0:E_FAIL",
+                                       "s0:E_INVALIDCONTINUATIONPOINT",
+                                       "s0:E_INVALIDFILTER",
+                                       "s0:E_INVALIDHOLDTIME",
+                                       "s0:E_INVALIDITEMNAME",
+                                       "s0:E_INVALIDITEMPATH",
+                                       "s0:E_INVALIDPID",
+                                       "s0:E_NOSUBSCRIPTION",
+                                       "s0:E_NOTSUPPORTED",
+                                       "s0:E_OUTOFMEMORY",
+                                       "s0:E_RANGE",
+                                       "s0:E_READONLY",
+                                       "s0:E_SERVERSTATE",
+                                       "s0:E_TIMEDOUT",
+                                       "s0:E_UNKNOWNITEMNAME",
+                                       "s0:E_UNKNOWNITEMPATH",
+                                       "s0:E_WRITEONLY",
+                                       "s0:E_BADTYPE"};
 
-static char opc_ResultTexts[23][140]
-    = { "The value written was accepted but the output was clamped.",
-        "Not every detected change has been returned since the server's buffer "
-        "reached its limit and had to purge out the oldest data.",
-        "The server does not support the requested rate but will use the "
-        "closest available rate.",
-        "The server deines access (read and/or write) to the specified item.",
-        "The server is currently processing another polled refresh for one or "
-        "more of the subscriptions.",
-        "Unspecified error.", "The continuation point is not valid.",
-        "The filter string is not valid.",
-        "The hold time is too long (determined by the server).",
-        "The item name does not conform the server's syntax.",
-        "The item path does not conform the server's syntax.",
-        "The property id is not valid for the item.",
-        "An invalid set of subscription handles was passed to the request.",
-        "The server does not support writing to the quality and/or timestamp.",
-        "Ran out of memory.", "The value was out of range.",
-        "The value is read only and may not be written to.",
-        "The operation could not complete due to an abnormal server state.",
-        "The operation took too long to complete (determined by the server).",
-        "The item name is no longer available in the server address space.",
-        "The item path is no longer available in the server address space.",
-        "The value is write-only and may not be read from or returned as part "
-        "of a write response.",
-        "The type is not valid." };
+static char opc_ResultTexts[23][140] = {
+    "The value written was accepted but the output was clamped.",
+    "Not every detected change has been returned since the server's buffer "
+    "reached its limit and had to purge out the oldest data.",
+    "The server does not support the requested rate but will use the "
+    "closest available rate.",
+    "The server deines access (read and/or write) to the specified item.",
+    "The server is currently processing another polled refresh for one or "
+    "more of the subscriptions.",
+    "Unspecified error.",
+    "The continuation point is not valid.",
+    "The filter string is not valid.",
+    "The hold time is too long (determined by the server).",
+    "The item name does not conform the server's syntax.",
+    "The item path does not conform the server's syntax.",
+    "The property id is not valid for the item.",
+    "An invalid set of subscription handles was passed to the request.",
+    "The server does not support writing to the quality and/or timestamp.",
+    "Ran out of memory.",
+    "The value was out of range.",
+    "The value is read only and may not be written to.",
+    "The operation could not complete due to an abnormal server state.",
+    "The operation took too long to complete (determined by the server).",
+    "The item name is no longer available in the server address space.",
+    "The item path is no longer available in the server address space.",
+    "The value is write-only and may not be read from or returned as part "
+    "of a write response.",
+    "The type is not valid."};
 
-void opcsrv_returnerror(struct soap* soap, std::vector<s0__OPCError*>& errors,
-    std::string** rc, int err_code, unsigned int options)
+void opcsrv_returnerror(struct soap* soap, std::vector<s0__OPCError*>& errors, std::string** rc, int err_code,
+                        unsigned int options)
 {
   int ii;
   bool exists = false;
 
-  if (rc) {
+  if (rc)
+  {
     *rc = soap_new_std__string(soap, -1);
     (*rc)->assign(opc_resultcode_to_string(err_code));
   }
 
-  for (ii = 0; ii < (int)errors.size(); ii++) {
-    if (strcmp(errors[ii]->ID.c_str(), opc_resultcode_to_string(err_code))
-        == 0) {
+  for (ii = 0; ii < (int)errors.size(); ii++)
+  {
+    if (strcmp(errors[ii]->ID.c_str(), opc_resultcode_to_string(err_code)) == 0)
+    {
       exists = true;
     }
   }
 
-  if (!exists) {
+  if (!exists)
+  {
     s0__OPCError* oe = soap_new_s0__OPCError(soap, -1);
     oe->ID.assign(opc_resultcode_to_string(err_code));
 
-    if (options & opc_mRequestOption_ReturnErrorText) {
+    if (options & opc_mRequestOption_ReturnErrorText)
+    {
       oe->Text = soap_new_std__string(soap, -1);
       oe->Text->assign(opc_resultcode_to_text(err_code));
     }
@@ -130,7 +152,8 @@ void opcsrv_returnerror(struct soap* soap, std::vector<s0__OPCError*>& errors,
 
 bool opc_requestoptions_to_mask(s0__RequestOptions* options, unsigned int* mask)
 {
-  if (!options) {
+  if (!options)
+  {
     *mask = 0;
     return false;
   }
@@ -139,9 +162,7 @@ bool opc_requestoptions_to_mask(s0__RequestOptions* options, unsigned int* mask)
     *mask |= *options->ReturnErrorText ? opc_mRequestOption_ReturnErrorText : 0;
 
   if (options->ReturnDiagnosticInfo)
-    *mask |= *options->ReturnDiagnosticInfo
-        ? opc_mRequestOption_ReturnDiagnosticInfo
-        : 0;
+    *mask |= *options->ReturnDiagnosticInfo ? opc_mRequestOption_ReturnDiagnosticInfo : 0;
 
   if (options->ReturnItemTime)
     *mask |= *options->ReturnItemTime ? opc_mRequestOption_ReturnItemTime : 0;
@@ -173,8 +194,10 @@ const char* opc_resultcode_to_text(int code)
 
 bool opc_string_to_resultcode(char* str, int* code)
 {
-  for (int ii = 0; ii < opc_eResultCode__; ii++) {
-    if (streq(opc_ResultCodes[ii], str)) {
+  for (int ii = 0; ii < opc_eResultCode__; ii++)
+  {
+    if (streq(opc_ResultCodes[ii], str))
+    {
       *code = ii;
       return true;
     }
@@ -206,9 +229,8 @@ pwr_tStatus opc_time_OPCAsciiToA(char* tstr, pwr_tTime* ts)
   strncpy(buf, tstr, sizeof(buf) - 1);
   buf[sizeof(buf) - 1] = '\0';
 
-  num = sscanf(tstr, "%4d-%02d-%02dT%02d:%02d:%02d.%d-%02d:%02d", &tt.tm_year,
-      &tt.tm_mon, &tt.tm_mday, &tt.tm_hour, &tt.tm_min, &tt.tm_sec, &tmphs,
-      &tmps1, &tmps2);
+  num = sscanf(tstr, "%4d-%02d-%02dT%02d:%02d:%02d.%d-%02d:%02d", &tt.tm_year, &tt.tm_mon, &tt.tm_mday,
+               &tt.tm_hour, &tt.tm_min, &tt.tm_sec, &tmphs, &tmps1, &tmps2);
   if (num < 7)
     return TIME__IVDTIME;
 
@@ -231,7 +253,8 @@ pwr_tStatus time_AtoOPCAscii(pwr_tTime* tp, char* buf, int bufsize)
   pwr_tTime t;
   int tzone;
 
-  if (!tp) {
+  if (!tp)
+  {
     time_GetTime(&t);
     tp = &t;
   }
@@ -245,8 +268,7 @@ pwr_tStatus time_AtoOPCAscii(pwr_tTime* tp, char* buf, int bufsize)
 #endif
   strftime(buf, bufsize, "%Y-%m-%dT%H:%M:%S", tmpTm);
 
-  sprintf(tmpStr, ".%07d%s%02d:00", (int)(tp->tv_nsec / 100),
-      tzone >= 0 ? "+" : "-", abs(tzone));
+  snprintf(tmpStr, sizeof(tmpStr), ".%07d%s%02d:00", (int)(tp->tv_nsec / 100), tzone >= 0 ? "+" : "-", abs(tzone));
   buflen = strlen(buf);
   if (strlen(tmpStr) + buflen < (unsigned int)bufsize)
     strcpy(&buf[buflen], tmpStr);
@@ -257,77 +279,91 @@ pwr_tStatus time_AtoOPCAscii(pwr_tTime* tp, char* buf, int bufsize)
 //
 // Return the corresponding opc type for a opc type string
 //
-xsd__anyType* opc_opctype_to_value(
-    struct soap* soap, void* bufp, int size, int opc_type)
+xsd__anyType* opc_opctype_to_value(struct soap* soap, void* bufp, int size, int opc_type)
 {
-  switch (opc_type) {
-  case opc_eDataType_string: {
+  switch (opc_type)
+  {
+  case opc_eDataType_string:
+  {
     xsd__string* val = soap_new_xsd__string(soap, -1);
     val->__item.assign((char*)bufp);
     return val;
   }
-  case opc_eDataType_boolean: {
+  case opc_eDataType_boolean:
+  {
     xsd__boolean* val = soap_new_xsd__boolean(soap, -1);
     val->__item = (bool)(*(char*)bufp);
     return val;
   }
-  case opc_eDataType_float: {
+  case opc_eDataType_float:
+  {
     xsd__float* val = soap_new_xsd__float(soap, -1);
     val->__item = *(pwr_tFloat32*)bufp;
     return val;
   }
-  case opc_eDataType_decimal: {
+  case opc_eDataType_decimal:
+  {
     xsd__decimal_* val = soap_new_xsd__decimal_(soap, -1);
     sprintf((char*)bufp, "%f", *(pwr_tFloat64*)bufp);
     val->__item = std::string((char*)bufp);
     return val;
   }
-  case opc_eDataType_double: {
+  case opc_eDataType_double:
+  {
     xsd__double* val = soap_new_xsd__double(soap, -1);
     val->__item = *(pwr_tFloat64*)bufp;
     return val;
   }
-  case opc_eDataType_long: {
+  case opc_eDataType_long:
+  {
     xsd__long* val = soap_new_xsd__long(soap, -1);
     val->__item = *(pwr_tInt64*)bufp;
     return val;
   }
-  case opc_eDataType_int: {
+  case opc_eDataType_int:
+  {
     xsd__int* val = soap_new_xsd__int(soap, -1);
     val->__item = *(pwr_tInt32*)bufp;
     return val;
   }
-  case opc_eDataType_short: {
+  case opc_eDataType_short:
+  {
     xsd__short* val = soap_new_xsd__short(soap, -1);
     val->__item = *(pwr_tInt16*)bufp;
     return val;
   }
-  case opc_eDataType_byte: {
+  case opc_eDataType_byte:
+  {
     xsd__byte* val = soap_new_xsd__byte(soap, -1);
     val->__item = *(pwr_tChar*)bufp;
     return val;
   }
-  case opc_eDataType_unsignedLong: {
+  case opc_eDataType_unsignedLong:
+  {
     xsd__unsignedLong* val = soap_new_xsd__unsignedLong(soap, -1);
     val->__item = *(pwr_tUInt64*)bufp;
     return val;
   }
-  case opc_eDataType_unsignedInt: {
+  case opc_eDataType_unsignedInt:
+  {
     xsd__unsignedInt* val = soap_new_xsd__unsignedInt(soap, -1);
     val->__item = *(pwr_tInt32*)bufp;
     return val;
   }
-  case opc_eDataType_unsignedShort: {
+  case opc_eDataType_unsignedShort:
+  {
     xsd__unsignedShort* val = soap_new_xsd__unsignedShort(soap, -1);
     val->__item = *(pwr_tUInt16*)bufp;
     return val;
   }
-  case opc_eDataType_unsignedByte: {
+  case opc_eDataType_unsignedByte:
+  {
     xsd__unsignedByte* val = soap_new_xsd__unsignedByte(soap, -1);
     val->__item = *(pwr_tUInt8*)bufp;
     return val;
   }
-  case opc_eDataType_dateTime: {
+  case opc_eDataType_dateTime:
+  {
     xsd__dateTime* val = soap_new_xsd__dateTime(soap, -1);
     char timstr[40];
 
@@ -335,7 +371,8 @@ xsd__anyType* opc_opctype_to_value(
     val->__item.assign(timstr);
     return val;
   }
-  case opc_eDataType_duration: {
+  case opc_eDataType_duration:
+  {
     xsd__duration* val = soap_new_xsd__duration(soap, -1);
     // TODO
     // char timstr[40];
@@ -354,8 +391,7 @@ xsd__anyType* opc_opctype_to_value(
 //
 // Return the corresponding pwrtype for a opctype
 //
-bool opc_convert_opctype_to_pwrtype(
-    void* bufp, int size, xsd__anyType* value, pwr_eType pwr_type)
+bool opc_convert_opctype_to_pwrtype(void* bufp, int size, xsd__anyType* value, pwr_eType pwr_type)
 {
   opc_eDataType opc_type;
 
@@ -408,9 +444,11 @@ bool opc_convert_opctype_to_pwrtype(
   else
     opc_type = opc_eDataType_;
 
-  switch (pwr_type) {
+  switch (pwr_type)
+  {
   case pwr_eType_Float64:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_boolean:
       (*(pwr_tFloat64*)bufp) = ((xsd__boolean*)value)->__item;
       break;
@@ -452,7 +490,8 @@ bool opc_convert_opctype_to_pwrtype(
     }
     break;
   case pwr_eType_Float32:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_boolean:
       (*(pwr_tFloat32*)bufp) = ((xsd__boolean*)value)->__item;
       break;
@@ -494,7 +533,8 @@ bool opc_convert_opctype_to_pwrtype(
     }
     break;
   case pwr_eType_Char:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_boolean:
       (*(pwr_tChar*)bufp) = ((xsd__boolean*)value)->__item;
       break;
@@ -536,7 +576,8 @@ bool opc_convert_opctype_to_pwrtype(
     }
     break;
   case pwr_eType_Int8:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_boolean:
       (*(pwr_tInt8*)bufp) = ((xsd__boolean*)value)->__item;
       break;
@@ -578,7 +619,8 @@ bool opc_convert_opctype_to_pwrtype(
     }
     break;
   case pwr_eType_Int16:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_boolean:
       (*(pwr_tInt16*)bufp) = ((xsd__boolean*)value)->__item;
       break;
@@ -620,7 +662,8 @@ bool opc_convert_opctype_to_pwrtype(
     }
     break;
   case pwr_eType_Int32:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_boolean:
       (*(pwr_tInt32*)bufp) = ((xsd__boolean*)value)->__item;
       break;
@@ -662,7 +705,8 @@ bool opc_convert_opctype_to_pwrtype(
     }
     break;
   case pwr_eType_Int64:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_boolean:
       (*(pwr_tInt64*)bufp) = ((xsd__boolean*)value)->__item;
       break;
@@ -704,7 +748,8 @@ bool opc_convert_opctype_to_pwrtype(
     }
     break;
   case pwr_eType_Boolean:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_boolean:
       (*(pwr_tBoolean*)bufp) = ((xsd__boolean*)value)->__item;
       break;
@@ -746,7 +791,8 @@ bool opc_convert_opctype_to_pwrtype(
     }
     break;
   case pwr_eType_UInt8:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_boolean:
       (*(pwr_tUInt8*)bufp) = ((xsd__boolean*)value)->__item;
       break;
@@ -788,7 +834,8 @@ bool opc_convert_opctype_to_pwrtype(
     }
     break;
   case pwr_eType_UInt16:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_boolean:
       (*(pwr_tUInt16*)bufp) = ((xsd__boolean*)value)->__item;
       break;
@@ -834,7 +881,8 @@ bool opc_convert_opctype_to_pwrtype(
   case pwr_eType_Enum:
   case pwr_eType_Status:
   case pwr_eType_NetStatus:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_boolean:
       (*(pwr_tUInt32*)bufp) = ((xsd__boolean*)value)->__item;
       break;
@@ -876,7 +924,8 @@ bool opc_convert_opctype_to_pwrtype(
     }
     break;
   case pwr_eType_UInt64:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_boolean:
       (*(pwr_tUInt64*)bufp) = ((xsd__boolean*)value)->__item;
       break;
@@ -918,7 +967,8 @@ bool opc_convert_opctype_to_pwrtype(
     }
     break;
   case pwr_eType_String:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_string:
       strncpy((char*)bufp, ((xsd__string*)value)->__item.c_str(), size);
       break;
@@ -975,7 +1025,8 @@ bool opc_convert_opctype_to_pwrtype(
     }
     break;
   case pwr_eType_Time:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_string:
     case opc_eDataType_boolean:
     case opc_eDataType_float:
@@ -991,15 +1042,15 @@ bool opc_convert_opctype_to_pwrtype(
     case opc_eDataType_unsignedByte:
       break;
     case opc_eDataType_dateTime:
-      opc_time_OPCAsciiToA(
-          (char*)((xsd__dateTime*)value)->__item.c_str(), (pwr_tTime*)bufp);
+      opc_time_OPCAsciiToA((char*)((xsd__dateTime*)value)->__item.c_str(), (pwr_tTime*)bufp);
       break;
     default:
       return false;
     }
     break;
   case pwr_eType_DeltaTime:
-    switch (opc_type) {
+    switch (opc_type)
+    {
     case opc_eDataType_string:
     case opc_eDataType_boolean:
     case opc_eDataType_float:
@@ -1029,14 +1080,15 @@ bool opc_convert_opctype_to_pwrtype(
 //
 // Return the corresponding opc type for a opc type string
 //
-bool opc_convert_pwrtype_to_opctype(
-    void* bufin, void* bufout, int size, int opc_type, int pwr_type)
+bool opc_convert_pwrtype_to_opctype(void* bufin, void* bufout, int size, int opc_type, int pwr_type)
 {
   if (!bufout)
     bufout = bufin;
-  switch (opc_type) {
+  switch (opc_type)
+  {
   case opc_eDataType_string:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Float64:
       snprintf((char*)bufout, size, "%f", *(pwr_tFloat64*)bufin);
       break;
@@ -1090,7 +1142,8 @@ bool opc_convert_pwrtype_to_opctype(
     }
     break;
   case opc_eDataType_boolean:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Float32:
       (*(char*)bufout) = (*(pwr_tFloat32*)bufin) ? 1 : 0;
       break;
@@ -1130,7 +1183,8 @@ bool opc_convert_pwrtype_to_opctype(
     }
     break;
   case opc_eDataType_float:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Float32:
       (*(float*)bufout) = (*(pwr_tFloat32*)bufin);
       break;
@@ -1171,7 +1225,8 @@ bool opc_convert_pwrtype_to_opctype(
     break;
   case opc_eDataType_double:
   case opc_eDataType_decimal:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Float32:
       (*(double*)bufout) = (*(pwr_tFloat32*)bufin);
       break;
@@ -1211,7 +1266,8 @@ bool opc_convert_pwrtype_to_opctype(
     }
     break;
   case opc_eDataType_int:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Float32:
       (*(int*)bufout) = (int)(*(pwr_tFloat32*)bufin);
       break;
@@ -1251,7 +1307,8 @@ bool opc_convert_pwrtype_to_opctype(
     }
     break;
   case opc_eDataType_unsignedInt:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Float32:
       (*(unsigned int*)bufout) = (unsigned int)(*(pwr_tFloat32*)bufin);
       break;
@@ -1291,7 +1348,8 @@ bool opc_convert_pwrtype_to_opctype(
     }
     break;
   case opc_eDataType_short:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Float32:
       (*(short int*)bufout) = (short int)(*(pwr_tFloat32*)bufin);
       break;
@@ -1331,47 +1389,39 @@ bool opc_convert_pwrtype_to_opctype(
     }
     break;
   case opc_eDataType_unsignedShort:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Float32:
-      (*(unsigned short int*)bufout)
-          = (unsigned short int)(*(pwr_tFloat32*)bufin);
+      (*(unsigned short int*)bufout) = (unsigned short int)(*(pwr_tFloat32*)bufin);
       break;
     case pwr_eType_Float64:
-      (*(unsigned short int*)bufout)
-          = (unsigned short int)(*(pwr_tFloat64*)bufin);
+      (*(unsigned short int*)bufout) = (unsigned short int)(*(pwr_tFloat64*)bufin);
       break;
     case pwr_eType_Char:
     case pwr_eType_Int8:
       (*(unsigned short int*)bufout) = (unsigned short int)(*(pwr_tChar*)bufin);
       break;
     case pwr_eType_Int16:
-      (*(unsigned short int*)bufout)
-          = (unsigned short int)(*(pwr_tInt16*)bufin);
+      (*(unsigned short int*)bufout) = (unsigned short int)(*(pwr_tInt16*)bufin);
       break;
     case pwr_eType_Int32:
     case pwr_eType_Boolean:
-      (*(unsigned short int*)bufout)
-          = (unsigned short int)(*(pwr_tInt32*)bufin);
+      (*(unsigned short int*)bufout) = (unsigned short int)(*(pwr_tInt32*)bufin);
       break;
     case pwr_eType_Int64:
-      (*(unsigned short int*)bufout)
-          = (unsigned short int)(*(pwr_tInt64*)bufin);
+      (*(unsigned short int*)bufout) = (unsigned short int)(*(pwr_tInt64*)bufin);
       break;
     case pwr_eType_UInt8:
-      (*(unsigned short int*)bufout)
-          = (unsigned short int)(*(pwr_tUInt8*)bufin);
+      (*(unsigned short int*)bufout) = (unsigned short int)(*(pwr_tUInt8*)bufin);
       break;
     case pwr_eType_UInt16:
-      (*(unsigned short int*)bufout)
-          = (unsigned short int)(*(pwr_tUInt16*)bufin);
+      (*(unsigned short int*)bufout) = (unsigned short int)(*(pwr_tUInt16*)bufin);
       break;
     case pwr_eType_UInt32:
-      (*(unsigned short int*)bufout)
-          = (unsigned short int)(*(pwr_tUInt32*)bufin);
+      (*(unsigned short int*)bufout) = (unsigned short int)(*(pwr_tUInt32*)bufin);
       break;
     case pwr_eType_UInt64:
-      (*(unsigned short int*)bufout)
-          = (unsigned short int)(*(pwr_tUInt64*)bufin);
+      (*(unsigned short int*)bufout) = (unsigned short int)(*(pwr_tUInt64*)bufin);
       break;
     case pwr_eType_String:
     case pwr_eType_Time:
@@ -1380,7 +1430,8 @@ bool opc_convert_pwrtype_to_opctype(
     }
     break;
   case opc_eDataType_byte:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Float32:
       (*(char*)bufout) = (char)(*(pwr_tFloat32*)bufin);
       break;
@@ -1420,7 +1471,8 @@ bool opc_convert_pwrtype_to_opctype(
     }
     break;
   case opc_eDataType_unsignedByte:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Float32:
       (*(unsigned char*)bufout) = (unsigned char)(*(pwr_tFloat32*)bufin);
       break;
@@ -1460,7 +1512,8 @@ bool opc_convert_pwrtype_to_opctype(
     }
     break;
   case opc_eDataType_long:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Float32:
       (*(pwr_tInt64*)bufout) = (pwr_tInt64)(*(pwr_tFloat32*)bufin);
       break;
@@ -1500,7 +1553,8 @@ bool opc_convert_pwrtype_to_opctype(
     }
     break;
   case opc_eDataType_unsignedLong:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Float32:
       (*(pwr_tUInt64*)bufout) = (pwr_tUInt64)(*(pwr_tFloat32*)bufin);
       break;
@@ -1540,7 +1594,8 @@ bool opc_convert_pwrtype_to_opctype(
     }
     break;
   case opc_eDataType_dateTime:
-    switch (pwr_type) {
+    switch (pwr_type)
+    {
     case pwr_eType_Time:
       memcpy(bufout, bufin, sizeof(pwr_tTime));
       // time_AtoOPCAscii( (pwr_tTime *)bufin, (char *)bufout, size);
@@ -1568,8 +1623,10 @@ bool opc_string_to_opctype(const char* str, int* type)
 {
   int ii;
 
-  for (ii = 0; ii < opc_cDataTypeSize; ii++) {
-    if (str_StartsWith(str, str_dt[ii])) {
+  for (ii = 0; ii < opc_cDataTypeSize; ii++)
+  {
+    if (str_StartsWith(str, str_dt[ii]))
+    {
       *type = ii;
       return true;
     }
@@ -1580,14 +1637,12 @@ bool opc_string_to_opctype(const char* str, int* type)
 //
 // Return the corresponding opc type string for a opc type
 //
-char* opc_opctype_to_string(int type)
-{
-  return str_dt[type];
-}
+char* opc_opctype_to_string(int type) { return str_dt[type]; }
 
 bool opc_pwrtype_to_opctype(int pwrtype, int* opctype)
 {
-  switch (pwrtype) {
+  switch (pwrtype)
+  {
   case pwr_eType_String:
   case pwr_eType_Objid:
   case pwr_eType_AttrRef:
@@ -1644,7 +1699,8 @@ bool opc_pwrtype_to_opctype(int pwrtype, int* opctype)
 }
 bool opc_opctype_to_pwrtype(int type, int* pwrtype)
 {
-  switch (type) {
+  switch (type)
+  {
   case opc_eDataType_string:
     *pwrtype = pwr_eType_String;
     break;
@@ -1715,27 +1771,28 @@ bool opc_pwrtype_to_string(int type, char** str)
   return true;
 }
 
-void opc_mask_to_propertynames(
-    std::vector<std::string>& pnames, unsigned int mask)
+void opc_mask_to_propertynames(std::vector<std::string>& pnames, unsigned int mask)
 {
   unsigned int m;
 
-  for (int i = 0; i < opc_cPropertySize; i++) {
+  for (int i = 0; i < opc_cPropertySize; i++)
+  {
     m = 1 << i;
     if (mask & m)
       pnames.push_back(std::string(opc_PropertyNames[i]));
   }
 }
 
-bool opc_get_property(std::vector<s0__ItemProperty*> properties,
-    unsigned int mask, xsd__anyType** valp)
+bool opc_get_property(std::vector<s0__ItemProperty*> properties, unsigned int mask, xsd__anyType** valp)
 {
   char name[80];
   char* s;
   int idx = -1;
 
-  for (int i = 0; i < opc_cPropertySize; i++) {
-    if ((unsigned int)(1 << i) == mask) {
+  for (int i = 0; i < opc_cPropertySize; i++)
+  {
+    if ((unsigned int)(1 << i) == mask)
+    {
       idx = i;
       break;
     }
@@ -1743,14 +1800,16 @@ bool opc_get_property(std::vector<s0__ItemProperty*> properties,
   if (idx == -1)
     return false;
 
-  for (int i = 0; i < (int)properties.size(); i++) {
+  for (int i = 0; i < (int)properties.size(); i++)
+  {
     strcpy(name, properties[i]->Name.c_str());
     if ((s = strrchr(name, ':')))
       s++;
     else
       s = name;
 
-    if (streq(s, opc_PropertyNames[idx])) {
+    if (streq(s, opc_PropertyNames[idx]))
+    {
       if (!properties[0]->Value)
         return false;
       *valp = properties[i]->Value;
@@ -1760,27 +1819,29 @@ bool opc_get_property(std::vector<s0__ItemProperty*> properties,
   return false;
 }
 
-bool opc_propertynames_to_mask(
-    std::vector<std::string>& pnames, unsigned int* mask)
+bool opc_propertynames_to_mask(std::vector<std::string>& pnames, unsigned int* mask)
 {
   char name[200];
   char* np;
 
   *mask = 0;
 
-  for (int i = 0; i < (int)pnames.size(); i++) {
+  for (int i = 0; i < (int)pnames.size(); i++)
+  {
     strcpy(name, pnames[i].c_str());
     if ((np = strrchr(name, ':')))
       np++;
     else
       np = name;
 
-    switch (*np) {
+    switch (*np)
+    {
     case 'a':
       *mask |= opc_mProperty_AccessRights;
       break;
     case 'd':
-      switch (*(np + 1)) {
+      switch (*(np + 1))
+      {
       case 'a':
         *mask |= opc_mProperty_DataType;
         break;
@@ -1798,7 +1859,8 @@ bool opc_propertynames_to_mask(
       *mask |= opc_mProperty_Quality;
       break;
     case 't':
-      switch (*(np + 4)) {
+      switch (*(np + 4))
+      {
       case 's':
         *mask |= opc_mProperty_Timestamp;
         break;
@@ -1813,7 +1875,8 @@ bool opc_propertynames_to_mask(
       *mask |= opc_mProperty_ScanRate;
       break;
     case 'e':
-      switch (*(np + 2)) {
+      switch (*(np + 2))
+      {
       case 'T':
         *mask |= opc_mProperty_EuType;
         break;
@@ -1828,7 +1891,8 @@ bool opc_propertynames_to_mask(
       }
       break;
     case 'h':
-      switch (*(np + 4)) {
+      switch (*(np + 4))
+      {
       case 'E':
         *mask |= opc_mProperty_HighEU;
         break;
@@ -1840,7 +1904,8 @@ bool opc_propertynames_to_mask(
       }
       break;
     case 'l':
-      switch (*(np + 3)) {
+      switch (*(np + 3))
+      {
       case 'E':
         *mask |= opc_mProperty_LowEU;
         break;
@@ -1867,7 +1932,8 @@ bool opc_propertynames_to_mask(
 bool opc_quality_to_string(int quality, char** str)
 {
   *str = (char*)malloc(30);
-  switch (quality) {
+  switch (quality)
+  {
   case s0__qualityBits__bad:
     strcpy(*str, "bad");
     break;
@@ -1924,7 +1990,8 @@ bool opc_quality_to_string(int quality, char** str)
 
 bool opc_cmp_pwr(void* p1, void* p2, int size, int type, float deadband)
 {
-  switch (type) {
+  switch (type)
+  {
   case pwr_eType_Boolean:
   case pwr_eType_Int32:
   case pwr_eType_UInt32:
@@ -1932,10 +1999,13 @@ bool opc_cmp_pwr(void* p1, void* p2, int size, int type, float deadband)
       return true;
     break;
   case pwr_eType_Float32:
-    if (feqf(deadband, 0.0f)) {
+    if (feqf(deadband, 0.0f))
+    {
       if (fabs(*(pwr_tFloat32*)p1 - *(pwr_tFloat32*)p2) < FLT_EPSILON)
         return true;
-    } else {
+    }
+    else
+    {
       if (fabs(*(pwr_tFloat32*)p1 - *(pwr_tFloat32*)p2) < deadband)
         return true;
     }

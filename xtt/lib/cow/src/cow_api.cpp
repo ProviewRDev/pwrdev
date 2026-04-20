@@ -37,7 +37,8 @@
 #include "cow_msgwindow.h"
 #include "cow_xhelp.h"
 
-extern "C" {
+extern "C"
+{
 #include "cow_api.h"
 #include "co_dcli.h"
 }
@@ -45,49 +46,34 @@ extern "C" {
 //
 // c api to co_msgwindow
 //
-void msgw_message(int severity, const char* text, msgw_ePop pop)
-{
-  MsgWindow::message(severity, text, pop);
-}
+void msgw_message(int severity, const char* text, msgw_ePop pop) { MsgWindow::message(severity, text, pop); }
 
 void msgw_message_sts(pwr_tStatus sts, const char* text1, const char* text2)
 {
   MsgWindow::message(co_error(sts), text1, text2);
 }
 
-void msgw_message_object(
-    pwr_tStatus sts, const char* text1, const char* text2, pwr_tOid oid)
+void msgw_message_object(pwr_tStatus sts, const char* text1, const char* text2, pwr_tOid oid)
 {
   MsgWindow::message(co_error(sts), text1, text2, oid);
 }
 
-void msgw_message_plcobject(
-    pwr_tStatus sts, const char* text1, const char* text2, pwr_tOid oid)
+void msgw_message_plcobject(pwr_tStatus sts, const char* text1, const char* text2, pwr_tOid oid)
 {
   MsgWindow::message(co_error(sts), text1, text2, oid, msgw_eRow_Plc);
 }
 
-void msgw_set_nodraw()
-{
-  MsgWindow::dset_nodraw();
-}
+void msgw_set_nodraw() { MsgWindow::dset_nodraw(); }
 
-void msgw_reset_nodraw()
-{
-  MsgWindow::dreset_nodraw();
-}
+void msgw_reset_nodraw() { MsgWindow::dreset_nodraw(); }
 
-int msgw_has_default()
-{
-  return MsgWindow::has_default();
-}
+int msgw_has_default() { return MsgWindow::has_default(); }
 
 //
 // c api to co_xhelp
 //
 
-int xhelp_help(char* key, char* help_bookmark, navh_eHelpFile file_type,
-    char* file_name, int strict)
+int xhelp_help(char* key, char* help_bookmark, navh_eHelpFile file_type, char* file_name, int strict)
 {
   return CoXHelp::dhelp(key, help_bookmark, file_type, file_name, strict != 0);
 }

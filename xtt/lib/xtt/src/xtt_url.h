@@ -40,12 +40,13 @@
 /* xtt_utl.h -- Open an URL attribute */
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "pwr.h"
 
-int xnav_open_URL(pwr_tURL url);
+  int xnav_open_URL(pwr_tURL url);
 
 #if defined __cplusplus
 }

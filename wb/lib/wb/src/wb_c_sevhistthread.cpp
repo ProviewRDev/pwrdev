@@ -52,11 +52,10 @@
 //
 //  Syntax check.
 //
-static pwr_tStatus SyntaxCheck(
-    ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
-    int* ErrorCount, /* accumulated error count */
-    int* WarningCount /* accumulated waring count */
-    )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated waring count */
+)
 {
   wb_session* sp = (wb_session*)Session;
   pwr_tString40 server_name;
@@ -75,13 +74,11 @@ static pwr_tStatus SyntaxCheck(
     return thread_a.sts();
 
   if (streq(server_name, ""))
-    wsx_error_msg_str(Session, "Server name is missing", Object, 'E',
-        ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Server name is missing", Object, 'E', ErrorCount, WarningCount);
 
   return PWRB__SUCCESS;
 }
 
 //  Every method to be exported to the workbench should be registred here.
 
-pwr_dExport pwr_BindMethods(SevHistThread)
-    = { pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(SevHistThread) = {pwr_BindMethod(SyntaxCheck), pwr_NullMethod};

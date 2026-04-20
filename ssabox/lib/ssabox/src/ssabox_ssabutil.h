@@ -35,15 +35,15 @@
  */
 
 /************************************************************************
-*
-* Filename:		rs_ssabutil.h
-*
-*			Datum	Pgm.		Anm
-* Reviderad		920724	CS		Skapad.
-*
-* Beskrivning:
-*
-**************************************************************************/
+ *
+ * Filename:		rs_ssabutil.h
+ *
+ *			Datum	Pgm.		Anm
+ * Reviderad		920724	CS		Skapad.
+ *
+ * Beskrivning:
+ *
+ **************************************************************************/
 
 int ssabutil_lopnr_check(pwr_tInt32 lopnr);
 
@@ -51,20 +51,16 @@ pwr_tInt32 ssabutil_chksum_lop(pwr_tInt32 lopnummer);
 
 pwr_tInt32 ssabutil_chksum_kupong(pwr_tInt32 kupong_nummer);
 
-pwr_tInt32 ssabutil_chksum_calculate(
-    pwr_tInt32 value, pwr_tInt16* weights, pwr_tInt16 num_figures);
+pwr_tInt32 ssabutil_chksum_calculate(pwr_tInt32 value, pwr_tInt16* weights, pwr_tInt16 num_figures);
 
 int ssab_curve(float x, float* y, float* table, int size);
 
-int ssab_curve_2d(
-    float x, float y, float* z, float* table, int x_size, int y_size);
+int ssab_curve_2d(float x, float y, float* z, float* table, int x_size, int y_size);
 
-#define SSAB_CURVE_2D(x, y, z, table)                                          \
-  ssab_curve_2d(x, y, z, (float*)&table,                                       \
-      sizeof(table[0]) / sizeof(table[0][0]) - 1,                              \
-      sizeof(table) / sizeof(table[0]) - 1)
+#define SSAB_CURVE_2D(x, y, z, table)                                                                        \
+  ssab_curve_2d(x, y, z, (float*)&table, sizeof(table[0]) / sizeof(table[0][0]) - 1,                         \
+                sizeof(table) / sizeof(table[0]) - 1)
 
-#define SSAB_CURVE(x, y, table)                                                \
-  ssab_curve(x, y, (float*)&table, sizeof(table) / sizeof(table[0]))
+#define SSAB_CURVE(x, y, table) ssab_curve(x, y, (float*)&table, sizeof(table) / sizeof(table[0]))
 
 pwr_tStatus sutl_sleep(float time);

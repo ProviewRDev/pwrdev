@@ -49,17 +49,17 @@
 #include "rt_rtt_msg.h"
 
 /*************************************************************************
-*
-* Name:		rtt_get_nodename()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get nodename for the current system.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_nodename()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get nodename for the current system.
+ *
+ **************************************************************************/
 int rtt_get_nodename(char* nodename, int size)
 {
   struct utsname buf;
@@ -71,19 +71,19 @@ int rtt_get_nodename(char* nodename, int size)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_fgetname()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get filename for a filedescriptor.
-*	This function is not implementet on all os, therefor a defaultname
-*	should be supplied which is returned for this os.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_fgetname()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get filename for a filedescriptor.
+ *	This function is not implementet on all os, therefor a defaultname
+ *	should be supplied which is returned for this os.
+ *
+ **************************************************************************/
 char* rtt_fgetname(FILE* fp, char* name, char* def_name)
 {
   strcpy(name, def_name);
@@ -91,17 +91,17 @@ char* rtt_fgetname(FILE* fp, char* name, char* def_name)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_set_prio()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Set process priority.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_set_prio()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Set process priority.
+ *
+ **************************************************************************/
 int rtt_set_prio(int prio)
 {
   /* TODO.... */
@@ -109,17 +109,17 @@ int rtt_set_prio(int prio)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_set_prio()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Set process priority to default value for rtt.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_set_prio()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Set process priority to default value for rtt.
+ *
+ **************************************************************************/
 int rtt_set_default_prio()
 {
   /* TODO.... */
@@ -127,17 +127,17 @@ int rtt_set_default_prio()
 }
 
 /*************************************************************************
-*
-* Name:		rtt_get_platform()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get platform for the current system.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_platform()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get platform for the current system.
+ *
+ **************************************************************************/
 int rtt_get_platform(char* platform)
 {
   struct utsname buf;
@@ -150,17 +150,17 @@ int rtt_get_platform(char* platform)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_get_hw()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get hardware for the current system.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_hw()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get hardware for the current system.
+ *
+ **************************************************************************/
 int rtt_get_hw(char* hw)
 {
 #if defined(OS_LINUX)
@@ -192,20 +192,20 @@ int rtt_get_hw(char* hw)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_replace_env()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Replace env variables in UNIX filenames.
-*	A string that starts with $ and ends with . or / will replaced
-*	if then string is found by getenv. Only lower case variables
-*	will be detected.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_replace_env()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Replace env variables in UNIX filenames.
+ *	A string that starts with $ and ends with . or / will replaced
+ *	if then string is found by getenv. Only lower case variables
+ *	will be detected.
+ *
+ **************************************************************************/
 int rtt_replace_env(char* str, char* newstr)
 {
   char* s;
@@ -222,23 +222,30 @@ int rtt_replace_env(char* str, char* newstr)
   s = str;
   t = news;
 
-  while (*s != 0) {
-    if (*s == '$') {
+  while (*s != 0)
+  {
+    if (*s == '$')
+    {
       symbolmode = 1;
       u = s + 1;
       *t = *s;
       t++;
-    } else if (symbolmode && (*s == '/' || *s == '.')) {
+    }
+    else if (symbolmode && (*s == '/' || *s == '.'))
+    {
       /* End of potential symbol */
       size = (long int)s - (long int)u;
       strncpy(symbol, u, size);
       symbol[size] = 0;
       str_ToLower(lower_symbol, symbol);
-      if ((value = getenv(lower_symbol)) == NULL) {
+      if ((value = getenv(lower_symbol)) == NULL)
+      {
         /* It was no symbol */
         *t = *s;
         t++;
-      } else {
+      }
+      else
+      {
         /* Symbol found */
         t -= strlen(symbol) + 1;
         strcpy(t, value);
@@ -247,16 +254,20 @@ int rtt_replace_env(char* str, char* newstr)
         t++;
       }
       symbolmode = 0;
-    } else {
+    }
+    else
+    {
       *t = *s;
       t++;
     }
     s++;
   }
 
-  if (symbolmode) {
+  if (symbolmode)
+  {
     strcpy(t, u);
-  } else
+  }
+  else
     *t = 0;
 
   strcpy(newstr, news);

@@ -51,7 +51,8 @@
 #include "xtt_methodtoolbar.h"
 
 typedef union alau_Event ala_uEvent;
-union alau_Event {
+union alau_Event
+{
   mh_sMsgInfo Info;
   mh_sAck Ack;
   mh_sMessage Msg;
@@ -115,215 +116,150 @@ void EvListBrow::create_nodeclasses()
   // Create common-class
 
   brow_CreateNodeClass(ctx, "EventDefault", flow_eNodeGroup_Common, &nc_event);
-  brow_AddAnnot(nc_event, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_event, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
   brow_AddAnnotPixmap(nc_event, 0, 1.6, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_event, 1, 2.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmapButton(nc_event, 2, 3.0, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_event, 3, 3.8, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_event, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_event, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_event, 13.5, 0.6, 3, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_event, 29.5, 0.6, 4, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_event, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_event, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_event, 13.5, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_event, 29.5, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_event, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for A-alarm
   brow_CreateNodeClass(ctx, "A_Alarm", flow_eNodeGroup_Common, &nc_a_alarm);
   brow_AddFilledRect(nc_a_alarm, 0.05, 0.05, 0.6, 0.6, flow_eDrawType_LineRed);
   brow_AddRect(nc_a_alarm, 0.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_a_alarm, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_a_alarm, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
   brow_AddAnnotPixmap(nc_a_alarm, 0, 1.6, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_a_alarm, 1, 2.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmapButton(nc_a_alarm, 2, 3.0, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_a_alarm, 3, 3.8, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_a_alarm, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_a_alarm, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_a_alarm, 13.5, 0.6, 3, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_a_alarm, 29.5, 0.6, 4, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_a_alarm, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_a_alarm, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_a_alarm, 13.5, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_a_alarm, 29.5, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_a_alarm, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for B-alarm
   brow_CreateNodeClass(ctx, "B_Alarm", flow_eNodeGroup_Common, &nc_b_alarm);
   brow_AddFilledRect(nc_b_alarm, 0.05, 0.05, 0.6, 0.6, flow_eDrawType_Yellow);
   brow_AddRect(nc_b_alarm, 0.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_b_alarm, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_b_alarm, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
   brow_AddAnnotPixmap(nc_b_alarm, 0, 1.6, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_b_alarm, 1, 2.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmapButton(nc_b_alarm, 2, 3.0, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_b_alarm, 3, 3.8, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_b_alarm, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_b_alarm, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_b_alarm, 13.5, 0.6, 3, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_b_alarm, 29.5, 0.6, 4, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_b_alarm, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_b_alarm, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_b_alarm, 13.5, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_b_alarm, 29.5, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_b_alarm, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Info
   brow_CreateNodeClass(ctx, "Info", flow_eNodeGroup_Common, &nc_info);
   // brow_AddFilledRect( nc_info, 0.05, 0.05, 0.6, 0.6, flow_eDrawType_Green);
   brow_AddRect(nc_info, 0.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_info, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_info, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
   brow_AddAnnotPixmap(nc_info, 0, 1.6, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_info, 1, 2.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmapButton(nc_info, 2, 3.0, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_info, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_info, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_info, 13.5, 0.6, 3, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_info, 29.5, 0.6, 4, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_info, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_info, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_info, 13.5, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_info, 29.5, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_info, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for InfoSuccess
-  brow_CreateNodeClass(
-      ctx, "InfoSuccess", flow_eNodeGroup_Common, &nc_infosuccess);
-  brow_AddFilledRect(
-      nc_infosuccess, 0.05, 0.05, 0.6, 0.6, flow_eDrawType_Green);
+  brow_CreateNodeClass(ctx, "InfoSuccess", flow_eNodeGroup_Common, &nc_infosuccess);
+  brow_AddFilledRect(nc_infosuccess, 0.05, 0.05, 0.6, 0.6, flow_eDrawType_Green);
   brow_AddRect(nc_infosuccess, 0.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_infosuccess, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_infosuccess, 0.8, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
   brow_AddAnnotPixmap(nc_infosuccess, 0, 1.6, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_infosuccess, 1, 2.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnotPixmapButton(
-      nc_infosuccess, 2, 3.0, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_infosuccess, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_infosuccess, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_infosuccess, 13.5, 0.6, 3, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_infosuccess, 29.5, 0.6, 4, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnotPixmapButton(nc_infosuccess, 2, 3.0, 0.1, flow_eDrawType_Line, 2, 0);
+  brow_AddAnnot(nc_infosuccess, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_infosuccess, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_infosuccess, 13.5, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_infosuccess, 29.5, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_infosuccess, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Category
   brow_CreateNodeClass(ctx, "Category", flow_eNodeGroup_Common, &nc_category);
   brow_AddAnnotPixmap(nc_category, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_category, 1, 1.8, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddRect(
-      nc_category, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_LineGray, 0, 0);
-  brow_AddAnnot(nc_category, 2.5, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddRect(nc_category, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_LineGray, 0, 0);
+  brow_AddAnnot(nc_category, 2.5, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_category, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Category
-  brow_CreateNodeClass(
-      ctx, "CategoryA", flow_eNodeGroup_Common, &nc_category_a);
+  brow_CreateNodeClass(ctx, "CategoryA", flow_eNodeGroup_Common, &nc_category_a);
   brow_AddAnnotPixmap(nc_category_a, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_category_a, 1, 1.8, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddFilledRect(
-      nc_category_a, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_LineRed);
+  brow_AddFilledRect(nc_category_a, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_LineRed);
   brow_AddRect(nc_category_a, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_category_a, 2.5, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category_a, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category_a, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_a, 2.5, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_a, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_a, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_category_a, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Category
-  brow_CreateNodeClass(
-      ctx, "CategoryB", flow_eNodeGroup_Common, &nc_category_b);
+  brow_CreateNodeClass(ctx, "CategoryB", flow_eNodeGroup_Common, &nc_category_b);
   brow_AddAnnotPixmap(nc_category_b, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_category_b, 1, 1.8, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddFilledRect(
-      nc_category_b, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Yellow);
+  brow_AddFilledRect(nc_category_b, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Yellow);
   brow_AddRect(nc_category_b, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_category_b, 2.5, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category_b, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category_b, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_b, 2.5, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_b, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_b, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_category_b, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Category
-  brow_CreateNodeClass(
-      ctx, "CategoryC", flow_eNodeGroup_Common, &nc_category_c);
+  brow_CreateNodeClass(ctx, "CategoryC", flow_eNodeGroup_Common, &nc_category_c);
   brow_AddAnnotPixmap(nc_category_c, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_category_c, 1, 1.8, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddFilledRect(
-      nc_category_c, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_LineGray);
+  brow_AddFilledRect(nc_category_c, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_LineGray);
   brow_AddRect(nc_category_c, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_category_c, 2.5, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category_c, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category_c, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_c, 2.5, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_c, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_c, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_category_c, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Category
-  brow_CreateNodeClass(
-      ctx, "CategoryD", flow_eNodeGroup_Common, &nc_category_d);
+  brow_CreateNodeClass(ctx, "CategoryD", flow_eNodeGroup_Common, &nc_category_d);
   brow_AddAnnotPixmap(nc_category_d, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_category_d, 1, 1.8, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddFilledRect(
-      nc_category_d, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_LineGray);
+  brow_AddFilledRect(nc_category_d, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_LineGray);
   brow_AddRect(nc_category_d, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_category_d, 2.5, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category_d, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category_d, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_d, 2.5, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_d, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_d, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_category_d, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Category
-  brow_CreateNodeClass(
-      ctx, "CategoryInfo", flow_eNodeGroup_Common, &nc_category_i);
+  brow_CreateNodeClass(ctx, "CategoryInfo", flow_eNodeGroup_Common, &nc_category_i);
   brow_AddAnnotPixmap(nc_category_i, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_category_i, 1, 1.8, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_category_i, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Green);
   brow_AddRect(nc_category_i, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_category_i, 2.5, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category_i, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category_i, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_i, 2.5, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_i, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_i, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_category_i, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for category flash
-  brow_CreateNodeClass(
-      ctx, "CategoryFlash", flow_eNodeGroup_Common, &nc_category_flash);
-  brow_AddAnnotPixmap(
-      nc_category_flash, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnotPixmap(
-      nc_category_flash, 1, 1.8, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddFilledRect(
-      nc_category_flash, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line);
-  brow_AddRect(
-      nc_category_flash, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_category_flash, 2.5, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category_flash, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_category_flash, 11.5, 0.6, 2, flow_eDrawType_TextRoboto,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddFrame(
-      nc_category_flash, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
+  brow_CreateNodeClass(ctx, "CategoryFlash", flow_eNodeGroup_Common, &nc_category_flash);
+  brow_AddAnnotPixmap(nc_category_flash, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
+  brow_AddAnnotPixmap(nc_category_flash, 1, 1.8, 0.1, flow_eDrawType_Line, 2, 0);
+  brow_AddFilledRect(nc_category_flash, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line);
+  brow_AddRect(nc_category_flash, 1.05, 0.05, 0.6, 0.6, flow_eDrawType_Line, 0, 0);
+  brow_AddAnnot(nc_category_flash, 2.5, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_flash, 4.8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_category_flash, 11.5, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddFrame(nc_category_flash, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 
 void EvListBrow::brow_setup()
@@ -342,40 +278,23 @@ void EvListBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, evlist);
 
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-      EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack,
-      EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_PixmapButton, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, EvList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_PixmapButton, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, EvList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, EvList::brow_cb);
   // brow_EnableEvent( ctx, flow_eEvent_TipText, flow_eEventType_CallBack,
   //	EvList::brow_cb);
 }
@@ -410,28 +329,27 @@ int EvList::init_browtree_cb(BrowCtx* fctx, void* client_data)
   evlist->browtree->brow_setup();
 
   // Redirect callback object deleted
-  brow_EnableEvent(evlist->browtree->ctx, flow_eEvent_ObjectDeleted,
-      flow_eEventType_CallBack, browtree_cb);
+  brow_EnableEvent(evlist->browtree->ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, browtree_cb);
 
   evlist->browtree->create_nodeclasses();
 
   return 1;
 }
 
-EvList::EvList(void* ev_parent_ctx, ev_eType ev_type, int ev_size,
-    int ev_eventname_seg, void (*ev_init_cb)(void*))
-    : parent_ctx(ev_parent_ctx), type(ev_type), browbase(0), browtree(0),
-      size(0), max_size(ev_size), display_hundredth(0), hide_object(0),
-      hide_text(0), start_trace_cb(0), display_in_xnav_cb(0),
-      name_to_alias_cb(0), sound_cb(0), selection_changed_cb(0),
-      init_cb(ev_init_cb), help_event_cb(0), acc_beep_time(0), beep_interval(4),
-      eventname_seg(ev_eventname_seg), current_view(pwr_cNOid),
+EvList::EvList(void* ev_parent_ctx, ev_eType ev_type, int ev_size, int ev_eventname_seg,
+               void (*ev_init_cb)(void*))
+    : parent_ctx(ev_parent_ctx), type(ev_type), browbase(0), browtree(0), size(0), max_size(ev_size),
+      display_hundredth(0), hide_object(0), hide_text(0), start_trace_cb(0), display_in_xnav_cb(0),
+      name_to_alias_cb(0), sound_cb(0), selection_changed_cb(0), init_cb(ev_init_cb), help_event_cb(0),
+      acc_beep_time(0), beep_interval(4), eventname_seg(ev_eventname_seg), current_view(pwr_cNOid),
       flash_value(false), alarm_table_cnt(0)
 {
   memset(alarm_table_member_cnt, 0, sizeof(alarm_table_member_cnt));
 
-  if (max_size <= 0) {
-    switch (type) {
+  if (max_size <= 0)
+  {
+    switch (type)
+    {
     case ev_eType_AlarmList:
       max_size = 1000;
       break;
@@ -443,7 +361,8 @@ EvList::EvList(void* ev_parent_ctx, ev_eType ev_type, int ev_size,
     }
   }
 
-  if (type == ev_eType_AlarmList) {
+  if (type == ev_eType_AlarmList)
+  {
     // Fetch sound objects
     pwr_tStatus sts;
 
@@ -474,7 +393,8 @@ EvList::EvList(void* ev_parent_ctx, ev_eType ev_type, int ev_size,
 //
 EvList::~EvList()
 {
-  for (unsigned int i = 0; i < alarm_table_cnt; i++) {
+  for (unsigned int i = 0; i < alarm_table_cnt; i++)
+  {
     gdh_DLUnrefObjectInfo(alarm_tables_refid[i]);
     if (alarm_table_member_cnt[i] > 0)
       free(alarm_table_members[i]);
@@ -495,32 +415,36 @@ void EvList::event_info(mh_sMessage* msg)
   flow_eDest dest_code;
   brow_tNode dest_node;
 
-  if (type == ev_eType_AlarmList
-      && !(event->Info.EventFlags & mh_mEventFlags_Ack))
+  if (type == ev_eType_AlarmList && !(event->Info.EventFlags & mh_mEventFlags_Ack))
     return;
 
-  if (type == ev_eType_AlarmList
-      && !(msg->Status & mh_mEventStatus_NotAck
-             || msg->Status & mh_mEventStatus_NotRet))
+  if (type == ev_eType_AlarmList &&
+      !(msg->Status & mh_mEventStatus_NotAck || msg->Status & mh_mEventStatus_NotRet))
     return;
 
-  if (type != ev_eType_HistList) {
-    sts = get_destination(
-        net_NetTimeToTime(&event->Info.EventTime), (void**)&dest);
-    if (EVEN(sts)) {
+  if (type != ev_eType_HistList)
+  {
+    sts = get_destination(net_NetTimeToTime(&event->Info.EventTime), (void**)&dest);
+    if (EVEN(sts))
+    {
       dest_code = flow_eDest_IntoLast;
       dest_node = NULL;
-    } else {
+    }
+    else
+    {
       dest_code = flow_eDest_Before;
       dest_node = dest->node;
     }
-  } else {
+  }
+  else
+  {
     dest_code = flow_eDest_IntoLast;
     dest_node = NULL;
   }
 
   evlist_eEventType eventtype;
-  switch (event->Msg.Info.EventType) {
+  switch (event->Msg.Info.EventType)
+  {
   case mh_eEvent_Info:
     eventtype = evlist_eEventType_Info;
     break;
@@ -531,12 +455,10 @@ void EvList::event_info(mh_sMessage* msg)
     return;
   }
 
-  new ItemAlarm(this, "Alarm", net_NetTimeToTime(&event->Info.EventTime),
-      event->Msg.EventText, event->Msg.EventName, event->Info.EventType,
-      event->Info.EventFlags, event->Info.EventPrio, event->Info.Id,
-      &event->Msg.Object, &event->Msg.EventSound, event->Msg.EventMoreText,
-      msg->Status, eventtype, &event->Msg.SupObject, dest_node, dest_code,
-      &sts);
+  new ItemAlarm(this, "Alarm", net_NetTimeToTime(&event->Info.EventTime), event->Msg.EventText,
+                event->Msg.EventName, event->Info.EventType, event->Info.EventFlags, event->Info.EventPrio,
+                event->Info.Id, &event->Msg.Object, &event->Msg.EventSound, event->Msg.EventMoreText,
+                msg->Status, eventtype, &event->Msg.SupObject, dest_node, dest_code, &sts);
   if (EVEN(sts))
     return;
   size++;
@@ -551,16 +473,17 @@ void EvList::event_alarm(mh_sMessage* msg)
   brow_tNode dest_node;
   ItemAlarm* item;
 
-  if (type == ev_eType_AlarmList) {
-    if (!(msg->Status & mh_mEventStatus_NotAck
-            || msg->Status & mh_mEventStatus_NotRet))
+  if (type == ev_eType_AlarmList)
+  {
+    if (!(msg->Status & mh_mEventStatus_NotAck || msg->Status & mh_mEventStatus_NotRet))
       return;
 
     // Check that this id not already inserted
     if (id_to_item(&event->Info.Id, (void**)&item))
       return;
   }
-  if (type != ev_eType_HistList) {
+  if (type != ev_eType_HistList)
+  {
     // Check that this id not already inserted
     if (id_to_item(&event->Info.Id, (void**)&item))
       return;
@@ -568,26 +491,29 @@ void EvList::event_alarm(mh_sMessage* msg)
     if (type != ev_eType_EventList)
       timelog_sii(4, "Ev, New alarm", event->Info.Id.Nix, event->Info.Id.Idx);
 
-    sts = get_destination(
-        net_NetTimeToTime(&event->Info.EventTime), (void**)&dest);
-    if (EVEN(sts)) {
+    sts = get_destination(net_NetTimeToTime(&event->Info.EventTime), (void**)&dest);
+    if (EVEN(sts))
+    {
       dest_code = flow_eDest_IntoLast;
       dest_node = NULL;
-    } else {
+    }
+    else
+    {
       dest_code = flow_eDest_Before;
       dest_node = dest->node;
     }
-  } else {
+  }
+  else
+  {
     dest_code = flow_eDest_IntoLast;
     dest_node = NULL;
   }
 
-  item = new ItemAlarm(this, "Alarm", net_NetTimeToTime(&event->Info.EventTime),
-      event->Msg.EventText, event->Msg.EventName, event->Info.EventType,
-      event->Info.EventFlags, event->Info.EventPrio, event->Info.Id,
-      &event->Msg.Object, &event->Msg.EventSound, event->Msg.EventMoreText,
-      msg->Status, evlist_eEventType_Alarm, &event->Msg.SupObject, dest_node,
-      dest_code, &sts);
+  item = new ItemAlarm(this, "Alarm", net_NetTimeToTime(&event->Info.EventTime), event->Msg.EventText,
+                       event->Msg.EventName, event->Info.EventType, event->Info.EventFlags,
+                       event->Info.EventPrio, event->Info.Id, &event->Msg.Object, &event->Msg.EventSound,
+                       event->Msg.EventMoreText, msg->Status, evlist_eEventType_Alarm, &event->Msg.SupObject,
+                       dest_node, dest_code, &sts);
   if (EVEN(sts))
     return;
   size++;
@@ -601,10 +527,13 @@ void EvList::event_block(mh_sBlock* msg)
   ala_uEvent* event = (ala_uEvent*)msg;
   int sts;
 
-  if (type == ev_eType_BlockList) {
-    switch (msg->Info.EventType) {
+  if (type == ev_eType_BlockList)
+  {
+    switch (msg->Info.EventType)
+    {
     case mh_eEvent_Block:
-    case mh_eEvent_Reblock: {
+    case mh_eEvent_Reblock:
+    {
       ItemAlarm* item;
       ItemAlarm* dest;
       flow_eDest dest_code;
@@ -612,39 +541,43 @@ void EvList::event_block(mh_sBlock* msg)
       char name[80];
       char text[100];
 
-      if (oid_to_item(msg->Object.Objid, (void**)&item)) {
+      if (oid_to_item(msg->Object.Objid, (void**)&item))
+      {
         brow_DeleteNode(browbase->ctx, item->node);
         size--;
       }
-      sts = get_destination(
-          net_NetTimeToTime(&event->Info.EventTime), (void**)&dest);
-      if (EVEN(sts)) {
+      sts = get_destination(net_NetTimeToTime(&event->Info.EventTime), (void**)&dest);
+      if (EVEN(sts))
+      {
         dest_code = flow_eDest_IntoLast;
         dest_node = NULL;
-      } else {
+      }
+      else
+      {
         dest_code = flow_eDest_Before;
         dest_node = dest->node;
       }
-      sts = gdh_ObjidToName(
-          msg->Outunit, name, sizeof(name), cdh_mName_path | cdh_mName_object);
-      if (ODD(sts)) {
+      sts = gdh_ObjidToName(msg->Outunit, name, sizeof(name), cdh_mName_path | cdh_mName_object);
+      if (ODD(sts))
+      {
         strcpy(text, "User: ");
         strcat(text, name);
-      } else
+      }
+      else
         strcpy(text, "Unknown");
 
-      new ItemAlarm(this, "Alarm", net_NetTimeToTime(&event->Info.EventTime),
-          event->Block.EventName, text, event->Info.EventType,
-          event->Info.EventFlags, event->Info.EventPrio, event->Info.Id,
-          &event->Block.Object, 0, 0, 0, evlist_eEventType_Block,
-          &event->Block.SupObject, dest_node, dest_code, &sts);
+      new ItemAlarm(this, "Alarm", net_NetTimeToTime(&event->Info.EventTime), event->Block.EventName, text,
+                    event->Info.EventType, event->Info.EventFlags, event->Info.EventPrio, event->Info.Id,
+                    &event->Block.Object, 0, 0, 0, evlist_eEventType_Block, &event->Block.SupObject,
+                    dest_node, dest_code, &sts);
       if (EVEN(sts))
         return;
       size++;
       break;
     }
     case mh_eEvent_CancelBlock:
-    case mh_eEvent_Unblock: {
+    case mh_eEvent_Unblock:
+    {
       ItemAlarm* item;
 
       if (!oid_to_item(msg->Object.Objid, (void**)&item))
@@ -656,19 +589,21 @@ void EvList::event_block(mh_sBlock* msg)
     }
     default:;
     }
-  } else if (type == ev_eType_EventList) {
+  }
+  else if (type == ev_eType_EventList)
+  {
     char text[100];
     char name[80];
     flow_eDest dest_code;
     brow_tNode dest_node;
     ItemAlarm* dest;
 
-    sts = gdh_ObjidToName(
-        msg->Outunit, name, sizeof(name), cdh_mName_path | cdh_mName_object);
+    sts = gdh_ObjidToName(msg->Outunit, name, sizeof(name), cdh_mName_path | cdh_mName_object);
     if (EVEN(sts))
       strcpy(name, "");
 
-    switch (msg->Info.EventType) {
+    switch (msg->Info.EventType)
+    {
     case mh_eEvent_Block:
       strcpy(text, "Blocked by: ");
       break;
@@ -686,25 +621,28 @@ void EvList::event_block(mh_sBlock* msg)
     }
     strcat(text, name);
 
-    sts = get_destination(
-        net_NetTimeToTime(&event->Info.EventTime), (void**)&dest);
-    if (EVEN(sts)) {
+    sts = get_destination(net_NetTimeToTime(&event->Info.EventTime), (void**)&dest);
+    if (EVEN(sts))
+    {
       dest_code = flow_eDest_IntoLast;
       dest_node = NULL;
-    } else {
+    }
+    else
+    {
       dest_code = flow_eDest_Before;
       dest_node = dest->node;
     }
 
-    ItemAlarm* item = new ItemAlarm(this, "Alarm",
-        net_NetTimeToTime(&event->Info.EventTime), text, event->Block.EventName,
-        event->Info.EventType, event->Info.EventFlags, event->Info.EventPrio,
-        event->Info.Id, &event->Block.Object, 0, 0, 0, evlist_eEventType_Block,
-        &event->Block.SupObject, dest_node, dest_code, &sts);
+    ItemAlarm* item =
+        new ItemAlarm(this, "Alarm", net_NetTimeToTime(&event->Info.EventTime), text, event->Block.EventName,
+                      event->Info.EventType, event->Info.EventFlags, event->Info.EventPrio, event->Info.Id,
+                      &event->Block.Object, 0, 0, 0, evlist_eEventType_Block, &event->Block.SupObject,
+                      dest_node, dest_code, &sts);
     if (EVEN(sts))
       return;
 
-    switch (msg->Info.EventType) {
+    switch (msg->Info.EventType)
+    {
     case mh_eEvent_Block:
     case mh_eEvent_Reblock:
       brow_SetAnnotPixmap(item->node, 0, browbase->pixmap_blockr);
@@ -731,10 +669,12 @@ void EvList::block_remove()
   if (!node_count)
     return;
 
-  for (int i = 0; i < node_count; i++) {
+  for (int i = 0; i < node_count; i++)
+  {
     brow_GetUserData(node_list[i], (void**)&item);
 
-    switch (item->type) {
+    switch (item->type)
+    {
     case evlist_eItemType_Alarm:
       sts = mh_OutunitBlock(item->object.Objid, prio);
       break;
@@ -767,31 +707,36 @@ void EvList::event_ack(mh_sAck* msg)
   flow_eDest dest_code;
   brow_tNode dest_node;
 
-  if (type == ev_eType_EventList || type == ev_eType_HistList) {
-    if (type == ev_eType_EventList) {
+  if (type == ev_eType_EventList || type == ev_eType_HistList)
+  {
+    if (type == ev_eType_EventList)
+    {
       // Check that this id not already inserted
       if (id_to_item(&event->Info.Id, (void**)&item))
         return;
       timelog_sii(4, "Ev, new ack", event->Info.Id.Nix, event->Info.Id.Idx);
 
-      sts = get_destination(
-          net_NetTimeToTime(&event->Info.EventTime), (void**)&dest);
-      if (EVEN(sts)) {
+      sts = get_destination(net_NetTimeToTime(&event->Info.EventTime), (void**)&dest);
+      if (EVEN(sts))
+      {
         dest_code = flow_eDest_IntoLast;
         dest_node = NULL;
-      } else {
+      }
+      else
+      {
         dest_code = flow_eDest_Before;
         dest_node = dest->node;
       }
-    } else {
+    }
+    else
+    {
       dest_code = flow_eDest_IntoLast;
       dest_node = NULL;
     }
-    ItemAlarm* item = new ItemAlarm(this, "Alarm",
-        net_NetTimeToTime(&event->Info.EventTime), "", event->Ack.EventName,
-        event->Info.EventType, event->Info.EventFlags, event->Info.EventPrio,
-        event->Info.Id, &event->Ack.Object, 0, 0, 0, evlist_eEventType_Ack,
-        &event->Ack.SupObject, dest_node, dest_code, &sts);
+    ItemAlarm* item = new ItemAlarm(this, "Alarm", net_NetTimeToTime(&event->Info.EventTime), "",
+                                    event->Ack.EventName, event->Info.EventType, event->Info.EventFlags,
+                                    event->Info.EventPrio, event->Info.Id, &event->Ack.Object, 0, 0, 0,
+                                    evlist_eEventType_Ack, &event->Ack.SupObject, dest_node, dest_code, &sts);
     if (EVEN(sts))
       return;
     size++;
@@ -800,25 +745,31 @@ void EvList::event_ack(mh_sAck* msg)
     view_configure();
   }
 
-  else {
+  else
+  {
     // Alarmlist
     ItemAlarm* item;
 
     if (!id_to_item(&msg->TargetId, (void**)&item))
       return;
 
-    switch (item->event_type) {
+    switch (item->event_type)
+    {
     case evlist_eEventType_Alarm:
-      if (item->status & mh_mEventStatus_NotRet) {
+      if (item->status & mh_mEventStatus_NotRet)
+      {
         item->status &= ~mh_mEventStatus_NotAck;
         item->update_text(0);
         if (item->tree_node)
           item->update_text(1);
-      } else {
+      }
+      else
+      {
         brow_tObject item_tree_node = item->tree_node;
 
         brow_DeleteNode(browbase->ctx, item->node);
-        if (browtree) {
+        if (browtree)
+        {
           if (item_tree_node)
             brow_DeleteNode(browtree->ctx, item_tree_node);
           view_configure();
@@ -828,17 +779,22 @@ void EvList::event_ack(mh_sAck* msg)
       break;
     case evlist_eEventType_Info:
     case evlist_eEventType_InfoSuccess:
-      if (item->eventflags & mh_mEventFlags_InfoWindow) {
-        if (item->status & mh_mEventStatus_NotRet) {
+      if (item->eventflags & mh_mEventFlags_InfoWindow)
+      {
+        if (item->status & mh_mEventStatus_NotRet)
+        {
           item->status &= ~mh_mEventStatus_NotAck;
           item->update_text(0);
           if (item->tree_node)
             item->update_text(1);
-        } else {
+        }
+        else
+        {
           brow_tObject item_tree_node = item->tree_node;
 
           brow_DeleteNode(browbase->ctx, item->node);
-          if (browtree) {
+          if (browtree)
+          {
             if (item_tree_node)
               brow_DeleteNode(browtree->ctx, item_tree_node);
             view_configure();
@@ -861,32 +817,37 @@ void EvList::event_return(mh_sReturn* msg)
   flow_eDest dest_code;
   brow_tNode dest_node;
 
-  if (type == ev_eType_EventList || type == ev_eType_HistList) {
-    if (type == ev_eType_EventList) {
+  if (type == ev_eType_EventList || type == ev_eType_HistList)
+  {
+    if (type == ev_eType_EventList)
+    {
       // Check that this id not already inserted
       if (id_to_item(&event->Info.Id, (void**)&item))
         return;
       timelog_sii(4, "Ev, New return", event->Info.Id.Nix, event->Info.Id.Idx);
 
-      sts = get_destination(
-          net_NetTimeToTime(&event->Info.EventTime), (void**)&dest);
-      if (EVEN(sts)) {
+      sts = get_destination(net_NetTimeToTime(&event->Info.EventTime), (void**)&dest);
+      if (EVEN(sts))
+      {
         dest_code = flow_eDest_IntoLast;
         dest_node = NULL;
-      } else {
+      }
+      else
+      {
         dest_code = flow_eDest_Before;
         dest_node = dest->node;
       }
-    } else {
+    }
+    else
+    {
       dest_code = flow_eDest_IntoLast;
       dest_node = NULL;
     }
-    ItemAlarm* item = new ItemAlarm(this, "Alarm",
-        net_NetTimeToTime(&event->Info.EventTime), event->Msg.EventText,
-        event->Return.EventName, event->Info.EventType, event->Info.EventFlags,
-        event->Info.EventPrio, event->Info.Id, &event->Return.Object, 0, 0, 0,
-        evlist_eEventType_Return, &event->Return.SupObject, dest_node,
-        dest_code, &sts);
+    ItemAlarm* item =
+        new ItemAlarm(this, "Alarm", net_NetTimeToTime(&event->Info.EventTime), event->Msg.EventText,
+                      event->Return.EventName, event->Info.EventType, event->Info.EventFlags,
+                      event->Info.EventPrio, event->Info.Id, &event->Return.Object, 0, 0, 0,
+                      evlist_eEventType_Return, &event->Return.SupObject, dest_node, dest_code, &sts);
     if (EVEN(sts))
       return;
     size++;
@@ -895,23 +856,28 @@ void EvList::event_return(mh_sReturn* msg)
     view_configure();
   }
 
-  else {
+  else
+  {
     // Alarmlist
     ItemAlarm* item;
 
     if (!id_to_item(&msg->TargetId, (void**)&item))
       return;
 
-    if (item->status & mh_mEventStatus_NotAck) {
+    if (item->status & mh_mEventStatus_NotAck)
+    {
       item->status &= ~mh_mEventStatus_NotRet;
       item->update_text(0);
       if (item->tree_node)
         item->update_text(1);
-    } else {
+    }
+    else
+    {
       brow_tObject item_tree_node = item->tree_node;
 
       brow_DeleteNode(browbase->ctx, item->node);
-      if (browtree) {
+      if (browtree)
+      {
         if (item_tree_node)
           brow_DeleteNode(browtree->ctx, item_tree_node);
         view_configure();
@@ -923,14 +889,16 @@ void EvList::event_return(mh_sReturn* msg)
 
 int EvList::event_delete(mh_sEventId* id)
 {
-  if (type == ev_eType_AlarmList) {
+  if (type == ev_eType_AlarmList)
+  {
     // Alarmlist
     ItemAlarm* item;
 
     if (!id_to_item(id, (void**)&item))
       return 0;
 
-    if (browtree) {
+    if (browtree)
+    {
       if (item->tree_node)
         brow_DeleteNode(browtree->ctx, item->tree_node);
       view_configure();
@@ -943,10 +911,7 @@ int EvList::event_delete(mh_sEventId* id)
   return 1;
 }
 
-void EvList::print_nodia(char* filename)
-{
-  brow_Print(brow->ctx, filename);
-}
+void EvList::print_nodia(char* filename) { brow_Print(brow->ctx, filename); }
 
 void EvList::event_clear_alarmlist(pwr_tNodeIndex nix)
 {
@@ -964,14 +929,18 @@ void EvList::event_clear_alarmlist(pwr_tNodeIndex nix)
   memcpy(stored_object_list, object_list, object_cnt * sizeof(brow_tObject));
 
   // Remove all items with the present node index
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(stored_object_list[i], (void**)&object_item);
-    switch (object_item->type) {
+    switch (object_item->type)
+    {
     case evlist_eItemType_Alarm:
-      if (object_item->eventid.Nix == nix) {
+      if (object_item->eventid.Nix == nix)
+      {
         brow_tObject item_tree_node = object_item->tree_node;
         brow_DeleteNode(browbase->ctx, object_item->node);
-        if (browtree) {
+        if (browtree)
+        {
           if (item_tree_node)
             brow_DeleteNode(browtree->ctx, item_tree_node);
           view_configure();
@@ -987,18 +956,12 @@ void EvList::event_clear_alarmlist(pwr_tNodeIndex nix)
 //
 //  Zoom
 //
-void EvList::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void EvList::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void EvList::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void EvList::unzoom() { brow_UnZoom(brow->ctx); }
 
 void EvList::beep(double scantime)
 {
@@ -1009,21 +972,28 @@ void EvList::beep(double scantime)
     acc_beep_time = 0;
 
   sts = get_last_not_acked_beep(&id);
-  if (ODD(sts)) {
-    if (feq(acc_beep_time, 0.0)) {
+  if (ODD(sts))
+  {
+    if (feq(acc_beep_time, 0.0))
+    {
       sts = 0;
-      if (sound_cb) {
+      if (sound_cb)
+      {
         ItemAlarm* item;
 
-        if (id_to_item(id, (void**)&item)) {
+        if (id_to_item(id, (void**)&item))
+        {
           pwr_tAttrRef* sound_arp;
 
           if (cdh_ObjidIsNotNull(item->eventsound.Objid))
             sound_arp = &item->eventsound;
-          else {
-            switch (item->event_type) {
+          else
+          {
+            switch (item->event_type)
+            {
             case evlist_eEventType_Alarm:
-              switch (item->eventprio) {
+              switch (item->eventprio)
+              {
               case mh_eEventPrio_A:
                 sound_arp = &aalarm_sound;
                 break;
@@ -1050,14 +1020,12 @@ void EvList::beep(double scantime)
         bell();
     }
     acc_beep_time += scantime;
-  } else
+  }
+  else
     acc_beep_time = 0;
 }
 
-void EvList::set_nodraw()
-{
-  brow_SetNodraw(brow->ctx);
-}
+void EvList::set_nodraw() { brow_SetNodraw(brow->ctx); }
 
 void EvList::reset_nodraw()
 {
@@ -1082,7 +1050,8 @@ void EvList::start_trace()
   brow_GetUserData(node_list[0], (void**)&item);
   free(node_list);
 
-  switch (item->type) {
+  switch (item->type)
+  {
   case evlist_eItemType_Alarm:
 
     sts = gdh_GetParent(item->object.Objid, &parent);
@@ -1093,13 +1062,11 @@ void EvList::start_trace()
     if (EVEN(sts))
       return;
 
-    if (!(classid == pwr_cClass_windowplc || classid == pwr_cClass_windowcond
-            || classid == pwr_cClass_windoworderact
-            || classid == pwr_cClass_windowsubstep))
+    if (!(classid == pwr_cClass_windowplc || classid == pwr_cClass_windowcond ||
+          classid == pwr_cClass_windoworderact || classid == pwr_cClass_windowsubstep))
       return;
 
-    sts = gdh_ObjidToName(
-        item->object.Objid, name, sizeof(name), cdh_mName_object);
+    sts = gdh_ObjidToName(item->object.Objid, name, sizeof(name), cdh_mName_object);
     if (EVEN(sts))
       return;
 
@@ -1124,11 +1091,13 @@ void EvList::display_in_xnav()
   brow_GetUserData(node_list[0], (void**)&item);
   free(node_list);
 
-  switch (item->type) {
+  switch (item->type)
+  {
   case evlist_eItemType_Alarm:
     if (cdh_ObjidIsNull(item->object.Objid))
       return;
-    if (display_in_xnav_cb) {
+    if (display_in_xnav_cb)
+    {
       (display_in_xnav_cb)(parent_ctx, &item->object);
     }
     break;
@@ -1143,7 +1112,8 @@ int EvList::browtree_cb(FlowCtx* ctx, flow_tEvent event)
 {
   ItemEvBase* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     if (item->type == evlist_eItemType_Category)
       delete item;
@@ -1151,7 +1121,8 @@ int EvList::browtree_cb(FlowCtx* ctx, flow_tEvent event)
       ((ItemAlarm*)item)->tree_node = 0;
 
     return 1;
-  } else
+  }
+  else
     brow_cb(ctx, event);
 
   return 1;
@@ -1162,7 +1133,8 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
   EvList* evlist;
   ItemAlarm* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     ItemEvBase* ditem;
     brow_GetUserData(event->object.object, (void**)&ditem);
     delete ditem;
@@ -1170,27 +1142,35 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
   }
 
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&evlist);
-  switch (event->event) {
-  case flow_eEvent_Key_Up: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(evlist->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLastVisible(evlist->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              evlist->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(evlist->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetLastVisible(evlist->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(evlist->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -1208,26 +1188,33 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
       (evlist->selection_changed_cb)(evlist->parent_ctx);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(evlist->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirstVisible(evlist->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              evlist->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(evlist->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetFirstVisible(evlist->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(evlist->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -1248,15 +1235,18 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
   case flow_eEvent_SelectClear:
     brow_ResetSelectInverse(evlist->brow->ctx);
     break;
-  case flow_eEvent_MB1Click: {
+  case flow_eEvent_MB1Click:
+  {
     // Select
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -1267,9 +1257,12 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
         free((char*)doubleclick_event);
         return sts;
       }
-      if (brow_FindSelectedObject(evlist->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(evlist->brow->ctx, event->object.object))
+      {
         brow_SelectClear(evlist->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(evlist->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(evlist->brow->ctx, event->object.object);
@@ -1282,30 +1275,38 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_MB3Down: {
+  case flow_eEvent_MB3Down:
+  {
     brow_SetClickSensitivity(evlist->brow->ctx, flow_mSensitivity_MB3Press);
     break;
   }
-  case flow_eEvent_MB3Press: {
+  case flow_eEvent_MB3Press:
+  {
     // Popup menu
     int x, y;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
-      if (evlist->popup_menu_cb) {
+      if (evlist->popup_menu_cb)
+      {
         brow_GetUserData(event->object.object, (void**)&item);
-        if (event->any.x < 2) {
+        if (event->any.x < 2)
+        {
           // Popup menu methods for sup object
-          if (cdh_ObjidIsNotNull(item->supobject.Objid)) {
-            evlist->popup_position(
-                event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
+          if (cdh_ObjidIsNotNull(item->supobject.Objid))
+          {
+            evlist->popup_position(event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
             (evlist->popup_menu_cb)(evlist->parent_ctx, item->supobject,
-                (unsigned long)xmenu_eItemType_Object,
-                (unsigned long)xmenu_mUtility_EventList, NULL, x, y);
+                                    (unsigned long)xmenu_eItemType_Object,
+                                    (unsigned long)xmenu_mUtility_EventList, NULL, x, y);
           }
-        } else {
+        }
+        else
+        {
           // Popup menu methods for eventname object
-          if (cdh_ObjidIsNotNull(item->object.Objid)) {
+          if (cdh_ObjidIsNotNull(item->object.Objid))
+          {
             pwr_tAttrRef aref;
             pwr_tObjName cname;
             pwr_tStatus sts;
@@ -1316,24 +1317,25 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
             if (EVEN(sts))
               break;
 
-            sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid), cname, sizeof(cname),
-                cdh_mName_object);
-            if (ODD(sts)) {
-              if (str_StartsWith(cname, "CompMode")) {
+            sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid), cname, sizeof(cname), cdh_mName_object);
+            if (ODD(sts))
+            {
+              if (str_StartsWith(cname, "CompMode"))
+              {
                 // Take parent object level
                 sts = gdh_AttrArefToObjectAref(&item->object, &aref);
                 if (EVEN(sts))
                   aref = item->object;
-              } else
+              }
+              else
                 aref = item->object;
-            } else
+            }
+            else
               aref = item->object;
 
-            evlist->popup_position(
-                event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
-            (evlist->popup_menu_cb)(evlist->parent_ctx, aref,
-                (unsigned long)xmenu_eItemType_Object,
-                (unsigned long)xmenu_mUtility_EventList, NULL, x, y);
+            evlist->popup_position(event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
+            (evlist->popup_menu_cb)(evlist->parent_ctx, aref, (unsigned long)xmenu_eItemType_Object,
+                                    (unsigned long)xmenu_mUtility_EventList, NULL, x, y);
           }
         }
       }
@@ -1342,23 +1344,28 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_Key_PageDown: {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(evlist->brow->ctx, 0.9);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(evlist->brow->ctx, -0.9);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(evlist->brow->ctx, 0.1);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(evlist->brow->ctx, -0.1);
     break;
   }
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
@@ -1371,16 +1378,19 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (brow_IsOpen(node_list[0]))
       // Close this node
       object = node_list[0];
-    else {
+    else
+    {
       // Close parent
       sts = brow_GetParent(evlist->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(node_list);
         return 1;
       }
     }
     brow_GetUserData(object, (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case evlist_eItemType_Alarm:
       //	  ((ItemLocal *)item)->close( evlist, 0, 0);
       break;
@@ -1397,7 +1407,8 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     int node_count;
 
@@ -1406,7 +1417,8 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
       return 1;
 
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case evlist_eItemType_Alarm:
       //	  ((ItemAlarm *)item)->open_children( evlist, 0, 0);
       break;
@@ -1416,18 +1428,20 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
   }
+  /* fall through */
   case flow_eEvent_MB1DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case evlist_eItemType_Alarm:
         //	      ((ItemAlarm *)item)->open_children( evlist,
         //			event->object.x, event->object.y);
         break;
       case evlist_eItemType_Category:
-        ((ItemCategory*)item)
-            ->open_children(evlist, event->object.x, event->object.y);
+        ((ItemCategory*)item)->open_children(evlist, event->object.x, event->object.y);
         break;
       default:;
       }
@@ -1435,25 +1449,30 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
     break;
-  case flow_eEvent_TipText: {
+  case flow_eEvent_TipText:
+  {
     brow_GetUserData(event->object.object, (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case evlist_eItemType_Alarm:
-      if (!streq(((ItemAlarm*)item)->eventmoretext, "")) {
-        brow_SetTipText(evlist->brow->ctx, event->object.object,
-            ((ItemAlarm*)item)->eventmoretext, event->any.x_pixel,
-            event->any.y_pixel);
+      if (!streq(((ItemAlarm*)item)->eventmoretext, ""))
+      {
+        brow_SetTipText(evlist->brow->ctx, event->object.object, ((ItemAlarm*)item)->eventmoretext,
+                        event->any.x_pixel, event->any.y_pixel);
       }
       break;
     default:;
     }
     break;
   }
-  case flow_eEvent_PixmapButton: {
+  case flow_eEvent_PixmapButton:
+  {
     brow_GetUserData(event->object.object, (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case evlist_eItemType_Alarm:
-      if (!streq(((ItemAlarm*)item)->eventmoretext, "")) {
+      if (!streq(((ItemAlarm*)item)->eventmoretext, ""))
+      {
         if (evlist->help_event_cb)
           evlist->help_event_cb(evlist->parent_ctx, item);
       }
@@ -1467,18 +1486,16 @@ int EvList::brow_cb(FlowCtx* ctx, flow_tEvent event)
   return 1;
 }
 
-ItemAlarm::ItemAlarm(EvList* item_evlist, const char* item_name,
-    pwr_tTime item_time, const char* item_eventtext, char* item_eventname,
-    int item_eventtype, int item_eventflags, unsigned long item_eventprio,
-    mh_sEventId item_eventid, pwr_tAttrRef* item_object,
-    pwr_tAttrRef* item_eventsound, char* item_eventmoretext,
-    unsigned long item_status, evlist_eEventType item_event_type,
-    pwr_tAttrRef* item_supobject, brow_tNode dest, flow_eDest dest_code,
-    int* rsts)
-    : event_type(item_event_type), evlist(item_evlist), tree_node(0),
-      time(item_time), eventtype(item_eventtype), eventflags(item_eventflags),
-      eventprio(item_eventprio), eventid(item_eventid), object(*item_object),
-      status(item_status), supobject(*item_supobject), check(0), display_time(pwr_cNTime)
+ItemAlarm::ItemAlarm(EvList* item_evlist, const char* item_name, pwr_tTime item_time,
+                     const char* item_eventtext, char* item_eventname, int item_eventtype,
+                     int item_eventflags, unsigned long item_eventprio, mh_sEventId item_eventid,
+                     pwr_tAttrRef* item_object, pwr_tAttrRef* item_eventsound, char* item_eventmoretext,
+                     unsigned long item_status, evlist_eEventType item_event_type,
+                     pwr_tAttrRef* item_supobject, brow_tNode dest, flow_eDest dest_code, int* rsts)
+    : event_type(item_event_type), evlist(item_evlist), tree_node(0), time(item_time),
+      eventtype(item_eventtype), eventflags(item_eventflags), eventprio(item_eventprio),
+      eventid(item_eventid), object(*item_object), status(item_status), supobject(*item_supobject), check(0),
+      display_time(pwr_cNTime)
 {
   type = evlist_eItemType_Alarm;
   brow_tNodeClass nc;
@@ -1500,10 +1517,12 @@ ItemAlarm::ItemAlarm(EvList* item_evlist, const char* item_name,
   else
     strcpy(eventmoretext, "");
 
-  switch (event_type) {
+  switch (event_type)
+  {
   case evlist_eEventType_Alarm:
   case evlist_eEventType_Block:
-    switch (eventprio) {
+    switch (eventprio)
+    {
     case mh_eEventPrio_A:
       nc = evlist->browbase->nc_a_alarm;
       break;
@@ -1525,20 +1544,21 @@ ItemAlarm::ItemAlarm(EvList* item_evlist, const char* item_name,
     break;
   }
 
-  brow_CreateNode(evlist->browbase->ctx, item_name, nc, dest, dest_code,
-      (void*)this, 1, &node);
+  brow_CreateNode(evlist->browbase->ctx, item_name, nc, dest, dest_code, (void*)this, 1, &node);
 
   //  brow_SetAnnotPixmap( node, 0, evlist->browbase->pixmap_leaf);
   update_text(0);
 
-  if (evlist->size > evlist->max_size) {
+  if (evlist->size > evlist->max_size)
+  {
     // Delete last
     brow_tObject last_node;
     int sts;
     ItemAlarm* item;
 
     sts = brow_GetLast(evlist->browbase->ctx, &last_node);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       if (node == last_node)
         // I'm deleting myself
         *rsts = 0;
@@ -1551,7 +1571,8 @@ ItemAlarm::ItemAlarm(EvList* item_evlist, const char* item_name,
       brow_DeleteNode(evlist->browbase->ctx, last_node);
 
       // Note! This ItemAlarm might be deleted by now if node == last_node
-      if (item_type == evlist_eItemType_Alarm && item_evlist->browtree) {
+      if (item_type == evlist_eItemType_Alarm && item_evlist->browtree)
+      {
         if (item_tree_node)
           brow_DeleteNode(item_evlist->browtree->ctx, item_tree_node);
         item_evlist->view_configure();
@@ -1575,7 +1596,8 @@ void ItemAlarm::update_text(int use_treenode)
     n = node;
 
   strcpy(info_str, "");
-  if (evlist->type == ev_eType_AlarmList) {
+  if (evlist->type == ev_eType_AlarmList)
+  {
     if (status & mh_mEventStatus_NotAck)
       brow_SetAnnotPixmap(n, 0, evlist->browbase->pixmap_ack);
     else
@@ -1584,8 +1606,11 @@ void ItemAlarm::update_text(int use_treenode)
       brow_SetAnnotPixmap(n, 1, evlist->browbase->pixmap_alarm);
     else
       brow_RemoveAnnotPixmap(n, 1);
-  } else {
-    switch (event_type) {
+  }
+  else
+  {
+    switch (event_type)
+    {
     case evlist_eEventType_Return:
       brow_SetAnnotPixmap(n, 0, evlist->browbase->pixmap_eventreturn);
       break;
@@ -1603,7 +1628,8 @@ void ItemAlarm::update_text(int use_treenode)
     }
   }
 
-  switch (event_type) {
+  switch (event_type)
+  {
   case evlist_eEventType_Info:
   case evlist_eEventType_InfoSuccess:
     strcpy(type_str, "I");
@@ -1611,7 +1637,8 @@ void ItemAlarm::update_text(int use_treenode)
     break;
   case evlist_eEventType_Block:
   case evlist_eEventType_Alarm:
-    switch (eventprio) {
+    switch (eventprio)
+    {
     case mh_eEventPrio_A:
       strcpy(type_str, "A");
       break;
@@ -1632,22 +1659,25 @@ void ItemAlarm::update_text(int use_treenode)
   default:;
   }
 
-  time_AtoAscii(
-      &time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
+  time_AtoAscii(&time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
   if (!evlist->display_hundredth)
     time_str[17] = 0;
   brow_SetAnnotation(n, 1, time_str, strlen(time_str));
 
-  switch (event_type) {
+  switch (event_type)
+  {
   case evlist_eEventType_Info:
   case evlist_eEventType_InfoSuccess:
   case evlist_eEventType_Alarm:
   case evlist_eEventType_Return:
   case evlist_eEventType_Block:
-    if (!evlist->hide_text) {
+    if (!evlist->hide_text)
+    {
       brow_SetAnnotation(n, 2, alias, strlen(alias));
       brow_SetAnnotation(n, 3, eventtext, strlen(eventtext));
-    } else {
+    }
+    else
+    {
       brow_SetAnnotation(n, 2, "", 0);
       brow_SetAnnotation(n, 3, "", 0);
     }
@@ -1657,11 +1687,13 @@ void ItemAlarm::update_text(int use_treenode)
     brow_SetAnnotation(n, 3, "", 0);
   }
 
-  if (!evlist->hide_object && evlist->hide_text) {
+  if (!evlist->hide_object && evlist->hide_text)
+  {
     brow_SetAnnotation(n, 2, eventname, strlen(eventname));
     brow_SetAnnotation(n, 3, "", 0);
     brow_SetAnnotation(n, 4, "", 0);
-  } else if (!evlist->hide_object)
+  }
+  else if (!evlist->hide_object)
     brow_SetAnnotation(n, 4, eventname, strlen(eventname));
   else
     brow_SetAnnotation(n, 4, "", 0);
@@ -1669,7 +1701,8 @@ void ItemAlarm::update_text(int use_treenode)
   if (!streq(eventmoretext, ""))
     brow_SetAnnotPixmap(n, 2, evlist->browbase->pixmap_info);
 
-  switch (eventtype) {
+  switch (eventtype)
+  {
   case mh_eEvent_SystemAlarm:
     brow_SetAnnotPixmap(n, 3, evlist->browbase->pixmap_system);
     break;
@@ -1680,9 +1713,8 @@ void ItemAlarm::update_text(int use_treenode)
   }
 }
 
-ItemCategory::ItemCategory(EvList* item_evlist, const char* item_name,
-    pwr_sClass_AlarmCategory* cop, brow_tNode dest, flow_eDest dest_code,
-    int* rsts)
+ItemCategory::ItemCategory(EvList* item_evlist, const char* item_name, pwr_sClass_AlarmCategory* cop,
+                           brow_tNode dest, flow_eDest dest_code, int* rsts)
     : evlist(item_evlist), prio(0), base_nc(0), notacked_child(0)
 {
   pwr_tStatus sts;
@@ -1696,17 +1728,15 @@ ItemCategory::ItemCategory(EvList* item_evlist, const char* item_name,
   select_eventtype = cop->EventType;
 
   member_cnt = 0;
-  for (unsigned int i = 0; i < sizeof(cop->Members) / sizeof(cop->Members[0]);
-       i++) {
+  for (unsigned int i = 0; i < sizeof(cop->Members) / sizeof(cop->Members[0]); i++)
+  {
     if (cdh_ObjidIsNull(cop->Members[i].Objid))
       break;
-    sts = gdh_AttrrefToName(
-        &cop->Members[i], members[i], sizeof(members[0]), cdh_mName_pathStrict);
+    sts = gdh_AttrrefToName(&cop->Members[i], members[i], sizeof(members[0]), cdh_mName_pathStrict);
     member_cnt++;
   }
 
-  brow_CreateNode(evlist->brow->ctx, name, evlist->brow->nc_category, dest,
-      dest_code, (void*)this, 1, &node);
+  brow_CreateNode(evlist->brow->ctx, name, evlist->brow->nc_category, dest, dest_code, (void*)this, 1, &node);
 
   brow_SetAnnotation(node, 1, text, strlen(text));
   brow_SetAnnotPixmap(node, 0, evlist->brow->pixmap_map);
@@ -1719,44 +1749,54 @@ void ItemCategory::configure(EvList* evlist)
   unsigned int child_prio = 0;
   brow_tObject next;
 
-  if (brow_IsOpen(node) & evlist_mOpen_Children) {
+  if (brow_IsOpen(node) & evlist_mOpen_Children)
+  {
     // Check children
     for (sts = brow_GetChild(evlist->brow->ctx, node, &next); ODD(sts);
-         sts = brow_GetNextSibling(evlist->brow->ctx, next, &next)) {
+         sts = brow_GetNextSibling(evlist->brow->ctx, next, &next))
+    {
       brow_GetUserData(next, (void**)&item);
-      if (item->event_type == evlist_eEventType_Info
-          || item->event_type == evlist_eEventType_InfoSuccess) {
+      if (item->event_type == evlist_eEventType_Info || item->event_type == evlist_eEventType_InfoSuccess)
+      {
         if (1 > child_prio)
           child_prio = 1;
-      } else if (item->eventprio > child_prio)
+      }
+      else if (item->eventprio > child_prio)
         child_prio = item->eventprio;
     }
-  } else {
+  }
+  else
+  {
     // Check potential children
     brow_tObject* object_list;
     int object_cnt;
 
     brow_GetObjectList(evlist->browbase->ctx, &object_list, &object_cnt);
-    for (int i = 0; i < object_cnt; i++) {
+    for (int i = 0; i < object_cnt; i++)
+    {
       brow_GetUserData(object_list[i], (void**)&item);
-      switch (item->type) {
-      case evlist_eItemType_Alarm: {
-        for (int j = 0; j < member_cnt; j++) {
-          if (item->eventtype != mh_eEvent_Info
-              && item->eventtype != mh_eEvent_InfoSuccess
-              && select_priority != 0
-              && !(select_priority & prio_enum_to_mask(item->eventprio)))
+      switch (item->type)
+      {
+      case evlist_eItemType_Alarm:
+      {
+        for (int j = 0; j < member_cnt; j++)
+        {
+          if (item->eventtype != mh_eEvent_Info && item->eventtype != mh_eEvent_InfoSuccess &&
+              select_priority != 0 && !(select_priority & prio_enum_to_mask(item->eventprio)))
             continue;
           if (select_eventtype != 0 && !(select_eventtype & item->eventtype))
             continue;
 
-          if (str_StartsWith(item->eventname, members[j])) {
+          if (str_StartsWith(item->eventname, members[j]))
+          {
             // Presupmtive child
-            if (item->event_type == evlist_eEventType_Info
-                || item->event_type == evlist_eEventType_InfoSuccess) {
+            if (item->event_type == evlist_eEventType_Info ||
+                item->event_type == evlist_eEventType_InfoSuccess)
+            {
               if (1 > child_prio)
                 child_prio = 1;
-            } else if (item->eventprio > child_prio)
+            }
+            else if (item->eventprio > child_prio)
               child_prio = item->eventprio;
           }
         }
@@ -1767,9 +1807,11 @@ void ItemCategory::configure(EvList* evlist)
     }
   }
 
-  if (prio != child_prio) {
+  if (prio != child_prio)
+  {
     prio = child_prio;
-    switch (prio) {
+    switch (prio)
+    {
     case 1:
       base_nc = evlist->brow->nc_category_i;
       break;
@@ -1794,11 +1836,13 @@ void ItemCategory::configure(EvList* evlist)
   if (base_nc == 0)
     base_nc = evlist->brow->nc_category;
 
-  if (prio == 0) {
+  if (prio == 0)
+  {
     brow_SetAnnotPixmap(node, 0, evlist->brow->pixmap_leaf);
     if (brow_IsOpen(node) & evlist_mOpen_Children)
       brow_ResetOpen(node, evlist_mOpen_All);
-  } else if (brow_IsOpen(node) & evlist_mOpen_Children)
+  }
+  else if (brow_IsOpen(node) & evlist_mOpen_Children)
     brow_SetAnnotPixmap(node, 0, evlist->brow->pixmap_openmap);
   else
     brow_SetAnnotPixmap(node, 0, evlist->brow->pixmap_map);
@@ -1814,15 +1858,21 @@ void ItemCategory::alarm(EvList* evlist, ItemAlarm* item)
   if (item->tree_node)
     return;
 
-  switch (item->type) {
-  case evlist_eItemType_Alarm: {
-    for (int j = 0; j < member_cnt; j++) {
-      if (str_StartsWith(item->eventname, members[j])) {
+  switch (item->type)
+  {
+  case evlist_eItemType_Alarm:
+  {
+    for (int j = 0; j < member_cnt; j++)
+    {
+      if (str_StartsWith(item->eventname, members[j]))
+      {
         // Insert item
-        switch (item->event_type) {
+        switch (item->event_type)
+        {
         case evlist_eEventType_Alarm:
         case evlist_eEventType_Block:
-          switch (item->eventprio) {
+          switch (item->eventprio)
+          {
           case mh_eEventPrio_A:
             nc = evlist->brow->nc_a_alarm;
             break;
@@ -1844,8 +1894,7 @@ void ItemCategory::alarm(EvList* evlist, ItemAlarm* item)
           break;
         }
 
-        brow_CreateNode(evlist->brow->ctx, name, nc, node, flow_eDest_IntoFirst,
-            item, 1, &item->tree_node);
+        brow_CreateNode(evlist->brow->ctx, name, nc, node, flow_eDest_IntoFirst, item, 1, &item->tree_node);
         item->update_text(1);
         brow_SetAnnotPixmap(node, 0, evlist->brow->pixmap_openmap);
       }
@@ -1862,11 +1911,13 @@ void ItemCategory::close(EvList* evlist, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(evlist->brow->ctx);
     brow_CloseNode(evlist->brow->ctx, node);
-    if (brow_IsOpen(node) & evlist_mOpen_Children) {
+    if (brow_IsOpen(node) & evlist_mOpen_Children)
+    {
       brow_SetAnnotPixmap(node, 0, evlist->brow->pixmap_map);
     }
     brow_ResetOpen(node, evlist_mOpen_All);
@@ -1881,17 +1932,21 @@ int ItemCategory::open_children(EvList* evlist, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(evlist->brow->ctx);
     brow_CloseNode(evlist->brow->ctx, node);
-    if (brow_IsOpen(node) & evlist_mOpen_Children) {
+    if (brow_IsOpen(node) & evlist_mOpen_Children)
+    {
       brow_SetAnnotPixmap(node, 0, evlist->brow->pixmap_map);
     }
     brow_ResetOpen(node, evlist_mOpen_All);
     brow_ResetNodraw(evlist->brow->ctx);
     brow_Redraw(evlist->brow->ctx, node_y);
-  } else {
+  }
+  else
+  {
     ItemAlarm* item;
     brow_tObject* object_list;
     int object_cnt;
@@ -1903,26 +1958,32 @@ int ItemCategory::open_children(EvList* evlist, double x, double y)
 
     child_exist = 0;
     brow_GetObjectList(evlist->browbase->ctx, &object_list, &object_cnt);
-    for (int i = 0; i < object_cnt; i++) {
+    for (int i = 0; i < object_cnt; i++)
+    {
       brow_GetUserData(object_list[i], (void**)&item);
-      switch (item->type) {
-      case evlist_eItemType_Alarm: {
+      switch (item->type)
+      {
+      case evlist_eItemType_Alarm:
+      {
         if (item->tree_node)
           continue;
-        if (item->eventtype != mh_eEvent_Info
-            && item->eventtype != mh_eEvent_InfoSuccess && select_priority != 0
-            && !(select_priority & prio_enum_to_mask(item->eventprio)))
+        if (item->eventtype != mh_eEvent_Info && item->eventtype != mh_eEvent_InfoSuccess &&
+            select_priority != 0 && !(select_priority & prio_enum_to_mask(item->eventprio)))
           continue;
         if (select_eventtype != 0 && !(select_eventtype & item->eventtype))
           continue;
 
-        for (int j = 0; j < member_cnt; j++) {
-          if (str_StartsWith(item->eventname, members[j])) {
+        for (int j = 0; j < member_cnt; j++)
+        {
+          if (str_StartsWith(item->eventname, members[j]))
+          {
             // Insert item
-            switch (item->event_type) {
+            switch (item->event_type)
+            {
             case evlist_eEventType_Alarm:
             case evlist_eEventType_Block:
-              switch (item->eventprio) {
+              switch (item->eventprio)
+              {
               case mh_eEventPrio_A:
                 nc = evlist->brow->nc_a_alarm;
                 break;
@@ -1944,8 +2005,8 @@ int ItemCategory::open_children(EvList* evlist, double x, double y)
               break;
             }
 
-            brow_CreateNode(evlist->brow->ctx, name, nc, node,
-                flow_eDest_IntoLast, item, 1, &item->tree_node);
+            brow_CreateNode(evlist->brow->ctx, name, nc, node, flow_eDest_IntoLast, item, 1,
+                            &item->tree_node);
             item->update_text(1);
             child_exist = 1;
           }
@@ -1956,7 +2017,8 @@ int ItemCategory::open_children(EvList* evlist, double x, double y)
       }
     }
 
-    if (child_exist) {
+    if (child_exist)
+    {
       brow_SetOpen(node, evlist_mOpen_Children);
       brow_SetAnnotPixmap(node, 0, evlist->brow->pixmap_openmap);
     }
@@ -1975,35 +2037,45 @@ void ItemCategory::flash(EvList* evlist)
   int notacked = 0;
 
   notacked = false;
-  if (brow_IsOpen(node) & evlist_mOpen_Children) {
+  if (brow_IsOpen(node) & evlist_mOpen_Children)
+  {
     // Check children
     for (sts = brow_GetChild(evlist->brow->ctx, node, &next); ODD(sts);
-         sts = brow_GetNextSibling(evlist->brow->ctx, next, &next)) {
+         sts = brow_GetNextSibling(evlist->brow->ctx, next, &next))
+    {
       brow_GetUserData(next, (void**)&item);
 
-      if (item->status & mh_mEventStatus_NotAck) {
+      if (item->status & mh_mEventStatus_NotAck)
+      {
         notacked++;
       }
     }
-  } else {
+  }
+  else
+  {
     // Check potential children
     brow_tObject* object_list;
     int object_cnt;
 
     brow_GetObjectList(evlist->browbase->ctx, &object_list, &object_cnt);
-    for (int i = 0; i < object_cnt; i++) {
+    for (int i = 0; i < object_cnt; i++)
+    {
       brow_GetUserData(object_list[i], (void**)&item);
-      switch (item->type) {
-      case evlist_eItemType_Alarm: {
-        if (select_priority != 0
-            && !(select_priority & prio_enum_to_mask(item->eventprio)))
+      switch (item->type)
+      {
+      case evlist_eItemType_Alarm:
+      {
+        if (select_priority != 0 && !(select_priority & prio_enum_to_mask(item->eventprio)))
           continue;
         if (select_eventtype != 0 && !(select_eventtype & item->eventtype))
           continue;
-        for (int j = 0; j < member_cnt; j++) {
-          if (str_StartsWith(item->eventname, members[j])) {
+        for (int j = 0; j < member_cnt; j++)
+        {
+          if (str_StartsWith(item->eventname, members[j]))
+          {
             // Presupmtive child
-            if (item->status & mh_mEventStatus_NotAck) {
+            if (item->status & mh_mEventStatus_NotAck)
+            {
               notacked++;
             }
           }
@@ -2015,10 +2087,12 @@ void ItemCategory::flash(EvList* evlist)
     }
   }
 
-  if (notacked != notacked_child) {
+  if (notacked != notacked_child)
+  {
     if (!notacked)
       brow_SetAnnotation(node, 0, "", 0);
-    else {
+    else
+    {
       char notacked_str[20];
       sprintf(notacked_str, "%d", notacked);
 
@@ -2028,13 +2102,15 @@ void ItemCategory::flash(EvList* evlist)
 
   if (notacked && !notacked_child)
     brow_SetAnnotPixmap(node, 1, evlist->browbase->pixmap_ack);
-  else if (!notacked && notacked_child) {
+  else if (!notacked && notacked_child)
+  {
     brow_ChangeObjectNodeClass(node, base_nc);
     brow_RemoveAnnotPixmap(node, 1);
   }
   notacked_child = notacked;
 
-  if (notacked_child) {
+  if (notacked_child)
+  {
     if (evlist->flash_value)
       brow_ChangeObjectNodeClass(node, base_nc);
     else
@@ -2051,9 +2127,11 @@ int EvList::get_num_not_acked()
   int num = 0;
 
   brow_GetObjectList(browbase->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&object_item);
-    switch (object_item->type) {
+    switch (object_item->type)
+    {
     case evlist_eItemType_Alarm:
       if (object_item->status & mh_mEventStatus_NotAck)
         num++;
@@ -2072,11 +2150,14 @@ int EvList::get_last_not_acked(mh_sEventId** id)
   ItemAlarm* object_item;
 
   brow_GetObjectList(browbase->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&object_item);
-    switch (object_item->type) {
+    switch (object_item->type)
+    {
     case evlist_eItemType_Alarm:
-      if (object_item->status & mh_mEventStatus_NotAck) {
+      if (object_item->status & mh_mEventStatus_NotAck)
+      {
         *id = &object_item->eventid;
         return 1;
       }
@@ -2098,15 +2179,19 @@ int EvList::get_last_not_acked_beep(mh_sEventId** id)
 
   // Get first not acked event with highest priority
   brow_GetObjectList(browbase->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&object_item);
-    switch (object_item->type) {
+    switch (object_item->type)
+    {
     case evlist_eItemType_Alarm:
-      if (object_item->status & mh_mEventStatus_NotAck
-          && object_item->eventflags & mh_mEventFlags_Bell) {
-        switch (object_item->event_type) {
+      if (object_item->status & mh_mEventStatus_NotAck && object_item->eventflags & mh_mEventFlags_Bell)
+      {
+        switch (object_item->event_type)
+        {
         case evlist_eEventType_Alarm:
-          if (object_item->eventprio > prio) {
+          if (object_item->eventprio > prio)
+          {
             *id = &object_item->eventid;
             prio = object_item->eventprio;
             found = 1;
@@ -2130,8 +2215,8 @@ int EvList::get_last_not_acked_beep(mh_sEventId** id)
   return found;
 }
 
-int EvList::get_last_not_acked_prio(mh_sEventId** id, unsigned long type,
-				    unsigned long prio, int backward, int timecheck)
+int EvList::get_last_not_acked_prio(mh_sEventId** id, unsigned long type, unsigned long prio, int backward,
+                                    int timecheck)
 {
   int i, j;
   brow_tObject* object_list;
@@ -2140,48 +2225,54 @@ int EvList::get_last_not_acked_prio(mh_sEventId** id, unsigned long type,
   pwr_tTime current;
 
   brow_GetObjectList(browbase->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
-    if ( backward)
+  for (i = 0; i < object_cnt; i++)
+  {
+    if (backward)
       j = object_cnt - i - 1;
     else
       j = i;
     brow_GetUserData(object_list[j], (void**)&object_item);
-    switch (object_item->type) {
+    switch (object_item->type)
+    {
     case evlist_eItemType_Alarm:
-      switch (object_item->event_type) {
+      switch (object_item->event_type)
+      {
       case evlist_eEventType_Alarm:
-        if (object_item->status & mh_mEventStatus_NotAck
-            && object_item->event_type == (evlist_eEventType)type
-            && object_item->eventprio == prio) {
+        if (object_item->status & mh_mEventStatus_NotAck &&
+            object_item->event_type == (evlist_eEventType)type && object_item->eventprio == prio)
+        {
           *id = &object_item->eventid;
-	  if ( timecheck) {
-	    pwr_tDeltaTime diff;
-	    pwr_tFloat32 fdiff;
+          if (timecheck)
+          {
+            pwr_tDeltaTime diff;
+            pwr_tFloat32 fdiff;
 
-	    time_GetTime( &current);
-	    time_Adiff( &diff, &current, &object_item->display_time);
-	    time_DToFloat( &fdiff, &diff);
-	    if ( fdiff < 1)
-	      return 0;
-	  }
+            time_GetTime(&current);
+            time_Adiff(&diff, &current, &object_item->display_time);
+            time_DToFloat(&fdiff, &diff);
+            if (fdiff < 1)
+              return 0;
+          }
           return 1;
         }
         break;
       case evlist_eEventType_Info:
       case evlist_eEventType_InfoSuccess:
-        if (object_item->status & mh_mEventStatus_NotAck
-            && object_item->event_type == (evlist_eEventType)type) {
+        if (object_item->status & mh_mEventStatus_NotAck &&
+            object_item->event_type == (evlist_eEventType)type)
+        {
           *id = &object_item->eventid;
-	  if ( timecheck) {
-	    pwr_tDeltaTime diff;
-	    pwr_tFloat32 fdiff;
+          if (timecheck)
+          {
+            pwr_tDeltaTime diff;
+            pwr_tFloat32 fdiff;
 
-	    time_GetTime( &current);
-	    time_Adiff( &diff, &current, &object_item->display_time);
-	    time_DToFloat( &fdiff, &diff);
-	    if ( fdiff < 1)
-	      return 0;
-	  }
+            time_GetTime(&current);
+            time_Adiff(&diff, &current, &object_item->display_time);
+            time_DToFloat(&fdiff, &diff);
+            if (fdiff < 1)
+              return 0;
+          }
           return 1;
         }
         break;
@@ -2209,104 +2300,96 @@ int EvList::get_alarm_info(evlist_sAlarmInfo* info, int backward, int alarmsize)
   memset(info, 0, sizeof(*info));
 
   brow_GetObjectList(browbase->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
-    if ( backward)
+  for (i = 0; i < object_cnt; i++)
+  {
+    if (backward)
       j = object_cnt - i - 1;
     else
       j = i;
     brow_GetUserData(object_list[j], (void**)&object_item);
-    switch (object_item->type) {
+    switch (object_item->type)
+    {
     case evlist_eItemType_Alarm:
-      switch (object_item->event_type) {
+      switch (object_item->event_type)
+      {
       case evlist_eEventType_Alarm:
         if (object_item->status & mh_mEventStatus_NotRet)
           info->alarms_total++;
 
-        if (object_item->status & mh_mEventStatus_NotAck) {
+        if (object_item->status & mh_mEventStatus_NotAck)
+        {
           // Compose the alarmtext from eventtext and eventname
           char eventtext[600];
 
           strcpy(eventtext, object_item->eventtext);
-          if (eventname_seg
-              && !(streq(object_item->eventname, "")
-                     || strstr(object_item->eventname, "-W-") != 0)) {
+          if (eventname_seg &&
+              !(streq(object_item->eventname, "") || strstr(object_item->eventname, "-W-") != 0))
+          {
             strcat(eventtext, ", ");
-            cdh_CutNameSegments(&eventtext[strlen(eventtext)],
-                object_item->eventname, eventname_seg);
+            cdh_CutNameSegments(&eventtext[strlen(eventtext)], object_item->eventname, eventname_seg);
           }
 
           info->alarms_notacked++;
-          switch (object_item->eventprio) {
+          switch (object_item->eventprio)
+          {
           case mh_eEventPrio_A:
             if (a_cnt >= ALARM_INFO_A_SIZE)
               break;
-            strncpy(info->a_alarm_text[a_cnt], eventtext,
-                sizeof(info->a_alarm_text[0]));
+            strncpy(info->a_alarm_text[a_cnt], eventtext, sizeof(info->a_alarm_text[0]));
             strncpy(info->a_alarm_moretext[a_cnt], object_item->eventmoretext,
-                sizeof(info->a_alarm_moretext[0]));
+                    sizeof(info->a_alarm_moretext[0]));
             info->a_alarm_text[a_cnt][sizeof(info->a_alarm_text[0]) - 1] = 0;
-            strncpy(info->a_alarm_alias[a_cnt], object_item->alias,
-                sizeof(info->a_alarm_alias[0]));
+            strncpy(info->a_alarm_alias[a_cnt], object_item->alias, sizeof(info->a_alarm_alias[0]));
             info->a_alarm_time[a_cnt] = object_item->time;
-            info->a_alarm_active[a_cnt]
-                = object_item->status & mh_mEventStatus_NotRet;
+            info->a_alarm_active[a_cnt] = object_item->status & mh_mEventStatus_NotRet;
             info->a_alarm_exist[a_cnt] = 1;
-	    if ( object_item->display_time.tv_sec == 0 && a_cnt < alarmsize)
-	      time_GetTime( &object_item->display_time);
+            if (object_item->display_time.tv_sec == 0 && a_cnt < alarmsize)
+              time_GetTime(&object_item->display_time);
             a_cnt++;
             break;
           case mh_eEventPrio_B:
             if (b_cnt >= ALARM_INFO_B_SIZE)
               break;
-            strncpy(info->b_alarm_text[b_cnt], eventtext,
-                sizeof(info->b_alarm_text[0]));
+            strncpy(info->b_alarm_text[b_cnt], eventtext, sizeof(info->b_alarm_text[0]));
             strncpy(info->b_alarm_moretext[b_cnt], object_item->eventmoretext,
-                sizeof(info->b_alarm_moretext[0]));
+                    sizeof(info->b_alarm_moretext[0]));
             info->b_alarm_text[b_cnt][sizeof(info->b_alarm_text[0]) - 1] = 0;
-            strncpy(info->b_alarm_alias[b_cnt], object_item->alias,
-                sizeof(info->b_alarm_alias[0]));
+            strncpy(info->b_alarm_alias[b_cnt], object_item->alias, sizeof(info->b_alarm_alias[0]));
             info->b_alarm_time[b_cnt] = object_item->time;
-            info->b_alarm_active[b_cnt]
-                = object_item->status & mh_mEventStatus_NotRet;
+            info->b_alarm_active[b_cnt] = object_item->status & mh_mEventStatus_NotRet;
             info->b_alarm_exist[b_cnt] = 1;
-	    if ( object_item->display_time.tv_sec == 0)
-	      time_GetTime( &object_item->display_time);
+            if (object_item->display_time.tv_sec == 0)
+              time_GetTime(&object_item->display_time);
             b_cnt++;
             break;
           case mh_eEventPrio_C:
             if (c_cnt >= ALARM_INFO_C_SIZE)
               break;
-            strncpy(info->c_alarm_text[c_cnt], eventtext,
-                sizeof(info->c_alarm_text[0]));
+            strncpy(info->c_alarm_text[c_cnt], eventtext, sizeof(info->c_alarm_text[0]));
             strncpy(info->c_alarm_moretext[c_cnt], object_item->eventmoretext,
-                sizeof(info->c_alarm_moretext[0]));
+                    sizeof(info->c_alarm_moretext[0]));
             info->c_alarm_text[c_cnt][sizeof(info->c_alarm_text[0]) - 1] = 0;
-            strncpy(info->c_alarm_alias[c_cnt], object_item->alias,
-                sizeof(info->c_alarm_alias[0]));
+            strncpy(info->c_alarm_alias[c_cnt], object_item->alias, sizeof(info->c_alarm_alias[0]));
             info->c_alarm_time[c_cnt] = object_item->time;
-            info->c_alarm_active[c_cnt]
-                = object_item->status & mh_mEventStatus_NotRet;
+            info->c_alarm_active[c_cnt] = object_item->status & mh_mEventStatus_NotRet;
             info->c_alarm_exist[c_cnt] = 1;
-	    if ( object_item->display_time.tv_sec == 0)
-	      time_GetTime( &object_item->display_time);
+            if (object_item->display_time.tv_sec == 0)
+              time_GetTime(&object_item->display_time);
             c_cnt++;
             break;
           case mh_eEventPrio_D:
             if (d_cnt >= ALARM_INFO_D_SIZE)
               break;
-            strncpy(info->d_alarm_text[d_cnt], eventtext,
-                sizeof(info->d_alarm_text[0]));
+            strncpy(info->d_alarm_text[d_cnt], eventtext, sizeof(info->d_alarm_text[0]));
             strncpy(info->d_alarm_moretext[d_cnt], object_item->eventmoretext,
-                sizeof(info->d_alarm_moretext[0]));
+                    sizeof(info->d_alarm_moretext[0]));
             info->d_alarm_text[d_cnt][sizeof(info->d_alarm_text[0]) - 1] = 0;
-            strncpy(info->d_alarm_alias[d_cnt], object_item->alias,
-                sizeof(info->d_alarm_alias[0]));
+            strncpy(info->d_alarm_alias[d_cnt], object_item->alias, sizeof(info->d_alarm_alias[0]));
             info->d_alarm_time[d_cnt] = object_item->time;
-            info->d_alarm_active[d_cnt]
-                = object_item->status & mh_mEventStatus_NotRet;
+            info->d_alarm_active[d_cnt] = object_item->status & mh_mEventStatus_NotRet;
             info->d_alarm_exist[d_cnt] = 1;
-	    if ( object_item->display_time.tv_sec == 0)
-	      time_GetTime( &object_item->display_time);
+            if (object_item->display_time.tv_sec == 0)
+              time_GetTime(&object_item->display_time);
             d_cnt++;
             break;
           default:;
@@ -2315,23 +2398,21 @@ int EvList::get_alarm_info(evlist_sAlarmInfo* info, int backward, int alarmsize)
         break;
       case evlist_eEventType_Info:
       case evlist_eEventType_InfoSuccess:
-        if (object_item->eventflags & mh_mEventFlags_InfoWindow
-            && object_item->status & mh_mEventStatus_NotAck) {
+        if (object_item->eventflags & mh_mEventFlags_InfoWindow &&
+            object_item->status & mh_mEventStatus_NotAck)
+        {
           if (i_cnt >= ALARM_INFO_I_SIZE)
             break;
-          strncpy(info->i_alarm_text[i_cnt], object_item->eventtext,
-              sizeof(info->i_alarm_text[0]));
+          strncpy(info->i_alarm_text[i_cnt], object_item->eventtext, sizeof(info->i_alarm_text[0]));
           strncpy(info->i_alarm_moretext[i_cnt], object_item->eventmoretext,
-              sizeof(info->i_alarm_moretext[0]));
-          strncpy(info->i_alarm_alias[i_cnt], object_item->alias,
-              sizeof(info->i_alarm_alias[0]));
+                  sizeof(info->i_alarm_moretext[0]));
+          strncpy(info->i_alarm_alias[i_cnt], object_item->alias, sizeof(info->i_alarm_alias[0]));
           info->i_alarm_time[i_cnt] = object_item->time;
-          info->i_alarm_active[i_cnt]
-              = object_item->status & mh_mEventStatus_NotRet;
+          info->i_alarm_active[i_cnt] = object_item->status & mh_mEventStatus_NotRet;
           info->i_alarm_exist[i_cnt] = 1;
           info->i_alarm_eventtype[i_cnt] = object_item->event_type;
-	  if ( object_item->display_time.tv_sec == 0)
-	    time_GetTime( &object_item->display_time);
+          if (object_item->display_time.tv_sec == 0)
+            time_GetTime(&object_item->display_time);
           i_cnt++;
         }
         break;
@@ -2380,9 +2461,11 @@ void EvList::update_text()
 
   brow_SetNodraw(browbase->ctx);
   brow_GetObjectList(browbase->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&object_item);
-    switch (object_item->type) {
+    switch (object_item->type)
+    {
     case evlist_eItemType_Alarm:
       object_item->update_text(0);
       break;
@@ -2402,12 +2485,14 @@ int EvList::id_to_item(mh_sEventId* id, void** item)
 
   brow_GetObjectList(browbase->ctx, &object_list, &object_cnt);
 
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&object_item);
-    switch (object_item->type) {
+    switch (object_item->type)
+    {
     case evlist_eItemType_Alarm:
-      if (object_item->eventid.Idx == id->Idx
-          && object_item->eventid.Nix == id->Nix) {
+      if (object_item->eventid.Idx == id->Idx && object_item->eventid.Nix == id->Nix)
+      {
         *item = (void*)object_item;
         return 1;
       }
@@ -2427,11 +2512,14 @@ int EvList::oid_to_item(pwr_tOid oid, void** item)
 
   brow_GetObjectList(browbase->ctx, &object_list, &object_cnt);
 
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&object_item);
-    switch (object_item->type) {
+    switch (object_item->type)
+    {
     case evlist_eItemType_Alarm:
-      if (cdh_ObjidIsEqual(object_item->object.Objid, oid)) {
+      if (cdh_ObjidIsEqual(object_item->object.Objid, oid))
+      {
         *item = (void*)object_item;
         return 1;
       }
@@ -2456,14 +2544,16 @@ void EvList::ack(mh_sEventId* id)
   if (item->status & mh_mEventStatus_NotRet)
     // Remove the not ack marks in the item text
     item->update_text(0);
-  else if (type == ev_eType_AlarmList) {
+  else if (type == ev_eType_AlarmList)
+  {
     // Detete the item from the alarm list
     item_tree_node = item->tree_node;
 
     brow_DeleteNode(browbase->ctx, item->node);
 
     // Note! item is deleted now
-    if (browtree) {
+    if (browtree)
+    {
       if (item_tree_node)
         brow_DeleteNode(browtree->ctx, item_tree_node);
       view_configure();
@@ -2486,7 +2576,8 @@ int EvList::get_selected_event(char* eventname, ItemAlarm** item)
 
   brow_GetUserData(node_list[0], (void**)item);
   free(node_list);
-  switch ((*item)->type) {
+  switch ((*item)->type)
+  {
   case evlist_eItemType_Alarm:
     strcpy(eventname, (*item)->eventname);
     break;
@@ -2504,11 +2595,14 @@ int EvList::get_destination(pwr_tTime time, void** dest)
   ItemAlarm* object_item;
 
   brow_GetObjectList(browbase->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&object_item);
-    switch (object_item->type) {
+    switch (object_item->type)
+    {
     case evlist_eItemType_Alarm:
-      if (time_Acomp(&time, &object_item->time) >= 0) {
+      if (time_Acomp(&time, &object_item->time) >= 0)
+      {
         *dest = (void*)object_item;
         return 1;
       }
@@ -2561,7 +2655,8 @@ int EvList::get_select_supobject(void* ctx, pwr_tAttrRef* attrref, int* is_attr)
 
 pwr_tStatus EvList::set_view(pwr_tOid view)
 {
-  if (cdh_ObjidIsNull(view)) {
+  if (cdh_ObjidIsNull(view))
+  {
     if (browtree == 0)
       return 0;
 
@@ -2571,12 +2666,13 @@ pwr_tStatus EvList::set_view(pwr_tOid view)
     browtree = 0;
 
     current_view = pwr_cNObjid;
-  } else {
+  }
+  else
+  {
     BrowCtx* secondary_ctx;
     EvListBrow* prev_browtree = browtree;
 
-    brow_CreateSecondaryCtx(browbase->ctx, &secondary_ctx, init_browtree_cb,
-        (void*)this, flow_eCtxType_Brow);
+    brow_CreateSecondaryCtx(browbase->ctx, &secondary_ctx, init_browtree_cb, (void*)this, flow_eCtxType_Brow);
 
     brow_ChangeCtx(brow->ctx, browtree->ctx);
     brow = browtree;
@@ -2594,8 +2690,8 @@ pwr_tStatus EvList::view_init(pwr_tOid view)
   pwr_tStatus sts;
   pwr_tOid child;
 
-  for (sts = gdh_GetChild(view, &child); ODD(sts);
-       sts = gdh_GetNextSibling(child, &child)) {
+  for (sts = gdh_GetChild(view, &child); ODD(sts); sts = gdh_GetNextSibling(child, &child))
+  {
     pwr_tAttrRef aref = cdh_ObjidToAref(child);
     pwr_sClass_AlarmCategory body;
 
@@ -2622,8 +2718,8 @@ void EvList::view_alarm(ItemAlarm* alarm_item)
   brow_tObject node;
   ItemCategory* item;
 
-  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts);
-       sts = brow_GetNextSibling(brow->ctx, node, &node)) {
+  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts); sts = brow_GetNextSibling(brow->ctx, node, &node))
+  {
     brow_GetUserData(node, (void**)&item);
     if (item->type == evlist_eItemType_Category)
       item->alarm(this, alarm_item);
@@ -2639,8 +2735,8 @@ void EvList::view_configure()
   brow_tObject node;
   ItemCategory* item;
 
-  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts);
-       sts = brow_GetNextSibling(brow->ctx, node, &node)) {
+  for (sts = brow_GetFirst(brow->ctx, &node); ODD(sts); sts = brow_GetNextSibling(brow->ctx, node, &node))
+  {
     brow_GetUserData(node, (void**)&item);
     if (item->type == evlist_eItemType_Category)
       item->configure(this);
@@ -2657,9 +2753,11 @@ void EvList::flash()
   flash_value = !flash_value;
 
   brow_GetObjectList(brow->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case evlist_eItemType_Category:
       item->flash(this);
       break;
@@ -2677,15 +2775,16 @@ void EvList::copy_list(EvList* evl)
   pwr_tStatus sts;
 
   brow_GetObjectList(browbase->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case evlist_eItemType_Alarm:
-      new ItemAlarm(evl, item->name, item->time, item->eventtext,
-          item->eventname, item->eventtype, item->eventflags, item->eventprio,
-          item->eventid, &item->object, &item->eventsound, item->eventmoretext,
-          item->status, item->event_type, &item->supobject, 0,
-          flow_eDest_IntoLast, &sts);
+      new ItemAlarm(evl, item->name, item->time, item->eventtext, item->eventname, item->eventtype,
+                    item->eventflags, item->eventprio, item->eventid, &item->object, &item->eventsound,
+                    item->eventmoretext, item->status, item->event_type, &item->supobject, 0,
+                    flow_eDest_IntoLast, &sts);
       break;
     default:;
     }
@@ -2701,14 +2800,16 @@ int EvList::get_alarm_tables(pwr_tOid user)
 
   // Find alarm tables
   alarm_table_cnt = 0;
-  for (pwr_tStatus lsts = gdh_GetChild(user, &ch); ODD(lsts);
-       lsts = gdh_GetNextSibling(ch, &ch)) {
+  for (pwr_tStatus lsts = gdh_GetChild(user, &ch); ODD(lsts); lsts = gdh_GetNextSibling(ch, &ch))
+  {
     sts = gdh_GetObjectClass(ch, &cid);
     if (EVEN(sts))
       return sts;
 
-    switch (cid) {
-    case pwr_cClass_AlarmTable: {
+    switch (cid)
+    {
+    case pwr_cClass_AlarmTable:
+    {
       pwr_sClass_AlarmTable* op;
       int idx = alarm_table_cnt;
 
@@ -2716,8 +2817,7 @@ int EvList::get_alarm_tables(pwr_tOid user)
         break;
 
       aref = cdh_ObjidToAref(ch);
-      sts = gdh_DLRefObjectInfoAttrref(
-          &aref, (void**)&op, &alarm_tables_refid[idx]);
+      sts = gdh_DLRefObjectInfoAttrref(&aref, (void**)&op, &alarm_tables_refid[idx]);
       if (EVEN(sts))
         return sts;
 
@@ -2725,17 +2825,16 @@ int EvList::get_alarm_tables(pwr_tOid user)
 
       alarm_table_member_cnt[idx] = 0;
       int mix = 0;
-      for (unsigned int i = 0; i < sizeof(op->Members) / sizeof(op->Members[0]);
-           i++) {
+      for (unsigned int i = 0; i < sizeof(op->Members) / sizeof(op->Members[0]); i++)
+      {
         if (cdh_ObjidIsNull(op->Members[i].Objid))
           break;
-        if (mix == 0) {
-          alarm_table_members[idx] = (ev_sAlarmTableMembers*)calloc(
-              1, sizeof(ev_sAlarmTableMembers));
+        if (mix == 0)
+        {
+          alarm_table_members[idx] = (ev_sAlarmTableMembers*)calloc(1, sizeof(ev_sAlarmTableMembers));
         }
-        sts = gdh_AttrrefToName(&op->Members[i],
-            (char*)(*alarm_table_members[idx])[mix], sizeof(pwr_tAName),
-            cdh_mName_pathStrict);
+        sts = gdh_AttrrefToName(&op->Members[i], (char*)(*alarm_table_members[idx])[mix], sizeof(pwr_tAName),
+                                cdh_mName_pathStrict);
         mix++;
       }
       alarm_table_member_cnt[idx] = mix;
@@ -2763,27 +2862,34 @@ void EvList::fill_alarm_tables()
   int eventtype = 0;
 
   brow_GetObjectList(browbase->ctx, &object_list, &object_cnt);
-  for (unsigned int j = 0; j < alarm_table_cnt; j++) {
+  for (unsigned int j = 0; j < alarm_table_cnt; j++)
+  {
     memset(&at, 0, sizeof(at));
 
     idx = 0;
-    for (i = 0; i < object_cnt; i++) {
+    for (i = 0; i < object_cnt; i++)
+    {
       if (idx >= int(sizeof(at.ActiveArray) / sizeof(at.ActiveArray[0])))
         break;
 
       brow_GetUserData(object_list[i], (void**)&item);
-      switch (item->type) {
-      case evlist_eItemType_Alarm: {
-        if (alarm_tables[j]->Options & pwr_mAlarmTableOptionsMask_UnackedOnly
-            && !(item->status & mh_mEventStatus_NotAck))
+      switch (item->type)
+      {
+      case evlist_eItemType_Alarm:
+      {
+        if (alarm_tables[j]->Options & pwr_mAlarmTableOptionsMask_UnackedOnly &&
+            !(item->status & mh_mEventStatus_NotAck))
           break;
 
         // Check membership
         int skip = 0;
-        if (alarm_table_member_cnt[j] > 0) {
+        if (alarm_table_member_cnt[j] > 0)
+        {
           skip = 1;
-          for (int i = 0; i < alarm_table_member_cnt[j]; i++) {
-            if (str_StartsWith(item->eventname, (char*)(*alarm_table_members[j])[i])) {
+          for (int i = 0; i < alarm_table_member_cnt[j]; i++)
+          {
+            if (str_StartsWith(item->eventname, (char*)(*alarm_table_members[j])[i]))
+            {
               skip = 0;
               break;
             }
@@ -2794,7 +2900,8 @@ void EvList::fill_alarm_tables()
 
         // Check event type and priority
         skip = 0;
-        switch (item->event_type) {
+        switch (item->event_type)
+        {
         case evlist_eEventType_Info:
         case evlist_eEventType_InfoSuccess:
           if (alarm_tables[j]->EventType & pwr_mEventTypeMask_Info)
@@ -2805,11 +2912,13 @@ void EvList::fill_alarm_tables()
             skip = 1;
           break;
         case evlist_eEventType_Alarm:
-          if (alarm_tables[j]->EventType & item->eventtype) {
+          if (alarm_tables[j]->EventType & item->eventtype)
+          {
             eventtype = item->eventtype;
             if (!(alarm_tables[j]->EventPriority & item->eventprio))
               skip = 1;
-          } else
+          }
+          else
             skip = 1;
           break;
         default:
@@ -2840,13 +2949,14 @@ void EvList::fill_alarm_tables()
     }
     at.NoOfAlarms = idx;
     memcpy(&alarm_tables[j]->NoOfAlarms, &at.NoOfAlarms,
-        sizeof(at) - offsetof(pwr_sClass_AlarmTable, NoOfAlarms));
+           sizeof(at) - offsetof(pwr_sClass_AlarmTable, NoOfAlarms));
   }
 }
 
 static unsigned int prio_enum_to_mask(unsigned int prio)
 {
-  switch (prio) {
+  switch (prio)
+  {
   case mh_eEventPrio_A:
     return pwr_mEventPrioMask_A;
   case mh_eEventPrio_B:

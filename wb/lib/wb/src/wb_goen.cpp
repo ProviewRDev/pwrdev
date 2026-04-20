@@ -60,53 +60,46 @@
 #include "wb_goenm15.h"
 #include "wb_goenm16.h"
 
-typedef int (*goen_tCreateNodeTypeFunc)(pwr_sGraphPlcNode*, pwr_tCid,
-    ldh_tSesContext, flow_tCtx, unsigned int*, unsigned long, unsigned long,
-    flow_tNodeClass*, vldh_t_node);
-typedef int (*goen_tGetParamFunc)(pwr_sGraphPlcNode*, pwr_tCid, ldh_tSesContext,
-    unsigned long, unsigned int*, unsigned long*, unsigned long*,
-    unsigned long*);
-typedef int (*goen_tGetPointInfoFunc)(WGre*, pwr_sGraphPlcNode*, unsigned long,
-    unsigned int*, unsigned long, goen_conpoint_type*, vldh_t_node);
-typedef int (*goen_tGetLocationPointFunc)(WGre*, pwr_sGraphPlcNode*,
-    unsigned int*, unsigned long, goen_point_type*, vldh_t_node);
+typedef int (*goen_tCreateNodeTypeFunc)(pwr_sGraphPlcNode*, pwr_tCid, ldh_tSesContext, flow_tCtx,
+                                        unsigned int*, unsigned long, unsigned long, flow_tNodeClass*,
+                                        vldh_t_node);
+typedef int (*goen_tGetParamFunc)(pwr_sGraphPlcNode*, pwr_tCid, ldh_tSesContext, unsigned long, unsigned int*,
+                                  unsigned long*, unsigned long*, unsigned long*);
+typedef int (*goen_tGetPointInfoFunc)(WGre*, pwr_sGraphPlcNode*, unsigned long, unsigned int*, unsigned long,
+                                      goen_conpoint_type*, vldh_t_node);
+typedef int (*goen_tGetLocationPointFunc)(WGre*, pwr_sGraphPlcNode*, unsigned int*, unsigned long,
+                                          goen_point_type*, vldh_t_node);
 
 /*_Local variables_______________________________________________________*/
 
 goen_tGetParamFunc goen_get_parameter_m[20] = {
-  goen_get_parameter_m0, goen_get_parameter_m1, goen_get_parameter_m2,
-  goen_get_parameter_m3, goen_get_parameter_m4, goen_get_parameter_m5,
-  goen_get_parameter_m6, goen_get_parameter_m7, goen_get_parameter_m8,
-  goen_get_parameter_m9, goen_get_parameter_m10, goen_get_parameter_m11,
-  goen_get_parameter_m12, goen_get_parameter_m0, goen_get_parameter_m14,
-  goen_get_parameter_m15, goen_get_parameter_m16, goen_get_parameter_m0,
+    goen_get_parameter_m0,  goen_get_parameter_m1, goen_get_parameter_m2,  goen_get_parameter_m3,
+    goen_get_parameter_m4,  goen_get_parameter_m5, goen_get_parameter_m6,  goen_get_parameter_m7,
+    goen_get_parameter_m8,  goen_get_parameter_m9, goen_get_parameter_m10, goen_get_parameter_m11,
+    goen_get_parameter_m12, goen_get_parameter_m0, goen_get_parameter_m14, goen_get_parameter_m15,
+    goen_get_parameter_m16, goen_get_parameter_m0,
 };
 goen_tCreateNodeTypeFunc goen_create_nodetype_m[20] = {
-  goen_create_nodetype_m0, goen_create_nodetype_m1, goen_create_nodetype_m2,
-  goen_create_nodetype_m3, goen_create_nodetype_m4, goen_create_nodetype_m5,
-  goen_create_nodetype_m6, goen_create_nodetype_m7, goen_create_nodetype_m8,
-  goen_create_nodetype_m9, goen_create_nodetype_m10, goen_create_nodetype_m11,
-  goen_create_nodetype_m12, goen_create_nodetype_m0, goen_create_nodetype_m14,
-  goen_create_nodetype_m15, goen_create_nodetype_m16, goen_create_nodetype_m0,
+    goen_create_nodetype_m0,  goen_create_nodetype_m1, goen_create_nodetype_m2,  goen_create_nodetype_m3,
+    goen_create_nodetype_m4,  goen_create_nodetype_m5, goen_create_nodetype_m6,  goen_create_nodetype_m7,
+    goen_create_nodetype_m8,  goen_create_nodetype_m9, goen_create_nodetype_m10, goen_create_nodetype_m11,
+    goen_create_nodetype_m12, goen_create_nodetype_m0, goen_create_nodetype_m14, goen_create_nodetype_m15,
+    goen_create_nodetype_m16, goen_create_nodetype_m0,
 };
 goen_tGetPointInfoFunc goen_get_point_info_m[20] = {
-  goen_get_point_info_m0, goen_get_point_info_m1, goen_get_point_info_m2,
-  goen_get_point_info_m3, goen_get_point_info_m4, goen_get_point_info_m5,
-  goen_get_point_info_m6, goen_get_point_info_m7, goen_get_point_info_m8,
-  goen_get_point_info_m9, goen_get_point_info_m10, goen_get_point_info_m11,
-  goen_get_point_info_m12, goen_get_point_info_m0, goen_get_point_info_m14,
-  goen_get_point_info_m15, goen_get_point_info_m16, goen_get_point_info_m0,
+    goen_get_point_info_m0,  goen_get_point_info_m1, goen_get_point_info_m2,  goen_get_point_info_m3,
+    goen_get_point_info_m4,  goen_get_point_info_m5, goen_get_point_info_m6,  goen_get_point_info_m7,
+    goen_get_point_info_m8,  goen_get_point_info_m9, goen_get_point_info_m10, goen_get_point_info_m11,
+    goen_get_point_info_m12, goen_get_point_info_m0, goen_get_point_info_m14, goen_get_point_info_m15,
+    goen_get_point_info_m16, goen_get_point_info_m0,
 };
 goen_tGetLocationPointFunc goen_get_location_point_m[20] = {
-  goen_get_location_point_m0, goen_get_location_point_m1,
-  goen_get_location_point_m2, goen_get_location_point_m3,
-  goen_get_location_point_m4, goen_get_location_point_m5,
-  goen_get_location_point_m6, goen_get_location_point_m7,
-  goen_get_location_point_m8, goen_get_location_point_m9,
-  goen_get_location_point_m10, goen_get_location_point_m11,
-  goen_get_location_point_m12, goen_get_location_point_m0,
-  goen_get_location_point_m14, goen_get_location_point_m15,
-  goen_get_location_point_m16, goen_get_location_point_m0,
+    goen_get_location_point_m0,  goen_get_location_point_m1,  goen_get_location_point_m2,
+    goen_get_location_point_m3,  goen_get_location_point_m4,  goen_get_location_point_m5,
+    goen_get_location_point_m6,  goen_get_location_point_m7,  goen_get_location_point_m8,
+    goen_get_location_point_m9,  goen_get_location_point_m10, goen_get_location_point_m11,
+    goen_get_location_point_m12, goen_get_location_point_m0,  goen_get_location_point_m14,
+    goen_get_location_point_m15, goen_get_location_point_m16, goen_get_location_point_m0,
 };
 
 /*_Methods defined for this module_______________________________________*/
@@ -167,8 +160,8 @@ goen_tGetLocationPointFunc goen_get_location_point_m[20] = {
  *	GOEN_STEPCONV 	6		Step convergence
  *
  **************************************************************************/
-int goen_create_contype(flow_tCtx ctx, pwr_tClassId conclass,
-    ldh_tSesContext ldhses, flow_tConClass* con_class)
+int goen_create_contype(flow_tCtx ctx, pwr_tClassId conclass, ldh_tSesContext ldhses,
+                        flow_tConClass* con_class)
 {
   pwr_tClassId bodyclass;
   pwr_sGraphPlcConnection* graphbody;
@@ -182,16 +175,15 @@ int goen_create_contype(flow_tCtx ctx, pwr_tClassId conclass,
   double round_corner_amount;
   flow_eCorner corner_type;
 
-  if (conclass == 0) {
+  if (conclass == 0)
+  {
     /* Fix for syref connections */
-    flow_CreateConClass(ctx, "RefCon", flow_eConType_Reference,
-        flow_eCorner_Right, flow_eDrawType_Line, 2, 0, 0, 0,
-        flow_eConGroup_Common, con_class);
+    flow_CreateConClass(ctx, "RefCon", flow_eConType_Reference, flow_eCorner_Right, flow_eDrawType_Line, 2, 0,
+                        0, 0, flow_eConGroup_Common, con_class);
     return 1;
   }
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody(
-      ldhses, conclass, "GraphPlcCon", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhses, conclass, "GraphPlcCon", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
@@ -199,12 +191,13 @@ int goen_create_contype(flow_tCtx ctx, pwr_tClassId conclass,
   if (EVEN(sts))
     return sts;
 
-  if (graphbody->arrows != 0) {
+  if (graphbody->arrows != 0)
+  {
     con_type = flow_eConType_StraightOneArrow;
     arrow_width = 0.03;
     arrow_length = 0.045;
-  } else if (graphbody->curvature == GOEN_ROUTECON
-      || graphbody->curvature == GOEN_RECTILINEAR)
+  }
+  else if (graphbody->curvature == GOEN_ROUTECON || graphbody->curvature == GOEN_RECTILINEAR)
     con_type = flow_eConType_Routed;
   else if (graphbody->curvature == GOEN_STRANSDIV)
     con_type = flow_eConType_TransDiv;
@@ -225,17 +218,19 @@ int goen_create_contype(flow_tCtx ctx, pwr_tClassId conclass,
   else
     line_type = flow_eDrawType_Line;
 
-  if (graphbody->corners > 0.0) {
+  if (graphbody->corners > 0.0)
+  {
     corner_type = flow_eCorner_Rounded;
     round_corner_amount = 0.025;
-  } else {
+  }
+  else
+  {
     corner_type = flow_eCorner_Right;
     round_corner_amount = 0;
   }
 
-  flow_CreateConClass(ctx, name, con_type, corner_type, line_type, line_width,
-      arrow_width, arrow_length, round_corner_amount, flow_eConGroup_Common,
-      con_class);
+  flow_CreateConClass(ctx, name, con_type, corner_type, line_type, line_width, arrow_width, arrow_length,
+                      round_corner_amount, flow_eConGroup_Common, con_class);
   return GOEN__SUCCESS;
 }
 
@@ -245,17 +240,16 @@ int goen_create_contype(flow_tCtx ctx, pwr_tClassId conclass,
 //	The routine calls the graphical method for creating a nodetype
 //	of this class.
 //
-int goen_create_nodetype(flow_tCtx ctx, pwr_tClassId cid,
-    ldh_tSesContext ldhses, unsigned int* mask, unsigned long subwindowmark,
-    unsigned long node_width, flow_tNode* node_class, vldh_t_node node)
+int goen_create_nodetype(flow_tCtx ctx, pwr_tClassId cid, ldh_tSesContext ldhses, unsigned int* mask,
+                         unsigned long subwindowmark, unsigned long node_width, flow_tNode* node_class,
+                         vldh_t_node node)
 {
   int sts, size, graphmethod;
   pwr_tClassId bodyclass;
   pwr_sGraphPlcNode* graphbody;
 
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody(
-      ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
@@ -263,8 +257,8 @@ int goen_create_nodetype(flow_tCtx ctx, pwr_tClassId cid,
   if (graphmethod >= GOEN_MAX_GRAPHMETHOD)
     return GOEN__BADMETHOD;
 
-  sts = (goen_create_nodetype_m[graphmethod])(graphbody, cid, ldhses, ctx, mask,
-      subwindowmark, node_width, node_class, node);
+  sts = (goen_create_nodetype_m[graphmethod])(graphbody, cid, ldhses, ctx, mask, subwindowmark, node_width,
+                                              node_class, node);
 
   return sts;
 }
@@ -273,18 +267,17 @@ int goen_create_nodetype(flow_tCtx ctx, pwr_tClassId cid,
 //  Returns geometrical info of a connectionpoint and info of the
 //  corresponding parameter.
 //
-int goen_get_parinfo(WGre* grectx, pwr_tClassId cid, ldh_tSesContext ldhses,
-    unsigned int* mask, unsigned long node_width, unsigned long con_point,
-    goen_conpoint_type* graph_pointer, unsigned long* par_type,
-    unsigned long* par_inverted, unsigned long* par_index, vldh_t_node node)
+int goen_get_parinfo(WGre* grectx, pwr_tClassId cid, ldh_tSesContext ldhses, unsigned int* mask,
+                     unsigned long node_width, unsigned long con_point, goen_conpoint_type* graph_pointer,
+                     unsigned long* par_type, unsigned long* par_inverted, unsigned long* par_index,
+                     vldh_t_node node)
 {
   int sts, size, graphmethod;
   pwr_tClassId bodyclass;
   pwr_sGraphPlcNode* graphbody;
 
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody(
-      ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
@@ -292,54 +285,51 @@ int goen_get_parinfo(WGre* grectx, pwr_tClassId cid, ldh_tSesContext ldhses,
   if (graphmethod >= GOEN_MAX_GRAPHMETHOD)
     return GOEN__BADMETHOD;
 
-  sts = (goen_get_point_info_m[graphmethod])(
-      grectx, graphbody, con_point, mask, node_width, graph_pointer, node);
+  sts = (goen_get_point_info_m[graphmethod])(grectx, graphbody, con_point, mask, node_width, graph_pointer,
+                                             node);
   if (EVEN(sts))
     return (sts);
 
-  sts = (goen_get_parameter_m[graphmethod])(graphbody, cid, ldhses, con_point,
-      mask, par_type, par_inverted, par_index);
+  sts = (goen_get_parameter_m[graphmethod])(graphbody, cid, ldhses, con_point, mask, par_type, par_inverted,
+                                            par_index);
   return sts;
 }
 //
 //	Gets returns geometrical info of a connectionpoint.
 //
-int goen_get_pointinfo(WGre* grectx, pwr_tClassId cid, ldh_tSesContext ldhses,
-    unsigned int* mask, unsigned long node_width, unsigned long con_point,
-    goen_conpoint_type* graph_pointer, vldh_t_node node)
+int goen_get_pointinfo(WGre* grectx, pwr_tClassId cid, ldh_tSesContext ldhses, unsigned int* mask,
+                       unsigned long node_width, unsigned long con_point, goen_conpoint_type* graph_pointer,
+                       vldh_t_node node)
 {
   int sts, size, graphmethod;
   pwr_tClassId bodyclass;
   pwr_sGraphPlcNode* graphbody;
 
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody(
-      ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
   graphmethod = graphbody->graphmethod;
   if (graphmethod >= GOEN_MAX_GRAPHMETHOD)
     return GOEN__BADMETHOD;
 
-  sts = (goen_get_point_info_m[graphmethod])(
-      grectx, graphbody, con_point, mask, node_width, graph_pointer, node);
+  sts = (goen_get_point_info_m[graphmethod])(grectx, graphbody, con_point, mask, node_width, graph_pointer,
+                                             node);
   return sts;
 }
 
 //
 //  Gets info of a corresponding parameter to a connectionpoint.
 //
-int goen_get_parameter(pwr_tClassId cid, ldh_tSesContext ldhses,
-    unsigned int* mask, unsigned long con_point, unsigned long* par_type,
-    unsigned long* par_inverted, unsigned long* par_index)
+int goen_get_parameter(pwr_tClassId cid, ldh_tSesContext ldhses, unsigned int* mask, unsigned long con_point,
+                       unsigned long* par_type, unsigned long* par_inverted, unsigned long* par_index)
 {
   int sts, size, graphmethod;
   pwr_tClassId bodyclass;
   pwr_sGraphPlcNode* graphbody;
 
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody(
-      ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
@@ -347,8 +337,8 @@ int goen_get_parameter(pwr_tClassId cid, ldh_tSesContext ldhses,
   if (graphmethod >= GOEN_MAX_GRAPHMETHOD)
     return GOEN__BADMETHOD;
 
-  sts = (goen_get_parameter_m[graphmethod])(graphbody, cid, ldhses, con_point,
-      mask, par_type, par_inverted, par_index);
+  sts = (goen_get_parameter_m[graphmethod])(graphbody, cid, ldhses, con_point, mask, par_type, par_inverted,
+                                            par_index);
   return sts;
 }
 
@@ -358,24 +348,22 @@ int goen_get_parameter(pwr_tClassId cid, ldh_tSesContext ldhses,
 //	on a gridpoint in the neted window.
 //	The returned koordinates are relative the lower left corner of the node.
 //
-int goen_get_location_point(WGre* grectx, pwr_tClassId cid,
-    ldh_tSesContext ldhses, unsigned int* mask, unsigned long node_width,
-    goen_point_type* location_point, vldh_t_node node)
+int goen_get_location_point(WGre* grectx, pwr_tClassId cid, ldh_tSesContext ldhses, unsigned int* mask,
+                            unsigned long node_width, goen_point_type* location_point, vldh_t_node node)
 {
   int sts, size, graphmethod;
   pwr_tClassId bodyclass;
   pwr_sGraphPlcNode* graphbody;
 
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody(
-      ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
   graphmethod = graphbody->graphmethod;
   if (graphmethod >= GOEN_MAX_GRAPHMETHOD)
     return GOEN__BADMETHOD;
 
-  sts = (goen_get_location_point_m[graphbody->graphmethod])(
-      grectx, graphbody, mask, node_width, location_point, node);
+  sts = (goen_get_location_point_m[graphbody->graphmethod])(grectx, graphbody, mask, node_width,
+                                                            location_point, node);
   return sts;
 }

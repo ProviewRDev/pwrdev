@@ -34,8 +34,15 @@
  * General Public License plus this exception.
  */
 
+#ifndef rt_io_rack_close_h
+#define rt_io_rack_close_h
+
+#include "rt_io_base.h"
+
 /*----------------------------------------------------------------------------*\
   Prototypes for io methods
 \*----------------------------------------------------------------------------*/
 
 static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp);
+
+#endif

@@ -55,17 +55,20 @@
 /*_Local procedues_______________________________________________________*/
 
 static int trv_get_child_object_search(trv_tCtx trvctx, pwr_tObjid objdid,
-    trv_tBcFunc backcall, void* arg1, void* arg2, void* arg3, void* arg4,
-    void* arg5);
+                                       trv_tBcFunc backcall, void *arg1,
+                                       void *arg2, void *arg3, void *arg4,
+                                       void *arg5);
 
 static int trv_get_child_plc(ldh_tSesContext ldhses, pwr_tObjid objdid,
-    unsigned long* plc_count, pwr_tObjid** plclist);
+                             unsigned long *plc_count, pwr_tObjid **plclist);
 
 static int trv_get_child_rtnode(ldh_tSesContext ldhses, pwr_tObjid objdid,
-    unsigned long* rtnode_count, pwr_tObjid** rtnodelist);
+                                unsigned long *rtnode_count,
+                                pwr_tObjid **rtnodelist);
 
 static int trv_get_window_subwindows(ldh_tSesContext ldhses, pwr_tObjid window,
-    unsigned long* wind_count, pwr_tObjid** windlist);
+                                     unsigned long *wind_count,
+                                     pwr_tObjid **windlist);
 
 /*
 static int trv_get_child_object(ldh_tSesContext ldhses, pwr_tObjid objdid,
@@ -74,13 +77,14 @@ static int trv_get_child_object(ldh_tSesContext ldhses, pwr_tObjid objdid,
 */
 
 static int trv_get_child_object_class(ldh_tSesContext ldhses, pwr_tClassId cid,
-    pwr_tObjid objdid, trv_tBcFunc backcall, void* arg1, void* arg2, void* arg3,
-    void* arg4, void* arg5);
+                                      pwr_tObjid objdid, trv_tBcFunc backcall,
+                                      void *arg1, void *arg2, void *arg3,
+                                      void *arg4, void *arg5);
 
-static int trv_get_child_object_hi_cl_na(ldh_tSesContext ldhses,
-    pwr_tObjid hierobjdid, pwr_tClassId* cid, char* name,
-    pwr_tObjid childobjdid, trv_tBcFunc backcall, void* arg1, void* arg2,
-    void* arg3, void* arg4, void* arg5);
+static int trv_get_child_object_hi_cl_na(
+    ldh_tSesContext ldhses, pwr_tObjid hierobjdid, pwr_tClassId *cid,
+    char *name, pwr_tObjid childobjdid, trv_tBcFunc backcall, void *arg1,
+    void *arg2, void *arg3, void *arg4, void *arg5);
 
 /*
 static int trv_get_child_object_name(ldh_tSesContext ldhses, char* name,
@@ -99,32 +103,31 @@ static int trv_get_child_object_hier_class(ldh_tSesContext ldhses,
 */
 
 static int trv_get_child_docobject(ldh_tSesContext ldhses, pwr_tObjid objdid,
-    trv_tBcFunc backcall, void* arg1, void* arg2, void* arg3, void* arg4,
-    void* arg5);
+                                   trv_tBcFunc backcall, void *arg1, void *arg2,
+                                   void *arg3, void *arg4, void *arg5);
 
 /*************************************************************************
-*
-* Name:		trv_wildcard()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*wildname	I	wildcard name.
-* char		*name		I	object name.
-*
-* Description:
-*	Checks if the object name can be described by the
-*	wildcard string.
-*	Returns 0 if ok, else 1.
-*
-**************************************************************************/
+ *
+ * Name:		trv_wildcard()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*wildname	I	wildcard name.
+ * char		*name		I	object name.
+ *
+ * Description:
+ *	Checks if the object name can be described by the
+ *	wildcard string.
+ *	Returns 0 if ok, else 1.
+ *
+ **************************************************************************/
 
-static int trv_wildcard(char* wildname, char* name)
-{
+static int trv_wildcard(char *wildname, char *name) {
   int len;
-  char* s;
-  char* t;
-  char* u;
+  char *s;
+  char *t;
+  char *u;
   char checkstr[240];
   char upper_name[240];
   char namechar;
@@ -188,39 +191,39 @@ static int trv_wildcard(char* wildname, char* name)
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_child_rtnode()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	ldhses		I	ldh session.
-* unsigned long	objdid		I	objdid of the object
-* unsigned long	* rtnode_count	IO	the number of rtnodes in rtnodelist.
-* void **	rtnodelist	IO	list of found rtnodes.
-*
-* Description:
-*	Routine used by trv_get_rtnode to find all nodes in a system.
-*	Checks if the objdid is of class $Node, and if that is the case
-*	adds it to the rtnodelist and increments rtnode_count.
-*	This is  a recursiv functions that calls itself for all children
-*	found to the given objdid.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_child_rtnode()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	ldhses		I	ldh session.
+ * unsigned long	objdid		I	objdid of the object
+ * unsigned long	* rtnode_count	IO	the number of rtnodes in
+ *rtnodelist. void **	rtnodelist	IO	list of found rtnodes.
+ *
+ * Description:
+ *	Routine used by trv_get_rtnode to find all nodes in a system.
+ *	Checks if the objdid is of class $Node, and if that is the case
+ *	adds it to the rtnodelist and increments rtnode_count.
+ *	This is  a recursiv functions that calls itself for all children
+ *	found to the given objdid.
+ *
+ **************************************************************************/
 
 static int trv_get_child_rtnode(ldh_tSesContext ldhses, pwr_tObjid objdid,
-    unsigned long* rtnode_count, pwr_tObjid** rtnodelist)
-{
+                                unsigned long *rtnode_count,
+                                pwr_tObjid **rtnodelist) {
   pwr_tClassId cid;
   int sts;
-  pwr_tObjid* rtnodelist_pointer;
+  pwr_tObjid *rtnodelist_pointer;
 
   /* Check if this is a rtnode */
   sts = ldh_GetObjectClass(ldhses, objdid, &cid);
   if (cid == pwr_eClass_Node) {
     /* Yes, this is a rtnode, insert in list */
-    sts = utl_realloc((char**)rtnodelist, *rtnode_count * sizeof(pwr_tObjid),
-        (*rtnode_count + 1) * sizeof(pwr_tObjid));
+    sts = utl_realloc((char **)rtnodelist, *rtnode_count * sizeof(pwr_tObjid),
+                      (*rtnode_count + 1) * sizeof(pwr_tObjid));
     if (EVEN(sts))
       return sts;
 
@@ -243,34 +246,33 @@ static int trv_get_child_rtnode(ldh_tSesContext ldhses, pwr_tObjid objdid,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_rtnodes()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	* rtnode_count	O	the number of rtnodes in rtnodelist.
-* void **	rtnodelist	O	list of found rtnodes.
-*
-* Description:
-*	Finds all nodes in a system.
-*	Returns a pointer to list of all objects of class $Node found in the
-*	workbench. The user should free the allocated space of the list
-*	by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_rtnodes()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	* rtnode_count	O	the number of rtnodes in
+ *rtnodelist. void **	rtnodelist	O	list of found rtnodes.
+ *
+ * Description:
+ *	Finds all nodes in a system.
+ *	Returns a pointer to list of all objects of class $Node found in the
+ *	workbench. The user should free the allocated space of the list
+ *	by a free call.
+ *
+ **************************************************************************/
 
-int trv_get_rtnodes(ldh_tSesContext ldhses, unsigned long* rtnode_count,
-    pwr_tObjid** rtnodelist)
-{
+int trv_get_rtnodes(ldh_tSesContext ldhses, unsigned long *rtnode_count,
+                    pwr_tObjid **rtnodelist) {
   int sts;
   pwr_tObjid objdid;
   pwr_tClassId cid;
 
   *rtnode_count = 0;
   *rtnodelist = NULL;
-  pwr_tObjid* rtnodelist_pointer;
+  pwr_tObjid *rtnodelist_pointer;
 
   sts = ldh_GetRootList(ldhses, &objdid);
   while (ODD(sts)) {
@@ -286,8 +288,8 @@ int trv_get_rtnodes(ldh_tSesContext ldhses, unsigned long* rtnode_count,
         return sts;
     } else if (cid == pwr_eClass_Node) {
       /* Yes, this is a rtnode, insert in list */
-      sts = utl_realloc((char**)rtnodelist, *rtnode_count * sizeof(pwr_tObjid),
-          (*rtnode_count + 1) * sizeof(pwr_tObjid));
+      sts = utl_realloc((char **)rtnodelist, *rtnode_count * sizeof(pwr_tObjid),
+                        (*rtnode_count + 1) * sizeof(pwr_tObjid));
       if (EVEN(sts))
         return sts;
 
@@ -302,35 +304,34 @@ int trv_get_rtnodes(ldh_tSesContext ldhses, unsigned long* rtnode_count,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_child_plc()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	objdid		I	objdid of the object
-* unsigned long	rtnode		I	objdid of the $Node object
-* unsigned long	* plc_count	IO	the number of plcpgm's in plclist
-* void **	plclist		IO	list of found plcpgm objects.
-*
-* Description:
-*	Routine used by trv_get_rtnode_plc to find all plcpgm's connected
-*	to a node.
-*	Checks if the objdid is of class Plcpgm and if this is the case
-*	and the node of the plcpgm is equivalent to the given rtnode
-*	it adds the plcpgm to the plclist and increments plc_count.
-*	This is  a recursiv functions that calls itself for all children
-*	found to the given objdid.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_child_plc()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	objdid		I	objdid of the object
+ * unsigned long	rtnode		I	objdid of the $Node object
+ * unsigned long	* plc_count	IO	the number of plcpgm's in
+ *plclist void **	plclist		IO	list of found plcpgm objects.
+ *
+ * Description:
+ *	Routine used by trv_get_rtnode_plc to find all plcpgm's connected
+ *	to a node.
+ *	Checks if the objdid is of class Plcpgm and if this is the case
+ *	and the node of the plcpgm is equivalent to the given rtnode
+ *	it adds the plcpgm to the plclist and increments plc_count.
+ *	This is  a recursiv functions that calls itself for all children
+ *	found to the given objdid.
+ *
+ **************************************************************************/
 
 static int trv_get_child_plc(ldh_tSesContext ldhses, pwr_tObjid objdid,
-    unsigned long* plc_count, pwr_tObjid** plclist)
-{
+                             unsigned long *plc_count, pwr_tObjid **plclist) {
   pwr_tClassId cid;
   int sts;
-  pwr_tObjid* plclist_pointer;
+  pwr_tObjid *plclist_pointer;
 
   /* Get all the children of this  node */
   sts = ldh_GetChild(ldhses, objdid, &objdid);
@@ -338,8 +339,8 @@ static int trv_get_child_plc(ldh_tSesContext ldhses, pwr_tObjid objdid,
     /* Check if plc */
     sts = ldh_GetObjectClass(ldhses, objdid, &cid);
     if (cid == pwr_cClass_plc) {
-      sts = utl_realloc((char**)plclist, *plc_count * sizeof(pwr_tObjid),
-          (*plc_count + 1) * sizeof(pwr_tObjid));
+      sts = utl_realloc((char **)plclist, *plc_count * sizeof(pwr_tObjid),
+                        (*plc_count + 1) * sizeof(pwr_tObjid));
       if (EVEN(sts))
         return sts;
 
@@ -358,28 +359,27 @@ static int trv_get_child_plc(ldh_tSesContext ldhses, pwr_tObjid objdid,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_plcpgms()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	* plc_count	O	the number of plcpgm's in plclist
-* void **	plclist		O	list of found plcpgm objects.
-*
-* Description:
-*	Finds all plcpgm's in a volume.
-*	Returns a pointer to list of all objects of class Plcpgm found in the
-*	workbench that is conneted to the specified node.
-*	The user should free the allocated space of the list
-*	by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_plcpgms()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	* plc_count	O	the number of plcpgm's in
+ *plclist void **	plclist		O	list of found plcpgm objects.
+ *
+ * Description:
+ *	Finds all plcpgm's in a volume.
+ *	Returns a pointer to list of all objects of class Plcpgm found in the
+ *	workbench that is conneted to the specified node.
+ *	The user should free the allocated space of the list
+ *	by a free call.
+ *
+ **************************************************************************/
 
-int trv_get_plcpgms(
-    ldh_tSesContext ldhses, unsigned long* plc_count, pwr_tObjid** plclist)
-{
+int trv_get_plcpgms(ldh_tSesContext ldhses, unsigned long *plc_count,
+                    pwr_tObjid **plclist) {
   int sts;
   pwr_tObjid objdid;
   pwr_tClassId cid;
@@ -406,28 +406,27 @@ int trv_get_plcpgms(
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_plc_window()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	plc		I	a object of class Plcpgm
-* unsigned long	* window	O	the window of the plc
-*
-* Description:
-*	Returns the root window of a plcprogram.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_plc_window()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	plc		I	a object of class Plcpgm
+ * unsigned long	* window	O	the window of the plc
+ *
+ * Description:
+ *	Returns the root window of a plcprogram.
+ *
+ **************************************************************************/
 
-int trv_get_plc_window(
-    ldh_tSesContext ldhses, pwr_tObjid plc, pwr_tObjid* window)
-{
+int trv_get_plc_window(ldh_tSesContext ldhses, pwr_tObjid plc,
+                       pwr_tObjid *window) {
   int sts, size, window_found;
   pwr_tObjid objdid;
   pwr_tClassId cid;
-  char* windbuffer;
+  char *windbuffer;
 
   /* Check if windowobject in ldh exists */
   /* Get the first child to the plc */
@@ -436,7 +435,7 @@ int trv_get_plc_window(
   while (ODD(sts)) {
     /* Check if window */
     sts = ldh_GetObjectBuffer(ldhses, objdid, "DevBody", "PlcWindow",
-        (pwr_eClass*)&cid, &windbuffer, &size);
+                              (pwr_eClass *)&cid, &windbuffer, &size);
     if (ODD(sts)) {
       free(windbuffer);
       window_found = 1;
@@ -452,41 +451,41 @@ int trv_get_plc_window(
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_window_subwindows()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	window		I	objdid of the window object
-* unsigned long	* window_count	O	the number of windows in windowlist
-* void **	windowlist	O	list of found window objects.
-*
-*
-* Description:
-*	Routine used by trv_get_rtnode_plc to find all subwindows of a
-*	window.
-*	Checks if the objdid is of some window class and if it is
-*	adds it to the windowlist and increments window_count.
-*	This is  a recursiv functions that calls itself for all children
-*	found to the given objdid.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_window_subwindows()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	window		I	objdid of the window object
+ * unsigned long	* window_count	O	the number of windows in
+ *windowlist void **	windowlist	O	list of found window objects.
+ *
+ *
+ * Description:
+ *	Routine used by trv_get_rtnode_plc to find all subwindows of a
+ *	window.
+ *	Checks if the objdid is of some window class and if it is
+ *	adds it to the windowlist and increments window_count.
+ *	This is  a recursiv functions that calls itself for all children
+ *	found to the given objdid.
+ *
+ **************************************************************************/
 
 static int trv_get_window_subwindows(ldh_tSesContext ldhses, pwr_tObjid window,
-    unsigned long* wind_count, pwr_tObjid** windlist)
-{
+                                     unsigned long *wind_count,
+                                     pwr_tObjid **windlist) {
   int sts, size;
   pwr_tObjid objdid;
   pwr_tObjid subwindow;
   pwr_tClassId cid;
-  char* windbuffer;
-  pwr_tObjid* windlist_pointer;
+  char *windbuffer;
+  pwr_tObjid *windlist_pointer;
 
   /* Insert the window in windlist */
-  sts = utl_realloc((char**)windlist, *wind_count * sizeof(pwr_tObjid),
-      (*wind_count + 1) * sizeof(pwr_tObjid));
+  sts = utl_realloc((char **)windlist, *wind_count * sizeof(pwr_tObjid),
+                    (*wind_count + 1) * sizeof(pwr_tObjid));
   if (EVEN(sts))
     return sts;
 
@@ -502,11 +501,11 @@ static int trv_get_window_subwindows(ldh_tSesContext ldhses, pwr_tObjid window,
     while (ODD(sts)) {
       /* Check if window */
       sts = ldh_GetObjectBuffer(ldhses, subwindow, "DevBody", "PlcWindow",
-          (pwr_eClass*)&cid, &windbuffer, &size);
+                                (pwr_eClass *)&cid, &windbuffer, &size);
       if (ODD(sts)) {
         free(windbuffer);
-        sts = trv_get_window_subwindows(
-            ldhses, subwindow, wind_count, windlist);
+        sts =
+            trv_get_window_subwindows(ldhses, subwindow, wind_count, windlist);
         if (EVEN(sts))
           return sts;
       }
@@ -519,31 +518,30 @@ static int trv_get_window_subwindows(ldh_tSesContext ldhses, pwr_tObjid window,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_window_windows()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	window		I	objdid of the window object
-* unsigned long	* window_count	O	the number of windows in windowlist
-* void **	windowlist	O	list of found window objects.
-*
-* Description:
-*	Get a list of all subwindows under a window.
-*	The rootwindow is returned first in the list.
-*	Returns a pointer to list of all window objects found in the
-*	workbench that is found below the specified rootwindow.
-*	The user should free the allocated space of the list
-*	by a free call.
-*
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_window_windows()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	window		I	objdid of the window object
+ * unsigned long	* window_count	O	the number of windows in
+ *windowlist void **	windowlist	O	list of found window objects.
+ *
+ * Description:
+ *	Get a list of all subwindows under a window.
+ *	The rootwindow is returned first in the list.
+ *	Returns a pointer to list of all window objects found in the
+ *	workbench that is found below the specified rootwindow.
+ *	The user should free the allocated space of the list
+ *	by a free call.
+ *
+ *
+ **************************************************************************/
 
 int trv_get_window_windows(ldh_tSesContext ldhses, pwr_tObjid window,
-    unsigned long* wind_count, pwr_tObjid** windlist)
-{
+                           unsigned long *wind_count, pwr_tObjid **windlist) {
   int sts;
 
   *windlist = NULL;
@@ -557,34 +555,34 @@ int trv_get_window_windows(ldh_tSesContext ldhses, pwr_tObjid window,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_window_objects()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	window		I	objdid of the window object
-* unsigned long	* object_count	O	the number of objects in objectlist
-* void **	objectlist	O	list of found objects.
-*
-* Description:
-*	Returns the objects in a window ( not connections objects).
-*	Returns a pointer to list of all objects found in the
-*	window.
-*	The user should free the allocated space of the list
-*	by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_window_objects()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	window		I	objdid of the window object
+ * unsigned long	* object_count	O	the number of objects in
+ *objectlist void **	objectlist	O	list of found objects.
+ *
+ * Description:
+ *	Returns the objects in a window ( not connections objects).
+ *	Returns a pointer to list of all objects found in the
+ *	window.
+ *	The user should free the allocated space of the list
+ *	by a free call.
+ *
+ **************************************************************************/
 
 int trv_get_window_objects(ldh_tSesContext ldhses, pwr_tObjid window,
-    unsigned long* object_count, pwr_tObjid** objectlist)
-{
+                           unsigned long *object_count,
+                           pwr_tObjid **objectlist) {
   int sts, size;
   pwr_tObjid objdid;
   pwr_tClassId cid;
-  char* nodebuffer;
-  pwr_tObjid* objectlist_pointer;
+  char *nodebuffer;
+  pwr_tObjid *objectlist_pointer;
 
   *object_count = 0;
   *objectlist = NULL;
@@ -594,12 +592,12 @@ int trv_get_window_objects(ldh_tSesContext ldhses, pwr_tObjid window,
   while (ODD(sts)) {
     /* Check if node */
     sts = ldh_GetObjectBuffer(ldhses, objdid, "DevBody", "PlcNode",
-        (pwr_eClass*)&cid, &nodebuffer, &size);
+                              (pwr_eClass *)&cid, &nodebuffer, &size);
     if (ODD(sts)) {
       free(nodebuffer);
       /* insert into object list */
-      sts = utl_realloc((char**)objectlist, *object_count * sizeof(pwr_tObjid),
-          (*object_count + 1) * sizeof(pwr_tObjid));
+      sts = utl_realloc((char **)objectlist, *object_count * sizeof(pwr_tObjid),
+                        (*object_count + 1) * sizeof(pwr_tObjid));
       if (EVEN(sts))
         return sts;
 
@@ -614,34 +612,34 @@ int trv_get_window_objects(ldh_tSesContext ldhses, pwr_tObjid window,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_window_connections()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	window		I	objdid of the window object
-* unsigned long	* object_count	O	the number of objects in objectlist
-* void **	objectlist	O	list of found objects.
-*
-* Description:
-*	Returns the connection objects in a window.
-*	Returns a pointer to list of all objects found in the
-*	window.
-*	The user should free the allocated space of the list
-*	by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_window_connections()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	window		I	objdid of the window object
+ * unsigned long	* object_count	O	the number of objects in
+ *objectlist void **	objectlist	O	list of found objects.
+ *
+ * Description:
+ *	Returns the connection objects in a window.
+ *	Returns a pointer to list of all objects found in the
+ *	window.
+ *	The user should free the allocated space of the list
+ *	by a free call.
+ *
+ **************************************************************************/
 
 int trv_get_window_connections(ldh_tSesContext ldhses, pwr_tObjid window,
-    unsigned long* object_count, pwr_tObjid** objectlist)
-{
+                               unsigned long *object_count,
+                               pwr_tObjid **objectlist) {
   int sts, size;
   pwr_tObjid objdid;
   pwr_tClassId cid;
-  char* nodebuffer;
-  pwr_tObjid* objectlist_pointer;
+  char *nodebuffer;
+  pwr_tObjid *objectlist_pointer;
 
   *object_count = 0;
 
@@ -650,12 +648,12 @@ int trv_get_window_connections(ldh_tSesContext ldhses, pwr_tObjid window,
   while (ODD(sts)) {
     /* Check if connection */
     sts = ldh_GetObjectBuffer(ldhses, objdid, "DevBody", "PlcConnection",
-        (pwr_eClass*)&cid, &nodebuffer, &size);
+                              (pwr_eClass *)&cid, &nodebuffer, &size);
     if (ODD(sts)) {
       free(nodebuffer);
       /* insert into object list */
-      sts = utl_realloc((char**)objectlist, *object_count * sizeof(pwr_tObjid),
-          (*object_count + 1) * sizeof(pwr_tObjid));
+      sts = utl_realloc((char **)objectlist, *object_count * sizeof(pwr_tObjid),
+                        (*object_count + 1) * sizeof(pwr_tObjid));
       if (EVEN(sts))
         return sts;
 
@@ -670,35 +668,34 @@ int trv_get_window_connections(ldh_tSesContext ldhses, pwr_tObjid window,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_parentlist()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	object		I	objdid of the object
-* unsigned long	* object_count	O	the number of parents in objectlist
-* void **	objectlist	O	list of found parents.
-*
-* Description:
-*	Returns the all parents untill the plcpgm. The plcpgm is
-*	positioned last in the list and the closest parent first.
-*	Returns a pointer to list of all parents found to the object
-*	until a plcpgm is found.
-*	The user should free the allocated space of the list
-*	by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_parentlist()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	object		I	objdid of the object
+ * unsigned long	* object_count	O	the number of parents in
+ *objectlist void **	objectlist	O	list of found parents.
+ *
+ * Description:
+ *	Returns the all parents untill the plcpgm. The plcpgm is
+ *	positioned last in the list and the closest parent first.
+ *	Returns a pointer to list of all parents found to the object
+ *	until a plcpgm is found.
+ *	The user should free the allocated space of the list
+ *	by a free call.
+ *
+ **************************************************************************/
 
 int trv_get_parentlist(ldh_tSesContext ldhses, pwr_tObjid object,
-    unsigned long* object_count, pwr_tObjid** objectlist)
-{
+                       unsigned long *object_count, pwr_tObjid **objectlist) {
   int sts, size, plc_found;
   pwr_tObjid objdid;
   pwr_tClassId cid;
-  pwr_tObjid* objectlist_pointer;
-  char* plcbuffer;
+  pwr_tObjid *objectlist_pointer;
+  char *plcbuffer;
 
   *object_count = 0;
 
@@ -708,14 +705,14 @@ int trv_get_parentlist(ldh_tSesContext ldhses, pwr_tObjid object,
   while (ODD(sts) || plc_found) {
     /* Check if plc */
     if (ODD(ldh_GetObjectBuffer(ldhses, objdid, "DevBody", "PlcProgram",
-            (pwr_eClass*)&cid, &plcbuffer, &size))) {
+                                (pwr_eClass *)&cid, &plcbuffer, &size))) {
       plc_found = 1;
       free(plcbuffer);
     }
 
     /* insert into object list */
-    sts = utl_realloc((char**)objectlist, *object_count * sizeof(pwr_tObjid),
-        (*object_count + 1) * sizeof(pwr_tObjid));
+    sts = utl_realloc((char **)objectlist, *object_count * sizeof(pwr_tObjid),
+                      (*object_count + 1) * sizeof(pwr_tObjid));
     if (EVEN(sts))
       return sts;
 
@@ -734,28 +731,28 @@ int trv_get_parentlist(ldh_tSesContext ldhses, pwr_tObjid object,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_child_object()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	objdid		I	objdid of the object
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Routine used by trv_get_objects to find all objects in a system.
-*	Calls a backcallroutine with the given arguments for every object.
-*	This is  a recursiv functions that calls itself for all children
-*	found to the given objdid.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_child_object()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	objdid		I	objdid of the object
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Routine used by trv_get_objects to find all objects in a system.
+ *	Calls a backcallroutine with the given arguments for every object.
+ *	This is  a recursiv functions that calls itself for all children
+ *	found to the given objdid.
+ *
+ **************************************************************************/
 /*
 static int trv_get_child_object(ldh_tSesContext ldhses, pwr_tObjid objdid,
     trv_tBcFunc backcall, void* arg1, void* arg2, void* arg3, void* arg4,
@@ -785,36 +782,36 @@ static int trv_get_child_object(ldh_tSesContext ldhses, pwr_tObjid objdid,
 */
 
 /*************************************************************************
-*
-* Name:		trv_get_child_object_class()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	class		I	class of the wanted objects.
-* pwr_tObjid	objdid		I	objdid of the object
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Routine used by trv_get_objects_class to find all objects in a system of
-*	a specified class.
-*	Calls a backcallroutine with the given arguments for every object
-*	found of the specified class.
-*	This is  a recursiv functions that calls itself for all children
-*	found to the given objdid.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_child_object_class()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	class		I	class of the wanted objects.
+ * pwr_tObjid	objdid		I	objdid of the object
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Routine used by trv_get_objects_class to find all objects in a system of
+ *	a specified class.
+ *	Calls a backcallroutine with the given arguments for every object
+ *	found of the specified class.
+ *	This is  a recursiv functions that calls itself for all children
+ *	found to the given objdid.
+ *
+ **************************************************************************/
 
 static int trv_get_child_object_class(ldh_tSesContext ldhses, pwr_tClassId cid,
-    pwr_tObjid objdid, trv_tBcFunc backcall, void* arg1, void* arg2, void* arg3,
-    void* arg4, void* arg5)
-{
+                                      pwr_tObjid objdid, trv_tBcFunc backcall,
+                                      void *arg1, void *arg2, void *arg3,
+                                      void *arg4, void *arg5) {
   int sts;
   pwr_tClassId obj_class;
 
@@ -833,8 +830,8 @@ static int trv_get_child_object_class(ldh_tSesContext ldhses, pwr_tClassId cid,
   /* Get the first child to the object */
   sts = ldh_GetChild(ldhses, objdid, &objdid);
   while (ODD(sts)) {
-    sts = trv_get_child_object_class(
-        ldhses, cid, objdid, backcall, arg1, arg2, arg3, arg4, arg5);
+    sts = trv_get_child_object_class(ldhses, cid, objdid, backcall, arg1, arg2,
+                                     arg3, arg4, arg5);
     if (EVEN(sts))
       return sts;
     sts = ldh_GetNextSibling(ldhses, objdid, &objdid);
@@ -844,44 +841,43 @@ static int trv_get_child_object_class(ldh_tSesContext ldhses, pwr_tClassId cid,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_objects_class()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tClassId	class		I	class of the wanded objects.
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Traverses the objects in the plant and nodehierarchy.
-*	Calls a backcallroutine with the given arguments for every found
-*	object of the specified class. The objdid of the found object
-*	and arguments will be
-*	passed to the backcallroutine. The backcallroutine should be
-*	declared as:
-*
-*	int	'backcallroutine name'( objdid, arg1, arg2, arg3, arg4, arg5)
-*	pwr_tObjid	objdid;
-*	void		*arg1;
-*	void		*arg2;
-*	void		*arg3;
-*	void		*arg4;
-*	void		*arg5;
-*	...
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_objects_class()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tClassId	class		I	class of the wanded objects.
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Traverses the objects in the plant and nodehierarchy.
+ *	Calls a backcallroutine with the given arguments for every found
+ *	object of the specified class. The objdid of the found object
+ *	and arguments will be
+ *	passed to the backcallroutine. The backcallroutine should be
+ *	declared as:
+ *
+ *	int	'backcallroutine name'( objdid, arg1, arg2, arg3, arg4, arg5)
+ *	pwr_tObjid	objdid;
+ *	void		*arg1;
+ *	void		*arg2;
+ *	void		*arg3;
+ *	void		*arg4;
+ *	void		*arg5;
+ *	...
+ *
+ **************************************************************************/
 
 int trv_get_objects_class(ldh_tSesContext ldhses, pwr_tClassId cid,
-    trv_tBcFunc backcall, void* arg1, void* arg2, void* arg3, void* arg4,
-    void* arg5)
-{
+                          trv_tBcFunc backcall, void *arg1, void *arg2,
+                          void *arg3, void *arg4, void *arg5) {
   int sts;
   pwr_tObjid objdid;
   pwr_tClassId obj_class;
@@ -893,11 +889,11 @@ int trv_get_objects_class(ldh_tSesContext ldhses, pwr_tClassId cid,
       return sts;
 
     /* Check that the class of the node object is correct */
-    if (!(obj_class == pwr_eClass_ClassHier
-            || obj_class == pwr_eClass_TypeHier)) {
+    if (!(obj_class == pwr_eClass_ClassHier ||
+          obj_class == pwr_eClass_TypeHier)) {
       /* Check if the children is a plc */
-      sts = trv_get_child_object_class(
-          ldhses, cid, objdid, backcall, arg1, arg2, arg3, arg4, arg5);
+      sts = trv_get_child_object_class(ldhses, cid, objdid, backcall, arg1,
+                                       arg2, arg3, arg4, arg5);
       if (EVEN(sts))
         return sts;
     }
@@ -907,41 +903,41 @@ int trv_get_objects_class(ldh_tSesContext ldhses, pwr_tClassId cid,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_child_object_hier_class_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
-* pwr_tObjid	hierobjdid is found.
-* pwr_tClassId	class		I	class of the wanted objects.
-* char		*name		I	wildcard name of wanted objects.
-* pwr_tObjid	objdid		I	objdid of the object
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Routine used by trv_get_objects_hier_class
-*	to find all objects in a system of
-*	a specified class that has a specific object as ancestor.
-*	Calls a backcallroutine with the given arguments for every object
-*	found of the specified class below the specified hierarchy object.
-*	This is  a recursiv functions that calls itself for all children
-*	found to the given objdid.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_child_object_hier_class_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
+ * pwr_tObjid	hierobjdid is found.
+ * pwr_tClassId	class		I	class of the wanted objects.
+ * char		*name		I	wildcard name of wanted objects.
+ * pwr_tObjid	objdid		I	objdid of the object
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Routine used by trv_get_objects_hier_class
+ *	to find all objects in a system of
+ *	a specified class that has a specific object as ancestor.
+ *	Calls a backcallroutine with the given arguments for every object
+ *	found of the specified class below the specified hierarchy object.
+ *	This is  a recursiv functions that calls itself for all children
+ *	found to the given objdid.
+ *
+ **************************************************************************/
 
-static int trv_get_child_object_hi_cl_na(ldh_tSesContext ldhses,
-    pwr_tObjid hierobjdid, pwr_tClassId* cid, char* name, pwr_tObjid objdid,
-    trv_tBcFunc backcall, void* arg1, void* arg2, void* arg3, void* arg4,
-    void* arg5)
-{
+static int
+trv_get_child_object_hi_cl_na(ldh_tSesContext ldhses, pwr_tObjid hierobjdid,
+                              pwr_tClassId *cid, char *name, pwr_tObjid objdid,
+                              trv_tBcFunc backcall, void *arg1, void *arg2,
+                              void *arg3, void *arg4, void *arg5) {
   int sts, size;
   pwr_tClassId obj_class;
   pwr_tObjid childobjdid;
@@ -971,8 +967,8 @@ static int trv_get_child_object_hi_cl_na(ldh_tSesContext ldhses,
   name_ok = 1;
   if (class_ok && (name != NULL)) {
     /* Get the name of the object */
-    sts = ldh_ObjidToName(
-        ldhses, objdid, ldh_eName_Hierarchy, obj_name, sizeof(obj_name), &size);
+    sts = ldh_ObjidToName(ldhses, objdid, ldh_eName_Hierarchy, obj_name,
+                          sizeof(obj_name), &size);
     if (EVEN(sts))
       return sts;
 
@@ -993,7 +989,8 @@ static int trv_get_child_object_hi_cl_na(ldh_tSesContext ldhses,
     sts = ldh_GetChild(ldhses, objdid, &childobjdid);
     while (ODD(sts)) {
       sts = trv_get_child_object_hi_cl_na(ldhses, hierobjdid, cid, name,
-          childobjdid, backcall, arg1, arg2, arg3, arg4, arg5);
+                                          childobjdid, backcall, arg1, arg2,
+                                          arg3, arg4, arg5);
       if (EVEN(sts))
         return sts;
       sts = ldh_GetNextSibling(ldhses, childobjdid, &childobjdid);
@@ -1006,66 +1003,67 @@ static int trv_get_child_object_hi_cl_na(ldh_tSesContext ldhses,
    cpp call to trv_get_objects_hier_class_name
  */
 int trv_get_objects_hcn(ldh_tSesContext ldhses, pwr_tObjid hierobjdid,
-    pwr_tClassId* classid, char* name, trv_tBcFunc backcall, void* arg1,
-    void* arg2, void* arg3, void* arg4, void* arg5)
-{
+                        pwr_tClassId *classid, char *name, trv_tBcFunc backcall,
+                        void *arg1, void *arg2, void *arg3, void *arg4,
+                        void *arg5) {
   return trv_get_objects_hier_class_name(ldhses, hierobjdid, classid, name,
-      backcall, arg1, arg2, arg3, arg4, arg5);
+                                         backcall, arg1, arg2, arg3, arg4,
+                                         arg5);
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_objects_hier_class_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
-* pwr_tClassId	class		I	class of the wanded objects.
-* char		*name		I	wildcard name of wanted objects.
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Traverses the objects in the plant and nodehierarchy.
-*	Calls a backcallroutine with the given arguments for every found
-*	object of the specified class that is found below the hierobjdid in
-*	the hierarchy and that  fits in a wildcard description.
-*	If hierobjdid is eq 0 the hierarchy is not tested.
-*	If class is eq 0 the class is not tested.
-*	If name is eq NULL the name is not tested.
-*	The objdid of the found object and arguments will be
-*	passed to the backcallroutine. The backcallroutine should be
-*	declared as:
-*
-*	int	'backcallroutine name'( objdid, arg1, arg2, arg3, arg4, arg5)
-*	unsigned long	objdid;
-*	void		*arg1;
-*	void		*arg2;
-*	void		*arg3;
-*	void		*arg4;
-*	void		*arg5;
-*	...
-*	Calls a backcall routine for every object in the plathierarchy
-*	of a specified class under a specific object in the hierarchy.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_objects_hier_class_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
+ * pwr_tClassId	class		I	class of the wanded objects.
+ * char		*name		I	wildcard name of wanted objects.
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Traverses the objects in the plant and nodehierarchy.
+ *	Calls a backcallroutine with the given arguments for every found
+ *	object of the specified class that is found below the hierobjdid in
+ *	the hierarchy and that  fits in a wildcard description.
+ *	If hierobjdid is eq 0 the hierarchy is not tested.
+ *	If class is eq 0 the class is not tested.
+ *	If name is eq NULL the name is not tested.
+ *	The objdid of the found object and arguments will be
+ *	passed to the backcallroutine. The backcallroutine should be
+ *	declared as:
+ *
+ *	int	'backcallroutine name'( objdid, arg1, arg2, arg3, arg4, arg5)
+ *	unsigned long	objdid;
+ *	void		*arg1;
+ *	void		*arg2;
+ *	void		*arg3;
+ *	void		*arg4;
+ *	void		*arg5;
+ *	...
+ *	Calls a backcall routine for every object in the plathierarchy
+ *	of a specified class under a specific object in the hierarchy.
+ *
+ **************************************************************************/
 
-int trv_get_attrobjects(ldh_tSesContext ldhses, pwr_tOid oid, pwr_tCid* cid,
-    char* name, trv_eDepth depth, trv_tBcFunc backcall, void* arg1, void* arg2,
-    void* arg3, void* arg4, void* arg5)
-{
+int trv_get_attrobjects(ldh_tSesContext ldhses, pwr_tOid oid, pwr_tCid *cid,
+                        char *name, trv_eDepth depth, trv_tBcFunc backcall,
+                        void *arg1, void *arg2, void *arg3, void *arg4,
+                        void *arg5) {
   int i;
   pwr_tStatus sts;
   pwr_sAttrRef aref;
-  char* aname;
+  char *aname;
   int size;
   pwr_tObjid child;
   pwr_tCid child_cid;
@@ -1075,31 +1073,31 @@ int trv_get_attrobjects(ldh_tSesContext ldhses, pwr_tOid oid, pwr_tCid* cid,
   case trv_eDepth_Deep:
     if (!cid) {
       /* TODO Doesn't find attribute objects... */
-      return trv_get_objects_hier_class_name(
-          ldhses, oid, cid, name, backcall, arg1, arg2, arg3, arg4, arg5);
+      return trv_get_objects_hier_class_name(ldhses, oid, cid, name, backcall,
+                                             arg1, arg2, arg3, arg4, arg5);
     } else {
       for (i = 0; cid[i]; i++) {
         for (sts = ldh_GetClassListAttrRef(ldhses, cid[i], &aref); ODD(sts);
              sts = ldh_GetNextAttrRef(ldhses, cid[i], &aref, &aref)) {
-          if (cdh_ObjidIsNotNull(oid) && !cdh_ObjidIsEqual(oid, aref.Objid)
-              && !ldh_IsAncestor(ldhses, oid, aref.Objid))
+          if (cdh_ObjidIsNotNull(oid) && !cdh_ObjidIsEqual(oid, aref.Objid) &&
+              !ldh_IsAncestor(ldhses, oid, aref.Objid))
             continue;
           if (name) {
             /* Get the name of the object */
-            sts = ldh_AttrRefToName(
-                ldhses, &aref, ldh_eName_Hierarchy, &aname, &size);
+            sts = ldh_AttrRefToName(ldhses, &aref, ldh_eName_Hierarchy, &aname,
+                                    &size);
             if (EVEN(sts))
               return sts;
-	    
+
             if (trv_wildcard(name, aname) == 1)
               continue;
           }
 
-	  sts = ldh_AttributeDisabled(ldhses, &aref, &disabled);
-	  if (EVEN(sts))
-	    return sts;
-	  if (disabled)
-	    continue;
+          sts = ldh_AttributeDisabled(ldhses, &aref, &disabled);
+          if (EVEN(sts))
+            return sts;
+          if (disabled)
+            continue;
 
           sts = (backcall)(&aref, arg1, arg2, arg3, arg4, arg5);
           if (EVEN(sts))
@@ -1116,8 +1114,8 @@ int trv_get_attrobjects(ldh_tSesContext ldhses, pwr_tOid oid, pwr_tCid* cid,
            sts = ldh_GetNextObjectAttrRef(ldhses, cid[i], &aref, &aref)) {
         if (name) {
           /* Get the name of the object */
-          sts = ldh_AttrRefToName(
-              ldhses, &aref, ldh_eName_Hierarchy, &aname, &size);
+          sts = ldh_AttrRefToName(ldhses, &aref, ldh_eName_Hierarchy, &aname,
+                                  &size);
           if (EVEN(sts))
             return sts;
 
@@ -1125,11 +1123,11 @@ int trv_get_attrobjects(ldh_tSesContext ldhses, pwr_tOid oid, pwr_tCid* cid,
             continue;
         }
 
-	sts = ldh_AttributeDisabled(ldhses, &aref, &disabled);
-	if (EVEN(sts))
-	  return sts;
-	if (disabled)
-	  continue;
+        sts = ldh_AttributeDisabled(ldhses, &aref, &disabled);
+        if (EVEN(sts))
+          return sts;
+        if (disabled)
+          continue;
 
         sts = (backcall)(&aref, arg1, arg2, arg3, arg4, arg5);
         if (EVEN(sts))
@@ -1159,8 +1157,8 @@ int trv_get_attrobjects(ldh_tSesContext ldhses, pwr_tOid oid, pwr_tCid* cid,
                  sts = ldh_GetNextObjectAttrRef(ldhses, cid[i], &aref, &aref)) {
               if (name) {
                 /* Get the name of the object */
-                sts = ldh_AttrRefToName(
-                    ldhses, &aref, ldh_eName_Hierarchy, &aname, &size);
+                sts = ldh_AttrRefToName(ldhses, &aref, ldh_eName_Hierarchy,
+                                        &aname, &size);
                 if (EVEN(sts))
                   return sts;
 
@@ -1168,11 +1166,11 @@ int trv_get_attrobjects(ldh_tSesContext ldhses, pwr_tOid oid, pwr_tCid* cid,
                   continue;
               }
 
-	      sts = ldh_AttributeDisabled(ldhses, &aref, &disabled);
-	      if (EVEN(sts))
-		return sts;
-	      if (disabled)
-		continue;
+              sts = ldh_AttributeDisabled(ldhses, &aref, &disabled);
+              if (EVEN(sts))
+                return sts;
+              if (disabled)
+                continue;
 
               sts = (backcall)(&aref, arg1, arg2, arg3, arg4, arg5);
               if (EVEN(sts))
@@ -1186,8 +1184,8 @@ int trv_get_attrobjects(ldh_tSesContext ldhses, pwr_tOid oid, pwr_tCid* cid,
 
         if (name) {
           /* Get the name of the object */
-          sts = ldh_AttrRefToName(
-              ldhses, &aref, ldh_eName_Hierarchy, &aname, &size);
+          sts = ldh_AttrRefToName(ldhses, &aref, ldh_eName_Hierarchy, &aname,
+                                  &size);
           if (EVEN(sts))
             return sts;
 
@@ -1195,11 +1193,11 @@ int trv_get_attrobjects(ldh_tSesContext ldhses, pwr_tOid oid, pwr_tCid* cid,
             continue;
         }
 
-	sts = ldh_AttributeDisabled(ldhses, &aref, &disabled);
-	if (EVEN(sts))
-	  return sts;
-	if (disabled)
-	  continue;
+        sts = ldh_AttributeDisabled(ldhses, &aref, &disabled);
+        if (EVEN(sts))
+          return sts;
+        if (disabled)
+          continue;
 
         sts = (backcall)(&aref, arg1, arg2, arg3, arg4, arg5);
         if (EVEN(sts))
@@ -1214,17 +1212,19 @@ int trv_get_attrobjects(ldh_tSesContext ldhses, pwr_tOid oid, pwr_tCid* cid,
 }
 
 int trv_get_objects_hier_class_name(ldh_tSesContext ldhses,
-    pwr_tObjid hierobjdid, pwr_tClassId* cid, char* name, trv_tBcFunc backcall,
-    void* arg1, void* arg2, void* arg3, void* arg4, void* arg5)
-{
+                                    pwr_tObjid hierobjdid, pwr_tClassId *cid,
+                                    char *name, trv_tBcFunc backcall,
+                                    void *arg1, void *arg2, void *arg3,
+                                    void *arg4, void *arg5) {
   int sts;
   pwr_tObjid objdid;
   pwr_tClassId obj_class;
 
   if (cdh_ObjidIsNotNull(hierobjdid)) {
     /* Hierarchy object is supplied. Check if the children */
-    sts = trv_get_child_object_hi_cl_na(ldhses, hierobjdid, cid, name,
-        hierobjdid, backcall, arg1, arg2, arg3, arg4, arg5);
+    sts =
+        trv_get_child_object_hi_cl_na(ldhses, hierobjdid, cid, name, hierobjdid,
+                                      backcall, arg1, arg2, arg3, arg4, arg5);
     if (EVEN(sts))
       return sts;
   } else {
@@ -1235,11 +1235,12 @@ int trv_get_objects_hier_class_name(ldh_tSesContext ldhses,
         return sts;
 
       /* Check that the class of the node object is correct */
-      if (!(obj_class == pwr_eClass_ClassHier
-              || obj_class == pwr_eClass_TypeHier)) {
+      if (!(obj_class == pwr_eClass_ClassHier ||
+            obj_class == pwr_eClass_TypeHier)) {
         /* Check if the children */
         sts = trv_get_child_object_hi_cl_na(ldhses, hierobjdid, cid, name,
-            objdid, backcall, arg1, arg2, arg3, arg4, arg5);
+                                            objdid, backcall, arg1, arg2, arg3,
+                                            arg4, arg5);
         if (EVEN(sts))
           return sts;
       }
@@ -1250,49 +1251,49 @@ int trv_get_objects_hier_class_name(ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_children_class_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
-* pwr_tClassId	class		I	class of the wanded objects.
-* char		*name		I	wildcard name of wanted objects.
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Calls a backcall routine for every child to the parent object
-*	of a specified class and name.
-*	If class is eq 0 the class is not tested.
-*	If name is eq NULL the name is not tested.
-*	The objdid of the found object and arguments will be
-*	passed to the backcallroutine. The backcallroutine should be
-*	declared as:
-*
-*	int	'backcallroutine name'( objdid, arg1, arg2, arg3, arg4, arg5)
-*	pwr_tObjid	objdid;
-*	void		*arg1;
-*	void		*arg2;
-*	void		*arg3;
-*	void		*arg4;
-*	void		*arg5;
-*	...
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_children_class_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
+ * pwr_tClassId	class		I	class of the wanded objects.
+ * char		*name		I	wildcard name of wanted objects.
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Calls a backcall routine for every child to the parent object
+ *	of a specified class and name.
+ *	If class is eq 0 the class is not tested.
+ *	If name is eq NULL the name is not tested.
+ *	The objdid of the found object and arguments will be
+ *	passed to the backcallroutine. The backcallroutine should be
+ *	declared as:
+ *
+ *	int	'backcallroutine name'( objdid, arg1, arg2, arg3, arg4, arg5)
+ *	pwr_tObjid	objdid;
+ *	void		*arg1;
+ *	void		*arg2;
+ *	void		*arg3;
+ *	void		*arg4;
+ *	void		*arg5;
+ *	...
+ *
+ **************************************************************************/
 
 int trv_get_children_class_name(ldh_tSesContext ldhses, pwr_tObjid parentobjdid,
-    pwr_tClassId* cid, char* name, trv_tBcFunc backcall, void* arg1, void* arg2,
-    void* arg3, void* arg4, void* arg5)
-{
+                                pwr_tClassId *cid, char *name,
+                                trv_tBcFunc backcall, void *arg1, void *arg2,
+                                void *arg3, void *arg4, void *arg5) {
   int sts, size;
   pwr_tObjid objdid;
   pwr_tClassId obj_class;
@@ -1328,7 +1329,7 @@ int trv_get_children_class_name(ldh_tSesContext ldhses, pwr_tObjid parentobjdid,
       if (class_ok && (name != NULL)) {
         /* Get the name of the object */
         sts = ldh_ObjidToName(ldhses, objdid, ldh_eName_Hierarchy, obj_name,
-            sizeof(obj_name), &size);
+                              sizeof(obj_name), &size);
         if (EVEN(sts))
           return sts;
 
@@ -1351,31 +1352,31 @@ int trv_get_children_class_name(ldh_tSesContext ldhses, pwr_tObjid parentobjdid,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_child_object_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* char		name		I	wildcard name of the wanted objects.
-* pwr_tObjid	objdid		I	objdid of the object
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Routine used by trv_get_objects_class to find all objects in a system of
-*	a specified class.
-*	Calls a backcallroutine with the given arguments for every object
-*	found of the specified class.
-*	This is  a recursiv functions that calls itself for all children
-*	found to the given objdid.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_child_object_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * char		name		I	wildcard name of the wanted objects.
+ * pwr_tObjid	objdid		I	objdid of the object
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Routine used by trv_get_objects_class to find all objects in a system of
+ *	a specified class.
+ *	Calls a backcallroutine with the given arguments for every object
+ *	found of the specified class.
+ *	This is  a recursiv functions that calls itself for all children
+ *	found to the given objdid.
+ *
+ **************************************************************************/
 /*
 static int trv_get_child_object_name(ldh_tSesContext ldhses, char* name,
     pwr_tObjid objdid, trv_tBcFunc backcall, void* arg1, void* arg2, void* arg3,
@@ -1413,34 +1414,34 @@ static int trv_get_child_object_name(ldh_tSesContext ldhses, char* name,
 */
 
 /*************************************************************************
-*
-* Name:		trv_get_child_object_hier_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
-* pwr_tObjid	hierobjdid is found.
-* char		*name		I	wildcard name of the wanted objects.
-* pwr_tObjid	objdid		I	objdid of the object
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Routine used by trv_get_objects_hier_class
-*	to find all objects in a system of that fits in a wildcard description
-*	and that has a specific object as ancestor.
-*	Calls a backcallroutine with the given arguments for every object
-*	found of the specified class below the specified hierarchy object.
-*	This is  a recursiv functions that calls itself for all children
-*	found to the given objdid.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_child_object_hier_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
+ * pwr_tObjid	hierobjdid is found.
+ * char		*name		I	wildcard name of the wanted objects.
+ * pwr_tObjid	objdid		I	objdid of the object
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Routine used by trv_get_objects_hier_class
+ *	to find all objects in a system of that fits in a wildcard description
+ *	and that has a specific object as ancestor.
+ *	Calls a backcallroutine with the given arguments for every object
+ *	found of the specified class below the specified hierarchy object.
+ *	This is  a recursiv functions that calls itself for all children
+ *	found to the given objdid.
+ *
+ **************************************************************************/
 /*
 static int trv_get_child_object_hier_name(ldh_tSesContext ldhses,
     pwr_tObjid hierobjdid, unsigned long* hierflag, char* name,
@@ -1496,34 +1497,34 @@ static int trv_get_child_object_hier_name(ldh_tSesContext ldhses,
 */
 
 /*************************************************************************
-*
-* Name:		trv_get_child_object_hier_class()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
-* pwr_tObjid	hierobjdid is found.
-* pwr_tClassId	class		I	class of the wanted objects.
-* pwr_tObjid	objdid		I	objdid of the object
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Routine used by trv_get_objects_hier_class
-*	to find all objects in a system of
-*	a specified class that has a specific object as ancestor.
-*	Calls a backcallroutine with the given arguments for every object
-*	found of the specified class below the specified hierarchy object.
-*	This is  a recursiv functions that calls itself for all children
-*	found to the given objdid.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_child_object_hier_class()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
+ * pwr_tObjid	hierobjdid is found.
+ * pwr_tClassId	class		I	class of the wanted objects.
+ * pwr_tObjid	objdid		I	objdid of the object
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Routine used by trv_get_objects_hier_class
+ *	to find all objects in a system of
+ *	a specified class that has a specific object as ancestor.
+ *	Calls a backcallroutine with the given arguments for every object
+ *	found of the specified class below the specified hierarchy object.
+ *	This is  a recursiv functions that calls itself for all children
+ *	found to the given objdid.
+ *
+ **************************************************************************/
 /*
 static int trv_get_child_object_hier_class(ldh_tSesContext ldhses,
     pwr_tObjid hierobjdid, unsigned long* hierflag, pwr_tClassId cid,
@@ -1577,55 +1578,56 @@ static int trv_get_child_object_hier_class(ldh_tSesContext ldhses,
 */
 
 /*************************************************************************
-*
-* Name:		trv_get_class_hier()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
-* pwr_tClassId	class		I	class of the wanded objects.
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Traverses the objects in the plant and classhierarchy.
-*	Calls a backcallroutine with the given arguments for every found
-*	object of the specified class found below the hierobjdid in
-*	the hierarchy. The objdid of the found object and arguments will be
-*	passed to the backcallroutine. The backcallroutine should be
-*	declared as:
-*
-*	int	'backcallroutine name'( objdid, arg1, arg2, arg3, arg4, arg5)
-*	pwr_tObjid	objdid;
-*	void		*arg1;
-*	void		*arg2;
-*	void		*arg3;
-*	void		*arg4;
-*	void		*arg5;
-*	...
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_class_hier()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
+ * pwr_tClassId	class		I	class of the wanded objects.
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Traverses the objects in the plant and classhierarchy.
+ *	Calls a backcallroutine with the given arguments for every found
+ *	object of the specified class found below the hierobjdid in
+ *	the hierarchy. The objdid of the found object and arguments will be
+ *	passed to the backcallroutine. The backcallroutine should be
+ *	declared as:
+ *
+ *	int	'backcallroutine name'( objdid, arg1, arg2, arg3, arg4, arg5)
+ *	pwr_tObjid	objdid;
+ *	void		*arg1;
+ *	void		*arg2;
+ *	void		*arg3;
+ *	void		*arg4;
+ *	void		*arg5;
+ *	...
+ *
+ **************************************************************************/
 
 int trv_get_class_hier(ldh_tSesContext ldhses, pwr_tObjid hierobjdid,
-    char* name, pwr_tClassId* cid, trv_tBcFunc backcall, void* arg1, void* arg2,
-    void* arg3, void* arg4, void* arg5)
-{
+                       char *name, pwr_tClassId *cid, trv_tBcFunc backcall,
+                       void *arg1, void *arg2, void *arg3, void *arg4,
+                       void *arg5) {
   int sts;
   pwr_tObjid objdid;
   pwr_tClassId obj_class;
 
   if (cdh_ObjidIsNotNull(hierobjdid)) {
     /* hierobjdid is supplied */
-    sts = trv_get_child_object_hi_cl_na(ldhses, hierobjdid, cid, name,
-        hierobjdid, backcall, arg1, arg2, arg3, arg4, arg5);
+    sts =
+        trv_get_child_object_hi_cl_na(ldhses, hierobjdid, cid, name, hierobjdid,
+                                      backcall, arg1, arg2, arg3, arg4, arg5);
     if (EVEN(sts))
       return sts;
   } else {
@@ -1639,7 +1641,8 @@ int trv_get_class_hier(ldh_tSesContext ldhses, pwr_tObjid hierobjdid,
       if (obj_class == pwr_eClass_ClassHier) {
         /* Check if the children */
         sts = trv_get_child_object_hi_cl_na(ldhses, hierobjdid, cid, name,
-            objdid, backcall, arg1, arg2, arg3, arg4, arg5);
+                                            objdid, backcall, arg1, arg2, arg3,
+                                            arg4, arg5);
         if (EVEN(sts))
           return sts;
       }
@@ -1651,33 +1654,32 @@ int trv_get_class_hier(ldh_tSesContext ldhses, pwr_tObjid hierobjdid,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_child_objectdoc()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	objdid		I	objdid of the object
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Routine used by trv_get_objects to find all documentobjects in a system.
-*	Calls a backcallroutine with the given arguments for every object.
-*	This is  a recursiv functions that calls itself for all children
-*	found to the given objdid.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_child_objectdoc()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	objdid		I	objdid of the object
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Routine used by trv_get_objects to find all documentobjects in a system.
+ *	Calls a backcallroutine with the given arguments for every object.
+ *	This is  a recursiv functions that calls itself for all children
+ *	found to the given objdid.
+ *
+ **************************************************************************/
 
 static int trv_get_child_docobject(ldh_tSesContext ldhses, pwr_tObjid objdid,
-    trv_tBcFunc backcall, void* arg1, void* arg2, void* arg3, void* arg4,
-    void* arg5)
-{
+                                   trv_tBcFunc backcall, void *arg1, void *arg2,
+                                   void *arg3, void *arg4, void *arg5) {
   int sts;
   pwr_tObjid newobjdid;
 
@@ -1698,8 +1700,8 @@ static int trv_get_child_docobject(ldh_tSesContext ldhses, pwr_tObjid objdid,
   /* Get the first child to the object */
   sts = ldh_GetChild(ldhses, objdid, &newobjdid);
   while (ODD(sts)) {
-    sts = trv_get_child_docobject(
-        ldhses, newobjdid, backcall, arg1, arg2, arg3, arg4, arg5);
+    sts = trv_get_child_docobject(ldhses, newobjdid, backcall, arg1, arg2, arg3,
+                                  arg4, arg5);
     if (EVEN(sts))
       return sts;
     sts = ldh_GetNextSibling(ldhses, newobjdid, &newobjdid);
@@ -1709,41 +1711,40 @@ static int trv_get_child_docobject(ldh_tSesContext ldhses, pwr_tObjid objdid,
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_docobjects()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Traverses the objects in the planthierarchy and nodehierarchy.
-*	Calls a backcallroutine with the given arguments for every found
-*	object. The objdid of the found object and arguments will be
-*	passed to the backcallroutine. The backcallroutine should be
-*	declared as:
-*
-*	int	'backcallroutine name'( objdid, arg1, arg2, arg3, arg4, arg5)
-*	pwr_tObjid	objdid;
-*	void		*arg1;
-*	void		*arg2;
-*	void		*arg3;
-*	void		*arg4;
-*	void		*arg5;
-*	...
-**************************************************************************/
+ *
+ * Name:		trv_get_docobjects()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Traverses the objects in the planthierarchy and nodehierarchy.
+ *	Calls a backcallroutine with the given arguments for every found
+ *	object. The objdid of the found object and arguments will be
+ *	passed to the backcallroutine. The backcallroutine should be
+ *	declared as:
+ *
+ *	int	'backcallroutine name'( objdid, arg1, arg2, arg3, arg4, arg5)
+ *	pwr_tObjid	objdid;
+ *	void		*arg1;
+ *	void		*arg2;
+ *	void		*arg3;
+ *	void		*arg4;
+ *	void		*arg5;
+ *	...
+ **************************************************************************/
 
 int trv_get_docobjects(ldh_tSesContext ldhses, pwr_tObjid hierobjdid,
-    trv_tBcFunc backcall, void* arg1, void* arg2, void* arg3, void* arg4,
-    void* arg5)
-{
+                       trv_tBcFunc backcall, void *arg1, void *arg2, void *arg3,
+                       void *arg4, void *arg5) {
   int sts;
   pwr_tObjid objdid;
   pwr_tClassId cid;
@@ -1758,16 +1759,16 @@ int trv_get_docobjects(ldh_tSesContext ldhses, pwr_tObjid hierobjdid,
       /* Check that the class of the node object is correct */
       if (!(cid == pwr_eClass_ClassHier || cid == pwr_eClass_TypeHier)) {
         /* Check if the children is a plc */
-        sts = trv_get_child_docobject(
-            ldhses, objdid, backcall, arg1, arg2, arg3, arg4, arg5);
+        sts = trv_get_child_docobject(ldhses, objdid, backcall, arg1, arg2,
+                                      arg3, arg4, arg5);
         if (EVEN(sts))
           return sts;
       }
       sts = ldh_GetNextSibling(ldhses, objdid, &objdid);
     }
   } else {
-    sts = trv_get_child_docobject(
-        ldhses, hierobjdid, backcall, arg1, arg2, arg3, arg4, arg5);
+    sts = trv_get_child_docobject(ldhses, hierobjdid, backcall, arg1, arg2,
+                                  arg3, arg4, arg5);
     if (EVEN(sts))
       return sts;
   }
@@ -1776,19 +1777,19 @@ int trv_get_docobjects(ldh_tSesContext ldhses, pwr_tObjid hierobjdid,
 }
 
 /*************************************************************************
-*
-* Name:		trv_create_ctx()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-**************************************************************************/
+ *
+ * Name:		trv_create_ctx()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ **************************************************************************/
 
-int trv_create_ctx(trv_tCtx* trvctx, ldh_tSesContext ldhses,
-    pwr_tObjid hierobjid, pwr_tClassId* cid, char* name, pwr_tVolumeId* volume)
-{
+int trv_create_ctx(trv_tCtx *trvctx, ldh_tSesContext ldhses,
+                   pwr_tObjid hierobjid, pwr_tClassId *cid, char *name,
+                   pwr_tVolumeId *volume) {
   *trvctx = (trv_tCtx)calloc(1, sizeof(**trvctx));
   if (*trvctx == 0)
     return FOE__NOMEMORY;
@@ -1803,57 +1804,56 @@ int trv_create_ctx(trv_tCtx* trvctx, ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Name:		trv_delete_ctx()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-**************************************************************************/
+ *
+ * Name:		trv_delete_ctx()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ **************************************************************************/
 
-int trv_delete_ctx(trv_tCtx trvctx)
-{
-  free((char*)trvctx);
+int trv_delete_ctx(trv_tCtx trvctx) {
+  free((char *)trvctx);
   return FOE__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		trv_get_child_object_hier_class_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
-* pwr_tObjid	hierobjdid is found.
-* pwr_tClassId	class		I	class of the wanted objects.
-* char		*name		I	wildcard name of wanted objects.
-* pwr_tObjid	objdid		I	objdid of the object
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Routine used by trv_get_objects_hier_class
-*	to find all objects in a system of
-*	a specified class that has a specific object as ancestor.
-*	Calls a backcallroutine with the given arguments for every object
-*	found of the specified class below the specified hierarchy object.
-*	This is  a recursiv functions that calls itself for all children
-*	found to the given objdid.
-*
-**************************************************************************/
+ *
+ * Name:		trv_get_child_object_hier_class_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	hierobjdid	I	ancestor of wanted objects.
+ * pwr_tObjid	hierobjdid is found.
+ * pwr_tClassId	class		I	class of the wanted objects.
+ * char		*name		I	wildcard name of wanted objects.
+ * pwr_tObjid	objdid		I	objdid of the object
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Routine used by trv_get_objects_hier_class
+ *	to find all objects in a system of
+ *	a specified class that has a specific object as ancestor.
+ *	Calls a backcallroutine with the given arguments for every object
+ *	found of the specified class below the specified hierarchy object.
+ *	This is  a recursiv functions that calls itself for all children
+ *	found to the given objdid.
+ *
+ **************************************************************************/
 
 static int trv_get_child_object_search(trv_tCtx trvctx, pwr_tObjid objdid,
-    trv_tBcFunc backcall, void* arg1, void* arg2, void* arg3, void* arg4,
-    void* arg5)
-{
+                                       trv_tBcFunc backcall, void *arg1,
+                                       void *arg2, void *arg3, void *arg4,
+                                       void *arg5) {
   int sts, size;
   pwr_tClassId obj_class;
   pwr_tObjid childobjdid;
@@ -1885,7 +1885,7 @@ static int trv_get_child_object_search(trv_tCtx trvctx, pwr_tObjid objdid,
   if (class_ok && (trvctx->name != NULL)) {
     /* Get the name of the object */
     sts = ldh_ObjidToName(trvctx->ldhses, objdid, ldh_eName_Hierarchy, obj_name,
-        sizeof(obj_name), &size);
+                          sizeof(obj_name), &size);
     if (EVEN(sts))
       return sts;
 
@@ -1901,12 +1901,12 @@ static int trv_get_child_object_search(trv_tCtx trvctx, pwr_tObjid objdid,
   }
 
   /* Get the first child to the object */
-  if (!(obj_class == pwr_eClass_MountObject
-          || obj_class == pwr_eClass_LibHier)) {
+  if (!(obj_class == pwr_eClass_MountObject ||
+        obj_class == pwr_eClass_LibHier)) {
     sts = ldh_GetChild(trvctx->ldhses, objdid, &childobjdid);
     while (ODD(sts)) {
-      sts = trv_get_child_object_search(
-          trvctx, childobjdid, backcall, arg1, arg2, arg3, arg4, arg5);
+      sts = trv_get_child_object_search(trvctx, childobjdid, backcall, arg1,
+                                        arg2, arg3, arg4, arg5);
       if (EVEN(sts))
         return sts;
       sts = ldh_GetNextSibling(trvctx->ldhses, childobjdid, &childobjdid);
@@ -1916,65 +1916,65 @@ static int trv_get_child_object_search(trv_tCtx trvctx, pwr_tObjid objdid,
 }
 
 /*************************************************************************
-*
-* Name:		trv_object_search()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-* trv_tCtx	trvctx		I	ldh session.
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Traverses the objects in the plant and nodehierarchy.
-*	Calls a backcallroutine with the given arguments for every found
-*	object of the specified class that is found below the hierobjdid in
-*	the hierarchy and that  fits in a wildcard description.
-*	If hierobjdid is eq 0 the hierarchy is not tested.
-*	If class is eq 0 the class is not tested.
-*	If name is eq NULL the name is not tested.
-*	The objdid of the found object and arguments will be
-*	passed to the backcallroutine. The backcallroutine should be
-*	declared as:
-*
-*	int	'backcallroutine name'( objdid, arg1, arg2, arg3, arg4, arg5)
-*	unsigned long	objdid;
-*	void		*arg1;
-*	void		*arg2;
-*	void		*arg3;
-*	void		*arg4;
-*	void		*arg5;
-*	...
-*	Calls a backcall routine for every object in the plathierarchy
-*	of a specified class under a specific object in the hierarchy.
-*
-**************************************************************************/
+ *
+ * Name:		trv_object_search()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ * trv_tCtx	trvctx		I	ldh session.
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Traverses the objects in the plant and nodehierarchy.
+ *	Calls a backcallroutine with the given arguments for every found
+ *	object of the specified class that is found below the hierobjdid in
+ *	the hierarchy and that  fits in a wildcard description.
+ *	If hierobjdid is eq 0 the hierarchy is not tested.
+ *	If class is eq 0 the class is not tested.
+ *	If name is eq NULL the name is not tested.
+ *	The objdid of the found object and arguments will be
+ *	passed to the backcallroutine. The backcallroutine should be
+ *	declared as:
+ *
+ *	int	'backcallroutine name'( objdid, arg1, arg2, arg3, arg4, arg5)
+ *	unsigned long	objdid;
+ *	void		*arg1;
+ *	void		*arg2;
+ *	void		*arg3;
+ *	void		*arg4;
+ *	void		*arg5;
+ *	...
+ *	Calls a backcall routine for every object in the plathierarchy
+ *	of a specified class under a specific object in the hierarchy.
+ *
+ **************************************************************************/
 
-int trv_object_search(trv_tCtx trvctx, trv_tBcFunc backcall, void* arg1,
-    void* arg2, void* arg3, void* arg4, void* arg5)
-{
+int trv_object_search(trv_tCtx trvctx, trv_tBcFunc backcall, void *arg1,
+                      void *arg2, void *arg3, void *arg4, void *arg5) {
   int sts;
   pwr_tObjid objdid;
   pwr_tClassId obj_class;
-  pwr_tVolumeId* volume_ptr;
+  pwr_tVolumeId *volume_ptr;
 
   if (cdh_ObjidIsNotNull(trvctx->hierobjid)) {
     sts = ldh_GetObjectClass(trvctx->ldhses, trvctx->hierobjid, &obj_class);
     if (EVEN(sts))
       return sts;
-    if (!(obj_class == pwr_eClass_ClassHier || obj_class == pwr_eClass_TypeHier
-            || obj_class == pwr_eClass_MountObject
-            || obj_class == pwr_eClass_LibHier)) {
+    if (!(obj_class == pwr_eClass_ClassHier ||
+          obj_class == pwr_eClass_TypeHier ||
+          obj_class == pwr_eClass_MountObject ||
+          obj_class == pwr_eClass_LibHier)) {
       /* Hierarchy object is supplied. Check if the children */
-      sts = trv_get_child_object_search(
-          trvctx, trvctx->hierobjid, backcall, arg1, arg2, arg3, arg4, arg5);
+      sts = trv_get_child_object_search(trvctx, trvctx->hierobjid, backcall,
+                                        arg1, arg2, arg3, arg4, arg5);
       if (EVEN(sts))
         return sts;
     }
@@ -1988,13 +1988,13 @@ int trv_object_search(trv_tCtx trvctx, trv_tBcFunc backcall, void* arg1,
           return sts;
 
         /* Check that the class of the object is correct */
-        if (!(obj_class == pwr_eClass_ClassHier
-                || obj_class == pwr_eClass_TypeHier
-                || obj_class == pwr_eClass_MountObject
-                || obj_class == pwr_eClass_LibHier)) {
+        if (!(obj_class == pwr_eClass_ClassHier ||
+              obj_class == pwr_eClass_TypeHier ||
+              obj_class == pwr_eClass_MountObject ||
+              obj_class == pwr_eClass_LibHier)) {
           /* Check if the children */
-          sts = trv_get_child_object_search(
-              trvctx, objdid, backcall, arg1, arg2, arg3, arg4, arg5);
+          sts = trv_get_child_object_search(trvctx, objdid, backcall, arg1,
+                                            arg2, arg3, arg4, arg5);
           if (EVEN(sts))
             return sts;
         }
@@ -2010,11 +2010,11 @@ int trv_object_search(trv_tCtx trvctx, trv_tBcFunc backcall, void* arg1,
         return sts;
 
       /* Check that the class of the node object is correct */
-      if (!(obj_class == pwr_eClass_ClassHier
-              || obj_class == pwr_eClass_TypeHier)) {
+      if (!(obj_class == pwr_eClass_ClassHier ||
+            obj_class == pwr_eClass_TypeHier)) {
         /* Check if the children */
-        sts = trv_get_child_object_search(
-            trvctx, objdid, backcall, arg1, arg2, arg3, arg4, arg5);
+        sts = trv_get_child_object_search(trvctx, objdid, backcall, arg1, arg2,
+                                          arg3, arg4, arg5);
         if (EVEN(sts))
           return sts;
       }
@@ -2027,25 +2027,25 @@ int trv_object_search(trv_tCtx trvctx, trv_tBcFunc backcall, void* arg1,
 // Get all objects and attribute objects matching the search criteria.
 // Call the backcall function for found objects and attribute objects.
 
-int trv_aobject_search(trv_tCtx trvctx, trv_tBcFunc backcall, void* arg1,
-    void* arg2, void* arg3, void* arg4, void* arg5)
-{
+int trv_aobject_search(trv_tCtx trvctx, trv_tBcFunc backcall, void *arg1,
+                       void *arg2, void *arg3, void *arg4, void *arg5) {
   int sts;
   pwr_tObjid objdid;
   pwr_tClassId obj_class;
-  pwr_tVolumeId* volume_ptr;
+  pwr_tVolumeId *volume_ptr;
 
   if (cdh_ObjidIsNotNull(trvctx->hierobjid)) {
     sts = ldh_GetObjectClass(trvctx->ldhses, trvctx->hierobjid, &obj_class);
     if (EVEN(sts))
       return sts;
-    if (!(obj_class == pwr_eClass_ClassHier || obj_class == pwr_eClass_TypeHier
-            || obj_class == pwr_eClass_MountObject
-            || obj_class == pwr_eClass_LibHier)) {
+    if (!(obj_class == pwr_eClass_ClassHier ||
+          obj_class == pwr_eClass_TypeHier ||
+          obj_class == pwr_eClass_MountObject ||
+          obj_class == pwr_eClass_LibHier)) {
       /* Hierarchy object is supplied. Check if the children */
       sts = trv_get_attrobjects(trvctx->ldhses, trvctx->hierobjid,
-          trvctx->classid, trvctx->name, trv_eDepth_Deep, backcall, arg1, arg2,
-          arg3, arg4, arg5);
+                                trvctx->classid, trvctx->name, trv_eDepth_Deep,
+                                backcall, arg1, arg2, arg3, arg4, arg5);
       if (EVEN(sts))
         return sts;
     }
@@ -2059,14 +2059,14 @@ int trv_aobject_search(trv_tCtx trvctx, trv_tBcFunc backcall, void* arg1,
           return sts;
 
         /* Check that the class of the object is correct */
-        if (!(obj_class == pwr_eClass_ClassHier
-                || obj_class == pwr_eClass_TypeHier
-                || obj_class == pwr_eClass_MountObject
-                || obj_class == pwr_eClass_LibHier)) {
+        if (!(obj_class == pwr_eClass_ClassHier ||
+              obj_class == pwr_eClass_TypeHier ||
+              obj_class == pwr_eClass_MountObject ||
+              obj_class == pwr_eClass_LibHier)) {
           /* Check if the children */
           sts = trv_get_attrobjects(trvctx->ldhses, objdid, trvctx->classid,
-              trvctx->name, trv_eDepth_Deep, backcall, arg1, arg2, arg3, arg4,
-              arg5);
+                                    trvctx->name, trv_eDepth_Deep, backcall,
+                                    arg1, arg2, arg3, arg4, arg5);
           if (EVEN(sts))
             return sts;
         }
@@ -2082,12 +2082,12 @@ int trv_aobject_search(trv_tCtx trvctx, trv_tBcFunc backcall, void* arg1,
         return sts;
 
       /* Check that the class of the node object is correct */
-      if (!(obj_class == pwr_eClass_ClassHier
-              || obj_class == pwr_eClass_TypeHier)) {
+      if (!(obj_class == pwr_eClass_ClassHier ||
+            obj_class == pwr_eClass_TypeHier)) {
         /* Check if the children */
         sts = trv_get_attrobjects(trvctx->ldhses, objdid, trvctx->classid,
-            trvctx->name, trv_eDepth_Deep, backcall, arg1, arg2, arg3, arg4,
-            arg5);
+                                  trvctx->name, trv_eDepth_Deep, backcall, arg1,
+                                  arg2, arg3, arg4, arg5);
         if (EVEN(sts))
           return sts;
       }

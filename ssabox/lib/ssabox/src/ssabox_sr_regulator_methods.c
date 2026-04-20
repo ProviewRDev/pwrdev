@@ -35,9 +35,9 @@
  **/
 
 /*
-* Author: Jonas Haulin   email: jonas@haulin.se
-* Contains internal and engine functions for antisway objects.
-*/
+ * Author: Jonas Haulin   email: jonas@haulin.se
+ * Contains internal and engine functions for antisway objects.
+ */
 
 #include "ssabox_sr_regulator_methods.h"
 
@@ -49,7 +49,8 @@ void SR_addNewRef(SR_RefList** objectRefListpp, double aR, double uR, double xR)
   SR_RefList* newest;
 
   newest = (SR_RefList*)malloc(sizeof(SR_RefList));
-  if (newest == NULL) {
+  if (newest == NULL)
+  {
     fprintf(stderr, "SR_addNewRef: Could not allocate memory!\n");
     exit(99);
   }
@@ -62,8 +63,7 @@ void SR_addNewRef(SR_RefList** objectRefListpp, double aR, double uR, double xR)
                              // newest reference.
 }
 
-void SR_extractRef(SR_RefList** objectRefListpp, int delay, double* aDelayp,
-    double* uDelayp, double* xDelayp)
+void SR_extractRef(SR_RefList** objectRefListpp, int delay, double* aDelayp, double* uDelayp, double* xDelayp)
 {
   int i = 0;
   SR_RefList* sought;
@@ -81,16 +81,14 @@ void SR_extractRef(SR_RefList** objectRefListpp, int delay, double* aDelayp,
   *uDelayp = sought->u;
   *xDelayp = sought->x;
 
-  if ((i > delay)
-      && (sought->older
-             != NULL)) { // Remove tail of post-delay references if it exists
+  if ((i > delay) && (sought->older != NULL))
+  { // Remove tail of post-delay references if it exists
     remove_tail(sought->older);
     sought->older = NULL;
   }
 }
 
-static void remove_tail(
-    SR_RefList* tail) // recursive function to remove tail of list.
+static void remove_tail(SR_RefList* tail) // recursive function to remove tail of list.
 {
   if (tail->older != NULL)
     remove_tail(tail->older);

@@ -39,10 +39,11 @@
 
 #include "glow_growctx.h"
 
-class CurveCtx : public GrowCtx {
+class CurveCtx : public GrowCtx
+{
 public:
   CurveCtx(const char* ctx_name, double zoom_fact = 100)
-    : GrowCtx(ctx_name, zoom_fact), layout_adjusted(0), layout_height(0)
+      : GrowCtx(ctx_name, zoom_fact), layout_adjusted(0), layout_height(0)
   {
     ctx_type = glow_eCtxType_Curve;
   }
@@ -50,17 +51,14 @@ public:
   int layout_height;
   void configure();
   void zoom(double factor);
-  void unzoom()
-  {
-    zoom(mw.base_zoom_factor / mw.zoom_factor_x);
-  }
+  void unzoom() { zoom(mw.base_zoom_factor / mw.zoom_factor_x); }
   void nav_zoom_invalidated();
   void get_zoom(double* factor_x, double* factor_y);
   void get_prefered_zoom_y(int height, double* factor_y);
   void adjust_layout();
   void scroll(double value);
   int event_handler_nav(glow_eEvent event, int x, int y);
-  ~CurveCtx(){}
+  ~CurveCtx() {}
 };
 
 void curve_scroll_horizontal(CurveCtx* ctx, int value, int bottom);

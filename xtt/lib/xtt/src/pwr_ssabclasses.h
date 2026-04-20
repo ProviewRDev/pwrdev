@@ -9,7 +9,8 @@
 /* Class: Buff1440
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tInt16 Data[720];
 } pwr_sClass_Buff1440;
 
@@ -21,7 +22,8 @@ typedef struct {
 /* Class: Buff256
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tInt16 Data[128];
 } pwr_sClass_Buff256;
 
@@ -33,7 +35,8 @@ typedef struct {
 /* Class: Buff32k
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tInt16 Data[16384];
 } pwr_sClass_Buff32k;
 
@@ -45,7 +48,8 @@ typedef struct {
 /* Class: Buff4096
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tInt16 Data[2048];
 } pwr_sClass_Buff4096;
 
@@ -57,7 +61,8 @@ typedef struct {
 /* Class: LoggConfig
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString40 LoggFile;
   pwr_tBoolean NewVersion;
   pwr_tUInt32 Identity;
@@ -73,7 +78,8 @@ typedef struct {
 /* Class: LocTrans
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
   pwr_tBoolean DataValid;
 } pwr_sClass_LocTrans;
@@ -86,7 +92,8 @@ typedef struct {
 /* Class: MultiCast
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt16 Address[16];
 } pwr_sClass_MultiCast;
 
@@ -98,7 +105,8 @@ typedef struct {
 /* Class: RemAi
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
 } pwr_sClass_RemAi;
 
@@ -110,7 +118,8 @@ typedef struct {
 /* Class: RemAo
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
 } pwr_sClass_RemAo;
 
@@ -122,7 +131,8 @@ typedef struct {
 /* Class: RemChan_Ai
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
   pwr_tObjid SigChanCon;
   pwr_tString40 Identity;
@@ -142,7 +152,8 @@ typedef struct {
 /* Class: RemChan_Ao
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
   pwr_tObjid SigChanCon;
   pwr_tString40 Identity;
@@ -165,7 +176,8 @@ typedef struct {
 /* Class: RemChan_Co
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
   pwr_tObjid SigChanCon;
   pwr_tString40 Identity;
@@ -186,7 +198,8 @@ typedef struct {
 /* Class: RemChan_Di
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
   pwr_tObjid SigChanCon;
   pwr_tString40 Identity;
@@ -205,7 +218,8 @@ typedef struct {
 /* Class: RemChan_Do
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
   pwr_tObjid SigChanCon;
   pwr_tString40 Identity;
@@ -226,7 +240,8 @@ typedef struct {
 /* Class: RemChan_Dv
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
   pwr_tObjid SigChanCon;
   pwr_tBoolean* ActualValue;
@@ -246,7 +261,8 @@ typedef struct {
 /* Class: RemCo
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
 } pwr_sClass_RemCo;
 
@@ -258,7 +274,8 @@ typedef struct {
 /* Class: RemDi
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
 } pwr_sClass_RemDi;
 
@@ -270,7 +287,8 @@ typedef struct {
 /* Class: RemDo
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
 } pwr_sClass_RemDo;
 
@@ -282,7 +300,8 @@ typedef struct {
 /* Class: RemDv
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
 } pwr_sClass_RemDv;
 
@@ -294,7 +313,8 @@ typedef struct {
 /* Class: RemNode
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
   pwr_tString40 NodeName;
   pwr_tUInt16 Address[4];
@@ -327,7 +347,8 @@ typedef struct {
 /* Class: RemTrans
    Body:  RtBody  */
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description;
   pwr_tString40 TransName;
   pwr_tUInt16 Address[4];

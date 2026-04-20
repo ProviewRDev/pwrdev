@@ -57,5 +57,5 @@ static pwr_tStatus PlayFilter(xmenu_sMenuCall* ip)
   Every method to be exported to xtt should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindXttMethods(Sound) = { pwr_BindXttMethod(Play),
-  pwr_BindXttMethod(PlayFilter), pwr_NullMethod };
+pwr_dExport pwr_BindXttMethods(Sound) = {pwr_BindXttMethod(Play), pwr_BindXttMethod(PlayFilter),
+                                         pwr_NullMethod};

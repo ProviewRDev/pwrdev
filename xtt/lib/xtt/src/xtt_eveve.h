@@ -46,11 +46,11 @@
 class CoWow;
 class XttMethodToolbar;
 
-class EvEve {
+class EvEve
+{
 public:
-  EvEve(void* ev_parent_ctx, char* eve_name, pwr_tObjid ev_user,
-      int ev_eventname_seg, int ev_width, int ev_height, int ev_x, int ev_y,
-      pwr_tObjid ev_view, unsigned int ev_options, pwr_tStatus* status);
+  EvEve(void* ev_parent_ctx, char* eve_name, pwr_tObjid ev_user, int ev_eventname_seg, int ev_width,
+        int ev_height, int ev_x, int ev_y, pwr_tObjid ev_view, unsigned int ev_options, pwr_tStatus* status);
   virtual ~EvEve();
 
   void* parent_ctx;
@@ -66,8 +66,7 @@ public:
   void (*start_trace_cb)(void*, pwr_tObjid, char*);
   void (*display_in_xnav_cb)(void*, pwr_tAttrRef*);
   void (*help_cb)(void*, const char*);
-  void (*popup_menu_cb)(
-      void*, pwr_tAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  void (*popup_menu_cb)(void*, pwr_tAttrRef, unsigned long, unsigned long, char*, int x, int y);
   int (*sound_cb)(void*, pwr_tAttrRef*);
   void (*pop_cb)(void*);
   int (*is_authorized_cb)(void*, unsigned int);
@@ -83,20 +82,11 @@ public:
   XttMethodToolbar* eve_sup_methodtoolbar;
   int list_copied;
 
-  virtual void map_ala()
-  {
-  }
-  virtual void unmap_ala()
-  {
-  }
-  virtual void set_title_ala(char* title)
-  {
-  }
+  virtual void map_ala() {}
+  virtual void unmap_ala() {}
+  virtual void set_title_ala(char* title) {}
 
-  int is_mapped_ala()
-  {
-    return eve_displayed;
-  }
+  int is_mapped_ala() { return eve_displayed; }
   pwr_tStatus set_view(pwr_tOid view);
   void view_shift();
   void update();
@@ -116,17 +106,13 @@ public:
   void eve_activate_ack_all();
   void ack_last_prio(unsigned long type, unsigned long prio);
   void ack_all();
-  void ack(mh_sEventId* id)
-  {
-    ala->ack(id);
-  }
-  int get_last_not_acked_prio(
-      mh_sEventId** id, unsigned long type, unsigned long prio);
+  void ack(mh_sEventId* id) { ala->ack(id); }
+  int get_last_not_acked_prio(mh_sEventId** id, unsigned long type, unsigned long prio);
 
   static void eve_display_in_xnav_cb(void* ctx, pwr_tAttrRef* arp);
   static void eve_start_trace_cb(void* ctx, pwr_tObjid objid, char* name);
-  static void eve_popup_menu_cb(void* ctx, pwr_tAttrRef attrref,
-      unsigned long item_type, unsigned long utility, char* arg, int x, int y);
+  static void eve_popup_menu_cb(void* ctx, pwr_tAttrRef attrref, unsigned long item_type,
+                                unsigned long utility, char* arg, int x, int y);
   static int eve_sound_cb(void* ctx, pwr_tAttrRef* attrref);
   static void eve_selection_changed_cb(void* ctx);
   static char* eve_name_to_alias_cb(void* ctx, char* name);

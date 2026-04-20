@@ -41,10 +41,7 @@
 #include <stdio.h>
 #include "pwr.h"
 
-void bck_ForceBackup(void** context)
-{
-  printf("bck_ForceBackup is not implemented\n");
-}
+void bck_ForceBackup(void** context) { printf("bck_ForceBackup is not implemented\n"); }
 
 pwr_tUInt32 bck_WaitBackup(void* context, pwr_tBoolean timeout)
 {

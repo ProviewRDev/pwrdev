@@ -33,11 +33,13 @@
 #pragma pack(1)
 #endif
 
-typedef struct _AVAIL {
+typedef struct _AVAIL
+{
   q_address target_q;
 } AVAIL;
 
-typedef struct _AVAIL_DEREG {
+typedef struct _AVAIL_DEREG
+{
   int16 version;
   int16 filler;
   q_address target_q;
@@ -45,7 +47,8 @@ typedef struct _AVAIL_DEREG {
   char req_ack;
 } AVAIL_DEREG;
 
-typedef struct _AVAIL_REG {
+typedef struct _AVAIL_REG
+{
   int16 version;
   int16 filler;
   q_address target_q;
@@ -53,7 +56,8 @@ typedef struct _AVAIL_REG {
   int32 timeout;
 } AVAIL_REG;
 
-typedef struct _AVAIL_REG_REPLY {
+typedef struct _AVAIL_REG_REPLY
+{
   int16 status;
   uint16 reg_id;
   int16 number_reg;
@@ -63,7 +67,8 @@ typedef struct _AVAIL_REG_REPLY {
 /*       DISABLE_Q_NOTIFY_REQ is the same structure as LIST_ALL_Q_REQ       */
 /*       DISABLE_Q_NOTIFY_RESP is the same structure as Q_NOTIFY_RESP       */
 
-typedef struct _ENABLE_NOTIFY {
+typedef struct _ENABLE_NOTIFY
+{
   char reserved;
   char connection_flag;
 } ENABLE_NOTIFY;
@@ -71,16 +76,19 @@ typedef struct _ENABLE_NOTIFY {
 /* NOTE: ENABLE_Q_NOTIFY_REQ is the same structure as LIST_ALL_Q_REQ        */
 /*       ENABLE_Q_NOTIFY_RESP is the same structure as Q_NOTIFY_RESP        */
 
-typedef struct _TADDRESS {
+typedef struct _TADDRESS
+{
   int32 len;
   char str[16];
 } TADDRESS;
-typedef struct _NODENAME {
+typedef struct _NODENAME
+{
   int32 len;
   char str[256];
 } NODENAME;
 
-typedef struct _LINKMGT_REQ {
+typedef struct _LINKMGT_REQ
+{
   int32 version;
   int32 user_tag;
   int32 function_code;
@@ -94,7 +102,8 @@ typedef struct _LINKMGT_REQ {
   NODENAME node_name;
 } LINKMGT_REQ;
 
-typedef struct _LINKMGT_RESP {
+typedef struct _LINKMGT_RESP
+{
   int32 version;
   int32 user_tag;
   int32 status;
@@ -113,7 +122,8 @@ typedef struct _LINKMGT_RESP {
 
 /* NOTE: LINK_COMPLETE uses the LINK_NOTIFICATION structure                 */
 
-typedef struct _LINK_NOTIFICATION {
+typedef struct _LINK_NOTIFICATION
+{
   int16 group_number;
   int16 filler1;
   char os_type;
@@ -124,7 +134,8 @@ typedef struct _LINK_NOTIFICATION {
 /*       LIST_ALL_CONNECTIONS uses the GROUP_RECORD structure               */
 /*       LIST_ALL_GROUPS uses the GROUP_RECORD structure                    */
 
-typedef struct _GROUP_RECORD {
+typedef struct _GROUP_RECORD
+{
   int16 group_number;
   char group_name[4];
   char uic[3];
@@ -136,7 +147,8 @@ typedef struct _GROUP_RECORD {
 
 /* NOTE: LIST_ALL_ENTRIES uses the QLIST_RECORD structure                   */
 
-typedef struct _QLIST_RECORD {
+typedef struct _QLIST_RECORD
+{
   char q_name[20];
   int16 q_number;
   char attach_flag;
@@ -145,7 +157,8 @@ typedef struct _QLIST_RECORD {
 
 /* NOTE: LIST_ALL_RESP has the same format as GROUP_RECORD                  */
 
-typedef struct _LIST_ALL_RESP {
+typedef struct _LIST_ALL_RESP
+{
   int16 group_number;
   char group_name[4];
   char uic_number[3];
@@ -158,14 +171,16 @@ typedef struct _LIST_ALL_RESP {
 /* NOTE: LIST_ALL_Q_REQ, DISABLE_Q_NOTIFY_REQ, and                          */
 /*       ENABLE_Q_NOTIFY_REQ use the same structure                         */
 
-typedef struct _Q_NOTIFY_REQ {
+typedef struct _Q_NOTIFY_REQ
+{
   int32 version;
   int32 user_tag;
 } Q_NOTIFY_REQ;
 
 /* NOTE: LIST_ALL_Q_RESP uses the Q_NOTIFY_RESP structure                   */
 
-typedef struct _LOCATE_Q_REP {
+typedef struct _LOCATE_Q_REP
+{
   int32 version;
   int32 search_loc;
   int32 object_handle;
@@ -184,7 +199,8 @@ typedef struct _LOCATE_Q_REP {
 #define DQF_SET_SUCCESS 1
 #define DQF_SET_REFUSED 2
 
-typedef struct _MRS_DQF_SET {
+typedef struct _MRS_DQF_SET
+{
   int16 version;
   int16 action;
   int32 status;
@@ -196,7 +212,8 @@ typedef struct _MRS_DQF_SET {
 
 /* NOTE: MRS_DQF_SET_REP returns the same struture as MRS_DQF_SET           */
 
-typedef struct _MRS_DQF_TRANSFER {
+typedef struct _MRS_DQF_TRANSFER
+{
   int16 version;
   int32 user_tag;
   int16 status;
@@ -221,7 +238,8 @@ typedef struct _MRS_DQF_TRANSFER {
 /* NOTE: MRS_JRN_DISABLE_REP return the same structure as MRS_JRN_ENABLE    */
 /*       MRS_JRN_ENABLE uses the MRS_JRN_SET_ALL structure                  */
 
-typedef struct _MRS_JRN_SET_ALL {
+typedef struct _MRS_JRN_SET_ALL
+{
   int32 version;
   int32 dqf_status;
   int32 saf_status;
@@ -242,7 +260,8 @@ typedef struct _MRS_JRN_SET_ALL {
 #define SAF_SET_SUCCESS 1
 #define SAF_SET_REFUSED 2
 
-typedef struct _MRS_SAF_SET {
+typedef struct _MRS_SAF_SET
+{
   int16 version;
   int16 action;
   int32 status;
@@ -257,7 +276,8 @@ typedef struct _MRS_SAF_SET {
 /* NOTE: MRS_SAF_SET_REP return the same structure as MRS_SAF_SET           */
 /*       MRS_SET_DLJ, MRS_SET_DLJ_REP use the same MRS_SET_DLJ structure    */
 
-typedef struct _MRS_SET_DLJ {
+typedef struct _MRS_SET_DLJ
+{
   int16 version;
   int32 user_tag;
   int32 status;
@@ -266,7 +286,8 @@ typedef struct _MRS_SET_DLJ {
 
 /* NOTE: MRS_SET_PCJ, MRS_SET_PCJ_REP use the same MRS_SET_PCJ structure    */
 
-typedef struct _MRS_SET_PCJ {
+typedef struct _MRS_SET_PCJ
+{
   int16 version;
   int32 user_tag;
   int32 force_j;
@@ -278,13 +299,15 @@ typedef struct _MRS_SET_PCJ {
 /*       and LIST_ALL_Q_RESP use the same Q_NOTIFY_RESP structure           */
 
 #define MAX_NUMBER_Q_RECS 50
-typedef struct _Q_NOTIFY_RESP {
+typedef struct _Q_NOTIFY_RESP
+{
   int32 version;
   int32 user_tag;
   int32 status_code;
   int32 last_block_flag;
   int32 number_q_recs;
-  struct {
+  struct
+  {
     q_address q_num;
     q_address q_owner;
     int32 q_type;
@@ -294,7 +317,8 @@ typedef struct _Q_NOTIFY_RESP {
   } q_rec[50];
 } Q_NOTIFY_RESP;
 
-typedef struct _SBS_REGISTER_HEAD {
+typedef struct _SBS_REGISTER_HEAD
+{
   int32 version;
   int32 user_tag;
   int32 mot;
@@ -306,7 +330,8 @@ typedef struct _SBS_REGISTER_HEAD {
   int32 rule_conjunct;
 } SBS_REGISTER_HEAD;
 
-typedef struct _SBS_REGISTER_RULE {
+typedef struct _SBS_REGISTER_RULE
+{
   int32 offset;
   int32 data_operator;
   int32 length;
@@ -314,12 +339,14 @@ typedef struct _SBS_REGISTER_RULE {
 } SBS_REGISTER_RULE;
 
 #define MAX_SEL_RULES 256
-typedef struct _SBS_REGISTER_REQ {
+typedef struct _SBS_REGISTER_REQ
+{
   SBS_REGISTER_HEAD head;
   SBS_REGISTER_RULE rule[256];
 } SBS_REGISTER_REQ;
 
-typedef struct _SBS_REGISTER_RESP {
+typedef struct _SBS_REGISTER_RESP
+{
   int32 version;
   int32 user_tag;
   int32 status;
@@ -327,7 +354,8 @@ typedef struct _SBS_REGISTER_RESP {
   int32 number_reg;
 } SBS_REGISTER_RESP;
 
-typedef struct _SBS_DEREGISTER_REQ {
+typedef struct _SBS_DEREGISTER_REQ
+{
   int32 version;
   int32 user_tag;
   int32 mot;
@@ -336,14 +364,16 @@ typedef struct _SBS_DEREGISTER_REQ {
   int32 req_ack;
 } SBS_DEREGISTER_REQ;
 
-typedef struct _SBS_DEREGISTER_RESP {
+typedef struct _SBS_DEREGISTER_RESP
+{
   int32 version;
   int32 status;
   int32 user_tag;
   int32 number_reg;
 } SBS_DEREGISTER_RESP;
 
-typedef struct _SBS_STATUS_REQ {
+typedef struct _SBS_STATUS_REQ
+{
   int32 version;
   int32 user_tag;
   int32 start_mot;
@@ -351,7 +381,8 @@ typedef struct _SBS_STATUS_REQ {
   int32 reset;
 } SBS_STATUS_REQ;
 
-typedef struct _SBS_STATUS_RESP {
+typedef struct _SBS_STATUS_RESP
+{
   int32 version;
   int32 user_tag;
   int32 status;
@@ -360,18 +391,24 @@ typedef struct _SBS_STATUS_RESP {
   char data[31988];
 } SBS_STATUS_RESP;
 
-typedef struct _SBS_STATUS_RESP_MOT {
+typedef struct _SBS_STATUS_RESP_MOT
+{
   int32 mot;
-  union {
-    struct {
-      union {
-        struct {
+  union
+  {
+    struct
+    {
+      union
+      {
+        struct
+        {
           char s_b1;
           char s_b2;
           char s_b3;
           char s_b4;
         } S_un_b;
-        struct {
+        struct
+        {
           uint16 s_w1;
           uint16 s_w2;
         } S_un_w;
@@ -379,11 +416,13 @@ typedef struct _SBS_STATUS_RESP_MOT {
       } inet_addr;
       uint16 inet_port;
     } udp;
-    struct {
+    struct
+    {
       char mca_addr[12];
       char protocol[4];
     } eth;
-    struct {
+    struct
+    {
       char unused[20];
     } dmq;
     int32 filler[5];
@@ -398,9 +437,11 @@ typedef struct _SBS_STATUS_RESP_MOT {
   int32 seq_gaps;
   int32 whole_msg_gaps;
   int32 whole_silo_gap;
-  struct {
+  struct
+  {
     char device_name[16];
-    struct {
+    struct
+    {
       uint32 tv_sec;
       uint32 tv_usec;
     } fail_tod;
@@ -412,15 +453,18 @@ typedef struct _SBS_STATUS_RESP_MOT {
   } rail[2];
 } SBS_STATUS_RESP_MOT;
 
-typedef struct _SBS_STATUS_REP_REG_Q {
+typedef struct _SBS_STATUS_REP_REG_Q
+{
   q_address reg_q;
 } SBS_STATUS_REP_REG_Q;
 
-typedef struct _SBS_STATUS_REP_NUM_GROUPS {
+typedef struct _SBS_STATUS_REP_NUM_GROUPS
+{
   int32 num_groups;
 } SBS_STATUS_REP_NUM_GROUPS;
 
-typedef struct _SBS_STATUS_RESP_GROUP {
+typedef struct _SBS_STATUS_RESP_GROUP
+{
   int32 group;
   int32 rexmit_reqs_to_remote;
   int32 rexmit_sat_by_remote;
@@ -429,19 +473,22 @@ typedef struct _SBS_STATUS_RESP_GROUP {
   int32 rexmit_sat_by_local;
 } SBS_STATUS_RESP_GROUP;
 
-typedef struct _SBS_SEQUENCE_GAP {
+typedef struct _SBS_SEQUENCE_GAP
+{
   int32 num_msgs_missing;
   int32 sender_group;
   int32 mot;
   int32 channel;
 } SBS_SEQUENCE_GAP;
 
-typedef struct _TIMER_EXPIRED {
+typedef struct _TIMER_EXPIRED
+{
   int32 timer_id;
   char reserved[20];
 } TIMER_EXPIRED;
 
-typedef struct _UNAVAIL {
+typedef struct _UNAVAIL
+{
   q_address target_q; /* Q that is now un-available       */
 } UNAVAIL;
 
@@ -453,20 +500,23 @@ typedef struct _UNAVAIL {
 /*                                                                          */
 /*                                                                          */
 
-typedef struct _AVAIL_REG_V20 {
+typedef struct _AVAIL_REG_V20
+{
   int16 version;
   q_address target_q;
   q_address distribution_q;
 } AVAIL_REG_V20;
 
-typedef struct _AVAIL_DEREG_V20 {
+typedef struct _AVAIL_DEREG_V20
+{
   int16 version;
   q_address target_q;
   q_address distribution_q;
   char req_ack;
 } AVAIL_DEREG_V20;
 
-typedef struct _SBS_REG {
+typedef struct _SBS_REG
+{
   int16 version;
   uint16 mot;
   q_address distribution_q;
@@ -479,37 +529,43 @@ typedef struct _SBS_REG {
   char req_autodereg;
 } SBS_REG;
 
-typedef struct _SBS_REG_REPLY {
+typedef struct _SBS_REG_REPLY
+{
   int16 status;
   uint16 reg_id;
   int16 number_reg;
 } SBS_REG_REPLY;
 
-typedef struct _SBS_REG_EZ {
+typedef struct _SBS_REG_EZ
+{
   int16 version;
   int16 mot;
   q_address distribution_q;
 } SBS_REG_EZ;
 
-typedef struct _SBS_REG_EZ_REPLY {
+typedef struct _SBS_REG_EZ_REPLY
+{
   int16 status;
   uint16 reg_id;
   int16 number_reg;
 } SBS_REG_EZ_REPLY;
 
-typedef struct _SBS_DEREG {
+typedef struct _SBS_DEREG
+{
   int16 version;
   uint16 mot;
   q_address distribution_q;
   char req_ack;
 } SBS_DEREG;
 
-typedef struct _SBS_DEREG_ACK {
+typedef struct _SBS_DEREG_ACK
+{
   int16 status;
   int16 number_reg;
 } SBS_DEREG_ACK;
 
-typedef struct _SBS_BS_SEQGAP {
+typedef struct _SBS_BS_SEQGAP
+{
   int32 num_msgs_missing;
   uint16 sender_group;
   uint16 mot;

@@ -33,8 +33,8 @@ install_pwrrt="apt-get install -y libgtk-3-0 libasound2 \
 	openjdk-11-jre"
 install_pkg="dpkg -i"
 jdk_dir=/usr/lib/jvm/java-11-openjdk-amd64
-ver="6.1.3-1"
-sver="61"
+ver="7.0.0-1"
+sver="70"
 arch="amd64"
 pkg_pwr="pwr"$sver"_"$ver"_"$arch".deb"
 pkg_pwrdemo="pwrdemo"$sver"_"$ver"_"$arch".deb"

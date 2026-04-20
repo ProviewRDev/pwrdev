@@ -40,7 +40,8 @@
 #include "cow_wow.h"
 #include "wb_session.h"
 
-class wb_crrgen {
+class wb_crrgen
+{
 protected:
   wb_session* m_sp;
   tree_sTable* m_signal_th;

@@ -43,7 +43,8 @@
 
 /* cow_tree.h -- Tree viewer */
 
-typedef enum {
+typedef enum
+{
   tree_mOptions_LayoutList = 1 << 0,
   tree_mOptions_LayoutTree = 1 << 1,
   tree_mOptions_AlphaOrder = 1 << 2
@@ -51,21 +52,19 @@ typedef enum {
 
 class TreeNav;
 class CoWow;
-class CowTree {
+class CowTree
+{
 public:
-  CowTree(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist, int xn_item_cnt,
-      unsigned int xn_options,
-      pwr_tStatus (*get_object_info)(
-          void*, pwr_tAttrRef*, char*, int, char*, char*, int),
-      pwr_tStatus (*get_node_info)(void*, char*, char*, int),
-      pwr_tStatus (*action)(void*, pwr_tAttrRef*));
+  CowTree(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist, int xn_item_cnt, unsigned int xn_options,
+          pwr_tStatus (*get_object_info)(void*, pwr_tAttrRef*, char*, int, char*, char*, int),
+          pwr_tStatus (*get_node_info)(void*, char*, char*, int),
+          pwr_tStatus (*action)(void*, pwr_tAttrRef*));
   void* parent_ctx;
   char name[80];
   TreeNav* treenav;
   void (*close_cb)(void*);
   void (*object_info_cb)(void*, pwr_tAttrRef, char*, char*);
-  pwr_tStatus (*get_object_info_cb)(
-      void*, pwr_tAttrRef*, char*, int, char*, char*, int);
+  pwr_tStatus (*get_object_info_cb)(void*, pwr_tAttrRef*, char*, int, char*, char*, int);
   pwr_tStatus (*get_node_info_cb)(void*, char*, char*, int);
   pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*);
   CoWow* wow;
@@ -77,22 +76,16 @@ public:
   void activate_help();
   int activate_button_ok();
 
-  virtual void message(char sev, const char* text)
-  {
-  }
-  virtual void pop()
-  {
-  }
+  virtual void message(char sev, const char* text) {}
+  virtual void pop() {}
 
   static void message(void* attr, char severity, const char* message);
-  static int cowtree_get_select_cb(
-      void* ctx, pwr_tOid* oid, char* aname, char* oname);
+  static int cowtree_get_select_cb(void* ctx, pwr_tOid* oid, char* aname, char* oname);
   static void cowtree_help_cb(void* ctx, const char* key);
   static int get_select_cb(void* ctx, pwr_tAttrRef* aref);
-  static pwr_tStatus get_object_info(void* ctx, pwr_tAttrRef* aref, char* name,
-      int nsize, char* cname, char* descr, int dsize);
-  static pwr_tStatus get_node_info(
-      void* ctx, char* name, char* descr, int dsize);
+  static pwr_tStatus get_object_info(void* ctx, pwr_tAttrRef* aref, char* name, int nsize, char* cname,
+                                     char* descr, int dsize);
+  static pwr_tStatus get_node_info(void* ctx, char* name, char* descr, int dsize);
   static pwr_tStatus action(void* ctx, pwr_tAttrRef* aref);
   virtual ~CowTree();
 };

@@ -55,14 +55,19 @@
 #define VIEW 2
 #define EDIT 3
 
-typedef enum { foe_mOption_EnableComment = 1 } foe_mOption;
+typedef enum
+{
+  foe_mOption_EnableComment = 1
+} foe_mOption;
 
-typedef enum {
+typedef enum
+{
   foe_eFuncAccess_View = 1 << 0,
   foe_eFuncAccess_Edit = 1 << 1
 } foe_eFuncAccess;
 
-enum foe_ePopupmenu {
+enum foe_ePopupmenu
+{
   foe_ePopupmenu_attribute = 1 << 0,
   foe_ePopupmenu_subwindow = 1 << 1,
   foe_ePopupmenu_connect = 1 << 2,
@@ -85,9 +90,14 @@ class Pal;
 class Nav;
 class wb_build_opt;
 
-typedef enum { foe_eAttr_WAtt, foe_eAttr_WAttText } foe_eAttr;
+typedef enum
+{
+  foe_eAttr_WAtt,
+  foe_eAttr_WAttText
+} foe_eAttr;
 
-typedef struct {
+typedef struct
+{
   void* a_ctx;
   WFoe* foe;
   vldh_t_node node;
@@ -97,7 +107,8 @@ typedef struct {
 // WFoe is the top-level Function Object Editor context for one plc editor
 // window. It owns editor state and auxiliary dialogs, and uses WGre for the
 // graphics canvas itself.
-class WFoe : public WUtility {
+class WFoe : public WUtility
+{
 public:
   void* parent_ctx;
   pwr_tOName name;
@@ -136,35 +147,31 @@ public:
   static int attr_count;
   CoWow* wow;
 
-  WFoe(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram,
-      ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, int f_map_window,
-      ldh_eAccess f_access, unsigned int f_options, pwr_tStatus* sts);
-  WFoe(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram,
-      ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
-      vldh_t_node nodeobject, unsigned long windowindex,
-      unsigned long new_window, int f_map_window, ldh_eAccess f_access,
-      foe_eFuncAccess function_access, unsigned int f_options,
-      pwr_tStatus* sts);
+  WFoe(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
+       ldh_tSesContext ldhsesctx, int f_map_window, ldh_eAccess f_access, unsigned int f_options,
+       pwr_tStatus* sts);
+  WFoe(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
+       ldh_tSesContext ldhsesctx, vldh_t_node nodeobject, unsigned long windowindex, unsigned long new_window,
+       int f_map_window, ldh_eAccess f_access, foe_eFuncAccess function_access, unsigned int f_options,
+       pwr_tStatus* sts);
   virtual ~WFoe();
 
   virtual void pop();
-  virtual WAtt* watt_new(void* a_parent_ctx, ldh_tSesContext a_ldhses,
-      pwr_sAttrRef a_aref, int a_editmode, int a_advanced_user,
-      int a_display_objectname);
-  virtual WAttText* watttext_new(void* a_parent_ctx, ldh_tSesContext a_ldhses,
-      pwr_sAttrRef a_aref, int a_editmode, pwr_tStatus* status);
-  virtual WFoe* subwindow_new(void* f_parent_ctx, char* f_name,
-      pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
-      vldh_t_node nodeobject, unsigned long windowindex,
-      unsigned long new_window, int f_map_window, ldh_eAccess f_access,
-      foe_eFuncAccess function_access, unsigned int f_options,
-      pwr_tStatus* sts);
+  virtual WAtt* watt_new(void* a_parent_ctx, ldh_tSesContext a_ldhses, pwr_sAttrRef a_aref, int a_editmode,
+                         int a_advanced_user, int a_display_objectname);
+  virtual WAttText* watttext_new(void* a_parent_ctx, ldh_tSesContext a_ldhses, pwr_sAttrRef a_aref,
+                                 int a_editmode, pwr_tStatus* status);
+  virtual WFoe* subwindow_new(void* f_parent_ctx, char* f_name, pwr_tObjid plcprogram,
+                              ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, vldh_t_node nodeobject,
+                              unsigned long windowindex, unsigned long new_window, int f_map_window,
+                              ldh_eAccess f_access, foe_eFuncAccess function_access, unsigned int f_options,
+                              pwr_tStatus* sts);
   virtual void destroy();
   virtual void set_title();
   virtual void message(const char* new_label);
   virtual void msgbox(const char* new_label);
-  virtual int create_window(int x_top, int y_top, int width_adb, int height_adb,
-      ldh_tSesContext ldhsession, foe_eFuncAccess function_access);
+  virtual int create_window(int x_top, int y_top, int width_adb, int height_adb, ldh_tSesContext ldhsession,
+                            foe_eFuncAccess function_access);
   virtual int get_textinput(const char* message, int (*function)(WFoe*, char*));
   virtual int edit_set_entries();
   virtual int view_set_entries();
@@ -173,8 +180,8 @@ public:
   virtual void clock_cursor();
   virtual void normal_cursor();
   virtual int get_selection(char* str, int len);
-  virtual void popupmsg(const char* new_label, void (*yes_procedure)(WFoe*),
-      void (*no_procedure)(WFoe*), void (*cancel_procedure)(WFoe*));
+  virtual void popupmsg(const char* new_label, void (*yes_procedure)(WFoe*), void (*no_procedure)(WFoe*),
+                        void (*cancel_procedure)(WFoe*));
 
   void activate_save();
   void activate_exit();
@@ -231,10 +238,7 @@ public:
   void activate_view_togg(int set);
   void activate_edit_togg(int set);
   void activate_conpoint_lock();
-  void activate_confeedback(int set)
-  {
-    use_feedback_con = set;
-  }
+  void activate_confeedback(int set) { use_feedback_con = set; }
 
   void function_setup();
   int register_callbacks();
@@ -271,29 +275,23 @@ public:
   static void reset_current_node(WFoe* foe);
   static int search_object(WFoe* foe, char* searchstr);
   static int search_string(WFoe* foe, char* searchstr);
-  int new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
-      ldh_tSesContext ldhsesctx, vldh_t_node nodeobject,
-      unsigned long windowindex, unsigned long new_window,
-      foe_eFuncAccess function_access);
+  int new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
+                vldh_t_node nodeobject, unsigned long windowindex, unsigned long new_window,
+                foe_eFuncAccess function_access);
   void get_hinactx(void** hinactx);
   int cmd_get_ldhses(ldh_tSesContext* ldhses);
-  int cmd_create_node(char* name, pwr_tCid cid, pwr_tOid* destoid, float x,
-      float y, int use_default_masks, unsigned int inputmask,
-      unsigned int outputmask, unsigned int invertmask);
+  int cmd_create_node(char* name, pwr_tCid cid, pwr_tOid* destoid, float x, float y, int use_default_masks,
+                      unsigned int inputmask, unsigned int outputmask, unsigned int invertmask);
   int cmd_delete_node(pwr_tOid oid);
-  int cmd_create_con(pwr_tOid srcoid, char* srcattr, pwr_tOid destoid,
-      char* destattr, int feedback);
+  int cmd_create_con(pwr_tOid srcoid, char* srcattr, pwr_tOid destoid, char* destattr, int feedback);
   int cmd_connect(pwr_tAttrRef* aref, pwr_tOid plcnode);
 
   static pwr_tStatus ldh_this_session_cb(void* ctx, ldh_sEvent* event);
   static void error_msg(unsigned long sts);
   static void info_msg(unsigned long sts);
-  static int attrlist_get(
-      void* a_ctx, foe_eAttr type, WFoe** foe, vldh_t_node* node);
-  static int attrlist_get_by_node(
-      vldh_t_node node, foe_eAttr type, void** a_ctx);
-  static int attrlist_insert(
-      void* a_ctx, WFoe* foe, vldh_t_node node, foe_eAttr type);
+  static int attrlist_get(void* a_ctx, foe_eAttr type, WFoe** foe, vldh_t_node* node);
+  static int attrlist_get_by_node(vldh_t_node node, foe_eAttr type, void** a_ctx);
+  static int attrlist_insert(void* a_ctx, WFoe* foe, vldh_t_node node, foe_eAttr type);
   static int attrlist_delete(void* a_ctx);
   static void attr_quit(void* a_ctx);
   static void attredit_quit(void* a_ctx);
@@ -308,16 +306,14 @@ public:
   static void deletewind_ok(WFoe* foe);
 
   static void gre_setup_window(WGre* gre);
-  static void gre_node_created(
-      WGre* gre, unsigned long current_node_type, float x, float y);
+  static void gre_node_created(WGre* gre, unsigned long current_node_type, float x, float y);
   static void gre_node_floating_created(WGre* gre, vldh_t_node node);
   static void gre_node_moved(WGre* gre);
   static void gre_node_selected(WGre* gre);
   static void gre_con_selected(WGre* gre);
-  static void gre_con_created(WGre* gre, double x, double y,
-      vldh_t_node source_obj, unsigned long source_point,
-      vldh_t_node destination_obj, unsigned long destination_point, int select,
-      int* sts);
+  static void gre_con_created(WGre* gre, double x, double y, vldh_t_node source_obj,
+                              unsigned long source_point, vldh_t_node destination_obj,
+                              unsigned long destination_point, int select, int* sts);
   static void gre_region_selected(WGre* gre);
   static void gre_enter_leave(WGre* gre);
   static void gre_delete(WGre* gre, void* object, unsigned long object_type);
@@ -325,10 +321,9 @@ public:
   static void gre_copy(WGre* gre, void* object, unsigned long object_type);
   static void gre_paste(WGre* gre, float x, float y);
   static void gre_attribute(WGre* gre, vldh_t_node object);
-  static void gre_subwindow(
-      WGre* gre, vldh_t_node object, unsigned long subwindow_nr);
-  static void gre_popupmenu(WGre* gre, int x_pix, int y_pix, int popupmenu_type,
-      vldh_t_node node, int unselect);
+  static void gre_subwindow(WGre* gre, vldh_t_node object, unsigned long subwindow_nr);
+  static void gre_popupmenu(WGre* gre, int x_pix, int y_pix, int popupmenu_type, vldh_t_node node,
+                            int unselect);
   static void gre_getobj(WGre* gre, vldh_t_node node, unsigned long index);
   static void gre_undelete(WGre* gre);
   static void gre_unselect(WGre* gre);

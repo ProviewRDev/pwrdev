@@ -37,8 +37,7 @@
 #include <iostream>
 #include "flow_point.h"
 
-FlowPoint::FlowPoint(FlowCtx* flow_ctx, double x1, double y1)
-    : ctx(flow_ctx), x(x1), y(y1)
+FlowPoint::FlowPoint(FlowCtx* flow_ctx, double x1, double y1) : ctx(flow_ctx), x(x1), y(y1)
 {
   (*this).zoom();
 }
@@ -82,9 +81,7 @@ void FlowPoint::print_zoom()
   print_z_y = y * ctx->print_zoom_factor;
 }
 
-void FlowPoint::traverse(int x, int y)
-{
-}
+void FlowPoint::traverse(int x, int y) {}
 
 void FlowPoint::save(std::ofstream& fp, flow_eSaveMode mode)
 {
@@ -100,9 +97,11 @@ void FlowPoint::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
+  for (;;)
+  {
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case flow_eSave_Point:
       break;
     case flow_eSave_Point_x:

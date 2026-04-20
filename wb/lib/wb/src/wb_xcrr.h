@@ -45,10 +45,11 @@ class WAttNav;
 
 #include "wb_ldh.h"
 
-class WCrr {
+class WCrr
+{
 public:
-  WCrr(void* xa_parent_ctx, ldh_tSesContext xa_ldhses, pwr_sAttrRef* xa_objar,
-      int xa_advanced_user, int* xa_sts);
+  WCrr(void* xa_parent_ctx, ldh_tSesContext xa_ldhses, pwr_sAttrRef* xa_objar, int xa_advanced_user,
+       int* xa_sts);
   virtual ~WCrr();
   void* parent_ctx;
   ldh_tSesContext ldhses;
@@ -61,26 +62,18 @@ public:
   void* object;
   void (*close_cb)(void*, void*);
   void (*redraw_cb)(void*);
-  void (*popup_menu_cb)(
-      void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  void (*popup_menu_cb)(void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
   void (*start_trace_cb)(void*, pwr_tObjid, char*);
   void* client_data;
   brow_tObject input_node;
   char input_name[80];
 
-  virtual void pop()
-  {
-  }
-  virtual void print()
-  {
-  }
+  virtual void pop() {}
+  virtual void print() {}
 
-  void activate_print()
-  {
-    print();
-  }
-  static void xcrr_popup_menu_cb(void* ctx, pwr_sAttrRef attrref,
-      unsigned long item_type, unsigned long utility, char* arg, int x, int y);
+  void activate_print() { print(); }
+  static void xcrr_popup_menu_cb(void* ctx, pwr_sAttrRef attrref, unsigned long item_type,
+                                 unsigned long utility, char* arg, int x, int y);
   static void xcrr_start_trace_cb(void* ctx, pwr_tObjid objid, char* name);
   static void xcrr_close_cb(void* ctx);
 };

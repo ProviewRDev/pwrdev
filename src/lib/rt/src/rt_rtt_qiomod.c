@@ -54,17 +54,17 @@
 extern volatile sig_atomic_t g_rtt_exit_process;
 
 /************************************************************************
-*
-* Name:	qio_assign(char *s, int *chn)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* char		*s		     I	    String
-* int		*chn		 O	    Kanal
-*
-* Description:	G�r en assign av s till kanalnummer chn
-*************************************************************************/
+ *
+ * Name:	qio_assign(char *s, int *chn)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * char		*s		     I	    String
+ * int		*chn		 O	    Kanal
+ *
+ * Description:	G�r en assign av s till kanalnummer chn
+ *************************************************************************/
 int qio_assign(char* s, int* chn)
 {
   int chan = -1;
@@ -72,9 +72,11 @@ int qio_assign(char* s, int* chn)
 
   if (streq(s, "stdin"))
     chan = STDIN_FILENO;
-  else {
+  else
+  {
     chan = open(s, O_RDWR | O_NOCTTY);
-    if (chan == -1) {
+    if (chan == -1)
+    {
       printf("No such device\n");
       return 0;
     }
@@ -85,17 +87,17 @@ int qio_assign(char* s, int* chn)
 }
 
 /************************************************************************
-*
-* Name:	qio_set_attr(int *chn)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* char		*s		     I	    String
-* int		*chn		 O	    Kanal
-*
-* Description:	Set rtt attributes to a tty
-*************************************************************************/
+ *
+ * Name:	qio_set_attr(int *chn)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * char		*s		     I	    String
+ * int		*chn		 O	    Kanal
+ *
+ * Description:	Set rtt attributes to a tty
+ *************************************************************************/
 int qio_set_attr(int* chn)
 {
   int chan;
@@ -120,17 +122,17 @@ int qio_set_attr(int* chn)
 }
 
 /************************************************************************
-*
-* Name:	qio_reset(char *s, int *chn)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* char		*s		     I	    String
-* int		*chn		 O	    Kanal
-*
-* Description:	Reset the channel before exit
-*************************************************************************/
+ *
+ * Name:	qio_reset(char *s, int *chn)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * char		*s		     I	    String
+ * int		*chn		 O	    Kanal
+ *
+ * Description:	Reset the channel before exit
+ *************************************************************************/
 int qio_reset(int* chn)
 {
   int chan;
@@ -155,18 +157,18 @@ int qio_reset(int* chn)
 }
 
 /************************************************************************
-*
-* Name:	qio_readw(int chn, char *buf, int len)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* int		chn         I       Kanal
-* char		*buf         O      L�st buffer
-* int		len         I       Antal tecken som f�r l�sas
-*
-* Description:	L�ser med qiow fr�n chn till buf
-*************************************************************************/
+ *
+ * Name:	qio_readw(int chn, char *buf, int len)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * int		chn         I       Kanal
+ * char		*buf         O      L�st buffer
+ * int		len         I       Antal tecken som f�r l�sas
+ *
+ * Description:	L�ser med qiow fr�n chn till buf
+ *************************************************************************/
 int qio_readw(int* chn, char* buf, int len)
 {
   int n = 0;
@@ -177,19 +179,19 @@ int qio_readw(int* chn, char* buf, int len)
 }
 
 /************************************************************************
-*
-* Name:	qio_read(int chn, int tmo, char *buf, int len)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* int		chn         I       Kanal
-* int		tmo         I       Timout-tid
-* char		*buf         O      L�st buffer
-* int		len         I       Antal tecken som f�r l�sas
-*
-* Description:	L�ser med qio fr�n chn till buf med timout-tid tmo (ms)
-*************************************************************************/
+ *
+ * Name:	qio_read(int chn, int tmo, char *buf, int len)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * int		chn         I       Kanal
+ * int		tmo         I       Timout-tid
+ * char		*buf         O      L�st buffer
+ * int		len         I       Antal tecken som f�r l�sas
+ *
+ * Description:	L�ser med qio fr�n chn till buf med timout-tid tmo (ms)
+ *************************************************************************/
 int qio_read(int* chn, int tmo, char* buf, int len)
 {
   int n;
@@ -202,18 +204,18 @@ int qio_read(int* chn, int tmo, char* buf, int len)
 }
 
 /************************************************************************
-*
-* Name:	qio_writew(int chn, char *buf, int len)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* int		chn         I       Kanal
-* char		*buf        I       Buffer
-* int		len         I       Antal tecken som ska skrivas
-*
-* Description:	Skriver med qiow fr�n buf till chn
-*************************************************************************/
+ *
+ * Name:	qio_writew(int chn, char *buf, int len)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * int		chn         I       Kanal
+ * char		*buf        I       Buffer
+ * int		len         I       Antal tecken som ska skrivas
+ *
+ * Description:	Skriver med qiow fr�n buf till chn
+ *************************************************************************/
 int qio_writew(int* chn, char* buf, int len)
 {
   if (*chn == STDIN_FILENO)
@@ -224,19 +226,19 @@ int qio_writew(int* chn, char* buf, int len)
 }
 
 /************************************************************************
-*
-* Name:	qio_write(int chn, int tmo, char *buf, int len)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* int		chn         I       Kanal
-* int		tmo         I       Timout-tid
-* char		*buf         O      L�st buffer
-* int		len         I       Antal tecken som f�r l�sas
-*
-* Description:	Skriver med qio fr�n buf till chn med timout-tid tmo (ms)
-*************************************************************************/
+ *
+ * Name:	qio_write(int chn, int tmo, char *buf, int len)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * int		chn         I       Kanal
+ * int		tmo         I       Timout-tid
+ * char		*buf         O      L�st buffer
+ * int		len         I       Antal tecken som f�r l�sas
+ *
+ * Description:	Skriver med qio fr�n buf till chn med timout-tid tmo (ms)
+ *************************************************************************/
 int qio_write(int* chn, int tmo, char* buf, int len)
 {
   if (*chn == STDIN_FILENO)

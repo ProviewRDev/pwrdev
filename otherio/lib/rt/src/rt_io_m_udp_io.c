@@ -62,7 +62,8 @@
 #include "rt_io_msg.h"
 #include "rt_iom_msg.h"
 
-typedef struct {
+typedef struct
+{
   float time_since_rcv;
   float time_since_keepalive;
   int socket;
@@ -85,7 +86,8 @@ typedef struct {
   unsigned int msgs_lost;
 } io_sLocalUDP_IO;
 
-typedef struct {
+typedef struct
+{
   unsigned char protocol_id[2];
   unsigned short int msg_size;
   unsigned short int msg_id[2];
@@ -112,32 +114,34 @@ static void udp_reset_inputs(io_sLocalUDP_IO* local)
     memset(local->input_area, 0, local->input_area_size);
 }
 
-static pwr_tStatus udp_check_stall(
-    io_tCtx ctx, io_sCard* cp, io_sLocalUDP_IO* local, int reset_inputs)
+static pwr_tStatus udp_check_stall(io_tCtx ctx, io_sCard* cp, io_sLocalUDP_IO* local, int reset_inputs)
 {
   pwr_sClass_UDP_IO* op = (pwr_sClass_UDP_IO*)cp->op;
 
-  if (op->ErrorCount >= op->ErrorSoftLimit && !local->softlimit_logged) {
+  if (op->ErrorCount >= op->ErrorSoftLimit && !local->softlimit_logged)
+  {
     errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
     ctx->IOHandler->CardErrorSoftLimit = 1;
     ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
     local->softlimit_logged = 1;
-  } else if (op->ErrorCount < op->ErrorSoftLimit)
+  }
+  else if (op->ErrorCount < op->ErrorSoftLimit)
     local->softlimit_logged = 0;
 
-  if (op->ErrorCount >= op->ErrorHardLimit && !local->hardlimit_logged) {
+  if (op->ErrorCount >= op->ErrorHardLimit && !local->hardlimit_logged)
+  {
     if (op->StallAction == pwr_eStallActionEnum_EmergencyBreak)
       errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
     else if (op->StallAction == pwr_eStallActionEnum_ResetInputs)
-      errh_Error(
-          "IO Card ErrorHardLimit reached '%s', IO input area reset", cp->Name);
+      errh_Error("IO Card ErrorHardLimit reached '%s', IO input area reset", cp->Name);
     else
       errh_Error("IO Card ErrorHardLimit reached '%s'", cp->Name);
 
     ctx->IOHandler->CardErrorHardLimit = 1;
     ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
     local->hardlimit_logged = 1;
-  } else if (op->ErrorCount < op->ErrorHardLimit)
+  }
+  else if (op->ErrorCount < op->ErrorHardLimit)
     local->hardlimit_logged = 0;
 
   if (op->ErrorCount < op->ErrorHardLimit)
@@ -145,7 +149,8 @@ static pwr_tStatus udp_check_stall(
 
   if (op->StallAction == pwr_eStallActionEnum_ResetInputs && reset_inputs)
     udp_reset_inputs(local);
-  else if (op->StallAction == pwr_eStallActionEnum_EmergencyBreak) {
+  else if (op->StallAction == pwr_eStallActionEnum_EmergencyBreak)
+  {
     ctx->Node->EmergBreakTrue = 1;
     return IO__ERRDEVICE;
   }
@@ -153,8 +158,7 @@ static pwr_tStatus udp_check_stall(
   return IO__SUCCESS;
 }
 
-pwr_tStatus udp_recv_data(
-    io_sLocalUDP_IO* local, io_sCard* cp, char* buf, int buf_size)
+pwr_tStatus udp_recv_data(io_sLocalUDP_IO* local, io_sCard* cp, char* buf, int buf_size)
 {
   pwr_sClass_UDP_IO* op = (pwr_sClass_UDP_IO*)cp->op;
   pwr_tStatus sts;
@@ -169,7 +173,8 @@ pwr_tStatus udp_recv_data(
 
   sts = 1;
 
-  while (sts > 0) {
+  while (sts > 0)
+  {
     FD_ZERO(&fdr);
     FD_ZERO(&fdw);
     FD_ZERO(&fde);
@@ -182,7 +187,8 @@ pwr_tStatus udp_recv_data(
 
     sts = select(32, &fdr, &fdw, &fde, &tv);
 
-    if (sts < 0) {
+    if (sts < 0)
+    {
       op->Status = IOM__UDP_DOWN;
       // close(local->socket);
       errh_Error("UDP IO, Connection lost, %s", cp->Name);
@@ -192,7 +198,8 @@ pwr_tStatus udp_recv_data(
         return 0;
     }
 
-    if (!(FD_ISSET(local->socket, &fdw))) {
+    if (!(FD_ISSET(local->socket, &fdw)))
+    {
       op->Status = IOM__UDP_DOWN;
       // close(local->socket);
       errh_Error("UDP IO; Connection down, %s", cp->Name);
@@ -212,7 +219,8 @@ pwr_tStatus udp_recv_data(
 
     sts = select(32, &fdr, NULL, &fde, &tv);
 
-    if (sts < 0) {
+    if (sts < 0)
+    {
       op->Status = IOM__UDP_DOWN;
       // close(local->socket);
       errh_Error("UDP IO, Connection lost, %s", cp->Name);
@@ -222,17 +230,20 @@ pwr_tStatus udp_recv_data(
         return 0;
     }
 
-    if (sts == 0) {
+    if (sts == 0)
+    {
       if (!received)
         return 0;
       else
         return IO__SUCCESS;
     }
 
-    if (sts > 0 && FD_ISSET(local->socket, &fdr)) {
+    if (sts > 0 && FD_ISSET(local->socket, &fdr))
+    {
       data_size = recv(local->socket, rcv_buffer, local->input_buffer_size, 0);
 
-      if (data_size < 0) {
+      if (data_size < 0)
+      {
         op->Status = IOM__UDP_DOWN;
         // close(local->socket);
         errh_Error("UDP IO Connection lost, %s", cp->Name);
@@ -242,7 +253,8 @@ pwr_tStatus udp_recv_data(
           return 0;
       }
 
-      if (data_size == 0) {
+      if (data_size == 0)
+      {
         op->Status = IOM__UDP_DOWN;
         // close(local->socket);
         errh_Error("UDP IO Connection down, %s", cp->Name);
@@ -252,14 +264,16 @@ pwr_tStatus udp_recv_data(
           return 0;
       }
 
-      if (data_size < buf_size) {
+      if (data_size < buf_size)
+      {
         if (!received)
           return 0;
         else
           return IO__SUCCESS;
       }
 
-      if (data_size > 0) {
+      if (data_size > 0)
+      {
         memcpy(buf, rcv_buffer, buf_size);
         received = 1;
         op->RX_Packets++;
@@ -270,14 +284,13 @@ pwr_tStatus udp_recv_data(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalUDP_IO* local;
   pwr_sClass_UDP_IO* op = (pwr_sClass_UDP_IO*)cp->op;
   int sts;
   unsigned char badr[4];
-  int iadr[4] = { -1, -1, -1, -1 };
+  int iadr[4] = {-1, -1, -1, -1};
   struct hostent* he;
   struct sockaddr_in address;
   socklen_t address_len = sizeof(struct sockaddr_in);
@@ -296,27 +309,30 @@ static pwr_tStatus IoCardInit(
 
   /* Create a socket for UDP */
   local->socket = socket(AF_INET, SOCK_DGRAM, 0);
-  if (local->socket < 0) {
-    errh_Error(
-        "UDP_IO, error creating socket, %d, '%s'", local->socket, cp->Name);
+  if (local->socket < 0)
+  {
+    errh_Error("UDP_IO, error creating socket, %d, '%s'", local->socket, cp->Name);
     op->Status = IOM__UDP_SOCKET;
     return IO__INITFAIL;
   }
 
-  if (op->LocalPort != 0) {
+  if (op->LocalPort != 0)
+  {
     /* Set local port */
     local->local_addr.sin_family = AF_INET;
     local->local_addr.sin_port = htons(op->LocalPort);
 
     /* Bind the created socket */
-    sts = bind(local->socket, (struct sockaddr*)&local->local_addr,
-        sizeof(local->local_addr));
-    if (sts != 0) {
+    sts = bind(local->socket, (struct sockaddr*)&local->local_addr, sizeof(local->local_addr));
+    if (sts != 0)
+    {
       errh_Error("UDP_IO, error bind socket, %d, '%s'", sts, cp->Name);
       op->Status = IOM__UDP_BIND;
       return IO__INITFAIL;
     }
-  } else {
+  }
+  else
+  {
     getsockname(local->socket, (struct sockaddr*)&address, &address_len);
     op->LocalPort = ntohs(address.sin_port);
   }
@@ -325,25 +341,29 @@ static pwr_tStatus IoCardInit(
 
   local->remote_addr.sin_family = AF_INET;
   local->remote_addr.sin_port = htons(op->RemotePort);
-  sscanf((char*)&(op->RemoteAddress), "%d.%d.%d.%d", &iadr[0], &iadr[1],
-      &iadr[2], &iadr[3]);
+  sscanf((char*)&(op->RemoteAddress), "%d.%d.%d.%d", &iadr[0], &iadr[1], &iadr[2], &iadr[3]);
 
   /* If none or invalid ip-address is given, use hostname to get hostent struct,
      otherwise use the given ip address directly */
 
-  if ((iadr[0] < 0 || iadr[0] > 255) || (iadr[1] < 0 || iadr[1] > 255)
-      || (iadr[2] < 0 || iadr[2] > 255) || (iadr[3] < 0 || iadr[3] > 255)) {
+  if ((iadr[0] < 0 || iadr[0] > 255) || (iadr[1] < 0 || iadr[1] > 255) || (iadr[2] < 0 || iadr[2] > 255) ||
+      (iadr[3] < 0 || iadr[3] > 255))
+  {
     he = gethostbyname(op->RemoteHostName);
-    if (he) {
+    if (he)
+    {
       memcpy(&local->remote_addr.sin_addr, he->h_addr, 4);
       sprintf(op->RemoteAddress, "%s", inet_ntoa(local->remote_addr.sin_addr));
-    } else {
-      errh_Error(
-          "UDP_IO, unknown remote host %s, '%s'", op->RemoteHostName, cp->Name);
+    }
+    else
+    {
+      errh_Error("UDP_IO, unknown remote host %s, '%s'", op->RemoteHostName, cp->Name);
       op->Status = IOM__UDP_REMOTE;
       return IO__INITFAIL;
     }
-  } else {
+  }
+  else
+  {
     badr[0] = (unsigned char)iadr[0];
     badr[1] = (unsigned char)iadr[1];
     badr[2] = (unsigned char)iadr[2];
@@ -355,9 +375,8 @@ static pwr_tStatus IoCardInit(
 
   local->byte_ordering = op->ByteOrdering;
 
-  io_bus_card_init(ctx, cp, &input_area_offset, &input_area_chansize,
-      &output_area_offset, &output_area_chansize, local->byte_ordering,
-      io_eAlignment_Packed);
+  io_bus_card_init(ctx, cp, &input_area_offset, &input_area_chansize, &output_area_offset,
+                   &output_area_chansize, local->byte_ordering, io_eAlignment_Packed);
 
   local->input_area_size = input_area_offset + input_area_chansize;
   local->output_area_size = output_area_offset + output_area_chansize;
@@ -365,11 +384,13 @@ static pwr_tStatus IoCardInit(
   op->InputAreaSize = local->input_area_size;
   op->OutputAreaSize = local->output_area_size;
 
-  if (op->EnableHeader) {
+  if (op->EnableHeader)
+  {
     local->input_buffer_size = local->input_area_size + sizeof(io_sUDP_Header);
-    local->output_buffer_size
-        = local->output_area_size + sizeof(io_sUDP_Header);
-  } else {
+    local->output_buffer_size = local->output_area_size + sizeof(io_sUDP_Header);
+  }
+  else
+  {
     local->input_buffer_size = local->input_area_size;
     local->output_buffer_size = local->output_area_size;
   }
@@ -379,10 +400,13 @@ static pwr_tStatus IoCardInit(
   if (local->output_area_size > 0)
     local->output_buffer = calloc(1, local->output_buffer_size);
 
-  if (op->EnableHeader) {
+  if (op->EnableHeader)
+  {
     local->input_area = local->input_buffer + sizeof(io_sUDP_Header);
     local->output_area = local->output_buffer + sizeof(io_sUDP_Header);
-  } else {
+  }
+  else
+  {
     local->input_area = local->input_buffer;
     local->output_area = local->output_buffer;
   }
@@ -392,8 +416,7 @@ static pwr_tStatus IoCardInit(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalUDP_IO* local = (io_sLocalUDP_IO*)cp->Local;
 
@@ -409,8 +432,7 @@ static pwr_tStatus IoCardClose(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalUDP_IO* local = (io_sLocalUDP_IO*)cp->Local;
   pwr_sClass_UDP_IO* op = (pwr_sClass_UDP_IO*)cp->op;
@@ -422,16 +444,17 @@ static pwr_tStatus IoCardRead(
   int timed_out;
 
   sts = udp_recv_data(local, cp, local->input_buffer, local->input_buffer_size);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     if (op->EnableHeader)
       memcpy(&header, local->input_buffer, sizeof(io_sUDP_Header));
 
-    io_bus_card_read(ctx, rp, cp, local->input_area, 0, local->byte_ordering,
-        pwr_eFloatRepEnum_FloatIEEE);
+    io_bus_card_read(ctx, rp, cp, local->input_area, 0, local->byte_ordering, pwr_eFloatRepEnum_FloatIEEE);
 
     time_GetTimeMonotonic(&local->last_receive_time);
     op->ErrorCount = 0;
-    if (op->Link == pwr_eUpDownEnum_Down) {
+    if (op->Link == pwr_eUpDownEnum_Down)
+    {
       op->Link = pwr_eUpDownEnum_Up;
       op->Status = IOM__UDP_UP;
     }
@@ -440,7 +463,8 @@ static pwr_tStatus IoCardRead(
   time_GetTimeMonotonic(&now);
   time_Adiff(&dt, &now, &local->last_receive_time);
   timed_out = time_DToFloat(0, &dt) >= op->LinkTimeout;
-  if (timed_out) {
+  if (timed_out)
+  {
     op->Link = pwr_eUpDownEnum_Down;
     op->Status = IOM__UDP_DOWN;
     if (!ODD(sts))
@@ -448,17 +472,15 @@ static pwr_tStatus IoCardRead(
   }
 
   stall_sts = udp_check_stall(ctx, cp, local, 1);
-  if (op->ErrorCount >= op->ErrorHardLimit
-      && op->StallAction == pwr_eStallActionEnum_ResetInputs) {
-    io_bus_card_read(ctx, rp, cp, local->input_area, 0, local->byte_ordering,
-        pwr_eFloatRepEnum_FloatIEEE);
+  if (op->ErrorCount >= op->ErrorHardLimit && op->StallAction == pwr_eStallActionEnum_ResetInputs)
+  {
+    io_bus_card_read(ctx, rp, cp, local->input_area, 0, local->byte_ordering, pwr_eFloatRepEnum_FloatIEEE);
   }
 
   return stall_sts;
 }
 
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalUDP_IO* local = (io_sLocalUDP_IO*)cp->Local;
   pwr_sClass_UDP_IO* op = (pwr_sClass_UDP_IO*)cp->op;
@@ -467,20 +489,23 @@ static pwr_tStatus IoCardWrite(
   pwr_tDeltaTime dt;
   int try_connect = 0;
 
-  if (op->Link == pwr_eUpDownEnum_Down) {
+  if (op->Link == pwr_eUpDownEnum_Down)
+  {
     /* Reconnect */
 
     time_GetTimeMonotonic(&now);
     time_Adiff(&dt, &now, &local->last_try_connect_time);
-    if (time_DToFloat(0, &dt) >= op->ReconnectTime) {
+    if (time_DToFloat(0, &dt) >= op->ReconnectTime)
+    {
       try_connect = 1;
-      memcpy(&local->last_try_connect_time, &now,
-          sizeof(local->last_try_connect_time));
-    } else
+      memcpy(&local->last_try_connect_time, &now, sizeof(local->last_try_connect_time));
+    }
+    else
       return IO__SUCCESS;
   }
 
-  if (op->EnableHeader) {
+  if (op->EnableHeader)
+  {
     io_sUDP_Header* hp = (io_sUDP_Header*)local->output_buffer;
     hp->protocol_id[0] = STX;
     hp->protocol_id[1] = ETB;
@@ -490,23 +515,27 @@ static pwr_tStatus IoCardWrite(
     hp->msg_id[1] = htons(op->MessageId[1]);
   }
 
-  io_bus_card_write(ctx, cp, local->output_area, local->byte_ordering,
-      pwr_eFloatRepEnum_FloatIEEE);
+  io_bus_card_write(ctx, cp, local->output_area, local->byte_ordering, pwr_eFloatRepEnum_FloatIEEE);
 
-  sts = sendto(local->socket, local->output_buffer, local->output_buffer_size,
-      0, (struct sockaddr*)&local->remote_addr, sizeof(struct sockaddr));
-  if (sts < 0) {
+  sts = sendto(local->socket, local->output_buffer, local->output_buffer_size, 0,
+               (struct sockaddr*)&local->remote_addr, sizeof(struct sockaddr));
+  if (sts < 0)
+  {
     op->Status = IOM__UDP_DOWN;
     op->Link = pwr_eUpDownEnum_Down;
-    if (udp_is_link_send_error(errno)) {
+    if (udp_is_link_send_error(errno))
+    {
       if (op->ErrorCount <= op->ErrorHardLimit)
         op->ErrorCount = op->ErrorHardLimit + 1;
-    } else
+    }
+    else
       op->ErrorCount++;
   }
 
-  if (try_connect) {
-    if (sts >= 0) {
+  if (try_connect)
+  {
+    if (sts >= 0)
+    {
       op->Status = IOM__UDP_UP;
       op->Link = pwr_eUpDownEnum_Up;
     }
@@ -519,6 +548,6 @@ static pwr_tStatus IoCardWrite(
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(UDP_IO) = { pwr_BindIoMethod(IoCardInit),
-  pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead),
-  pwr_BindIoMethod(IoCardWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(UDP_IO) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                         pwr_BindIoMethod(IoCardRead), pwr_BindIoMethod(IoCardWrite),
+                                         pwr_NullMethod};

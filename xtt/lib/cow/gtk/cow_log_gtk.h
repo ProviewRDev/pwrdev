@@ -42,13 +42,11 @@
 #include "cow_log.h"
 #include "cow_wow_gtk.h"
 
-class CoLogGtk : public CoLog {
+class CoLogGtk : public CoLog
+{
 public:
   CoLogGtk(GtkWidget* parent, const char* filename);
-  ~CoLogGtk()
-  {
-    delete m_wow;
-  }
+  ~CoLogGtk() { delete m_wow; }
 };
 
 #endif

@@ -41,24 +41,25 @@
 #define co_syi_h
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "pwr.h"
 
-char* syi_BootDisk(pwr_tStatus*, char*, int);
-int syi_Busid(pwr_tStatus*);
-char* syi_Ethernet(pwr_tStatus*, char*, int);
-char* syi_HostName(pwr_tStatus*, char*, int);
-char* syi_HostSpec(pwr_tStatus*, char*, int);
-char* syi_NodeName(pwr_tStatus*, char*, int);
-char* syi_NodeSpec(pwr_tStatus*, char*, int);
-pwr_tBoolean syi_LocalBoot(pwr_tStatus*);
-pwr_tStatus syi_UserName(char* user, int len);
-const char* syi_Hardware();
-const char* syi_OpSys();
-char* syi_ProcessId();
-pwr_tStatus syi_GetSysctlInt(const char *var, int *val);
+  char* syi_BootDisk(pwr_tStatus*, char*, int);
+  int syi_Busid(pwr_tStatus*);
+  char* syi_Ethernet(pwr_tStatus*, char*, int);
+  char* syi_HostName(pwr_tStatus*, char*, int);
+  char* syi_HostSpec(pwr_tStatus*, char*, int);
+  char* syi_NodeName(pwr_tStatus*, char*, int);
+  char* syi_NodeSpec(pwr_tStatus*, char*, int);
+  pwr_tBoolean syi_LocalBoot(pwr_tStatus*);
+  pwr_tStatus syi_UserName(char* user, int len);
+  const char* syi_Hardware();
+  const char* syi_OpSys();
+  char* syi_ProcessId();
+  pwr_tStatus syi_GetSysctlInt(const char* var, int* val);
 
 #if defined __cplusplus
 }

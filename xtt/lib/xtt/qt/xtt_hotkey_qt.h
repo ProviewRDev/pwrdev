@@ -43,7 +43,8 @@
 
 #include <QEvent>
 
-class HotkeyAction {
+class HotkeyAction
+{
 public:
   char m_name[80];
   void (*m_action)(char*, void*);
@@ -51,7 +52,8 @@ public:
   HotkeyAction(const HotkeyAction& x);
 };
 
-class HotkeyKey {
+class HotkeyKey
+{
 public:
   int m_mod;
   int m_key;
@@ -65,15 +67,15 @@ public:
   void set_action(HotkeyAction* action, void* userdata);
 };
 
-class XttHotkey {
+class XttHotkey
+{
 public:
   pwr_tFileName m_filename;
   std::vector<HotkeyAction> m_actions;
   std::vector<HotkeyKey> m_keys;
   XttHotkey(const char* filename);
   ~XttHotkey() {}
-  void register_action(
-      const char* name, void (*action)(char*, void*), void* userdata);
+  void register_action(const char* name, void (*action)(char*, void*), void* userdata);
   int read_file();
   static int event_handler(QEvent* xevent, QObject* obj);
 };
@@ -81,19 +83,16 @@ public:
 #else
 // Dummy for other platforms than OS_LINUX
 
-class XttHotkey {
+class XttHotkey
+{
 public:
   XttHotkey(const char* filename) {}
 
   ~XttHotkey() {}
 
-  void register_action(
-      const char* name, void (*action)(char*, void*), void* userdata) {}
+  void register_action(const char* name, void (*action)(char*, void*), void* userdata) {}
 
-  static int event_handler(QEvent* xevent, QObject* obj)
-  {
-    return 1;
-  }
+  static int event_handler(QEvent* xevent, QObject* obj) { return 1; }
 };
 
 #endif

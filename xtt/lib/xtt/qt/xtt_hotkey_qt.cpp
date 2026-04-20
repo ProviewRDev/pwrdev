@@ -70,16 +70,12 @@
 #include <QKeyEvent>
 #include <QKeySequence>
 
-HotkeyAction::HotkeyAction(const char* name, void (*action)(char*, void*))
-    : m_action(action)
+HotkeyAction::HotkeyAction(const char* name, void (*action)(char*, void*)) : m_action(action)
 {
   strcpy(m_name, name);
 }
 
-HotkeyAction::HotkeyAction(const HotkeyAction& x) : m_action(x.m_action)
-{
-  strcpy(m_name, x.m_name);
-}
+HotkeyAction::HotkeyAction(const HotkeyAction& x) : m_action(x.m_action) { strcpy(m_name, x.m_name); }
 
 HotkeyKey::HotkeyKey(int mod, int key, char* action_name, char* action_arg)
     : m_mod(mod), m_key(key), m_action(0), m_userdata(0)
@@ -89,8 +85,7 @@ HotkeyKey::HotkeyKey(int mod, int key, char* action_name, char* action_arg)
 }
 
 HotkeyKey::HotkeyKey(const HotkeyKey& x)
-    : m_mod(x.m_mod), m_key(x.m_key), m_action(x.m_action),
-      m_userdata(x.m_userdata)
+    : m_mod(x.m_mod), m_key(x.m_key), m_action(x.m_action), m_userdata(x.m_userdata)
 {
   strcpy(m_action_name, x.m_action_name);
   strcpy(m_action_arg, x.m_action_arg);
@@ -98,19 +93,20 @@ HotkeyKey::HotkeyKey(const HotkeyKey& x)
 
 void HotkeyKey::set_action(HotkeyAction* action, void* userdata)
 {
-  if (streq(m_action_name, action->m_name)) {
+  if (streq(m_action_name, action->m_name))
+  {
     m_action = action->m_action;
     m_userdata = userdata;
   }
 }
 
-void XttHotkey::register_action(
-    const char* name, void (*action)(char*, void*), void* userdata)
+void XttHotkey::register_action(const char* name, void (*action)(char*, void*), void* userdata)
 {
   HotkeyAction a(name, action);
   m_actions.push_back(a);
 
-  for (int i = 0; i < (int)m_keys.size(); i++) {
+  for (int i = 0; i < (int)m_keys.size(); i++)
+  {
     m_keys[i].set_action(&m_actions[m_actions.size() - 1], userdata);
   }
 }
@@ -136,7 +132,8 @@ int XttHotkey::read_file()
   if (!fp)
     return 0;
 
-  while (dcli_read_line(line, sizeof(line), fp)) {
+  while (dcli_read_line(line, sizeof(line), fp))
+  {
     int mod = 0;
     char keystr[20] = "";
     char action_arg[200];
@@ -148,40 +145,44 @@ int XttHotkey::read_file()
     if (line[0] == 0 || line[0] == '#')
       continue;
 
-    n = dcli_parse(
-        line, ":", "", (char*)p1, sizeof(p1) / sizeof(p1[0]), sizeof(p1[0]), 0);
-    if (n != 2) {
+    n = dcli_parse(line, ":", "", (char*)p1, sizeof(p1) / sizeof(p1[0]), sizeof(p1[0]), 0);
+    if (n != 2)
+    {
       printf("Syntax error, %s, row %d\n", m_filename, row);
       continue;
     }
     str_trim(p1[0], p1[0]);
     str_trim(p1[1], p1[1]);
 
-    n = dcli_parse(p1[0], " 	", "", (char*)p2, sizeof(p2) / sizeof(p2[0]),
-        sizeof(p2[0]), 0);
-    if (n < 1) {
+    n = dcli_parse(p1[0], " 	", "", (char*)p2, sizeof(p2) / sizeof(p2[0]), sizeof(p2[0]), 0);
+    if (n < 1)
+    {
       printf("Syntax error, %s, row %d\n", m_filename, row);
       continue;
     }
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < n; i++)
+    {
       if (str_NoCaseStrcmp(p2[i], "Control") == 0)
         mod |= Qt::ControlModifier;
       else if (str_NoCaseStrcmp(p2[i], "Shift") == 0)
         mod |= Qt::ShiftModifier;
       else if (str_NoCaseStrcmp(p2[i], "Alt") == 0)
         mod |= Qt::AltModifier;
-      else if (str_NoCaseStrncmp(p2[i], "<key>", 5) == 0) {
+      else if (str_NoCaseStrncmp(p2[i], "<key>", 5) == 0)
+      {
         strcpy(keystr, &p2[i][5]);
         str_trim(keystr, keystr);
-      } else {
+      }
+      else
+      {
         printf("Syntax error, %s, row %d\n", m_filename, row);
         break;
       }
     }
 
-    n = dcli_parse(p1[1], "(", "", (char*)p2, sizeof(p2) / sizeof(p2[0]),
-        sizeof(p2[0]), 0);
-    if (n < 2) {
+    n = dcli_parse(p1[1], "(", "", (char*)p2, sizeof(p2) / sizeof(p2[0]), sizeof(p2[0]), 0);
+    if (n < 2)
+    {
       printf("Syntax error, %s, row %d\n", m_filename, row);
       continue;
     }
@@ -190,13 +191,15 @@ int XttHotkey::read_file()
     strcpy(action_arg, p2[1]);
     if ((s = strrchr(action_arg, ')')))
       *s = 0;
-    else {
+    else
+    {
       printf("Syntax error, %s, row %d\n", m_filename, row);
       continue;
     }
     QKeySequence seq = QKeySequence(keystr);
     int keycode = seq[0];
-    if (!keycode) {
+    if (!keycode)
+    {
       printf("Syntax error, %s, row %d\n", m_filename, row);
       continue;
     }
@@ -214,17 +217,18 @@ int XttHotkey::event_handler(QEvent* event, QObject* data)
 {
   XttHotkey* hotkey = (XttHotkey*)data;
 
-  if (event->type() == QEvent::KeyPress) {
+  if (event->type() == QEvent::KeyPress)
+  {
     QKeyEvent* e = ((QKeyEvent*)event);
     int key = e->key();
 
-    for (int i = 0; i < (int)hotkey->m_keys.size(); i++) {
-      if (hotkey->m_keys[i].m_key == key
-          && (hotkey->m_keys[i].m_mod & e->modifiers() & ~Qt::MetaModifier
-                 & ~Qt::GroupSwitchModifier)) {
+    for (int i = 0; i < (int)hotkey->m_keys.size(); i++)
+    {
+      if (hotkey->m_keys[i].m_key == key &&
+          (hotkey->m_keys[i].m_mod & e->modifiers() & ~Qt::MetaModifier & ~Qt::GroupSwitchModifier))
+      {
         if (hotkey->m_keys[i].m_action)
-          (hotkey->m_keys[i].m_action)(
-              hotkey->m_keys[i].m_action_arg, hotkey->m_keys[i].m_userdata);
+          (hotkey->m_keys[i].m_action)(hotkey->m_keys[i].m_action_arg, hotkey->m_keys[i].m_userdata);
       }
     }
   }

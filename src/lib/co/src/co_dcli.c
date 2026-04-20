@@ -52,8 +52,7 @@
 #define DCLI_SUBST_SLASH 3
 #define DCLI_SUBST_EQUAL 4
 
-typedef struct
-{
+typedef struct {
   char key[DCLI_SYM_KEY_SIZE];
   char value[DCLI_SYM_VALUE_SIZE];
 } dcli_t_symboltable;
@@ -64,9 +63,9 @@ static char dcli_qual_str[10][2][400];
 static dcli_t_symboltable dcli_symboltable[DCLI_SYMBOLTABLE_SIZE];
 static int dcli_symboltable_count;
 
-static int dcli_symbol_to_int(int* int_value, char* value);
-static int dcli_symbol_to_float(float* int_value, char* value);
-static void dcli_message(char s, char* text);
+static int dcli_symbol_to_int(int *int_value, char *value);
+static int dcli_symbol_to_float(float *int_value, char *value);
+static void dcli_message(char s, char *text);
 
 /*************************************************************************
  *
@@ -89,13 +88,13 @@ static void dcli_message(char s, char* text);
  *
  **************************************************************************/
 
-int dcli_parse(const char* string, const char* parse_char, const char* inc_parse_char, char* outstr,
-               int max_rows, int max_cols, int keep_quota)
-{
+int dcli_parse(const char *string, const char *parse_char,
+               const char *inc_parse_char, char *outstr, int max_rows,
+               int max_cols, int keep_quota) {
   int row;
   int col;
-  char* char_ptr;
-  char* inc_char_ptr;
+  char *char_ptr;
+  char *inc_char_ptr;
   int parsechar_found;
   int inc_parsechar_found;
   int next_token;
@@ -110,39 +109,31 @@ int dcli_parse(const char* string, const char* parse_char, const char* inc_parse
   char_found = 0;
   next_token = 0;
   nullstr = 0;
-  while (*string != '\0')
-  {
-    char_ptr = (char*)parse_char;
-    inc_char_ptr = (char*)inc_parse_char;
+  while (*string != '\0') {
+    char_ptr = (char *)parse_char;
+    inc_char_ptr = (char *)inc_parse_char;
     parsechar_found = 0;
     inc_parsechar_found = 0;
-    if (*string == '"' && prev_char != '\\')
-    {
+    if (*string == '"' && prev_char != '\\') {
       one_token = !one_token;
       prev_char = (unsigned char)*string;
       if (!one_token && col == 0)
         nullstr = 1;
       else
         nullstr = 0;
-      if (!keep_quota)
-      {
+      if (!keep_quota) {
         string++;
         continue;
       }
-    }
-    else if (*string == '"' && prev_char == '\\')
+    } else if (*string == '"' && prev_char == '\\')
       col--;
-    if (!one_token)
-    {
-      while (*char_ptr != '\0')
-      {
+    if (!one_token) {
+      while (*char_ptr != '\0') {
         /* Check if this is a parse charachter */
-        if (*string == *char_ptr)
-        {
+        if (*string == *char_ptr) {
           parsechar_found = 1;
           /* Next token */
-          if (col > 0 || nullstr || (col == 0 && *char_ptr == ','))
-          {
+          if (col > 0 || nullstr || (col == 0 && *char_ptr == ',')) {
             *(outstr + row * max_cols + col) = '\0';
             row++;
             if (row >= max_rows)
@@ -154,16 +145,13 @@ int dcli_parse(const char* string, const char* parse_char, const char* inc_parse
         }
         char_ptr++;
       }
-      while (*inc_char_ptr != '\0')
-      {
+      while (*inc_char_ptr != '\0') {
         /* Check if this is a parse charachter */
-        if (*string == *inc_char_ptr)
-        {
+        if (*string == *inc_char_ptr) {
           parsechar_found = 1;
           inc_parsechar_found = 1;
           /* Next token */
-          if (col > 0 || nullstr)
-          {
+          if (col > 0 || nullstr) {
             *(outstr + row * max_cols + col) = '\0';
             row++;
             if (row >= max_rows)
@@ -176,14 +164,12 @@ int dcli_parse(const char* string, const char* parse_char, const char* inc_parse
         inc_char_ptr++;
       }
     }
-    if (!parsechar_found && !next_token)
-    {
+    if (!parsechar_found && !next_token) {
       char_found++;
       *(outstr + row * max_cols + col) = *string;
       col++;
     }
-    if (inc_parsechar_found)
-    {
+    if (inc_parsechar_found) {
       *(outstr + row * max_cols + col) = *inc_char_ptr;
       col++;
     }
@@ -223,16 +209,16 @@ int dcli_parse(const char* string, const char* parse_char, const char* inc_parse
  *
  **************************************************************************/
 
-int dcli_cli(dcli_tCmdTable* command_table, const char* string, void* userdata1, void* userdata2)
-{
+int dcli_cli(dcli_tCmdTable *command_table, const char *string, void *userdata1,
+             void *userdata2) {
   char out_str[20][DCLI_QUAL_SIZE];
   char value_str[10][DCLI_QUAL_SIZE];
   int nr, i, j, valuenr;
   int hitnr, sts;
   char command[DCLI_CMD_SIZE];
   int (*func)() = NULL;
-  dcli_tCmdTable* comtbl_ptr;
-  dcli_tCmdTable* current_comtbl = NULL;
+  dcli_tCmdTable *comtbl_ptr;
+  dcli_tCmdTable *current_comtbl = NULL;
   int arg_count;
   char qual[80];
   char *s, *t;
@@ -241,14 +227,12 @@ int dcli_cli(dcli_tCmdTable* command_table, const char* string, void* userdata1,
 
   /* Fill spaces around '=' with '=' , this is a trick to avoid
      parsing of the qualifier and value in the first step */
-  s = (char*)string;
+  s = (char *)string;
   quota_mode = 0;
-  while (*s != 0)
-  {
+  while (*s != 0) {
     if (*s == '"')
       quota_mode = !quota_mode;
-    if (quota_mode)
-    {
+    if (quota_mode) {
       /* Replace / and = to avoid parsing */
       if (*s == '/')
         *s = DCLI_SUBST_SLASH;
@@ -257,17 +241,14 @@ int dcli_cli(dcli_tCmdTable* command_table, const char* string, void* userdata1,
       s++;
       continue;
     }
-    if (*s == '=')
-    {
+    if (*s == '=') {
       t = s - 1;
-      while ((*t == ' ') && (*t != 0))
-      {
+      while ((*t == ' ') && (*t != 0)) {
         *t = '=';
         t--;
       }
       t = s + 1;
-      while ((*t == ' ') && (*t != 0))
-      {
+      while ((*t == ' ') && (*t != 0)) {
         *t = '=';
         t++;
       }
@@ -277,8 +258,8 @@ int dcli_cli(dcli_tCmdTable* command_table, const char* string, void* userdata1,
   }
 
   /* Parse the command string */
-  nr = dcli_parse(string, " ", "/", (char*)out_str, sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]),
-                  0);
+  nr = dcli_parse(string, " ", "/", (char *)out_str,
+                  sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]), 0);
 
   if (nr == 0)
     return DCLI__NOCOMMAND;
@@ -286,22 +267,17 @@ int dcli_cli(dcli_tCmdTable* command_table, const char* string, void* userdata1,
   /* Find the command in the command table */
   comtbl_ptr = command_table;
   hitnr = 0;
-  while (comtbl_ptr->command[0] != '\0')
-  {
+  while (comtbl_ptr->command[0] != '\0') {
     strcpy(command, comtbl_ptr->command);
-    if (str_NoCaseStrcmp(out_str[0], command) == 0)
-    {
+    if (str_NoCaseStrcmp(out_str[0], command) == 0) {
       /* Perfect hit */
       func = comtbl_ptr->func;
       hitnr = 1;
       current_comtbl = comtbl_ptr;
       break;
-    }
-    else
-    {
+    } else {
       command[strlen(out_str[0])] = '\0';
-      if (str_NoCaseStrcmp(out_str[0], command) == 0)
-      {
+      if (str_NoCaseStrcmp(out_str[0], command) == 0) {
         /* Hit */
         func = comtbl_ptr->func;
         hitnr++;
@@ -311,33 +287,27 @@ int dcli_cli(dcli_tCmdTable* command_table, const char* string, void* userdata1,
     comtbl_ptr++;
   }
 
-  if (hitnr > 1)
-  {
+  if (hitnr > 1) {
     /* Command not unique */
     return DCLI__COM_AMBIG;
-  }
-  else if (hitnr < 1)
-  {
+  } else if (hitnr < 1) {
     /* Command not defined */
     return DCLI__COM_NODEF;
   }
 
   /* Identify the qualifiers */
   arg_count = 0;
-  for (i = 1; i < nr; i++)
-  {
-    valuenr = dcli_parse((char*)out_str[i], "=", "", (char*)value_str,
-                         sizeof(value_str) / sizeof(value_str[0]), sizeof(value_str[0]), 1);
-    if (valuenr > 1)
-    {
+  for (i = 1; i < nr; i++) {
+    valuenr = dcli_parse((char *)out_str[i], "=", "", (char *)value_str,
+                         sizeof(value_str) / sizeof(value_str[0]),
+                         sizeof(value_str[0]), 1);
+    if (valuenr > 1) {
       strcpy(dcli_qual_str[i - 1][1], value_str[1]);
-      for (j = 2; j < valuenr; j++)
-      {
+      for (j = 2; j < valuenr; j++) {
         strcat(dcli_qual_str[i - 1][1], "=");
         strcat(dcli_qual_str[i - 1][1], value_str[j]);
       }
-    }
-    else
+    } else
       strcpy(dcli_qual_str[i - 1][1], "");
 
     /* Check if this qualifier is ok */
@@ -347,14 +317,11 @@ int dcli_cli(dcli_tCmdTable* command_table, const char* string, void* userdata1,
     if (value_str[0][0] == 0)
       /* Null string sent as an argument */
       is_arg = 1;
-    else
-    {
-      while (current_comtbl->qualifier[j][0] != 0)
-      {
+    else {
+      while (current_comtbl->qualifier[j][0] != 0) {
         strcpy(qual, current_comtbl->qualifier[j]);
         qual[strlen(value_str[0])] = '\0';
-        if (str_NoCaseStrcmp(qual, value_str[0]) == 0)
-        {
+        if (str_NoCaseStrcmp(qual, value_str[0]) == 0) {
           /* Hit */
           strcpy(dcli_qual_str[i - 1][0], current_comtbl->qualifier[j]);
           hitnr++;
@@ -362,29 +329,23 @@ int dcli_cli(dcli_tCmdTable* command_table, const char* string, void* userdata1,
         j++;
       }
     }
-    if (hitnr == 0 || is_arg)
-    {
+    if (hitnr == 0 || is_arg) {
       /* This might be a argument, look for a argument */
-      if (str_NoCaseStrncmp(current_comtbl->qualifier[arg_count], "dcli_arg", 7) == 0)
-      {
+      if (str_NoCaseStrncmp(current_comtbl->qualifier[arg_count], "dcli_arg",
+                            7) == 0) {
         sprintf(dcli_qual_str[i - 1][0], "dcli_arg%d", arg_count + 1);
         strcpy(dcli_qual_str[i - 1][1], value_str[0]);
         arg_count++;
-      }
-      else
-      {
+      } else {
         /* qualifier not found */
         return DCLI__QUAL_NODEF;
       }
-    }
-    else if (hitnr > 1)
-    {
+    } else if (hitnr > 1) {
       /* qualifier not unique */
       return DCLI__QUAL_AMBIG;
     }
     /* Place back the / and = within quotes */
-    for (s = dcli_qual_str[i - 1][1]; *s != 0; s++)
-    {
+    for (s = dcli_qual_str[i - 1][1]; *s != 0; s++) {
       if (*s == DCLI_SUBST_SLASH)
         *s = '/';
       if (*s == DCLI_SUBST_EQUAL)
@@ -415,19 +376,15 @@ int dcli_cli(dcli_tCmdTable* command_table, const char* string, void* userdata1,
  *
  **************************************************************************/
 
-int dcli_get_qualifier(const char* qualifier, char* value, size_t size)
-{
+int dcli_get_qualifier(const char *qualifier, char *value, size_t size) {
   int i, found;
 
   i = 0;
   found = 0;
-  while (dcli_qual_str[i][0][0] != '\0')
-  {
-    if (str_NoCaseStrcmp(qualifier, (char*)dcli_qual_str[i]) == 0)
-    {
+  while (dcli_qual_str[i][0][0] != '\0') {
+    if (str_NoCaseStrcmp(qualifier, (char *)dcli_qual_str[i]) == 0) {
       /* Hit */
-      if (value)
-      {
+      if (value) {
         if (strlen(dcli_qual_str[i][1]) > size - 1)
           return DCLI__TOOLONG;
         strcpy(value, dcli_qual_str[i][1]);
@@ -436,8 +393,7 @@ int dcli_get_qualifier(const char* qualifier, char* value, size_t size)
     }
     i++;
   }
-  if (!found)
-  {
+  if (!found) {
     /* qualifier is not found */
     if (value)
       *value = 0;
@@ -447,14 +403,11 @@ int dcli_get_qualifier(const char* qualifier, char* value, size_t size)
   return DCLI__SUCCESS;
 }
 
-int dcli_set_qualifier(const char* qualifier, char* value)
-{
+int dcli_set_qualifier(const char *qualifier, char *value) {
   int i = 0;
 
-  while (dcli_qual_str[i][0][0] != '\0')
-  {
-    if (str_NoCaseStrcmp(qualifier, (char*)dcli_qual_str[i]) == 0)
-    {
+  while (dcli_qual_str[i][0][0] != '\0') {
+    if (str_NoCaseStrcmp(qualifier, (char *)dcli_qual_str[i]) == 0) {
       /* Hit */
       if (strlen(value) > sizeof(dcli_qual_str[0][0]) - 1)
         return DCLI__TOOLONG;
@@ -480,12 +433,11 @@ int dcli_set_qualifier(const char* qualifier, char* value)
  *	Store all symbols in a rtt commandfile.
  *
  **************************************************************************/
-int dcli_store_symbols(char* filename)
-{
+int dcli_store_symbols(char *filename) {
   char filename_str[80];
-  FILE* file;
+  FILE *file;
   char message[120];
-  char* s;
+  char *s;
   int i;
 
   strcpy(filename_str, filename);
@@ -495,17 +447,13 @@ int dcli_store_symbols(char* filename)
   if (file == 0)
     return DCLI__NOFILE;
 
-  for (i = 0; i < dcli_symboltable_count; i++)
-  {
+  for (i = 0; i < dcli_symboltable_count; i++) {
     fprintf(file, "define %s \"", dcli_symboltable[i].key);
-    for (s = dcli_symboltable[i].value; *s; s++)
-    {
-      if (*s == '"')
-      {
+    for (s = dcli_symboltable[i].value; *s; s++) {
+      if (*s == '"') {
         fputc('\\', file);
         fputc(*s, file);
-      }
-      else
+      } else
         fputc(*s, file);
     }
     fprintf(file, "\"\n");
@@ -532,11 +480,10 @@ int dcli_store_symbols(char* filename)
  *	will not be replaced.
  *
  **************************************************************************/
-int dcli_replace_symbol(char* command, char* newcommand, int newsize)
-{
-  char* s;
-  char* t;
-  char* u = NULL;
+int dcli_replace_symbol(char *command, char *newcommand, int newsize) {
+  char *s;
+  char *t;
+  char *u = NULL;
   int symbolmode;
   long int size;
   char value[80];
@@ -551,21 +498,15 @@ int dcli_replace_symbol(char* command, char* newcommand, int newsize)
   s = command;
   t = news;
 
-  while (*s != 0)
-  {
-    if ((unsigned char)*s == '#')
-    {
-      if (ignore_symbolmode)
-      {
+  while (*s != 0) {
+    if ((unsigned char)*s == '#') {
+      if (ignore_symbolmode) {
         strcpy(t, "#");
         t++;
       }
       ignore_symbolmode = 1;
-    }
-    else if (*s == '\'')
-    {
-      if (symbolmode)
-      {
+    } else if (*s == '\'') {
+      if (symbolmode) {
         /* End of potential symbol */
         size = (long int)s - (long int)u;
         strncpy(symbol, u, size);
@@ -573,8 +514,7 @@ int dcli_replace_symbol(char* command, char* newcommand, int newsize)
         // str_ToUpper( upper_symbol, symbol);
         strcpy(upper_symbol, symbol);
         sts = dcli_get_symbol(upper_symbol, value);
-        if (EVEN(sts))
-        {
+        if (EVEN(sts)) {
           /* It was no symbol */
           strcpy(t, "'");
           t++;
@@ -582,36 +522,25 @@ int dcli_replace_symbol(char* command, char* newcommand, int newsize)
           t += strlen(symbol);
           strcat(t, "'");
           t++;
-        }
-        else
-        {
+        } else {
           /* Symbol found */
           strcpy(t, value);
           t += strlen(value);
         }
         symbolmode = 0;
-      }
-      else
-      {
-        if (ignore_symbolmode)
-        {
+      } else {
+        if (ignore_symbolmode) {
           strcpy(t, "'");
           t++;
-        }
-        else
-        {
+        } else {
           symbolmode = 1;
           u = s + 1;
         }
       }
       ignore_symbolmode = 0;
-    }
-    else
-    {
-      if (!symbolmode)
-      {
-        if (ignore_symbolmode)
-        {
+    } else {
+      if (!symbolmode) {
+        if (ignore_symbolmode) {
           strcpy(t, "#");
           t++;
         }
@@ -622,15 +551,11 @@ int dcli_replace_symbol(char* command, char* newcommand, int newsize)
     }
     s++;
   }
-  if (ignore_symbolmode)
-  {
+  if (ignore_symbolmode) {
     strcpy(t, "#");
-  }
-  else if (symbolmode)
-  {
+  } else if (symbolmode) {
     strcpy(t, u);
-  }
-  else
+  } else
     *t = 0;
 
   if (strlen(news) >= newsize)
@@ -651,14 +576,11 @@ int dcli_replace_symbol(char* command, char* newcommand, int newsize)
  *	Get a symbol from the symbol table.
  *
  **************************************************************************/
-int dcli_get_symbol(char* key, char* value)
-{
+int dcli_get_symbol(char *key, char *value) {
   int i;
 
-  for (i = 0; i < dcli_symboltable_count; i++)
-  {
-    if (!str_NoCaseStrcmp(dcli_symboltable[i].key, key))
-    {
+  for (i = 0; i < dcli_symboltable_count; i++) {
+    if (!str_NoCaseStrcmp(dcli_symboltable[i].key, key)) {
       strcpy(value, dcli_symboltable[i].value);
       return DCLI__SUCCESS;
     }
@@ -666,8 +588,7 @@ int dcli_get_symbol(char* key, char* value)
   return DCLI__NOSYMBOL;
 }
 
-int dcli_get_symbol_by_index(int index, char* key, char* value)
-{
+int dcli_get_symbol_by_index(int index, char *key, char *value) {
   if (index >= dcli_symboltable_count)
     return DCLI__NOSYMBOL;
 
@@ -688,22 +609,17 @@ int dcli_get_symbol_by_index(int index, char* key, char* value)
  *	Get a symbol from the symbol table. Abbrevations is allowed.
  *
  **************************************************************************/
-int dcli_get_symbol_cmd(char* key, char* value)
-{
+int dcli_get_symbol_cmd(char *key, char *value) {
   int i;
   int found;
 
   found = 0;
-  for (i = 0; i < dcli_symboltable_count; i++)
-  {
-    if (!str_NoCaseStrcmp(dcli_symboltable[i].key, key))
-    {
+  for (i = 0; i < dcli_symboltable_count; i++) {
+    if (!str_NoCaseStrcmp(dcli_symboltable[i].key, key)) {
       /* Perfect match */
       strcpy(value, dcli_symboltable[i].value);
       return DCLI__SUCCESS;
-    }
-    else if (!str_NoCaseStrncmp(dcli_symboltable[i].key, key, strlen(key)))
-    {
+    } else if (!str_NoCaseStrncmp(dcli_symboltable[i].key, key, strlen(key))) {
       if (found)
         return DCLI__SYMBOL_AMBIG;
       strcpy(value, dcli_symboltable[i].value);
@@ -728,8 +644,7 @@ int dcli_get_symbol_cmd(char* key, char* value)
  *	Define a symbol in the symbol table.
  *
  **************************************************************************/
-int dcli_define_symbol(char* key, char* arg1, char* arg2, char* arg3)
-{
+int dcli_define_symbol(char *key, char *arg1, char *arg2, char *arg3) {
   int i;
   char value[DCLI_SYM_VALUE_SIZE];
   int int_value;
@@ -740,164 +655,116 @@ int dcli_define_symbol(char* key, char* arg1, char* arg2, char* arg3)
   float float_value2;
   int sts;
 
-  if (dcli_symboltable_count >= DCLI_SYMBOLTABLE_SIZE)
-  {
+  if (dcli_symboltable_count >= DCLI_SYMBOLTABLE_SIZE) {
     return DCLI__SYMTBLFULL;
   }
-  if (strlen(key) > sizeof(dcli_symboltable[0].key) - 1)
-  {
+  if (strlen(key) > sizeof(dcli_symboltable[0].key) - 1) {
     return DCLI__SYMNAMETOLONG;
   }
 
   /* Check if arg1 is an operator */
-  if (!strcmp(arg1, "++"))
-  {
+  if (!strcmp(arg1, "++")) {
     /* Get the old value */
     sts = dcli_get_symbol(key, value);
-    if (EVEN(sts))
-    {
+    if (EVEN(sts)) {
       return DCLI__SYMNOTFOUND;
     }
 
     /* convert to integer or float */
-    if (ODD(dcli_symbol_to_int(&int_value, value)))
-    {
+    if (ODD(dcli_symbol_to_int(&int_value, value))) {
       int_value++;
       sprintf(value, "%d", int_value);
-    }
-    else if (ODD(dcli_symbol_to_float(&float_value, value)))
-    {
+    } else if (ODD(dcli_symbol_to_float(&float_value, value))) {
       float_value++;
       sprintf(value, "%f", float_value);
-    }
-    else
-    {
+    } else {
       return DCLI__SYMTYPE;
     }
-  }
-  else if (!strcmp(arg1, "--"))
-  {
+  } else if (!strcmp(arg1, "--")) {
     /* Get the old value */
     sts = dcli_get_symbol(key, value);
-    if (EVEN(sts))
-    {
+    if (EVEN(sts)) {
       return DCLI__SYMNOTFOUND;
     }
 
     /* convert to integer or float */
-    if (ODD(dcli_symbol_to_int(&int_value, value)))
-    {
+    if (ODD(dcli_symbol_to_int(&int_value, value))) {
       int_value--;
       sprintf(value, "%d", int_value);
-    }
-    else if (ODD(dcli_symbol_to_float(&float_value, value)))
-    {
+    } else if (ODD(dcli_symbol_to_float(&float_value, value))) {
       float_value--;
       sprintf(value, "%f", float_value);
-    }
-    else
-    {
+    } else {
       return DCLI__SYMTYPE;
     }
-  }
-  else if (arg2 == 0)
-  {
+  } else if (arg2 == 0) {
     /* arg1 is the value */
     str_StrncpyCutOff(value, arg1, sizeof(value), 0);
-  }
-  else
-  {
+  } else {
     /* arg2 is the operator */
-    if (arg3 == 0)
-    {
+    if (arg3 == 0) {
       return DCLI__SYNTAX;
     }
-    if (!strcmp(arg2, "+"))
-    {
-      if (ODD(dcli_symbol_to_int(&int_value1, arg1)) && ODD(dcli_symbol_to_int(&int_value2, arg3)))
-      {
+    if (!strcmp(arg2, "+")) {
+      if (ODD(dcli_symbol_to_int(&int_value1, arg1)) &&
+          ODD(dcli_symbol_to_int(&int_value2, arg3))) {
         int_value = int_value1 + int_value2;
         sprintf(value, "%d", int_value);
-      }
-      else if (ODD(dcli_symbol_to_float(&float_value1, arg1)) &&
-               ODD(dcli_symbol_to_float(&float_value2, arg3)))
-      {
+      } else if (ODD(dcli_symbol_to_float(&float_value1, arg1)) &&
+                 ODD(dcli_symbol_to_float(&float_value2, arg3))) {
         float_value = float_value1 + float_value2;
         sprintf(value, "%f", float_value);
-      }
-      else
-      {
+      } else {
         return DCLI__SYMTYPE;
       }
-    }
-    else if (!strcmp(arg2, "-"))
-    {
-      if (ODD(dcli_symbol_to_int(&int_value1, arg1)) && ODD(dcli_symbol_to_int(&int_value2, arg3)))
-      {
+    } else if (!strcmp(arg2, "-")) {
+      if (ODD(dcli_symbol_to_int(&int_value1, arg1)) &&
+          ODD(dcli_symbol_to_int(&int_value2, arg3))) {
         int_value = int_value1 - int_value2;
         sprintf(value, "%d", int_value);
-      }
-      else if (ODD(dcli_symbol_to_float(&float_value1, arg1)) &&
-               ODD(dcli_symbol_to_float(&float_value2, arg3)))
-      {
+      } else if (ODD(dcli_symbol_to_float(&float_value1, arg1)) &&
+                 ODD(dcli_symbol_to_float(&float_value2, arg3))) {
         float_value = float_value1 - float_value2;
         sprintf(value, "%f", float_value);
-      }
-      else
-      {
+      } else {
         return DCLI__SYMTYPE;
       }
-    }
-    else if (!strcmp(arg2, "*"))
-    {
-      if (ODD(dcli_symbol_to_int(&int_value1, arg1)) && ODD(dcli_symbol_to_int(&int_value2, arg3)))
-      {
+    } else if (!strcmp(arg2, "*")) {
+      if (ODD(dcli_symbol_to_int(&int_value1, arg1)) &&
+          ODD(dcli_symbol_to_int(&int_value2, arg3))) {
         int_value = int_value1 * int_value2;
         sprintf(value, "%d", int_value);
-      }
-      else if (ODD(dcli_symbol_to_float(&float_value1, arg1)) &&
-               ODD(dcli_symbol_to_float(&float_value2, arg3)))
-      {
+      } else if (ODD(dcli_symbol_to_float(&float_value1, arg1)) &&
+                 ODD(dcli_symbol_to_float(&float_value2, arg3))) {
         float_value = float_value1 * float_value2;
         sprintf(value, "%f", float_value);
-      }
-      else
-      {
+      } else {
         return DCLI__SYMTYPE;
       }
-    }
-    else if (!strcmp(arg2, "/"))
-    {
-      if (ODD(dcli_symbol_to_int(&int_value1, arg1)) && ODD(dcli_symbol_to_int(&int_value2, arg3)))
-      {
+    } else if (!strcmp(arg2, "/")) {
+      if (ODD(dcli_symbol_to_int(&int_value1, arg1)) &&
+          ODD(dcli_symbol_to_int(&int_value2, arg3))) {
         int_value = int_value1 / int_value2;
         sprintf(value, "%d", int_value);
-      }
-      else if (ODD(dcli_symbol_to_float(&float_value1, arg1)) &&
-               ODD(dcli_symbol_to_float(&float_value2, arg3)))
-      {
+      } else if (ODD(dcli_symbol_to_float(&float_value1, arg1)) &&
+                 ODD(dcli_symbol_to_float(&float_value2, arg3))) {
         float_value = float_value1 / float_value2;
         sprintf(value, "%f", float_value);
-      }
-      else
-      {
+      } else {
         return DCLI__SYMTYPE;
       }
     }
   }
 
-  if (strlen(value) > sizeof(dcli_symboltable[0].value) - 1)
-  {
+  if (strlen(value) > sizeof(dcli_symboltable[0].value) - 1) {
     return DCLI__SYMVALTOLONG;
   }
 
   // str_ToUpper( value, value);
   /* Look if the symbol exists */
 
-  for (i = 0; i < dcli_symboltable_count; i++)
-  {
-    if (!str_NoCaseStrcmp(dcli_symboltable[i].key, key))
-    {
+  for (i = 0; i < dcli_symboltable_count; i++) {
+    if (!str_NoCaseStrcmp(dcli_symboltable[i].key, key)) {
       strcpy(dcli_symboltable[i].value, value);
       return DCLI__SUCCESS;
     }
@@ -910,8 +777,7 @@ int dcli_define_symbol(char* key, char* arg1, char* arg2, char* arg3)
   return DCLI__SYMDEFINED;
 }
 
-static int dcli_symbol_to_int(int* int_value, char* value)
-{
+static int dcli_symbol_to_int(int *int_value, char *value) {
   int nr;
 
   /* Check if this is a float */
@@ -927,8 +793,7 @@ static int dcli_symbol_to_int(int* int_value, char* value)
   return 1;
 }
 
-static int dcli_symbol_to_float(float* float_value, char* value)
-{
+static int dcli_symbol_to_float(float *float_value, char *value) {
   int nr;
 
   nr = sscanf(value, "%f", float_value);
@@ -953,11 +818,10 @@ static int dcli_symbol_to_float(float* float_value, char* value)
  *
  **************************************************************************/
 
-int dcli_toupper(char* str_upper, char* str)
-{
+int dcli_toupper(char *str_upper, char *str) {
   char namechar;
-  char* u;
-  char* t;
+  char *u;
+  char *t;
   int convert;
   unsigned char prev_char;
 
@@ -966,13 +830,11 @@ int dcli_toupper(char* str_upper, char* str)
   t = str_upper;
   prev_char = 0;
   convert = 1;
-  while (*u != '\0')
-  {
+  while (*u != '\0') {
     namechar = *(u++);
     if (namechar == '"' && prev_char != '\\')
       convert = !convert;
-    if (convert)
-    {
+    if (convert) {
       *t = (char)toupper(namechar);
       if (*t == 'ö')
         *t = (char)'Ö';
@@ -980,8 +842,7 @@ int dcli_toupper(char* str_upper, char* str)
         *t = (char)'Ä';
       else if (*t == 'å')
         *t = (char)'Å';
-    }
-    else
+    } else
       *t = namechar;
     prev_char = (unsigned char)*t;
     t++;
@@ -991,17 +852,17 @@ int dcli_toupper(char* str_upper, char* str)
   return DCLI__SUCCESS;
 }
 
-static void dcli_message(char s, char* text) { printf("%%DCLI-%c-MSG, %s\n", s, text); }
+static void dcli_message(char s, char *text) {
+  printf("%%DCLI-%c-MSG, %s\n", s, text);
+}
 
-char* dcli_pwr_dir(const char* dir)
-{
+char *dcli_pwr_dir(const char *dir) {
   static char pwr_dir[120];
-  char* s;
+  char *s;
 
   if ((s = getenv(dir)) == NULL)
     strcpy(pwr_dir, "");
-  else
-  {
+  else {
     strcpy(pwr_dir, s);
     strcat(pwr_dir, "/");
   }
@@ -1025,12 +886,11 @@ char* dcli_pwr_dir(const char* dir)
  *
  **************************************************************************/
 
-int dcli_wildcard(char* wildname, char* name)
-{
+int dcli_wildcard(char *wildname, char *name) {
   int len;
-  char* s;
-  char* t;
-  char* u;
+  char *s;
+  char *t;
+  char *u;
   char checkstr[400];
   char upper_name[400];
 
@@ -1041,8 +901,7 @@ int dcli_wildcard(char* wildname, char* name)
   t = wildname;
   u = upper_name;
   s = strchr(t, '*');
-  if (s == 0)
-  {
+  if (s == 0) {
     if (str_NoCaseStrcmp(t, u) == 0)
       return 0;
     else
@@ -1050,8 +909,7 @@ int dcli_wildcard(char* wildname, char* name)
   }
 
   len = s - t;
-  if (len > 0)
-  {
+  if (len > 0) {
     strncpy(checkstr, t, len);
     checkstr[len] = '\0';
     if (str_NoCaseStrncmp(checkstr, u, len) != 0)
@@ -1061,11 +919,9 @@ int dcli_wildcard(char* wildname, char* name)
   t += len + 1;
   s = strchr(t, '*');
 
-  while (s != 0)
-  {
+  while (s != 0) {
     len = s - t;
-    if (len > 0)
-    {
+    if (len > 0) {
       strncpy(checkstr, t, len);
       checkstr[len] = '\0';
       u = strstr(u, cdh_Low(checkstr));
@@ -1097,9 +953,8 @@ int dcli_wildcard(char* wildname, char* name)
  *
  **************************************************************************/
 
-int dcli_read_line(char* line, int maxsize, FILE* file)
-{
-  char* s;
+int dcli_read_line(char *line, int maxsize, FILE *file) {
+  char *s;
 
   if (fgets(line, maxsize, file) == NULL)
     return 0;
@@ -1111,10 +966,8 @@ int dcli_read_line(char* line, int maxsize, FILE* file)
   return 1;
 }
 
-int checkTargetLocation(const char* line, const char* target_word)
-{
-  if (!line || !target_word || target_word[0] == '\0')
-  {
+int checkTargetLocation(const char *line, const char *target_word) {
+  if (!line || !target_word || target_word[0] == '\0') {
     return 0;
   }
 
@@ -1124,39 +977,35 @@ int checkTargetLocation(const char* line, const char* target_word)
   // lowercase to find link
   str_ToLower(lowerLine, line);
 
-  char* lowerLink = strstr(lowerLine, "<link>");
+  char *lowerLink = strstr(lowerLine, "<link>");
 
-  if (lowerLink != NULL)
-  {
+  if (lowerLink != NULL) {
     // Find the corresponding position in the original line
     // Calculate the position of the found link in the original line
     size_t pos = lowerLink - lowerLine;
 
     // search if target word exists in the link
-    if (strstr(&line[pos], target_word))
-    {
+    if (strstr(&line[pos], target_word)) {
       return 1; // exists
     }
   }
   return 0;
 }
 
-int dcli_search_line_in_file(FILE* file, const char* target_line, const char* location, char* error_line,
-                             int* error_line_number)
-{
+int dcli_search_line_in_file(FILE *file, const char *target_line,
+                             const char *location, char *error_line,
+                             int *error_line_number) {
   char line[256];
   int line_number = 0;
 
-  while (fgets(line, sizeof(line), file) != NULL)
-  {
+  while (fgets(line, sizeof(line), file) != NULL) {
     line_number++;
 
     // Remove the newline character, if present
     line[strcspn(line, "\n")] = 0;
 
     // Check if the current line matches the target line
-    if (strcmp(line, target_line) == 0)
-    {
+    if (strcmp(line, target_line) == 0) {
       strcpy(error_line, line);
       error_line[strlen(line)] = '\0';
 
@@ -1165,11 +1014,11 @@ int dcli_search_line_in_file(FILE* file, const char* target_line, const char* lo
       return 1;
     }
     // Check if the line and location is a substring of current_line
-    else if (strstr(line, target_line) != NULL)
-    {
-      // if (strstr(line, location) != NULL || countOccurrences(line, target_line) > 1)
-      if (checkTargetLocation(line, location) || checkTargetLocation(line, target_line))
-      {
+    else if (strstr(line, target_line) != NULL) {
+      // if (strstr(line, location) != NULL || countOccurrences(line,
+      // target_line) > 1)
+      if (checkTargetLocation(line, location) ||
+          checkTargetLocation(line, target_line)) {
         strcpy(error_line, line);
         error_line[strlen(line)] = '\0';
 
@@ -1187,8 +1036,7 @@ int dcli_search_line_in_file(FILE* file, const char* target_line, const char* lo
   return 0; // Line not found
 }
 
-unsigned int dcli_random()
-{
+unsigned int dcli_random() {
   pwr_tTime t;
 
   time_GetTime(&t);
@@ -1198,15 +1046,11 @@ unsigned int dcli_random()
   return (unsigned int)(rand() / ((double)RAND_MAX + 1) * 999999);
 }
 
-void dcli_execute_flavour_if_exists(char* argv[], const char* flavour)
-{
+void dcli_execute_flavour_if_exists(char *argv[], const char *flavour) {
   pwr_tFileName file;
-  if (strchr(argv[0], '/'))
-  {
+  if (strchr(argv[0], '/')) {
     strcpy(file, argv[0]);
-  }
-  else
-  {
+  } else {
     strcpy(file, "$pwr_exe/");
     strcat(file, argv[0]);
   }
@@ -1216,8 +1060,7 @@ void dcli_execute_flavour_if_exists(char* argv[], const char* flavour)
   execvp(file, argv); // execvp only return if the file doesn't exist
 }
 
-void dcli_execute_flavour(char* argv[])
-{
+void dcli_execute_flavour(char *argv[]) {
   dcli_execute_flavour_if_exists(argv, "qt");
   dcli_execute_flavour_if_exists(argv, "gtk");
 }

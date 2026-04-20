@@ -35,19 +35,19 @@
  */
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* Functions for serial lines */
+  /* Functions for serial lines */
 
-int RemUtils_InitSerialDev(
-    char* device, int speed, int databits, int stopbits, int parity);
+  int RemUtils_InitSerialDev(char* device, int speed, int databits, int stopbits, int parity);
 
-/* Functions for radix 50 */
+  /* Functions for radix 50 */
 
-char RemUtils_ConvertR50ToAscii(int i);
-int RemUtils_R50ToAscii(unsigned short R50[], char asc[]);
-int RemUtils_AsciiToR50(char asc[], short R50[]);
+  char RemUtils_ConvertR50ToAscii(int i);
+  int RemUtils_R50ToAscii(unsigned short R50[], char asc[]);
+  int RemUtils_AsciiToR50(char asc[], short R50[]);
 
 #if defined __cplusplus
 }

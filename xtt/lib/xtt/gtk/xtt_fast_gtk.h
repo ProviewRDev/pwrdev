@@ -41,16 +41,16 @@
 
 #include "xtt_fast.h"
 
-class XttFastGtk : public XttFast {
+class XttFastGtk : public XttFast
+{
 public:
   GtkWidget* parent_widget; //!< Parent widget.
 
-  XttFastGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, char* xn_name,
-      GtkWidget** w, pwr_sAttrRef* fast_arp, int width, int height,
-      unsigned int xn_options, int xn_color_theme, void* basewidget, int* sts);
-  XttFastGtk(void* parent_ctx, GtkWidget* parent_wid, const char* name,
-      GtkWidget** w, char* filename, int xn_color_theme, void* basewidget,
-      int* sts);
+  XttFastGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, char* xn_name, GtkWidget** w,
+             pwr_sAttrRef* fast_arp, int width, int height, unsigned int xn_options, int xn_color_theme,
+             void* basewidget, int* sts);
+  XttFastGtk(void* parent_ctx, GtkWidget* parent_wid, const char* name, GtkWidget** w, char* filename,
+             int xn_color_theme, void* basewidget, int* sts);
   ~XttFastGtk();
 };
 

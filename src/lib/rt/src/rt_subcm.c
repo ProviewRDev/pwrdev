@@ -76,7 +76,8 @@ void subcm_CheckTimeout()
   if (n == 0)
     n = MIN(1, gdbroot->db->subt_lc);
 
-  for (i = 0; i < n; i++) {
+  for (i = 0; i < n; i++)
+  {
     /* Temporarily remove the first entry from the queue for processing.  */
 
     cl = pool_QremoveSucc(NULL, gdbroot->pool, &gdbroot->db->subt_lh);
@@ -84,7 +85,8 @@ void subcm_CheckTimeout()
 
     /* Find out if the client has timed out */
 
-    if (!cp->old) {
+    if (!cp->old)
+    {
       /* cp->tmo in 10ths of seconds */
       tmotim.tv_sec = cp->tmo / 10;
       tmotim.tv_nsec = (cp->tmo - tmotim.tv_sec * 10) * 100000000;
@@ -133,8 +135,7 @@ void subcm_Data(qcom_sGet* get)
   {
     /* Allocate space for, and store the message in the pool.  */
 
-    mp = pool_Alloc(
-        &sts, gdbroot->pool, sizeof(*mp) - sizeof(mp->msg) + get->size);
+    mp = pool_Alloc(&sts, gdbroot->pool, sizeof(*mp) - sizeof(mp->msg) + get->size);
     if (mp == NULL)
       break;
     mr = pool_ItemReference(NULL, gdbroot->pool, mp);
@@ -147,9 +148,10 @@ void subcm_Data(qcom_sGet* get)
 
     /* Check if message is corrupt */
     dp = (net_sSubData*)&mp->msg.subdata;
-    for (i = 0; i < mp->msg.count; i++) {
-      if ((char*)dp > (char*)&mp->msg + get->size
-          || (char*)dp < (char*)&mp->msg) {
+    for (i = 0; i < mp->msg.count; i++)
+    {
+      if ((char*)dp > (char*)&mp->msg + get->size || (char*)dp < (char*)&mp->msg)
+      {
         errh_Error("Subscription client message corrupt");
         gdb_Unlock;
         return;
@@ -158,18 +160,19 @@ void subcm_Data(qcom_sGet* get)
     }
 
     /* Walk through every entry in the message buffer.  */
-    for (i = 0, dp = (net_sSubData*)&mp->msg.subdata,
-        dr = mr + offsetof(sub_sMessage, msg.subdata);
+    for (i = 0, dp = (net_sSubData*)&mp->msg.subdata, dr = mr + offsetof(sub_sMessage, msg.subdata);
 
          i < mp->msg.count;
 
          i++, dr += offsetof(net_sSubData, data) + (unsigned long)dp->size,
-        dp = (net_sSubData*)((unsigned long)&dp->data + dp->size)) {
+        dp = (net_sSubData*)((unsigned long)&dp->data + dp->size))
+    {
       cp = hash_Search(&sts, gdbroot->subc_ht, &dp->sid);
-      if (cp == NULL) {
-        if (rp == NULL) {
-          rp = pool_Alloc(&sts, gdbroot->pool,
-              sizeof(*rp) + ((mp->msg.count - 1) * sizeof(rp->sid[0])));
+      if (cp == NULL)
+      {
+        if (rp == NULL)
+        {
+          rp = pool_Alloc(&sts, gdbroot->pool, sizeof(*rp) + ((mp->msg.count - 1) * sizeof(rp->sid[0])));
           if (rp == NULL)
             continue;
           tgt.nid = mp->msg.hdr.nid;
@@ -191,13 +194,15 @@ void subcm_Data(qcom_sGet* get)
       cp->sts = dp->sts;
       cp->count++;
 
-      if (ODD(dp->sts)) {
+      if (ODD(dp->sts))
+      {
         cp->old = FALSE; /* There is new, fresh, real data!  */
         cp->submsg = mr;
         cp->subdata = dr;
         refcount++;
 
-        if (cp->cclass == pool_cNRef) {
+        if (cp->cclass == pool_cNRef)
+        {
           gdb_sClass* classp;
           cdh_uTypeId cid;
 
@@ -207,18 +212,21 @@ void subcm_Data(qcom_sGet* get)
           rsize = dp->size;
 
           if (classp != NULL)
-            ndc_ConvertData(&sts, np, classp, &cp->aref, dp->data, dp->data,
-                (pwr_tUInt32*)&rsize, ndc_eOp_decode, cp->aref.Offset, 0);
-        } else {
+            ndc_ConvertData(&sts, np, classp, &cp->aref, dp->data, dp->data, (pwr_tUInt32*)&rsize,
+                            ndc_eOp_decode, cp->aref.Offset, 0);
+        }
+        else
+        {
           cp->old = TRUE;
           ccp = pool_Address(&cp->sts, gdbroot->pool, cp->cclass);
-          if (ccp != NULL) {
+          if (ccp != NULL)
+          {
             tbl = pool_Address(&cp->sts, gdbroot->pool, ccp->rnConv);
-            if (tbl != NULL) {
+            if (tbl != NULL)
+            {
               rsize = dp->size;
-              ndc_ConvertRemoteData(&cp->sts, np, ccp, &cp->raref, dp->data,
-                  dp->data, (pwr_tUInt32*)&rsize, ndc_eOp_decode,
-                  cp->raref.Offset, 0);
+              ndc_ConvertRemoteData(&cp->sts, np, ccp, &cp->raref, dp->data, dp->data, (pwr_tUInt32*)&rsize,
+                                    ndc_eOp_decode, cp->raref.Offset, 0);
               if (ODD(cp->sts))
                 cp->old = FALSE;
             }
@@ -230,17 +238,19 @@ void subcm_Data(qcom_sGet* get)
         /* If the userdata field contains a valid pool_tRef, then
            copy the data. This poolref is resolved in RTDB!  */
 
-        if (cp->userdata != pool_cNRef) {
+        if (cp->userdata != pool_cNRef)
+        {
           adrs = pool_Address(NULL, gdbroot->rtdb, cp->userdata);
-          if (adrs != NULL) {
+          if (adrs != NULL)
+          {
             if (cp->cclass == pool_cNRef)
               memcpy(adrs, dp->data, MIN(dp->size, cp->usersize));
-            else if (!cp->old) {
+            else if (!cp->old)
+            {
               pwr_tUInt32 size = cp->usersize;
               pwr_tBoolean first = 1;
-              ndc_ConvertRemoteToNativeTable(&cp->sts, ccp, tbl, &cp->raref,
-                  &cp->aref, adrs, dp->data, &size, cp->aref.Offset, 0, 0,
-                  &first, np->nid);
+              ndc_ConvertRemoteToNativeTable(&cp->sts, ccp, tbl, &cp->raref, &cp->aref, adrs, dp->data, &size,
+                                             cp->aref.Offset, 0, 0, &first, np->nid);
               if (EVEN(cp->sts))
                 cp->old = TRUE;
             }
@@ -254,9 +264,12 @@ void subcm_Data(qcom_sGet* get)
        can be returned to pool. If there are no references to the 'message'
        just dispose it!  */
 
-    if (refcount != 0) {
+    if (refcount != 0)
+    {
       mp->msg.count = refcount;
-    } else {
+    }
+    else
+    {
       pool_Qremove(NULL, gdbroot->pool, &mp->subm_ll);
       gdbroot->db->subm_lc--;
       pool_Free(NULL, gdbroot->pool, mp);
@@ -264,17 +277,14 @@ void subcm_Data(qcom_sGet* get)
   }
   gdb_ScopeUnlock;
 
-  if (rp != NULL) {
+  if (rp != NULL)
+  {
     tgt = np->handler;
-    net_Put(NULL, &tgt, rp, net_eMsg_subRemove, 0,
-        pwr_Offset(rp, sid[rp->count]), 0);
+    net_Put(NULL, &tgt, rp, net_eMsg_subRemove, 0, pwr_Offset(rp, sid[rp->count]), 0);
     pool_Free(NULL, gdbroot->pool, rp);
   }
 }
 
 /* Move all clients from the indicated node to the unknown node.  */
 
-void subcm_FlushNode(pwr_tStatus* sts, gdb_sNode* np)
-{
-  subc_ActivateList(&np->subc_lh, pwr_cNObjid);
-}
+void subcm_FlushNode(pwr_tStatus* sts, gdb_sNode* np) { subc_ActivateList(&np->subc_lh, pwr_cNObjid); }

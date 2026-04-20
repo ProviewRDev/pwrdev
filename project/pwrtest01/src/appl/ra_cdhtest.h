@@ -4,15 +4,15 @@
 #include "co_cdh.h"
 #include "co_tst_log.h"
 
-class ra_cdhtest {
+class ra_cdhtest
+{
   pwr_tStatus m_sts;
-  tst_log *m_log;
+  tst_log* m_log;
 
-
- public:
+public:
   ra_cdhtest();
   ~ra_cdhtest();
-  tst_log *log() {return m_log;}
+  tst_log* log() { return m_log; }
 
   void ObjidCompare();
   void ObjidIsEqual();

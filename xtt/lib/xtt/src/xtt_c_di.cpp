@@ -121,7 +121,6 @@ static pwr_tStatus InvertOff(xmenu_sMenuCall* ip)
   Every method to be exported to xtt should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindXttMethods(Di)
-    = { pwr_BindXttMethod(InvertOn), pwr_BindXttMethod(InvertOff),
-        pwr_BindXttMethod(ConversionOn), pwr_BindXttMethod(ConversionOff),
-        pwr_BindXttMethod(SetFilter), pwr_NullMethod };
+pwr_dExport pwr_BindXttMethods(Di) = {pwr_BindXttMethod(InvertOn),     pwr_BindXttMethod(InvertOff),
+                                      pwr_BindXttMethod(ConversionOn), pwr_BindXttMethod(ConversionOff),
+                                      pwr_BindXttMethod(SetFilter),    pwr_NullMethod};

@@ -58,54 +58,52 @@
 #include "jpwr_rt_gdh.h"
 
 // Defined in ge_graph.h...
-typedef enum {
+typedef enum
+{
   graph_eType_Bit = (1 << 15) + 1 //!< Type for a bit in a bitmask
 } graph_eType;
 
-typedef struct {
-  char		TypeStr[32];
-  pwr_eType	Type;
-  int		Size;
+typedef struct
+{
+  char TypeStr[32];
+  pwr_eType Type;
+  int Size;
 } gdh_sSuffixTable;
 
-typedef struct {
-  tree_sNode 	node;
-  int 		jid;
-  void 		*p;
-  pwr_tRefId 	refid;
+typedef struct
+{
+  tree_sNode node;
+  int jid;
+  void* p;
+  pwr_tRefId refid;
 } sJid;
 
-typedef struct {
+typedef struct
+{
   char buf[4000];
   int len;
   int truncated;
 } gdh_sCrrCtx;
 
 #if defined HW_X86_64
-static tree_sTable *jid_table = 0;
+static tree_sTable* jid_table = 0;
 static int jid_next = 1;
 static thread_sMutex jid_mutex;
 #endif
 
-static int gdh_ExtractNameSuffix(	char   *Name,
-                          		char   **Suffix);
-static void  gdh_TranslateSuffixToClassData (
-    char        *SuffixPtr,
-    pwr_eType 	*PwrType,
-    int		*PwrSize,
-    int  	*NoOfElements);
-static int gdh_StringToAttr( char *str_value, char *buffer_p, int buffer_size,
-	pwr_eType attrtype, int attrsize);
-static void  gdh_AttrToString( int type_id, void *value_ptr,
-        char *str, int size, int *len, char *format);
-static void gdh_ConvertUTFstring(const char *out, char *in);
-static int gdh_JidToPointer( int id, void **p);
-static int gdh_JidStore( void *p, pwr_tRefId r, int *id);
-static int gdh_JidRemove( pwr_tRefId r);
+static int gdh_ExtractNameSuffix(char* Name, char** Suffix);
+static void gdh_TranslateSuffixToClassData(char* SuffixPtr, pwr_eType* PwrType, int* PwrSize,
+                                           int* NoOfElements);
+static int gdh_StringToAttr(char* str_value, char* buffer_p, int buffer_size, pwr_eType attrtype,
+                            int attrsize);
+static void gdh_AttrToString(int type_id, void* value_ptr, char* str, int size, int* len, char* format);
+static void gdh_ConvertUTFstring(const char* out, char* in);
+static int gdh_JidToPointer(int id, void** p);
+static int gdh_JidStore(void* p, pwr_tRefId r, int* id);
+static int gdh_JidRemove(pwr_tRefId r);
 static sevcli_tCtx gdh_scctx = 0;
 
-JNIEXPORT jint JNICALL Java_jpwr_rt_Gdh_init
-  (JNIEnv *env, jclass obj)
+JNIEXPORT jint JNICALL Java_jpwr_rt_Gdh_init(JNIEnv* env, jclass obj)
 {
   int sts;
 
@@ -113,232 +111,228 @@ JNIEXPORT jint JNICALL Java_jpwr_rt_Gdh_init
   return sts;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_setObjectInfoFloat
-  (JNIEnv *env, jclass obj, jstring name, jfloat value)
-{
-  int 		sts;
-  const char 	*str;
-  char 		*cstr;
-  pwr_tFloat32 	val;
-  jclass 	pwrtStatus_id;
-  jmethodID 	pwrtStatus_cid;
-  jobject 	return_obj;
-  jint		jsts;
-  char 		*s, *s1;
-
-  pwrtStatus_id = (*env)->FindClass( env, "jpwr/rt/PwrtStatus");
-  pwrtStatus_cid = (*env)->GetMethodID( env, pwrtStatus_id,
-    	"<init>", "(I)V");
-
-  val = value;
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  if ( (s = (char *)strchr( cstr, '#'))) {
-    *s = 0;
-    if ( (s1 = strchr( s+1, '[')))
-      strcat( cstr, s1);
-  }
-  sts = gdh_SetObjectInfo( cstr, (void *) &val, sizeof(val));
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, pwrtStatus_id,
-  	pwrtStatus_cid, jsts);
-  return return_obj;
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_setObjectInfoInt
-  (JNIEnv *env, jclass obj, jstring name, jint value)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_setObjectInfoFloat(JNIEnv* env, jclass obj, jstring name,
+                                                              jfloat value)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
+  pwr_tFloat32 val;
+  jclass pwrtStatus_id;
+  jmethodID pwrtStatus_cid;
+  jobject return_obj;
+  jint jsts;
+  char *s, *s1;
+
+  pwrtStatus_id = (*env)->FindClass(env, "jpwr/rt/PwrtStatus");
+  pwrtStatus_cid = (*env)->GetMethodID(env, pwrtStatus_id, "<init>", "(I)V");
+
+  val = value;
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  if ((s = (char*)strchr(cstr, '#')))
+  {
+    *s = 0;
+    if ((s1 = strchr(s + 1, '[')))
+      strcat(cstr, s1);
+  }
+  sts = gdh_SetObjectInfo(cstr, (void*)&val, sizeof(val));
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, pwrtStatus_id, pwrtStatus_cid, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_setObjectInfoInt(JNIEnv* env, jclass obj, jstring name, jint value)
+{
+  int sts;
+  const char* str;
+  char* cstr;
   pwr_tInt32 val;
-  jclass 	pwrtStatus_id;
-  jmethodID 	pwrtStatus_cid;
-  jobject 	return_obj;
-  jint		jsts;
-  char 		*s, *s1;
+  jclass pwrtStatus_id;
+  jmethodID pwrtStatus_cid;
+  jobject return_obj;
+  jint jsts;
+  char *s, *s1;
 
-  pwrtStatus_id = (*env)->FindClass( env, "jpwr/rt/PwrtStatus");
-  pwrtStatus_cid = (*env)->GetMethodID( env, pwrtStatus_id,
-    	"<init>", "(I)V");
+  pwrtStatus_id = (*env)->FindClass(env, "jpwr/rt/PwrtStatus");
+  pwrtStatus_cid = (*env)->GetMethodID(env, pwrtStatus_id, "<init>", "(I)V");
 
   val = value;
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  if ( (s = (char *)strchr( cstr, '#'))) {
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  if ((s = (char*)strchr(cstr, '#')))
+  {
     *s = 0;
-    if ( (s1 = strchr( s+1, '[')))
-      strcat( cstr, s1);
+    if ((s1 = strchr(s + 1, '[')))
+      strcat(cstr, s1);
   }
-  sts = gdh_SetObjectInfo( cstr, (void *) &val, sizeof(val));
+  sts = gdh_SetObjectInfo(cstr, (void*)&val, sizeof(val));
 
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, pwrtStatus_id,
-  	pwrtStatus_cid, jsts);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, pwrtStatus_id, pwrtStatus_cid, jsts);
   return return_obj;
 }
 
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_setObjectInfoBoolean
-  (JNIEnv *env, jclass obj, jstring name, jboolean value)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_setObjectInfoBoolean(JNIEnv* env, jclass obj, jstring name,
+                                                                jboolean value)
 {
-  int 		sts;
-  const char 	*str;
-  char 		*cstr;
-  pwr_tBoolean 	val;
-  jclass 	pwrtStatus_id;
-  jmethodID 	pwrtStatus_cid;
-  jobject 	return_obj;
-  jint		jsts;
-  char 		*s, *s1;
+  int sts;
+  const char* str;
+  char* cstr;
+  pwr_tBoolean val;
+  jclass pwrtStatus_id;
+  jmethodID pwrtStatus_cid;
+  jobject return_obj;
+  jint jsts;
+  char *s, *s1;
 
-  pwrtStatus_id = (*env)->FindClass( env, "jpwr/rt/PwrtStatus");
-  pwrtStatus_cid = (*env)->GetMethodID( env, pwrtStatus_id,
-    	"<init>", "(I)V");
+  pwrtStatus_id = (*env)->FindClass(env, "jpwr/rt/PwrtStatus");
+  pwrtStatus_cid = (*env)->GetMethodID(env, pwrtStatus_id, "<init>", "(I)V");
 
   val = value;
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  if ( (s = (char *)strchr( cstr, '#'))) {
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  if ((s = (char*)strchr(cstr, '#')))
+  {
     *s = 0;
-    if ( (s1 = strchr( s+1, '[')))
-      strcat( cstr, s1);
+    if ((s1 = strchr(s + 1, '[')))
+      strcat(cstr, s1);
   }
-  sts = gdh_SetObjectInfo( cstr, (void *) &val, sizeof(val));
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, pwrtStatus_id,
-  	pwrtStatus_cid, jsts);
+  sts = gdh_SetObjectInfo(cstr, (void*)&val, sizeof(val));
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, pwrtStatus_id, pwrtStatus_cid, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_setObjectInfoString
-  (JNIEnv *env, jclass obj, jstring name, jstring value)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_setObjectInfoString(JNIEnv* env, jclass obj, jstring name,
+                                                               jstring value)
 {
-  int 		sts;
-  const char 	*str;
-  char 		*cstr;
-  const char 	*str_value;
-  char 		*cstr_value;
-  jclass 	pwrtStatus_id;
-  jmethodID 	pwrtStatus_cid;
-  jobject 	return_obj;
-  jint		jsts;
-  pwr_tTypeId	attrtype;
-  unsigned int	attrsize, attroffs, attrelem;
-  char 		*s, *s1;
-  char		buffer[256];
-  int           element = 0;
-  int		null_value = 0;
+  int sts;
+  const char* str;
+  char* cstr;
+  const char* str_value;
+  char* cstr_value;
+  jclass pwrtStatus_id;
+  jmethodID pwrtStatus_cid;
+  jobject return_obj;
+  jint jsts;
+  pwr_tTypeId attrtype;
+  unsigned int attrsize, attroffs, attrelem;
+  char *s, *s1;
+  char buffer[256];
+  int element = 0;
+  int null_value = 0;
 
-  if ( !value) {
+  if (!value)
+  {
     null_value = 1;
-    value = (*env)->NewStringUTF( env, "");
+    value = (*env)->NewStringUTF(env, "");
   }
 
-  pwrtStatus_id = (*env)->FindClass( env, "jpwr/rt/PwrtStatus");
-  pwrtStatus_cid = (*env)->GetMethodID( env, pwrtStatus_id,
-    	"<init>", "(I)V");
+  pwrtStatus_id = (*env)->FindClass(env, "jpwr/rt/PwrtStatus");
+  pwrtStatus_cid = (*env)->GetMethodID(env, pwrtStatus_id, "<init>", "(I)V");
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
 
-  str_value = (*env)->GetStringUTFChars( env, value, 0);
-  cstr_value = (char *)str_value;
-  gdh_ConvertUTFstring( cstr_value, cstr_value);
+  str_value = (*env)->GetStringUTFChars(env, value, 0);
+  cstr_value = (char*)str_value;
+  gdh_ConvertUTFstring(cstr_value, cstr_value);
 
-  if ( (s = (char *)strchr( cstr, '#'))) {
+  if ((s = (char*)strchr(cstr, '#')))
+  {
     *s = 0;
-    if ( (s1 = strchr( s+1, '[')))
+    if ((s1 = strchr(s + 1, '[')))
       element = 1;
   }
   /* Get typeid and convert string to attr */
-  sts = gdh_GetAttributeCharacteristics( cstr,
-                &attrtype, &attrsize, &attroffs, &attrelem);
-  if ( ODD(sts))
+  sts = gdh_GetAttributeCharacteristics(cstr, &attrtype, &attrsize, &attroffs, &attrelem);
+  if (ODD(sts))
   {
-    if ( element) {
+    if (element)
+    {
       attrsize /= attrelem;
-      strcat( cstr, s1);
+      strcat(cstr, s1);
     }
-    sts = gdh_StringToAttr( cstr_value, buffer, sizeof(buffer),
-	attrtype, attrsize);
-    if (ODD(sts)) {
-      sts = gdh_SetObjectInfo( cstr, (void *) buffer, attrsize);
+    sts = gdh_StringToAttr(cstr_value, buffer, sizeof(buffer), attrtype, attrsize);
+    if (ODD(sts))
+    {
+      sts = gdh_SetObjectInfo(cstr, (void*)buffer, attrsize);
     }
   }
-  if ( null_value)
-    (*env)->DeleteLocalRef( env, value);
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
-  (*env)->ReleaseStringUTFChars( env, value, cstr_value);
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, pwrtStatus_id,
-  	pwrtStatus_cid, jsts);
+  if (null_value)
+    (*env)->DeleteLocalRef(env, value);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
+  (*env)->ReleaseStringUTFChars(env, value, cstr_value);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, pwrtStatus_id, pwrtStatus_cid, jsts);
 
   return return_obj;
 }
 
-JNIEXPORT jfloat JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoFloat
-  (JNIEnv *env, jclass obj, jint id)
+JNIEXPORT jfloat JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoFloat(JNIEnv* env, jclass obj, jint id)
 {
   pwr_tStatus sts;
-  pwr_tFloat32 *p;
+  pwr_tFloat32* p;
 
-  sts = gdh_JidToPointer( id, (void **)&p);
-  if ( EVEN(sts)) return (jfloat) 0;
+  sts = gdh_JidToPointer(id, (void**)&p);
+  if (EVEN(sts))
+    return (jfloat)0;
 
-  return (jfloat) *p;
+  return (jfloat)*p;
 }
 
-JNIEXPORT jboolean JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoBoolean
-  (JNIEnv *env, jclass obj, jint id)
+JNIEXPORT jboolean JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoBoolean(JNIEnv* env, jclass obj, jint id)
 {
   pwr_tStatus sts;
-  pwr_tBoolean *p;
+  pwr_tBoolean* p;
 
-  sts = gdh_JidToPointer( id, (void **)&p);
-  if ( EVEN(sts)) return 0;
+  sts = gdh_JidToPointer(id, (void**)&p);
+  if (EVEN(sts))
+    return 0;
 
-  if ( *p)
+  if (*p)
     return 1;
   else
     return 0;
 }
 
-JNIEXPORT jint JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoInt
-  (JNIEnv *env, jclass obj, jint id)
+JNIEXPORT jint JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoInt(JNIEnv* env, jclass obj, jint id)
 {
   pwr_tStatus sts;
-  pwr_tInt32 *p;
+  pwr_tInt32* p;
 
-  sts = gdh_JidToPointer( id, (void **)&p);
-  if ( EVEN(sts)) return 0;
+  sts = gdh_JidToPointer(id, (void**)&p);
+  if (EVEN(sts))
+    return 0;
 
-  return (jint) *p;
+  return (jint)*p;
 }
 
-JNIEXPORT jstring JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoString
-  (JNIEnv *env, jclass obj, jint id, jint jtypeid)
+JNIEXPORT jstring JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoString(JNIEnv* env, jclass obj, jint id,
+                                                                  jint jtypeid)
 {
   jstring jvalue;
   pwr_tTypeId typeid;
   pwr_tStatus sts;
-  char *p;
+  char* p;
 
-  sts = gdh_JidToPointer( id, (void **)&p);
-  if ( EVEN(sts)) return 0;
+  sts = gdh_JidToPointer(id, (void**)&p);
+  if (EVEN(sts))
+    return 0;
 
-  typeid = (pwr_tTypeId) jtypeid;
-  if ( typeid == 0 || typeid == pwr_eType_String)
+  typeid = (pwr_tTypeId)jtypeid;
+  if (typeid == 0 || typeid == pwr_eType_String)
   {
     /* String is default */
-    jvalue = (*env)->NewStringUTF( env, p);
+    jvalue = (*env)->NewStringUTF(env, p);
     return jvalue;
   }
   else
@@ -346,117 +340,116 @@ JNIEXPORT jstring JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoString
     char buffer[256];
     int len;
 
-    gdh_AttrToString( typeid, (void *)p, buffer, sizeof(buffer),
-			    &len, NULL);
-    jvalue = (*env)->NewStringUTF( env, buffer);
+    gdh_AttrToString(typeid, (void*)p, buffer, sizeof(buffer), &len, NULL);
+    jvalue = (*env)->NewStringUTF(env, buffer);
     return jvalue;
   }
 }
 
-JNIEXPORT jfloatArray JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoFloatArray
-  (JNIEnv *env, jclass obj, jint id, jint size)
+JNIEXPORT jfloatArray JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoFloatArray(JNIEnv* env, jclass obj, jint id,
+                                                                          jint size)
 {
   jfloatArray jfloatArr = (*env)->NewFloatArray(env, size);
   pwr_tStatus sts;
-  float *p;
+  float* p;
 
-  sts = gdh_JidToPointer( id, (void **)&p);
-  if ( EVEN(sts)) return 0;
+  sts = gdh_JidToPointer(id, (void**)&p);
+  if (EVEN(sts))
+    return 0;
 
-  if(jfloatArr == NULL || p == NULL)
+  if (jfloatArr == NULL || p == NULL)
   {
-    //something very weird has happen
+    // something very weird has happen
     return (jfloatArray)NULL;
   }
 
-  (*env)->SetFloatArrayRegion(env, jfloatArr, 0, size, (jfloat *)p);
+  (*env)->SetFloatArrayRegion(env, jfloatArr, 0, size, (jfloat*)p);
 
   return jfloatArr;
 }
 
-
-JNIEXPORT jbooleanArray JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoBooleanArray
-  (JNIEnv *env, jclass obj, jint id, jint size)
+JNIEXPORT jbooleanArray JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoBooleanArray(JNIEnv* env, jclass obj,
+                                                                              jint id, jint size)
 {
   jbooleanArray jbooleanArr = (*env)->NewBooleanArray(env, size);
   pwr_tStatus sts;
-  pwr_tBoolean *p;
-  jboolean *jp;
+  pwr_tBoolean* p;
+  jboolean* jp;
   int i;
 
-  sts = gdh_JidToPointer( id, (void **)&p);
-  if ( EVEN(sts)) return 0;
+  sts = gdh_JidToPointer(id, (void**)&p);
+  if (EVEN(sts))
+    return 0;
 
-
-  if(jbooleanArr == NULL || p == NULL)
+  if (jbooleanArr == NULL || p == NULL)
   {
-    //something very weird has happen
+    // something very weird has happen
     return (jbooleanArray)NULL;
   }
 
   jp = malloc(size * sizeof(jboolean));
-  for ( i = 0; i < size; i++)
+  for (i = 0; i < size; i++)
     jp[i] = p[i];
   (*env)->SetBooleanArrayRegion(env, jbooleanArr, 0, size, jp);
-  free( jp);
+  free(jp);
   return jbooleanArr;
 }
 
-
-JNIEXPORT jintArray JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoIntArray
-  (JNIEnv *env, jclass obj, jint id, jint size)
+JNIEXPORT jintArray JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoIntArray(JNIEnv* env, jclass obj, jint id,
+                                                                      jint size)
 {
   jintArray jintArr = (*env)->NewIntArray(env, size);
   pwr_tStatus sts;
-  pwr_tInt32 *p;
+  pwr_tInt32* p;
 
-  sts = gdh_JidToPointer( id, (void **)&p);
-  if ( EVEN(sts)) return 0;
+  sts = gdh_JidToPointer(id, (void**)&p);
+  if (EVEN(sts))
+    return 0;
 
-  if(jintArr == NULL || p == NULL)
+  if (jintArr == NULL || p == NULL)
   {
-    //something very weird has happen
+    // something very weird has happen
     return (jintArray)NULL;
   }
 
-  (*env)->SetIntArrayRegion(env, jintArr, 0, size, (jint *)p);
+  (*env)->SetIntArrayRegion(env, jintArr, 0, size, (jint*)p);
 
   return jintArr;
-
 }
 
-JNIEXPORT jobjectArray JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoStringArray
-  (JNIEnv *env, jclass obj, jint id, jint jtypeid, jint size, jint elements)
+JNIEXPORT jobjectArray JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoStringArray(JNIEnv* env, jclass obj, jint id,
+                                                                            jint jtypeid, jint size,
+                                                                            jint elements)
 {
 
   pwr_tTypeId typeid;
   jobjectArray jobjectArr;
   int i = 0;
   pwr_tStatus sts;
-  char *p;
+  char* p;
 
-  sts = gdh_JidToPointer( id, (void **)&p);
-  if ( EVEN(sts)) return 0;
+  sts = gdh_JidToPointer(id, (void**)&p);
+  if (EVEN(sts))
+    return 0;
 
-  //find the class for String[]
+  // find the class for String[]
   jclass strArrCls = (*env)->FindClass(env, "java/lang/String");
 
-  if(strArrCls == NULL)
+  if (strArrCls == NULL)
   {
     return (jobjectArray)NULL;
   }
-  //create a new String[]
+  // create a new String[]
   jobjectArr = (*env)->NewObjectArray(env, elements, strArrCls, NULL);
 
-
-  typeid = (pwr_tTypeId) jtypeid;
-  if ( typeid == 0 || typeid == pwr_eType_String)
+  typeid = (pwr_tTypeId)jtypeid;
+  if (typeid == 0 || typeid == pwr_eType_String)
   {
     // String is default
-    //put the result in an objectarray of Strings
-    for(i=0;i<elements;i++)
+    // put the result in an objectarray of Strings
+    for (i = 0; i < elements; i++)
     {
-      (*env)->SetObjectArrayElement(env, jobjectArr, i, (*env)->NewStringUTF( env, p));
+      (*env)->SetObjectArrayElement(env, jobjectArr, i, (*env)->NewStringUTF(env, p));
       p += size;
     }
   }
@@ -482,27 +475,24 @@ JNIEXPORT jobjectArray JNICALL Java_jpwr_rt_Gdh_getObjectRefInfoStringArray
       size = 4;
     }
 */
-    //put the result in an objectarray of Strings
-    for(i=0;i<elements;i++)
+    // put the result in an objectarray of Strings
+    for (i = 0; i < elements; i++)
     {
-      gdh_AttrToString( typeid, (void *)p, buffer, sizeof(buffer),
-      	                &len, NULL);
+      gdh_AttrToString(typeid, (void*)p, buffer, sizeof(buffer), &len, NULL);
 
-      (*env)->SetObjectArrayElement(env, jobjectArr, i, (*env)->NewStringUTF( env, (char *)buffer));
+      (*env)->SetObjectArrayElement(env, jobjectArr, i, (*env)->NewStringUTF(env, (char*)buffer));
       p += size;
     }
   }
   return jobjectArr;
 }
 
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_refObjectInfo
-  (JNIEnv *env, jclass obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_refObjectInfo(JNIEnv* env, jclass obj, jstring name)
 {
   int sts = GDH__SUCCESS;
-  const char *str;
-  char *cstr;
-  void *attr_p;
+  const char* str;
+  char* cstr;
+  void* attr_p;
   pwr_tSubid subid;
   jint id;
   jobject refid_obj = NULL;
@@ -517,159 +507,152 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_refObjectInfo
 
   static jmethodID PwrtRefId_cid = NULL;
 
-  char *suffix_p;
+  char* suffix_p;
   int size;
   int elements;
   pwr_eType typeid;
 
-  gdhrRefObjectInfo_id = (*env)->FindClass( env, "jpwr/rt/GdhrRefObjectInfo");
+  gdhrRefObjectInfo_id = (*env)->FindClass(env, "jpwr/rt/GdhrRefObjectInfo");
 
-  if(gdhrRefObjectInfo_cid == NULL)
+  if (gdhrRefObjectInfo_cid == NULL)
   {
-    gdhrRefObjectInfo_cid = (*env)->GetMethodID( env, gdhrRefObjectInfo_id,
-    	"<init>", "(Ljpwr/rt/PwrtRefId;IIIII)V");
+    gdhrRefObjectInfo_cid =
+        (*env)->GetMethodID(env, gdhrRefObjectInfo_id, "<init>", "(Ljpwr/rt/PwrtRefId;IIIII)V");
 
-    if(gdhrRefObjectInfo_cid == NULL)
+    if (gdhrRefObjectInfo_cid == NULL)
     {
       printf("fel vid init av gdhrRefObjectInfo_cid\n");
       return NULL;
     }
   }
-  PwrtRefId_id = (*env)->FindClass( env, "jpwr/rt/PwrtRefId");
-  if(PwrtRefId_cid == NULL)
+  PwrtRefId_id = (*env)->FindClass(env, "jpwr/rt/PwrtRefId");
+  if (PwrtRefId_cid == NULL)
   {
-    PwrtRefId_cid = (*env)->GetMethodID( env, PwrtRefId_id,
-    	"<init>", "(II)V");
-    //printf("PwrtRefId_cid initierad\n");
-    if(PwrtRefId_cid == NULL)
+    PwrtRefId_cid = (*env)->GetMethodID(env, PwrtRefId_id, "<init>", "(II)V");
+    // printf("PwrtRefId_cid initierad\n");
+    if (PwrtRefId_cid == NULL)
     {
       printf("fel vid init av PwrtRefId_cid\n");
       return NULL;
     }
   }
   /* The pointer and the subid should be stored somewhere... */
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
 
   /* Extract the type and size from the suffix */
-  if ( gdh_ExtractNameSuffix( cstr, &suffix_p)) {
-    gdh_TranslateSuffixToClassData( suffix_p, &typeid, &size, &elements);
-    if ( typeid == (int)graph_eType_Bit) {
-      char *s = strrchr( cstr, '[');
-      if ( s)
-	*s = 0;
+  if (gdh_ExtractNameSuffix(cstr, &suffix_p))
+  {
+    gdh_TranslateSuffixToClassData(suffix_p, &typeid, &size, &elements);
+    if (typeid == (int)graph_eType_Bit)
+    {
+      char* s = strrchr(cstr, '[');
+      if (s)
+        *s = 0;
     }
   }
   else
   {
-    sts = gdh_GetAttributeCharacteristics( cstr, &typeid, (pwr_tUInt32 *)&size, 0,
-					   (pwr_tUInt32 *)&elements);
+    sts = gdh_GetAttributeCharacteristics(cstr, &typeid, (pwr_tUInt32*)&size, 0, (pwr_tUInt32*)&elements);
   }
 
-  if ( ODD(sts))
-    sts = gdh_RefObjectInfo( cstr, &attr_p, &subid, size);
+  if (ODD(sts))
+    sts = gdh_RefObjectInfo(cstr, &attr_p, &subid, size);
 
-  if ( ODD(sts))
+  if (ODD(sts))
   {
-    gdh_JidStore( attr_p, subid, (int *) &id);
-    rix = (jint) subid.rix;
-    nid = (jint) subid.nid;
-    refid_obj = (*env)->NewObject( env, PwrtRefId_id, PwrtRefId_cid,
-    	rix, nid);
+    gdh_JidStore(attr_p, subid, (int*)&id);
+    rix = (jint)subid.rix;
+    nid = (jint)subid.nid;
+    refid_obj = (*env)->NewObject(env, PwrtRefId_id, PwrtRefId_cid, rix, nid);
   }
   else
     id = 0;
 
-  //printf( "RefObjectInfo: %s, id: %d, sts: %d\n", cstr, id, sts);
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
+  // printf( "RefObjectInfo: %s, id: %d, sts: %d\n", cstr, id, sts);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  jsts = (jint) sts;
-  //we want the size of each element not the hole object
-  if(elements > 0)
-      size = size/elements;
-  return_obj = (*env)->NewObject( env, gdhrRefObjectInfo_id,
-  	gdhrRefObjectInfo_cid, refid_obj, id, jsts, (jint)typeid, (jint)elements, (jint)size);
+  jsts = (jint)sts;
+  // we want the size of each element not the hole object
+  if (elements > 0)
+    size = size / elements;
+  return_obj = (*env)->NewObject(env, gdhrRefObjectInfo_id, gdhrRefObjectInfo_cid, refid_obj, id, jsts,
+                                 (jint) typeid, (jint)elements, (jint)size);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_unrefObjectInfo
-  (JNIEnv *env, jclass obj, jobject refid_obj)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_unrefObjectInfo(JNIEnv* env, jclass obj, jobject refid_obj)
 {
-  pwr_tRefId 	refid;
-  int 		sts;
-  jclass 	pwrtRefId_id;
-  jmethodID 	pwrtRefId_getRix;
-  jmethodID 	pwrtRefId_getNid;
-  jclass 	pwrtStatus_id;
-  jmethodID 	pwrtStatus_cid;
-  jobject 	return_obj;
-  jint		jsts;
+  pwr_tRefId refid;
+  int sts;
+  jclass pwrtRefId_id;
+  jmethodID pwrtRefId_getRix;
+  jmethodID pwrtRefId_getNid;
+  jclass pwrtStatus_id;
+  jmethodID pwrtStatus_cid;
+  jobject return_obj;
+  jint jsts;
 
-  pwrtStatus_id = (*env)->FindClass( env, "jpwr/rt/PwrtStatus");
-  pwrtStatus_cid = (*env)->GetMethodID( env, pwrtStatus_id,
-    	"<init>", "(I)V");
+  pwrtStatus_id = (*env)->FindClass(env, "jpwr/rt/PwrtStatus");
+  pwrtStatus_cid = (*env)->GetMethodID(env, pwrtStatus_id, "<init>", "(I)V");
 
-  pwrtRefId_id = (*env)->FindClass( env, "jpwr/rt/PwrtRefId");
-  pwrtRefId_getRix = (*env)->GetMethodID( env, pwrtRefId_id, "getRix", "()I");
-  pwrtRefId_getNid = (*env)->GetMethodID( env, pwrtRefId_id, "getNid", "()I");
+  pwrtRefId_id = (*env)->FindClass(env, "jpwr/rt/PwrtRefId");
+  pwrtRefId_getRix = (*env)->GetMethodID(env, pwrtRefId_id, "getRix", "()I");
+  pwrtRefId_getNid = (*env)->GetMethodID(env, pwrtRefId_id, "getNid", "()I");
 
-  refid.rix = (*env)->CallIntMethod( env, refid_obj, pwrtRefId_getRix);
-  refid.nid = (*env)->CallIntMethod( env, refid_obj, pwrtRefId_getNid);
+  refid.rix = (*env)->CallIntMethod(env, refid_obj, pwrtRefId_getRix);
+  refid.nid = (*env)->CallIntMethod(env, refid_obj, pwrtRefId_getNid);
 
-  sts = gdh_JidRemove( refid);
-  sts = gdh_UnrefObjectInfo( refid);
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, pwrtStatus_id,
-  	pwrtStatus_cid, jsts);
+  sts = gdh_JidRemove(refid);
+  sts = gdh_UnrefObjectInfo(refid);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, pwrtStatus_id, pwrtStatus_cid, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_toggleObjectInfo
-  (JNIEnv *env, jclass obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_toggleObjectInfo(JNIEnv* env, jclass obj, jstring name)
 {
-  int 		sts;
-  const 	char *str;
-  char 		*cstr;
-  pwr_tBoolean 	val;
-  jclass 	pwrtStatus_id;
-  jmethodID 	pwrtStatus_cid;
-  jobject 	return_obj;
-  jint		jsts;
-  char 		*s, *s1;
+  int sts;
+  const char* str;
+  char* cstr;
+  pwr_tBoolean val;
+  jclass pwrtStatus_id;
+  jmethodID pwrtStatus_cid;
+  jobject return_obj;
+  jint jsts;
+  char *s, *s1;
 
-  pwrtStatus_id = (*env)->FindClass( env, "jpwr/rt/PwrtStatus");
-  pwrtStatus_cid = (*env)->GetMethodID( env, pwrtStatus_id,
-    	"<init>", "(I)V");
+  pwrtStatus_id = (*env)->FindClass(env, "jpwr/rt/PwrtStatus");
+  pwrtStatus_cid = (*env)->GetMethodID(env, pwrtStatus_id, "<init>", "(I)V");
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  if ( (s = (char *)strchr( cstr, '#'))) {
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  if ((s = (char*)strchr(cstr, '#')))
+  {
     *s = 0;
-    if ( (s1 = strchr( s+1, '[')))
-      strcat( cstr, s1);
+    if ((s1 = strchr(s + 1, '[')))
+      strcat(cstr, s1);
   }
-  sts = gdh_GetObjectInfo( cstr, (void *) &val, sizeof(val));
+  sts = gdh_GetObjectInfo(cstr, (void*)&val, sizeof(val));
   if (ODD(sts))
   {
     val = !val;
-    sts = gdh_SetObjectInfo( cstr, (void *) &val, sizeof(val));
+    sts = gdh_SetObjectInfo(cstr, (void*)&val, sizeof(val));
   }
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, pwrtStatus_id,
-  	pwrtStatus_cid, jsts);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, pwrtStatus_id, pwrtStatus_cid, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_nameToObjid
-  (JNIEnv *env, jclass obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_nameToObjid(JNIEnv* env, jclass obj, jstring name)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
   pwr_tObjid objid;
   jclass cdhrObjid_id;
   jmethodID cdhrObjid_cid;
@@ -680,41 +663,35 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_nameToObjid
   jobject return_obj;
   jint jsts;
 
+  cdhrObjid_id = (*env)->FindClass(env, "jpwr/rt/CdhrObjid");
+  cdhrObjid_cid = (*env)->GetMethodID(env, cdhrObjid_id, "<init>", "(Ljpwr/rt/PwrtObjid;I)V");
 
-  cdhrObjid_id = (*env)->FindClass( env, "jpwr/rt/CdhrObjid");
-  cdhrObjid_cid = (*env)->GetMethodID( env, cdhrObjid_id,
-    	"<init>", "(Ljpwr/rt/PwrtObjid;I)V");
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  PwrtObjid_cid = (*env)->GetMethodID(env, PwrtObjid_id, "<init>", "(II)V");
 
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  PwrtObjid_cid = (*env)->GetMethodID( env, PwrtObjid_id,
-    	"<init>", "(II)V");
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  sts = gdh_NameToObjid(cstr, &objid);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  sts = gdh_NameToObjid( cstr, &objid);
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
-
-  if ( ODD(sts))
+  if (ODD(sts))
   {
-    oix = (jint) objid.oix;
-    vid = (jint) objid.vid;
-    objid_obj = (*env)->NewObject( env, PwrtObjid_id, PwrtObjid_cid,
-    	oix, vid);
+    oix = (jint)objid.oix;
+    vid = (jint)objid.vid;
+    objid_obj = (*env)->NewObject(env, PwrtObjid_id, PwrtObjid_cid, oix, vid);
   }
 
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrObjid_id,
-  	cdhrObjid_cid, objid_obj, jsts);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrObjid_id, cdhrObjid_cid, objid_obj, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_nameToAttrRef
-  (JNIEnv *env, jclass obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_nameToAttrRef(JNIEnv* env, jclass obj, jstring name)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
   pwr_tAttrRef aref;
   jclass cdhrAttrRef_id;
   jmethodID cdhrAttrRef_cid;
@@ -729,780 +706,713 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_nameToAttrRef
   jobject return_obj;
   jint jsts;
 
+  cdhrAttrRef_id = (*env)->FindClass(env, "jpwr/rt/CdhrAttrRef");
+  cdhrAttrRef_cid = (*env)->GetMethodID(env, cdhrAttrRef_id, "<init>", "(Ljpwr/rt/PwrtAttrRef;I)V");
 
-  cdhrAttrRef_id = (*env)->FindClass( env, "jpwr/rt/CdhrAttrRef");
-  cdhrAttrRef_cid = (*env)->GetMethodID( env, cdhrAttrRef_id,
-    	"<init>", "(Ljpwr/rt/PwrtAttrRef;I)V");
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  PwrtObjid_cid = (*env)->GetMethodID(env, PwrtObjid_id, "<init>", "(II)V");
 
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  PwrtObjid_cid = (*env)->GetMethodID( env, PwrtObjid_id,
-    	"<init>", "(II)V");
+  PwrtAttrRef_id = (*env)->FindClass(env, "jpwr/rt/PwrtAttrRef");
+  PwrtAttrRef_cid = (*env)->GetMethodID(env, PwrtAttrRef_id, "<init>", "(Ljpwr/rt/PwrtObjid;IIII)V");
 
-  PwrtAttrRef_id = (*env)->FindClass( env, "jpwr/rt/PwrtAttrRef");
-  PwrtAttrRef_cid = (*env)->GetMethodID( env, PwrtAttrRef_id,
-    	"<init>", "(Ljpwr/rt/PwrtObjid;IIII)V");
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  sts = gdh_NameToAttrref(pwr_cNOid, cstr, &aref);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  sts = gdh_NameToAttrref( pwr_cNOid, cstr, &aref);
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
+  if (ODD(sts))
+  {
+    oix = (jint)aref.Objid.oix;
+    vid = (jint)aref.Objid.vid;
+    objid_obj = (*env)->NewObject(env, PwrtObjid_id, PwrtObjid_cid, oix, vid);
 
-  if ( ODD(sts)) {
-    oix = (jint) aref.Objid.oix;
-    vid = (jint) aref.Objid.vid;
-    objid_obj = (*env)->NewObject( env, PwrtObjid_id, PwrtObjid_cid,
-    	oix, vid);
-
-    body = (jint) aref.Body;
-    offset = (jint) aref.Offset;
-    size = (jint) aref.Size;
-    flags = (jint) aref.Flags.m;
-    attrref_obj = (*env)->NewObject( env, PwrtAttrRef_id, PwrtAttrRef_cid,
-    	objid_obj, body, offset, size, flags);
+    body = (jint)aref.Body;
+    offset = (jint)aref.Offset;
+    size = (jint)aref.Size;
+    flags = (jint)aref.Flags.m;
+    attrref_obj =
+        (*env)->NewObject(env, PwrtAttrRef_id, PwrtAttrRef_cid, objid_obj, body, offset, size, flags);
   }
 
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrAttrRef_id,
-  	cdhrAttrRef_cid, attrref_obj, jsts);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrAttrRef_id, cdhrAttrRef_cid, attrref_obj, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_objidToName
-  (JNIEnv *env, jclass obj, jobject objid_obj, jint nameType)
-{
-  int 		sts;
-  pwr_tOName	name;
-  pwr_tObjid 	objid;
-  jclass 	cdhrString_id;
-  static jmethodID 	cdhrString_cid = NULL;
-  jobject 	return_obj;
-  jint 		jsts;
-  jclass 	PwrtObjid_id;
-  static jmethodID 	PwrtObjid_getOix = NULL;
-  static jmethodID 	PwrtObjid_getVid = NULL;
-  jstring	jname = NULL;
-
-  cdhrString_id = (*env)->FindClass( env, "jpwr/rt/CdhrString");
-  if(cdhrString_cid == NULL)
-  {
-    cdhrString_cid = (*env)->GetMethodID( env, cdhrString_id,
-    	  "<init>", "(Ljava/lang/String;I)V");
-  }
-
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  if(PwrtObjid_getOix == NULL || PwrtObjid_getVid == NULL)
-  {
-    PwrtObjid_getOix = (*env)->GetMethodID( env, PwrtObjid_id, "getOix", "()I");
-    PwrtObjid_getVid = (*env)->GetMethodID( env, PwrtObjid_id, "getVid", "()I");
-  }
-
-  objid.oix = (*env)->CallIntMethod( env, objid_obj, PwrtObjid_getOix);
-  objid.vid = (*env)->CallIntMethod( env, objid_obj, PwrtObjid_getVid);
-
-  sts = gdh_ObjidToName( objid, name, sizeof(name), nameType);
-
-  if ( ODD(sts))
-    jname = (*env)->NewStringUTF( env, name);
-
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrString_id,
-  	cdhrString_cid, jname, jsts);
-  return return_obj;
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_attrRefToName
-  (JNIEnv *env, jclass obj, jobject aref_obj, jint nameType)
-{
-  int 		sts;
-  pwr_tOName	name;
-  pwr_tAttrRef 	aref;
-  jclass 	cdhrString_id;
-  static jmethodID 	cdhrString_cid = NULL;
-  jobject 	return_obj;
-  jint 		jsts;
-  jclass 	PwrtAttrRef_id;
-  static jmethodID 	PwrtAttrRef_getOix = NULL;
-  static jmethodID 	PwrtAttrRef_getVid = NULL;
-  static jmethodID 	PwrtAttrRef_getBody = NULL;
-  static jmethodID 	PwrtAttrRef_getOffset = NULL;
-  static jmethodID 	PwrtAttrRef_getSize = NULL;
-  static jmethodID 	PwrtAttrRef_getFlags = NULL;
-  jstring	jname = NULL;
-
-  cdhrString_id = (*env)->FindClass( env, "jpwr/rt/CdhrString");
-  if(cdhrString_cid == NULL) {
-    cdhrString_cid = (*env)->GetMethodID( env, cdhrString_id,
-    	  "<init>", "(Ljava/lang/String;I)V");
-  }
-
-  PwrtAttrRef_id = (*env)->FindClass( env, "jpwr/rt/PwrtAttrRef");
-  if(PwrtAttrRef_getOix == NULL || PwrtAttrRef_getVid == NULL) {
-    PwrtAttrRef_getOix = (*env)->GetMethodID( env, PwrtAttrRef_id, "getOix", "()I");
-    PwrtAttrRef_getVid = (*env)->GetMethodID( env, PwrtAttrRef_id, "getVid", "()I");
-    PwrtAttrRef_getBody = (*env)->GetMethodID( env, PwrtAttrRef_id, "getBody", "()I");
-    PwrtAttrRef_getOffset = (*env)->GetMethodID( env, PwrtAttrRef_id, "getOffset", "()I");
-    PwrtAttrRef_getSize = (*env)->GetMethodID( env, PwrtAttrRef_id, "getSize", "()I");
-    PwrtAttrRef_getFlags = (*env)->GetMethodID( env, PwrtAttrRef_id, "getFlags", "()I");
-  }
-
-  aref.Objid.oix = (*env)->CallIntMethod( env, aref_obj, PwrtAttrRef_getOix);
-  aref.Objid.vid = (*env)->CallIntMethod( env, aref_obj, PwrtAttrRef_getVid);
-  aref.Body = (*env)->CallIntMethod( env, aref_obj, PwrtAttrRef_getBody);
-  aref.Offset = (*env)->CallIntMethod( env, aref_obj, PwrtAttrRef_getOffset);
-  aref.Size = (*env)->CallIntMethod( env, aref_obj, PwrtAttrRef_getSize);
-  aref.Flags.m = (*env)->CallIntMethod( env, aref_obj, PwrtAttrRef_getFlags);
-
-  sts = gdh_AttrrefToName( &aref, name, sizeof(name), nameType);
-
-  if ( ODD(sts))
-    jname = (*env)->NewStringUTF( env, name);
-
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrString_id,
-  	cdhrString_cid, jname, jsts);
-  return return_obj;
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getRootList
-  (JNIEnv *env, jclass obj)
-{
-  int		sts;
-  jclass 	PwrtObjid_id;
-  jmethodID 	PwrtObjid_cid;
-  pwr_tObjid 	objid;
-  jclass 	cdhrObjid_id;
-  jmethodID 	cdhrObjid_cid;
-  jobject 	objid_obj = NULL;
-  jint 		oix, vid;
-  jobject 	return_obj;
-  jint 		jsts;
-
-  cdhrObjid_id = (*env)->FindClass( env, "jpwr/rt/CdhrObjid");
-  cdhrObjid_cid = (*env)->GetMethodID( env, cdhrObjid_id,
-    	"<init>", "(Ljpwr/rt/PwrtObjid;I)V");
-
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  PwrtObjid_cid = (*env)->GetMethodID( env, PwrtObjid_id,
-    	"<init>", "(II)V");
-
-  sts = gdh_GetRootList( &objid);
-  if ( ODD(sts))
-  {
-    oix = (jint) objid.oix;
-    vid = (jint) objid.vid;
-    objid_obj = (*env)->NewObject( env, PwrtObjid_id, PwrtObjid_cid,
-    	oix, vid);
-  }
-
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrObjid_id,
-  	cdhrObjid_cid, objid_obj, jsts);
-  return return_obj;
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getChild
-  (JNIEnv *env, jclass obj, jobject objid_obj)
-{
-  int		sts;
-  jclass 	PwrtObjid_id;
-  static jmethodID 	PwrtObjid_getOix;
-  static jmethodID 	PwrtObjid_getVid;
-  static jmethodID 	PwrtObjid_cid;
-  pwr_tObjid 	objid;
-  pwr_tObjid	child_objid;
-  jclass 	cdhrObjid_id;
-  static jmethodID 	cdhrObjid_cid;
-  jobject 	child_objid_obj = NULL;
-  jint 		oix, vid;
-  jobject 	return_obj;
-  jint 		jsts;
-
-  cdhrObjid_id = (*env)->FindClass( env, "jpwr/rt/CdhrObjid");
-  if(cdhrObjid_cid == NULL)
-  {
-    cdhrObjid_cid = (*env)->GetMethodID( env, cdhrObjid_id,
-    	  "<init>", "(Ljpwr/rt/PwrtObjid;I)V");
-  }
-
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-
-  if(PwrtObjid_cid == NULL || PwrtObjid_getOix == NULL || PwrtObjid_getVid == NULL)
-  {
-    PwrtObjid_cid = (*env)->GetMethodID( env, PwrtObjid_id,
-    	  "<init>", "(II)V");
-    PwrtObjid_getOix = (*env)->GetMethodID( env, PwrtObjid_id, "getOix", "()I");
-    PwrtObjid_getVid = (*env)->GetMethodID( env, PwrtObjid_id, "getVid", "()I");
-  }
-
-  objid.oix = (*env)->CallIntMethod( env, objid_obj, PwrtObjid_getOix);
-  objid.vid = (*env)->CallIntMethod( env, objid_obj, PwrtObjid_getVid);
-
-  sts = gdh_GetChild( objid, &child_objid);
-  if ( ODD(sts))
-  {
-    oix = (jint) child_objid.oix;
-    vid = (jint) child_objid.vid;
-    child_objid_obj = (*env)->NewObject( env, PwrtObjid_id, PwrtObjid_cid,
-    	oix, vid);
-  }
-
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrObjid_id,
-  	cdhrObjid_cid, child_objid_obj, jsts);
-  return return_obj;
-}
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getParent
-  (JNIEnv *env, jclass obj, jobject objid_obj)
-{
-  int		sts;
-  jclass 	PwrtObjid_id;
-  static jmethodID 	PwrtObjid_getOix;
-  static jmethodID 	PwrtObjid_getVid;
-  static jmethodID 	PwrtObjid_cid;
-  pwr_tObjid 	objid;
-  pwr_tObjid	parent_objid;
-  jclass 	cdhrObjid_id;
-  static jmethodID 	cdhrObjid_cid;
-  jobject 	parent_objid_obj = NULL;
-  jint 		oix, vid;
-  jobject 	return_obj;
-  jint 		jsts;
-
-  cdhrObjid_id = (*env)->FindClass( env, "jpwr/rt/CdhrObjid");
-  if(cdhrObjid_cid == NULL)
-  {
-    cdhrObjid_cid = (*env)->GetMethodID( env, cdhrObjid_id,
-    	  "<init>", "(Ljpwr/rt/PwrtObjid;I)V");
-    //printf("cdhrObjid initierad\n");
-  }
-
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-
-  if(PwrtObjid_cid == NULL || PwrtObjid_getOix == NULL || PwrtObjid_getVid == NULL)
-  {
-    PwrtObjid_cid = (*env)->GetMethodID( env, PwrtObjid_id,
-    	  "<init>", "(II)V");
-    PwrtObjid_getOix = (*env)->GetMethodID( env, PwrtObjid_id, "getOix", "()I");
-    PwrtObjid_getVid = (*env)->GetMethodID( env, PwrtObjid_id, "getVid", "()I");
-    //printf("PwrtObjid_yyy initierade\n");
-  }
-
-  objid.oix = (*env)->CallIntMethod( env, objid_obj, PwrtObjid_getOix);
-  objid.vid = (*env)->CallIntMethod( env, objid_obj, PwrtObjid_getVid);
-
-  sts = gdh_GetParent( objid, &parent_objid);
-  if ( ODD(sts))
-  {
-    oix = (jint) parent_objid.oix;
-    vid = (jint) parent_objid.vid;
-    parent_objid_obj = (*env)->NewObject( env, PwrtObjid_id, PwrtObjid_cid,
-    	oix, vid);
-  }
-
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrObjid_id,
-  	cdhrObjid_cid, parent_objid_obj, jsts);
-  return return_obj;
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getNextObject
-  (JNIEnv *env, jclass obj, jobject objid_obj)
-{
-  int		sts;
-  jclass 	PwrtObjid_id;
-  jmethodID 	PwrtObjid_getOix;
-  jmethodID 	PwrtObjid_getVid;
-  jmethodID 	PwrtObjid_cid;
-  pwr_tObjid 	objid;
-  pwr_tObjid	next_objid;
-  jclass 	cdhrObjid_id;
-  jmethodID 	cdhrObjid_cid;
-  jobject 	next_objid_obj = NULL;
-  jint 		oix, vid;
-  jobject 	return_obj;
-  jint 		jsts;
-
-  cdhrObjid_id = (*env)->FindClass( env, "jpwr/rt/CdhrObjid");
-  cdhrObjid_cid = (*env)->GetMethodID( env, cdhrObjid_id,
-    	"<init>", "(Ljpwr/rt/PwrtObjid;I)V");
-
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  PwrtObjid_cid = (*env)->GetMethodID( env, PwrtObjid_id,
-    	"<init>", "(II)V");
-  PwrtObjid_getOix = (*env)->GetMethodID( env, PwrtObjid_id, "getOix", "()I");
-  PwrtObjid_getVid = (*env)->GetMethodID( env, PwrtObjid_id, "getVid", "()I");
-
-  objid.oix = (*env)->CallIntMethod( env, objid_obj, PwrtObjid_getOix);
-  objid.vid = (*env)->CallIntMethod( env, objid_obj, PwrtObjid_getVid);
-
-  sts = gdh_GetNextObject( objid, &next_objid);
-  if ( ODD(sts))
-  {
-    oix = (jint) next_objid.oix;
-    vid = (jint) next_objid.vid;
-    next_objid_obj = (*env)->NewObject( env, PwrtObjid_id, PwrtObjid_cid,
-    	oix, vid);
-  }
-
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrObjid_id,
-  	cdhrObjid_cid, next_objid_obj, jsts);
-  return return_obj;
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getNextSibling
-  (JNIEnv *env, jclass obj, jobject objid_obj)
-{
-  int		sts;
-  jclass 	PwrtObjid_id;
-  jmethodID 	PwrtObjid_getOix;
-  jmethodID 	PwrtObjid_getVid;
-  jmethodID 	PwrtObjid_cid;
-  pwr_tObjid 	objid;
-  pwr_tObjid	next_objid;
-  jclass 	cdhrObjid_id;
-  jmethodID 	cdhrObjid_cid;
-  jobject 	next_objid_obj = NULL;
-  jint 		oix, vid;
-  jobject 	return_obj;
-  jint 		jsts;
-
-  cdhrObjid_id = (*env)->FindClass( env, "jpwr/rt/CdhrObjid");
-  cdhrObjid_cid = (*env)->GetMethodID( env, cdhrObjid_id,
-    	"<init>", "(Ljpwr/rt/PwrtObjid;I)V");
-
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  PwrtObjid_cid = (*env)->GetMethodID( env, PwrtObjid_id,
-    	"<init>", "(II)V");
-  PwrtObjid_getOix = (*env)->GetMethodID( env, PwrtObjid_id, "getOix", "()I");
-  PwrtObjid_getVid = (*env)->GetMethodID( env, PwrtObjid_id, "getVid", "()I");
-
-  objid.oix = (*env)->CallIntMethod( env, objid_obj, PwrtObjid_getOix);
-  objid.vid = (*env)->CallIntMethod( env, objid_obj, PwrtObjid_getVid);
-
-  sts = gdh_GetNextSibling( objid, &next_objid);
-  if ( ODD(sts))
-  {
-    oix = (jint) next_objid.oix;
-    vid = (jint) next_objid.vid;
-    next_objid_obj = (*env)->NewObject( env, PwrtObjid_id, PwrtObjid_cid,
-    	oix, vid);
-  }
-
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrObjid_id,
-  	cdhrObjid_cid, next_objid_obj, jsts);
-  return return_obj;
-
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectClass
-  (JNIEnv *env, jclass obj, jobject objid_obj)
-{
-  int		sts;
-  jclass 	pwrtObjid_id;
-  static jmethodID 	pwrtObjid_getOix = NULL;
-  static jmethodID 	pwrtObjid_getVid = NULL;
-  static jmethodID 	pwrtObjid_cid = NULL;
-  pwr_tObjid 	objid;
-  jclass 	cdhrClassId_id;
-  static jmethodID 	cdhrClassId_cid;
-  jint	 	jclassid = 0;
-  jobject 	return_obj;
-  jint 		jsts;
-  pwr_tClassId	classid;
-
-  cdhrClassId_id = (*env)->FindClass( env, "jpwr/rt/CdhrClassId");
-  if(cdhrClassId_cid == NULL)
-  {
-    cdhrClassId_cid = (*env)->GetMethodID( env, cdhrClassId_id,
-    	  "<init>", "(II)V");
-    //printf("cdhrClassId_cid initierad\n");
-  }
-
-  pwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  if(pwrtObjid_cid == NULL || pwrtObjid_getOix == NULL || pwrtObjid_getVid == NULL)
-  {
-    pwrtObjid_cid = (*env)->GetMethodID( env, pwrtObjid_id,
-    	  "<init>", "(II)V");
-    pwrtObjid_getOix = (*env)->GetMethodID( env, pwrtObjid_id, "getOix", "()I");
-    pwrtObjid_getVid = (*env)->GetMethodID( env, pwrtObjid_id, "getVid", "()I");
-    //printf("pwrtObjid_yyy initierade\n");
-  }
-
-  objid.oix = (*env)->CallIntMethod( env, objid_obj, pwrtObjid_getOix);
-  objid.vid = (*env)->CallIntMethod( env, objid_obj, pwrtObjid_getVid);
-
-  sts = gdh_GetObjectClass( objid, &classid);
-  if ( ODD(sts))
-  {
-    jclassid = (jint)classid;
-  }
-
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrClassId_id,
-  	cdhrClassId_cid, jclassid, jsts);
-  return return_obj;
-
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getAttrRefTid
-  (JNIEnv *env, jclass obj, jobject aref_obj)
-{
-  int		sts;
-  jclass 	pwrtAttrRef_id;
-  static jmethodID 	pwrtAttrRef_getOix = NULL;
-  static jmethodID 	pwrtAttrRef_getVid = NULL;
-  static jmethodID 	pwrtAttrRef_getBody = NULL;
-  static jmethodID 	pwrtAttrRef_getOffset = NULL;
-  static jmethodID 	pwrtAttrRef_getSize = NULL;
-  static jmethodID 	pwrtAttrRef_getFlags = NULL;
-  pwr_tAttrRef 	aref;
-  jclass 	cdhrTypeId_id;
-  static jmethodID 	cdhrTypeId_cid;
-  jint	 	jtypeid = 0;
-  jobject 	return_obj;
-  jint 		jsts;
-  pwr_tTid	tid;
-
-  cdhrTypeId_id = (*env)->FindClass( env, "jpwr/rt/CdhrTypeId");
-  if(cdhrTypeId_cid == NULL)
-  {
-    cdhrTypeId_cid = (*env)->GetMethodID( env, cdhrTypeId_id,
-    	  "<init>", "(II)V");
-  }
-
-  pwrtAttrRef_id = (*env)->FindClass( env, "jpwr/rt/PwrtAttrRef");
-  if( pwrtAttrRef_getOix == NULL || pwrtAttrRef_getVid == NULL) {
-    pwrtAttrRef_getOix = (*env)->GetMethodID( env, pwrtAttrRef_id, "getOix", "()I");
-    pwrtAttrRef_getVid = (*env)->GetMethodID( env, pwrtAttrRef_id, "getVid", "()I");
-    pwrtAttrRef_getBody = (*env)->GetMethodID( env, pwrtAttrRef_id, "getBody", "()I");
-    pwrtAttrRef_getOffset = (*env)->GetMethodID( env, pwrtAttrRef_id, "getOffset", "()I");
-    pwrtAttrRef_getSize = (*env)->GetMethodID( env, pwrtAttrRef_id, "getSize", "()I");
-    pwrtAttrRef_getFlags = (*env)->GetMethodID( env, pwrtAttrRef_id, "getFlags", "()I");
-  }
-
-  aref.Objid.oix = (*env)->CallIntMethod( env, aref_obj, pwrtAttrRef_getOix);
-  aref.Objid.vid = (*env)->CallIntMethod( env, aref_obj, pwrtAttrRef_getVid);
-  aref.Body = (*env)->CallIntMethod( env, aref_obj, pwrtAttrRef_getBody);
-  aref.Offset = (*env)->CallIntMethod( env, aref_obj, pwrtAttrRef_getOffset);
-  aref.Size = (*env)->CallIntMethod( env, aref_obj, pwrtAttrRef_getSize);
-  aref.Flags.m = (*env)->CallIntMethod( env, aref_obj, pwrtAttrRef_getFlags);
-
-  sts = gdh_GetAttrRefTid( &aref, &tid);
-  if ( ODD(sts)) {
-    jtypeid = (jint)tid;
-  }
-  //printf( "GetAttrRefTid %d\n", tid);
-
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrTypeId_id,
-  	cdhrTypeId_cid, jtypeid, jsts);
-  return return_obj;
-
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getClassList
-  (JNIEnv *env, jclass obj, jint jclassid)
-{
-  int		sts;
-  jclass 	pwrtObjid_id;
-  jmethodID 	pwrtObjid_cid;
-  pwr_tObjid 	objid;
-  jclass 	cdhrObjid_id;
-  jmethodID 	cdhrObjid_cid;
-  jobject 	objid_obj = NULL;
-  jobject 	return_obj;
-  jint 		jsts;
-  pwr_tClassId	classid;
-  jint 		oix, vid;
-
-
-  cdhrObjid_id = (*env)->FindClass( env, "jpwr/rt/CdhrObjid");
-  cdhrObjid_cid = (*env)->GetMethodID( env, cdhrObjid_id,
-    	"<init>", "(Ljpwr/rt/PwrtObjid;I)V");
-
-  pwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  pwrtObjid_cid = (*env)->GetMethodID( env, pwrtObjid_id,
-    	"<init>", "(II)V");
-
-  classid = (pwr_tClassId)jclassid;
-
-  sts = gdh_GetClassList( classid, &objid);
-  if ( ODD(sts))
-  {
-    oix = (jint) objid.oix;
-    vid = (jint) objid.vid;
-    objid_obj = (*env)->NewObject( env, pwrtObjid_id, pwrtObjid_cid,
-    	oix, vid);
-  }
-
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrObjid_id,
-  	cdhrObjid_cid, objid_obj, jsts);
-  return return_obj;
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_classNameToId
-  (JNIEnv *env, jclass obj, jstring name)
-{
-  int		sts;
-  jclass 	cdhrClassId_id;
-  static jmethodID 	cdhrClassId_cid;
-  jint	 	jclassid = 0;
-  jobject 	return_obj;
-  jint 		jsts;
-  pwr_tClassId	classid;
-  const char *str;
-  char *cstr;
-
-  cdhrClassId_id = (*env)->FindClass( env, "jpwr/rt/CdhrClassId");
-  if(cdhrClassId_cid == NULL)
-  {
-    cdhrClassId_cid = (*env)->GetMethodID( env, cdhrClassId_id,
-    	  "<init>", "(II)V");
-  }
-
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-
-  sts = gdh_ClassNameToId( cstr, &classid);
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
-  if ( ODD(sts)) {
-    jclassid = (jint)classid;
-  }
-
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrClassId_id,
-  	cdhrClassId_cid, jclassid, jsts);
-  return return_obj;
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_classIdToObjid
-  (JNIEnv *env, jclass obj, jint jclassid)
-{
-  jclass 	pwrtObjid_id;
-  jmethodID 	pwrtObjid_cid;
-  pwr_tObjid 	objid;
-  jclass 	cdhrObjid_id;
-  jmethodID 	cdhrObjid_cid;
-  jobject 	objid_obj = NULL;
-  jobject 	return_obj;
-  jint 		jsts;
-  pwr_tClassId	classid;
-  jint 		oix, vid;
-
-
-  cdhrObjid_id = (*env)->FindClass( env, "jpwr/rt/CdhrObjid");
-  cdhrObjid_cid = (*env)->GetMethodID( env, cdhrObjid_id,
-    	"<init>", "(Ljpwr/rt/PwrtObjid;I)V");
-
-  pwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  pwrtObjid_cid = (*env)->GetMethodID( env, pwrtObjid_id,
-    	"<init>", "(II)V");
-
-  classid = (pwr_tClassId)jclassid;
-
-  objid = cdh_ClassIdToObjid( classid);
-  oix = (jint) objid.oix;
-  vid = (jint) objid.vid;
-  objid_obj = (*env)->NewObject( env, pwrtObjid_id, pwrtObjid_cid,
-    	oix, vid);
-
-  jsts = (jint) CDH__SUCCESS;
-  return_obj = (*env)->NewObject( env, cdhrObjid_id,
-  	cdhrObjid_cid, objid_obj, jsts);
-  return return_obj;
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoBoolean
-  (JNIEnv *env, jclass obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_objidToName(JNIEnv* env, jclass obj, jobject objid_obj,
+                                                       jint nameType)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  pwr_tOName name;
+  pwr_tObjid objid;
+  jclass cdhrString_id;
+  static jmethodID cdhrString_cid = NULL;
+  jobject return_obj;
+  jint jsts;
+  jclass PwrtObjid_id;
+  static jmethodID PwrtObjid_getOix = NULL;
+  static jmethodID PwrtObjid_getVid = NULL;
+  jstring jname = NULL;
+
+  cdhrString_id = (*env)->FindClass(env, "jpwr/rt/CdhrString");
+  if (cdhrString_cid == NULL)
+  {
+    cdhrString_cid = (*env)->GetMethodID(env, cdhrString_id, "<init>", "(Ljava/lang/String;I)V");
+  }
+
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  if (PwrtObjid_getOix == NULL || PwrtObjid_getVid == NULL)
+  {
+    PwrtObjid_getOix = (*env)->GetMethodID(env, PwrtObjid_id, "getOix", "()I");
+    PwrtObjid_getVid = (*env)->GetMethodID(env, PwrtObjid_id, "getVid", "()I");
+  }
+
+  objid.oix = (*env)->CallIntMethod(env, objid_obj, PwrtObjid_getOix);
+  objid.vid = (*env)->CallIntMethod(env, objid_obj, PwrtObjid_getVid);
+
+  sts = gdh_ObjidToName(objid, name, sizeof(name), nameType);
+
+  if (ODD(sts))
+    jname = (*env)->NewStringUTF(env, name);
+
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrString_id, cdhrString_cid, jname, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_attrRefToName(JNIEnv* env, jclass obj, jobject aref_obj,
+                                                         jint nameType)
+{
+  int sts;
+  pwr_tOName name;
+  pwr_tAttrRef aref;
+  jclass cdhrString_id;
+  static jmethodID cdhrString_cid = NULL;
+  jobject return_obj;
+  jint jsts;
+  jclass PwrtAttrRef_id;
+  static jmethodID PwrtAttrRef_getOix = NULL;
+  static jmethodID PwrtAttrRef_getVid = NULL;
+  static jmethodID PwrtAttrRef_getBody = NULL;
+  static jmethodID PwrtAttrRef_getOffset = NULL;
+  static jmethodID PwrtAttrRef_getSize = NULL;
+  static jmethodID PwrtAttrRef_getFlags = NULL;
+  jstring jname = NULL;
+
+  cdhrString_id = (*env)->FindClass(env, "jpwr/rt/CdhrString");
+  if (cdhrString_cid == NULL)
+  {
+    cdhrString_cid = (*env)->GetMethodID(env, cdhrString_id, "<init>", "(Ljava/lang/String;I)V");
+  }
+
+  PwrtAttrRef_id = (*env)->FindClass(env, "jpwr/rt/PwrtAttrRef");
+  if (PwrtAttrRef_getOix == NULL || PwrtAttrRef_getVid == NULL)
+  {
+    PwrtAttrRef_getOix = (*env)->GetMethodID(env, PwrtAttrRef_id, "getOix", "()I");
+    PwrtAttrRef_getVid = (*env)->GetMethodID(env, PwrtAttrRef_id, "getVid", "()I");
+    PwrtAttrRef_getBody = (*env)->GetMethodID(env, PwrtAttrRef_id, "getBody", "()I");
+    PwrtAttrRef_getOffset = (*env)->GetMethodID(env, PwrtAttrRef_id, "getOffset", "()I");
+    PwrtAttrRef_getSize = (*env)->GetMethodID(env, PwrtAttrRef_id, "getSize", "()I");
+    PwrtAttrRef_getFlags = (*env)->GetMethodID(env, PwrtAttrRef_id, "getFlags", "()I");
+  }
+
+  aref.Objid.oix = (*env)->CallIntMethod(env, aref_obj, PwrtAttrRef_getOix);
+  aref.Objid.vid = (*env)->CallIntMethod(env, aref_obj, PwrtAttrRef_getVid);
+  aref.Body = (*env)->CallIntMethod(env, aref_obj, PwrtAttrRef_getBody);
+  aref.Offset = (*env)->CallIntMethod(env, aref_obj, PwrtAttrRef_getOffset);
+  aref.Size = (*env)->CallIntMethod(env, aref_obj, PwrtAttrRef_getSize);
+  aref.Flags.m = (*env)->CallIntMethod(env, aref_obj, PwrtAttrRef_getFlags);
+
+  sts = gdh_AttrrefToName(&aref, name, sizeof(name), nameType);
+
+  if (ODD(sts))
+    jname = (*env)->NewStringUTF(env, name);
+
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrString_id, cdhrString_cid, jname, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getRootList(JNIEnv* env, jclass obj)
+{
+  int sts;
+  jclass PwrtObjid_id;
+  jmethodID PwrtObjid_cid;
+  pwr_tObjid objid;
+  jclass cdhrObjid_id;
+  jmethodID cdhrObjid_cid;
+  jobject objid_obj = NULL;
+  jint oix, vid;
+  jobject return_obj;
+  jint jsts;
+
+  cdhrObjid_id = (*env)->FindClass(env, "jpwr/rt/CdhrObjid");
+  cdhrObjid_cid = (*env)->GetMethodID(env, cdhrObjid_id, "<init>", "(Ljpwr/rt/PwrtObjid;I)V");
+
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  PwrtObjid_cid = (*env)->GetMethodID(env, PwrtObjid_id, "<init>", "(II)V");
+
+  sts = gdh_GetRootList(&objid);
+  if (ODD(sts))
+  {
+    oix = (jint)objid.oix;
+    vid = (jint)objid.vid;
+    objid_obj = (*env)->NewObject(env, PwrtObjid_id, PwrtObjid_cid, oix, vid);
+  }
+
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrObjid_id, cdhrObjid_cid, objid_obj, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getChild(JNIEnv* env, jclass obj, jobject objid_obj)
+{
+  int sts;
+  jclass PwrtObjid_id;
+  static jmethodID PwrtObjid_getOix;
+  static jmethodID PwrtObjid_getVid;
+  static jmethodID PwrtObjid_cid;
+  pwr_tObjid objid;
+  pwr_tObjid child_objid;
+  jclass cdhrObjid_id;
+  static jmethodID cdhrObjid_cid;
+  jobject child_objid_obj = NULL;
+  jint oix, vid;
+  jobject return_obj;
+  jint jsts;
+
+  cdhrObjid_id = (*env)->FindClass(env, "jpwr/rt/CdhrObjid");
+  if (cdhrObjid_cid == NULL)
+  {
+    cdhrObjid_cid = (*env)->GetMethodID(env, cdhrObjid_id, "<init>", "(Ljpwr/rt/PwrtObjid;I)V");
+  }
+
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+
+  if (PwrtObjid_cid == NULL || PwrtObjid_getOix == NULL || PwrtObjid_getVid == NULL)
+  {
+    PwrtObjid_cid = (*env)->GetMethodID(env, PwrtObjid_id, "<init>", "(II)V");
+    PwrtObjid_getOix = (*env)->GetMethodID(env, PwrtObjid_id, "getOix", "()I");
+    PwrtObjid_getVid = (*env)->GetMethodID(env, PwrtObjid_id, "getVid", "()I");
+  }
+
+  objid.oix = (*env)->CallIntMethod(env, objid_obj, PwrtObjid_getOix);
+  objid.vid = (*env)->CallIntMethod(env, objid_obj, PwrtObjid_getVid);
+
+  sts = gdh_GetChild(objid, &child_objid);
+  if (ODD(sts))
+  {
+    oix = (jint)child_objid.oix;
+    vid = (jint)child_objid.vid;
+    child_objid_obj = (*env)->NewObject(env, PwrtObjid_id, PwrtObjid_cid, oix, vid);
+  }
+
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrObjid_id, cdhrObjid_cid, child_objid_obj, jsts);
+  return return_obj;
+}
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getParent(JNIEnv* env, jclass obj, jobject objid_obj)
+{
+  int sts;
+  jclass PwrtObjid_id;
+  static jmethodID PwrtObjid_getOix;
+  static jmethodID PwrtObjid_getVid;
+  static jmethodID PwrtObjid_cid;
+  pwr_tObjid objid;
+  pwr_tObjid parent_objid;
+  jclass cdhrObjid_id;
+  static jmethodID cdhrObjid_cid;
+  jobject parent_objid_obj = NULL;
+  jint oix, vid;
+  jobject return_obj;
+  jint jsts;
+
+  cdhrObjid_id = (*env)->FindClass(env, "jpwr/rt/CdhrObjid");
+  if (cdhrObjid_cid == NULL)
+  {
+    cdhrObjid_cid = (*env)->GetMethodID(env, cdhrObjid_id, "<init>", "(Ljpwr/rt/PwrtObjid;I)V");
+    // printf("cdhrObjid initierad\n");
+  }
+
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+
+  if (PwrtObjid_cid == NULL || PwrtObjid_getOix == NULL || PwrtObjid_getVid == NULL)
+  {
+    PwrtObjid_cid = (*env)->GetMethodID(env, PwrtObjid_id, "<init>", "(II)V");
+    PwrtObjid_getOix = (*env)->GetMethodID(env, PwrtObjid_id, "getOix", "()I");
+    PwrtObjid_getVid = (*env)->GetMethodID(env, PwrtObjid_id, "getVid", "()I");
+    // printf("PwrtObjid_yyy initierade\n");
+  }
+
+  objid.oix = (*env)->CallIntMethod(env, objid_obj, PwrtObjid_getOix);
+  objid.vid = (*env)->CallIntMethod(env, objid_obj, PwrtObjid_getVid);
+
+  sts = gdh_GetParent(objid, &parent_objid);
+  if (ODD(sts))
+  {
+    oix = (jint)parent_objid.oix;
+    vid = (jint)parent_objid.vid;
+    parent_objid_obj = (*env)->NewObject(env, PwrtObjid_id, PwrtObjid_cid, oix, vid);
+  }
+
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrObjid_id, cdhrObjid_cid, parent_objid_obj, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getNextObject(JNIEnv* env, jclass obj, jobject objid_obj)
+{
+  int sts;
+  jclass PwrtObjid_id;
+  jmethodID PwrtObjid_getOix;
+  jmethodID PwrtObjid_getVid;
+  jmethodID PwrtObjid_cid;
+  pwr_tObjid objid;
+  pwr_tObjid next_objid;
+  jclass cdhrObjid_id;
+  jmethodID cdhrObjid_cid;
+  jobject next_objid_obj = NULL;
+  jint oix, vid;
+  jobject return_obj;
+  jint jsts;
+
+  cdhrObjid_id = (*env)->FindClass(env, "jpwr/rt/CdhrObjid");
+  cdhrObjid_cid = (*env)->GetMethodID(env, cdhrObjid_id, "<init>", "(Ljpwr/rt/PwrtObjid;I)V");
+
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  PwrtObjid_cid = (*env)->GetMethodID(env, PwrtObjid_id, "<init>", "(II)V");
+  PwrtObjid_getOix = (*env)->GetMethodID(env, PwrtObjid_id, "getOix", "()I");
+  PwrtObjid_getVid = (*env)->GetMethodID(env, PwrtObjid_id, "getVid", "()I");
+
+  objid.oix = (*env)->CallIntMethod(env, objid_obj, PwrtObjid_getOix);
+  objid.vid = (*env)->CallIntMethod(env, objid_obj, PwrtObjid_getVid);
+
+  sts = gdh_GetNextObject(objid, &next_objid);
+  if (ODD(sts))
+  {
+    oix = (jint)next_objid.oix;
+    vid = (jint)next_objid.vid;
+    next_objid_obj = (*env)->NewObject(env, PwrtObjid_id, PwrtObjid_cid, oix, vid);
+  }
+
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrObjid_id, cdhrObjid_cid, next_objid_obj, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getNextSibling(JNIEnv* env, jclass obj, jobject objid_obj)
+{
+  int sts;
+  jclass PwrtObjid_id;
+  jmethodID PwrtObjid_getOix;
+  jmethodID PwrtObjid_getVid;
+  jmethodID PwrtObjid_cid;
+  pwr_tObjid objid;
+  pwr_tObjid next_objid;
+  jclass cdhrObjid_id;
+  jmethodID cdhrObjid_cid;
+  jobject next_objid_obj = NULL;
+  jint oix, vid;
+  jobject return_obj;
+  jint jsts;
+
+  cdhrObjid_id = (*env)->FindClass(env, "jpwr/rt/CdhrObjid");
+  cdhrObjid_cid = (*env)->GetMethodID(env, cdhrObjid_id, "<init>", "(Ljpwr/rt/PwrtObjid;I)V");
+
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  PwrtObjid_cid = (*env)->GetMethodID(env, PwrtObjid_id, "<init>", "(II)V");
+  PwrtObjid_getOix = (*env)->GetMethodID(env, PwrtObjid_id, "getOix", "()I");
+  PwrtObjid_getVid = (*env)->GetMethodID(env, PwrtObjid_id, "getVid", "()I");
+
+  objid.oix = (*env)->CallIntMethod(env, objid_obj, PwrtObjid_getOix);
+  objid.vid = (*env)->CallIntMethod(env, objid_obj, PwrtObjid_getVid);
+
+  sts = gdh_GetNextSibling(objid, &next_objid);
+  if (ODD(sts))
+  {
+    oix = (jint)next_objid.oix;
+    vid = (jint)next_objid.vid;
+    next_objid_obj = (*env)->NewObject(env, PwrtObjid_id, PwrtObjid_cid, oix, vid);
+  }
+
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrObjid_id, cdhrObjid_cid, next_objid_obj, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectClass(JNIEnv* env, jclass obj, jobject objid_obj)
+{
+  int sts;
+  jclass pwrtObjid_id;
+  static jmethodID pwrtObjid_getOix = NULL;
+  static jmethodID pwrtObjid_getVid = NULL;
+  static jmethodID pwrtObjid_cid = NULL;
+  pwr_tObjid objid;
+  jclass cdhrClassId_id;
+  static jmethodID cdhrClassId_cid;
+  jint jclassid = 0;
+  jobject return_obj;
+  jint jsts;
+  pwr_tClassId classid;
+
+  cdhrClassId_id = (*env)->FindClass(env, "jpwr/rt/CdhrClassId");
+  if (cdhrClassId_cid == NULL)
+  {
+    cdhrClassId_cid = (*env)->GetMethodID(env, cdhrClassId_id, "<init>", "(II)V");
+    // printf("cdhrClassId_cid initierad\n");
+  }
+
+  pwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  if (pwrtObjid_cid == NULL || pwrtObjid_getOix == NULL || pwrtObjid_getVid == NULL)
+  {
+    pwrtObjid_cid = (*env)->GetMethodID(env, pwrtObjid_id, "<init>", "(II)V");
+    pwrtObjid_getOix = (*env)->GetMethodID(env, pwrtObjid_id, "getOix", "()I");
+    pwrtObjid_getVid = (*env)->GetMethodID(env, pwrtObjid_id, "getVid", "()I");
+    // printf("pwrtObjid_yyy initierade\n");
+  }
+
+  objid.oix = (*env)->CallIntMethod(env, objid_obj, pwrtObjid_getOix);
+  objid.vid = (*env)->CallIntMethod(env, objid_obj, pwrtObjid_getVid);
+
+  sts = gdh_GetObjectClass(objid, &classid);
+  if (ODD(sts))
+  {
+    jclassid = (jint)classid;
+  }
+
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrClassId_id, cdhrClassId_cid, jclassid, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getAttrRefTid(JNIEnv* env, jclass obj, jobject aref_obj)
+{
+  int sts;
+  jclass pwrtAttrRef_id;
+  static jmethodID pwrtAttrRef_getOix = NULL;
+  static jmethodID pwrtAttrRef_getVid = NULL;
+  static jmethodID pwrtAttrRef_getBody = NULL;
+  static jmethodID pwrtAttrRef_getOffset = NULL;
+  static jmethodID pwrtAttrRef_getSize = NULL;
+  static jmethodID pwrtAttrRef_getFlags = NULL;
+  pwr_tAttrRef aref;
+  jclass cdhrTypeId_id;
+  static jmethodID cdhrTypeId_cid;
+  jint jtypeid = 0;
+  jobject return_obj;
+  jint jsts;
+  pwr_tTid tid;
+
+  cdhrTypeId_id = (*env)->FindClass(env, "jpwr/rt/CdhrTypeId");
+  if (cdhrTypeId_cid == NULL)
+  {
+    cdhrTypeId_cid = (*env)->GetMethodID(env, cdhrTypeId_id, "<init>", "(II)V");
+  }
+
+  pwrtAttrRef_id = (*env)->FindClass(env, "jpwr/rt/PwrtAttrRef");
+  if (pwrtAttrRef_getOix == NULL || pwrtAttrRef_getVid == NULL)
+  {
+    pwrtAttrRef_getOix = (*env)->GetMethodID(env, pwrtAttrRef_id, "getOix", "()I");
+    pwrtAttrRef_getVid = (*env)->GetMethodID(env, pwrtAttrRef_id, "getVid", "()I");
+    pwrtAttrRef_getBody = (*env)->GetMethodID(env, pwrtAttrRef_id, "getBody", "()I");
+    pwrtAttrRef_getOffset = (*env)->GetMethodID(env, pwrtAttrRef_id, "getOffset", "()I");
+    pwrtAttrRef_getSize = (*env)->GetMethodID(env, pwrtAttrRef_id, "getSize", "()I");
+    pwrtAttrRef_getFlags = (*env)->GetMethodID(env, pwrtAttrRef_id, "getFlags", "()I");
+  }
+
+  aref.Objid.oix = (*env)->CallIntMethod(env, aref_obj, pwrtAttrRef_getOix);
+  aref.Objid.vid = (*env)->CallIntMethod(env, aref_obj, pwrtAttrRef_getVid);
+  aref.Body = (*env)->CallIntMethod(env, aref_obj, pwrtAttrRef_getBody);
+  aref.Offset = (*env)->CallIntMethod(env, aref_obj, pwrtAttrRef_getOffset);
+  aref.Size = (*env)->CallIntMethod(env, aref_obj, pwrtAttrRef_getSize);
+  aref.Flags.m = (*env)->CallIntMethod(env, aref_obj, pwrtAttrRef_getFlags);
+
+  sts = gdh_GetAttrRefTid(&aref, &tid);
+  if (ODD(sts))
+  {
+    jtypeid = (jint)tid;
+  }
+  // printf( "GetAttrRefTid %d\n", tid);
+
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrTypeId_id, cdhrTypeId_cid, jtypeid, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getClassList(JNIEnv* env, jclass obj, jint jclassid)
+{
+  int sts;
+  jclass pwrtObjid_id;
+  jmethodID pwrtObjid_cid;
+  pwr_tObjid objid;
+  jclass cdhrObjid_id;
+  jmethodID cdhrObjid_cid;
+  jobject objid_obj = NULL;
+  jobject return_obj;
+  jint jsts;
+  pwr_tClassId classid;
+  jint oix, vid;
+
+  cdhrObjid_id = (*env)->FindClass(env, "jpwr/rt/CdhrObjid");
+  cdhrObjid_cid = (*env)->GetMethodID(env, cdhrObjid_id, "<init>", "(Ljpwr/rt/PwrtObjid;I)V");
+
+  pwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  pwrtObjid_cid = (*env)->GetMethodID(env, pwrtObjid_id, "<init>", "(II)V");
+
+  classid = (pwr_tClassId)jclassid;
+
+  sts = gdh_GetClassList(classid, &objid);
+  if (ODD(sts))
+  {
+    oix = (jint)objid.oix;
+    vid = (jint)objid.vid;
+    objid_obj = (*env)->NewObject(env, pwrtObjid_id, pwrtObjid_cid, oix, vid);
+  }
+
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrObjid_id, cdhrObjid_cid, objid_obj, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_classNameToId(JNIEnv* env, jclass obj, jstring name)
+{
+  int sts;
+  jclass cdhrClassId_id;
+  static jmethodID cdhrClassId_cid;
+  jint jclassid = 0;
+  jobject return_obj;
+  jint jsts;
+  pwr_tClassId classid;
+  const char* str;
+  char* cstr;
+
+  cdhrClassId_id = (*env)->FindClass(env, "jpwr/rt/CdhrClassId");
+  if (cdhrClassId_cid == NULL)
+  {
+    cdhrClassId_cid = (*env)->GetMethodID(env, cdhrClassId_id, "<init>", "(II)V");
+  }
+
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+
+  sts = gdh_ClassNameToId(cstr, &classid);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
+  if (ODD(sts))
+  {
+    jclassid = (jint)classid;
+  }
+
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrClassId_id, cdhrClassId_cid, jclassid, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_classIdToObjid(JNIEnv* env, jclass obj, jint jclassid)
+{
+  jclass pwrtObjid_id;
+  jmethodID pwrtObjid_cid;
+  pwr_tObjid objid;
+  jclass cdhrObjid_id;
+  jmethodID cdhrObjid_cid;
+  jobject objid_obj = NULL;
+  jobject return_obj;
+  jint jsts;
+  pwr_tClassId classid;
+  jint oix, vid;
+
+  cdhrObjid_id = (*env)->FindClass(env, "jpwr/rt/CdhrObjid");
+  cdhrObjid_cid = (*env)->GetMethodID(env, cdhrObjid_id, "<init>", "(Ljpwr/rt/PwrtObjid;I)V");
+
+  pwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  pwrtObjid_cid = (*env)->GetMethodID(env, pwrtObjid_id, "<init>", "(II)V");
+
+  classid = (pwr_tClassId)jclassid;
+
+  objid = cdh_ClassIdToObjid(classid);
+  oix = (jint)objid.oix;
+  vid = (jint)objid.vid;
+  objid_obj = (*env)->NewObject(env, pwrtObjid_id, pwrtObjid_cid, oix, vid);
+
+  jsts = (jint)CDH__SUCCESS;
+  return_obj = (*env)->NewObject(env, cdhrObjid_id, cdhrObjid_cid, objid_obj, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoBoolean(JNIEnv* env, jclass obj, jstring name)
+{
+  int sts;
+  const char* str;
+  char* cstr;
   jclass cdhrBoolean_id;
   jmethodID cdhrBoolean_cid;
   jobject return_obj;
   jint jsts;
   jboolean jvalue;
   pwr_tBoolean value;
-  char 		*s;
+  char* s;
 
-  cdhrBoolean_id = (*env)->FindClass( env, "jpwr/rt/CdhrBoolean");
-  cdhrBoolean_cid = (*env)->GetMethodID( env, cdhrBoolean_id,
-    	"<init>", "(ZI)V");
+  cdhrBoolean_id = (*env)->FindClass(env, "jpwr/rt/CdhrBoolean");
+  cdhrBoolean_cid = (*env)->GetMethodID(env, cdhrBoolean_id, "<init>", "(ZI)V");
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  if ( (s = (char *)strchr( cstr, '#')))
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  if ((s = (char*)strchr(cstr, '#')))
     *s = 0;
-  sts = gdh_GetObjectInfo( cstr, &value, sizeof(value));
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
+  sts = gdh_GetObjectInfo(cstr, &value, sizeof(value));
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  jsts = (jint) sts;
+  jsts = (jint)sts;
   jvalue = value;
-  return_obj = (*env)->NewObject( env, cdhrBoolean_id,
-  	cdhrBoolean_cid, jvalue, jsts);
+  return_obj = (*env)->NewObject(env, cdhrBoolean_id, cdhrBoolean_cid, jvalue, jsts);
   return return_obj;
 }
 
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoFloat
-  (JNIEnv *env, jclass obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoFloat(JNIEnv* env, jclass obj, jstring name)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
   jclass cdhrFloat_id;
   jmethodID cdhrFloat_cid;
   jobject return_obj;
   jint jsts;
   jfloat jvalue;
   pwr_tFloat32 value;
-  char 		*s;
+  char* s;
 
-  cdhrFloat_id = (*env)->FindClass( env, "jpwr/rt/CdhrFloat");
-  cdhrFloat_cid = (*env)->GetMethodID( env, cdhrFloat_id,
-    	"<init>", "(FI)V");
+  cdhrFloat_id = (*env)->FindClass(env, "jpwr/rt/CdhrFloat");
+  cdhrFloat_cid = (*env)->GetMethodID(env, cdhrFloat_id, "<init>", "(FI)V");
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  if ( (s = (char *)strchr( cstr, '#')))
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  if ((s = (char*)strchr(cstr, '#')))
     *s = 0;
-  sts = gdh_GetObjectInfo( cstr, &value, sizeof(value));
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
+  sts = gdh_GetObjectInfo(cstr, &value, sizeof(value));
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  jsts = (jint) sts;
+  jsts = (jint)sts;
   jvalue = value;
-  return_obj = (*env)->NewObject( env, cdhrFloat_id,
-  	cdhrFloat_cid, jvalue, jsts);
+  return_obj = (*env)->NewObject(env, cdhrFloat_id, cdhrFloat_cid, jvalue, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoFloatArray
-  (JNIEnv *env, jclass obj, jstring name, jint size)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoFloatArray(JNIEnv* env, jclass obj, jstring name,
+                                                                   jint size)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
   jclass cdhrFloatArray_id;
   jmethodID cdhrFloatArray_cid;
   jobject return_obj;
   jint jsts;
   jfloatArray jvalue = 0;
-  pwr_tFloat32 *value;
-  char 		*s;
+  pwr_tFloat32* value;
+  char* s;
 
-  cdhrFloatArray_id = (*env)->FindClass( env, "jpwr/rt/CdhrFloatArray");
-  cdhrFloatArray_cid = (*env)->GetMethodID( env, cdhrFloatArray_id,
-    	"<init>", "([FI)V");
+  cdhrFloatArray_id = (*env)->FindClass(env, "jpwr/rt/CdhrFloatArray");
+  cdhrFloatArray_cid = (*env)->GetMethodID(env, cdhrFloatArray_id, "<init>", "([FI)V");
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  if ( (s = (char *)strchr( cstr, '#')))
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  if ((s = (char*)strchr(cstr, '#')))
     *s = 0;
 
-  value = (pwr_tFloat32 *)calloc( size, sizeof(pwr_tFloat32));
-  sts = gdh_GetObjectInfo( cstr, value, size * 4);
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
+  value = (pwr_tFloat32*)calloc(size, sizeof(pwr_tFloat32));
+  sts = gdh_GetObjectInfo(cstr, value, size * 4);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  jsts = (jint) sts;
-  if ( ODD(sts)) {
-    jvalue = (*env)->NewFloatArray( env, size);
-    (*env)->SetFloatArrayRegion( env, jvalue, 0, (int)size, value);
+  jsts = (jint)sts;
+  if (ODD(sts))
+  {
+    jvalue = (*env)->NewFloatArray(env, size);
+    (*env)->SetFloatArrayRegion(env, jvalue, 0, (int)size, value);
   }
-  free( value);
+  free(value);
 
-  return_obj = (*env)->NewObject( env, cdhrFloatArray_id,
-  	cdhrFloatArray_cid, jvalue, jsts);
+  return_obj = (*env)->NewObject(env, cdhrFloatArray_id, cdhrFloatArray_cid, jvalue, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoInt
-  (JNIEnv *env, jclass obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoInt(JNIEnv* env, jclass obj, jstring name)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
   jclass cdhrInt_id;
   jmethodID cdhrInt_cid;
   jobject return_obj;
   jint jsts;
   jint jvalue;
   pwr_tInt32 value = 0;
-  char 		*s;
+  char* s;
 
-  cdhrInt_id = (*env)->FindClass( env, "jpwr/rt/CdhrInt");
-  cdhrInt_cid = (*env)->GetMethodID( env, cdhrInt_id,
-    	"<init>", "(II)V");
+  cdhrInt_id = (*env)->FindClass(env, "jpwr/rt/CdhrInt");
+  cdhrInt_cid = (*env)->GetMethodID(env, cdhrInt_id, "<init>", "(II)V");
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  if ( (s = (char *)strchr( cstr, '#')))
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  if ((s = (char*)strchr(cstr, '#')))
     *s = 0;
-  sts = gdh_GetObjectInfo( cstr, &value, sizeof(value));
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
+  sts = gdh_GetObjectInfo(cstr, &value, sizeof(value));
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  jsts = (jint) sts;
+  jsts = (jint)sts;
   jvalue = value;
-  return_obj = (*env)->NewObject( env, cdhrInt_id,
-  	cdhrInt_cid, jvalue, jsts);
+  return_obj = (*env)->NewObject(env, cdhrInt_id, cdhrInt_cid, jvalue, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoIntArray
-  (JNIEnv *env, jclass obj, jstring name, jint size)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoIntArray(JNIEnv* env, jclass obj, jstring name,
+                                                                 jint size)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
   jclass cdhrIntArray_id;
   jmethodID cdhrIntArray_cid;
   jobject return_obj;
   jint jsts;
   jintArray jvalue = 0;
-  pwr_tInt32 *value;
-  char 		*s;
+  pwr_tInt32* value;
+  char* s;
 
-  cdhrIntArray_id = (*env)->FindClass( env, "jpwr/rt/CdhrIntArray");
-  cdhrIntArray_cid = (*env)->GetMethodID( env, cdhrIntArray_id,
-    	"<init>", "([FI)V");
+  cdhrIntArray_id = (*env)->FindClass(env, "jpwr/rt/CdhrIntArray");
+  cdhrIntArray_cid = (*env)->GetMethodID(env, cdhrIntArray_id, "<init>", "([FI)V");
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  if ( (s = (char *)strchr( cstr, '#')))
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  if ((s = (char*)strchr(cstr, '#')))
     *s = 0;
 
-  value = (pwr_tInt32 *)calloc( size, sizeof(pwr_tInt32));
-  sts = gdh_GetObjectInfo( cstr, value, size * 4);
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
+  value = (pwr_tInt32*)calloc(size, sizeof(pwr_tInt32));
+  sts = gdh_GetObjectInfo(cstr, value, size * 4);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  jsts = (jint) sts;
-  if ( ODD(sts)) {
-    jvalue = (*env)->NewIntArray( env, size);
-    (*env)->SetIntArrayRegion( env, jvalue, 0, (int)size, value);
+  jsts = (jint)sts;
+  if (ODD(sts))
+  {
+    jvalue = (*env)->NewIntArray(env, size);
+    (*env)->SetIntArrayRegion(env, jvalue, 0, (int)size, value);
   }
-  free( value);
+  free(value);
 
-  return_obj = (*env)->NewObject( env, cdhrIntArray_id,
-  	cdhrIntArray_cid, jvalue, jsts);
+  return_obj = (*env)->NewObject(env, cdhrIntArray_id, cdhrIntArray_cid, jvalue, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoString
-  (JNIEnv *env, jclass obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoString(JNIEnv* env, jclass obj, jstring name)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
   jclass cdhrString_id;
   static jmethodID cdhrString_cid = NULL;
   jobject return_obj;
@@ -1510,52 +1420,51 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoString
   jstring jvalue = NULL;
   char buf[256];
   char value[256];
-  char *s;
+  char* s;
   pwr_sAttrRef attrref;
   int len;
   pwr_tTypeId a_type;
   unsigned int a_size, a_offs, a_dim;
 
-  cdhrString_id = (*env)->FindClass( env, "jpwr/rt/CdhrString");
-  if(cdhrString_cid == NULL)
+  cdhrString_id = (*env)->FindClass(env, "jpwr/rt/CdhrString");
+  if (cdhrString_cid == NULL)
   {
-    cdhrString_cid = (*env)->GetMethodID( env, cdhrString_id,
-    	"<init>", "(Ljava/lang/String;I)V");
-    //printf("cdhrString_cid initierad\n");
+    cdhrString_cid = (*env)->GetMethodID(env, cdhrString_id, "<init>", "(Ljava/lang/String;I)V");
+    // printf("cdhrString_cid initierad\n");
   }
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  if ( (s = strchr( cstr, '#')))
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  if ((s = strchr(cstr, '#')))
     *s = 0;
 
-  sts = gdh_NameToAttrref( pwr_cNObjid, cstr, &attrref);
-  if ( ODD(sts)) {
-    sts = gdh_GetObjectInfoAttrref( &attrref, buf, sizeof(buf));
-    (*env)->ReleaseStringUTFChars( env, name, cstr);
+  sts = gdh_NameToAttrref(pwr_cNObjid, cstr, &attrref);
+  if (ODD(sts))
+  {
+    sts = gdh_GetObjectInfoAttrref(&attrref, buf, sizeof(buf));
+    (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-    if ( ODD(sts)) {
-      sts = gdh_GetAttributeCharAttrref( &attrref, &a_type, &a_size, &a_offs, &a_dim);
-      if ( ODD(sts)) {
-        gdh_AttrToString( a_type, (void *)buf, value, sizeof(value),
-			  &len, NULL);
-        jvalue = (*env)->NewStringUTF( env, value);
+    if (ODD(sts))
+    {
+      sts = gdh_GetAttributeCharAttrref(&attrref, &a_type, &a_size, &a_offs, &a_dim);
+      if (ODD(sts))
+      {
+        gdh_AttrToString(a_type, (void*)buf, value, sizeof(value), &len, NULL);
+        jvalue = (*env)->NewStringUTF(env, value);
       }
     }
   }
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrString_id,
-  	cdhrString_cid, jvalue, jsts);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrString_id, cdhrString_cid, jvalue, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoObjid
-  (JNIEnv *env, jclass obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoObjid(JNIEnv* env, jclass obj, jstring name)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
   pwr_tObjid objid;
   jclass cdhrObjid_id;
   jmethodID cdhrObjid_cid;
@@ -1566,89 +1475,82 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectInfoObjid
   jobject return_obj;
   jint jsts;
   pwr_sAttrRef attrref;
-  char *s;
+  char* s;
 
-  cdhrObjid_id = (*env)->FindClass( env, "jpwr/rt/CdhrObjid");
-  cdhrObjid_cid = (*env)->GetMethodID( env, cdhrObjid_id,
-    	"<init>", "(Ljpwr/rt/PwrtObjid;I)V");
+  cdhrObjid_id = (*env)->FindClass(env, "jpwr/rt/CdhrObjid");
+  cdhrObjid_cid = (*env)->GetMethodID(env, cdhrObjid_id, "<init>", "(Ljpwr/rt/PwrtObjid;I)V");
 
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  PwrtObjid_cid = (*env)->GetMethodID( env, PwrtObjid_id,
-    	"<init>", "(II)V");
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  PwrtObjid_cid = (*env)->GetMethodID(env, PwrtObjid_id, "<init>", "(II)V");
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
-  if ( (s = strchr( cstr, '#'))) {
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
+  if ((s = strchr(cstr, '#')))
+  {
     *s = 0;
-    if ( (s = strrchr( ++s, '[')))
-      strcat( cstr, s);
+    if ((s = strrchr(++s, '[')))
+      strcat(cstr, s);
   }
-  //printf( "RefObjid: %s\n", cstr);
+  // printf( "RefObjid: %s\n", cstr);
 
-  sts = gdh_NameToAttrref( pwr_cNObjid, cstr, &attrref);
-  if ( ODD(sts)) {
-    sts = gdh_GetObjectInfoAttrref( &attrref, &objid, sizeof(objid));
-    (*env)->ReleaseStringUTFChars( env, name, cstr);
+  sts = gdh_NameToAttrref(pwr_cNObjid, cstr, &attrref);
+  if (ODD(sts))
+  {
+    sts = gdh_GetObjectInfoAttrref(&attrref, &objid, sizeof(objid));
+    (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-    if ( ODD(sts)) {
-      oix = (jint) objid.oix;
-      vid = (jint) objid.vid;
-      objid_obj = (*env)->NewObject( env, PwrtObjid_id, PwrtObjid_cid,
-				     oix, vid);
+    if (ODD(sts))
+    {
+      oix = (jint)objid.oix;
+      vid = (jint)objid.vid;
+      objid_obj = (*env)->NewObject(env, PwrtObjid_id, PwrtObjid_cid, oix, vid);
     }
   }
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrObjid_id,
-  	cdhrObjid_cid, objid_obj, jsts);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrObjid_id, cdhrObjid_cid, objid_obj, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getNodeObject
-  (JNIEnv *env, jclass obj, jint jnix)
-{
-  int		sts;
-  jclass 	PwrtObjid_id;
-  jmethodID 	PwrtObjid_cid;
-  pwr_tObjid 	objid;
-  jclass 	cdhrObjid_id;
-  jmethodID 	cdhrObjid_cid;
-  jobject 	objid_obj = NULL;
-  jint 		oix, vid;
-  jobject 	return_obj;
-  jint 		jsts;
-  int           nix;
-
-  cdhrObjid_id = (*env)->FindClass( env, "jpwr/rt/CdhrObjid");
-  cdhrObjid_cid = (*env)->GetMethodID( env, cdhrObjid_id,
-    	"<init>", "(Ljpwr/rt/PwrtObjid;I)V");
-
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  PwrtObjid_cid = (*env)->GetMethodID( env, PwrtObjid_id,
-    	"<init>", "(II)V");
-
-  nix = jnix;
-  sts = gdh_GetNodeObject( nix, &objid);
-  if ( ODD(sts))
-  {
-    oix = (jint) objid.oix;
-    vid = (jint) objid.vid;
-    objid_obj = (*env)->NewObject( env, PwrtObjid_id, PwrtObjid_cid,
-    	oix, vid);
-  }
-
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrObjid_id,
-  	cdhrObjid_cid, objid_obj, jsts);
-  return return_obj;
-}
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getAttributeChar
-  (JNIEnv *env, jobject obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getNodeObject(JNIEnv* env, jclass obj, jint jnix)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  jclass PwrtObjid_id;
+  jmethodID PwrtObjid_cid;
+  pwr_tObjid objid;
+  jclass cdhrObjid_id;
+  jmethodID cdhrObjid_cid;
+  jobject objid_obj = NULL;
+  jint oix, vid;
+  jobject return_obj;
+  jint jsts;
+  int nix;
+
+  cdhrObjid_id = (*env)->FindClass(env, "jpwr/rt/CdhrObjid");
+  cdhrObjid_cid = (*env)->GetMethodID(env, cdhrObjid_id, "<init>", "(Ljpwr/rt/PwrtObjid;I)V");
+
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  PwrtObjid_cid = (*env)->GetMethodID(env, PwrtObjid_id, "<init>", "(II)V");
+
+  nix = jnix;
+  sts = gdh_GetNodeObject(nix, &objid);
+  if (ODD(sts))
+  {
+    oix = (jint)objid.oix;
+    vid = (jint)objid.vid;
+    objid_obj = (*env)->NewObject(env, PwrtObjid_id, PwrtObjid_cid, oix, vid);
+  }
+
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrObjid_id, cdhrObjid_cid, objid_obj, jsts);
+  return return_obj;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getAttributeChar(JNIEnv* env, jobject obj, jstring name)
+{
+  int sts;
+  const char* str;
+  char* cstr;
   jobject return_obj;
   jint jsts;
   jclass gdhrGetAttributeChar_id;
@@ -1659,35 +1561,30 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getAttributeChar
   pwr_eType type_id;
   pwr_tAttrRef aref;
 
-  gdhrGetAttributeChar_id = (*env)->FindClass( env,
-		    "jpwr/rt/GdhrGetAttributeChar");
-  gdhrGetAttributeChar_cid = (*env)->GetMethodID( env,
-        gdhrGetAttributeChar_id, "<init>", "(IIIII)V");
+  gdhrGetAttributeChar_id = (*env)->FindClass(env, "jpwr/rt/GdhrGetAttributeChar");
+  gdhrGetAttributeChar_cid = (*env)->GetMethodID(env, gdhrGetAttributeChar_id, "<init>", "(IIIII)V");
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
 
-  sts = gdh_NameToAttrref( pwr_cNObjid, cstr, &aref);
-  if ( ODD(sts))
-    sts = gdh_GetAttributeCharAttrref( &aref, &type_id, &size, &offset,
-				       &elements);
+  sts = gdh_NameToAttrref(pwr_cNObjid, cstr, &aref);
+  if (ODD(sts))
+    sts = gdh_GetAttributeCharAttrref(&aref, &type_id, &size, &offset, &elements);
 
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, gdhrGetAttributeChar_id,
-  	gdhrGetAttributeChar_cid, (jint)type_id, (jint)size,
-				  (jint)offset, (jint)elements, jsts);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, gdhrGetAttributeChar_id, gdhrGetAttributeChar_cid, (jint)type_id,
+                                 (jint)size, (jint)offset, (jint)elements, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getAttributeFlags
-  (JNIEnv *env, jobject obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getAttributeFlags(JNIEnv* env, jobject obj, jstring name)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
   jobject return_obj;
   jint jsts;
   jclass gdhrGetAttributeFlags_id;
@@ -1695,88 +1592,78 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getAttributeFlags
   unsigned int flags;
   pwr_tAttrRef aref;
 
-  gdhrGetAttributeFlags_id = (*env)->FindClass( env,
-		    "jpwr/rt/GdhrGetAttributeFlags");
-  gdhrGetAttributeFlags_cid = (*env)->GetMethodID( env,
-        gdhrGetAttributeFlags_id, "<init>", "(II)V");
+  gdhrGetAttributeFlags_id = (*env)->FindClass(env, "jpwr/rt/GdhrGetAttributeFlags");
+  gdhrGetAttributeFlags_cid = (*env)->GetMethodID(env, gdhrGetAttributeFlags_id, "<init>", "(II)V");
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
 
-  sts = gdh_NameToAttrref( pwr_cNObjid, cstr, &aref);
-  if ( ODD(sts))
-    sts = gdh_GetAttributeFlags( &aref, &flags);
+  sts = gdh_NameToAttrref(pwr_cNObjid, cstr, &aref);
+  if (ODD(sts))
+    sts = gdh_GetAttributeFlags(&aref, &flags);
 
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, gdhrGetAttributeFlags_id,
-  	gdhrGetAttributeFlags_cid, (jint)flags, jsts);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, gdhrGetAttributeFlags_id, gdhrGetAttributeFlags_cid, (jint)flags, jsts);
   return return_obj;
 }
 
-JNIEXPORT jstring JNICALL Java_jpwr_rt_Gdh_translateFilename
-  (JNIEnv *env, jclass obj, jstring filename)
+JNIEXPORT jstring JNICALL Java_jpwr_rt_Gdh_translateFilename(JNIEnv* env, jclass obj, jstring filename)
 {
   jstring jvalue;
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
   char buffer[256];
 
-  str = (*env)->GetStringUTFChars( env, filename, 0);
-  cstr = (char *)str;
+  str = (*env)->GetStringUTFChars(env, filename, 0);
+  cstr = (char*)str;
 
-  sts = dcli_translate_filename( buffer, cstr);
-  (*env)->ReleaseStringUTFChars( env, filename, cstr);
+  sts = dcli_translate_filename(buffer, cstr);
+  (*env)->ReleaseStringUTFChars(env, filename, cstr);
 
-  jvalue = (*env)->NewStringUTF( env, buffer);
+  jvalue = (*env)->NewStringUTF(env, buffer);
   return jvalue;
 }
 
-static void  gdh_TranslateSuffixToClassData (
-    char        *SuffixPtr,
-    pwr_eType 	*PwrType,
-    int		*PwrSize,
-    int  	*NoOfElements
-    )
+static void gdh_TranslateSuffixToClassData(char* SuffixPtr, pwr_eType* PwrType, int* PwrSize,
+                                           int* NoOfElements)
 {
 
-  static const  gdh_sSuffixTable   XlationTbl[] = {
-    {"BOOLEAN",pwr_eType_Boolean, sizeof(pwr_tBoolean)},
-    {"FLOAT32",pwr_eType_Float32, sizeof(pwr_tFloat32)},
-    {"FLOAT64",pwr_eType_Float64, sizeof(pwr_tFloat64)},
-    {"CHAR"   ,pwr_eType_Char,    sizeof(pwr_tChar)},
-    {"INT8"   ,pwr_eType_Int8,    sizeof(pwr_tInt8)},
-    {"INT16"  ,pwr_eType_Int16,   sizeof(pwr_tInt16)},
-    {"INT32"  ,pwr_eType_Int32,   sizeof(pwr_tInt32)},
-    {"INT64"  ,pwr_eType_Int64,   sizeof(pwr_tInt64)},
-    {"UINT8"  ,pwr_eType_UInt8,   sizeof(pwr_tUInt8)},
-    {"UINT16" ,pwr_eType_UInt16,  sizeof(pwr_tInt16)},
-    {"UINT32" ,pwr_eType_UInt32,  sizeof(pwr_tInt32)},
-    {"UINT64" ,pwr_eType_UInt64,  sizeof(pwr_tInt64)},
-    {"OBJID"  ,pwr_eType_Objid,   sizeof(pwr_tObjid)},
-//    {"STRING" ,pwr_eType_String,  sizeof(void *)},
-    {"TIME"   ,pwr_eType_Time,    sizeof(pwr_tTime)},
-    {"DELTATIME" ,pwr_eType_DeltaTime, sizeof(pwr_tDeltaTime)},
-    {"ATTRREF" ,pwr_eType_AttrRef, sizeof(pwr_sAttrRef)},
-    {"STATUS" ,pwr_eType_Status, sizeof(pwr_tStatus)},
-    {"NETSTATUS" ,pwr_eType_NetStatus, sizeof(pwr_tNetStatus)},
-    {"BIT" ,(pwr_eType)graph_eType_Bit, sizeof(pwr_tBit)}
-  };
+  static const gdh_sSuffixTable XlationTbl[] = {{"BOOLEAN", pwr_eType_Boolean, sizeof(pwr_tBoolean)},
+                                                {"FLOAT32", pwr_eType_Float32, sizeof(pwr_tFloat32)},
+                                                {"FLOAT64", pwr_eType_Float64, sizeof(pwr_tFloat64)},
+                                                {"CHAR", pwr_eType_Char, sizeof(pwr_tChar)},
+                                                {"INT8", pwr_eType_Int8, sizeof(pwr_tInt8)},
+                                                {"INT16", pwr_eType_Int16, sizeof(pwr_tInt16)},
+                                                {"INT32", pwr_eType_Int32, sizeof(pwr_tInt32)},
+                                                {"INT64", pwr_eType_Int64, sizeof(pwr_tInt64)},
+                                                {"UINT8", pwr_eType_UInt8, sizeof(pwr_tUInt8)},
+                                                {"UINT16", pwr_eType_UInt16, sizeof(pwr_tInt16)},
+                                                {"UINT32", pwr_eType_UInt32, sizeof(pwr_tInt32)},
+                                                {"UINT64", pwr_eType_UInt64, sizeof(pwr_tInt64)},
+                                                {"OBJID", pwr_eType_Objid, sizeof(pwr_tObjid)},
+                                                //    {"STRING" ,pwr_eType_String,  sizeof(void *)},
+                                                {"TIME", pwr_eType_Time, sizeof(pwr_tTime)},
+                                                {"DELTATIME", pwr_eType_DeltaTime, sizeof(pwr_tDeltaTime)},
+                                                {"ATTRREF", pwr_eType_AttrRef, sizeof(pwr_sAttrRef)},
+                                                {"STATUS", pwr_eType_Status, sizeof(pwr_tStatus)},
+                                                {"NETSTATUS", pwr_eType_NetStatus, sizeof(pwr_tNetStatus)},
+                                                {"BIT", (pwr_eType)graph_eType_Bit, sizeof(pwr_tBit)}};
 
-  static const int    XlationTblLen = sizeof(XlationTbl)/sizeof(XlationTbl[0]);
-  int                 Index;
-  char                *Ptr;
-  pwr_tBoolean        Found;
+  static const int XlationTblLen = sizeof(XlationTbl) / sizeof(XlationTbl[0]);
+  int Index;
+  char* Ptr;
+  pwr_tBoolean Found;
 
   /* Check if there is a array size */
 
-  if ((Ptr = (char *)strchr(SuffixPtr,'#')) != 0)
+  if ((Ptr = (char*)strchr(SuffixPtr, '#')) != 0)
   {
-    *(Ptr++)='\0';
-    if ( ! strchr( Ptr, '['))
+    *(Ptr++) = '\0';
+    if (!strchr(Ptr, '['))
       *NoOfElements = atoi(Ptr);
     else
       *NoOfElements = 1;
@@ -1794,7 +1681,7 @@ static void  gdh_TranslateSuffixToClassData (
     *(SuffixPtr + 3) = 0;
 
   for (Index = 0, Found = FALSE; Index < XlationTblLen; Index++)
-    if (!str_NoCaseStrcmp(XlationTbl[Index].TypeStr,SuffixPtr))
+    if (!str_NoCaseStrcmp(XlationTbl[Index].TypeStr, SuffixPtr))
     {
       *PwrSize = XlationTbl[Index].Size;
       *PwrType = XlationTbl[Index].Type;
@@ -1808,21 +1695,19 @@ static void  gdh_TranslateSuffixToClassData (
     *PwrType = pwr_eType_String;
   }
 
-
-  if ( Ptr != NULL && *NoOfElements > 1)
+  if (Ptr != NULL && *NoOfElements > 1)
   {
     *PwrSize *= *NoOfElements;
     *Ptr = '#';
   }
 }
 
-static int gdh_ExtractNameSuffix(	char   *Name,
-                          		char   **Suffix)
+static int gdh_ExtractNameSuffix(char* Name, char** Suffix)
 {
-  char    	*TempPtr, *s;
-  static char	Str[80];
+  char *TempPtr, *s;
+  static char Str[80];
 
-  if ((TempPtr = (char *)strstr(Name,"##")) == NULL) /* if not found */
+  if ((TempPtr = (char*)strstr(Name, "##")) == NULL) /* if not found */
   {
     if (Suffix != NULL)
       *Suffix = NULL;
@@ -1831,620 +1716,613 @@ static int gdh_ExtractNameSuffix(	char   *Name,
   /* Continue here if found */
   *TempPtr = 0;
 
-  TempPtr+=2;
+  TempPtr += 2;
 
   if (Suffix != NULL)
   {
-    str_ToUpper(Str,TempPtr);
+    str_ToUpper(Str, TempPtr);
     *Suffix = Str;
   }
 
   /* Add array index to name */
-  if ( (s = strchr( TempPtr + 1, '[')))
-    strcat( Name, s);
+  if ((s = strchr(TempPtr + 1, '[')))
+    strcat(Name, s);
 
   return 1;
 }
 
-static int gdh_StringToAttr( char *str_value, char *buffer_p, int buffer_size,
-	pwr_eType attrtype, int attrsize)
+static int gdh_StringToAttr(char* str_value, char* buffer_p, int buffer_size, pwr_eType attrtype,
+                            int attrsize)
 {
   int sts;
 
-  switch ( attrtype)
+  switch (attrtype)
   {
-    case pwr_eType_Boolean:
-      if ( sscanf( str_value, "%d", (pwr_tBoolean *)buffer_p) != 1)
-        return GDH__BADARG;
-      break;
-    case pwr_eType_Float32:
-      if ( sscanf( str_value, "%f", (pwr_tFloat32 *)buffer_p) != 1)
-        return GDH__BADARG;
-      break;
-    case pwr_eType_Float64:
-    {
-      pwr_tFloat32 f;
-      pwr_tFloat64 d;
-      if ( sscanf( str_value, "%f", &f) != 1)
-        return GDH__BADARG;
-      d = f;
-      memcpy( buffer_p, (char *) &d, sizeof(d));
-    }
-    case pwr_eType_Char:
-      if ( sscanf( str_value, "%c", buffer_p) != 1)
-        return GDH__BADARG;
-      break;
-    case pwr_eType_Int8:
-    {
-      pwr_tInt8	  vint8;
-      pwr_tInt16  vint16;
-      if ( sscanf( str_value, "%hd", &vint16) != 1)
-        return GDH__BADARG;
-      vint8 = vint16;
-      memcpy( buffer_p, (char *)&vint8, sizeof(vint8));
-      break;
-    }
-    case pwr_eType_Int16:
-      if ( sscanf( str_value, "%hd", (pwr_tInt16 *)buffer_p) != 1)
-        return GDH__BADARG;
-      break;
-    case pwr_eType_Int32:
-      if ( sscanf( str_value, "%d", (pwr_tInt32 *)buffer_p) != 1)
-        return GDH__BADARG;
-      break;
-    case pwr_eType_Int64:
-      if ( sscanf( str_value, pwr_dFormatInt64, (pwr_tInt64 *)buffer_p) != 1)
-        return GDH__BADARG;
-      break;
-    case pwr_eType_UInt8:
-    {
-      pwr_tUInt8   vint8;
-      pwr_tUInt16  vint16;
-      if ( sscanf( str_value, "%hu", &vint16) != 1)
-        return GDH__BADARG;
-      vint8 = vint16;
-      memcpy( buffer_p, (char *)&vint8, sizeof(vint8));
-      break;
-    }
-    case pwr_eType_UInt16:
-      if ( sscanf( str_value, "%hu", (pwr_tUInt16 *)buffer_p) != 1)
-        return GDH__BADARG;
-      break;
-    case pwr_eType_UInt32:
-    case pwr_eType_Enum:
-    case pwr_eType_Mask:
-    case pwr_eType_Status:
-    case pwr_eType_NetStatus:
-      if ( sscanf( str_value, "%u", (pwr_tUInt32 *)buffer_p) != 1)
-        return GDH__BADARG;
-      break;
-    case pwr_eType_UInt64:
-      if ( sscanf( str_value, pwr_dFormatUInt64, (pwr_tUInt64 *)buffer_p) != 1)
-        return GDH__BADARG;
-      break;
-    case pwr_eType_String:
-      strncpy( buffer_p, str_value, buffer_size);
-      break;
-    case pwr_eType_Objid:
-    {
-      pwr_tObjid objid;
+  case pwr_eType_Boolean:
+    if (sscanf(str_value, "%d", (pwr_tBoolean*)buffer_p) != 1)
+      return GDH__BADARG;
+    break;
+  case pwr_eType_Float32:
+    if (sscanf(str_value, "%f", (pwr_tFloat32*)buffer_p) != 1)
+      return GDH__BADARG;
+    break;
+  case pwr_eType_Float64:
+  {
+    pwr_tFloat32 f;
+    pwr_tFloat64 d;
+    if (sscanf(str_value, "%f", &f) != 1)
+      return GDH__BADARG;
+    d = f;
+    memcpy(buffer_p, (char*)&d, sizeof(d));
+    break;
+  }
+  case pwr_eType_Char:
+    if (sscanf(str_value, "%c", buffer_p) != 1)
+      return GDH__BADARG;
+    break;
+  case pwr_eType_Int8:
+  {
+    pwr_tInt8 vint8;
+    pwr_tInt16 vint16;
+    if (sscanf(str_value, "%hd", &vint16) != 1)
+      return GDH__BADARG;
+    vint8 = vint16;
+    memcpy(buffer_p, (char*)&vint8, sizeof(vint8));
+    break;
+  }
+  case pwr_eType_Int16:
+    if (sscanf(str_value, "%hd", (pwr_tInt16*)buffer_p) != 1)
+      return GDH__BADARG;
+    break;
+  case pwr_eType_Int32:
+    if (sscanf(str_value, "%d", (pwr_tInt32*)buffer_p) != 1)
+      return GDH__BADARG;
+    break;
+  case pwr_eType_Int64:
+    if (sscanf(str_value, pwr_dFormatInt64, (pwr_tInt64*)buffer_p) != 1)
+      return GDH__BADARG;
+    break;
+  case pwr_eType_UInt8:
+  {
+    pwr_tUInt8 vint8;
+    pwr_tUInt16 vint16;
+    if (sscanf(str_value, "%hu", &vint16) != 1)
+      return GDH__BADARG;
+    vint8 = vint16;
+    memcpy(buffer_p, (char*)&vint8, sizeof(vint8));
+    break;
+  }
+  case pwr_eType_UInt16:
+    if (sscanf(str_value, "%hu", (pwr_tUInt16*)buffer_p) != 1)
+      return GDH__BADARG;
+    break;
+  case pwr_eType_UInt32:
+  case pwr_eType_Enum:
+  case pwr_eType_Mask:
+  case pwr_eType_Status:
+  case pwr_eType_NetStatus:
+    if (sscanf(str_value, "%u", (pwr_tUInt32*)buffer_p) != 1)
+      return GDH__BADARG;
+    break;
+  case pwr_eType_UInt64:
+    if (sscanf(str_value, pwr_dFormatUInt64, (pwr_tUInt64*)buffer_p) != 1)
+      return GDH__BADARG;
+    break;
+  case pwr_eType_String:
+    strncpy(buffer_p, str_value, buffer_size);
+    break;
+  case pwr_eType_Objid:
+  {
+    pwr_tObjid objid;
 
-      sts = gdh_NameToObjid( str_value, &objid);
-      if (EVEN(sts)) return sts;
+    sts = gdh_NameToObjid(str_value, &objid);
+    if (EVEN(sts))
+      return sts;
 
-      memcpy( buffer_p, &objid, sizeof(objid));
-      break;
-    }
-    case pwr_eType_TypeId:
-    {
-      pwr_tTypeId typeid;
-      pwr_tObjid objid;
+    memcpy(buffer_p, &objid, sizeof(objid));
+    break;
+  }
+  case pwr_eType_TypeId:
+  {
+    pwr_tTypeId typeid;
+    pwr_tObjid objid;
 
-      sts = gdh_NameToObjid ( str_value, &objid);
-      if (EVEN(sts)) return sts;
+    sts = gdh_NameToObjid(str_value, &objid);
+    if (EVEN(sts))
+      return sts;
 
-      typeid = cdh_TypeObjidToId( objid);
-      memcpy( buffer_p, (char *) &typeid, sizeof(typeid));
-      break;
-    }
-    case pwr_eType_ObjectIx:
-    {
-      pwr_tObjectIx objectix;
+    typeid = cdh_TypeObjidToId(objid);
+    memcpy(buffer_p, (char*)&typeid, sizeof(typeid));
+    break;
+  }
+  case pwr_eType_ObjectIx:
+  {
+    pwr_tObjectIx objectix;
 
-      sts = cdh_StringToObjectIx( str_value, &objectix);
-      if (EVEN(sts)) return sts;
+    sts = cdh_StringToObjectIx(str_value, &objectix);
+    if (EVEN(sts))
+      return sts;
 
-      memcpy( buffer_p, (char *) &objectix, sizeof(objectix));
-      break;
-    }
-    case pwr_eType_VolumeId:
-    {
-      pwr_tVolumeId volumeid;
+    memcpy(buffer_p, (char*)&objectix, sizeof(objectix));
+    break;
+  }
+  case pwr_eType_VolumeId:
+  {
+    pwr_tVolumeId volumeid;
 
-      sts = cdh_StringToVolumeId( str_value, &volumeid);
-      if (EVEN(sts)) return sts;
+    sts = cdh_StringToVolumeId(str_value, &volumeid);
+    if (EVEN(sts))
+      return sts;
 
-      memcpy( buffer_p, (char *) &volumeid, sizeof(volumeid));
-      break;
-    }
-    case pwr_eType_RefId:
-    {
-      pwr_tRefId subid;
+    memcpy(buffer_p, (char*)&volumeid, sizeof(volumeid));
+    break;
+  }
+  case pwr_eType_RefId:
+  {
+    pwr_tRefId subid;
 
-      sts = cdh_StringToSubid( str_value, &subid);
-      if (EVEN(sts)) return sts;
+    sts = cdh_StringToSubid(str_value, &subid);
+    if (EVEN(sts))
+      return sts;
 
-      memcpy( buffer_p, (char *) &subid, sizeof(subid));
-      break;
-    }
-    case pwr_eType_AttrRef:
-    {
-      pwr_sAttrRef attrref;
+    memcpy(buffer_p, (char*)&subid, sizeof(subid));
+    break;
+  }
+  case pwr_eType_AttrRef:
+  {
+    pwr_sAttrRef attrref;
 
-      sts = gdh_NameToAttrref ( pwr_cNObjid, str_value, &attrref);
-      if (EVEN(sts)) return sts;
+    sts = gdh_NameToAttrref(pwr_cNObjid, str_value, &attrref);
+    if (EVEN(sts))
+      return sts;
 
-      memcpy( buffer_p, &attrref, sizeof(attrref));
-      break;
-    }
-    case pwr_eType_Time:
-    {
-      pwr_tTime time;
+    memcpy(buffer_p, &attrref, sizeof(attrref));
+    break;
+  }
+  case pwr_eType_Time:
+  {
+    pwr_tTime time;
 
-      sts = time_AsciiToA( str_value, &time);
-      if (EVEN(sts)) return GDH__BADARG;
+    sts = time_AsciiToA(str_value, &time);
+    if (EVEN(sts))
+      return GDH__BADARG;
 
-      memcpy( buffer_p, (char *) &time, sizeof(time));
-      break;
-    }
-    case pwr_eType_DeltaTime:
-    {
-      pwr_tDeltaTime deltatime;
+    memcpy(buffer_p, (char*)&time, sizeof(time));
+    break;
+  }
+  case pwr_eType_DeltaTime:
+  {
+    pwr_tDeltaTime deltatime;
 
-      sts = time_AsciiToD( str_value, &deltatime);
-      if (EVEN(sts)) return GDH__BADARG;
+    sts = time_AsciiToD(str_value, &deltatime);
+    if (EVEN(sts))
+      return GDH__BADARG;
 
-      memcpy( buffer_p, (char *) &deltatime, sizeof(deltatime));
-      break;
-    }
-    default:
-      ;
+    memcpy(buffer_p, (char*)&deltatime, sizeof(deltatime));
+    break;
+  }
+  default:;
   }
   return GDH__SUCCESS;
 }
 
-static void gdh_AttrToString( int type_id, void *value_ptr,
-        char *str, int size, int *len, char *format)
+static void gdh_AttrToString(int type_id, void* value_ptr, char* str, int size, int* len, char* format)
 {
-  pwr_tObjid            objid;
-  pwr_sAttrRef          *attrref;
-  int                   sts;
-  char                  timstr[64];
+  pwr_tObjid objid;
+  pwr_sAttrRef* attrref;
+  int sts;
+  char timstr[64];
 
-  if ( value_ptr == 0)
+  if (value_ptr == 0)
   {
-    strcpy( str, "UNDEFINED");
+    strcpy(str, "UNDEFINED");
     return;
   }
 
-  switch ( type_id )
+  switch (type_id)
   {
-    case pwr_eType_Boolean:
-    {
-      if ( !format)
-        *len = sprintf( str, "%d", *(pwr_tBoolean *)value_ptr);
-      else
-        *len = sprintf( str, format, *(pwr_tBoolean *)value_ptr);
-      break;
-    }
-    case pwr_eType_Float32:
-    {
-      if ( !format)
-        *len = sprintf( str, "%f", *(float *)value_ptr);
-      else
-        *len = sprintf( str, format, *(float *)value_ptr);
-      break;
-    }
-    case pwr_eType_Float64:
-    {
-      if ( !format)
-        *len = sprintf( str, "%f", *(double *)value_ptr);
-      else
-        *len = sprintf( str, format, *(double *)value_ptr);
-      break;
-    }
-    case pwr_eType_Char:
-    {
-      if ( !format)
-        *len = sprintf( str, "%c", *(char *)value_ptr);
-      else
-        *len = sprintf( str, format, *(char *)value_ptr);
-      break;
-    }
-    case pwr_eType_Int8:
-    {
-      if ( !format)
-        *len = sprintf( str, "%d", *(char *)value_ptr);
-      else
-        *len = sprintf( str, format, *(char *)value_ptr);
-      break;
-    }
-    case pwr_eType_Int16:
-    {
-      if ( !format)
-        *len = sprintf( str, "%hd", *(short *)value_ptr);
-      else
-        *len = sprintf( str, format, *(short *)value_ptr);
-      break;
-    }
-    case pwr_eType_Int32:
-    case pwr_eType_Enum:
-    {
-      if ( !format)
-        *len = sprintf( str, "%d", *(int *)value_ptr);
-      else
-        *len = sprintf( str, format, *(int *)value_ptr);
-      break;
-    }
-    case pwr_eType_Int64:
-    {
-      if ( !format)
-        *len = sprintf( str, pwr_dFormatInt64, *(pwr_tInt64 *)value_ptr);
-      else
-        *len = sprintf( str, format, *(pwr_tInt64 *)value_ptr);
-      break;
-    }
-    case pwr_eType_UInt8:
-    {
-      if ( !format)
-        *len = sprintf( str, "%d", *(unsigned char *)value_ptr);
-      else
-        *len = sprintf( str, format, *(unsigned char *)value_ptr);
-      break;
-    }
-    case pwr_eType_UInt16:
-    {
-      if ( !format)
-        *len = sprintf( str, "%hd", *(unsigned short *)value_ptr);
-      else
-        *len = sprintf( str, format, *(unsigned short *)value_ptr);
-      break;
-    }
-    case pwr_eType_UInt32:
-    case pwr_eType_Mask:
-    case pwr_eType_Status:
-    case pwr_eType_NetStatus:
-    {
-      if ( !format)
-        *len = sprintf( str, "%d", *(unsigned int *)value_ptr);
-      else
-        *len = sprintf( str, format, *(unsigned int *)value_ptr);
-      break;
-    }
-    case pwr_eType_UInt64:
-    {
-      if ( !format)
-        *len = sprintf( str, pwr_dFormatUInt64, *(pwr_tUInt64 *)value_ptr);
-      else
-        *len = sprintf( str, format, *(pwr_tUInt64 *)value_ptr);
-      break;
-    }
-    case pwr_eType_String:
-    {
-      strncpy( str, (char *)value_ptr, size);
-      str[size-1] = 0;
-      *len = strlen(str);
-      break;
-    }
-    case pwr_eType_Objid:
-    {
-      pwr_tOName            hiername;
+  case pwr_eType_Boolean:
+  {
+    if (!format)
+      *len = sprintf(str, "%d", *(pwr_tBoolean*)value_ptr);
+    else
+      *len = sprintf(str, format, *(pwr_tBoolean*)value_ptr);
+    break;
+  }
+  case pwr_eType_Float32:
+  {
+    if (!format)
+      *len = sprintf(str, "%f", *(float*)value_ptr);
+    else
+      *len = sprintf(str, format, *(float*)value_ptr);
+    break;
+  }
+  case pwr_eType_Float64:
+  {
+    if (!format)
+      *len = sprintf(str, "%f", *(double*)value_ptr);
+    else
+      *len = sprintf(str, format, *(double*)value_ptr);
+    break;
+  }
+  case pwr_eType_Char:
+  {
+    if (!format)
+      *len = sprintf(str, "%c", *(char*)value_ptr);
+    else
+      *len = sprintf(str, format, *(char*)value_ptr);
+    break;
+  }
+  case pwr_eType_Int8:
+  {
+    if (!format)
+      *len = sprintf(str, "%d", *(char*)value_ptr);
+    else
+      *len = sprintf(str, format, *(char*)value_ptr);
+    break;
+  }
+  case pwr_eType_Int16:
+  {
+    if (!format)
+      *len = sprintf(str, "%hd", *(short*)value_ptr);
+    else
+      *len = sprintf(str, format, *(short*)value_ptr);
+    break;
+  }
+  case pwr_eType_Int32:
+  case pwr_eType_Enum:
+  {
+    if (!format)
+      *len = sprintf(str, "%d", *(int*)value_ptr);
+    else
+      *len = sprintf(str, format, *(int*)value_ptr);
+    break;
+  }
+  case pwr_eType_Int64:
+  {
+    if (!format)
+      *len = sprintf(str, pwr_dFormatInt64, *(pwr_tInt64*)value_ptr);
+    else
+      *len = sprintf(str, format, *(pwr_tInt64*)value_ptr);
+    break;
+  }
+  case pwr_eType_UInt8:
+  {
+    if (!format)
+      *len = sprintf(str, "%d", *(unsigned char*)value_ptr);
+    else
+      *len = sprintf(str, format, *(unsigned char*)value_ptr);
+    break;
+  }
+  case pwr_eType_UInt16:
+  {
+    if (!format)
+      *len = sprintf(str, "%hd", *(unsigned short*)value_ptr);
+    else
+      *len = sprintf(str, format, *(unsigned short*)value_ptr);
+    break;
+  }
+  case pwr_eType_UInt32:
+  case pwr_eType_Mask:
+  case pwr_eType_Status:
+  case pwr_eType_NetStatus:
+  {
+    if (!format)
+      *len = sprintf(str, "%d", *(unsigned int*)value_ptr);
+    else
+      *len = sprintf(str, format, *(unsigned int*)value_ptr);
+    break;
+  }
+  case pwr_eType_UInt64:
+  {
+    if (!format)
+      *len = sprintf(str, pwr_dFormatUInt64, *(pwr_tUInt64*)value_ptr);
+    else
+      *len = sprintf(str, format, *(pwr_tUInt64*)value_ptr);
+    break;
+  }
+  case pwr_eType_String:
+  {
+    strncpy(str, (char*)value_ptr, size);
+    str[size - 1] = 0;
+    *len = strlen(str);
+    break;
+  }
+  case pwr_eType_Objid:
+  {
+    pwr_tOName hiername;
 
-      objid = *(pwr_tObjid *)value_ptr;
-      if ( !objid.oix)
-        sts = gdh_ObjidToName ( objid, hiername, sizeof(hiername),
-                         cdh_mName_volumeStrict);
-      else
-        sts = gdh_ObjidToName ( objid, hiername, sizeof(hiername),
-                cdh_mNName);
-      if (EVEN(sts))
-      {
-        strcpy( str, "");
-        *len = 0;
-        break;
-      }
-      *len = sprintf( str, "%s", hiername);
-      break;
-    }
-    case pwr_eType_AttrRef:
+    objid = *(pwr_tObjid*)value_ptr;
+    if (!objid.oix)
+      sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mName_volumeStrict);
+    else
+      sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
+    if (EVEN(sts))
     {
-      pwr_tAName            hiername;
-
-      attrref = (pwr_sAttrRef *) value_ptr;
-      sts = gdh_AttrrefToName ( attrref, hiername, sizeof(hiername),
-         cdh_mNName);
-      if (EVEN(sts))
-      {
-        strcpy( str, "");
-        *len = 0;
-        break;
-      }
-      *len = sprintf( str, "%s", hiername);
-      break;
-    }
-    case pwr_eType_DataRef:
-    {
-      pwr_tAName hiername;
-      pwr_tDataRef *dataref;
-
-      dataref = (pwr_tDataRef *) value_ptr;
-      sts = gdh_AttrrefToName( &dataref->Aref, hiername, sizeof(hiername), cdh_mNName);
-      if (EVEN(sts)) {
-	strcpy( str, "");
-	*len = 0;
-	break;
-      }
-      *len = sprintf( str, "%s", hiername);
-      break;
-    }
-    case pwr_eType_Time:
-    {
-      sts = time_AtoAscii( (pwr_tTime *) value_ptr, time_eFormat_DateAndTime,
-                timstr, sizeof(timstr));
-      if ( EVEN(sts))
-        strcpy( timstr, "-");
-      *len = sprintf( str, "%s", timstr);
-      break;
-    }
-    case pwr_eType_DeltaTime:
-    {
-      sts = time_DtoAscii( (pwr_tDeltaTime *) value_ptr, 1,
-                timstr, sizeof(timstr));
-      if ( EVEN(sts))
-        strcpy( timstr, "Undefined time");
-      *len = sprintf( str, "%s", timstr);
-      break;
-    }
-    case pwr_eType_ObjectIx:
-    {
-      cdh_ObjectIxToString( str, size, *(pwr_tObjectIx *) value_ptr, 1);
-      *len = strlen(str);
-      break;
-    }
-    case pwr_eType_ClassId:
-    {
-      pwr_tOName            hiername;
-
-      objid = cdh_ClassIdToObjid( *(pwr_tClassId *) value_ptr);
-      sts = gdh_ObjidToName ( objid, hiername, sizeof(hiername), cdh_mNName);
-      if (EVEN(sts))
-      {
-        strcpy( str, "");
-        *len = 0;
-        break;
-      }
-      *len = sprintf( str, "%s", hiername);
-      break;
-    }
-    case pwr_eType_TypeId:
-    {
-      pwr_tOName            hiername;
-
-      objid = cdh_TypeIdToObjid( *(pwr_tTypeId *) value_ptr);
-      sts = gdh_ObjidToName ( objid, hiername, sizeof(hiername), cdh_mNName);
-      if (EVEN(sts))
-      {
-        strcpy( str, "");
-        *len = 0;
-        break;
-      }
-      *len = sprintf( str, "%s", hiername);
-      break;
-    }
-    case pwr_eType_VolumeId:
-    {
-      cdh_VolumeIdToString( str, size, *(pwr_tVolumeId *) value_ptr, 1, 0);
-      *len = strlen(str);
-      break;
-    }
-    case pwr_eType_RefId:
-    {
-      cdh_SubidToString( str, size, *(pwr_tSubid *) value_ptr, 1);
-      *len = strlen(str);
-      break;
-    }
-    default:
+      strcpy(str, "");
       *len = 0;
-      strcpy( str, "");
-      printf( "gdh_AttrToString, unsupported type %d\n", type_id);
+      break;
+    }
+    *len = sprintf(str, "%s", hiername);
+    break;
+  }
+  case pwr_eType_AttrRef:
+  {
+    pwr_tAName hiername;
+
+    attrref = (pwr_sAttrRef*)value_ptr;
+    sts = gdh_AttrrefToName(attrref, hiername, sizeof(hiername), cdh_mNName);
+    if (EVEN(sts))
+    {
+      strcpy(str, "");
+      *len = 0;
+      break;
+    }
+    *len = sprintf(str, "%s", hiername);
+    break;
+  }
+  case pwr_eType_DataRef:
+  {
+    pwr_tAName hiername;
+    pwr_tDataRef* dataref;
+
+    dataref = (pwr_tDataRef*)value_ptr;
+    sts = gdh_AttrrefToName(&dataref->Aref, hiername, sizeof(hiername), cdh_mNName);
+    if (EVEN(sts))
+    {
+      strcpy(str, "");
+      *len = 0;
+      break;
+    }
+    *len = sprintf(str, "%s", hiername);
+    break;
+  }
+  case pwr_eType_Time:
+  {
+    sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+    if (EVEN(sts))
+      strcpy(timstr, "-");
+    *len = sprintf(str, "%s", timstr);
+    break;
+  }
+  case pwr_eType_DeltaTime:
+  {
+    sts = time_DtoAscii((pwr_tDeltaTime*)value_ptr, 1, timstr, sizeof(timstr));
+    if (EVEN(sts))
+      strcpy(timstr, "Undefined time");
+    *len = sprintf(str, "%s", timstr);
+    break;
+  }
+  case pwr_eType_ObjectIx:
+  {
+    cdh_ObjectIxToString(str, size, *(pwr_tObjectIx*)value_ptr, 1);
+    *len = strlen(str);
+    break;
+  }
+  case pwr_eType_ClassId:
+  {
+    pwr_tOName hiername;
+
+    objid = cdh_ClassIdToObjid(*(pwr_tClassId*)value_ptr);
+    sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
+    if (EVEN(sts))
+    {
+      strcpy(str, "");
+      *len = 0;
+      break;
+    }
+    *len = sprintf(str, "%s", hiername);
+    break;
+  }
+  case pwr_eType_TypeId:
+  {
+    pwr_tOName hiername;
+
+    objid = cdh_TypeIdToObjid(*(pwr_tTypeId*)value_ptr);
+    sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
+    if (EVEN(sts))
+    {
+      strcpy(str, "");
+      *len = 0;
+      break;
+    }
+    *len = sprintf(str, "%s", hiername);
+    break;
+  }
+  case pwr_eType_VolumeId:
+  {
+    cdh_VolumeIdToString(str, size, *(pwr_tVolumeId*)value_ptr, 1, 0);
+    *len = strlen(str);
+    break;
+  }
+  case pwr_eType_RefId:
+  {
+    cdh_SubidToString(str, size, *(pwr_tSubid*)value_ptr, 1);
+    *len = strlen(str);
+    break;
+  }
+  default:
+    *len = 0;
+    strcpy(str, "");
+    printf("gdh_AttrToString, unsupported type %d\n", type_id);
   }
 }
 
-static void gdh_ConvertUTFstring(const char* utf, char *iso)
+static void gdh_ConvertUTFstring(const char* utf, char* iso)
 {
   static iconv_t cd = 0;
   size_t utf_size = strlen(utf);
   size_t iso_size = utf_size;
   size_t iso_osize = iso_size;
-  char *isop = iso;
+  char* isop = iso;
 
   if (!cd)
     cd = iconv_open("ISO8859-1", "UTF-8");
 
-  if (iconv(cd, (char **)&utf, &utf_size, &isop, &iso_size) == (size_t)(-1))
+  if (iconv(cd, (char**)&utf, &utf_size, &isop, &iso_size) == (size_t)(-1))
     strcpy(iso, "");
   else
     iso[iso_osize - iso_size] = 0;
 }
 
 /*author: Jonas Nylund */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getClassAttribute
-  (JNIEnv *env, jclass obj, jint classid, jobject objid_obj)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getClassAttribute(JNIEnv* env, jclass obj, jint classid,
+                                                             jobject objid_obj)
 {
-  int		sts;
-  pwr_tOName   	classname;
-  pwr_tOName   	hiername;
-  char		parname[80];
-  pwr_tOName   	fullname;
-  char		*s;
-  pwr_sParInfo	parinfo;
-  pwr_tObjid   	body;
-  pwr_tObjid 	objid;
-  pwr_tObjid   	parameter;
-  pwr_tClassId	parameter_class;
-  pwr_tClassId	cid;
-  int		attr_exist;
-  int		j;
+  int sts;
+  pwr_tOName classname;
+  pwr_tOName hiername;
+  char parname[80];
+  pwr_tOName fullname;
+  char* s;
+  pwr_sParInfo parinfo;
+  pwr_tObjid body;
+  pwr_tObjid objid;
+  pwr_tObjid parameter;
+  pwr_tClassId parameter_class;
+  pwr_tClassId cid;
+  int attr_exist;
+  int j;
 
-  jclass 	PwrtObjid_id;
-  static jmethodID 	PwrtObjid_getOix = NULL;
-  static jmethodID 	PwrtObjid_getVid = NULL;
-  static jmethodID 	PwrtObjid_cid = NULL;
-  jclass 	cdhrObjAttr_id;
-  static jmethodID 	cdhrObjAttr_cid = NULL;
-  jobject       return_obj;
-  jobject       jobjid = NULL;
-  jint          jType = 0;
-  jint          jSize = 0;
-  jint          jFlags = 0;
-  jint          jElements = 0;
-  jstring       jparname;
-  jint          joix;
-  jint          jvid;
+  jclass PwrtObjid_id;
+  static jmethodID PwrtObjid_getOix = NULL;
+  static jmethodID PwrtObjid_getVid = NULL;
+  static jmethodID PwrtObjid_cid = NULL;
+  jclass cdhrObjAttr_id;
+  static jmethodID cdhrObjAttr_cid = NULL;
+  jobject return_obj;
+  jobject jobjid = NULL;
+  jint jType = 0;
+  jint jSize = 0;
+  jint jFlags = 0;
+  jint jElements = 0;
+  jstring jparname;
+  jint joix;
+  jint jvid;
 
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  if (PwrtObjid_id == NULL)
+    printf("Pwrtobjid_id ï¿½r NULL");
 
-
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  if(PwrtObjid_id == NULL) printf("Pwrtobjid_id är NULL");
-
-  if(PwrtObjid_cid == NULL || PwrtObjid_getOix == NULL || PwrtObjid_getVid == NULL)
+  if (PwrtObjid_cid == NULL || PwrtObjid_getOix == NULL || PwrtObjid_getVid == NULL)
   {
-    PwrtObjid_cid = (*env)->GetMethodID( env, PwrtObjid_id, "<init>", "(II)V");
-    if(PwrtObjid_cid == NULL) printf("Pwrtobjid_cid är NULL");
+    PwrtObjid_cid = (*env)->GetMethodID(env, PwrtObjid_id, "<init>", "(II)V");
+    if (PwrtObjid_cid == NULL)
+      printf("Pwrtobjid_cid ï¿½r NULL");
 
-    PwrtObjid_getOix = (*env)->GetMethodID( env, PwrtObjid_id, "getOix", "()I");
-    if(PwrtObjid_getOix == NULL) printf("Pwrtobjid_getOix är NULL");
-    PwrtObjid_getVid = (*env)->GetMethodID( env, PwrtObjid_id, "getVid", "()I");
-    if(PwrtObjid_getVid == NULL) printf("Pwrtobjid_getVid är NULL");
-    //printf("initierat Pwrtobjid metodIds\n");
+    PwrtObjid_getOix = (*env)->GetMethodID(env, PwrtObjid_id, "getOix", "()I");
+    if (PwrtObjid_getOix == NULL)
+      printf("Pwrtobjid_getOix ï¿½r NULL");
+    PwrtObjid_getVid = (*env)->GetMethodID(env, PwrtObjid_id, "getVid", "()I");
+    if (PwrtObjid_getVid == NULL)
+      printf("Pwrtobjid_getVid ï¿½r NULL");
+    // printf("initierat Pwrtobjid metodIds\n");
   }
 
-  cdhrObjAttr_id = (*env)->FindClass( env, "jpwr/rt/CdhrObjAttr");
-  if(cdhrObjAttr_id == NULL) printf("cdhrObjAttr_id är NULL");
+  cdhrObjAttr_id = (*env)->FindClass(env, "jpwr/rt/CdhrObjAttr");
+  if (cdhrObjAttr_id == NULL)
+    printf("cdhrObjAttr_id ï¿½r NULL");
 
-  if(cdhrObjAttr_cid == NULL)
+  if (cdhrObjAttr_cid == NULL)
   {
-    cdhrObjAttr_cid = (*env)->GetMethodID( env, cdhrObjAttr_id,
-    	  "<init>", "(Ljpwr/rt/PwrtObjid;Ljava/lang/String;IIII)V");
-    //printf("initierat cdhrObjAttr_cid metodId\n");
-    if(cdhrObjAttr_cid == NULL) printf("cdhrObjAttr_cid är NULL");
+    cdhrObjAttr_cid =
+        (*env)->GetMethodID(env, cdhrObjAttr_id, "<init>", "(Ljpwr/rt/PwrtObjid;Ljava/lang/String;IIII)V");
+    // printf("initierat cdhrObjAttr_cid metodId\n");
+    if (cdhrObjAttr_cid == NULL)
+      printf("cdhrObjAttr_cid ï¿½r NULL");
   }
-
 
   cid = (pwr_tClassId)classid;
-  if(objid_obj != NULL)
+  if (objid_obj != NULL)
   {
-    objid.oix = (*env)->CallIntMethod( env, objid_obj, PwrtObjid_getOix);
-    objid.vid = (*env)->CallIntMethod( env, objid_obj, PwrtObjid_getVid);
+    objid.oix = (*env)->CallIntMethod(env, objid_obj, PwrtObjid_getOix);
+    objid.vid = (*env)->CallIntMethod(env, objid_obj, PwrtObjid_getVid);
   }
 
-  sts = gdh_ObjidToName ( cdh_ClassIdToObjid(cid), classname,
-		sizeof(classname), cdh_mName_volumeStrict);
-  if ( EVEN(sts))
+  sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid), classname, sizeof(classname), cdh_mName_volumeStrict);
+  if (EVEN(sts))
   {
     printf("return NULL after objidtoname\n");
     return NULL;
   }
 
-
   attr_exist = 0;
-  for ( j = 0; j < 2; j++)
+  for (j = 0; j < 2; j++)
   {
-    strcpy( hiername, classname);
-    if ( j == 0)
-      strcat( hiername, "-RtBody");
+    strcpy(hiername, classname);
+    if (j == 0)
+      strcat(hiername, "-RtBody");
     else
-      strcat( hiername, "-SysBody");
+      strcat(hiername, "-SysBody");
 
-    sts = gdh_NameToObjid( hiername, &body);
-    if ( EVEN(sts))
+    sts = gdh_NameToObjid(hiername, &body);
+    if (EVEN(sts))
     {
       continue;
     }
 
     /* if we dont have a objid then we must find the child*/
-    if(!(objid.oix + objid.vid))
+    if (!(objid.oix + objid.vid))
     {
-      sts = gdh_GetChild( body, &parameter);
+      sts = gdh_GetChild(body, &parameter);
     }
     /* we have the objid for a child to the class then we want the next
        sibling*/
     else
     {
-      sts = gdh_GetNextSibling ( objid, &parameter);
+      sts = gdh_GetNextSibling(objid, &parameter);
     }
-    while ( ODD(sts))
+    while (ODD(sts))
     {
-      sts = gdh_ObjidToName ( parameter, hiername, sizeof(hiername),
-			cdh_mName_volumeStrict);
-      if ( EVEN(sts))
+      sts = gdh_ObjidToName(parameter, hiername, sizeof(hiername), cdh_mName_volumeStrict);
+      if (EVEN(sts))
       {
         printf("return NULL after objidtoname 2\n");
         return NULL;
       }
 
-
       /* Skip hierarchy */
-      s = strrchr( hiername, '-');
-      if ( s == 0)
-        strcpy( parname, hiername);
+      s = strrchr(hiername, '-');
+      if (s == 0)
+        strcpy(parname, hiername);
       else
-        strcpy( parname, s + 1);
+        strcpy(parname, s + 1);
 
       /* Get parameter info for this parameter */
-      strcpy( fullname, hiername);
-      sts = gdh_GetObjectInfo( fullname, &parinfo, sizeof(parinfo));
+      strcpy(fullname, hiername);
+      sts = gdh_GetObjectInfo(fullname, &parinfo, sizeof(parinfo));
       if (EVEN(sts))
       {
         printf("return NULL after getobjectinfo\n");
         return NULL;
       }
-      sts = gdh_GetObjectClass( parameter, &parameter_class);
-      if ( EVEN(sts))
+      sts = gdh_GetObjectClass(parameter, &parameter_class);
+      if (EVEN(sts))
       {
         printf("return NULL after getobjecclass 2\n");
         return NULL;
       }
 
-
-      if ( parinfo.Flags & PWR_MASK_RTVIRTUAL ||
-           (parinfo.Flags & PWR_MASK_PRIVATE &&
-	    parinfo.Flags & PWR_MASK_POINTER))
+      if (parinfo.Flags & PWR_MASK_RTVIRTUAL ||
+          (parinfo.Flags & PWR_MASK_PRIVATE && parinfo.Flags & PWR_MASK_POINTER))
       {
         /* This parameter does not contain any useful information, take the
-	    next one */
-        sts = gdh_GetNextSibling ( parameter, &parameter);
-	continue;
+            next one */
+        sts = gdh_GetNextSibling(parameter, &parameter);
+        continue;
       }
       jType = (jint)parinfo.Type;
       jSize = (jint)parinfo.Size;
       jFlags = (jint)parinfo.Flags;
       jElements = (jint)parinfo.Elements;
-      jparname = (*env)->NewStringUTF( env, parname);
-      joix = (jint) parameter.oix;
-      jvid = (jint) parameter.vid;
-      jobjid = (*env)->NewObject( env, PwrtObjid_id, PwrtObjid_cid, joix, jvid);
+      jparname = (*env)->NewStringUTF(env, parname);
+      joix = (jint)parameter.oix;
+      jvid = (jint)parameter.vid;
+      jobjid = (*env)->NewObject(env, PwrtObjid_id, PwrtObjid_cid, joix, jvid);
 
       /*make a new javaobject CdhrObjAttr*/
-      return_obj = (*env)->NewObject(env,
-	                             cdhrObjAttr_id,
-  	                             cdhrObjAttr_cid,
-				     jobjid,
-				     jparname,
-				     jType,
-				     jSize,
-				     jFlags,
-				     jElements);
+      return_obj = (*env)->NewObject(env, cdhrObjAttr_id, cdhrObjAttr_cid, jobjid, jparname, jType, jSize,
+                                     jFlags, jElements);
       return return_obj;
     }
   }
@@ -2452,492 +2330,481 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getClassAttribute
   return NULL;
 }
 
-static void gdh_crr_insert_cb( void *ctx, void *parent_node,
-				navc_eItemType item_type,
-				char *text1, char *text2, int write)
+static void gdh_crr_insert_cb(void* ctx, void* parent_node, navc_eItemType item_type, char* text1,
+                              char* text2, int write)
 {
-  gdh_sCrrCtx *crrctx = (gdh_sCrrCtx *)ctx;
+  gdh_sCrrCtx* crrctx = (gdh_sCrrCtx*)ctx;
 
-  if ( crrctx->truncated)
+  if (crrctx->truncated)
     return;
 
-  if ( crrctx->len > sizeof(crrctx->buf) - 260) {
-    strcat( crrctx->buf, "\n0 ** List truncated **\n");
+  if (crrctx->len > sizeof(crrctx->buf) - 260)
+  {
+    strcat(crrctx->buf, "\n0 ** List truncated **\n");
     crrctx->truncated = 1;
     return;
   }
 
-  switch( item_type) {
-    case navc_eItemType_Crossref:
-      if ( !streq( crrctx->buf, "")) {
-        strcat( crrctx->buf, "\n");
-	crrctx->len++;
-      }
-      switch ( write) {
-      case 0:
-        strcat( crrctx->buf, "0");
-	crrctx->len++;
-	break;
-      case 1:
-	strcat( crrctx->buf, "1");
-	crrctx->len++;
-	break;
-      case 2:
-	strcat( crrctx->buf, "2");
-	crrctx->len++;
-	break;
-      }
-      // printf( "Insert %s %s\n", text1, text2);
-      strcat( crrctx->buf, text1);
-      strcat( crrctx->buf, "  ");
-      strcat( crrctx->buf, text2);
-      crrctx->len += strlen(text1) + 2 + strlen(text2);
-      // new ItemCrossref( brow, text1, text2,
-      //		write, parent_node, flow_eDest_IntoLast);
+  switch (item_type)
+  {
+  case navc_eItemType_Crossref:
+    if (!streq(crrctx->buf, ""))
+    {
+      strcat(crrctx->buf, "\n");
+      crrctx->len++;
+    }
+    switch (write)
+    {
+    case 0:
+      strcat(crrctx->buf, "0");
+      crrctx->len++;
       break;
-    case navc_eItemType_Header:
-      // new ItemHeader( brow, "crr", text1, parent_node, flow_eDest_IntoLast);
+    case 1:
+      strcat(crrctx->buf, "1");
+      crrctx->len++;
       break;
-    case navc_eItemType_Text:
-      // new ItemText( brow, "crr", text1, parent_node, flow_eDest_IntoLast);
+    case 2:
+      strcat(crrctx->buf, "2");
+      crrctx->len++;
       break;
+    }
+    // printf( "Insert %s %s\n", text1, text2);
+    strcat(crrctx->buf, text1);
+    strcat(crrctx->buf, "  ");
+    strcat(crrctx->buf, text2);
+    crrctx->len += strlen(text1) + 2 + strlen(text2);
+    // new ItemCrossref( brow, text1, text2,
+    //		write, parent_node, flow_eDest_IntoLast);
+    break;
+  case navc_eItemType_Header:
+    // new ItemHeader( brow, "crr", text1, parent_node, flow_eDest_IntoLast);
+    break;
+  case navc_eItemType_Text:
+    // new ItemText( brow, "crr", text1, parent_node, flow_eDest_IntoLast);
+    break;
   }
 }
 
-static int gdh_crr_name_to_objid_cb( void *ctx, char *name, pwr_tObjid *objid)
+static int gdh_crr_name_to_objid_cb(void* ctx, char* name, pwr_tObjid* objid)
 {
   int sts;
-  sts =  gdh_NameToObjid( name, objid);
+  sts = gdh_NameToObjid(name, objid);
   // printf( "name_to_objid_cb: %s %d\n", name, sts);
   return sts;
 }
 
-static int gdh_crr_get_volume_cb( void *ctx, pwr_tVid *volid,  pwr_tVid v)
+static int gdh_crr_get_volume_cb(void* ctx, pwr_tVid* volid, pwr_tVid v)
 {
   int sts;
   pwr_tObjid objid;
 
-  sts = gdh_GetNodeObject( 0, &objid);
-  if ( EVEN(sts)) return sts;
+  sts = gdh_GetNodeObject(0, &objid);
+  if (EVEN(sts))
+    return sts;
 
   *volid = objid.vid;
   return GDH__SUCCESS;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_crrObject
-  (JNIEnv *env, jclass obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_crrObject(JNIEnv* env, jclass obj, jstring name)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
   jobject return_obj;
   jint jsts;
-  jstring	jbuf = NULL;
-  gdh_sCrrCtx   *crrctx;
+  jstring jbuf = NULL;
+  gdh_sCrrCtx* crrctx;
   jclass cdhrString_id;
   static jmethodID cdhrString_cid = NULL;
 
-  cdhrString_id = (*env)->FindClass( env, "jpwr/rt/CdhrString");
-  if(cdhrString_cid == NULL)
+  cdhrString_id = (*env)->FindClass(env, "jpwr/rt/CdhrString");
+  if (cdhrString_cid == NULL)
   {
-    cdhrString_cid = (*env)->GetMethodID( env, cdhrString_id,
-    	  "<init>", "(Ljava/lang/String;I)V");
-    //printf("cdhrString_cid initierad\n");
+    cdhrString_cid = (*env)->GetMethodID(env, cdhrString_id, "<init>", "(Ljava/lang/String;I)V");
+    // printf("cdhrString_cid initierad\n");
   }
 
-  crrctx = (gdh_sCrrCtx *)calloc( 1, sizeof(gdh_sCrrCtx));
+  crrctx = (gdh_sCrrCtx*)calloc(1, sizeof(gdh_sCrrCtx));
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
   // printf( "crrObject name: %s %s\n", str, cstr);
-  sts = crr_object( crrctx, cstr, gdh_crr_insert_cb, gdh_crr_name_to_objid_cb,
-		    gdh_crr_get_volume_cb);
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
+  sts = crr_object(crrctx, cstr, gdh_crr_insert_cb, gdh_crr_name_to_objid_cb, gdh_crr_get_volume_cb);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  if ( ODD(sts))
-    jbuf = (*env)->NewStringUTF( env, crrctx->buf);
+  if (ODD(sts))
+    jbuf = (*env)->NewStringUTF(env, crrctx->buf);
 
-  free( crrctx);
+  free(crrctx);
 
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrString_id,
-  	cdhrString_cid, jbuf, jsts);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrString_id, cdhrString_cid, jbuf, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_crrSignal
-  (JNIEnv *env, jclass obj, jstring name)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_crrSignal(JNIEnv* env, jclass obj, jstring name)
 {
   int sts;
-  const char *str;
-  char *cstr;
+  const char* str;
+  char* cstr;
   jobject return_obj;
   jint jsts;
-  jstring	jbuf = NULL;
-  gdh_sCrrCtx          *crrctx;
+  jstring jbuf = NULL;
+  gdh_sCrrCtx* crrctx;
   jclass cdhrString_id;
   static jmethodID cdhrString_cid = NULL;
 
-  cdhrString_id = (*env)->FindClass( env, "jpwr/rt/CdhrString");
-  if(cdhrString_cid == NULL)
+  cdhrString_id = (*env)->FindClass(env, "jpwr/rt/CdhrString");
+  if (cdhrString_cid == NULL)
   {
-    cdhrString_cid = (*env)->GetMethodID( env, cdhrString_id,
-    	  "<init>", "(Ljava/lang/String;I)V");
-    //printf("cdhrString_cid initierad\n");
+    cdhrString_cid = (*env)->GetMethodID(env, cdhrString_id, "<init>", "(Ljava/lang/String;I)V");
+    // printf("cdhrString_cid initierad\n");
   }
 
-  crrctx = (gdh_sCrrCtx *)calloc( 1, sizeof(gdh_sCrrCtx));
+  crrctx = (gdh_sCrrCtx*)calloc(1, sizeof(gdh_sCrrCtx));
 
-  str = (*env)->GetStringUTFChars( env, name, 0);
-  cstr = (char *)str;
-  gdh_ConvertUTFstring( cstr, cstr);
+  str = (*env)->GetStringUTFChars(env, name, 0);
+  cstr = (char*)str;
+  gdh_ConvertUTFstring(cstr, cstr);
   // printf( "crrObject name: %s %s\n", str, cstr);
-  sts = crr_signal( crrctx, cstr, gdh_crr_insert_cb, gdh_crr_name_to_objid_cb,
-		    gdh_crr_get_volume_cb);
-  (*env)->ReleaseStringUTFChars( env, name, cstr);
+  sts = crr_signal(crrctx, cstr, gdh_crr_insert_cb, gdh_crr_name_to_objid_cb, gdh_crr_get_volume_cb);
+  (*env)->ReleaseStringUTFChars(env, name, cstr);
 
-  if ( ODD(sts))
-    jbuf = (*env)->NewStringUTF( env, crrctx->buf);
+  if (ODD(sts))
+    jbuf = (*env)->NewStringUTF(env, crrctx->buf);
 
-  free( crrctx);
+  free(crrctx);
 
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrString_id,
-  	cdhrString_cid, jbuf, jsts);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrString_id, cdhrString_cid, jbuf, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getMsg
-  (JNIEnv *env, jclass obj, jint sts)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getMsg(JNIEnv* env, jclass obj, jint sts)
 {
   int status;
   jobject return_obj;
   jint jsts;
-  jstring	jbuf = NULL;
-  char          buf[200];
+  jstring jbuf = NULL;
+  char buf[200];
   jclass cdhrString_id;
   static jmethodID cdhrString_cid = NULL;
 
-  cdhrString_id = (*env)->FindClass( env, "jpwr/rt/CdhrString");
-  if(cdhrString_cid == NULL)
+  cdhrString_id = (*env)->FindClass(env, "jpwr/rt/CdhrString");
+  if (cdhrString_cid == NULL)
   {
-    cdhrString_cid = (*env)->GetMethodID( env, cdhrString_id,
-    	  "<init>", "(Ljava/lang/String;I)V");
-    //printf("cdhrString_cid initierad\n");
+    cdhrString_cid = (*env)->GetMethodID(env, cdhrString_id, "<init>", "(Ljava/lang/String;I)V");
+    // printf("cdhrString_cid initierad\n");
   }
 
-  status = (pwr_tStatus) sts;
+  status = (pwr_tStatus)sts;
 
-  msg_GetMsg( status, buf, sizeof(buf));
+  msg_GetMsg(status, buf, sizeof(buf));
 
-  jbuf = (*env)->NewStringUTF( env, buf);
-  jsts = (jint) GDH__SUCCESS;
-  return_obj = (*env)->NewObject( env, cdhrString_id,
-  	cdhrString_cid, jbuf, jsts);
+  jbuf = (*env)->NewStringUTF(env, buf);
+  jsts = (jint)GDH__SUCCESS;
+  return_obj = (*env)->NewObject(env, cdhrString_id, cdhrString_cid, jbuf, jsts);
   return return_obj;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getMsgText
-  (JNIEnv *env, jclass obj, jint sts)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getMsgText(JNIEnv* env, jclass obj, jint sts)
 {
   int status;
   jobject return_obj;
   jint jsts;
-  jstring	jbuf = NULL;
-  char          buf[200];
+  jstring jbuf = NULL;
+  char buf[200];
   jclass cdhrString_id;
   static jmethodID cdhrString_cid = NULL;
 
-  cdhrString_id = (*env)->FindClass( env, "jpwr/rt/CdhrString");
-  if(cdhrString_cid == NULL)
+  cdhrString_id = (*env)->FindClass(env, "jpwr/rt/CdhrString");
+  if (cdhrString_cid == NULL)
   {
-    cdhrString_cid = (*env)->GetMethodID( env, cdhrString_id,
-    	  "<init>", "(Ljava/lang/String;I)V");
-    //printf("cdhrString_cid initierad\n");
+    cdhrString_cid = (*env)->GetMethodID(env, cdhrString_id, "<init>", "(Ljava/lang/String;I)V");
+    // printf("cdhrString_cid initierad\n");
   }
 
-  status = (pwr_tStatus) sts;
+  status = (pwr_tStatus)sts;
 
-  if ( status == 0)
-    strcpy( buf, "");
+  if (status == 0)
+    strcpy(buf, "");
   else
-    msg_GetText( status, buf, sizeof(buf));
+    msg_GetText(status, buf, sizeof(buf));
 
-  jbuf = (*env)->NewStringUTF( env, buf);
-  jsts = (jint) GDH__SUCCESS;
-  return_obj = (*env)->NewObject( env, cdhrString_id,
-  	cdhrString_cid, jbuf, jsts);
+  jbuf = (*env)->NewStringUTF(env, buf);
+  jsts = (jint)GDH__SUCCESS;
+  return_obj = (*env)->NewObject(env, cdhrString_id, cdhrString_cid, jbuf, jsts);
   return return_obj;
 }
 
-
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSuperClass
-  (JNIEnv *env, jclass obj, jint classid, jobject objid_obj)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSuperClass(JNIEnv* env, jclass obj, jint classid,
+                                                         jobject objid_obj)
 {
-  int		sts;
-  jclass 	pwrtObjid_id;
-  static jmethodID 	pwrtObjid_getOix = NULL;
-  static jmethodID 	pwrtObjid_getVid = NULL;
-  static jmethodID 	pwrtObjid_cid = NULL;
-  pwr_tObjid 	objid;
-  jclass 	cdhrClassId_id;
-  static jmethodID 	cdhrClassId_cid;
-  jint	 	jsupercid = 0;
-  jobject 	return_obj;
-  jint 		jsts;
-  pwr_tClassId	cid, supercid;
+  int sts;
+  jclass pwrtObjid_id;
+  static jmethodID pwrtObjid_getOix = NULL;
+  static jmethodID pwrtObjid_getVid = NULL;
+  static jmethodID pwrtObjid_cid = NULL;
+  pwr_tObjid objid;
+  jclass cdhrClassId_id;
+  static jmethodID cdhrClassId_cid;
+  jint jsupercid = 0;
+  jobject return_obj;
+  jint jsts;
+  pwr_tClassId cid, supercid;
 
-  cdhrClassId_id = (*env)->FindClass( env, "jpwr/rt/CdhrClassId");
-  if(cdhrClassId_cid == NULL)
+  cdhrClassId_id = (*env)->FindClass(env, "jpwr/rt/CdhrClassId");
+  if (cdhrClassId_cid == NULL)
   {
-    cdhrClassId_cid = (*env)->GetMethodID( env, cdhrClassId_id,
-    	  "<init>", "(II)V");
-    //printf("cdhrClassId_cid initierad\n");
+    cdhrClassId_cid = (*env)->GetMethodID(env, cdhrClassId_id, "<init>", "(II)V");
+    // printf("cdhrClassId_cid initierad\n");
   }
 
-  pwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  if(pwrtObjid_cid == NULL || pwrtObjid_getOix == NULL || pwrtObjid_getVid == NULL)
+  pwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  if (pwrtObjid_cid == NULL || pwrtObjid_getOix == NULL || pwrtObjid_getVid == NULL)
   {
-    pwrtObjid_cid = (*env)->GetMethodID( env, pwrtObjid_id,
-    	  "<init>", "(II)V");
-    pwrtObjid_getOix = (*env)->GetMethodID( env, pwrtObjid_id, "getOix", "()I");
-    pwrtObjid_getVid = (*env)->GetMethodID( env, pwrtObjid_id, "getVid", "()I");
+    pwrtObjid_cid = (*env)->GetMethodID(env, pwrtObjid_id, "<init>", "(II)V");
+    pwrtObjid_getOix = (*env)->GetMethodID(env, pwrtObjid_id, "getOix", "()I");
+    pwrtObjid_getVid = (*env)->GetMethodID(env, pwrtObjid_id, "getVid", "()I");
   }
 
-  cid = (pwr_tCid) classid;
+  cid = (pwr_tCid)classid;
 
-  if ( objid_obj != 0) {
-    objid.oix = (*env)->CallIntMethod( env, objid_obj, pwrtObjid_getOix);
-    objid.vid = (*env)->CallIntMethod( env, objid_obj, pwrtObjid_getVid);
+  if (objid_obj != 0)
+  {
+    objid.oix = (*env)->CallIntMethod(env, objid_obj, pwrtObjid_getOix);
+    objid.vid = (*env)->CallIntMethod(env, objid_obj, pwrtObjid_getVid);
 
-    sts = gdh_GetSuperClass( cid, &supercid, objid);
+    sts = gdh_GetSuperClass(cid, &supercid, objid);
   }
   else
-    sts = gdh_GetSuperClass( cid, &supercid, pwr_cNObjid);
+    sts = gdh_GetSuperClass(cid, &supercid, pwr_cNObjid);
 
-  if ( ODD(sts)) {
+  if (ODD(sts))
+  {
     jsupercid = (jint)supercid;
   }
 
-  jsts = (jint) sts;
-  return_obj = (*env)->NewObject( env, cdhrClassId_id,
-  	cdhrClassId_cid, jsupercid, jsts);
+  jsts = (jint)sts;
+  return_obj = (*env)->NewObject(env, cdhrClassId_id, cdhrClassId_cid, jsupercid, jsts);
   return return_obj;
-
 }
 
-JNIEXPORT jobjectArray JNICALL Java_jpwr_rt_Gdh_getObjectBodyDef
-  (JNIEnv *env, jobject obj, jint classid, jobject aref_obj)
+JNIEXPORT jobjectArray JNICALL Java_jpwr_rt_Gdh_getObjectBodyDef(JNIEnv* env, jobject obj, jint classid,
+                                                                 jobject aref_obj)
 {
-  int		sts,i;
+  int sts, i;
   int j = 0;
-  jclass                pwrsParInfo_id;
-  static jmethodID      pwrsParInfo_cid = NULL;
+  jclass pwrsParInfo_id;
+  static jmethodID pwrsParInfo_cid = NULL;
 
-  jclass                gdhrsAttrDef_id;
-  static jmethodID      gdhrsAttrDef_cid = NULL;
+  jclass gdhrsAttrDef_id;
+  static jmethodID gdhrsAttrDef_cid = NULL;
 
-  jclass 	        pwrtAttrRef_id;
-  static jmethodID 	pwrtAttrRef_getOix = NULL;
-  static jmethodID 	pwrtAttrRef_getVid = NULL;
-  static jmethodID 	pwrtAttrRef_getBody = NULL;
-  static jmethodID 	pwrtAttrRef_getOffset = NULL;
-  static jmethodID 	pwrtAttrRef_getSize = NULL;
-  static jmethodID 	pwrtAttrRef_getFlags = NULL;
-  pwr_tAttrRef 	        aref;
+  jclass pwrtAttrRef_id;
+  static jmethodID pwrtAttrRef_getOix = NULL;
+  static jmethodID pwrtAttrRef_getVid = NULL;
+  static jmethodID pwrtAttrRef_getBody = NULL;
+  static jmethodID pwrtAttrRef_getOffset = NULL;
+  static jmethodID pwrtAttrRef_getSize = NULL;
+  static jmethodID pwrtAttrRef_getFlags = NULL;
+  pwr_tAttrRef aref;
 
-  jobjectArray 	        gdhrsAttrDefArr = NULL;
-  jobject               gdhrsAttrDef;
-  jobject 	        pwrsParInfo;
-  pwr_tClassId	        cid = classid;
+  jobjectArray gdhrsAttrDefArr = NULL;
+  jobject gdhrsAttrDef;
+  jobject pwrsParInfo;
+  pwr_tClassId cid = classid;
 
-  gdh_sAttrDef *bd;
+  gdh_sAttrDef* bd;
   int rows;
   pwr_sAttrRef aaref;
   pwr_tDisableAttr disabled;
 
-  pwrtAttrRef_id = (*env)->FindClass( env, "jpwr/rt/PwrtAttrRef");
-  if( pwrtAttrRef_getOix == NULL || pwrtAttrRef_getVid == NULL) {
-    pwrtAttrRef_getOix = (*env)->GetMethodID( env, pwrtAttrRef_id, "getOix", "()I");
-    pwrtAttrRef_getVid = (*env)->GetMethodID( env, pwrtAttrRef_id, "getVid", "()I");
-    pwrtAttrRef_getBody = (*env)->GetMethodID( env, pwrtAttrRef_id, "getBody", "()I");
-    pwrtAttrRef_getOffset = (*env)->GetMethodID( env, pwrtAttrRef_id, "getOffset", "()I");
-    pwrtAttrRef_getSize = (*env)->GetMethodID( env, pwrtAttrRef_id, "getSize", "()I");
-    pwrtAttrRef_getFlags = (*env)->GetMethodID( env, pwrtAttrRef_id, "getFlags", "()I");
+  pwrtAttrRef_id = (*env)->FindClass(env, "jpwr/rt/PwrtAttrRef");
+  if (pwrtAttrRef_getOix == NULL || pwrtAttrRef_getVid == NULL)
+  {
+    pwrtAttrRef_getOix = (*env)->GetMethodID(env, pwrtAttrRef_id, "getOix", "()I");
+    pwrtAttrRef_getVid = (*env)->GetMethodID(env, pwrtAttrRef_id, "getVid", "()I");
+    pwrtAttrRef_getBody = (*env)->GetMethodID(env, pwrtAttrRef_id, "getBody", "()I");
+    pwrtAttrRef_getOffset = (*env)->GetMethodID(env, pwrtAttrRef_id, "getOffset", "()I");
+    pwrtAttrRef_getSize = (*env)->GetMethodID(env, pwrtAttrRef_id, "getSize", "()I");
+    pwrtAttrRef_getFlags = (*env)->GetMethodID(env, pwrtAttrRef_id, "getFlags", "()I");
   }
 
-  //find the class for PwrsParInfo
+  // find the class for PwrsParInfo
   pwrsParInfo_id = (*env)->FindClass(env, "jpwr/rt/PwrsParInfo");
   gdhrsAttrDef_id = (*env)->FindClass(env, "jpwr/rt/GdhrsAttrDef");
-  if(pwrsParInfo_id == NULL || gdhrsAttrDef_id == NULL) {
+  if (pwrsParInfo_id == NULL || gdhrsAttrDef_id == NULL)
+  {
     printf("Error in FindClass getObjectBodyDef\n");
     return (jobjectArray)NULL;
   }
-  if(pwrsParInfo_cid == NULL) {
-    pwrsParInfo_cid = (*env)->GetMethodID( env, pwrsParInfo_id,
-    	  "<init>", "(Ljava/lang/String;IIIIII)V");
+  if (pwrsParInfo_cid == NULL)
+  {
+    pwrsParInfo_cid = (*env)->GetMethodID(env, pwrsParInfo_id, "<init>", "(Ljava/lang/String;IIIIII)V");
   }
-  if(gdhrsAttrDef_cid == NULL) {
-    gdhrsAttrDef_cid = (*env)->GetMethodID( env, gdhrsAttrDef_id,
-    	  "<init>", "(Ljava/lang/String;IIIILjpwr/rt/PwrsParInfo;I)V");
+  if (gdhrsAttrDef_cid == NULL)
+  {
+    gdhrsAttrDef_cid = (*env)->GetMethodID(env, gdhrsAttrDef_id, "<init>",
+                                           "(Ljava/lang/String;IIIILjpwr/rt/PwrsParInfo;I)V");
   }
-  if(pwrsParInfo_cid == NULL || gdhrsAttrDef_cid == NULL) {
+  if (pwrsParInfo_cid == NULL || gdhrsAttrDef_cid == NULL)
+  {
     printf("Error in GetMethodId getObjectBodyDef\n");
     return (jobjectArray)NULL;
   }
-  if ( aref_obj != 0) {
+  if (aref_obj != 0)
+  {
 
-    aref.Objid.oix = (*env)->CallIntMethod( env, aref_obj, pwrtAttrRef_getOix);
-    aref.Objid.vid = (*env)->CallIntMethod( env, aref_obj, pwrtAttrRef_getVid);
-    aref.Body = (*env)->CallIntMethod( env, aref_obj, pwrtAttrRef_getBody);
-    aref.Offset = (*env)->CallIntMethod( env, aref_obj, pwrtAttrRef_getOffset);
-    aref.Size = (*env)->CallIntMethod( env, aref_obj, pwrtAttrRef_getSize);
-    aref.Flags.m = (*env)->CallIntMethod( env, aref_obj, pwrtAttrRef_getFlags);
+    aref.Objid.oix = (*env)->CallIntMethod(env, aref_obj, pwrtAttrRef_getOix);
+    aref.Objid.vid = (*env)->CallIntMethod(env, aref_obj, pwrtAttrRef_getVid);
+    aref.Body = (*env)->CallIntMethod(env, aref_obj, pwrtAttrRef_getBody);
+    aref.Offset = (*env)->CallIntMethod(env, aref_obj, pwrtAttrRef_getOffset);
+    aref.Size = (*env)->CallIntMethod(env, aref_obj, pwrtAttrRef_getSize);
+    aref.Flags.m = (*env)->CallIntMethod(env, aref_obj, pwrtAttrRef_getFlags);
   }
 
-  sts = gdh_GetObjectBodyDef( cid, &bd, &rows, aref.Objid);
-  if(EVEN(sts)) {
-    printf("Error in gdh_GetObjectBodyDef cid: %d, oid: %d,%d sts: %d\n", cid, aref.Objid.vid, aref.Objid.oix, sts);
+  sts = gdh_GetObjectBodyDef(cid, &bd, &rows, aref.Objid);
+  if (EVEN(sts))
+  {
+    printf("Error in gdh_GetObjectBodyDef cid: %d, oid: %d,%d sts: %d\n", cid, aref.Objid.vid, aref.Objid.oix,
+           sts);
     return (jobjectArray)NULL;
   }
 
-  // printf("gdh_GetObjectBodyDef cid: %d, oid: %d,%d sts: %d rows: %d\n", cid, aref.Objid.vid, aref.Objid.oix, sts, rows);
+  // printf("gdh_GetObjectBodyDef cid: %d, oid: %d,%d sts: %d rows: %d\n", cid, aref.Objid.vid,
+  // aref.Objid.oix, sts, rows);
 
-  //create a new GdhrsAttrDef[]
+  // create a new GdhrsAttrDef[]
   gdhrsAttrDefArr = (*env)->NewObjectArray(env, (jint)rows, gdhrsAttrDef_id, NULL);
 
-  for(i = 0;i < rows;i++) {
-    if ( (bd[i].flags & gdh_mAttrDef_Shadowed) ||
-	 (bd[i].attr->Param.Info.Flags & PWR_MASK_RTHIDE) ||
-	 (bd[i].attr->Param.Info.Flags & PWR_MASK_RTVIRTUAL) ||
-	 (bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE) ||
-	 (bd[i].attr->Param.Info.Type == pwr_eType_CastId) ||
-	 (bd[i].attr->Param.Info.Type == pwr_eType_DisableAttr) )
+  for (i = 0; i < rows; i++)
+  {
+    if ((bd[i].flags & gdh_mAttrDef_Shadowed) || (bd[i].attr->Param.Info.Flags & PWR_MASK_RTHIDE) ||
+        (bd[i].attr->Param.Info.Flags & PWR_MASK_RTVIRTUAL) ||
+        (bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE) ||
+        (bd[i].attr->Param.Info.Type == pwr_eType_CastId) ||
+        (bd[i].attr->Param.Info.Type == pwr_eType_DisableAttr))
       continue;
-    if(bd[i].attr->Param.Info.Flags & PWR_MASK_DISABLEATTR) {
-      sts = gdh_ArefANameToAref( &aref, bd[i].attrName, &aaref);
-      if ( EVEN(sts)) printf("Error in ArefANameToAref %d\n", sts);
+    if (bd[i].attr->Param.Info.Flags & PWR_MASK_DISABLEATTR)
+    {
+      sts = gdh_ArefANameToAref(&aref, bd[i].attrName, &aaref);
+      if (EVEN(sts))
+        printf("Error in ArefANameToAref %d\n", sts);
 
+      sts = gdh_ArefDisabled(&aaref, &disabled);
+      if (EVEN(sts))
+        printf("Error in ArefDisabled %d\n", sts);
 
-      sts = gdh_ArefDisabled( &aaref, &disabled);
-      if ( EVEN(sts)) printf("Error in ArefDisabled %d\n", sts);
-
-      if ( disabled)
-	continue;
+      if (disabled)
+        continue;
     }
 
-    pwrsParInfo = (*env)->NewObject( env, pwrsParInfo_id,
-				     pwrsParInfo_cid,
-				     NULL,
-				     bd[i].attr->Param.Info.Type,
-				     bd[i].attr->Param.Info.Offset,
-				     bd[i].attr->Param.Info.Size,
-				     bd[i].attr->Param.Info.Flags,
-				     bd[i].attr->Param.Info.Elements,
-				     bd[i].attr->Param.Info.ParamIndex);
+    pwrsParInfo = (*env)->NewObject(env, pwrsParInfo_id, pwrsParInfo_cid, NULL, bd[i].attr->Param.Info.Type,
+                                    bd[i].attr->Param.Info.Offset, bd[i].attr->Param.Info.Size,
+                                    bd[i].attr->Param.Info.Flags, bd[i].attr->Param.Info.Elements,
+                                    bd[i].attr->Param.Info.ParamIndex);
 
-
-    gdhrsAttrDef = (*env)->NewObject( env, gdhrsAttrDef_id,
-  	                              gdhrsAttrDef_cid,
-				      (*env)->NewStringUTF( env, (char *)bd[i].attrName),
-				      (jint)bd[i].attrLevel,
-				      (jint)bd[i].attrClass,
-				      (jint)bd[i].flags,
-				      (jint)(bd[i].attr->Param.TypeRef),
-				      pwrsParInfo,
-				      (jint)sts);
+    gdhrsAttrDef = (*env)->NewObject(env, gdhrsAttrDef_id, gdhrsAttrDef_cid,
+                                     (*env)->NewStringUTF(env, (char*)bd[i].attrName), (jint)bd[i].attrLevel,
+                                     (jint)bd[i].attrClass, (jint)bd[i].flags,
+                                     (jint)(bd[i].attr->Param.TypeRef), pwrsParInfo, (jint)sts);
 
     (*env)->SetObjectArrayElement(env, gdhrsAttrDefArr, j, gdhrsAttrDef);
     j++;
   }
-  free((char *)bd);
+  free((char*)bd);
   return gdhrsAttrDefArr;
 }
 
-JNIEXPORT jint JNICALL Java_jpwr_rt_Gdh_getCircBuffInfo
-  (JNIEnv *env, jobject obj, jobject info_obj)
+JNIEXPORT jint JNICALL Java_jpwr_rt_Gdh_getCircBuffInfo(JNIEnv* env, jobject obj, jobject info_obj)
 {
-  int		sts;
-  jclass 	circBuffInfo_id;
-  static jmethodID 	circBuffInfo_getCircArefOix = NULL;
-  static jmethodID 	circBuffInfo_getCircArefVid = NULL;
-  static jmethodID 	circBuffInfo_getCircArefBody = NULL;
-  static jmethodID 	circBuffInfo_getCircArefOffset = NULL;
-  static jmethodID 	circBuffInfo_getCircArefSize = NULL;
-  static jmethodID 	circBuffInfo_getCircArefFlags = NULL;
-  static jmethodID 	circBuffInfo_getResolution = NULL;
-  static jmethodID 	circBuffInfo_getSamples = NULL;
-  static jmethodID 	circBuffInfo_getElementType = NULL;
-  static jmethodID 	circBuffInfo_getFirstIdx = NULL;
-  static jmethodID 	circBuffInfo_getLastIdx = NULL;
-  static jmethodID 	circBuffInfo_getOffset = NULL;
-  static jfieldID	circBuffInfo_firstIdx_id;
-  static jfieldID	circBuffInfo_lastIdx_id;
-  static jfieldID	circBuffInfo_offset_id;
-  static jfieldID	circBuffInfo_samples_id;
-  static jfieldID	circBuffInfo_size_id;
-  static jfieldID	circBuffInfo_bufp_id;
-  static jfieldID	circBuffInfo_status_id;
-  int		element_type;
-  int		element_size;
-  jint 		jsts;
-  cbuf_sCircBuffInfo  info;
+  int sts;
+  jclass circBuffInfo_id;
+  static jmethodID circBuffInfo_getCircArefOix = NULL;
+  static jmethodID circBuffInfo_getCircArefVid = NULL;
+  static jmethodID circBuffInfo_getCircArefBody = NULL;
+  static jmethodID circBuffInfo_getCircArefOffset = NULL;
+  static jmethodID circBuffInfo_getCircArefSize = NULL;
+  static jmethodID circBuffInfo_getCircArefFlags = NULL;
+  static jmethodID circBuffInfo_getResolution = NULL;
+  static jmethodID circBuffInfo_getSamples = NULL;
+  static jmethodID circBuffInfo_getElementType = NULL;
+  static jmethodID circBuffInfo_getFirstIdx = NULL;
+  static jmethodID circBuffInfo_getLastIdx = NULL;
+  static jmethodID circBuffInfo_getOffset = NULL;
+  static jfieldID circBuffInfo_firstIdx_id;
+  static jfieldID circBuffInfo_lastIdx_id;
+  static jfieldID circBuffInfo_offset_id;
+  static jfieldID circBuffInfo_samples_id;
+  static jfieldID circBuffInfo_size_id;
+  static jfieldID circBuffInfo_bufp_id;
+  static jfieldID circBuffInfo_status_id;
+  int element_type;
+  int element_size;
+  jint jsts;
+  cbuf_sCircBuffInfo info;
 
-  memset( &info, 0, sizeof(info));
+  memset(&info, 0, sizeof(info));
 
-  circBuffInfo_id = (*env)->FindClass( env, "jpwr/rt/CircBuffInfo");
+  circBuffInfo_id = (*env)->FindClass(env, "jpwr/rt/CircBuffInfo");
 
-  if( circBuffInfo_getCircArefOix == NULL) {
-    circBuffInfo_getCircArefOix = (*env)->GetMethodID( env, circBuffInfo_id, "getCircArefOix", "()I");
-    circBuffInfo_getCircArefVid = (*env)->GetMethodID( env, circBuffInfo_id, "getCircArefVid", "()I");
-    circBuffInfo_getCircArefBody = (*env)->GetMethodID( env, circBuffInfo_id, "getCircArefBody", "()I");
-    circBuffInfo_getCircArefOffset = (*env)->GetMethodID( env, circBuffInfo_id, "getCircArefOffset", "()I");
-    circBuffInfo_getCircArefSize = (*env)->GetMethodID( env, circBuffInfo_id, "getCircArefSize", "()I");
-    circBuffInfo_getCircArefFlags = (*env)->GetMethodID( env, circBuffInfo_id, "getCircArefFlags", "()I");
-    circBuffInfo_getResolution = (*env)->GetMethodID( env, circBuffInfo_id, "getResolution", "()I");
-    circBuffInfo_getSamples = (*env)->GetMethodID( env, circBuffInfo_id, "getSamples", "()I");
-    circBuffInfo_getElementType = (*env)->GetMethodID( env, circBuffInfo_id, "getElementType", "()I");
-    circBuffInfo_getFirstIdx = (*env)->GetMethodID( env, circBuffInfo_id, "getFirstIdx", "()I");
-    circBuffInfo_getLastIdx = (*env)->GetMethodID( env, circBuffInfo_id, "getLastIdx", "()I");
-    circBuffInfo_getOffset = (*env)->GetMethodID( env, circBuffInfo_id, "getOffset", "()I");
+  if (circBuffInfo_getCircArefOix == NULL)
+  {
+    circBuffInfo_getCircArefOix = (*env)->GetMethodID(env, circBuffInfo_id, "getCircArefOix", "()I");
+    circBuffInfo_getCircArefVid = (*env)->GetMethodID(env, circBuffInfo_id, "getCircArefVid", "()I");
+    circBuffInfo_getCircArefBody = (*env)->GetMethodID(env, circBuffInfo_id, "getCircArefBody", "()I");
+    circBuffInfo_getCircArefOffset = (*env)->GetMethodID(env, circBuffInfo_id, "getCircArefOffset", "()I");
+    circBuffInfo_getCircArefSize = (*env)->GetMethodID(env, circBuffInfo_id, "getCircArefSize", "()I");
+    circBuffInfo_getCircArefFlags = (*env)->GetMethodID(env, circBuffInfo_id, "getCircArefFlags", "()I");
+    circBuffInfo_getResolution = (*env)->GetMethodID(env, circBuffInfo_id, "getResolution", "()I");
+    circBuffInfo_getSamples = (*env)->GetMethodID(env, circBuffInfo_id, "getSamples", "()I");
+    circBuffInfo_getElementType = (*env)->GetMethodID(env, circBuffInfo_id, "getElementType", "()I");
+    circBuffInfo_getFirstIdx = (*env)->GetMethodID(env, circBuffInfo_id, "getFirstIdx", "()I");
+    circBuffInfo_getLastIdx = (*env)->GetMethodID(env, circBuffInfo_id, "getLastIdx", "()I");
+    circBuffInfo_getOffset = (*env)->GetMethodID(env, circBuffInfo_id, "getOffset", "()I");
 
-    circBuffInfo_firstIdx_id = (*env)->GetFieldID( env, circBuffInfo_id, "firstIdx", "I");
-    circBuffInfo_lastIdx_id = (*env)->GetFieldID( env, circBuffInfo_id, "lastIdx", "I");
-    circBuffInfo_offset_id = (*env)->GetFieldID( env, circBuffInfo_id, "offset", "I");
-    circBuffInfo_samples_id = (*env)->GetFieldID( env, circBuffInfo_id, "samples", "I");
-    circBuffInfo_size_id = (*env)->GetFieldID( env, circBuffInfo_id, "size", "I");
-    circBuffInfo_bufp_id = (*env)->GetFieldID( env, circBuffInfo_id, "bufp", "Ljava/lang/Object;");
-    circBuffInfo_status_id = (*env)->GetFieldID( env, circBuffInfo_id, "status", "I");
+    circBuffInfo_firstIdx_id = (*env)->GetFieldID(env, circBuffInfo_id, "firstIdx", "I");
+    circBuffInfo_lastIdx_id = (*env)->GetFieldID(env, circBuffInfo_id, "lastIdx", "I");
+    circBuffInfo_offset_id = (*env)->GetFieldID(env, circBuffInfo_id, "offset", "I");
+    circBuffInfo_samples_id = (*env)->GetFieldID(env, circBuffInfo_id, "samples", "I");
+    circBuffInfo_size_id = (*env)->GetFieldID(env, circBuffInfo_id, "size", "I");
+    circBuffInfo_bufp_id = (*env)->GetFieldID(env, circBuffInfo_id, "bufp", "Ljava/lang/Object;");
+    circBuffInfo_status_id = (*env)->GetFieldID(env, circBuffInfo_id, "status", "I");
   }
 
-  info.circ_aref.Objid.oix = (*env)->CallIntMethod( env, info_obj, circBuffInfo_getCircArefOix);
-  info.circ_aref.Objid.vid = (*env)->CallIntMethod( env, info_obj, circBuffInfo_getCircArefVid);
-  info.circ_aref.Body = (*env)->CallIntMethod( env, info_obj, circBuffInfo_getCircArefBody);
-  info.circ_aref.Offset = (*env)->CallIntMethod( env, info_obj, circBuffInfo_getCircArefOffset);
-  info.circ_aref.Size = (*env)->CallIntMethod( env, info_obj, circBuffInfo_getCircArefSize);
-  info.circ_aref.Flags.m = (*env)->CallIntMethod( env, info_obj, circBuffInfo_getCircArefFlags);
-  info.samples = (*env)->CallIntMethod( env, info_obj, circBuffInfo_getSamples);
-  info.resolution = (*env)->CallIntMethod( env, info_obj, circBuffInfo_getResolution);
-  info.first_idx = (*env)->CallIntMethod( env, info_obj, circBuffInfo_getFirstIdx);
-  info.last_idx = (*env)->CallIntMethod( env, info_obj, circBuffInfo_getLastIdx);
-  info.offset = (*env)->CallIntMethod( env, info_obj, circBuffInfo_getOffset);
-  element_type = (*env)->CallIntMethod( env, info_obj, circBuffInfo_getElementType);
-  element_size = cdh_TypeToSize( (pwr_eType)element_type);
+  info.circ_aref.Objid.oix = (*env)->CallIntMethod(env, info_obj, circBuffInfo_getCircArefOix);
+  info.circ_aref.Objid.vid = (*env)->CallIntMethod(env, info_obj, circBuffInfo_getCircArefVid);
+  info.circ_aref.Body = (*env)->CallIntMethod(env, info_obj, circBuffInfo_getCircArefBody);
+  info.circ_aref.Offset = (*env)->CallIntMethod(env, info_obj, circBuffInfo_getCircArefOffset);
+  info.circ_aref.Size = (*env)->CallIntMethod(env, info_obj, circBuffInfo_getCircArefSize);
+  info.circ_aref.Flags.m = (*env)->CallIntMethod(env, info_obj, circBuffInfo_getCircArefFlags);
+  info.samples = (*env)->CallIntMethod(env, info_obj, circBuffInfo_getSamples);
+  info.resolution = (*env)->CallIntMethod(env, info_obj, circBuffInfo_getResolution);
+  info.first_idx = (*env)->CallIntMethod(env, info_obj, circBuffInfo_getFirstIdx);
+  info.last_idx = (*env)->CallIntMethod(env, info_obj, circBuffInfo_getLastIdx);
+  info.offset = (*env)->CallIntMethod(env, info_obj, circBuffInfo_getOffset);
+  element_type = (*env)->CallIntMethod(env, info_obj, circBuffInfo_getElementType);
+  element_size = cdh_TypeToSize((pwr_eType)element_type);
   info.bufsize = info.samples * element_size;
-  info.bufp = (char *) calloc( 1, info.bufsize);
+  info.bufp = (char*)calloc(1, info.bufsize);
 
-  sts = cbuf_GetCircBuffInfo( &info, 1);
-  jsts = (jint) sts;
-  (*env)->SetIntField( env, info_obj, circBuffInfo_status_id, jsts);
-  if ( ODD(sts)) {
-    switch ( element_type) {
-    case pwr_eType_Float32: {
+  sts = cbuf_GetCircBuffInfo(&info, 1);
+  jsts = (jint)sts;
+  (*env)->SetIntField(env, info_obj, circBuffInfo_status_id, jsts);
+  if (ODD(sts))
+  {
+    switch (element_type)
+    {
+    case pwr_eType_Float32:
+    {
       jfloatArray jfarray = 0;
-      jfarray = (*env)->NewFloatArray( env, info.bufsize/4);
-      (*env)->SetFloatArrayRegion( env, jfarray, 0, info.bufsize/4, info.bufp);
+      jfarray = (*env)->NewFloatArray(env, info.bufsize / 4);
+      (*env)->SetFloatArrayRegion(env, jfarray, 0, info.bufsize / 4, info.bufp);
 
-      (*env)->SetObjectField( env, info_obj, circBuffInfo_bufp_id, (jobject)jfarray);
+      (*env)->SetObjectField(env, info_obj, circBuffInfo_bufp_id, (jobject)jfarray);
 
       break;
     }
@@ -2946,122 +2813,128 @@ JNIEXPORT jint JNICALL Java_jpwr_rt_Gdh_getCircBuffInfo
     case pwr_eType_UInt16:
     case pwr_eType_Int16:
     case pwr_eType_UInt8:
-    case pwr_eType_Int8: {
+    case pwr_eType_Int8:
+    {
       jintArray jiarray = 0;
-      jiarray = (*env)->NewIntArray( env, info.bufsize/4);
-      (*env)->SetIntArrayRegion( env, jiarray, 0, info.bufsize/4, info.bufp);
+      jiarray = (*env)->NewIntArray(env, info.bufsize / 4);
+      (*env)->SetIntArrayRegion(env, jiarray, 0, info.bufsize / 4, info.bufp);
 
-      (*env)->SetObjectField( env, info_obj, circBuffInfo_bufp_id, (jobject)jiarray);
+      (*env)->SetObjectField(env, info_obj, circBuffInfo_bufp_id, (jobject)jiarray);
       break;
     }
-    default: ;
+    default:;
     }
-    (*env)->SetIntField( env, info_obj, circBuffInfo_firstIdx_id, info.first_idx);
-    (*env)->SetIntField( env, info_obj, circBuffInfo_lastIdx_id, info.last_idx);
-    (*env)->SetIntField( env, info_obj, circBuffInfo_offset_id, info.offset);
-    (*env)->SetIntField( env, info_obj, circBuffInfo_samples_id, info.samples);
-    (*env)->SetIntField( env, info_obj, circBuffInfo_size_id, info.size);
+    (*env)->SetIntField(env, info_obj, circBuffInfo_firstIdx_id, info.first_idx);
+    (*env)->SetIntField(env, info_obj, circBuffInfo_lastIdx_id, info.last_idx);
+    (*env)->SetIntField(env, info_obj, circBuffInfo_offset_id, info.offset);
+    (*env)->SetIntField(env, info_obj, circBuffInfo_samples_id, info.samples);
+    (*env)->SetIntField(env, info_obj, circBuffInfo_size_id, info.size);
   }
-  free( info.bufp);
+  free(info.bufp);
 
   return 1;
 }
 
-JNIEXPORT jint JNICALL Java_jpwr_rt_Gdh_updateCircBuffInfo
-   (JNIEnv *env, jobject obj, jobject info_array, jint info_size)
+JNIEXPORT jint JNICALL Java_jpwr_rt_Gdh_updateCircBuffInfo(JNIEnv* env, jobject obj, jobject info_array,
+                                                           jint info_size)
 {
-  int		sts;
-  jclass 	circBuffInfo_id;
-  static jmethodID 	circBuffInfo_getCircArefOix = NULL;
-  static jmethodID 	circBuffInfo_getCircArefVid = NULL;
-  static jmethodID 	circBuffInfo_getCircArefBody = NULL;
-  static jmethodID 	circBuffInfo_getCircArefOffset = NULL;
-  static jmethodID 	circBuffInfo_getCircArefSize = NULL;
-  static jmethodID 	circBuffInfo_getCircArefFlags = NULL;
-  static jmethodID 	circBuffInfo_getResolution = NULL;
-  static jmethodID 	circBuffInfo_getSamples = NULL;
-  static jmethodID 	circBuffInfo_getElementType = NULL;
-  static jmethodID 	circBuffInfo_getFirstIdx = NULL;
-  static jmethodID 	circBuffInfo_getLastIdx = NULL;
-  static jmethodID 	circBuffInfo_getOffset = NULL;
-  static jfieldID	circBuffInfo_firstIdx_id;
-  static jfieldID	circBuffInfo_lastIdx_id;
-  static jfieldID	circBuffInfo_offset_id;
-  static jfieldID	circBuffInfo_samples_id;
-  static jfieldID	circBuffInfo_size_id;
-  static jfieldID	circBuffInfo_bufp_id;
-  static jfieldID	circBuffInfo_status_id;
-  int		element_type;
-  int		element_size;
-  jint 		jsts;
-  cbuf_sCircBuffInfo  info[20];
-  jobject 	info_obj[20];
-  int 		i;
+  int sts;
+  jclass circBuffInfo_id;
+  static jmethodID circBuffInfo_getCircArefOix = NULL;
+  static jmethodID circBuffInfo_getCircArefVid = NULL;
+  static jmethodID circBuffInfo_getCircArefBody = NULL;
+  static jmethodID circBuffInfo_getCircArefOffset = NULL;
+  static jmethodID circBuffInfo_getCircArefSize = NULL;
+  static jmethodID circBuffInfo_getCircArefFlags = NULL;
+  static jmethodID circBuffInfo_getResolution = NULL;
+  static jmethodID circBuffInfo_getSamples = NULL;
+  static jmethodID circBuffInfo_getElementType = NULL;
+  static jmethodID circBuffInfo_getFirstIdx = NULL;
+  static jmethodID circBuffInfo_getLastIdx = NULL;
+  static jmethodID circBuffInfo_getOffset = NULL;
+  static jfieldID circBuffInfo_firstIdx_id;
+  static jfieldID circBuffInfo_lastIdx_id;
+  static jfieldID circBuffInfo_offset_id;
+  static jfieldID circBuffInfo_samples_id;
+  static jfieldID circBuffInfo_size_id;
+  static jfieldID circBuffInfo_bufp_id;
+  static jfieldID circBuffInfo_status_id;
+  int element_type;
+  int element_size;
+  jint jsts;
+  cbuf_sCircBuffInfo info[20];
+  jobject info_obj[20] = {0};
+  int i;
 
-  memset( &info, 0, sizeof(info));
+  memset(&info, 0, sizeof(info));
 
-  circBuffInfo_id = (*env)->FindClass( env, "jpwr/rt/CircBuffInfo");
-  if( circBuffInfo_getCircArefOix == NULL) {
-    circBuffInfo_getCircArefOix = (*env)->GetMethodID( env, circBuffInfo_id, "getCircArefOix", "()I");
-    circBuffInfo_getCircArefVid = (*env)->GetMethodID( env, circBuffInfo_id, "getCircArefVid", "()I");
-    circBuffInfo_getCircArefBody = (*env)->GetMethodID( env, circBuffInfo_id, "getCircArefBody", "()I");
-    circBuffInfo_getCircArefOffset = (*env)->GetMethodID( env, circBuffInfo_id, "getCircArefOffset", "()I");
-    circBuffInfo_getCircArefSize = (*env)->GetMethodID( env, circBuffInfo_id, "getCircArefSize", "()I");
-    circBuffInfo_getCircArefFlags = (*env)->GetMethodID( env, circBuffInfo_id, "getCircArefFlags", "()I");
-    circBuffInfo_getResolution = (*env)->GetMethodID( env, circBuffInfo_id, "getResolution", "()I");
-    circBuffInfo_getSamples = (*env)->GetMethodID( env, circBuffInfo_id, "getSamples", "()I");
-    circBuffInfo_getElementType = (*env)->GetMethodID( env, circBuffInfo_id, "getElementType", "()I");
-    circBuffInfo_getFirstIdx = (*env)->GetMethodID( env, circBuffInfo_id, "getFirstIdx", "()I");
-    circBuffInfo_getLastIdx = (*env)->GetMethodID( env, circBuffInfo_id, "getLastIdx", "()I");
-    circBuffInfo_getOffset = (*env)->GetMethodID( env, circBuffInfo_id, "getOffset", "()I");
+  circBuffInfo_id = (*env)->FindClass(env, "jpwr/rt/CircBuffInfo");
+  if (circBuffInfo_getCircArefOix == NULL)
+  {
+    circBuffInfo_getCircArefOix = (*env)->GetMethodID(env, circBuffInfo_id, "getCircArefOix", "()I");
+    circBuffInfo_getCircArefVid = (*env)->GetMethodID(env, circBuffInfo_id, "getCircArefVid", "()I");
+    circBuffInfo_getCircArefBody = (*env)->GetMethodID(env, circBuffInfo_id, "getCircArefBody", "()I");
+    circBuffInfo_getCircArefOffset = (*env)->GetMethodID(env, circBuffInfo_id, "getCircArefOffset", "()I");
+    circBuffInfo_getCircArefSize = (*env)->GetMethodID(env, circBuffInfo_id, "getCircArefSize", "()I");
+    circBuffInfo_getCircArefFlags = (*env)->GetMethodID(env, circBuffInfo_id, "getCircArefFlags", "()I");
+    circBuffInfo_getResolution = (*env)->GetMethodID(env, circBuffInfo_id, "getResolution", "()I");
+    circBuffInfo_getSamples = (*env)->GetMethodID(env, circBuffInfo_id, "getSamples", "()I");
+    circBuffInfo_getElementType = (*env)->GetMethodID(env, circBuffInfo_id, "getElementType", "()I");
+    circBuffInfo_getFirstIdx = (*env)->GetMethodID(env, circBuffInfo_id, "getFirstIdx", "()I");
+    circBuffInfo_getLastIdx = (*env)->GetMethodID(env, circBuffInfo_id, "getLastIdx", "()I");
+    circBuffInfo_getOffset = (*env)->GetMethodID(env, circBuffInfo_id, "getOffset", "()I");
 
-    circBuffInfo_firstIdx_id = (*env)->GetFieldID( env, circBuffInfo_id, "firstIdx", "I");
-    circBuffInfo_lastIdx_id = (*env)->GetFieldID( env, circBuffInfo_id, "lastIdx", "I");
-    circBuffInfo_offset_id = (*env)->GetFieldID( env, circBuffInfo_id, "offset", "I");
-    circBuffInfo_samples_id = (*env)->GetFieldID( env, circBuffInfo_id, "samples", "I");
-    circBuffInfo_size_id = (*env)->GetFieldID( env, circBuffInfo_id, "size", "I");
-    circBuffInfo_bufp_id = (*env)->GetFieldID( env, circBuffInfo_id, "bufp", "Ljava/lang/Object;");
-    circBuffInfo_status_id = (*env)->GetFieldID( env, circBuffInfo_id, "status", "I");
+    circBuffInfo_firstIdx_id = (*env)->GetFieldID(env, circBuffInfo_id, "firstIdx", "I");
+    circBuffInfo_lastIdx_id = (*env)->GetFieldID(env, circBuffInfo_id, "lastIdx", "I");
+    circBuffInfo_offset_id = (*env)->GetFieldID(env, circBuffInfo_id, "offset", "I");
+    circBuffInfo_samples_id = (*env)->GetFieldID(env, circBuffInfo_id, "samples", "I");
+    circBuffInfo_size_id = (*env)->GetFieldID(env, circBuffInfo_id, "size", "I");
+    circBuffInfo_bufp_id = (*env)->GetFieldID(env, circBuffInfo_id, "bufp", "Ljava/lang/Object;");
+    circBuffInfo_status_id = (*env)->GetFieldID(env, circBuffInfo_id, "status", "I");
   }
 
-
-  if ( info_size > 20)
+  if (info_size > 20)
     info_size = 20;
 
-  for ( i = 0; i < info_size; i++) {
-    info_obj[i] = (*env)->GetObjectArrayElement( env, info_array, i);
+  for (i = 0; i < info_size; i++)
+  {
+    info_obj[i] = (*env)->GetObjectArrayElement(env, info_array, i);
 
-    info[i].circ_aref.Objid.oix = (*env)->CallIntMethod( env, info_obj[i], circBuffInfo_getCircArefOix);
-    info[i].circ_aref.Objid.vid = (*env)->CallIntMethod( env, info_obj[i], circBuffInfo_getCircArefVid);
-    info[i].circ_aref.Body = (*env)->CallIntMethod( env, info_obj[i], circBuffInfo_getCircArefBody);
-    info[i].circ_aref.Offset = (*env)->CallIntMethod( env, info_obj[i], circBuffInfo_getCircArefOffset);
-    info[i].circ_aref.Size = (*env)->CallIntMethod( env, info_obj[i], circBuffInfo_getCircArefSize);
-    info[i].circ_aref.Flags.m = (*env)->CallIntMethod( env, info_obj[i], circBuffInfo_getCircArefFlags);
-    info[i].samples = (*env)->CallIntMethod( env, info_obj[i], circBuffInfo_getSamples);
-    info[i].resolution = (*env)->CallIntMethod( env, info_obj[i], circBuffInfo_getResolution);
-    info[i].first_idx = (*env)->CallIntMethod( env, info_obj[i], circBuffInfo_getFirstIdx);
-    info[i].last_idx = (*env)->CallIntMethod( env, info_obj[i], circBuffInfo_getLastIdx);
-    info[i].offset = (*env)->CallIntMethod( env, info_obj[i], circBuffInfo_getOffset);
-    element_type = (*env)->CallIntMethod( env, info_obj[i], circBuffInfo_getElementType);
-    element_size = cdh_TypeToSize( (pwr_eType)element_type);
+    info[i].circ_aref.Objid.oix = (*env)->CallIntMethod(env, info_obj[i], circBuffInfo_getCircArefOix);
+    info[i].circ_aref.Objid.vid = (*env)->CallIntMethod(env, info_obj[i], circBuffInfo_getCircArefVid);
+    info[i].circ_aref.Body = (*env)->CallIntMethod(env, info_obj[i], circBuffInfo_getCircArefBody);
+    info[i].circ_aref.Offset = (*env)->CallIntMethod(env, info_obj[i], circBuffInfo_getCircArefOffset);
+    info[i].circ_aref.Size = (*env)->CallIntMethod(env, info_obj[i], circBuffInfo_getCircArefSize);
+    info[i].circ_aref.Flags.m = (*env)->CallIntMethod(env, info_obj[i], circBuffInfo_getCircArefFlags);
+    info[i].samples = (*env)->CallIntMethod(env, info_obj[i], circBuffInfo_getSamples);
+    info[i].resolution = (*env)->CallIntMethod(env, info_obj[i], circBuffInfo_getResolution);
+    info[i].first_idx = (*env)->CallIntMethod(env, info_obj[i], circBuffInfo_getFirstIdx);
+    info[i].last_idx = (*env)->CallIntMethod(env, info_obj[i], circBuffInfo_getLastIdx);
+    info[i].offset = (*env)->CallIntMethod(env, info_obj[i], circBuffInfo_getOffset);
+    element_type = (*env)->CallIntMethod(env, info_obj[i], circBuffInfo_getElementType);
+    element_size = cdh_TypeToSize((pwr_eType)element_type);
     info[i].bufsize = info[i].samples * element_size;
-    info[i].bufp = (char *) calloc( 1, info[i].bufsize);
+    info[i].bufp = (char*)calloc(1, info[i].bufsize);
   }
-  sts = cbuf_UpdateCircBuffInfo( info, info_size);
-  jsts = (jint) sts;
+  sts = cbuf_UpdateCircBuffInfo(info, info_size);
+  jsts = (jint)sts;
 
-  (*env)->SetIntField( env, info_obj[0], circBuffInfo_status_id, jsts);
-  if ( ODD(sts)) {
-    for ( i = 0; i < info_size; i++) {
-      switch ( element_type) {
-      case pwr_eType_Float32: {
-	jfloatArray jfarray = 0;
-	jfarray = (*env)->NewFloatArray( env, info[i].size);
-	(*env)->SetFloatArrayRegion( env, jfarray, 0, info[i].size, info[i].bufp);
+  (*env)->SetIntField(env, info_obj[0], circBuffInfo_status_id, jsts);
+  if (ODD(sts))
+  {
+    for (i = 0; i < info_size; i++)
+    {
+      switch (element_type)
+      {
+      case pwr_eType_Float32:
+      {
+        jfloatArray jfarray = 0;
+        jfarray = (*env)->NewFloatArray(env, info[i].size);
+        (*env)->SetFloatArrayRegion(env, jfarray, 0, info[i].size, info[i].bufp);
 
-	(*env)->SetObjectField( env, info_obj[i], circBuffInfo_bufp_id, (jobject)jfarray);
+        (*env)->SetObjectField(env, info_obj[i], circBuffInfo_bufp_id, (jobject)jfarray);
 
-	break;
+        break;
       }
       case pwr_eType_UInt32:
       case pwr_eType_Int32:
@@ -3069,35 +2942,36 @@ JNIEXPORT jint JNICALL Java_jpwr_rt_Gdh_updateCircBuffInfo
       case pwr_eType_Int16:
       case pwr_eType_UInt8:
       case pwr_eType_Int8:
-      case pwr_eType_Boolean: {
-	jintArray jiarray = 0;
-	jiarray = (*env)->NewIntArray( env, info[i].size);
-	(*env)->SetIntArrayRegion( env, jiarray, 0, info[i].size, info[i].bufp);
+      case pwr_eType_Boolean:
+      {
+        jintArray jiarray = 0;
+        jiarray = (*env)->NewIntArray(env, info[i].size);
+        (*env)->SetIntArrayRegion(env, jiarray, 0, info[i].size, info[i].bufp);
 
-	(*env)->SetObjectField( env, info_obj[i], circBuffInfo_bufp_id, (jobject)jiarray);
+        (*env)->SetObjectField(env, info_obj[i], circBuffInfo_bufp_id, (jobject)jiarray);
 
-	break;
+        break;
       }
-      default: ;
+      default:;
       }
-      (*env)->SetIntField( env, info_obj[i], circBuffInfo_firstIdx_id, info[i].first_idx);
-      (*env)->SetIntField( env, info_obj[i], circBuffInfo_lastIdx_id, info[i].last_idx);
-      (*env)->SetIntField( env, info_obj[i], circBuffInfo_offset_id, info[i].offset);
-      (*env)->SetIntField( env, info_obj[i], circBuffInfo_samples_id, info[i].samples);
-      (*env)->SetIntField( env, info_obj[i], circBuffInfo_size_id, info[i].size);
-      free( info[i].bufp);
+      (*env)->SetIntField(env, info_obj[i], circBuffInfo_firstIdx_id, info[i].first_idx);
+      (*env)->SetIntField(env, info_obj[i], circBuffInfo_lastIdx_id, info[i].last_idx);
+      (*env)->SetIntField(env, info_obj[i], circBuffInfo_offset_id, info[i].offset);
+      (*env)->SetIntField(env, info_obj[i], circBuffInfo_samples_id, info[i].samples);
+      (*env)->SetIntField(env, info_obj[i], circBuffInfo_size_id, info[i].size);
+      free(info[i].bufp);
     }
   }
   return 1;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getDsTrend
-(JNIEnv *env, jobject obj, jstring jdstrend_object, jint jlast_next_idx, jint jlast_buffer, jint jmax_size)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getDsTrend(JNIEnv* env, jobject obj, jstring jdstrend_object,
+                                                      jint jlast_next_idx, jint jlast_buffer, jint jmax_size)
 {
-  int 		sts = GDH__SUCCESS;
-  jclass 	gdhrGetDsTrend_id;
+  int sts = GDH__SUCCESS;
+  jclass gdhrGetDsTrend_id;
   static jmethodID gdhrGetDsTrend_cid = NULL;
-  jobject       gdhrGetDsTrend;
+  jobject gdhrGetDsTrend;
   int last_next_idx = jlast_next_idx;
   int last_buffer = jlast_buffer;
   int max_size = jmax_size;
@@ -3108,146 +2982,149 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getDsTrend
   int trend_buff_size = 478;
   int j, k;
   int idx = 0;
-  float *data = 0;
+  float* data = 0;
   int values = 0;
-  char *dstrend_object;
+  char* dstrend_object;
 
-  gdhrGetDsTrend_id = (*env)->FindClass( env, "jpwr/rt/GdhrGetDsTrend");
-  if(gdhrGetDsTrend_id == NULL) printf("gdhrGetDsTrend_id ks NULL");
+  gdhrGetDsTrend_id = (*env)->FindClass(env, "jpwr/rt/GdhrGetDsTrend");
+  if (gdhrGetDsTrend_id == NULL)
+    printf("gdhrGetDsTrend_id ks NULL");
 
-  if(gdhrGetDsTrend_cid == NULL) {
-    gdhrGetDsTrend_cid = (*env)->GetMethodID( env, gdhrGetDsTrend_id,
-    	  "<init>", "([FIIII)V");
-    if(gdhrGetDsTrend_cid == NULL) printf("gdhrGetDsTrend_cid is NULL");
+  if (gdhrGetDsTrend_cid == NULL)
+  {
+    gdhrGetDsTrend_cid = (*env)->GetMethodID(env, gdhrGetDsTrend_id, "<init>", "([FIIII)V");
+    if (gdhrGetDsTrend_cid == NULL)
+      printf("gdhrGetDsTrend_cid is NULL");
   }
 
-  dstrend_object = (char *)(*env)->GetStringUTFChars(env, jdstrend_object, 0);
+  dstrend_object = (char*)(*env)->GetStringUTFChars(env, jdstrend_object, 0);
 
-  gdh_ConvertUTFstring( dstrend_object, dstrend_object);
-
+  gdh_ConvertUTFstring(dstrend_object, dstrend_object);
 
   sts = gdh_GetObjectInfo(dstrend_object, &tp, sizeof(tp));
-  if (ODD(sts)) {
-    if (last_next_idx == -1 || last_next_idx == 65535) {
+  if (ODD(sts))
+  {
+    if (last_next_idx == -1 || last_next_idx == 65535)
+    {
       /* Get whole curve */
-      data = (float *)calloc(1, 4 * max_size);
+      data = (float*)calloc(1, 4 * max_size);
 
       int write_buffer = (int)tp.WriteBuffer;
-      start_idx = write_buffer * trend_buff_size / 2
-	+ (int)tp.NextWriteIndex[write_buffer];
-      if (start_idx == 0) {
-	start_idx = tp.NoOfSample - 1 + trend_buff_size / 2;
-	write_buffer = 1;
-      } else if (start_idx == trend_buff_size / 2) {
-	start_idx = tp.NoOfSample - 1;
-	write_buffer = 0;
-      } else
-	start_idx--;
-      
+      start_idx = write_buffer * trend_buff_size / 2 + (int)tp.NextWriteIndex[write_buffer];
+      if (start_idx == 0)
+      {
+        start_idx = tp.NoOfSample - 1 + trend_buff_size / 2;
+        write_buffer = 1;
+      }
+      else if (start_idx == trend_buff_size / 2)
+      {
+        start_idx = tp.NoOfSample - 1;
+        write_buffer = 0;
+      }
+      else
+        start_idx--;
+
       idx = 0;
-      for (j = start_idx; j >= write_buffer * trend_buff_size / 2; j--) {
-	if (idx >= max_size)
-	  break;
-	data[max_size-idx-1] = tp.DataBuffer[j];
-	idx++;
+      for (j = start_idx; j >= write_buffer * trend_buff_size / 2; j--)
+      {
+        if (idx >= max_size)
+          break;
+        data[max_size - idx - 1] = tp.DataBuffer[j];
+        idx++;
       }
       for (j = tp.NoOfSample - 1 + (!write_buffer) * trend_buff_size / 2;
-	   j >= (!write_buffer) * trend_buff_size / 2; j--) {
-	if (idx >= max_size)
-	  break;
+           j >= (!write_buffer) * trend_buff_size / 2; j--)
+      {
+        if (idx >= max_size)
+          break;
 
-	data[max_size-idx-1] = tp.DataBuffer[j];
-	idx++;
+        data[max_size - idx - 1] = tp.DataBuffer[j];
+        idx++;
       }
-      if (start_idx
-	  != (int)tp.NoOfSample - 1 + write_buffer * trend_buff_size / 2) {
-	for (j = tp.NoOfSample - 1 + write_buffer * trend_buff_size / 2;
-	     j > start_idx; j--) {
-	  if (idx >= max_size)
-	    break;
+      if (start_idx != (int)tp.NoOfSample - 1 + write_buffer * trend_buff_size / 2)
+      {
+        for (j = tp.NoOfSample - 1 + write_buffer * trend_buff_size / 2; j > start_idx; j--)
+        {
+          if (idx >= max_size)
+            break;
 
-	  data[max_size-idx-1] = tp.DataBuffer[j];
-	  idx++;
-	}
+          data[max_size - idx - 1] = tp.DataBuffer[j];
+          idx++;
+        }
       }
       last_buffer = tp.WriteBuffer;
       last_next_idx = tp.NextWriteIndex[last_buffer];
       values = idx;
     }
-    else {
+    else
+    {
       /* Get new value values since last_idx */
-      if (tp.NextWriteIndex[tp.WriteBuffer]
-	  != last_next_idx) {
-	values = tp.NextWriteIndex[tp.WriteBuffer]
-	  - last_next_idx;
-	if (values < 0)
-	  values = values + tp.NoOfSample;
-	
-	if (values > max_size)
-	  values = max_size;
-	
-	data = (float *)calloc(1, 4 * values);
-	
-	last_next_idx
-	  = tp.NextWriteIndex[tp.WriteBuffer];
-	
-	for (k = 0; k < values; k++) {
-	  // Add new points
-	  // Insert new value
-	  write_buffer = tp.WriteBuffer;
-	  idx = write_buffer * trend_buff_size / 2
-	    + (int)tp.NextWriteIndex[write_buffer]
-	    - (values - 1 - k);
-	  idx--;
-	  if (idx < 0)
-	    idx += trend_buff_size;
-	  /*
-	  if (idx == 0 || idx == trend_buff_size * write_buffer)
-	    idx = tp.NoOfSample - 1
-	      + (!write_buffer) * trend_buff_size / 2;
-	  else
-	    idx--;
-	  */
-	  data[k] = tp.DataBuffer[idx];
-	}
+      if (tp.NextWriteIndex[tp.WriteBuffer] != last_next_idx)
+      {
+        values = tp.NextWriteIndex[tp.WriteBuffer] - last_next_idx;
+        if (values < 0)
+          values = values + tp.NoOfSample;
+
+        if (values > max_size)
+          values = max_size;
+
+        data = (float*)calloc(1, 4 * values);
+
+        last_next_idx = tp.NextWriteIndex[tp.WriteBuffer];
+
+        for (k = 0; k < values; k++)
+        {
+          // Add new points
+          // Insert new value
+          write_buffer = tp.WriteBuffer;
+          idx = write_buffer * trend_buff_size / 2 + (int)tp.NextWriteIndex[write_buffer] - (values - 1 - k);
+          idx--;
+          if (idx < 0)
+            idx += trend_buff_size;
+          /*
+          if (idx == 0 || idx == trend_buff_size * write_buffer)
+            idx = tp.NoOfSample - 1
+              + (!write_buffer) * trend_buff_size / 2;
+          else
+            idx--;
+          */
+          data[k] = tp.DataBuffer[idx];
+        }
       }
     }
   }
 
   jfloatArray jfarray = 0;
-  if (values > 0) {
-    jfarray = (*env)->NewFloatArray( env, values);
-    (*env)->SetFloatArrayRegion( env, jfarray, 0, values, data);
+  if (values > 0)
+  {
+    jfarray = (*env)->NewFloatArray(env, values);
+    (*env)->SetFloatArrayRegion(env, jfarray, 0, values, data);
   }
-  (*env)->ReleaseStringUTFChars( env, jdstrend_object, dstrend_object);
+  (*env)->ReleaseStringUTFChars(env, jdstrend_object, dstrend_object);
   if (data)
     free(data);
 
-  gdhrGetDsTrend = (*env)->NewObject( env, gdhrGetDsTrend_id,
-				   gdhrGetDsTrend_cid,
-				   jfarray,
-				   (jint)values,
-				   (jint)last_next_idx,
-				   (jint)last_buffer,
-				   (jint)sts);
-  
+  gdhrGetDsTrend = (*env)->NewObject(env, gdhrGetDsTrend_id, gdhrGetDsTrend_cid, jfarray, (jint)values,
+                                     (jint)last_next_idx, (jint)last_buffer, (jint)sts);
+
   return gdhrGetDsTrend;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSevItemData
-(JNIEnv *env, jobject obj, jstring jserver, jobject joid, jstring jattribute, jfloat jtimerange, jint jmax_size)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSevItemData(JNIEnv* env, jobject obj, jstring jserver,
+                                                          jobject joid, jstring jattribute, jfloat jtimerange,
+                                                          jint jmax_size)
 {
-  int 		sts = GDH__SUCCESS;
-  jclass 	gdhrSevItemData_id;
+  int sts = GDH__SUCCESS;
+  jclass gdhrSevItemData_id;
   static jmethodID gdhrSevItemData_cid = NULL;
-  jobject       gdhrSevItemData;
-  jclass 	PwrtObjid_id;
-  static jmethodID 	PwrtObjid_getOix = NULL;
-  static jmethodID 	PwrtObjid_getVid = NULL;
+  jobject gdhrSevItemData;
+  jclass PwrtObjid_id;
+  static jmethodID PwrtObjid_getOix = NULL;
+  static jmethodID PwrtObjid_getVid = NULL;
   float timerange = jtimerange;
   int max_size = jmax_size;
-  char *server;
-  char *attribute;
+  char* server = NULL;
+  char* attribute = NULL;
   pwr_tOid oid;
   pwr_tOName aname;
   pwr_tDeltaTime dt_timerange;
@@ -3259,88 +3136,100 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSevItemData
   pwr_tTime from, to;
   pwr_tDeltaTime diff;
   int k;
-  char *s;
+  char* s;
   jfloatArray jtarray = 0;
   jfloatArray f_varray = 0;
   jintArray i_varray = 0;
-  float *tarray = 0;
-  void *jvarray = 0;
+  float* tarray = 0;
+  void* jvarray = 0;
 
-  gdhrSevItemData_id = (*env)->FindClass( env, "jpwr/rt/GdhrSevItemData");
-  if(gdhrSevItemData_id == NULL) printf("gdhrSevItemData_id ks NULL");
+  gdhrSevItemData_id = (*env)->FindClass(env, "jpwr/rt/GdhrSevItemData");
+  if (gdhrSevItemData_id == NULL)
+    printf("gdhrSevItemData_id ks NULL");
 
-  if(gdhrSevItemData_cid == NULL) {
-    gdhrSevItemData_cid = (*env)->GetMethodID( env, gdhrSevItemData_id,
-					       "<init>", "(I[FLjava/lang/Object;II)V");
-    if(gdhrSevItemData_cid == NULL) printf("gdhrSevItemData_cid is NULL");
+  if (gdhrSevItemData_cid == NULL)
+  {
+    gdhrSevItemData_cid =
+        (*env)->GetMethodID(env, gdhrSevItemData_id, "<init>", "(I[FLjava/lang/Object;II)V");
+    if (gdhrSevItemData_cid == NULL)
+      printf("gdhrSevItemData_cid is NULL");
   }
 
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  if(PwrtObjid_getOix == NULL || PwrtObjid_getVid == NULL) {
-    PwrtObjid_getOix = (*env)->GetMethodID( env, PwrtObjid_id, "getOix", "()I");
-    PwrtObjid_getVid = (*env)->GetMethodID( env, PwrtObjid_id, "getVid", "()I");
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  if (PwrtObjid_getOix == NULL || PwrtObjid_getVid == NULL)
+  {
+    PwrtObjid_getOix = (*env)->GetMethodID(env, PwrtObjid_id, "getOix", "()I");
+    PwrtObjid_getVid = (*env)->GetMethodID(env, PwrtObjid_id, "getVid", "()I");
   }
 
-  oid.oix = (*env)->CallIntMethod( env, joid, PwrtObjid_getOix);
-  oid.vid = (*env)->CallIntMethod( env, joid, PwrtObjid_getVid);
+  oid.oix = (*env)->CallIntMethod(env, joid, PwrtObjid_getOix);
+  oid.vid = (*env)->CallIntMethod(env, joid, PwrtObjid_getVid);
 
-  while(1) {
-    if (!gdh_scctx) {
+  while (1)
+  {
+    if (!gdh_scctx)
+    {
       sevcli_init(&sts, &gdh_scctx);
       if (EVEN(sts))
-	break;
+        break;
     }
 
-    server = (char *)(*env)->GetStringUTFChars(env, jserver, 0);
-    gdh_ConvertUTFstring( server, server);
+    server = (char*)(*env)->GetStringUTFChars(env, jserver, 0);
+    gdh_ConvertUTFstring(server, server);
 
-    attribute = (char *)(*env)->GetStringUTFChars(env, jattribute, 0);
-    gdh_ConvertUTFstring( attribute, attribute);
+    attribute = (char*)(*env)->GetStringUTFChars(env, jattribute, 0);
+    gdh_ConvertUTFstring(attribute, attribute);
 
     sevcli_set_servernode(&sts, gdh_scctx, server);
-    if (EVEN(sts)) 
+    if (EVEN(sts))
       break;
-    
+
     time_FloatToD(&dt_timerange, timerange);
     time_GetTime(&to);
     time_Asub(&from, &to, &dt_timerange);
 
-    //memset(&oid, 0, sizeof(oid));
+    // memset(&oid, 0, sizeof(oid));
     strncpy(aname, attribute, sizeof(aname));
     if ((s = strchr(aname, '#')))
       *s = 0;
 
-    sevcli_get_itemdata(&sts, gdh_scctx, oid, aname, from, to, max_size, &tbuf, &vbuf,
-			&rows, &vtype, &vsize);
+    sevcli_get_itemdata(&sts, gdh_scctx, oid, aname, from, to, max_size, &tbuf, &vbuf, &rows, &vtype, &vsize);
     if (EVEN(sts))
       break;
-    
-    tarray = (float *)calloc(1, 4 * rows);
-    for (k = 0; k < rows; k++) {
+
+    tarray = (float*)calloc(1, 4 * rows);
+    for (k = 0; k < rows; k++)
+    {
       time_Adiff(&diff, &to, &tbuf[k]);
-      time_DToFloat(&tarray[k], &diff);      
+      time_DToFloat(&tarray[k], &diff);
     }
 
-    if (rows > 0) {
+    if (rows > 0)
+    {
       jtarray = (*env)->NewFloatArray(env, rows);
       (*env)->SetFloatArrayRegion(env, jtarray, 0, rows, tarray);
     }
-    switch (vtype) {
-    case pwr_eType_Float32: {      
-      if (rows > 0) {
-	f_varray = (*env)->NewFloatArray(env, rows);
-	(*env)->SetFloatArrayRegion(env, f_varray, 0, rows, vbuf);
-	jvarray = f_varray;
+    switch (vtype)
+    {
+    case pwr_eType_Float32:
+    {
+      if (rows > 0)
+      {
+        f_varray = (*env)->NewFloatArray(env, rows);
+        (*env)->SetFloatArrayRegion(env, f_varray, 0, rows, vbuf);
+        jvarray = f_varray;
       }
       break;
     }
     case pwr_eType_Int32:
     case pwr_eType_UInt32:
-    case pwr_eType_Boolean: {
-      if (rows > 0) {
-	i_varray = (*env)->NewIntArray(env, rows);
-	(*env)->SetIntArrayRegion(env, i_varray, 0, rows, vbuf);
-	jvarray = i_varray;
+    case pwr_eType_Boolean:
+    {
+      if (rows > 0)
+      {
+        i_varray = (*env)->NewIntArray(env, rows);
+        (*env)->SetIntArrayRegion(env, i_varray, 0, rows, vbuf);
+        jvarray = i_varray;
       }
       break;
     }
@@ -3357,31 +3246,25 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSevItemData
   (*env)->ReleaseStringUTFChars(env, jserver, server);
   (*env)->ReleaseStringUTFChars(env, jattribute, attribute);
 
-  gdhrSevItemData = (*env)->NewObject( env, gdhrSevItemData_id,
-				       gdhrSevItemData_cid,
-				       (jint)rows,
-				       jtarray,
-				       jvarray,
-				       (jint)vtype,
-				       (jint)sts);
-  
+  gdhrSevItemData = (*env)->NewObject(env, gdhrSevItemData_id, gdhrSevItemData_cid, (jint)rows, jtarray,
+                                      jvarray, (jint)vtype, (jint)sts);
+
   return gdhrSevItemData;
 }
 
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSevItemInfo
-(JNIEnv *env, jobject obj, jstring jsevhist_object)
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSevItemInfo(JNIEnv* env, jobject obj, jstring jsevhist_object)
 {
-  int 		sts = GDH__SUCCESS;
-  jclass 	gdhrSevItemInfo_id;
+  int sts = GDH__SUCCESS;
+  jclass gdhrSevItemInfo_id;
   static jmethodID gdhrSevItemInfo_cid = NULL;
-  jobject       gdhrSevItemInfo;
-  jclass 	PwrtObjid_id;
-  jmethodID 	PwrtObjid_cid;
-  jobject 	objid_obj = NULL;
-  pwr_tOid	oid;
-  jint 		oix, vid;
-  jstring	jserver = NULL;
-  jstring	jattr = NULL;
+  jobject gdhrSevItemInfo;
+  jclass PwrtObjid_id;
+  jmethodID PwrtObjid_cid;
+  jobject objid_obj = NULL;
+  pwr_tOid oid;
+  jint oix, vid;
+  jstring jserver = NULL;
+  jstring jattr = NULL;
   pwr_tAttrRef sevhist_aref;
   pwr_tAttrRef thread_aref;
   pwr_tAttrRef aref;
@@ -3390,27 +3273,30 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSevItemInfo
   pwr_tCid cid;
   pwr_tOid thread_oid;
   char server[80];
-  char *sevhist_object;
+  char* sevhist_object;
   pwr_tOName attr;
-  char *s;
+  char* s;
 
-  gdhrSevItemInfo_id = (*env)->FindClass( env, "jpwr/rt/GdhrSevItemInfo");
-  if(gdhrSevItemInfo_id == NULL) printf("gdhrSevItemInfo_id ks NULL");
+  gdhrSevItemInfo_id = (*env)->FindClass(env, "jpwr/rt/GdhrSevItemInfo");
+  if (gdhrSevItemInfo_id == NULL)
+    printf("gdhrSevItemInfo_id ks NULL");
 
-  if(gdhrSevItemInfo_cid == NULL) {
-    gdhrSevItemInfo_cid = (*env)->GetMethodID( env, gdhrSevItemInfo_id,
-       "<init>", "(Ljpwr/rt/PwrtObjid;Ljava/lang/String;Ljava/lang/String;I)V");
-    if(gdhrSevItemInfo_cid == NULL) printf("gdhrSevItemInfo_cid is NULL");
+  if (gdhrSevItemInfo_cid == NULL)
+  {
+    gdhrSevItemInfo_cid = (*env)->GetMethodID(env, gdhrSevItemInfo_id, "<init>",
+                                              "(Ljpwr/rt/PwrtObjid;Ljava/lang/String;Ljava/lang/String;I)V");
+    if (gdhrSevItemInfo_cid == NULL)
+      printf("gdhrSevItemInfo_cid is NULL");
   }
 
-  PwrtObjid_id = (*env)->FindClass( env, "jpwr/rt/PwrtObjid");
-  PwrtObjid_cid = (*env)->GetMethodID( env, PwrtObjid_id,
-    	"<init>", "(II)V");
+  PwrtObjid_id = (*env)->FindClass(env, "jpwr/rt/PwrtObjid");
+  PwrtObjid_cid = (*env)->GetMethodID(env, PwrtObjid_id, "<init>", "(II)V");
 
-  sevhist_object = (char *)(*env)->GetStringUTFChars(env, jsevhist_object, 0);
+  sevhist_object = (char*)(*env)->GetStringUTFChars(env, jsevhist_object, 0);
   gdh_ConvertUTFstring(sevhist_object, sevhist_object);
 
-  while (1) {
+  while (1)
+  {
     sts = gdh_NameToAttrref(pwr_cNObjid, sevhist_object, &sevhist_aref);
     if (EVEN(sts))
       break;
@@ -3432,63 +3318,60 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSevItemInfo
 
     thread_aref = cdh_ObjidToAref(thread_oid);
     sts = gdh_ArefANameToAref(&thread_aref, "ServerNode", &aref);
-    if (EVEN(sts)) 
+    if (EVEN(sts))
       break;
 
     sts = gdh_GetObjectInfoAttrref(&aref, server, sizeof(server));
     if (EVEN(sts))
-      break;    
+      break;
 
     sts = gdh_ArefANameToAref(&sevhist_aref, "Attribute", &aref);
     if (EVEN(sts))
       break;
-    
+
     sts = gdh_GetObjectInfoAttrref(&aref, &attr_aref, sizeof(attr_aref));
     if (EVEN(sts))
-      break;    
+      break;
 
     sts = gdh_AttrrefToName(&attr_aref, aname, sizeof(aname), cdh_mNName);
     if (EVEN(sts))
       break;
 
     s = strchr(aname, '.');
-    if (!s) {
+    if (!s)
+    {
       sts = 0;
       break;
     }
 
     oid = attr_aref.Objid;
-    strcpy(attr, s+1);
+    strcpy(attr, s + 1);
 
-    oix = (jint) oid.oix;
-    vid = (jint) oid.vid;
+    oix = (jint)oid.oix;
+    vid = (jint)oid.vid;
 
     jattr = (*env)->NewStringUTF(env, attr);
     jserver = (*env)->NewStringUTF(env, server);
-    objid_obj = (*env)->NewObject(env, PwrtObjid_id, PwrtObjid_cid,
-				  oix, vid);
+    objid_obj = (*env)->NewObject(env, PwrtObjid_id, PwrtObjid_cid, oix, vid);
     break;
   }
-  gdhrSevItemInfo = (*env)->NewObject(env, gdhrSevItemInfo_id,
-				      gdhrSevItemInfo_cid,
-				      objid_obj,
-				      jattr,
-				      jserver,
-				      (jint)sts);
-  
+  gdhrSevItemInfo =
+      (*env)->NewObject(env, gdhrSevItemInfo_id, gdhrSevItemInfo_cid, objid_obj, jattr, jserver, (jint)sts);
+
   return gdhrSevItemInfo;
 }
 
-static int gdh_JidToPointer( int id, void **p)
+static int gdh_JidToPointer(int id, void** p)
 {
 #if defined HW_X86_64
   pwr_tStatus sts;
-  sJid *jp;
+  sJid* jp;
 
   thread_MutexLock(&jid_mutex);
-  jp = tree_Find( &sts, jid_table, &id);
+  jp = tree_Find(&sts, jid_table, &id);
   thread_MutexUnlock(&jid_mutex);
-  if ( !jp) {
+  if (!jp)
+  {
     printf("** Jid not found %d %d %lu\n", id, sts, (unsigned long)jid_table);
     return 0;
   }
@@ -3496,29 +3379,31 @@ static int gdh_JidToPointer( int id, void **p)
   *p = jp->p;
   return 1;
 #else
-  *p = (void *)id;
+  *p = (void*)id;
   return 1;
 #endif
 }
 
-static int gdh_JidStore( void *p, pwr_tRefId r, int *id)
+static int gdh_JidStore(void* p, pwr_tRefId r, int* id)
 {
 #if defined HW_X86_64
-  sJid *jp;
+  sJid* jp;
   pwr_tStatus sts;
 
-  if ( !jid_table) {
+  if (!jid_table)
+  {
     sts = thread_MutexInit(&jid_mutex);
-    jid_table = tree_CreateTable( &sts, sizeof(int), offsetof(sJid, jid),
-				  sizeof(sJid), 10, tree_Comp_int32);
-    if ( EVEN(sts)) return sts;
+    jid_table = tree_CreateTable(&sts, sizeof(int), offsetof(sJid, jid), sizeof(sJid), 10, tree_Comp_int32);
+    if (EVEN(sts))
+      return sts;
   }
 
   *id = jid_next++;
   thread_MutexLock(&jid_mutex);
   jp = tree_Insert(&sts, jid_table, id);
   thread_MutexUnlock(&jid_mutex);
-  if ( !jp) return sts;
+  if (!jp)
+    return sts;
 
   jp->p = p;
   jp->refid = r;
@@ -3531,17 +3416,19 @@ static int gdh_JidStore( void *p, pwr_tRefId r, int *id)
 #endif
 }
 
-static int gdh_JidRemove( pwr_tRefId r)
+static int gdh_JidRemove(pwr_tRefId r)
 {
 #if defined HW_X86_64
-  sJid *jp;
+  sJid* jp;
   pwr_tStatus sts;
 
   thread_MutexLock(&jid_mutex);
-  for (jp = tree_Minimum( &sts, jid_table); jp != NULL; jp = tree_Successor( &sts, jid_table, jp)) {
-    if ( jp->refid.nid == r.nid && jp->refid.rix == r.rix) {
+  for (jp = tree_Minimum(&sts, jid_table); jp != NULL; jp = tree_Successor(&sts, jid_table, jp))
+  {
+    if (jp->refid.nid == r.nid && jp->refid.rix == r.rix)
+    {
       // printf( "Jid remove: %d\n", jp->jid);
-      tree_Remove( &sts, jid_table, jp);
+      tree_Remove(&sts, jid_table, jp);
       thread_MutexUnlock(&jid_mutex);
       return 1;
     }

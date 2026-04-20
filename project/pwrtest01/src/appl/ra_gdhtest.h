@@ -5,16 +5,17 @@
 #include "rt_gdh.h"
 #include "co_tst_log.h"
 
-class ra_gdhtest {
+class ra_gdhtest
+{
   pwr_tStatus m_sts;
-  tst_log *m_log;
+  tst_log* m_log;
   pwr_tOid m_root;
   pwr_tOid m_child;
   pwr_tOid m_dynroot;
 
   pwr_tStatus check_object(pwr_tOid oid);
 
- public:
+public:
   ra_gdhtest();
   ~ra_gdhtest();
   void Init();

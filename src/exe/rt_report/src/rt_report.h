@@ -48,28 +48,26 @@
 /*! \addtogroup rt */
 /*@{*/
 
-typedef struct {
+typedef struct
+{
   pwr_sClass_Report* p;
   pwr_tDlid dlid;
 } report_sObject;
 
-class rt_report {
-  public:
+class rt_report
+{
+public:
   rt_report();
   void init(qcom_sQid* qid);
   void open();
   void close();
   void scan();
-  double scantime()
-  {
-    return scan_time;
-  }
+  double scantime() { return scan_time; }
   void create_report(pwr_sClass_Report* o);
   void replace_symbol(char* outstr, char* instr);
   int replace_value(char* out, unsigned int size, char* in);
-  void format_cmd(char* cmd, int cmd_size, const char* format,
-      const char* address, const char* text, const char* subject,
-      const char* reportfile, const char* date);
+  void format_cmd(char* cmd, int cmd_size, const char* format, const char* address, const char* text,
+                  const char* subject, const char* reportfile, const char* date);
   void periodic_scan();
   int periodic_check(pwr_sClass_Report* o);
   int parse(char* line);

@@ -63,21 +63,27 @@ FlowTraceAttr RtTrace::get_trace_attr(flow_tObject object, unsigned int* options
 
   FlowTraceAttr attr = flow_GetTraceAttr(object);
   strcpy(name, attr.object);
-  if (m_has_host) {
+  if (m_has_host)
+  {
     /* Replace "$host" with hostname */
-    if (str_StartsWith(name, "$host")) {
+    if (str_StartsWith(name, "$host"))
+    {
       strcpy(attr.object, m_hostname);
       strcat(attr.object, &name[5]);
-    } else
+    }
+    else
       strcpy(attr.object, name);
-  } else
+  }
+  else
     strcpy(attr.object, name);
 
   // Get options in attr_str after #
-  if ((s = strchr(attr.attribute, '#'))) {
+  if ((s = strchr(attr.attribute, '#')))
+  {
     *s = 0;
     sscanf(s + 1, "%u", options);
-  } else
+  }
+  else
     *options = 0;
 
   return attr;
@@ -89,8 +95,8 @@ void RtTrace::get_save_filename(pwr_tObjid window_objid, char* filename)
   dcli_translate_filename(filename, filename);
 }
 
-int RtTrace::get_filename(pwr_tObjid window_objid, char* filename,
-    int* has_host, char* hostname, char* plcconnect)
+int RtTrace::get_filename(pwr_tObjid window_objid, char* filename, int* has_host, char* hostname,
+                          char* plcconnect)
 {
   FILE* fp;
   pwr_tOid host;
@@ -106,7 +112,8 @@ int RtTrace::get_filename(pwr_tObjid window_objid, char* filename,
 
   *has_host = 0;
   fp = fopen(fname, "r");
-  if (!fp) {
+  if (!fp)
+  {
     /* Try class flowfile */
     sts = gdh_GetParent(window_objid, &host);
     if (EVEN(sts))
@@ -116,7 +123,8 @@ int RtTrace::get_filename(pwr_tObjid window_objid, char* filename,
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_plc) {
+    if (cid == pwr_cClass_plc)
+    {
       pwr_tAttrRef aref, hostaref;
 
       aref = cdh_ObjidToAref(host);
@@ -143,14 +151,15 @@ int RtTrace::get_filename(pwr_tObjid window_objid, char* filename,
                                cdh_mName_volumeStrict);
       if ( EVEN(sts)) return sts;
       */
-    } else {
+    }
+    else
+    {
       sts = gdh_ObjidToName(host, name, sizeof(name), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
     }
 
-    sts = gdh_ObjidToName(
-        cdh_ClassIdToObjid(cid), cname, sizeof(cname), cdh_mName_object);
+    sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid), cname, sizeof(cname), cdh_mName_object);
     if (EVEN(sts))
       return sts;
 
@@ -158,7 +167,8 @@ int RtTrace::get_filename(pwr_tObjid window_objid, char* filename,
     sprintf(fname, "$pwrp_load/pwr_%s.flw", cname);
     dcli_translate_filename(fname, fname);
     fp = fopen(fname, "r");
-    if (!fp) {
+    if (!fp)
+    {
       /* Try base load */
       sprintf(fname, "$pwr_load/pwr_%s.flw", cname);
       dcli_translate_filename(fname, fname);
@@ -173,9 +183,9 @@ int RtTrace::get_filename(pwr_tObjid window_objid, char* filename,
     strcat(name, ".PlcConnect");
     strcpy(plcconnect, "");
     sts = gdh_GetObjectInfo(name, &conar, sizeof(conar));
-    if (ODD(sts)) {
-      sts = gdh_AttrrefToName(
-          &conar, name, sizeof(name), cdh_mName_volumeStrict);
+    if (ODD(sts))
+    {
+      sts = gdh_AttrrefToName(&conar, name, sizeof(name), cdh_mName_volumeStrict);
       if (ODD(sts))
         strcpy(plcconnect, name);
     }
@@ -185,8 +195,7 @@ int RtTrace::get_filename(pwr_tObjid window_objid, char* filename,
   return 1;
 }
 
-int RtTrace::connect_bc(
-    flow_tObject object, char* name, char* attr, flow_eTraceType type, void** p)
+int RtTrace::connect_bc(flow_tObject object, char* name, char* attr, flow_eTraceType type, void** p)
 {
   pwr_tAName attr_str;
   int size;
@@ -202,11 +211,11 @@ int RtTrace::connect_bc(
   if (streq(name, "") || streq(attr, ""))
     return 1;
 
-  if (type != flow_eTraceType_Boolean
-      && flow_GetNodeGroup(object) != flow_eNodeGroup_Trace)
+  if (type != flow_eTraceType_Boolean && flow_GetNodeGroup(object) != flow_eNodeGroup_Trace)
     return 1;
 
-  switch (type) {
+  switch (type)
+  {
   case flow_eTraceType_Boolean:
     size = sizeof(pwr_tBoolean);
     break;
@@ -226,39 +235,50 @@ int RtTrace::connect_bc(
     size = sizeof(pwr_tInt32);
   }
 
-  if (tractx->m_has_host) {
-    if (str_StartsWith(name, "$host")) {
+  if (tractx->m_has_host)
+  {
+    if (str_StartsWith(name, "$host"))
+    {
       /* Replace "$host" with hostname */
       strcpy(attr_str, tractx->m_hostname);
       strcat(attr_str, &name[5]);
-    } else if (str_StartsWith(name, "$PlcFo:")) {
+    }
+    else if (str_StartsWith(name, "$PlcFo:"))
+    {
       /* Replace "$PlcFo:" with fo name */
       s = strchr(name, '.');
       if (!s)
         strcpy(attr_str, tractx->m_hostname);
-      else {
+      else
+      {
         strcpy(attr_str, tractx->m_hostname);
         strcat(attr_str, s);
       }
-    } else if (str_StartsWith(name, "$PlcMain:")) {
+    }
+    else if (str_StartsWith(name, "$PlcMain:"))
+    {
       /* Replace "$PlcMain:" with plcconnect name */
       s = strchr(name, '.');
       if (!s)
         strcpy(attr_str, tractx->m_plcconnect);
-      else {
+      else
+      {
         strcpy(attr_str, tractx->m_plcconnect);
         strcat(attr_str, s);
       }
-    } else
+    }
+    else
       strcpy(attr_str, name);
-  } else
+  }
+  else
     strcpy(attr_str, name);
   strcat(attr_str, ".");
   strcat(attr_str, attr);
   if ((s = strchr(attr_str, '#')))
     *s = 0;
 
-  if (flow_GetObjectType(object) == flow_eObjectType_Node) {
+  if (flow_GetObjectType(object) == flow_eObjectType_Node)
+  {
     sts = gdh_RefObjectInfo(attr_str, (void**)p, &subid, size);
     if (EVEN(sts))
       return sts;
@@ -272,16 +292,18 @@ int RtTrace::connect_bc(
 
 int RtTrace::disconnect_bc(flow_tObject object)
 {
-  if (flow_GetObjectType(object) == flow_eObjectType_Node) {
+  if (flow_GetObjectType(object) == flow_eObjectType_Node)
+  {
     FlowTraceAttr attr = flow_GetTraceAttr(object);
-    if (attr.type != flow_eTraceType_Boolean
-        && flow_GetNodeGroup(object) != flow_eNodeGroup_Trace)
+    if (attr.type != flow_eTraceType_Boolean && flow_GetNodeGroup(object) != flow_eNodeGroup_Trace)
       return 1;
 
-    if (!(streq(attr.object, "") || streq(attr.attribute, ""))) {
+    if (!(streq(attr.object, "") || streq(attr.attribute, "")))
+    {
       pwr_tSubid* subid_p;
       flow_GetUserData(object, (void**)&subid_p);
-      if (subid_p) {
+      if (subid_p)
+      {
         gdh_UnrefObjectInfo(*subid_p);
         free((char*)subid_p);
       }
@@ -300,17 +322,19 @@ int RtTrace::scan_bc(flow_tObject object, void* trace_p)
   pwr_tBoolean old;
   int dimmed;
 
-  if (flow_GetObjectType(object) == flow_eObjectType_Node) {
+  if (flow_GetObjectType(object) == flow_eObjectType_Node)
+  {
     FlowTraceAttr attr = flow_GetTraceAttr(object);
     flow_GetHighlight(object, &highlight);
 
-    switch (attr.type) {
+    switch (attr.type)
+    {
     case flow_eTraceType_Boolean:
-      on = attr.inverted ? *(unsigned int*)trace_p == 0
-                          : *(unsigned int*)trace_p != 0;
+      on = attr.inverted ? *(unsigned int*)trace_p == 0 : *(unsigned int*)trace_p != 0;
       if (highlight != on)
         flow_SetHighlight(object, on);
-      if (flow_GetNodeGroup(object) == flow_eNodeGroup_Trace) {
+      if (flow_GetNodeGroup(object) == flow_eNodeGroup_Trace)
+      {
         sprintf(txt, "%d", *(unsigned int*)trace_p);
         flow_SetAnnotation(object, 0, txt, strlen(txt));
       }
@@ -324,15 +348,16 @@ int RtTrace::scan_bc(flow_tObject object, void* trace_p)
       flow_SetAnnotation(object, 0, txt, strlen(txt));
       break;
     case flow_eTraceType_DataRef:
-      trace_p = (char *)trace_p + pwr_cAlignLW;
+      trace_p = (char*)trace_p + pwr_cAlignLW;
+    /* fall through */
     case flow_eTraceType_AttrRef:
       if (((pwr_tAttrRef*)trace_p)->Objid.vid == 0)
-	strcpy(txt, "");
-      else {
-	sts = gdh_AttrrefToName((pwr_tAttrRef*)trace_p, txt, sizeof(txt), 
-	    cdh_mName_object);
-	if (EVEN(sts))
-	  strcpy(txt, "");
+        strcpy(txt, "");
+      else
+      {
+        sts = gdh_AttrrefToName((pwr_tAttrRef*)trace_p, txt, sizeof(txt), cdh_mName_object);
+        if (EVEN(sts))
+          strcpy(txt, "");
       }
       flow_SetAnnotation(object, 0, txt, strlen(txt));
       break;
@@ -340,11 +365,14 @@ int RtTrace::scan_bc(flow_tObject object, void* trace_p)
       break;
     }
 
-    if (!(streq(attr.object, "") || streq(attr.attribute, ""))) {
+    if (!(streq(attr.object, "") || streq(attr.attribute, "")))
+    {
       flow_GetUserData(object, (void**)&subid_p);
-      if (subid_p) {
+      if (subid_p)
+      {
         sts = gdh_GetSubscriptionOldness(*subid_p, &old, 0, 0);
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           flow_GetDimmed(object, &dimmed);
           if ((int)old != dimmed)
             flow_SetDimmed(object, old);
@@ -359,11 +387,11 @@ void RtTrace::trace_scan(void* data)
 {
   RtTrace* tractx = (RtTrace*)data;
 
-  if (tractx->trace_started) {
+  if (tractx->trace_started)
+  {
     flow_TraceScan(tractx->flow_ctx);
 
-    tractx->trace_timerid->add(
-        (int)(tractx->scan_time * 1000), trace_scan, tractx);
+    tractx->trace_timerid->add((int)(tractx->scan_time * 1000), trace_scan, tractx);
   }
 }
 
@@ -397,9 +425,11 @@ void RtTrace::activate_print()
   /* Get selected object */
   flow_GetObjectList(ctx, &list, &cnt);
   np = list;
-  for (j = 0; j < cnt; j++) {
-    if (cnt > 0 && flow_GetObjectType(*np) == flow_eObjectType_Node
-        && flow_GetNodeGroup(*np) == flow_eNodeGroup_Document) {
+  for (j = 0; j < cnt; j++)
+  {
+    if (cnt > 0 && flow_GetObjectType(*np) == flow_eObjectType_Node &&
+        flow_GetNodeGroup(*np) == flow_eNodeGroup_Document)
+    {
       sprintf(filename, "$pwrp_tmp/trace%d.ps", ++i);
       dcli_translate_filename(filename, filename);
 
@@ -426,8 +456,9 @@ void RtTrace::activate_printselect()
 
   /* Get selected object */
   flow_GetSelectList(ctx, &list, &cnt);
-  if (cnt > 0 && flow_GetObjectType(*list) == flow_eObjectType_Node
-      && flow_GetNodeGroup(*list) == flow_eNodeGroup_Document) {
+  if (cnt > 0 && flow_GetObjectType(*list) == flow_eObjectType_Node &&
+      flow_GetNodeGroup(*list) == flow_eNodeGroup_Document)
+  {
     sprintf(filename, "$pwrp_tmp/trace%d.ps", ++i);
     dcli_translate_filename(filename, filename);
 
@@ -437,7 +468,8 @@ void RtTrace::activate_printselect()
 
     sprintf(cmd, "$pwr_exe/rt_print.sh %s 1", filename);
     system(cmd);
-  } else
+  }
+  else
     printf("No such node\n");
 }
 
@@ -482,9 +514,10 @@ void RtTrace::activate_parent_window()
   itemtype = xmenu_eItemType_Object;
   attrref = cdh_ObjidToAref(parent);
 
-  if (call_method_cb) {
-    (call_method_cb)(parent_ctx, "$Object-OpenTrace", "$Object-OpenTraceFilter",
-        attrref, itemtype, xmenu_mUtility_XNav, NULL);
+  if (call_method_cb)
+  {
+    (call_method_cb)(parent_ctx, "$Object-OpenTrace", "$Object-OpenTraceFilter", attrref, itemtype,
+                     xmenu_mUtility_XNav, NULL);
   }
 }
 
@@ -510,10 +543,10 @@ void RtTrace::activate_display_object()
   else
     itemtype = xmenu_eItemType_Attribute;
 
-  if (call_method_cb) {
-    (call_method_cb)(parent_ctx, "$Object-RtNavigator",
-        "$Object-RtNavigatorFilter", attrref, itemtype, xmenu_mUtility_Trace,
-        NULL);
+  if (call_method_cb)
+  {
+    (call_method_cb)(parent_ctx, "$Object-RtNavigator", "$Object-RtNavigatorFilter", attrref, itemtype,
+                     xmenu_mUtility_Trace, NULL);
   }
 }
 
@@ -539,9 +572,10 @@ void RtTrace::activate_collect_insert()
   else
     itemtype = xmenu_eItemType_Attribute;
 
-  if (call_method_cb) {
-    (call_method_cb)(parent_ctx, "$Object-Collect", "$Object-CollectFilter",
-        attrref, itemtype, xmenu_mUtility_Trace, NULL);
+  if (call_method_cb)
+  {
+    (call_method_cb)(parent_ctx, "$Object-Collect", "$Object-CollectFilter", attrref, itemtype,
+                     xmenu_mUtility_Trace, NULL);
   }
 }
 
@@ -559,11 +593,12 @@ void RtTrace::activate_open_object()
   if (EVEN(sts))
     return;
 
-  if (call_method_cb) {
+  if (call_method_cb)
+  {
     pwr_sAttrRef attrref = cdh_ObjidToAref(objid);
 
-    (call_method_cb)(parent_ctx, "$Object-OpenObject", NULL, attrref,
-        xmenu_eItemType_Object, xmenu_mUtility_Trace, NULL);
+    (call_method_cb)(parent_ctx, "$Object-OpenObject", NULL, attrref, xmenu_eItemType_Object,
+                     xmenu_mUtility_Trace, NULL);
   }
 }
 
@@ -588,12 +623,16 @@ void RtTrace::activate_open_subwindow()
   if (EVEN(sts))
     return;
 
-  if (subwindow_cb) {
+  if (subwindow_cb)
+  {
     // The parent context will start the subwindow
     (subwindow_cb)(parent_ctx, objid);
-  } else {
+  }
+  else
+  {
     new_tractx = subwindow_new(this, objid, &sts);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       new_tractx->close_cb = trace_close_cb;
       new_tractx->help_cb = help_cb;
       new_tractx->display_object_cb = display_object_cb;
@@ -604,7 +643,8 @@ void RtTrace::activate_open_subwindow()
       trace_list = (trace_tNode*)malloc(sizeof(trace_tNode));
       trace_list->Next = nnode;
       trace_list->tractx = new_tractx;
-    } else
+    }
+    else
       delete new_tractx;
   }
 }
@@ -631,10 +671,10 @@ void RtTrace::activate_show_cross()
   else
     itemtype = xmenu_eItemType_Attribute;
 
-  if (call_method_cb) {
-    (call_method_cb)(parent_ctx, "$Object-OpenCrossref",
-        "$Object-OpenCrossrefFilter", attrref, itemtype, xmenu_mUtility_Trace,
-        NULL);
+  if (call_method_cb)
+  {
+    (call_method_cb)(parent_ctx, "$Object-OpenCrossref", "$Object-OpenCrossrefFilter", attrref, itemtype,
+                     xmenu_mUtility_Trace, NULL);
   }
 }
 
@@ -660,22 +700,22 @@ void RtTrace::activate_open_classgraph()
   else
     itemtype = xmenu_eItemType_Attribute;
 
-  if (call_method_cb) {
+  if (call_method_cb)
+  {
     if (itemtype == xmenu_eItemType_Attribute)
-      (call_method_cb)(parent_ctx, "$Object-OpenTypeGraph",
-          "$Object-OpenTypeGraphFilter", attrref, itemtype,
-          xmenu_mUtility_Trace, NULL);
+      (call_method_cb)(parent_ctx, "$Object-OpenTypeGraph", "$Object-OpenTypeGraphFilter", attrref, itemtype,
+                       xmenu_mUtility_Trace, NULL);
     else
-      (call_method_cb)(parent_ctx, "$Object-OpenObjectGraph",
-          "$Object-OpenObjectGraphFilter", attrref, itemtype,
-          xmenu_mUtility_Trace, NULL);
+      (call_method_cb)(parent_ctx, "$Object-OpenObjectGraph", "$Object-OpenObjectGraphFilter", attrref,
+                       itemtype, xmenu_mUtility_Trace, NULL);
   }
 }
 
 void RtTrace::activate_trace()
 {
   trasetup();
-  if (!trace_started) {
+  if (!trace_started)
+  {
     trace_start();
   }
 }
@@ -683,14 +723,16 @@ void RtTrace::activate_trace()
 void RtTrace::activate_simulate()
 {
   simsetup();
-  if (!trace_started) {
+  if (!trace_started)
+  {
     trace_start();
   }
 }
 
 void RtTrace::activate_view()
 {
-  if (trace_started) {
+  if (trace_started)
+  {
     trace_stop();
     viewsetup();
   }
@@ -708,8 +750,7 @@ void RtTrace::activate_helpplc()
   char key[80];
   char volstr[20];
 
-  sprintf(filename, pwr_cNamePlcXttHelp,
-      cdh_VolumeIdToFnString(volstr, sizeof(volstr), objid.vid));
+  sprintf(filename, pwr_cNamePlcXttHelp, cdh_VolumeIdToFnString(volstr, sizeof(volstr), objid.vid));
   sprintf(key, "plcw_%s", cdh_ObjidToFnString(0, objid));
 
   if (help_cb)
@@ -721,24 +762,23 @@ void RtTrace::activate_helpplclist()
   pwr_tFileName filename;
   char volstr[20];
 
-  sprintf(filename, pwr_cNamePlcXttHelp,
-      cdh_VolumeIdToFnString(volstr, sizeof(volstr), objid.vid));
+  sprintf(filename, pwr_cNamePlcXttHelp, cdh_VolumeIdToFnString(volstr, sizeof(volstr), objid.vid));
 
   if (help_cb)
     (help_cb)(this, "index", filename);
 }
 
 /*************************************************************************
-*
-* Name:		int	trace_flow_cb()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Callback from flow.
-**************************************************************************/
+ *
+ * Name:		int	trace_flow_cb()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Callback from flow.
+ **************************************************************************/
 int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
 {
   char name[80];
@@ -747,12 +787,13 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
 
   flow_GetCtxUserData(ctx, (void**)&tractx);
 
-  if (event->any.type == flow_eEventType_CreateCon) {
-    if (flow_GetNodeGroup(event->con_create.source_object)
-        == flow_eNodeGroup_Trace)
+  if (event->any.type == flow_eEventType_CreateCon)
+  {
+    if (flow_GetNodeGroup(event->con_create.source_object) == flow_eNodeGroup_Trace)
       return 1;
 
-    if (tractx->trace_started) {
+    if (tractx->trace_started)
+    {
       flow_tNode n1;
       flow_tCon c1;
       flow_eDirection direction;
@@ -762,12 +803,13 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
       sprintf(name, "Trace%d", idx++);
 
       /* Connect only output points */
-      int sts = flow_GetConPoint(event->con_create.source_object,
-          event->con_create.source_conpoint, &x, &y, &direction);
+      int sts = flow_GetConPoint(event->con_create.source_object, event->con_create.source_conpoint, &x, &y,
+                                 &direction);
       if (EVEN(sts))
         return 1;
 
-      switch (direction) {
+      switch (direction)
+      {
       case flow_eDirection_Center:
       case flow_eDirection_Left:
       case flow_eDirection_Up:
@@ -780,8 +822,8 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
       FlowTraceAttr attr = flow_GetTraceAttr(event->con_create.source_object);
 
       /* Get attribute from connection point */
-      FlowTraceAttr con = flow_GetConPointTraceAttr(event->con_create.source_object,
-          event->con_create.source_conpoint);
+      FlowTraceAttr con =
+          flow_GetConPointTraceAttr(event->con_create.source_object, event->con_create.source_conpoint);
       /* If "$object", use object trace attribute */
       if (!streq(con.attribute, "$object"))
         strcpy(attr.attribute, con.attribute);
@@ -791,29 +833,33 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
 
       attr.type = con.type;
 
-      flow_CreateNode(ctx, name, tractx->trace_analyse_nc, event->object.x,
-          event->object.y, NULL, &n1);
+      flow_CreateNode(ctx, name, tractx->trace_analyse_nc, event->object.x, event->object.y, NULL, &n1);
       flow_SetTraceAttr(n1, attr.object, attr.attribute, attr.type, 0);
 
-      flow_CreateCon(ctx, name, tractx->trace_con_cc,
-          event->con_create.source_object, n1,
-          event->con_create.source_conpoint, 0, NULL, &c1, 0, NULL, NULL, &sts);
+      flow_CreateCon(ctx, name, tractx->trace_con_cc, event->con_create.source_object, n1,
+                     event->con_create.source_conpoint, 0, NULL, &c1, 0, NULL, NULL, &sts);
     }
   }
-  switch (event->event) {
+  switch (event->event)
+  {
   case flow_eEvent_Init:
     break;
-  case flow_eEvent_MB3Down: {
+  case flow_eEvent_MB3Down:
+  {
     flow_SetClickSensitivity(ctx, flow_mSensitivity_MB3Press);
     break;
   }
   case flow_eEvent_MB1Click:
     /* Select */
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
-      if (flow_FindSelectedObject(ctx, event->object.object)) {
+      if (flow_FindSelectedObject(ctx, event->object.object))
+      {
         flow_SelectClear(ctx);
-      } else {
+      }
+      else
+      {
         // if ( flow_GetNodeGroup( event->object.object) ==
         // flow_eNodeGroup_Document)
         //  break;
@@ -823,7 +869,8 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
       }
       break;
     case flow_eObjectType_Con:
-      if (flow_ConIsReference(event->object.object)) {
+      if (flow_ConIsReference(event->object.object))
+      {
         int val;
 
         flow_GetHighlight(event->object.object, &val);
@@ -835,9 +882,11 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   case flow_eEvent_MB2DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
-      if (flow_GetNodeGroup(event->object.object) == flow_eNodeGroup_Trace) {
+      if (flow_GetNodeGroup(event->object.object) == flow_eNodeGroup_Trace)
+      {
         flow_DeleteNodeCons(event->object.object);
         flow_DeleteNode(event->object.object);
       }
@@ -845,18 +894,21 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
     break;
-  case flow_eEvent_MB1Press: {
+  case flow_eEvent_MB1Press:
+  {
     /* Object moved */
     break;
   }
-  case flow_eEvent_MB3Press: {
+  case flow_eEvent_MB3Press:
+  {
     pwr_sAttrRef attrref;
     int sts;
     int x, y;
     unsigned int utility;
     xmenu_eItemType itemtype;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       sts = tractx->get_attrref(event->object.object, &attrref);
       if (EVEN(sts))
@@ -869,13 +921,12 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
       else
         itemtype = xmenu_eItemType_Attribute;
 
-      if (tractx->popup_menu_cb) {
+      if (tractx->popup_menu_cb)
+      {
         // Display popup menu
         utility = xmenu_mUtility_Trace;
-        tractx->popup_menu_position(
-            event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
-        (tractx->popup_menu_cb)(
-            tractx->parent_ctx, attrref, itemtype, utility, NULL, x, y);
+        tractx->popup_menu_position(event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
+        (tractx->popup_menu_cb)(tractx->parent_ctx, attrref, itemtype, utility, NULL, x, y);
       }
       break;
     default:;
@@ -884,32 +935,35 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
     /* Object moved */
     break;
   }
-  case flow_eEvent_MB1DoubleClick: {
+  case flow_eEvent_MB1DoubleClick:
+  {
     /* Open attribute editor */
     pwr_tAttrRef attrref;
     int sts;
 
     /* Display object */
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       sts = tractx->get_attrref(event->object.object, &attrref);
       if (EVEN(sts))
         return 1;
 
-      if (tractx->call_method_cb) {
+      if (tractx->call_method_cb)
+      {
         // Display crossreferences
         unsigned long utility = xmenu_mUtility_Trace;
 
-        (tractx->call_method_cb)(tractx->parent_ctx, "$Object-OpenCrossref",
-            "$Object-OpenCrossrefFilter", attrref, xmenu_eItemType_Object,
-            utility, NULL);
+        (tractx->call_method_cb)(tractx->parent_ctx, "$Object-OpenCrossref", "$Object-OpenCrossrefFilter",
+                                 attrref, xmenu_eItemType_Object, utility, NULL);
       }
       break;
     default:;
     }
     break;
   }
-  case flow_eEvent_MB1DoubleClickShift: {
+  case flow_eEvent_MB1DoubleClickShift:
+  {
     pwr_tOName name;
     flow_tName object_name;
     pwr_tObjid objid;
@@ -918,9 +972,11 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
     trace_tNode* node;
 
     /* Open subwindow */
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
-      if (flow_GetNodeGroup(event->object.object) != flow_eNodeGroup_Trace) {
+      if (flow_GetNodeGroup(event->object.object) != flow_eNodeGroup_Trace)
+      {
         sts = gdh_ObjidToName(tractx->objid, name, sizeof(name), cdh_mNName);
         if (EVEN(sts))
           return 1;
@@ -938,25 +994,31 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
         if (EVEN(sts))
           return 1;
 
-        if (tractx->subwindow_cb) {
+        if (tractx->subwindow_cb)
+        {
           // The parent context will start the subwindow
           (tractx->subwindow_cb)(tractx->parent_ctx, objid);
-        } else {
+        }
+        else
+        {
           new_tractx = tractx->subwindow_new(tractx, objid, &sts);
-          if (ODD(sts)) {
+          if (ODD(sts))
+          {
             new_tractx->close_cb = trace_close_cb;
             new_tractx->help_cb = tractx->help_cb;
             new_tractx->display_object_cb = tractx->display_object_cb;
             new_tractx->collect_insert_cb = tractx->collect_insert_cb;
             new_tractx->is_authorized_cb = tractx->is_authorized_cb;
 
-            if (tractx) {
+            if (tractx)
+            {
               node = tractx->trace_list;
               tractx->trace_list = (trace_tNode*)malloc(sizeof(trace_tNode));
               tractx->trace_list->Next = node;
               tractx->trace_list->tractx = new_tractx;
             }
-          } else
+          }
+          else
             delete new_tractx;
         }
       }
@@ -965,10 +1027,12 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_MB1ClickCtrl: {
+  case flow_eEvent_MB1ClickCtrl:
+  {
     break;
   }
-  case flow_eEvent_MB1DoubleClickShiftCtrl: {
+  case flow_eEvent_MB1DoubleClickShiftCtrl:
+  {
     if (event->object.object)
       tractx->changevalue(event->object.object);
     break;
@@ -984,7 +1048,8 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
     flow_RemoveTipText(ctx);
     flow_Scroll(ctx, 0, 0.05);
     break;
-  case flow_eEvent_TipText: {
+  case flow_eEvent_TipText:
+  {
     pwr_tAName aname;
     pwr_tAName name;
     char tiptext[512] = "";
@@ -996,42 +1061,54 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
 
     FlowTraceAttr attr = tractx->get_trace_attr(event->object.object, &options);
 
-    if (tractx->m_has_host) {
-      if (str_StartsWith(attr.object, "$host")) {
+    if (tractx->m_has_host)
+    {
+      if (str_StartsWith(attr.object, "$host"))
+      {
         /* Replace "$host" with hostname */
         strcpy(name, tractx->m_hostname);
         strcat(name, &attr.object[5]);
-      } else if (str_StartsWith(attr.object, "$PlcFo:")) {
+      }
+      else if (str_StartsWith(attr.object, "$PlcFo:"))
+      {
         /* Replace "$PlcFo:" with fo name */
         s = strchr(attr.object, '.');
         if (!s)
           strcpy(name, tractx->m_hostname);
-        else {
+        else
+        {
           strcpy(name, tractx->m_hostname);
           strcat(name, s);
         }
         is_plcfo = true;
-      } else if (str_StartsWith(attr.object, "$PlcMain:")) {
+      }
+      else if (str_StartsWith(attr.object, "$PlcMain:"))
+      {
         /* Replace "$PlcMain:" with plcconnect name */
         s = strchr(attr.object, '.');
         if (!s)
           strcpy(name, tractx->m_plcconnect);
-        else {
+        else
+        {
           strcpy(name, tractx->m_plcconnect);
           strcat(name, s);
         }
         is_plcmain = true;
-      } else
+      }
+      else
         strcpy(name, attr.object);
-    } else
+    }
+    else
       strcpy(name, attr.object);
 
-    if (!streq(name, "")) {
+    if (!streq(name, ""))
+    {
       strcpy(aname, name);
       strcat(aname, ".Description");
 
       sts = gdh_GetObjectInfo(aname, tiptext, sizeof(tiptext));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         // Try PlcConnect
         pwr_tAttrRef aref;
 
@@ -1040,16 +1117,17 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
 
         sts = gdh_GetObjectInfo(aname, &aref, sizeof(aref));
         if (ODD(sts))
-          sts = gdh_AttrrefToName(
-              &aref, aname, sizeof(aname), cdh_mName_volumeStrict);
-        if (ODD(sts)) {
+          sts = gdh_AttrrefToName(&aref, aname, sizeof(aname), cdh_mName_volumeStrict);
+        if (ODD(sts))
+        {
           strcat(aname, ".Description");
 
           sts = gdh_GetObjectInfo(aname, tiptext, sizeof(tiptext));
         }
       }
 
-      if (is_plcfo) {
+      if (is_plcfo)
+      {
         if (!streq(tiptext, ""))
           strcat(tiptext, "\n");
         if ((s = strchr(name, ':')))
@@ -1057,11 +1135,14 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
         else
           s = name;
         strncat(tiptext, s, sizeof(tiptext) - strlen(tiptext) - 1);
-        if (!streq(attr.attribute, "")) {
+        if (!streq(attr.attribute, ""))
+        {
           strcat(tiptext, ".");
           strncat(tiptext, attr.attribute, sizeof(tiptext) - strlen(tiptext) - 1);
         }
-      } else if (is_plcmain) {
+      }
+      else if (is_plcmain)
+      {
         if (!streq(tiptext, ""))
           strcat(tiptext, "\n");
         if ((s = strchr(name, ':')))
@@ -1069,7 +1150,8 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
         else
           s = name;
         strncat(tiptext, s, sizeof(tiptext) - strlen(tiptext) - 1);
-        if (!streq(attr.attribute, "")) {
+        if (!streq(attr.attribute, ""))
+        {
           strcat(tiptext, ".");
           strncat(tiptext, attr.attribute, sizeof(tiptext) - strlen(tiptext) - 1);
         }
@@ -1086,22 +1168,25 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
         if (EVEN(sts))
           break;
 
-        switch (tid) {
+        switch (tid)
+        {
         case pwr_cClass_Di:
         case pwr_cClass_Ai:
         case pwr_cClass_Ii:
         case pwr_cClass_Do:
         case pwr_cClass_Ao:
         case pwr_cClass_Io:
-        case pwr_cClass_Co: {
+        case pwr_cClass_Co:
+        {
           strcpy(aname, name);
           strcat(aname, ".SigChanCon");
 
           sts = gdh_GetObjectInfo(aname, &aref, sizeof(aref));
-          if (ODD(sts)) {
-            sts = gdh_AttrrefToName(
-                &aref, aname, sizeof(aname), cdh_mName_pathStrict);
-            if (ODD(sts)) {
+          if (ODD(sts))
+          {
+            sts = gdh_AttrrefToName(&aref, aname, sizeof(aname), cdh_mName_pathStrict);
+            if (ODD(sts))
+            {
               strcat(tiptext, "\n");
               strncat(tiptext, aname, sizeof(tiptext) - strlen(tiptext) - 1);
             }
@@ -1114,8 +1199,7 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
       }
 
       if (!streq(tiptext, ""))
-        flow_SetTipText(ctx, event->object.object, tiptext, event->any.x_pixel,
-            event->any.y_pixel);
+        flow_SetTipText(ctx, event->object.object, tiptext, event->any.x_pixel, event->any.y_pixel);
     }
     break;
   }
@@ -1132,13 +1216,18 @@ void RtTrace::trace_close_cb(RtTrace* child_tractx)
   tractx = (RtTrace*)child_tractx->parent_ctx;
 
   node = tractx->trace_list;
-  if (node && node->tractx == child_tractx) {
+  if (node && node->tractx == child_tractx)
+  {
     fnode = node;
     tractx->trace_list = node->Next;
     free((char*)fnode);
-  } else {
-    for (; node; node = node->Next) {
-      if (node->Next && node->Next->tractx == child_tractx) {
+  }
+  else
+  {
+    for (; node; node = node->Next)
+    {
+      if (node->Next && node->Next->tractx == child_tractx)
+      {
         fnode = node->Next;
         node->Next = fnode->Next;
         free((char*)fnode);
@@ -1166,7 +1255,8 @@ int RtTrace::get_objid(flow_tObject node, pwr_tObjid* oid)
   strcat(name, object_name);
 
   sts = gdh_NameToObjid(name, oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     /* Try trace object */
     FlowTraceAttr attr = get_trace_attr(node, &options);
 
@@ -1190,48 +1280,64 @@ int RtTrace::get_attrref(flow_tObject node, pwr_tAttrRef* aref)
 
   FlowTraceAttr attr = get_trace_attr(node, &options);
 
-  if (m_has_host) {
-    if (str_StartsWith(attr.object, "$host")) {
+  if (m_has_host)
+  {
+    if (str_StartsWith(attr.object, "$host"))
+    {
       /* Replace "$host" with hostname */
       strcpy(name, m_hostname);
       strcat(name, &attr.object[5]);
-    } else if (str_StartsWith(attr.object, "$PlcFo:")) {
+    }
+    else if (str_StartsWith(attr.object, "$PlcFo:"))
+    {
       /* Replace "$PlcFo:" with fo name */
       s = strchr(attr.object, '.');
       if (!s)
         strcpy(name, m_hostname);
-      else {
+      else
+      {
         strcpy(name, m_hostname);
         strcat(name, s);
       }
-    } else if (str_StartsWith(attr.object, "$PlcMain:")) {
+    }
+    else if (str_StartsWith(attr.object, "$PlcMain:"))
+    {
       /* Replace "$PlcMain:" with plcconnect name */
       s = strchr(attr.object, '.');
       if (!s)
         strcpy(name, m_plcconnect);
-      else {
+      else
+      {
         strcpy(name, m_plcconnect);
         strcat(name, s);
       }
-    } else
+    }
+    else
       strcpy(name, attr.object);
-  } else
+  }
+  else
     strcpy(name, attr.object);
 
-  if (options & trace_mAttrOptions_MenuAttr) {
-    if (!streq(attr.attribute, "")) {
+  if (options & trace_mAttrOptions_MenuAttr)
+  {
+    if (!streq(attr.attribute, ""))
+    {
       strcat(name, ".");
       strcat(name, attr.attribute);
 
       sts = gdh_NameToAttrref(pwr_cNObjid, name, &attrref);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       sts = gdh_NameToAttrref(pwr_cNObjid, name, &attrref);
       if (EVEN(sts))
         return sts;
     }
-  } else {
+  }
+  else
+  {
     sts = gdh_NameToAttrref(pwr_cNObjid, name, &attrref);
     if (EVEN(sts))
       return sts;
@@ -1258,18 +1364,12 @@ pwr_tStatus RtTrace::viewsetup()
 
   flow_DisableEventAll(ctx);
 
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, flow_cb);
   flow_EnableEvent(ctx, flow_eEvent_TipText, flow_eEventType_CallBack, flow_cb);
 
   return 1;
@@ -1280,31 +1380,19 @@ pwr_tStatus RtTrace::simsetup()
   flow_tCtx ctx = flow_ctx;
 
   flow_DisableEventAll(ctx);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1Press, flow_eEventType_MoveNode, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB2Press, flow_eEventType_CreateCon, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB2DoubleClick, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1Press, flow_eEventType_MoveNode, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2Press, flow_eEventType_CreateCon, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2DoubleClick, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, flow_cb);
   flow_EnableEvent(ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1ClickCtrl, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShiftCtrl,
-      flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1ClickCtrl, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShiftCtrl, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, flow_cb);
   flow_EnableEvent(ctx, flow_eEvent_TipText, flow_eEventType_CallBack, flow_cb);
   return 1;
 }
@@ -1314,28 +1402,17 @@ pwr_tStatus RtTrace::trasetup()
   flow_tCtx ctx = flow_ctx;
 
   flow_DisableEventAll(ctx);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1Press, flow_eEventType_MoveNode, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB2Press, flow_eEventType_CreateCon, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB2DoubleClick, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1ClickCtrl, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1Press, flow_eEventType_MoveNode, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2Press, flow_eEventType_CreateCon, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2DoubleClick, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1ClickCtrl, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, flow_cb);
   flow_EnableEvent(ctx, flow_eEvent_TipText, flow_eEventType_CallBack, flow_cb);
   return 1;
 }
@@ -1345,7 +1422,8 @@ int RtTrace::trace_start()
   int sts;
   double f_width, f_height;
 
-  if (!trace_started) {
+  if (!trace_started)
+  {
     flow_ResetHighlightAll(flow_ctx);
     flow_SelectClear(flow_ctx);
     sts = flow_TraceInit(flow_ctx, connect_bc, disconnect_bc, scan_bc);
@@ -1356,24 +1434,19 @@ int RtTrace::trace_start()
     trace_scan(this);
 
     /* Create node and con classes for trace */
-    if (!trace_analyse_nc) {
+    if (!trace_analyse_nc)
+    {
       f_width = 4.5 * GOEN_F_GRID;
       f_height = GOEN_F_GRID;
-      flow_CreateNodeClass(
-          flow_ctx, "TraceNode", flow_eNodeGroup_Trace, &trace_analyse_nc);
-      flow_AddRect(trace_analyse_nc, 0, 0, f_width, f_height,
-          flow_eDrawType_Line, 1, flow_mDisplayLevel_1);
-      flow_AddAnnot(trace_analyse_nc, 0.07 * f_width, 0.75 * f_height, 0,
-          flow_eDrawType_TextRoboto, 3, flow_eAnnotType_OneLine,
-          flow_mDisplayLevel_1);
-      flow_AddConPoint(
-          trace_analyse_nc, 0, 0.5 * f_height, 0, flow_eDirection_Left);
-      flow_AddConPoint(
-          trace_analyse_nc, f_width, 0.5 * f_height, 1, flow_eDirection_Right);
+      flow_CreateNodeClass(flow_ctx, "TraceNode", flow_eNodeGroup_Trace, &trace_analyse_nc);
+      flow_AddRect(trace_analyse_nc, 0, 0, f_width, f_height, flow_eDrawType_Line, 1, flow_mDisplayLevel_1);
+      flow_AddAnnot(trace_analyse_nc, 0.07 * f_width, 0.75 * f_height, 0, flow_eDrawType_TextRoboto, 3,
+                    flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
+      flow_AddConPoint(trace_analyse_nc, 0, 0.5 * f_height, 0, flow_eDirection_Left);
+      flow_AddConPoint(trace_analyse_nc, f_width, 0.5 * f_height, 1, flow_eDirection_Right);
 
-      flow_CreateConClass(flow_ctx, "TraceCon", flow_eConType_Straight,
-          flow_eCorner_Right, flow_eDrawType_Line, 1, 0, 0, 0,
-          flow_eConGroup_Trace, &trace_con_cc);
+      flow_CreateConClass(flow_ctx, "TraceCon", flow_eConType_Straight, flow_eCorner_Right,
+                          flow_eDrawType_Line, 1, 0, 0, 0, flow_eConGroup_Trace, &trace_con_cc);
     }
   }
   return 1;
@@ -1381,7 +1454,8 @@ int RtTrace::trace_start()
 
 int RtTrace::trace_stop()
 {
-  if (trace_started) {
+  if (trace_started)
+  {
     flow_TraceClose(flow_ctx);
     flow_ResetHighlightAll(flow_ctx);
     flow_ResetDimmedAll(flow_ctx);
@@ -1395,13 +1469,14 @@ int RtTrace::trace_stop()
 
 void RtTrace::changevalue(flow_tNode fnode)
 {
-  if (is_authorized_cb) {
-    if (!(is_authorized_cb)(
-            parent_ctx, pwr_mAccess_RtWrite | pwr_mAccess_System))
+  if (is_authorized_cb)
+  {
+    if (!(is_authorized_cb)(parent_ctx, pwr_mAccess_RtWrite | pwr_mAccess_System))
       return;
   }
 
-  if (flow_GetNodeGroup(fnode) == flow_eNodeGroup_Trace) {
+  if (flow_GetNodeGroup(fnode) == flow_eNodeGroup_Trace)
+  {
     trace_changenode = fnode;
 
     /* Get a value */
@@ -1409,7 +1484,9 @@ void RtTrace::changevalue(flow_tNode fnode)
         foe_get_textinput( tractx, "Enter value : ", &trace_aanalyse_set_value);
     */
     return;
-  } else {
+  }
+  else
+  {
     /* Toggle the value, start to get the current value */
     unsigned int options;
     FlowTraceAttr attr = get_trace_attr(fnode, &options);
@@ -1417,10 +1494,12 @@ void RtTrace::changevalue(flow_tNode fnode)
     strcpy(name, attr.object);
     strcat(name, ".");
     strcat(name, attr.attribute);
-    if (attr.type == flow_eTraceType_Boolean) {
+    if (attr.type == flow_eTraceType_Boolean)
+    {
       pwr_tBoolean value;
       int sts = gdh_GetObjectInfo(name, &value, sizeof(value));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return;
       }
 
@@ -1441,14 +1520,11 @@ char* RtTrace::id_to_str(pwr_tObjid objid)
   unsigned char volid[4];
 
   memcpy(&volid, &objid.vid, sizeof(volid));
-  sprintf(str, "%3.3u_%3.3u_%3.3u_%3.3u_%8.8x", volid[3], volid[2], volid[1],
-      volid[0], objid.oix);
+  sprintf(str, "%3.3u_%3.3u_%3.3u_%3.3u_%8.8x", volid[3], volid[2], volid[1], volid[0], objid.oix);
   return str;
 }
 
-RtTrace::~RtTrace()
-{
-}
+RtTrace::~RtTrace() {}
 
 int RtTrace::search_object(char* object_str)
 {
@@ -1470,13 +1546,18 @@ void RtTrace::swap(int mode)
 {
   pwr_tStatus sts;
 
-  if (mode == 0) {
-    if (trace_started) {
+  if (mode == 0)
+  {
+    if (trace_started)
+    {
       flow_TraceClose(flow_ctx);
       trace_timerid->remove();
     }
-  } else {
-    if (trace_started) {
+  }
+  else
+  {
+    if (trace_started)
+    {
       int fversion = 0;
 #if defined OS_LINUX
       {
@@ -1487,7 +1568,8 @@ void RtTrace::swap(int mode)
           fversion = time.tv_sec;
       }
 #endif
-      if (version != fversion) {
+      if (version != fversion)
+      {
         flow_sAttributes attr;
         char tfile[200];
         char* s;
@@ -1513,7 +1595,9 @@ void RtTrace::swap(int mode)
         flow_Redraw(flow_ctx);
         trace_start();
         flow_OpenTrace(flow_ctx, tfile);
-      } else {
+      }
+      else
+      {
         sts = flow_TraceInit(flow_ctx, connect_bc, disconnect_bc, NULL);
         if (EVEN(sts))
           return;
@@ -1524,11 +1608,9 @@ void RtTrace::swap(int mode)
 }
 
 RtTrace::RtTrace(void* tr_parent_ctx, pwr_tObjid tr_objid, pwr_tStatus* status)
-    : parent_ctx(tr_parent_ctx), trace_analyse_nc(0), trace_con_cc(0),
-      trace_started(0), trace_timerid(0), trace_changenode(0),
-      objid(pwr_cNObjid), scan_time(0.5), close_cb(0), help_cb(0),
-      subwindow_cb(0), display_object_cb(0), collect_insert_cb(0),
-      is_authorized_cb(0), popup_menu_cb(0), call_method_cb(0), trace_list(0),
-      version(0), m_has_host(0), wow(0)
+    : parent_ctx(tr_parent_ctx), trace_analyse_nc(0), trace_con_cc(0), trace_started(0), trace_timerid(0),
+      trace_changenode(0), objid(pwr_cNObjid), scan_time(0.5), close_cb(0), help_cb(0), subwindow_cb(0),
+      display_object_cb(0), collect_insert_cb(0), is_authorized_cb(0), popup_menu_cb(0), call_method_cb(0),
+      trace_list(0), version(0), m_has_host(0), wow(0)
 {
 }

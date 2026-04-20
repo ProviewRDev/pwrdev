@@ -50,40 +50,39 @@
 #include "rt_rtt_msg.h"
 
 /*************************************************************************
-*
-* Name:		rtt_search_file
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*		Söker efter en fil.
-*		Filnamnet kan innehålla wildcard.
-*		Vid sökning av flera filer mha wildcard anropas
-*		rutinen första gången med new=1 och sedan med new=0.
-*		Två sökningar med wildcard kan ej pågå parallellt efter
-*		som sökvillkor lagras i interna variabler.
-*
-* Parametrar
-*	file_name	*char	I  Namn på fil, kan innehålla wildcard.
-*	found_file	*char	O  Hittad fil.
-*	new		int	I  1 vid ej wildcard sökning och vid första
-*				   wildcardsökningsanropet. 0 vid sökning
-*				   efter fler filer med samma wildcard.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_search_file
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *		Söker efter en fil.
+ *		Filnamnet kan innehålla wildcard.
+ *		Vid sökning av flera filer mha wildcard anropas
+ *		rutinen första gången med new=1 och sedan med new=0.
+ *		Två sökningar med wildcard kan ej pågå parallellt efter
+ *		som sökvillkor lagras i interna variabler.
+ *
+ * Parametrar
+ *	file_name	*char	I  Namn på fil, kan innehålla wildcard.
+ *	found_file	*char	O  Hittad fil.
+ *	new		int	I  1 vid ej wildcard sökning och vid första
+ *				   wildcardsökningsanropet. 0 vid sökning
+ *				   efter fler filer med samma wildcard.
+ *
+ **************************************************************************/
 
-int rtt_search_file(char* name, char* found_file, int new)
-{
-  static DIR* directory;
+int rtt_search_file(char *name, char *found_file, int new) {
+  static DIR *directory;
   static char pattern[80];
   char dev[2], dir[200], dir2[200], file[80], type[80];
   char cwd[200];
   int version;
   int found;
   int wildcard;
-  struct dirent* dir_entry;
+  struct dirent *dir_entry;
 
   if (new == RTT_DIR_SEARCH_INIT) {
     rtt_parse_filename(name, dev, dir, file, type, &version);
@@ -143,30 +142,29 @@ int rtt_search_file(char* name, char* found_file, int new)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_parse_filename
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Delar upp ett filnamn i device, directory, namn, typ och version.
-*
-* Parameterar
-*	filenam		*char	I  Filnamn som ska delas.
-*	dev		*char	O  device.
-*	dir		*char	O  directory.
-*	file		*char	O  filnamn.
-*	type		*char	O  typ.
-*	version		*int	O  version.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_parse_filename
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Delar upp ett filnamn i device, directory, namn, typ och version.
+ *
+ * Parameterar
+ *	filenam		*char	I  Filnamn som ska delas.
+ *	dev		*char	O  device.
+ *	dir		*char	O  directory.
+ *	file		*char	O  filnamn.
+ *	type		*char	O  typ.
+ *	version		*int	O  version.
+ *
+ **************************************************************************/
 
-int rtt_parse_filename(
-    char* filename, char* dev, char* dir, char* file, char* type, int* version)
-{
-  char* s;
+int rtt_parse_filename(char *filename, char *dev, char *dir, char *file,
+                       char *type, int *version) {
+  char *s;
   char ldev[200];
   char ldir[200];
   char lfile[200];

@@ -71,10 +71,13 @@ void Ge::set_title()
   int page;
 
   graph->get_name(name);
-  if ((s = strstr(name, "__p")) && (sscanf(s + 3, "%d", &page) == 1)) {
+  if ((s = strstr(name, "__p")) && (sscanf(s + 3, "%d", &page) == 1))
+  {
     *s = 0;
     sprintf(title, "PwR Ge   %s   Page %d", name, page);
-  } else {
+  }
+  else
+  {
     if (graph->trace_started)
       sprintf(title, "PwR Ge   %s   Preview", name);
     else
@@ -89,8 +92,10 @@ void Ge::prevtable_insert(char* name, char* prev)
     return;
 
   // Check if alread inserted
-  for (int i = 0; i < prev_count; i++) {
-    if (streq(name, prev_table[i].name)) {
+  for (int i = 0; i < prev_count; i++)
+  {
+    if (streq(name, prev_table[i].name))
+    {
       strcpy(prev_table[i].prev, prev);
       return;
     }
@@ -103,8 +108,10 @@ void Ge::prevtable_insert(char* name, char* prev)
 
 int Ge::prevtable_get(char* name, char* prev)
 {
-  for (int i = 0; i < prev_count; i++) {
-    if (streq(name, prev_table[i].name)) {
+  for (int i = 0; i < prev_count; i++)
+  {
+    if (streq(name, prev_table[i].name))
+    {
       strcpy(prev, prev_table[i].prev);
       return 1;
     }
@@ -112,57 +119,42 @@ int Ge::prevtable_get(char* name, char* prev)
   return 0;
 }
 
-void Ge::prevtable_clear()
-{
-  prev_count = 0;
-}
+void Ge::prevtable_clear() { prev_count = 0; }
 
 void Ge::save_and_close()
 {
   char name[40];
 
   graph->get_name(name);
-  if (streq(name, "")) {
+  if (streq(name, ""))
+  {
     if (!graph->is_subgraph())
-      open_input_dialog(
-          "Graph name", "Save Graph", "", Ge::save_graph_and_close);
+      open_input_dialog("Graph name", "Save Graph", "", Ge::save_graph_and_close);
     else
-      open_input_dialog(
-          "SubGraph name", "Save SubGraph", "", Ge::save_graph_and_close);
-  } else {
+      open_input_dialog("SubGraph name", "Save SubGraph", "", Ge::save_graph_and_close);
+  }
+  else
+  {
     save_graph(this, name);
 
     delete this;
   }
 }
 
-void Ge::ungroup_yes_cb(Ge* gectx)
-{
-  gectx->graph->ungroup_select(1);
-}
+void Ge::ungroup_yes_cb(Ge* gectx) { gectx->graph->ungroup_select(1); }
 
-void Ge::ungroup_no_cb(Ge* gectx)
-{
-}
+void Ge::ungroup_no_cb(Ge* gectx) {}
 
 void Ge::recover_dynprop_yes_cb(Ge* gectx)
 {
   gectx->graph->set_recall_data(gectx->recover_object, gectx->recover_name);
 }
 
-void Ge::recover_dynprop_no_cb(Ge* gectx)
-{
-}
+void Ge::recover_dynprop_no_cb(Ge* gectx) {}
 
-void Ge::exit_save_cb(Ge* gectx)
-{
-  gectx->save_and_close();
-}
+void Ge::exit_save_cb(Ge* gectx) { gectx->save_and_close(); }
 
-void Ge::exit_nosave_cb(Ge* gectx)
-{
-  delete gectx;
-}
+void Ge::exit_nosave_cb(Ge* gectx) { delete gectx; }
 
 void Ge::load_graph_cb(void* ge_ctx, char* name)
 {
@@ -194,7 +186,8 @@ void Ge::save_graph(Ge* gectx, char* name)
   char next[40];
   int sts;
 
-  if (!gectx->graph->is_subgraph()) {
+  if (!gectx->graph->is_subgraph())
+  {
     str_ToLower(graphname, name);
     if ((s = strrchr(graphname, '.')))
       *s = 0;
@@ -206,22 +199,26 @@ void Ge::save_graph(Ge* gectx, char* name)
     gectx->graph->set_name(graphname);
 
     str_ToLower(filename, name);
-    if (!strrchr(filename, '.')) {
+    if (!strrchr(filename, '.'))
+    {
       if (gectx->graph->is_dashboard())
-	strcat(filename, ".pwd");
+        strcat(filename, ".pwd");
       else
-	strcat(filename, ".pwg");
+        strcat(filename, ".pwg");
     }
 
     sts = gectx->graph->save(filename);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gectx->message(sts);
       return;
     }
     gectx->message('I', "Graph saved");
 
     gectx->set_title();
-  } else {
+  }
+  else
+  {
     str_ToLower(graphname, name);
     if ((s = strrchr(graphname, '.')))
       *s = 0;
@@ -237,7 +234,8 @@ void Ge::save_graph(Ge* gectx, char* name)
     if (!strrchr(filename, '.'))
       strcat(filename, ".pwsg");
     sts = gectx->graph->save_subgraph(filename);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gectx->message(sts);
       return;
     }
@@ -246,7 +244,8 @@ void Ge::save_graph(Ge* gectx, char* name)
     if (!strrchr(filename, '.'))
       strcat(filename, ".pwg");
     sts = gectx->graph->save(filename);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gectx->message(sts);
       return;
     }
@@ -261,16 +260,12 @@ void Ge::save_graph(Ge* gectx, char* name)
     gectx->message('I', "SubGraph saved");
   }
 
-  unsigned int opt
-      = (gectx->options & ge_mOption_EnableComment) ? log_mOption_Comment : 0;
+  unsigned int opt = (gectx->options & ge_mOption_EnableComment) ? log_mOption_Comment : 0;
   if (!gectx->graph->disable_log)
     wb_log::log(wlog_eCategory_GeSave, graphname, 0, opt);
 }
 
-void Ge::save(char* name)
-{
-  save_graph(this, name);
-}
+void Ge::save(char* name) { save_graph(this, name); }
 
 void Ge::clear_all()
 {
@@ -293,10 +288,7 @@ void Ge::clear_all()
     layernav->clear();
 }
 
-void Ge::clear()
-{
-  clear_all();
-}
+void Ge::clear() { clear_all(); }
 
 void Ge::save_graph_and_close(Ge* gectx, char* name)
 {
@@ -305,27 +297,32 @@ void Ge::save_graph_and_close(Ge* gectx, char* name)
   char* s;
   int sts;
 
-  if (!gectx->graph->is_subgraph()) {
+  if (!gectx->graph->is_subgraph())
+  {
     str_ToLower(graphname, name);
     if ((s = strrchr(graphname, '.')))
       *s = 0;
     gectx->graph->set_name(graphname);
 
     str_ToLower(filename, name);
-    if (!strrchr(filename, '.')) {
+    if (!strrchr(filename, '.'))
+    {
       if (gectx->graph->is_dashboard())
-	strcat(filename, ".pwd");
+        strcat(filename, ".pwd");
       else
-	strcat(filename, ".pwg");
+        strcat(filename, ".pwg");
     }
 
     sts = gectx->graph->save(filename);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gectx->message(sts);
       return;
     }
     gectx->message('I', "Graph saved");
-  } else {
+  }
+  else
+  {
     char filename[80];
     char graphname[80];
     char* s;
@@ -340,7 +337,8 @@ void Ge::save_graph_and_close(Ge* gectx, char* name)
     if (!strrchr(filename, '.'))
       strcat(filename, ".pwsg");
     sts = gectx->graph->save_subgraph(filename);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gectx->message(sts);
       return;
     }
@@ -349,7 +347,8 @@ void Ge::save_graph_and_close(Ge* gectx, char* name)
     if (!strrchr(filename, '.'))
       strcat(filename, ".pwg");
     sts = gectx->graph->save(filename);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gectx->message(sts);
       return;
     }
@@ -372,7 +371,8 @@ void Ge::export_javabean(Ge* gectx, char* name)
   char* s;
   int sts;
 
-  if (gectx->graph->is_subgraph()) {
+  if (gectx->graph->is_subgraph())
+  {
     char beanname[80];
 
     strcpy(beanname, name);
@@ -389,11 +389,14 @@ void Ge::export_javabean(Ge* gectx, char* name)
       gectx->message('I', "Javabean exported");
     else
       gectx->message('E', "Java export error");
-  } else {
+  }
+  else
+  {
     char framename[80];
     char appletname[80];
 
-    if (isdigit(name[0])) {
+    if (isdigit(name[0]))
+    {
       gectx->message('E', "Java name syntax error");
       return;
     }
@@ -414,7 +417,8 @@ void Ge::export_javabean(Ge* gectx, char* name)
 
     // Export frame
     sts = gectx->graph->export_javaframe(filename, framename, 0, 0);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gectx->message('E', "Java export error");
       return;
     }
@@ -424,7 +428,8 @@ void Ge::export_javabean(Ge* gectx, char* name)
     strcat(filename, ".java");
 
     sts = gectx->graph->export_javaframe(filename, appletname, 1, 0);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gectx->message('E', "Java export error");
       return;
     }
@@ -436,7 +441,8 @@ void Ge::export_javabean(Ge* gectx, char* name)
     str_ToLower(filename, filename);
 
     sts = gectx->graph->export_javaframe(filename, appletname, 0, 1);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gectx->message('E', "Java export error");
       return;
     }
@@ -452,14 +458,18 @@ void Ge::export_gejava(Ge* gectx, char* name)
   char cmd[200];
   char gname[40];
 
-  if (gectx->graph->is_subgraph()) {
+  if (gectx->graph->is_subgraph())
+  {
     gectx->message('E', "Unable to save subgraph as ge java");
-  } else {
+  }
+  else
+  {
     char framename[80];
     char appletname[80];
     char systemname[80];
 
-    if (isdigit(name[0])) {
+    if (isdigit(name[0]))
+    {
       gectx->message('E', "Java name syntax error");
       return;
     }
@@ -479,12 +489,15 @@ void Ge::export_gejava(Ge* gectx, char* name)
       strcat(filename, ".java");
 
     // Export frame
-    if (gectx->graph->is_javaapplication()) {
+    if (gectx->graph->is_javaapplication())
+    {
       sts = gectx->graph->export_gejava(filename, framename, 0, 0);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         gectx->message('E', "Java export error");
         return;
-      } else if (sts == GE__ISBASECLASS)
+      }
+      else if (sts == GE__ISBASECLASS)
         return;
 
       // Compile frame
@@ -492,22 +505,26 @@ void Ge::export_gejava(Ge* gectx, char* name)
 
       sprintf(cmd, "$pwr_exe/ge_javac.sh java %s %s", filename, systemname);
       sts = system(cmd);
-      if (sts != 0) {
+      if (sts != 0)
+      {
         gectx->message('E', "Java compilation errors");
         return;
       }
     }
 
-    if (gectx->graph->is_javaapplet()) {
+    if (gectx->graph->is_javaapplet())
+    {
       strcpy(filename, appletname);
       strcat(filename, ".java");
 
       // Export applet
       sts = gectx->graph->export_gejava(filename, appletname, 1, 0);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         gectx->message('E', "Java export error");
         return;
-      } else if (sts == GE__ISBASECLASS)
+      }
+      else if (sts == GE__ISBASECLASS)
         return;
 
       // Compile applet
@@ -515,7 +532,8 @@ void Ge::export_gejava(Ge* gectx, char* name)
 
       sprintf(cmd, "$pwr_exe/ge_javac.sh java_web %s %s", filename, systemname);
       sts = system(cmd);
-      if (sts != 0) {
+      if (sts != 0)
+      {
         gectx->message('E', "Java compilation errors");
         return;
       }
@@ -527,26 +545,33 @@ void Ge::export_gejava(Ge* gectx, char* name)
       str_ToLower(filename, filename);
 
       sts = gectx->graph->export_gejava(filename, framename, 0, 1);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         gectx->message('E', "Java export error");
         return;
       }
     }
 
     gectx->graph->get_name(gname);
-    if (gectx->graph->is_javaapplication() && gectx->graph->is_javaapplet()) {
+    if (gectx->graph->is_javaapplication() && gectx->graph->is_javaapplet())
+    {
       gectx->message('I', "Java frame and applet exported");
       if (!gectx->graph->disable_log)
         wb_log::log(wlog_eCategory_GeExport, gname, 0);
-    } else if (gectx->graph->is_javaapplication()) {
+    }
+    else if (gectx->graph->is_javaapplication())
+    {
       gectx->message('I', "Java frame exported");
       if (!gectx->graph->disable_log)
         wb_log::log(wlog_eCategory_GeExport, gname, 0);
-    } else if (gectx->graph->is_javaapplet()) {
+    }
+    else if (gectx->graph->is_javaapplet())
+    {
       gectx->message('I', "Java applet exported");
       if (!gectx->graph->disable_log)
         wb_log::log(wlog_eCategory_GeExport, gname, 0);
-    } else
+    }
+    else
       gectx->message('I', "This graph is not java frame or applet");
   }
 }
@@ -570,7 +595,8 @@ void Ge::open_graph(const char* name, int dashboard)
   if ((s = strrchr(graphname, '.')))
     *s = 0;
   graph->set_name(graphname);
-  if (!strrchr(filename, '.')) {
+  if (!strrchr(filename, '.'))
+  {
     if (dashboard)
       strcat(filename, ".pwd");
     else
@@ -591,10 +617,7 @@ void Ge::open_graph(const char* name, int dashboard)
     graph->journal->open(graphname);
 }
 
-void Ge::open(char* name)
-{
-  open_graph(name, 0);
-}
+void Ge::open(char* name) { open_graph(name, 0); }
 
 void Ge::rotate(Ge* gectx, char* value_str)
 {
@@ -602,7 +625,8 @@ void Ge::rotate(Ge* gectx, char* value_str)
   int sts;
 
   sts = sscanf(value_str, "%f", &value);
-  if (sts != 1) {
+  if (sts != 1)
+  {
     gectx->message('E', "Syntax error");
     return;
   }
@@ -615,18 +639,16 @@ int Ge::subpalette_get_select(void* gectx, char* text, char* filename)
   return ((Ge*)gectx)->subpalette->get_select(text, filename);
 }
 
-void Ge::colorpalette_get_current(void* gectx, glow_eDrawType* fill_color,
-    glow_eDrawType* border_color, glow_eDrawType* text_color)
+void Ge::colorpalette_get_current(void* gectx, glow_eDrawType* fill_color, glow_eDrawType* border_color,
+                                  glow_eDrawType* text_color)
 {
-  colpal_GetCurrentColors(
-      ((Ge*)gectx)->colorpalette_ctx, fill_color, border_color, text_color);
+  colpal_GetCurrentColors(((Ge*)gectx)->colorpalette_ctx, fill_color, border_color, text_color);
 }
 
-void Ge::colorpalette_set_current(void* gectx, glow_eDrawType fill_color,
-    glow_eDrawType border_color, glow_eDrawType text_color)
+void Ge::colorpalette_set_current(void* gectx, glow_eDrawType fill_color, glow_eDrawType border_color,
+                                  glow_eDrawType text_color)
 {
-  colpal_SetCurrentColors(
-      ((Ge*)gectx)->colorpalette_ctx, fill_color, border_color, text_color);
+  colpal_SetCurrentColors(((Ge*)gectx)->colorpalette_ctx, fill_color, border_color, text_color);
 }
 
 void Ge::colorpalette_get_current_tone(void* gectx, glow_eDrawType* color_tone)
@@ -641,8 +663,7 @@ void Ge::colorpalette_set_current_tone(void* gectx, glow_eDrawType color_tone)
 
 void Ge::update_colorpalette(void* gectx)
 {
-  colpal_UpdateCustomColors(
-      ((Ge*)gectx)->colorpalette_ctx, ((Ge*)gectx)->graph->get_custom_colors());
+  colpal_UpdateCustomColors(((Ge*)gectx)->colorpalette_ctx, ((Ge*)gectx)->graph->get_custom_colors());
 }
 
 void Ge::subgraphs_close_cb(SubGraphs* subgraphs)
@@ -663,14 +684,16 @@ void Ge::status_msg(void* ge_ctx, double x, double y)
   static double old_x = 0;
   static double old_y = 0;
 
-  if (feq(x, 0.0) && feq(y, 0.0)) {
+  if (feq(x, 0.0) && feq(y, 0.0))
+  {
     x = old_x;
     y = old_y;
   }
   old_x = x;
   old_y = y;
 
-  switch (move_restriction) {
+  switch (move_restriction)
+  {
   case glow_eMoveRestriction_Vertical:
     strcpy(mr_str, "MoveVert");
     break;
@@ -686,7 +709,8 @@ void Ge::status_msg(void* ge_ctx, double x, double y)
   else
     strcpy(es_str, "          ");
 
-  switch (gectx->graph->get_mode()) {
+  switch (gectx->graph->get_mode())
+  {
   case grow_eMode_Rect:
     strcpy(em_str, "Rect     ");
     break;
@@ -732,26 +756,18 @@ int Ge::command_cb(void* ge_ctx, char* command, char* script, char* scriptargs)
   return 0;
 }
 
-int Ge::create_modal_dialog_cb(void* ge_ctx, const char* title,
-    const char* text, const char* button1, const char* button2,
-    const char* button3, const char* image)
+int Ge::create_modal_dialog_cb(void* ge_ctx, const char* title, const char* text, const char* button1,
+                               const char* button2, const char* button3, const char* image)
 {
-  return ((Ge*)ge_ctx)
-      ->create_modal_dialog(title, text, button1, button2, button3, image);
+  return ((Ge*)ge_ctx)->create_modal_dialog(title, text, button1, button2, button3, image);
 }
 
 //
 //  Callbackfunctions from menu entries
 //
-void Ge::activate_change_text()
-{
-  graph->change_select_text();
-}
+void Ge::activate_change_text() { graph->change_select_text(); }
 
-void Ge::activate_change_name()
-{
-  graph->change_select_name();
-}
+void Ge::activate_change_name() { graph->change_select_name(); }
 
 void Ge::search_object_cb(void* ge_ctx, void* data, char* name)
 {
@@ -768,8 +784,7 @@ void Ge::search_object_cb(void* ge_ctx, void* data, char* name)
 
 void Ge::activate_search_object()
 {
-  wow->CreateInputDialog(
-      this, "Search Object", "Object name", search_object_cb, 0, 80, 0, 0);
+  wow->CreateInputDialog(this, "Search Object", "Object name", search_object_cb, 0, 80, 0, 0);
 }
 
 void Ge::activate_preview_start()
@@ -777,9 +792,11 @@ void Ge::activate_preview_start()
   int sts;
 
   sts = graph->init_trace();
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Unable to start Preview");
-  } else
+  }
+  else
     set_title();
 }
 
@@ -789,30 +806,18 @@ void Ge::activate_preview_stop()
   set_title();
 }
 
-void Ge::delete_yes_cb(Ge* gectx)
-{
-  gectx->graph->delete_select();
-}
+void Ge::delete_yes_cb(Ge* gectx) { gectx->graph->delete_select(); }
 
-void Ge::delete_no_cb(Ge* gectx)
-{
-}
+void Ge::delete_no_cb(Ge* gectx) {}
 
 void Ge::activate_delete()
 {
-  open_yesnodia("Do you want to delete the selected objects", "Delete",
-      delete_yes_cb, delete_no_cb);
+  open_yesnodia("Do you want to delete the selected objects", "Delete", delete_yes_cb, delete_no_cb);
 }
 
-void Ge::activate_cut()
-{
-  graph->cut();
-}
+void Ge::activate_cut() { graph->cut(); }
 
-void Ge::activate_copy()
-{
-  graph->copy();
-}
+void Ge::activate_copy() { graph->copy(); }
 
 void Ge::activate_objattr_recall()
 {
@@ -821,15 +826,19 @@ void Ge::activate_objattr_recall()
   GeDyn* old_dyn;
 
   sts = graph->get_selected_object(&object);
-  if (sts == GE__NOSELECT) {
+  if (sts == GE__NOSELECT)
+  {
     message('E', "No object is selected");
     return;
-  } else if (sts == GE__MANYSELECT) {
+  }
+  else if (sts == GE__MANYSELECT)
+  {
     message('E', "More than one object is selected");
     return;
   }
   sts = Graph::graph_attr_recall_cb(graph, object, 0, &old_dyn);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Nothing to recall");
     return;
   }
@@ -843,10 +852,13 @@ void Ge::activate_objattr_store()
   grow_tObject object;
 
   sts = graph->get_selected_object(&object);
-  if (sts == GE__NOSELECT) {
+  if (sts == GE__NOSELECT)
+  {
     message('E', "No object is selected");
     return;
-  } else if (sts == GE__MANYSELECT) {
+  }
+  else if (sts == GE__MANYSELECT)
+  {
     message('E', "More than one object is selected");
     return;
   }
@@ -854,35 +866,17 @@ void Ge::activate_objattr_store()
   message('I', "Object attributes stored");
 }
 
-void Ge::activate_rotate()
-{
-  open_input_dialog("Value (degrees)", "Rotate", "", Ge::rotate);
-}
+void Ge::activate_rotate() { open_input_dialog("Value (degrees)", "Rotate", "", Ge::rotate); }
 
-void Ge::activate_rotate90()
-{
-  graph->rotate(-90.0);
-}
+void Ge::activate_rotate90() { graph->rotate(-90.0); }
 
-void Ge::activate_flip_vert()
-{
-  graph->flip(glow_eFlipDirection_Vertical);
-}
+void Ge::activate_flip_vert() { graph->flip(glow_eFlipDirection_Vertical); }
 
-void Ge::activate_flip_horiz()
-{
-  graph->flip(glow_eFlipDirection_Horizontal);
-}
+void Ge::activate_flip_horiz() { graph->flip(glow_eFlipDirection_Horizontal); }
 
-void Ge::activate_pop()
-{
-  graph->pop_select();
-}
+void Ge::activate_pop() { graph->pop_select(); }
 
-void Ge::activate_push()
-{
-  graph->push_select();
-}
+void Ge::activate_push() { graph->push_select(); }
 
 void Ge::activate_edit_polyline()
 {
@@ -914,80 +908,35 @@ void Ge::activate_move_reset()
   status_msg(this, 0, 0);
 }
 
-void Ge::activate_align_horiz_up()
-{
-  graph->align_select(glow_eAlignDirection_Down);
-}
+void Ge::activate_align_horiz_up() { graph->align_select(glow_eAlignDirection_Down); }
 
-void Ge::activate_align_horiz_down()
-{
-  graph->align_select(glow_eAlignDirection_Up);
-}
+void Ge::activate_align_horiz_down() { graph->align_select(glow_eAlignDirection_Up); }
 
-void Ge::activate_align_horiz_center()
-{
-  graph->align_select(glow_eAlignDirection_CenterHoriz);
-}
+void Ge::activate_align_horiz_center() { graph->align_select(glow_eAlignDirection_CenterHoriz); }
 
-void Ge::activate_align_vert_left()
-{
-  graph->align_select(glow_eAlignDirection_Left);
-}
+void Ge::activate_align_vert_left() { graph->align_select(glow_eAlignDirection_Left); }
 
-void Ge::activate_align_vert_right()
-{
-  graph->align_select(glow_eAlignDirection_Right);
-}
+void Ge::activate_align_vert_right() { graph->align_select(glow_eAlignDirection_Right); }
 
-void Ge::activate_align_vert_center()
-{
-  graph->align_select(glow_eAlignDirection_CenterVert);
-}
+void Ge::activate_align_vert_center() { graph->align_select(glow_eAlignDirection_CenterVert); }
 
-void Ge::activate_equid_vert_up()
-{
-  graph->equidistance_select(glow_eAlignDirection_Down);
-}
+void Ge::activate_equid_vert_up() { graph->equidistance_select(glow_eAlignDirection_Down); }
 
-void Ge::activate_equid_vert_down()
-{
-  graph->equidistance_select(glow_eAlignDirection_Up);
-}
+void Ge::activate_equid_vert_down() { graph->equidistance_select(glow_eAlignDirection_Up); }
 
-void Ge::activate_equid_vert_center()
-{
-  graph->equidistance_select(glow_eAlignDirection_CenterVert);
-}
+void Ge::activate_equid_vert_center() { graph->equidistance_select(glow_eAlignDirection_CenterVert); }
 
-void Ge::activate_equid_horiz_left()
-{
-  graph->equidistance_select(glow_eAlignDirection_Left);
-}
+void Ge::activate_equid_horiz_left() { graph->equidistance_select(glow_eAlignDirection_Left); }
 
-void Ge::activate_equid_horiz_right()
-{
-  graph->equidistance_select(glow_eAlignDirection_Right);
-}
+void Ge::activate_equid_horiz_right() { graph->equidistance_select(glow_eAlignDirection_Right); }
 
-void Ge::activate_equid_horiz_center()
-{
-  graph->equidistance_select(glow_eAlignDirection_CenterHoriz);
-}
+void Ge::activate_equid_horiz_center() { graph->equidistance_select(glow_eAlignDirection_CenterHoriz); }
 
-void Ge::activate_select_cons()
-{
-  graph->select_all_cons();
-}
+void Ge::activate_select_cons() { graph->select_all_cons(); }
 
-void Ge::activate_select_objects()
-{
-  graph->select_all_objects();
-}
+void Ge::activate_select_objects() { graph->select_all_objects(); }
 
-void Ge::activate_select_nextobject(glow_eDirection dir)
-{
-  graph->select_nextobject(dir);
-}
+void Ge::activate_select_nextobject(glow_eDirection dir) { graph->select_nextobject(dir); }
 
 void Ge::activate_group()
 {
@@ -1001,13 +950,12 @@ void Ge::activate_group()
     message('E', "Select objects to form at group");
   else if (sts == GLOW__GROUPCLASS)
     message('E', "Unable to group this kind of object");
-  else if (sts == GE__RECALLDATA_FOUND) {
+  else if (sts == GE__RECALLDATA_FOUND)
+  {
     recover_object = object;
     strcpy(recover_name, last_group);
-    sprintf(msg, "Do you want to recover dynamic properties for group %s",
-        last_group);
-    open_yesnodia(msg, "Recover dynamic properties", Ge::recover_dynprop_yes_cb,
-        Ge::recover_dynprop_no_cb);
+    sprintf(msg, "Do you want to recover dynamic properties for group %s", last_group);
+    open_yesnodia(msg, "Recover dynamic properties", Ge::recover_dynprop_yes_cb, Ge::recover_dynprop_no_cb);
   }
 }
 
@@ -1016,10 +964,11 @@ void Ge::activate_ungroup()
   int sts;
 
   sts = graph->ungroup_select(0);
-  if (sts == GE__GROUPDYNDATA) {
+  if (sts == GE__GROUPDYNDATA)
+  {
     open_yesnodia("Group has dynamic properties that will be lost\nDo you want "
                   "to ungroup",
-        "Ungroup", Ge::ungroup_yes_cb, Ge::ungroup_no_cb);
+                  "Ungroup", Ge::ungroup_yes_cb, Ge::ungroup_no_cb);
   }
 }
 
@@ -1030,15 +979,19 @@ void Ge::activate_connect()
   char name[120];
 
   sts = graph->get_selected_object(&object);
-  if (sts == GE__NOSELECT) {
+  if (sts == GE__NOSELECT)
+  {
     message('E', "No object is selected");
     return;
-  } else if (sts == GE__MANYSELECT) {
+  }
+  else if (sts == GE__MANYSELECT)
+  {
     message('E', "More than one object is selected");
     return;
   }
   sts = Ge::get_plant_select_cb((void*)this, name, sizeof(name));
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Select an object in the plant hierarchy");
     return;
   }
@@ -1053,15 +1006,19 @@ void Ge::activate_connectsecond()
   char name[120];
 
   sts = graph->get_selected_object(&object);
-  if (sts == GE__NOSELECT) {
+  if (sts == GE__NOSELECT)
+  {
     message('E', "No object is selected");
     return;
-  } else if (sts == GE__MANYSELECT) {
+  }
+  else if (sts == GE__MANYSELECT)
+  {
     message('E', "More than one object is selected");
     return;
   }
   sts = Ge::get_plant_select_cb((void*)this, name, sizeof(name));
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Select an object in the plant hierarchy");
     return;
   }
@@ -1075,29 +1032,24 @@ void Ge::activate_objectattributes()
   grow_tObject object;
 
   sts = graph->get_selected_object(&object);
-  if (sts == GE__NOSELECT) {
+  if (sts == GE__NOSELECT)
+  {
     message('E', "No object is selected");
     return;
-  } else if (sts == GE__MANYSELECT) {
+  }
+  else if (sts == GE__MANYSELECT)
+  {
     message('E', "More than one object is selected");
     return;
   }
   graph->edit_attributes(object);
 }
 
-void Ge::activate_show_grid(int set)
-{
-  graph->set_show_grid(set);
-}
+void Ge::activate_show_grid(int set) { graph->set_show_grid(set); }
 
-void Ge::activate_paste()
-{
-  graph->paste();
-}
+void Ge::activate_paste() { graph->paste(); }
 
-void Ge::activate_command()
-{
-}
+void Ge::activate_command() {}
 
 int Ge::get_plant_select_cb(void* ge_ctx, char* select_name, int size)
 {
@@ -1114,9 +1066,9 @@ void Ge::refresh_objects_cb(void* ge_ctx, unsigned int type)
 
 void Ge::close()
 {
-  if (graph->is_modified()) {
-    open_yesnodia("Do you want to save changes", "Save", Ge::exit_save_cb,
-        Ge::exit_nosave_cb);
+  if (graph->is_modified())
+  {
+    open_yesnodia("Do you want to save changes", "Save", Ge::exit_save_cb, Ge::exit_nosave_cb);
     return;
   }
 
@@ -1145,16 +1097,19 @@ void Ge::activate_print()
 
 void Ge::activate_new()
 {
-  if (graph->is_modified()) {
-    int rv = create_modal_dialog("New",
-        "Graph is not saved.\nDo you want to continue?", "Yes", "Cancel", NULL,
-        NULL);
-    if (rv == wow_eModalDialogReturn_Button1) {
+  if (graph->is_modified())
+  {
+    int rv = create_modal_dialog("New", "Graph is not saved.\nDo you want to continue?", "Yes", "Cancel",
+                                 NULL, NULL);
+    if (rv == wow_eModalDialogReturn_Button1)
+    {
       clear_all();
       if (layernav)
-	layernav->refresh_objects(attr_mRefresh_Objects);
+        layernav->refresh_objects(attr_mRefresh_Objects);
     }
-  } else {
+  }
+  else
+  {
     clear_all();
     if (layernav)
       layernav->refresh_objects(attr_mRefresh_Objects);
@@ -1165,18 +1120,21 @@ void Ge::activate_save()
 {
   char name[40];
 
-  if (graph->trace_started) {
+  if (graph->trace_started)
+  {
     message('I', "Nothing to save");
     return;
   }
 
   graph->get_name(name);
-  if (streq(name, "")) {
+  if (streq(name, ""))
+  {
     if (!graph->is_subgraph())
       open_input_dialog("Graph name", "Save Graph", "", Ge::save_graph);
     else
       open_input_dialog("SubGraph name", "Save SubGraph", "", Ge::save_graph);
-  } else
+  }
+  else
     Ge::save_graph(this, name);
 }
 
@@ -1184,7 +1142,8 @@ void Ge::activate_save_as()
 {
   char name[40];
 
-  if (graph->trace_started) {
+  if (graph->trace_started)
+  {
     message('E', "Preview is active");
     return;
   }
@@ -1203,7 +1162,8 @@ void Ge::activate_build()
   pwr_tFileName fname;
 
   graph->get_name(name);
-  if (streq(name, "") || graph->is_modified()) {
+  if (streq(name, "") || graph->is_modified())
+  {
     wow->DisplayError("Build error", "Graph is not saved");
     return;
   }
@@ -1233,22 +1193,28 @@ void Ge::activate_export_javabean()
   char name[80];
   char default_name[80];
 
-  if (!graph->get_java_name(name)) {
+  if (!graph->get_java_name(name))
+  {
     graph->get_name(name);
-    if (!streq(name, "")) {
-      if (str_StartsWith(name, "pwr_")) {
+    if (!streq(name, ""))
+    {
+      if (str_StartsWith(name, "pwr_"))
+      {
         strcpy(default_name, "Jop");
         strcat(default_name, &name[4]);
         default_name[3] = _toupper(default_name[3]);
-      } else {
+      }
+      else
+      {
         strcpy(default_name, name);
         default_name[0] = _toupper(default_name[0]);
       }
-    } else
+    }
+    else
       strcpy(default_name, "");
-    open_input_dialog(
-        "JavaBean name", "Export JavaBean", default_name, Ge::export_javabean);
-  } else
+    open_input_dialog("JavaBean name", "Export JavaBean", default_name, Ge::export_javabean);
+  }
+  else
     Ge::export_javabean(this, name);
 }
 
@@ -1257,28 +1223,35 @@ void Ge::activate_export_javabean_as()
   char name[80];
   char default_name[80];
 
-  if (!(graph->is_javaapplication() || graph->is_javaapplet())) {
+  if (!(graph->is_javaapplication() || graph->is_javaapplet()))
+  {
     message('I', "This graph is not java frame or applet");
     return;
   }
 
-  if (!graph->get_java_name(name)) {
+  if (!graph->get_java_name(name))
+  {
     graph->get_name(name);
-    if (!streq(name, "")) {
-      if (str_StartsWith(name, "pwr_")) {
+    if (!streq(name, ""))
+    {
+      if (str_StartsWith(name, "pwr_"))
+      {
         strcpy(default_name, "Jop");
         strcat(default_name, &name[4]);
         default_name[3] = _toupper(default_name[3]);
-      } else {
+      }
+      else
+      {
         strcpy(default_name, name);
         default_name[0] = _toupper(default_name[0]);
       }
-    } else
+    }
+    else
       strcpy(default_name, "");
-  } else
+  }
+  else
     strcpy(default_name, name);
-  open_input_dialog(
-      "JavaBean name", "Export JavaBean", default_name, Ge::export_javabean);
+  open_input_dialog("JavaBean name", "Export JavaBean", default_name, Ge::export_javabean);
 }
 
 void Ge::activate_export_gejava()
@@ -1286,31 +1259,40 @@ void Ge::activate_export_gejava()
   char name[80];
   char default_name[80];
 
-  if (!(graph->is_javaapplication() || graph->is_javaapplet())) {
+  if (!(graph->is_javaapplication() || graph->is_javaapplet()))
+  {
     message('I', "This graph is not java frame or applet");
     return;
   }
 
-  if (!graph->get_java_name(name)) {
+  if (!graph->get_java_name(name))
+  {
     graph->get_name(name);
-    if (!streq(name, "")) {
-      if (str_StartsWith(name, "pwr_c_")) {
+    if (!streq(name, ""))
+    {
+      if (str_StartsWith(name, "pwr_c_"))
+      {
         strcpy(default_name, "Jopc");
         strcat(default_name, &name[6]);
         default_name[4] = _toupper(default_name[4]);
-      } else if (str_StartsWith(name, "pwr_")) {
+      }
+      else if (str_StartsWith(name, "pwr_"))
+      {
         strcpy(default_name, "Jop");
         strcat(default_name, &name[4]);
         default_name[3] = _toupper(default_name[3]);
-      } else {
+      }
+      else
+      {
         strcpy(default_name, name);
         default_name[0] = _toupper(default_name[0]);
       }
-    } else
+    }
+    else
       strcpy(default_name, "");
-    open_input_dialog(
-        "Java name", "Export GeJava", default_name, Ge::export_gejava);
-  } else
+    open_input_dialog("Java name", "Export GeJava", default_name, Ge::export_gejava);
+  }
+  else
     Ge::export_gejava(this, name);
 }
 
@@ -1319,27 +1301,35 @@ void Ge::activate_export_gejava_as()
   char name[80];
   char default_name[80];
 
-  if (!graph->get_java_name(name)) {
+  if (!graph->get_java_name(name))
+  {
     graph->get_name(name);
-    if (!streq(name, "")) {
-      if (str_StartsWith(name, "pwr_c_")) {
+    if (!streq(name, ""))
+    {
+      if (str_StartsWith(name, "pwr_c_"))
+      {
         strcpy(default_name, "Jopc");
         strcat(default_name, &name[6]);
         default_name[4] = _toupper(default_name[4]);
-      } else if (str_StartsWith(name, "pwr_")) {
+      }
+      else if (str_StartsWith(name, "pwr_"))
+      {
         strcpy(default_name, "Jop");
         strcat(default_name, &name[4]);
         default_name[3] = _toupper(default_name[3]);
-      } else {
+      }
+      else
+      {
         strcpy(default_name, name);
         default_name[0] = _toupper(default_name[0]);
       }
-    } else
+    }
+    else
       strcpy(default_name, "");
-  } else
+  }
+  else
     strcpy(default_name, name);
-  open_input_dialog(
-      "Java name", "Export GeJava", default_name, Ge::export_gejava);
+  open_input_dialog("Java name", "Export GeJava", default_name, Ge::export_gejava);
 }
 
 void Ge::activate_export_java()
@@ -1425,12 +1415,14 @@ void Ge::activate_creanextpage()
   int page;
   char* s;
 
-  if (!graph->is_subgraph()) {
+  if (!graph->is_subgraph())
+  {
     message('E', "This is not a subgraph");
     return;
   }
 
-  if (graph->is_modified()) {
+  if (graph->is_modified())
+  {
     message('E', "Subgraph is not saved");
     return;
   }
@@ -1445,7 +1437,8 @@ void Ge::activate_creanextpage()
 
   // Store next name in graph
   graph->get_next_subgraph(next_name);
-  if (streq(next_name, name)) {
+  if (streq(next_name, name))
+  {
     // Next subgraph is already created, check file...
     message('E', "Subgraph is already created");
     return;
@@ -1468,18 +1461,21 @@ void Ge::activate_nextpage()
   char next[40];
   char name[40];
 
-  if (!graph->is_subgraph()) {
+  if (!graph->is_subgraph())
+  {
     message('E', "Only subgraphs can have a next page");
     return;
   }
 
-  if (graph->is_modified()) {
+  if (graph->is_modified())
+  {
     message('E', "Subgraph is not saved");
     return;
   }
 
   graph->get_next_subgraph(next);
-  if (streq(next, "")) {
+  if (streq(next, ""))
+  {
     message('E', "No next page is found");
     return;
   }
@@ -1502,14 +1498,16 @@ void Ge::activate_prevpage()
   char prev[40];
   int sts;
 
-  if (graph->is_modified()) {
+  if (graph->is_modified())
+  {
     message('E', "Subgraph is not saved");
     return;
   }
 
   graph->get_name(name);
   sts = prevtable_get(name, prev);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "No previous page is found");
     return;
   }
@@ -1530,16 +1528,18 @@ void Ge::activate_graph_attr()
     graph->edit_subgraph_attributes();
 }
 
-typedef struct {
-  Ge *gectx;
+typedef struct
+{
+  Ge* gectx;
   int dashboard;
 } sOpenList;
 
 void Ge::open_list_cb(void* ctx, char* text, int ok_pressed)
 {
-  ((sOpenList*)ctx)->gectx->open_graph(text, ((sOpenList *)ctx)->dashboard);
+  ((sOpenList*)ctx)->gectx->open_graph(text, ((sOpenList*)ctx)->dashboard);
   ((sOpenList*)ctx)->gectx->set_title();
-  if (ok_pressed) {
+  if (ok_pressed)
+  {
     ((sOpenList*)ctx)->gectx->open_dialog = 0;
     free(ctx);
   }
@@ -1551,10 +1551,7 @@ void Ge::open_cancel_cb(void* ctx)
   free(ctx);
 }
 
-int Ge::sort_files(const void* file1, const void* file2)
-{
-  return (strcmp((char*)file1, (char*)file2));
-}
+int Ge::sort_files(const void* file1, const void* file2) { return (strcmp((char*)file1, (char*)file2)); }
 
 void Ge::activate_open(int dashboard)
 {
@@ -1573,35 +1570,44 @@ void Ge::activate_open(int dashboard)
   char title[40];
   int version;
 
-  if (open_dialog) {
+  if (open_dialog)
+  {
     wow->PopList(open_dialog);
     return;
   }
 
   // Get the pwg files and order them
-  if (dashboard) {
+  if (dashboard)
+  {
     strcpy(title, "Open Dashboard");
     dcli_translate_filename(fname, "$pwrp_pop/*.pwd");
   }
-  else {
+  else
+  {
     strcpy(title, "Open Graph");
     dcli_translate_filename(fname, "$pwrp_pop/*.pwg");
   }
   file_cnt = 0;
   allocated = 0;
   sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
-  while (ODD(sts)) {
-    if (strstr(found_file, "__p")) {
+  while (ODD(sts))
+  {
+    if (strstr(found_file, "__p"))
+    {
       // Skip subgraph pages
       sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_NEXT);
       continue;
     }
     file_cnt++;
-    if (file_cnt > allocated - 1) {
-      if (allocated == 0) {
+    if (file_cnt > allocated - 1)
+    {
+      if (allocated == 0)
+      {
         allocated = 100;
         file_p = (pwr_tString80*)malloc(allocated * sizeof(*file_p));
-      } else {
+      }
+      else
+      {
         old_file_p = file_p;
         old_allocated = allocated;
         allocated += 100;
@@ -1618,7 +1624,8 @@ void Ge::activate_open(int dashboard)
   }
   dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
 
-  if (!file_cnt) {
+  if (!file_cnt)
+  {
     return;
   }
 
@@ -1626,11 +1633,10 @@ void Ge::activate_open(int dashboard)
 
   qsort(file_p, file_cnt, sizeof(*file_p), Ge::sort_files);
 
-  sOpenList *data = (sOpenList *)calloc(1, sizeof(sOpenList));
+  sOpenList* data = (sOpenList*)calloc(1, sizeof(sOpenList));
   data->gectx = this;
   data->dashboard = dashboard;
-  open_dialog = create_list(title, (char*)file_p, Ge::open_list_cb,
-      Ge::open_cancel_cb, (void*)data);
+  open_dialog = create_list(title, (char*)file_p, Ge::open_list_cb, Ge::open_cancel_cb, (void*)data);
 
   free(file_p);
 
@@ -1638,25 +1644,27 @@ void Ge::activate_open(int dashboard)
   //	Ge::open_graph);
 }
 
-typedef struct {
+typedef struct
+{
   pwr_tString32 name;
   int idx;
 } tThemes;
 
-static tThemes themes[] = { { "StandardLight", 15 }, { "Sand", 1 }, { "Maroon", 2 },
-  { "Sienna", 3 }, { "DarkBlue", 4 }, { "Classic", 5 }, { "Midnight", 6 },
-  { "PlayRoom", 7 }, { "NordicLight", 8 }, { "Contrast", 9 },
-  { "AzureContrast", 10 }, { "OchreContrast", 11 }, { "Chesterfield", 12 },
-  { "TerraVerte", 13 }, { "Polar", 14 },
-  { "StandardDark", 16 }, { "Custom", 100 } };
+static tThemes themes[] = {
+    {"StandardLight", 15}, {"Sand", 1},           {"Maroon", 2},        {"Sienna", 3},      {"DarkBlue", 4},
+    {"Classic", 5},        {"Midnight", 6},       {"PlayRoom", 7},      {"NordicLight", 8}, {"Contrast", 9},
+    {"AzureContrast", 10}, {"OchreContrast", 11}, {"Chesterfield", 12}, {"TerraVerte", 13}, {"Polar", 14},
+    {"StandardDark", 16},  {"Custom", 100}};
 
 static void ge_colortheme_selector_ok_cb(void* ctx, char* text, int ok_pressed)
 {
   Ge* gectx = (Ge*)ctx;
   int idx = -1;
 
-  for (unsigned int i = 0; i < sizeof(themes) / sizeof(themes[0]); i++) {
-    if (streq(text, themes[i].name)) {
+  for (unsigned int i = 0; i < sizeof(themes) / sizeof(themes[0]); i++)
+  {
+    if (streq(text, themes[i].name))
+    {
       idx = themes[i].idx;
       break;
     }
@@ -1671,20 +1679,23 @@ void Ge::activate_colortheme_select()
   pwr_tString80 names[30];
 
   memset(names, 0, sizeof(names));
-  for (unsigned int i = 0; i < sizeof(themes) / sizeof(themes[0]); i++) {
+  for (unsigned int i = 0; i < sizeof(themes) / sizeof(themes[0]); i++)
+  {
     strcpy(names[i], themes[i].name);
   }
 
-  wow->CreateList("ColorTheme Selector", (char*)names, sizeof(names[0]),
-      ge_colortheme_selector_ok_cb, 0, this);
+  wow->CreateList("ColorTheme Selector", (char*)names, sizeof(names[0]), ge_colortheme_selector_ok_cb, 0,
+                  this);
 }
 
 void Ge::activate_colortheme_next()
 {
   message(' ', null_str);
   int next_idx = -1;
-  for (unsigned int i = 0; i < sizeof(themes) / sizeof(themes[0]); i++) {
-    if (themes[i].idx == graph->color_theme) {
+  for (unsigned int i = 0; i < sizeof(themes) / sizeof(themes[0]); i++)
+  {
+    if (themes[i].idx == graph->color_theme)
+    {
       if (i == sizeof(themes) / sizeof(themes[0]) - 1)
         next_idx = themes[0].idx;
       else
@@ -1692,7 +1703,8 @@ void Ge::activate_colortheme_next()
       break;
     }
   }
-  if (next_idx < 0) {
+  if (next_idx < 0)
+  {
     message('E', "No color theme is active");
     return;
   }
@@ -1704,8 +1716,10 @@ void Ge::activate_colortheme_previous()
 {
   message(' ', null_str);
   int prev_idx = -1;
-  for (int i = sizeof(themes) / sizeof(themes[0]) - 1; i >= 0 ; i--) {
-    if (themes[i].idx == graph->color_theme) {
+  for (int i = sizeof(themes) / sizeof(themes[0]) - 1; i >= 0; i--)
+  {
+    if (themes[i].idx == graph->color_theme)
+    {
       if (i == 0)
         prev_idx = themes[sizeof(themes) / sizeof(themes[0]) - 1].idx;
       else
@@ -1713,7 +1727,8 @@ void Ge::activate_colortheme_previous()
       break;
     }
   }
-  if (prev_idx < 0) {
+  if (prev_idx < 0)
+  {
     message('E', "No color theme is active");
     return;
   }
@@ -1723,12 +1738,11 @@ void Ge::activate_colortheme_previous()
 
 void Ge::activate_customcolors_read()
 {
-  wow->CreateFileSelDia("CustomColors Selection", (void*)this,
-      customcolors_selected_cb, wow_eFileSelType_ColorTheme, wow_eFileSelAction_Open);
+  wow->CreateFileSelDia("CustomColors Selection", (void*)this, customcolors_selected_cb,
+                        wow_eFileSelType_ColorTheme, wow_eFileSelAction_Open);
 }
 
-void Ge::customcolors_selected_cb(
-    void* ctx, char* filename, wow_eFileSelType file_type)
+void Ge::customcolors_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type)
 {
   Ge* ge = (Ge*)ctx;
   pwr_tCmd cmd;
@@ -1738,8 +1752,7 @@ void Ge::customcolors_selected_cb(
 
 void Ge::activate_customcolors_write()
 {
-  open_input_dialog(
-      "CustomColors name", "CustomColors Save ", "", Ge::customcolors_write_cb);
+  open_input_dialog("CustomColors name", "CustomColors Save ", "", Ge::customcolors_write_cb);
 }
 
 void Ge::customcolors_write_cb(Ge* gectx, char* name)
@@ -1748,10 +1761,12 @@ void Ge::customcolors_write_cb(Ge* gectx, char* name)
   pwr_tCmd cmd;
   pwr_tFileName fname;
 
-  if (strchr(name, '/') == 0) {
+  if (strchr(name, '/') == 0)
+  {
     strcpy(fname, "$pwrp_pop/");
     strcat(fname, name);
-  } else
+  }
+  else
     strcpy(fname, name);
 
   sprintf(cmd, "custom write/file=\"%s\"", fname);
@@ -1760,7 +1775,8 @@ void Ge::customcolors_write_cb(Ge* gectx, char* name)
 
 void Ge::activate_subgraphs()
 {
-  if (subgraphs) {
+  if (subgraphs)
+  {
     message('I', "Loaded SubGraphs already active");
     return;
   }
@@ -1771,7 +1787,8 @@ void Ge::activate_subgraphs_reload()
 {
   char name[80];
 
-  if (graph->is_modified()) {
+  if (graph->is_modified())
+  {
     wow->DisplayError("Subgraph reload error", "Graph is not saved");
     return;
   }
@@ -1854,35 +1871,17 @@ void Ge::activate_shadow(int set)
   graph->set_select_shadow(set);
 }
 
-void Ge::activate_incr_lightness()
-{
-  graph->incr_select_color_lightness(1);
-}
+void Ge::activate_incr_lightness() { graph->incr_select_color_lightness(1); }
 
-void Ge::activate_decr_lightness()
-{
-  graph->incr_select_color_lightness(-1);
-}
+void Ge::activate_decr_lightness() { graph->incr_select_color_lightness(-1); }
 
-void Ge::activate_incr_intensity()
-{
-  graph->incr_select_color_intensity(1);
-}
+void Ge::activate_incr_intensity() { graph->incr_select_color_intensity(1); }
 
-void Ge::activate_decr_intensity()
-{
-  graph->incr_select_color_intensity(-1);
-}
+void Ge::activate_decr_intensity() { graph->incr_select_color_intensity(-1); }
 
-void Ge::activate_incr_shift()
-{
-  graph->incr_select_color_shift(1);
-}
+void Ge::activate_incr_shift() { graph->incr_select_color_shift(1); }
 
-void Ge::activate_decr_shift()
-{
-  graph->incr_select_color_shift(-1);
-}
+void Ge::activate_decr_shift() { graph->incr_select_color_shift(-1); }
 
 void Ge::activate_scale()
 {
@@ -1890,15 +1889,9 @@ void Ge::activate_scale()
   status_msg(this, 0, 0);
 }
 
-void Ge::activate_scale(double factor)
-{
-  graph->scale(factor, factor);
-}
+void Ge::activate_scale(double factor) { graph->scale(factor, factor); }
 
-void Ge::activate_grid(int set)
-{
-  graph->set_grid(set);
-}
+void Ge::activate_grid(int set) { graph->set_grid(set); }
 
 void Ge::activate_linewidth(int width)
 {
@@ -1948,10 +1941,7 @@ void Ge::activate_linetype7()
   graph->set_select_linetype(glow_eLineType_DotDashed2);
 }
 
-void Ge::activate_gridsize(double size)
-{
-  graph->set_gridsize(size);
-}
+void Ge::activate_gridsize(double size) { graph->set_gridsize(size); }
 
 void Ge::activate_textsize(int size)
 {
@@ -1967,123 +1957,61 @@ void Ge::activate_textfont(glow_eFont font)
 
 void Ge::activate_textbold(int set)
 {
-  if (set) {
+  if (set)
+  {
     graph->set_textbold(1);
     graph->set_select_textbold(1);
-  } else {
+  }
+  else
+  {
     graph->set_textbold(0);
     graph->set_select_textbold(0);
   }
 }
 
-void Ge::activate_zoom_in()
-{
-  graph->zoom(1.2);
-}
+void Ge::activate_zoom_in() { graph->zoom(1.2); }
 
-void Ge::activate_zoom_out()
-{
-  graph->zoom(5.0 / 6);
-}
+void Ge::activate_zoom_out() { graph->zoom(5.0 / 6); }
 
-void Ge::activate_zoom_reset()
-{
-  graph->unzoom();
-}
+void Ge::activate_zoom_reset() { graph->unzoom(); }
 
-void Ge::activate_concorner_right()
-{
-  graph->set_concorner(glow_eCorner_Right);
-}
+void Ge::activate_concorner_right() { graph->set_concorner(glow_eCorner_Right); }
 
-void Ge::activate_concorner_rounded()
-{
-  graph->set_concorner(glow_eCorner_Rounded);
-}
+void Ge::activate_concorner_rounded() { graph->set_concorner(glow_eCorner_Rounded); }
 
-void Ge::activate_round_amount(double amount)
-{
-  graph->set_corner_round_amount(amount);
-}
+void Ge::activate_round_amount(double amount) { graph->set_corner_round_amount(amount); }
 
-void Ge::activate_contype_straight()
-{
-  graph->set_contype(glow_eConType_Straight);
-}
+void Ge::activate_contype_straight() { graph->set_contype(glow_eConType_Straight); }
 
-void Ge::activate_contype_routed()
-{
-  graph->set_contype(glow_eConType_Routed);
-}
+void Ge::activate_contype_routed() { graph->set_contype(glow_eConType_Routed); }
 
-void Ge::activate_contype_stronearr()
-{
-  graph->set_contype(glow_eConType_StraightOneArrow);
-}
+void Ge::activate_contype_stronearr() { graph->set_contype(glow_eConType_StraightOneArrow); }
 
-void Ge::activate_contype_stepdiv()
-{
-  graph->set_contype(glow_eConType_StepDiv);
-}
+void Ge::activate_contype_stepdiv() { graph->set_contype(glow_eConType_StepDiv); }
 
-void Ge::activate_contype_stepconv()
-{
-  graph->set_contype(glow_eConType_StepConv);
-}
+void Ge::activate_contype_stepconv() { graph->set_contype(glow_eConType_StepConv); }
 
-void Ge::activate_contype_transdiv()
-{
-  graph->set_contype(glow_eConType_TransDiv);
-}
+void Ge::activate_contype_transdiv() { graph->set_contype(glow_eConType_TransDiv); }
 
-void Ge::activate_contype_transconv()
-{
-  graph->set_contype(glow_eConType_TransConv);
-}
+void Ge::activate_contype_transconv() { graph->set_contype(glow_eConType_TransConv); }
 
-void Ge::activate_condir_center()
-{
-  graph->set_condir(glow_eDirection_Center);
-}
+void Ge::activate_condir_center() { graph->set_condir(glow_eDirection_Center); }
 
-void Ge::activate_condir_left()
-{
-  graph->set_condir(glow_eDirection_Left);
-}
+void Ge::activate_condir_left() { graph->set_condir(glow_eDirection_Left); }
 
-void Ge::activate_condir_right()
-{
-  graph->set_condir(glow_eDirection_Right);
-}
+void Ge::activate_condir_right() { graph->set_condir(glow_eDirection_Right); }
 
-void Ge::activate_condir_up()
-{
-  graph->set_condir(glow_eDirection_Up);
-}
+void Ge::activate_condir_up() { graph->set_condir(glow_eDirection_Up); }
 
-void Ge::activate_condir_down()
-{
-  graph->set_condir(glow_eDirection_Down);
-}
+void Ge::activate_condir_down() { graph->set_condir(glow_eDirection_Down); }
 
-void Ge::activate_background_color()
-{
-  graph->set_background_color();
-}
+void Ge::activate_background_color() { graph->set_background_color(); }
 
-void Ge::activate_gradient(glow_eGradient gradient)
-{
-  graph->set_select_gradient(gradient);
-}
+void Ge::activate_gradient(glow_eGradient gradient) { graph->set_select_gradient(gradient); }
 
-void Ge::colortheme_init_yes_cb(Ge* gectx)
-{
-  gectx->graph->colortheme_init(1);
-}
+void Ge::colortheme_init_yes_cb(Ge* gectx) { gectx->graph->colortheme_init(1); }
 
-void Ge::colortheme_init_no_cb(Ge* gectx)
-{
-}
+void Ge::colortheme_init_no_cb(Ge* gectx) {}
 
 void Ge::activate_colortheme_init(int colortheme)
 {
@@ -2092,29 +2020,22 @@ void Ge::activate_colortheme_init(int colortheme)
   if (graph->custom_colors_is_empty())
     graph->colortheme_init(colortheme);
   else
-    open_yesnodia("Custom colors is not empty.\nDo you want to overwrite custom colors?", "Colortheme initialize",
-        colortheme_init_yes_cb, colortheme_init_no_cb);
+    open_yesnodia("Custom colors is not empty.\nDo you want to overwrite custom colors?",
+                  "Colortheme initialize", colortheme_init_yes_cb, colortheme_init_no_cb);
 }
 
 void Ge::activate_help()
 {
-  CoXHelp::dhelp(
-      "index", "", navh_eHelpFile_Other, "$pwr_lang/man_geref.dat", false);
+  CoXHelp::dhelp("index", "", navh_eHelpFile_Other, "$pwr_lang/man_geref.dat", false);
 }
 
 void Ge::activate_help_subgraph()
 {
-  CoXHelp::dhelp(
-      "index", "", navh_eHelpFile_Other, "$pwr_exe/man_subgraph.dat", false);
+  CoXHelp::dhelp("index", "", navh_eHelpFile_Other, "$pwr_exe/man_subgraph.dat", false);
 }
 
-void Ge::activate_india_ok(char* value)
-{
-  (india_ok_cb)(this, value);
-}
-void Ge::activate_india_cancel()
-{
-}
+void Ge::activate_india_ok(char* value) { (india_ok_cb)(this, value); }
+void Ge::activate_india_cancel() {}
 void Ge::activate_yesnodia_yes()
 {
   yesnodia_open = 0;
@@ -2127,19 +2048,13 @@ void Ge::activate_yesnodia_no()
 
   (yesnodia_no_cb)(this);
 }
-void Ge::activate_yesnodia_cancel()
-{
-  yesnodia_open = 0;
-}
+void Ge::activate_yesnodia_cancel() { yesnodia_open = 0; }
 void Ge::activate_confirm_ok()
 {
   confirm_open = 0;
   graph->confirm_ok(current_confirm_object);
 }
-void Ge::activate_confirm_cancel()
-{
-  confirm_open = 0;
-}
+void Ge::activate_confirm_cancel() { confirm_open = 0; }
 
 //
 // Callbacks from colorpalette
@@ -2151,12 +2066,14 @@ int Ge::colorpalette_cb(GlowCtx* ctx, glow_tEvent event)
 
   colpal_GetCtxUserData((ColPalCtx*)ctx, (void**)&gectx);
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Click:
 
     active = colpal_GetActive(gectx->colorpalette_ctx);
 
-    switch (active) {
+    switch (active)
+    {
     case colpal_eActive_FillColor:
       if (event->any.type == glow_eEventType_ColorTone)
         gectx->graph->set_select_color_tone(event->colortone.tone);
@@ -2177,17 +2094,16 @@ int Ge::colorpalette_cb(GlowCtx* ctx, glow_tEvent event)
   case glow_eEvent_MB1ClickShiftCtrl:
     if (event->any.type == glow_eEventType_ColorTone)
       // This is actually a color, not a tone
-      gectx->graph->set_select_background_color(
-          (glow_eDrawType)event->colortone.tone);
+      gectx->graph->set_select_background_color((glow_eDrawType)event->colortone.tone);
     break;
   case glow_eEvent_MB2Click:
     gectx->graph->set_select_border_color();
     break;
   case glow_eEvent_MB1DoubleClick:
-    if (event->any.type == glow_eEventType_CustomColor) {
-      gectx->graph->set_custom_color(event->customcolor.color,
-          event->customcolor.red, event->customcolor.green,
-          event->customcolor.blue);
+    if (event->any.type == glow_eEventType_CustomColor)
+    {
+      gectx->graph->set_custom_color(event->customcolor.color, event->customcolor.red,
+                                     event->customcolor.green, event->customcolor.blue);
     }
     break;
   default:;
@@ -2201,19 +2117,18 @@ int Ge::init_colorpalette_cb(GlowCtx* fctx, void* client_data)
   gectx->colorpalette_ctx = (colpal_tCtx)fctx;
   colpal_SetCtxUserData(gectx->colorpalette_ctx, gectx);
 
-  colpal_EnableEvent(gectx->colorpalette_ctx, glow_eEvent_MB1Click,
-      glow_eEventType_CallBack, Ge::colorpalette_cb);
-  colpal_EnableEvent(gectx->colorpalette_ctx, glow_eEvent_MB1ClickShift,
-      glow_eEventType_CallBack, Ge::colorpalette_cb);
-  colpal_EnableEvent(gectx->colorpalette_ctx, glow_eEvent_MB1ClickShiftCtrl,
-      glow_eEventType_CallBack, Ge::colorpalette_cb);
-  colpal_EnableEvent(gectx->colorpalette_ctx, glow_eEvent_MB2Click,
-      glow_eEventType_CallBack, Ge::colorpalette_cb);
-  colpal_EnableEvent(gectx->colorpalette_ctx, glow_eEvent_MB1DoubleClick,
-      glow_eEventType_CallBack, Ge::colorpalette_cb);
+  colpal_EnableEvent(gectx->colorpalette_ctx, glow_eEvent_MB1Click, glow_eEventType_CallBack,
+                     Ge::colorpalette_cb);
+  colpal_EnableEvent(gectx->colorpalette_ctx, glow_eEvent_MB1ClickShift, glow_eEventType_CallBack,
+                     Ge::colorpalette_cb);
+  colpal_EnableEvent(gectx->colorpalette_ctx, glow_eEvent_MB1ClickShiftCtrl, glow_eEventType_CallBack,
+                     Ge::colorpalette_cb);
+  colpal_EnableEvent(gectx->colorpalette_ctx, glow_eEvent_MB2Click, glow_eEventType_CallBack,
+                     Ge::colorpalette_cb);
+  colpal_EnableEvent(gectx->colorpalette_ctx, glow_eEvent_MB1DoubleClick, glow_eEventType_CallBack,
+                     Ge::colorpalette_cb);
 
-  colpal_UpdateCustomColors(
-      gectx->colorpalette_ctx, gectx->graph->get_custom_colors());
+  colpal_UpdateCustomColors(gectx->colorpalette_ctx, gectx->graph->get_custom_colors());
 
   return 1;
 }
@@ -2227,12 +2142,15 @@ int Ge::get_ldhses_cb(void* ctx, ldh_tSesContext* ldhses, int load)
   pwr_tClassId classid;
   ldh_tVolContext volctx;
 
-  if (gectx->ldhses) {
+  if (gectx->ldhses)
+  {
     *ldhses = gectx->ldhses;
     return 1;
-  } else if (!load)
+  }
+  else if (!load)
     return 0;
-  else {
+  else
+  {
     // Open workbench and attatch some volume
     sts = ldh_OpenWB(&wbctx, 0, 0);
     if (EVEN(sts))
@@ -2240,7 +2158,8 @@ int Ge::get_ldhses_cb(void* ctx, ldh_tSesContext* ldhses, int load)
 
     // Attach first rootvolume, or if no rootvolume exist some other volume
     sts = ldh_GetVolumeList(wbctx, &volid);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       sts = ldh_GetVolumeClass(wbctx, volid, &classid);
       if (EVEN(sts))
         return sts;
@@ -2257,8 +2176,7 @@ int Ge::get_ldhses_cb(void* ctx, ldh_tSesContext* ldhses, int load)
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_OpenSession(
-        ldhses, volctx, ldh_eAccess_ReadWrite, ldh_eUtility_Pwr);
+    sts = ldh_OpenSession(ldhses, volctx, ldh_eAccess_ReadWrite, ldh_eUtility_Pwr);
     if (EVEN(sts))
       return sts;
   }
@@ -2272,18 +2190,21 @@ int Ge::check_ldh_object_cb(void* ctx, char* name, pwr_eType* type)
   int sts;
   pwr_tAName n;
 
-  if (!gectx->graph->ldhses) {
+  if (!gectx->graph->ldhses)
+  {
     sts = get_ldhses_cb(gectx, &gectx->graph->ldhses, 1);
     if (EVEN(sts))
       return sts;
   }
 
-  if (gectx->graph->syntax_instance) {
+  if (gectx->graph->syntax_instance)
+  {
     char *t0, *s0, *s;
 
     t0 = n;
     s0 = name;
-    while ((s = strstr(s0, "$object"))) {
+    while ((s = strstr(s0, "$object")))
+    {
       strncpy(t0, s0, s - s0);
       t0 += s - s0;
       strcpy(t0, gectx->graph->syntax_instance);
@@ -2291,11 +2212,13 @@ int Ge::check_ldh_object_cb(void* ctx, char* name, pwr_eType* type)
       s0 = s + strlen("$object");
     }
     str_Strcpy(t0, s0);
-  } else
+  }
+  else
     strcpy(n, name);
 
   sts = ldh_NameToAttrRef(gectx->graph->ldhses, n, &aref);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     if (aref.Flags.b.Object)
       sts = ldh_GetAttrRefTid(gectx->graph->ldhses, &aref, (pwr_tTid*)type);
     else
@@ -2308,40 +2231,47 @@ int Ge::traverse_focus(void* ctx, void* component)
 {
   Ge* gectx = (Ge*)ctx;
 
-  if (component == (void*)gectx->graph) {
+  if (component == (void*)gectx->graph)
+  {
     if (gectx->subpalette_mapped)
       gectx->set_focus(gectx->subpalette);
     else if (gectx->plant_mapped)
       gectx->set_focus(gectx->plantctx);
-  } else if (component == (void*)gectx->subpalette) {
+  }
+  else if (component == (void*)gectx->subpalette)
+  {
     if (gectx->objectnav_mapped)
       gectx->set_focus(gectx->objectnav);
     gectx->set_focus(gectx->graph);
-  } else if (component == (void*)gectx->plantctx) {
+  }
+  else if (component == (void*)gectx->plantctx)
+  {
     if (gectx->objectnav_mapped)
       gectx->set_focus(gectx->objectnav);
     gectx->set_focus(gectx->graph);
-  } else if (component == (void*)gectx->objectnav) {
+  }
+  else if (component == (void*)gectx->objectnav)
+  {
     if (gectx->subpalette_mapped)
       gectx->set_focus(gectx->subpalette);
     else if (gectx->plant_mapped)
       gectx->set_focus(gectx->plantctx);
-  } else
+  }
+  else
     return 0;
   return 1;
 }
 
-int Ge::set_focus_cb(void* ctx, void* component)
-{
-  return ((Ge*)ctx)->set_focus(component);
-}
+int Ge::set_focus_cb(void* ctx, void* component) { return ((Ge*)ctx)->set_focus(component); }
 
 int Ge::set_focus(void* component)
 {
-  if (component == 0) {
+  if (component == 0)
+  {
     if (prev_focused_component != 0)
       set_focus(prev_focused_component);
-    else {
+    else
+    {
       if (objectnav_mapped)
         set_focus(objectnav);
       else if (subpalette_mapped)
@@ -2349,10 +2279,13 @@ int Ge::set_focus(void* component)
       else if (plant_mapped)
         set_focus(plantctx);
     }
-  } else if (component == (void*)graph) {
+  }
+  else if (component == (void*)graph)
+  {
     if (focused_component != 0)
       set_focus(focused_component);
-    else {
+    else
+    {
       if (objectnav_mapped)
         set_focus(objectnav);
       else if (subpalette_mapped)
@@ -2360,8 +2293,11 @@ int Ge::set_focus(void* component)
       else if (plant_mapped)
         set_focus(plantctx);
     }
-  } else if (component == (void*)subpalette) {
-    if (subpalette_mapped) {
+  }
+  else if (component == (void*)subpalette)
+  {
+    if (subpalette_mapped)
+    {
       graph->set_inputfocus(0);
       subpalette->set_inputfocus(1);
       if (focused_component != component)
@@ -2372,8 +2308,11 @@ int Ge::set_focus(void* component)
       if (objectnav_mapped)
         objectnav->set_inputfocus(0);
     }
-  } else if (component == (void*)plantctx) {
-    if (plant_mapped) {
+  }
+  else if (component == (void*)plantctx)
+  {
+    if (plant_mapped)
+    {
       if (subpalette_mapped)
         subpalette->set_inputfocus(0);
       graph->set_inputfocus(0);
@@ -2384,7 +2323,9 @@ int Ge::set_focus(void* component)
         prev_focused_component = focused_component;
       focused_component = component;
     }
-  } else if (component == (void*)objectnav) {
+  }
+  else if (component == (void*)objectnav)
+  {
     if (plant_mapped)
       plantctx->set_inputfocus(0);
     if (subpalette_mapped)
@@ -2400,38 +2341,27 @@ int Ge::set_focus(void* component)
   return 1;
 }
 
-int Ge::command(char* cmd)
-{
-  return graph->command(cmd);
-}
+int Ge::command(char* cmd) { return graph->command(cmd); }
 
-void Ge::message(pwr_tStatus sts)
-{
-  graph->message(sts);
-}
+void Ge::message(pwr_tStatus sts) { graph->message(sts); }
 
-void Ge::message_cb(void* ctx, char severity, const char* message)
-{
-  ((Ge*)ctx)->message(severity, message);
-}
+void Ge::message_cb(void* ctx, char severity, const char* message) { ((Ge*)ctx)->message(severity, message); }
 
 void Ge::help_cb(void* ctx, char* topic, char* helpfile)
 {
   CoXHelp::dhelp(topic, "", navh_eHelpFile_Other, helpfile, false);
 }
 
-void Ge::graph_get_object_list_cb(void* g, unsigned int type,
-    grow_tObject** list, int* list_cnt, grow_tObject* parent, int parent_cnt)
+void Ge::graph_get_object_list_cb(void* g, unsigned int type, grow_tObject** list, int* list_cnt,
+                                  grow_tObject* parent, int parent_cnt)
 {
-  Graph::graph_get_object_list_cb(
-      ((Ge*)g)->graph, type, list, list_cnt, parent, parent_cnt);
+  Graph::graph_get_object_list_cb(((Ge*)g)->graph, type, list, list_cnt, parent, parent_cnt);
 }
 void Ge::graph_attr_store_cb(void* g, grow_tObject object)
 {
   Graph::graph_attr_store_cb(((Ge*)g)->graph, object);
 }
-int Ge::graph_attr_recall_cb(
-    void* g, grow_tObject object, int idx, GeDyn** old_dyn)
+int Ge::graph_attr_recall_cb(void* g, grow_tObject object, int idx, GeDyn** old_dyn)
 {
   return Graph::graph_attr_recall_cb(((Ge*)g)->graph, object, idx, old_dyn);
 }
@@ -2439,45 +2369,37 @@ int Ge::graph_get_plant_select_cb(void* g, char* value, int size)
 {
   return Graph::graph_get_plant_select_cb(((Ge*)g)->graph, value, size);
 }
-int Ge::graph_get_current_colors_cb(void* g, glow_eDrawType* fill_color,
-    glow_eDrawType* border_color, glow_eDrawType* text_color)
+int Ge::graph_get_current_colors_cb(void* g, glow_eDrawType* fill_color, glow_eDrawType* border_color,
+                                    glow_eDrawType* text_color)
 {
-  return Graph::graph_get_current_colors_cb(
-      ((Ge*)g)->graph, fill_color, border_color, text_color);
+  return Graph::graph_get_current_colors_cb(((Ge*)g)->graph, fill_color, border_color, text_color);
 }
 int Ge::graph_get_current_color_tone_cb(void* g, glow_eDrawType* color_tone)
 {
   return Graph::graph_get_current_color_tone_cb(((Ge*)g)->graph, color_tone);
 }
-int Ge::graph_reconfigure_attr_cb(void* g, grow_tObject object,
-    attr_sItem** itemlist, int* itemlist_cnt, void** client_data)
+int Ge::graph_reconfigure_attr_cb(void* g, grow_tObject object, attr_sItem** itemlist, int* itemlist_cnt,
+                                  void** client_data)
 {
-  return Graph::graph_reconfigure_attr_cb(
-      ((Ge*)g)->graph, object, itemlist, itemlist_cnt, client_data);
+  return Graph::graph_reconfigure_attr_cb(((Ge*)g)->graph, object, itemlist, itemlist_cnt, client_data);
 }
 int Ge::graph_attr_set_data_cb(void* g, grow_tObject object, GeDyn* data)
 {
   return Graph::graph_attr_set_data_cb(((Ge*)g)->graph, object, data);
 }
-int Ge::graph_get_dyn_info_cb(
-    void* g, GeDyn* dyn, attr_sItem** itemlist, int* itemlist_cnt)
+int Ge::graph_get_dyn_info_cb(void* g, GeDyn* dyn, attr_sItem** itemlist, int* itemlist_cnt)
 {
-  return Graph::graph_get_dyn_info_cb(
-      ((Ge*)g)->graph, dyn, itemlist, itemlist_cnt);
+  return Graph::graph_get_dyn_info_cb(((Ge*)g)->graph, dyn, itemlist, itemlist_cnt);
 }
-int Ge::graph_get_subgraph_info_cb(
-    void* g, char* name, attr_sItem** itemlist, int* itemlist_cnt)
+int Ge::graph_get_subgraph_info_cb(void* g, char* name, attr_sItem** itemlist, int* itemlist_cnt)
 {
-  return Graph::graph_get_subgraph_info_cb(
-      ((Ge*)g)->graph, name, itemlist, itemlist_cnt);
+  return Graph::graph_get_subgraph_info_cb(((Ge*)g)->graph, name, itemlist, itemlist_cnt);
 }
-void Ge::graph_attr_close_cb(
-    void* g, void* attrctx, grow_tObject o, void* info, int keep)
+void Ge::graph_attr_close_cb(void* g, void* attrctx, grow_tObject o, void* info, int keep)
 {
   Graph::graph_attr_close_cb(((Ge*)g)->graph, attrctx, o, info, keep);
 }
-void Ge::graph_attr_redraw_cb(
-    void* g, void* attrctx, grow_tObject o, void* info)
+void Ge::graph_attr_redraw_cb(void* g, void* attrctx, grow_tObject o, void* info)
 {
   Graph::graph_attr_redraw_cb(((Ge*)g)->graph, attrctx, o, info);
 }
@@ -2496,25 +2418,22 @@ Ge::~Ge()
     ldh_CloseSession(ldhses);
 }
 
-Ge::Ge(void* x_parent_ctx, ldh_tSesContext x_ldhses, int x_exit_when_close,
-    unsigned int x_options)
-    : parent_ctx(x_parent_ctx), graph(0), subpalette(0), subgraphs(0),
-      colorpalette_ctx(0), text_input_open(0), name_input_open(0),
-      value_input_open(0), objectnav_input_open(0), command_open(0),
-      confirm_open(0), yesnodia_open(0), yesnodia_yes_cb(0), yesnodia_no_cb(0),
-      india_ok_cb(0), current_text_object(0), current_value_object(0),
-      current_confirm_object(0), ldhses(0), plantctx(0),
-      exit_when_close(x_exit_when_close), prev_count(0), focused_component(0),
-      prev_focused_component(0), recover_object(0), plant_mapped(0),
-      subpalette_mapped(0), objectnav_mapped(0), options(x_options),
+Ge::Ge(void* x_parent_ctx, ldh_tSesContext x_ldhses, int x_exit_when_close, unsigned int x_options)
+    : parent_ctx(x_parent_ctx), graph(0), subpalette(0), subgraphs(0), colorpalette_ctx(0),
+      text_input_open(0), name_input_open(0), value_input_open(0), objectnav_input_open(0), command_open(0),
+      confirm_open(0), yesnodia_open(0), yesnodia_yes_cb(0), yesnodia_no_cb(0), india_ok_cb(0),
+      current_text_object(0), current_value_object(0), current_confirm_object(0), ldhses(0), plantctx(0),
+      exit_when_close(x_exit_when_close), prev_count(0), focused_component(0), prev_focused_component(0),
+      recover_object(0), plant_mapped(0), subpalette_mapped(0), objectnav_mapped(0), options(x_options),
       open_dialog(0), objectnav(0), layernav(0), close_cb(0)
 {
   strcpy(name, "PwR Ge");
 
-  if (x_ldhses) {
+  if (x_ldhses)
+  {
     // Open a new session
-    pwr_tStatus sts = ldh_OpenSession(&ldhses, ldh_SessionToVol(x_ldhses),
-        ldh_eAccess_ReadOnly, ldh_eUtility_PlcEditor);
+    pwr_tStatus sts =
+        ldh_OpenSession(&ldhses, ldh_SessionToVol(x_ldhses), ldh_eAccess_ReadOnly, ldh_eUtility_PlcEditor);
     if (EVEN(sts))
       return;
   }

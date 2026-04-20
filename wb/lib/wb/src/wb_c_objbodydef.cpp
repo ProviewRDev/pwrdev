@@ -43,8 +43,7 @@
 #include "wb_pwrs.h"
 #include "wb_pwrs_msg.h"
 
-static pwr_tStatus AnteCreate(
-    ldh_tSesContext Session, pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus AnteCreate(ldh_tSesContext Session, pwr_tObjid Father, pwr_tClassId Class)
 {
   pwr_tCid cid;
   pwr_tStatus sts;
@@ -59,8 +58,8 @@ static pwr_tStatus AnteCreate(
   return PWRS__SUCCESS;
 }
 
-static pwr_tStatus AnteMove(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tObjid OldFather)
+static pwr_tStatus AnteMove(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father,
+                            pwr_tObjid OldFather)
 {
   // Check that that the father is the same
   if (!(Father.oix == OldFather.oix && Father.vid == OldFather.vid))
@@ -68,27 +67,25 @@ static pwr_tStatus AnteMove(ldh_tSesContext Session, pwr_tObjid Object,
   return PWRS__SUCCESS;
 }
 
-static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father,
+                              pwr_tClassId Class)
 {
   pwr_tStatus sts;
   pwr_tObjName name, uname;
   int size;
 
   // Set class name in StructName
-  sts = ldh_ObjidToName(
-      Session, Father, cdh_mName_object, name, sizeof(name), &size);
+  sts = ldh_ObjidToName(Session, Father, cdh_mName_object, name, sizeof(name), &size);
   if (EVEN(sts))
     return sts;
 
   strcpy(uname, wb_name::unatName(name));
 
-  sts = ldh_SetObjectPar(
-      Session, Object, "SysBody", "StructName", uname, sizeof(pwr_tPgmName));
+  sts = ldh_SetObjectPar(Session, Object, "SysBody", "StructName", uname, sizeof(pwr_tPgmName));
   if (EVEN(sts))
     return sts;
   return PWRS__SUCCESS;
 }
 
-pwr_dExport pwr_BindMethods($ObjBodyDef) = { pwr_BindMethod(AnteCreate),
-  pwr_BindMethod(AnteMove), pwr_BindMethod(PostCreate), pwr_NullMethod };
+pwr_dExport pwr_BindMethods($ObjBodyDef) = {pwr_BindMethod(AnteCreate), pwr_BindMethod(AnteMove),
+                                            pwr_BindMethod(PostCreate), pwr_NullMethod};

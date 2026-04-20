@@ -196,7 +196,7 @@ static void calculate(sCtx* ctx, int dir)
     if (total_size > 0)
     {
       // Spread space
-      double add_size;
+      double add_size = 0;
       int cnt = 0;
       for (int j = 0; j < ctx->row_size[dir][i]; j++)
       {

@@ -53,7 +53,8 @@ static int IsOkConnect(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
 {
   pwr_tStatus sts;
 
-  if (!streq(mbp->FilterArguments[1], "")) {
+  if (!streq(mbp->FilterArguments[1], ""))
+  {
     char arg_cid_str[20][32];
     int arg_cid_cnt;
     int i;
@@ -62,20 +63,21 @@ static int IsOkConnect(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
     pwr_tCid arg_cid;
 
     // arg 1 holds the allowed class or classes to connect to
-    arg_cid_cnt = dcli_parse(mbp->FilterArguments[1], ",", "",
-        (char*)arg_cid_str, sizeof(arg_cid_str) / sizeof(arg_cid_str[0]),
-        sizeof(arg_cid_str[0]), 0);
+    arg_cid_cnt = dcli_parse(mbp->FilterArguments[1], ",", "", (char*)arg_cid_str,
+                             sizeof(arg_cid_str) / sizeof(arg_cid_str[0]), sizeof(arg_cid_str[0]), 0);
 
     sts = ldh_GetObjectClass(ip->PointedSession, ip->Selected[0].Objid, &cid);
     if (EVEN(sts))
       return 0;
 
-    for (i = 0; i < arg_cid_cnt; i++) {
+    for (i = 0; i < arg_cid_cnt; i++)
+    {
       sts = ldh_ClassNameToId(ip->PointedSession, &arg_cid, arg_cid_str[i]);
       if (EVEN(sts))
         return 0;
 
-      if (cid == arg_cid) {
+      if (cid == arg_cid)
+      {
         cid_ok = 1;
         break;
       }
@@ -97,13 +99,13 @@ static pwr_tStatus Connect(ldh_sMenuCall* ip)
   pwr_sMenuButton mb;
   pwr_sAttrRef PattrRef;
 
-  sts = ldh_ReadObjectBody(ip->PointedSession,
-      ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
-      sizeof(pwr_sMenuButton));
+  sts = ldh_ReadObjectBody(ip->PointedSession, ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
+                           sizeof(pwr_sMenuButton));
   if (EVEN(sts))
     return sts;
 
-  if (!streq(mb.MethodArguments[1], "")) {
+  if (!streq(mb.MethodArguments[1], ""))
+  {
     char arg_cid_str[20][32];
     int arg_cid_cnt;
     int i;
@@ -113,19 +115,20 @@ static pwr_tStatus Connect(ldh_sMenuCall* ip)
 
     // arg 1 holds the allowed class or classes to connect to
     arg_cid_cnt = dcli_parse(mb.MethodArguments[1], ",", "", (char*)arg_cid_str,
-        sizeof(arg_cid_str) / sizeof(arg_cid_str[0]), sizeof(arg_cid_str[0]),
-        0);
+                             sizeof(arg_cid_str) / sizeof(arg_cid_str[0]), sizeof(arg_cid_str[0]), 0);
 
     sts = ldh_GetObjectClass(ip->PointedSession, ip->Selected[0].Objid, &cid);
     if (EVEN(sts))
       return 0;
 
-    for (i = 0; i < arg_cid_cnt; i++) {
+    for (i = 0; i < arg_cid_cnt; i++)
+    {
       sts = ldh_ClassNameToId(ip->PointedSession, &arg_cid, arg_cid_str[i]);
       if (EVEN(sts))
         return 0;
 
-      if (cid == arg_cid) {
+      if (cid == arg_cid)
+      {
         cid_ok = 1;
         break;
       }
@@ -136,17 +139,17 @@ static pwr_tStatus Connect(ldh_sMenuCall* ip)
 
   if (!streq(mb.MethodArguments[2], ""))
     // Body in MethodArguments 2, probably DevBody
-    sts = ldh_SetObjectPar(ip->PointedSession, ip->Pointed.Objid,
-        mb.MethodArguments[2], mb.MethodArguments[0],
-        (char*)&ip->Selected[0].Objid, sizeof(ip->Selected[0].Objid));
-  else {
+    sts =
+        ldh_SetObjectPar(ip->PointedSession, ip->Pointed.Objid, mb.MethodArguments[2], mb.MethodArguments[0],
+                         (char*)&ip->Selected[0].Objid, sizeof(ip->Selected[0].Objid));
+  else
+  {
     // Assume RtBody or SysBody
     char* aname_p;
     pwr_tAName aname;
     int size;
 
-    sts = ldh_AttrRefToName(
-        ip->PointedSession, &ip->Pointed, ldh_eName_ArefVol, &aname_p, &size);
+    sts = ldh_AttrRefToName(ip->PointedSession, &ip->Pointed, ldh_eName_ArefVol, &aname_p, &size);
     if (EVEN(sts))
       return 0;
 
@@ -158,24 +161,26 @@ static pwr_tStatus Connect(ldh_sMenuCall* ip)
     // sts = ldh_GetAttrRef(ip->PointedSession, ip->Pointed.Objid,
     //		 mb.MethodArguments[0], &PattrRef);
     if (ODD(sts))
-      sts = ldh_WriteAttribute(ip->PointedSession, &PattrRef,
-          &ip->Selected[0].Objid, sizeof(pwr_tObjid));
+      sts = ldh_WriteAttribute(ip->PointedSession, &PattrRef, &ip->Selected[0].Objid, sizeof(pwr_tObjid));
   }
-  if (ip->message_cb) {
+  if (ip->message_cb)
+  {
     char msg[300];
 
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       pwr_tOName name;
       int len;
 
-      sts = ldh_ObjidToName(ip->PointedSession, ip->Selected[0].Objid,
-          ldh_eName_Hierarchy, name, sizeof(name), &len);
+      sts = ldh_ObjidToName(ip->PointedSession, ip->Selected[0].Objid, ldh_eName_Hierarchy, name,
+                            sizeof(name), &len);
       if (EVEN(sts))
         cdh_OidToString(name, sizeof(name), ip->Selected[0].Objid, 1);
-      snprintf(msg, sizeof(msg), "%s connected to:   %s", mb.MethodArguments[0],
-          name);
+      snprintf(msg, sizeof(msg), "%s connected to:   %s", mb.MethodArguments[0], name);
       ip->wtt->message('I', msg);
-    } else {
+    }
+    else
+    {
       msg_GetMsg(sts, msg, sizeof(msg));
       ip->wtt->message('E', msg);
     }
@@ -189,13 +194,11 @@ static int IsOkDisconnect(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
   pwr_sAttrRef PattrRef;
   pwr_tOid oid;
 
-  sts = ldh_GetAttrRef(ip->PointedSession, ip->Pointed.Objid,
-      mbp->FilterArguments[0], &PattrRef);
+  sts = ldh_GetAttrRef(ip->PointedSession, ip->Pointed.Objid, mbp->FilterArguments[0], &PattrRef);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_ReadAttribute(
-      ip->PointedSession, &PattrRef, &oid, sizeof(pwr_tOid));
+  sts = ldh_ReadAttribute(ip->PointedSession, &PattrRef, &oid, sizeof(pwr_tOid));
 
   if (cdh_ObjidIsNull(oid))
     return 0;
@@ -213,24 +216,21 @@ static pwr_tStatus Disconnect(ldh_sMenuCall* ip)
   pwr_sAttrRef PattrRef;
   pwr_tOid oid;
 
-  sts = ldh_ReadObjectBody(ip->PointedSession,
-      ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
-      sizeof(pwr_sMenuButton));
+  sts = ldh_ReadObjectBody(ip->PointedSession, ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
+                           sizeof(pwr_sMenuButton));
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetAttrRef(
-      ip->PointedSession, ip->Pointed.Objid, mb.MethodArguments[0], &PattrRef);
+  sts = ldh_GetAttrRef(ip->PointedSession, ip->Pointed.Objid, mb.MethodArguments[0], &PattrRef);
   if (EVEN(sts))
     return sts;
 
   oid = pwr_cNObjid;
-  sts = ldh_WriteAttribute(
-      ip->PointedSession, &PattrRef, &oid, sizeof(pwr_tOid));
+  sts = ldh_WriteAttribute(ip->PointedSession, &PattrRef, &oid, sizeof(pwr_tOid));
 
   return PWRS__SUCCESS;
 }
 
-pwr_dExport pwr_BindMethods($Objid) = { pwr_BindMethod(Connect),
-  pwr_BindMethod(IsOkConnect), pwr_BindMethod(Disconnect),
-  pwr_BindMethod(IsOkDisconnect), pwr_NullMethod };
+pwr_dExport pwr_BindMethods($Objid) = {pwr_BindMethod(Connect), pwr_BindMethod(IsOkConnect),
+                                       pwr_BindMethod(Disconnect), pwr_BindMethod(IsOkDisconnect),
+                                       pwr_NullMethod};

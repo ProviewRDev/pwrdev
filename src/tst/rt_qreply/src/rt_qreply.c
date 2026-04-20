@@ -70,7 +70,8 @@ main(int argc, char* argv[])
   if (!qcom_Bind(&sts, &qid, &fqid))
     exit(sts);
 
-  while (1) {
+  while (1)
+  {
     get.data = NULL;
     p = qcom_Get(&sts, &qid, &get, 6000000);
     if (p == NULL)

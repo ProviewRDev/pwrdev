@@ -43,7 +43,7 @@
 #include "cow_msgwindow.h"
 #include "cow_qt_helpers.h"
 #include "cow_statusmon_nodelist_qt.h"
-//#include "cow_style_qt.h"
+// #include "cow_style_qt.h"
 #include "cow_xhelp_qt.h"
 
 #include <QApplication>
@@ -78,42 +78,62 @@ int main(int argc, char* argv[])
   char language[20] = "";
 
   log_debug("%s ", argv[0]);
-  for (int i = 1; i < argc; i++) {
+  for (int i = 1; i < argc; i++)
+  {
     fprintf(stderr, "%s ", argv[i]);
-    if (streq(argv[i], "-h")) {
+    if (streq(argv[i], "-h"))
+    {
       usage();
       exit(0);
-    } else if (streq(argv[i], "-l") && i + 1 < argc) {
+    }
+    else if (streq(argv[i], "-l") && i + 1 < argc)
+    {
       strncpy(language, argv[i + 1], sizeof(language));
       Lng::set(language);
-    } else if (streq(argv[i], "-m")) {
-      if (argc == i) {
+    }
+    else if (streq(argv[i], "-m"))
+    {
+      if (argc == i)
+      {
         usage();
         exit(0);
       }
-      if (streq(argv[i + 1], "1")) {
+      if (streq(argv[i + 1], "1"))
+      {
         mode = nodelist_eMode_Status1;
-      } else if (streq(argv[i + 1], "2")) {
+      }
+      else if (streq(argv[i + 1], "2"))
+      {
         mode = nodelist_eMode_Status2;
-      } else if (streq(argv[i + 1], "3")) {
+      }
+      else if (streq(argv[i + 1], "3"))
+      {
         mode = nodelist_eMode_Status3;
-      } else if (streq(argv[i + 1], "4")) {
+      }
+      else if (streq(argv[i + 1], "4"))
+      {
         mode = nodelist_eMode_Status4;
-      } else if (streq(argv[i + 1], "5")) {
+      }
+      else if (streq(argv[i + 1], "5"))
+      {
         mode = nodelist_eMode_Status5;
-      } else {
+      }
+      else
+      {
         usage();
         exit(0);
       }
       i++;
-    } else if (streq(argv[i], "-e")) {
+    }
+    else if (streq(argv[i], "-e"))
+    {
       view_descr = 1;
     }
   }
   fprintf(stderr, "\n");
 
   QApplication app(argc, argv);
-  //QApplication::setStyle(new PwrStyle());
+  // QApplication::setStyle(new PwrStyle());
 
   setlocale(LC_NUMERIC, "POSIX");
   setlocale(LC_TIME, "en_US");
@@ -121,8 +141,7 @@ int main(int argc, char* argv[])
   xhelp = new CoXHelpQt(NULL, xhelp_eUtility_Xtt, &sts);
   CoXHelp::set_default(xhelp);
 
-  nl = new NodelistQt(NULL, "Status Monitor", mode, view_descr, msgw_ePop_No,
-      &sts);
+  nl = new NodelistQt(NULL, "Status Monitor", mode, view_descr, msgw_ePop_No, &sts);
   nl->close_cb = statusmon_close;
   nl->set_scantime(3);
 

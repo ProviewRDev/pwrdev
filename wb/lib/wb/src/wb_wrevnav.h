@@ -44,11 +44,10 @@
 class WItemRev;
 class WItemRevision;
 
-class WRevNavBrow {
+class WRevNavBrow
+{
 public:
-  WRevNavBrow(BrowCtx* brow_ctx, void* lwnav) : ctx(brow_ctx), wrevnav(lwnav)
-  {
-  }
+  WRevNavBrow(BrowCtx* brow_ctx, void* lwnav) : ctx(brow_ctx), wrevnav(lwnav) {}
 
   BrowCtx* ctx;
   void* wrevnav;
@@ -68,10 +67,11 @@ public:
   void brow_setup();
 };
 
-class WRevNav {
+class WRevNav
+{
 public:
-  WRevNav(void* wa_parent_ctx, ldh_tSession wa_ldhses, const char* wa_name,
-      wb_eUtility wa_utility, pwr_tStatus* status);
+  WRevNav(void* wa_parent_ctx, ldh_tSession wa_ldhses, const char* wa_name, wb_eUtility wa_utility,
+          pwr_tStatus* status);
   virtual ~WRevNav();
 
   void* parent_ctx;
@@ -87,9 +87,7 @@ public:
   int displayed;
   wb_revision* rev;
 
-  virtual void set_inputfocus()
-  {
-  }
+  virtual void set_inputfocus() {}
 
   void message(char sev, const char* text);
   int root_objects();
@@ -107,12 +105,12 @@ public:
   static int rev_command_cb(void* ctx, char* cmd);
 };
 
-class WItemRev {
+class WItemRev
+{
 public:
   WItemRev();
   virtual ~WItemRev();
-  virtual int open_children(
-      WRevNavBrow* brow, wb_revision* rev, double x, double y);
+  virtual int open_children(WRevNavBrow* brow, wb_revision* rev, double x, double y);
   virtual int open_attributes(WRevNavBrow* brow, double x, double y);
   virtual int close(WRevNavBrow* brow, double x, double y);
 
@@ -121,12 +119,12 @@ public:
   int children;
 };
 
-class WItemRevision : public WItemRev {
+class WItemRevision : public WItemRev
+{
 public:
-  WItemRevision(WRevNavBrow* brow, char* item_name, char* item_description,
-      pwr_tTime item_date, char* item_version, bool item_current,
-      bool item_current_branch, bool item_in_manager, int item_children,
-      brow_tNode dest, flow_eDest dest_code);
+  WItemRevision(WRevNavBrow* brow, char* item_name, char* item_description, pwr_tTime item_date,
+                char* item_version, bool item_current, bool item_current_branch, bool item_in_manager,
+                int item_children, brow_tNode dest, flow_eDest dest_code);
   int open_children(WRevNavBrow* brow, wb_revision* rev, double x, double y);
   int open_attributes(WRevNavBrow* brow, double x, double y);
   char description[80];
@@ -137,10 +135,11 @@ public:
   bool in_manager;
 };
 
-class WItemRevAttr : public WItemRev {
+class WItemRevAttr : public WItemRev
+{
 public:
-  WItemRevAttr(WRevNavBrow* brow, const char* item_name, char* item_value,
-      brow_tNode dest, flow_eDest dest_code);
+  WItemRevAttr(WRevNavBrow* brow, const char* item_name, char* item_value, brow_tNode dest,
+               flow_eDest dest_code);
   virtual ~WItemRevAttr();
   char value[120];
 };

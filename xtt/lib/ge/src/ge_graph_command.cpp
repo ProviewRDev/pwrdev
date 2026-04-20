@@ -54,8 +54,8 @@
 #include "wb_wccm.h"
 #endif
 
-static void graph_group_replace_attr(grow_tObject group, char* from_str,
-    char* to_str, int* replace_cnt, int strict);
+static void graph_group_replace_attr(grow_tObject group, char* from_str, char* to_str, int* replace_cnt,
+                                     int strict);
 
 static int graph_show_func(void* client_data, void* client_flag);
 static int graph_save_func(void* client_data, void* client_flag);
@@ -85,41 +85,39 @@ static int graph_filter_func(void* client_data, void* client_flag);
 static int graph_check_func(void* client_data, void* client_flag);
 static int graph_nop_func(void* client_data, void* client_flag);
 
-dcli_tCmdTable graph_command_table[] = { { "SHOW", &graph_show_func,
-                                             { "dcli_arg1", "dcli_arg2", "" } },
-  { "SAVE", &graph_save_func, { "dcli_arg1", "/FILE", "" } },
-  { "OPEN", &graph_open_func, { "dcli_arg1", "/FILE", "" } },
-  { "NEW", &graph_new_func, { "" } },
-  { "SET", &graph_set_func, { "dcli_arg1", "dcli_arg2", "dcli_arg3",
-                                "dcli_arg4", "/ON", "/OFF", "/RESET", "" } },
-  { "ADD", &graph_add_func, { "dcli_arg1", "dcli_arg2", "/X1", "/Y1", "" } },
-  { "ROTATE", &graph_rotate_func, { "dcli_arg1", "/ANGLE", "" } },
-  { "FLIP", &graph_flip_func, { "dcli_arg1", "" } },
-  { "SCALE", &graph_scale_func,
-      { "dcli_arg1", "/SCALEX", "/SCALEY", "/X", "/Y", "" } },
-  { "MOVE", &graph_move_func,
-      { "dcli_arg1", "/X", "/Y", "/ABSX", "/ABSY", "" } },
-  { "CREATE", &graph_create_func,
-      { "dcli_arg1", "/X1", "/Y1", "/X2", "/Y2", "/WIDTH", "/HEIGHT", "/ANGLE1",
-          "/ANGLE2", "/TEXT", "/SUBGRAPH", "/IMAGE", "" } },
-  { "REPLACE", &graph_replace_func,
-      { "dcli_arg1", "/FROM", "/TO", "/STRICT", "" } },
-  { "CONVERT", &graph_convert_func, { "dcli_arg1", "" } },
-  { "EXIT", &graph_exit_func, { "" } }, { "QUIT", &graph_quit_func, { "" } },
-  { "GROUP", &graph_group_func, { "" } },
-  { "SELECT", &graph_select_func, { "dcli_arg1", "/NAME", "" } },
-  { "EXPORT", &graph_export_func, { "dcli_arg1", "/NAME", "/SIGNATURE", "/FILE", "" } },
-  { "DISABLE", &graph_disable_func, { "dcli_arg1", "" } },
-  { "TWO", &graph_two_func, { "" } }, { "BUILD", &graph_build_func, { "" } },
-  { "CUSTOMCOLOR", &graph_customcolor_func,
-      { "dcli_arg", "/FILE", "/LIGHTNESS", "/ISDEFAULT", "" } },
-  { "SEARCH", &graph_search_func, { "dcli_arg", "dcli_arg2", "/NAME", "" } },
-  { "FILTER", &graph_filter_func,
-      { "dcli_arg", "/RESET", "/TYPE", "/PATTERN", "" } },
-  { "CHECK", &graph_check_func, { "dcli_arg", "/INSTANCE", "" } },
-  { "EDIT", &graph_nop_func, { "" } },
-  { "", NULL, { "" } }
-};
+dcli_tCmdTable graph_command_table[] = {
+    {"SHOW", &graph_show_func, {"dcli_arg1", "dcli_arg2", ""}},
+    {"SAVE", &graph_save_func, {"dcli_arg1", "/FILE", ""}},
+    {"OPEN", &graph_open_func, {"dcli_arg1", "/FILE", ""}},
+    {"NEW", &graph_new_func, {""}},
+    {"SET",
+     &graph_set_func,
+     {"dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", "/ON", "/OFF", "/RESET", ""}},
+    {"ADD", &graph_add_func, {"dcli_arg1", "dcli_arg2", "/X1", "/Y1", ""}},
+    {"ROTATE", &graph_rotate_func, {"dcli_arg1", "/ANGLE", ""}},
+    {"FLIP", &graph_flip_func, {"dcli_arg1", ""}},
+    {"SCALE", &graph_scale_func, {"dcli_arg1", "/SCALEX", "/SCALEY", "/X", "/Y", ""}},
+    {"MOVE", &graph_move_func, {"dcli_arg1", "/X", "/Y", "/ABSX", "/ABSY", ""}},
+    {"CREATE",
+     &graph_create_func,
+     {"dcli_arg1", "/X1", "/Y1", "/X2", "/Y2", "/WIDTH", "/HEIGHT", "/ANGLE1", "/ANGLE2", "/TEXT",
+      "/SUBGRAPH", "/IMAGE", ""}},
+    {"REPLACE", &graph_replace_func, {"dcli_arg1", "/FROM", "/TO", "/STRICT", ""}},
+    {"CONVERT", &graph_convert_func, {"dcli_arg1", ""}},
+    {"EXIT", &graph_exit_func, {""}},
+    {"QUIT", &graph_quit_func, {""}},
+    {"GROUP", &graph_group_func, {""}},
+    {"SELECT", &graph_select_func, {"dcli_arg1", "/NAME", ""}},
+    {"EXPORT", &graph_export_func, {"dcli_arg1", "/NAME", "/SIGNATURE", "/FILE", ""}},
+    {"DISABLE", &graph_disable_func, {"dcli_arg1", ""}},
+    {"TWO", &graph_two_func, {""}},
+    {"BUILD", &graph_build_func, {""}},
+    {"CUSTOMCOLOR", &graph_customcolor_func, {"dcli_arg", "/FILE", "/LIGHTNESS", "/ISDEFAULT", ""}},
+    {"SEARCH", &graph_search_func, {"dcli_arg", "dcli_arg2", "/NAME", ""}},
+    {"FILTER", &graph_filter_func, {"dcli_arg", "/RESET", "/TYPE", "/PATTERN", ""}},
+    {"CHECK", &graph_check_func, {"dcli_arg", "/INSTANCE", ""}},
+    {"EDIT", &graph_nop_func, {""}},
+    {"", NULL, {""}}};
 
 static int graph_show_func(void* client_data, void* client_flag)
 {
@@ -130,18 +128,20 @@ static int graph_show_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "VERSION", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "VERSION", strlen(arg1_str)) == 0)
+  {
     // Command is "SHOW VERSION"
     char message_str[80];
     int grow_version, graph_version;
 
     grow_GetVersion(graph->grow->ctx, &grow_version, &graph_version);
 
-    sprintf(message_str, "Current graph: V%d.%03d, Grow: V%d.%03d",
-        int(graph_version / 1000), graph_version % 1000,
-        int(grow_version / 1000), grow_version % 1000);
+    sprintf(message_str, "Current graph: V%d.%03d, Grow: V%d.%03d", int(graph_version / 1000),
+            graph_version % 1000, int(grow_version / 1000), grow_version % 1000);
     graph->message('I', message_str);
-  } else {
+  }
+  else
+  {
     graph->message('E', "Unknown qualifier");
     return GE__QUAL;
   }
@@ -155,24 +155,31 @@ static int graph_save_func(void* client_data, void* client_flag)
   char file_str[80];
   char name[40];
 
-  if (graph->trace_started) {
+  if (graph->trace_started)
+  {
     graph->message('E', "Stop Preview before saving");
     return GE__SUCCESS;
   }
 
-  if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
-    if (strlen(file_str) > 39) {
+  if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+  {
+    if (strlen(file_str) > 39)
+    {
       graph->message('E', "Filename to long");
       return GE__FILENAME;
     }
     strcpy(name, file_str);
-  } else if (ODD(dcli_get_qualifier("dcli_arg1", file_str, sizeof(file_str)))) {
-    if (strlen(file_str) > 39) {
+  }
+  else if (ODD(dcli_get_qualifier("dcli_arg1", file_str, sizeof(file_str))))
+  {
+    if (strlen(file_str) > 39)
+    {
       graph->message('E', "Filename to long");
       return GE__FILENAME;
     }
     strcpy(name, file_str);
-  } else
+  }
+  else
     graph->get_name(name);
 
   // Assume that parent is Ge
@@ -197,7 +204,8 @@ static int graph_build_func(void* client_data, void* client_flag)
   pwr_tCmd cmd;
 
   graph->get_name(name);
-  if (streq(name, "") || graph->is_modified()) {
+  if (streq(name, "") || graph->is_modified())
+  {
     graph->message('E', "Build error, graph is not saved");
     return GE__NOTSAVED;
   }
@@ -218,28 +226,35 @@ static int graph_customcolor_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "WRITE", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "WRITE", strlen(arg1_str)) == 0)
+  {
     // Command is "CUSTOMCOLOR WRITE"
 
-    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = grow_WriteCustomColorFile(graph->grow->ctx, file_str);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       graph->message('E', "Write error");
       return GE__SYNTAX;
     }
     graph->message('I', "Custom color file created");
-  } else if (str_NoCaseStrncmp(arg1_str, "READ", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "READ", strlen(arg1_str)) == 0)
+  {
     // Command is "CUSTOMCOLOR READ"
 
-    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = grow_ReadCustomColorFile(graph->grow->ctx, file_str);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       graph->message('E', "Read error");
       return GE__SYNTAX;
     }
@@ -247,41 +262,54 @@ static int graph_customcolor_func(void* client_data, void* client_flag)
       (graph->update_colorpalette_cb)(graph->parent_ctx);
 
     graph->message('I', "Custom color file read");
-  } else if (str_NoCaseStrncmp(arg1_str, "PRINT", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "PRINT", strlen(arg1_str)) == 0)
+  {
     // Command is "CUSTOMCOLOR PRINT"
 
     grow_PrintRgbColors(graph->grow->ctx);
-  } else if (str_NoCaseStrncmp(arg1_str, "SET", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SET", strlen(arg1_str)) == 0)
+  {
     // Command is "CUSTOMCOLOR SET"
     char str[80];
 
-    if (ODD(dcli_get_qualifier("/LIGHTNESS", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/LIGHTNESS", str, sizeof(str))))
+    {
       int lightness;
       int num;
 
       num = sscanf(str, "%d", &lightness);
-      if (num != 1) {
+      if (num != 1)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
       grow_SetColorThemeLightness(graph->grow->ctx, lightness);
       graph->message('I', "ColorTheme lightness set");
-    } else if (ODD(dcli_get_qualifier("/ISDEFAULT", str, sizeof(str)))) {
+    }
+    else if (ODD(dcli_get_qualifier("/ISDEFAULT", str, sizeof(str))))
+    {
       int isdefault;
       int num;
 
       num = sscanf(str, "%d", &isdefault);
-      if (num != 1) {
+      if (num != 1)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
       grow_SetColorThemeIsDefault(graph->grow->ctx, isdefault);
       graph->message('I', "ColorTheme is default set");
-    } else {
+    }
+    else
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
@@ -297,14 +325,16 @@ static int graph_search_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0)
+  {
     // Command is "SEARCH OBJECT"
     char name_str[80];
 
     sts = dcli_get_qualifier("/NAME", name_str, sizeof(name_str));
     if (EVEN(sts))
       sts = dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
@@ -312,7 +342,9 @@ static int graph_search_func(void* client_data, void* client_flag)
     sts = graph->search_object(name_str);
     if (EVEN(sts))
       graph->message('E', "No such object");
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
@@ -328,19 +360,22 @@ static int graph_filter_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "NAVIGATOR", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "NAVIGATOR", strlen(arg1_str)) == 0)
+  {
     // Command is "FILTER NAVIGATOR"
     char type_str[80];
     char pattern_str[80];
     int type;
 
-    if (ODD(dcli_get_qualifier("/RESET", 0, 0))) {
+    if (ODD(dcli_get_qualifier("/RESET", 0, 0)))
+    {
       ((Ge*)graph->parent_ctx)->objectnav->filter(0, 0);
       return GE__SUCCESS;
     }
 
     sts = dcli_get_qualifier("/TYPE", type_str, sizeof(type_str));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
@@ -349,20 +384,24 @@ static int graph_filter_func(void* client_data, void* client_flag)
       type = 1;
     else if (str_NoCaseStrcmp(type_str, "class") == 0)
       type = 2;
-    else {
+    else
+    {
       graph->message('E', "Syntax error in filter type");
       return GE__SYNTAX;
     }
 
     sts = dcli_get_qualifier("/PATTERN", pattern_str, sizeof(pattern_str));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
 
     ((Ge*)graph->parent_ctx)->objectnav->filter(type, pattern_str);
     ;
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
@@ -377,7 +416,8 @@ static int graph_check_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "SYNTAX", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "SYNTAX", strlen(arg1_str)) == 0)
+  {
     // Command is "CHECK SYNTAX"
     pwr_tAName instance_str;
     char* instance_p;
@@ -390,7 +430,9 @@ static int graph_check_func(void* client_data, void* client_flag)
       instance_p = 0;
 
     graph->syntax_check(instance_p);
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
@@ -403,7 +445,8 @@ static int graph_exit_func(void* client_data, void* client_flag)
   char name[40];
 
   graph->get_name(name);
-  if (streq(name, "")) {
+  if (streq(name, ""))
+  {
     graph->message('E', "Graph has no name, 'save as' or 'quit'");
     return GE__NONAME;
   }
@@ -421,11 +464,16 @@ static int graph_open_func(void* client_data, void* client_flag)
   pwr_tFileName file_str;
   pwr_tFileName name;
 
-  if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+  if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+  {
     strcpy(name, file_str);
-  } else if (ODD(dcli_get_qualifier("dcli_arg1", file_str, sizeof(file_str)))) {
+  }
+  else if (ODD(dcli_get_qualifier("dcli_arg1", file_str, sizeof(file_str))))
+  {
     strcpy(name, file_str);
-  } else {
+  }
+  else
+  {
     graph->message('E', "Enter filename");
     return GE__SYNTAX;
   }
@@ -455,77 +503,110 @@ static int graph_set_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "VERIFY", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "VERIFY", strlen(arg1_str)) == 0)
+  {
     graph->verify = 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "NOVERIFY", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NOVERIFY", strlen(arg1_str)) == 0)
+  {
     graph->verify = 0;
-  } else if (str_NoCaseStrncmp(arg1_str, "FILL", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "FILL", strlen(arg1_str)) == 0)
+  {
     graph->set_fill(1);
-  } else if (str_NoCaseStrncmp(arg1_str, "NOFILL", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NOFILL", strlen(arg1_str)) == 0)
+  {
     graph->set_fill(0);
-  } else if (str_NoCaseStrncmp(arg1_str, "BORDER", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "BORDER", strlen(arg1_str)) == 0)
+  {
     graph->set_border(1);
-  } else if (str_NoCaseStrncmp(arg1_str, "NOBORDER", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NOBORDER", strlen(arg1_str)) == 0)
+  {
     graph->set_border(0);
-  } else if (str_NoCaseStrncmp(arg1_str, "SHADOW", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SHADOW", strlen(arg1_str)) == 0)
+  {
     graph->set_shadow(1);
-  } else if (str_NoCaseStrncmp(arg1_str, "NOSHADOW", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NOSHADOW", strlen(arg1_str)) == 0)
+  {
     graph->set_shadow(0);
-  } else if (str_NoCaseStrncmp(arg1_str, "GRID", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "GRID", strlen(arg1_str)) == 0)
+  {
     graph->set_grid(1);
-  } else if (str_NoCaseStrncmp(arg1_str, "NOGRID", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NOGRID", strlen(arg1_str)) == 0)
+  {
     graph->set_grid(0);
-  } else if (str_NoCaseStrncmp(arg1_str, "LINEWIDTH", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "LINEWIDTH", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     int line_width;
     int sts;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(arg2_str, "%d", &line_width);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
-    if (line_width < 1 || line_width > 8) {
+    if (line_width < 1 || line_width > 8)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
 
     graph->set_linewidth(line_width);
-  } else if (str_NoCaseStrncmp(arg1_str, "GRIDSIZE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "GRIDSIZE", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     float grid_size;
     int sts;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(arg2_str, "%f", &grid_size);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
 
     graph->set_gridsize(double(grid_size));
-  } else if (str_NoCaseStrncmp(arg1_str, "TEXTSIZE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "TEXTSIZE", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     int text_size, size;
     int sts;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(arg2_str, "%d", &text_size);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
-    switch (text_size) {
+    switch (text_size)
+    {
     case 8:
       size = 0;
       break;
@@ -549,173 +630,205 @@ static int graph_set_func(void* client_data, void* client_flag)
       return GE__SYNTAX;
     }
     graph->set_textsize(size);
-  } else if (str_NoCaseStrncmp(arg1_str, "TEXTFONT", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "TEXTFONT", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     int sts;
     int value;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(arg2_str, "%d", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       sts = AttrNav::string_to_enum(glow_eType_Font, arg2_str, &value);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
     }
     graph->textfont = (glow_eFont)value;
-  } else if (str_NoCaseStrncmp(arg1_str, "BOLD", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "BOLD", strlen(arg1_str)) == 0)
+  {
     graph->set_textbold(1);
-  } else if (str_NoCaseStrncmp(arg1_str, "NOBOLD", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NOBOLD", strlen(arg1_str)) == 0)
+  {
     graph->set_textbold(0);
-  } else if (str_NoCaseStrncmp(arg1_str, "BACKGROUNDCOLOR", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "BACKGROUNDCOLOR", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     int value;
     int sts;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->set_background_color();
-    } else {
+    }
+    else
+    {
       sts = sscanf(arg2_str, "%d", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         sts = AttrNav::string_to_enum(glow_eType_Color, arg2_str, &value);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           graph->message('E', "Syntax error");
           return GE__SYNTAX;
         }
       }
-      if (value < 0 || value >= glow_eDrawType_CustomColor__) {
+      if (value < 0 || value >= glow_eDrawType_CustomColor__)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
       grow_SetBackgroundColor(graph->grow->ctx, (glow_eDrawType)value);
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "FILLCOLOR", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "FILLCOLOR", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     glow_eDrawType fill_color, border_color, text_color;
     int value;
     int sts;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
 
     sts = sscanf(arg2_str, "%d", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       sts = AttrNav::string_to_enum(glow_eType_Color, arg2_str, &value);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
     }
-    if (!((value >= 0 && value < glow_eDrawType_CustomColor__) ||
-	  value == glow_eDrawType_Inherit)) {
+    if (!((value >= 0 && value < glow_eDrawType_CustomColor__) || value == glow_eDrawType_Inherit))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
-    (graph->get_current_colors_cb)(
-        graph->parent_ctx, &fill_color, &border_color, &text_color);
+    (graph->get_current_colors_cb)(graph->parent_ctx, &fill_color, &border_color, &text_color);
     fill_color = (glow_eDrawType)value;
-    (graph->set_current_colors_cb)(
-        graph->parent_ctx, fill_color, border_color, text_color);
-  } else if (str_NoCaseStrncmp(arg1_str, "BORDERCOLOR", strlen(arg1_str))
-      == 0) {
+    (graph->set_current_colors_cb)(graph->parent_ctx, fill_color, border_color, text_color);
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "BORDERCOLOR", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     glow_eDrawType fill_color, border_color, text_color;
     int value;
     int sts;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
 
     sts = sscanf(arg2_str, "%d", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       sts = AttrNav::string_to_enum(glow_eType_Color, arg2_str, &value);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
     }
-    if (value < 0 || value >= glow_eDrawType_CustomColor__) {
+    if (value < 0 || value >= glow_eDrawType_CustomColor__)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
-    (graph->get_current_colors_cb)(
-        graph->parent_ctx, &fill_color, &border_color, &text_color);
+    (graph->get_current_colors_cb)(graph->parent_ctx, &fill_color, &border_color, &text_color);
     border_color = (glow_eDrawType)value;
-    (graph->set_current_colors_cb)(
-        graph->parent_ctx, fill_color, border_color, text_color);
-  } else if (str_NoCaseStrncmp(arg1_str, "TEXTCOLOR", strlen(arg1_str)) == 0) {
+    (graph->set_current_colors_cb)(graph->parent_ctx, fill_color, border_color, text_color);
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "TEXTCOLOR", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     glow_eDrawType fill_color, border_color, text_color;
     int value;
     int sts;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
 
     sts = sscanf(arg2_str, "%d", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       sts = AttrNav::string_to_enum(glow_eType_Color, arg2_str, &value);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
     }
-    if (value < 0 || value >= glow_eDrawType_CustomColor__) {
+    if (value < 0 || value >= glow_eDrawType_CustomColor__)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
-    (graph->get_current_colors_cb)(
-        graph->parent_ctx, &fill_color, &border_color, &text_color);
+    (graph->get_current_colors_cb)(graph->parent_ctx, &fill_color, &border_color, &text_color);
     text_color = (glow_eDrawType)value;
-    (graph->set_current_colors_cb)(
-        graph->parent_ctx, fill_color, border_color, text_color);
-  } else if (str_NoCaseStrncmp(arg1_str, "CURRENTOBJECT", strlen(arg1_str))
-      == 0) {
+    (graph->set_current_colors_cb)(graph->parent_ctx, fill_color, border_color, text_color);
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "CURRENTOBJECT", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     int arg2_sts;
 
     arg2_sts = dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str));
 
-    if (str_NoCaseStrncmp(arg2_str, "FILLCOLOR", strlen(arg2_str)) == 0) {
+    if (str_NoCaseStrncmp(arg2_str, "FILLCOLOR", strlen(arg2_str)) == 0)
+    {
       char arg3_str[80];
       int sts;
       int value;
 
-      if (!graph->current_cmd_object) {
+      if (!graph->current_cmd_object)
+      {
         graph->message('E', "No current object");
         return GE__NOCURRENT;
       }
-      if (grow_GetObjectType(graph->current_cmd_object)
-          != glow_eObjectType_GrowNode) {
-        graph->message(
-            'E', "Current object type doesn't support this operation");
+      if (grow_GetObjectType(graph->current_cmd_object) != glow_eObjectType_GrowNode)
+      {
+        graph->message('E', "Current object type doesn't support this operation");
         return GE__CURRENT_TYPE;
       }
-      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str))))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
 
       sts = sscanf(arg3_str, "%u", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         sts = AttrNav::string_to_enum(glow_eType_Color, arg3_str, &value);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           graph->message('E', "Syntax error");
           return GE__SYNTAX;
         }
       }
-      if (value < 0 || value >= glow_eDrawType_CustomColor__) {
+      if (value < 0 || value >= glow_eDrawType_CustomColor__)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
@@ -725,26 +838,32 @@ static int graph_set_func(void* client_data, void* client_flag)
       grow_SetSelectOrigFillColor(graph->grow->ctx, (glow_eDrawType)value);
 
       grow_SelectRemove(graph->grow->ctx, graph->current_cmd_object);
-    } else if (str_NoCaseStrncmp(arg2_str, "SHADOW", strlen(arg2_str)) == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "SHADOW", strlen(arg2_str)) == 0)
+    {
       char arg3_str[80];
       int sts;
       int value;
 
-      if (!graph->current_cmd_object) {
+      if (!graph->current_cmd_object)
+      {
         graph->message('E', "No current object");
         return GE__NOCURRENT;
       }
-      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str))))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
 
       sts = sscanf(arg3_str, "%u", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
-      if (!(value == 0 || value == 1)) {
+      if (!(value == 0 || value == 1))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
@@ -754,36 +873,41 @@ static int graph_set_func(void* client_data, void* client_flag)
       grow_SetSelectShadow(graph->grow->ctx, value);
 
       grow_SelectRemove(graph->grow->ctx, graph->current_cmd_object);
-    } else if (str_NoCaseStrncmp(arg2_str, "COLORTONE", strlen(arg2_str))
-        == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "COLORTONE", strlen(arg2_str)) == 0)
+    {
       char arg3_str[80];
       int sts;
       int value;
 
-      if (!graph->current_cmd_object) {
+      if (!graph->current_cmd_object)
+      {
         graph->message('E', "No current object");
         return GE__NOCURRENT;
       }
-      if (grow_GetObjectType(graph->current_cmd_object)
-          != glow_eObjectType_GrowNode) {
-        graph->message(
-            'E', "Current object type doesn't support this operation");
+      if (grow_GetObjectType(graph->current_cmd_object) != glow_eObjectType_GrowNode)
+      {
+        graph->message('E', "Current object type doesn't support this operation");
         return GE__CURRENT_TYPE;
       }
-      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str))))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
 
       sts = sscanf(arg3_str, "%u", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         sts = AttrNav::string_to_enum(glow_eType_Tone, arg3_str, &value);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           graph->message('E', "Syntax error");
           return GE__SYNTAX;
         }
       }
-      if (value < 0 || value > 99) {
+      if (value < 0 || value > 99)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
@@ -793,29 +917,32 @@ static int graph_set_func(void* client_data, void* client_flag)
       grow_SetSelectOrigColorTone(graph->grow->ctx, (glow_eDrawTone)value);
 
       grow_SelectRemove(graph->grow->ctx, graph->current_cmd_object);
-    } else if (str_NoCaseStrncmp(arg2_str, "COLORLIGHTNESS", strlen(arg2_str))
-        == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "COLORLIGHTNESS", strlen(arg2_str)) == 0)
+    {
       char arg3_str[80];
       int sts;
       int value;
 
-      if (!graph->current_cmd_object) {
+      if (!graph->current_cmd_object)
+      {
         graph->message('E', "No current object");
         return GE__NOCURRENT;
       }
-      if (grow_GetObjectType(graph->current_cmd_object)
-          != glow_eObjectType_GrowNode) {
-        graph->message(
-            'E', "Current object type doesn't support this operation");
+      if (grow_GetObjectType(graph->current_cmd_object) != glow_eObjectType_GrowNode)
+      {
+        graph->message('E', "Current object type doesn't support this operation");
         return GE__CURRENT_TYPE;
       }
-      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str))))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
 
       sts = sscanf(arg3_str, "%d", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
@@ -825,29 +952,32 @@ static int graph_set_func(void* client_data, void* client_flag)
       grow_SetSelectOrigColLightness(graph->grow->ctx, value);
 
       grow_SelectRemove(graph->grow->ctx, graph->current_cmd_object);
-    } else if (str_NoCaseStrncmp(arg2_str, "COLORINTENSITY", strlen(arg2_str))
-        == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "COLORINTENSITY", strlen(arg2_str)) == 0)
+    {
       char arg3_str[80];
       int sts;
       int value;
 
-      if (!graph->current_cmd_object) {
+      if (!graph->current_cmd_object)
+      {
         graph->message('E', "No current object");
         return GE__NOCURRENT;
       }
-      if (grow_GetObjectType(graph->current_cmd_object)
-          != glow_eObjectType_GrowNode) {
-        graph->message(
-            'E', "Current object type doesn't support this operation");
+      if (grow_GetObjectType(graph->current_cmd_object) != glow_eObjectType_GrowNode)
+      {
+        graph->message('E', "Current object type doesn't support this operation");
         return GE__CURRENT_TYPE;
       }
-      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str))))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
 
       sts = sscanf(arg3_str, "%d", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
@@ -857,29 +987,32 @@ static int graph_set_func(void* client_data, void* client_flag)
       grow_SetSelectOrigColIntensity(graph->grow->ctx, value);
 
       grow_SelectRemove(graph->grow->ctx, graph->current_cmd_object);
-    } else if (str_NoCaseStrncmp(arg2_str, "COLORSHIFT", strlen(arg2_str))
-        == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "COLORSHIFT", strlen(arg2_str)) == 0)
+    {
       char arg3_str[80];
       int sts;
       int value;
 
-      if (!graph->current_cmd_object) {
+      if (!graph->current_cmd_object)
+      {
         graph->message('E', "No current object");
         return GE__NOCURRENT;
       }
-      if (grow_GetObjectType(graph->current_cmd_object)
-          != glow_eObjectType_GrowNode) {
-        graph->message(
-            'E', "Current object type doesn't support this operation");
+      if (grow_GetObjectType(graph->current_cmd_object) != glow_eObjectType_GrowNode)
+      {
+        graph->message('E', "Current object type doesn't support this operation");
         return GE__CURRENT_TYPE;
       }
-      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str))))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
 
       sts = sscanf(arg3_str, "%d", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
@@ -889,24 +1022,30 @@ static int graph_set_func(void* client_data, void* client_flag)
       grow_SetSelectOrigColorShift(graph->grow->ctx, value);
 
       grow_SelectRemove(graph->grow->ctx, graph->current_cmd_object);
-    } else if (str_NoCaseStrncmp(arg2_str, "GRADIENT", strlen(arg2_str)) == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "GRADIENT", strlen(arg2_str)) == 0)
+    {
       char arg3_str[80];
       int sts;
       int value;
 
-      if (!graph->current_cmd_object) {
+      if (!graph->current_cmd_object)
+      {
         graph->message('E', "No current object");
         return GE__NOCURRENT;
       }
-      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str))))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
 
       sts = sscanf(arg3_str, "%u", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         sts = AttrNav::string_to_enum(glow_eType_Gradient, arg3_str, &value);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           graph->message('E', "Syntax error");
           return GE__SYNTAX;
         }
@@ -917,8 +1056,9 @@ static int graph_set_func(void* client_data, void* client_flag)
       grow_SetSelectGradient(graph->grow->ctx, (glow_eGradient)value);
 
       grow_SelectRemove(graph->grow->ctx, graph->current_cmd_object);
-    } else if (str_NoCaseStrncmp(arg2_str, "ATTRIBUTES", strlen(arg2_str))
-        == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "ATTRIBUTES", strlen(arg2_str)) == 0)
+    {
       char arg3_str[80];
       char arg4_str[80];
       attr_sItem* itemlist;
@@ -933,43 +1073,50 @@ static int graph_set_func(void* client_data, void* client_flag)
       int sts;
       int found;
 
-      if (!graph->current_cmd_object) {
+      if (!graph->current_cmd_object)
+      {
         graph->message('E', "No current object");
         return GE__NOCURRENT;
       }
-      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str))))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
-      if (EVEN(dcli_get_qualifier("dcli_arg4", arg4_str, sizeof(arg4_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg4", arg4_str, sizeof(arg4_str))))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
-      graph->get_attr_items(
-          graph->current_cmd_object, &itemlist, &item_cnt, &client_data);
+      graph->get_attr_items(graph->current_cmd_object, &itemlist, &item_cnt, &client_data);
 
       found = 0;
       item_p = itemlist;
-      for (i = 0; i < item_cnt; i++) {
+      for (i = 0; i < item_cnt; i++)
+      {
         // str_ToUpper( attr_name, item_p->name);
         strcpy(attr_name, item_p->name);
-        if (str_NoCaseStrcmp(arg3_str, attr_name) == 0) {
+        if (str_NoCaseStrcmp(arg3_str, attr_name) == 0)
+        {
           found = 1;
           break;
         }
         item_p++;
       }
 
-      if (!found) {
+      if (!found)
+      {
         graph->message('E', "No such attribute");
         return GE__NOATTR;
       }
-      switch (item_p->type) {
+      switch (item_p->type)
+      {
       case glow_eType_Int:
       case glow_eType_TraceColor:
       case glow_eType_Boolean:
         sts = sscanf(arg4_str, "%d", &i_value);
-        if (sts != 1) {
+        if (sts != 1)
+        {
           graph->message('E', "Syntax error");
           return GE__SYNTAX;
         }
@@ -977,7 +1124,8 @@ static int graph_set_func(void* client_data, void* client_flag)
         break;
       case glow_eType_Double:
         sts = sscanf(arg4_str, "%f", &f_value);
-        if (sts != 1) {
+        if (sts != 1)
+        {
           graph->message('E', "Syntax error");
           return GE__SYNTAX;
         }
@@ -1005,12 +1153,15 @@ static int graph_set_func(void* client_data, void* client_flag)
       case glow_eType_HotIndication:
       case glow_eType_AppMotion:
       case glow_eType_AnnotType:
-      case ge_eAttrType_OptionMenuType: {
+      case ge_eAttrType_OptionMenuType:
+      {
         int value;
         sts = sscanf(arg4_str, "%u", &value);
-        if (sts != 1) {
+        if (sts != 1)
+        {
           sts = AttrNav::string_to_enum(item_p->type, arg4_str, &value);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             graph->message('E', "Syntax error");
             return GE__SYNTAX;
           }
@@ -1018,10 +1169,12 @@ static int graph_set_func(void* client_data, void* client_flag)
         memcpy(item_p->value, (char*)&value, sizeof(value));
         break;
       }
-      case glow_eType_TextSize: {
+      case glow_eType_TextSize:
+      {
         int value;
         sts = AttrNav::string_to_enum(item_p->type, arg4_str, &value);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           graph->message('E', "Syntax error");
           return GE__SYNTAX;
         }
@@ -1032,12 +1185,15 @@ static int graph_set_func(void* client_data, void* client_flag)
       case ge_eAttrType_DynType1:
       case ge_eAttrType_DynType2:
       case ge_eAttrType_ActionType1:
-      case ge_eAttrType_InputFocus: {
+      case ge_eAttrType_InputFocus:
+      {
         unsigned int value;
         sts = sscanf(arg4_str, "%u", &value);
-        if (sts != 1) {
+        if (sts != 1)
+        {
           sts = AttrNav::string_to_mask(item_p->type, arg4_str, &value);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             graph->message('E', "Syntax error");
             return GE__SYNTAX;
           }
@@ -1045,10 +1201,12 @@ static int graph_set_func(void* client_data, void* client_flag)
         memcpy(item_p->value, (char*)&value, sizeof(value));
         break;
       }
-      case ge_eAttrType_InstanceMask: {
+      case ge_eAttrType_InstanceMask:
+      {
         unsigned int value;
         sts = AttrNav::string_to_mask(item_p->type, arg4_str, &value);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           graph->message('E', "Syntax error");
           return GE__SYNTAX;
         }
@@ -1057,71 +1215,79 @@ static int graph_set_func(void* client_data, void* client_flag)
       }
       default:;
       }
-      grow_UpdateObject(graph->grow->ctx, graph->current_cmd_object,
-          (grow_sAttrInfo*)client_data);
-
-    } else if (str_NoCaseStrncmp(arg2_str, "ATTR1", strlen(arg2_str)) == 0) {
+      grow_UpdateObject(graph->grow->ctx, graph->current_cmd_object, (grow_sAttrInfo*)client_data);
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "ATTR1", strlen(arg2_str)) == 0)
+    {
       char arg3_str[80];
 
-      if (!graph->current_cmd_object) {
+      if (!graph->current_cmd_object)
+      {
         graph->message('E', "No current object");
         return GE__NOCURRENT;
       }
-      if (grow_GetObjectType(graph->current_cmd_object)
-          != glow_eObjectType_GrowNode) {
-        graph->message(
-            'E', "Current object type doesn't support this operation");
+      if (grow_GetObjectType(graph->current_cmd_object) != glow_eObjectType_GrowNode)
+      {
+        graph->message('E', "Current object type doesn't support this operation");
         return GE__CURRENT_TYPE;
       }
-      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str))))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
       graph->connect(graph->current_cmd_object, arg3_str, 0);
-    } else if (str_NoCaseStrncmp(arg2_str, "ATTR2", strlen(arg2_str)) == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "ATTR2", strlen(arg2_str)) == 0)
+    {
       char arg3_str[80];
 
-      if (!graph->current_cmd_object) {
+      if (!graph->current_cmd_object)
+      {
         graph->message('E', "No current object");
         return GE__NOCURRENT;
       }
-      if (grow_GetObjectType(graph->current_cmd_object)
-          != glow_eObjectType_GrowNode) {
-        graph->message(
-            'E', "Current object type doesn't support this operation");
+      if (grow_GetObjectType(graph->current_cmd_object) != glow_eObjectType_GrowNode)
+      {
+        graph->message('E', "Current object type doesn't support this operation");
         return GE__CURRENT_TYPE;
       }
-      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str))))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
       graph->connect(graph->current_cmd_object, arg3_str, 1);
-    } else if (str_NoCaseStrncmp(arg2_str, "ANNOTATION", strlen(arg2_str))
-        == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "ANNOTATION", strlen(arg2_str)) == 0)
+    {
       char arg3_str[80];
 
-      if (!graph->current_cmd_object) {
+      if (!graph->current_cmd_object)
+      {
         graph->message('E', "No current object");
         return GE__NOCURRENT;
       }
-      if (grow_GetObjectType(graph->current_cmd_object)
-          != glow_eObjectType_GrowNode) {
-        graph->message(
-            'E', "Current object type doesn't support this operation");
+      if (grow_GetObjectType(graph->current_cmd_object) != glow_eObjectType_GrowNode)
+      {
+        graph->message('E', "Current object type doesn't support this operation");
         return GE__CURRENT_TYPE;
       }
-      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str))))
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
-      grow_SetAnnotation(
-          graph->current_cmd_object, 1, arg3_str, strlen(arg3_str));
-    } else {
+      grow_SetAnnotation(graph->current_cmd_object, 1, arg3_str, strlen(arg3_str));
+    }
+    else
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "GRAPHATTRIBUTES", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "GRAPHATTRIBUTES", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     char arg3_str[80];
     int i, j;
@@ -1135,35 +1301,43 @@ static int graph_set_func(void* client_data, void* client_flag)
     double d_value;
     int sts;
     int found;
-    char transtab[][32] = { "DynType1", "DynType1", "DynType2", "DynType2",
-      "DynActionType1", "Action", "DynColor1", "Color1", "DynColor2", "Color2",
-      "DynColor3", "Color3", "DynColor4", "Color4", "DynAttr1", "AnimSequence",
-      "DynAttr2", "", "DynAttr3", "", "DynAttr4", "", "Dynamic", "", "" };
+    char transtab[][32] = {"DynType1",     "DynType1",  "DynType2",  "DynType2",  "DynActionType1",
+                           "Action",       "DynColor1", "Color1",    "DynColor2", "Color2",
+                           "DynColor3",    "Color3",    "DynColor4", "Color4",    "DynAttr1",
+                           "AnimSequence", "DynAttr2",  "",          "DynAttr3",  "",
+                           "DynAttr4",     "",          "Dynamic",   "",          ""};
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
 
-    if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg3", arg3_str, sizeof(arg3_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
 
     found = 0;
-    for (j = 0; j < 2; j++) {
-      if (j == 0) {
-        grow_GetSubGraphAttrInfo(
-            graph->grow->ctx, (char*)transtab, &grow_info_sub, &grow_info_cnt);
+    for (j = 0; j < 2; j++)
+    {
+      if (j == 0)
+      {
+        grow_GetSubGraphAttrInfo(graph->grow->ctx, (char*)transtab, &grow_info_sub, &grow_info_cnt);
         grow_info_p = grow_info_sub;
-      } else {
+      }
+      else
+      {
         grow_GetGraphAttrInfo(graph->grow->ctx, &grow_info, &grow_info_cnt);
         grow_info_p = grow_info;
       }
-      for (i = 0; i < grow_info_cnt; i++) {
+      for (i = 0; i < grow_info_cnt; i++)
+      {
         // str_ToUpper( attr_name, grow_info_p->name);
         strcpy(attr_name, grow_info_p->name);
-        if (str_NoCaseStrcmp(arg2_str, attr_name) == 0) {
+        if (str_NoCaseStrcmp(arg2_str, attr_name) == 0)
+        {
           found = 1;
           break;
         }
@@ -1172,18 +1346,21 @@ static int graph_set_func(void* client_data, void* client_flag)
       if (found)
         break;
     }
-    if (!found) {
+    if (!found)
+    {
       graph->message('E', "No such attribute");
       grow_FreeSubGraphAttrInfo(grow_info_sub);
       if (grow_info)
         grow_FreeGraphAttrInfo(grow_info);
       return GE__NOATTR;
     }
-    switch (grow_info_p->type) {
+    switch (grow_info_p->type)
+    {
     case glow_eType_Int:
     case glow_eType_Boolean:
       sts = sscanf(arg3_str, "%d", &i_value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         graph->message('E', "Syntax error");
         grow_FreeSubGraphAttrInfo(grow_info_sub);
         if (grow_info)
@@ -1194,7 +1371,8 @@ static int graph_set_func(void* client_data, void* client_flag)
       break;
     case glow_eType_Double:
       sts = sscanf(arg3_str, "%f", &f_value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         graph->message('E', "Syntax error");
         grow_FreeSubGraphAttrInfo(grow_info_sub);
         if (grow_info)
@@ -1209,6 +1387,7 @@ static int graph_set_func(void* client_data, void* client_flag)
       break;
     case glow_eType_TraceColor:
       grow_info_p->type = glow_eType_Color;
+    /* fall through */
     case glow_eType_Direction:
     case glow_eType_Color:
     case glow_eType_Tone:
@@ -1227,12 +1406,15 @@ static int graph_set_func(void* client_data, void* client_flag)
     case glow_eType_HotIndication:
     case glow_eType_AppMotion:
     case glow_eType_AnnotType:
-    case ge_eAttrType_OptionMenuType: {
+    case ge_eAttrType_OptionMenuType:
+    {
       int value;
       sts = sscanf(arg3_str, "%u", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         sts = AttrNav::string_to_enum(grow_info_p->type, arg3_str, &value);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           graph->message('E', "Syntax error");
           grow_FreeSubGraphAttrInfo(grow_info_sub);
           if (grow_info)
@@ -1243,10 +1425,12 @@ static int graph_set_func(void* client_data, void* client_flag)
       memcpy(grow_info_p->value_p, (char*)&value, sizeof(value));
       break;
     }
-    case glow_eType_TextSize: {
+    case glow_eType_TextSize:
+    {
       int value;
       sts = AttrNav::string_to_enum(grow_info_p->type, arg3_str, &value);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         graph->message('E', "Syntax error");
         grow_FreeSubGraphAttrInfo(grow_info_sub);
         if (grow_info)
@@ -1260,12 +1444,15 @@ static int graph_set_func(void* client_data, void* client_flag)
     case ge_eAttrType_DynType1:
     case ge_eAttrType_DynType2:
     case ge_eAttrType_ActionType1:
-    case ge_eAttrType_InputFocus: {
+    case ge_eAttrType_InputFocus:
+    {
       unsigned int value;
       sts = sscanf(arg3_str, "%u", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         sts = AttrNav::string_to_mask(grow_info_p->type, arg3_str, &value);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           graph->message('E', "Syntax error");
           grow_FreeSubGraphAttrInfo(grow_info_sub);
           if (grow_info)
@@ -1282,169 +1469,208 @@ static int graph_set_func(void* client_data, void* client_flag)
     grow_FreeSubGraphAttrInfo(grow_info_sub);
     if (grow_info)
       grow_FreeGraphAttrInfo(grow_info);
-  } else if (str_NoCaseStrncmp(arg1_str, "EXTERN", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "EXTERN", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     int sts;
     grow_tObject nodeclass;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     // str_ToLower( arg2_str, arg2_str);
     sts = grow_FindNodeClassByName(graph->grow->ctx, arg2_str, &nodeclass);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       graph->message('E', "Subgraph not found");
       return GE__NOSUBGRAPH;
     }
 
     grow_SetNodeClassExtern(nodeclass, 1);
-  } else if (str_NoCaseStrncmp(arg1_str, "INTERN", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "INTERN", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     int sts;
     grow_tObject nodeclass;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     // str_ToLower( arg2_str, arg2_str);
     sts = grow_FindNodeClassByName(graph->grow->ctx, arg2_str, &nodeclass);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       graph->message('E', "Subgraph not found");
       return GE__NOSUBGRAPH;
     }
 
     grow_SetNodeClassExtern(nodeclass, 0);
-  } else if (str_NoCaseStrncmp(arg1_str, "JAVAPATH", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "JAVAPATH", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     // str_ToLower( arg2_str, arg2_str);
 
     strcpy(graph->java_path, arg2_str);
-  } else if (str_NoCaseStrncmp(arg1_str, "JAVAPACKAGE", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "JAVAPACKAGE", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     // str_ToLower( arg2_str, arg2_str);
 
     strcpy(graph->java_package, arg2_str);
-  } else if (str_NoCaseStrncmp(arg1_str, "ZOOM", strlen(arg1_str)) == 0) {
-    if (ODD(dcli_get_qualifier("/RESET", 0, 0))) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "ZOOM", strlen(arg1_str)) == 0)
+  {
+    if (ODD(dcli_get_qualifier("/RESET", 0, 0)))
+    {
       grow_UnZoom(graph->grow->ctx);
-    } else {
+    }
+    else
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
-  } else if (str_NoCaseStrcmp(arg1_str, "ADVANCEDUSER") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOADVANCEDUSER") == 0
-      || str_NoCaseStrcmp(arg1_str, "ALLTOPLEVEL") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOALLTOPLEVEL") == 0
-      || str_NoCaseStrcmp(arg1_str, "SHOWCLASS") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOSHOWCLASS") == 0
-      || str_NoCaseStrcmp(arg1_str, "SHOWALIAS") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOSHOWALIAS") == 0
-      || str_NoCaseStrcmp(arg1_str, "SHOWDESCRIPTION") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOSHOWDESCRIPTION") == 0
-      || str_NoCaseStrcmp(arg1_str, "SHOWOBJREF") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOSHOWOBJREF") == 0
-      || str_NoCaseStrcmp(arg1_str, "SHOWOBJXREF") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOSHOWOBJXREF") == 0
-      || str_NoCaseStrcmp(arg1_str, "SHOWATTRREF") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOSHOWATTRREF") == 0
-      || str_NoCaseStrcmp(arg1_str, "SHOWATTRXREF") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOSHOWATTRXREF") == 0
-      || str_NoCaseStrcmp(arg1_str, "BUILDCROSSREF") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOBUILDCROSSREF") == 0
-      || str_NoCaseStrcmp(arg1_str, "BUILDCROSSREFSIM") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOBUILDCROSSREFSIM") == 0
-      || str_NoCaseStrcmp(arg1_str, "BUILDCROSSREFGRAPH") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOBUILDCROSSREFGRAPH") == 0
-      || str_NoCaseStrcmp(arg1_str, "BUILDMANUAL") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOBUILDMANUAL") == 0
-      || str_NoCaseStrcmp(arg1_str, "BUILDDEBUG") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOBUILDDEBUG") == 0
-      || str_NoCaseStrcmp(arg1_str, "BUILDSYNTAX") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOBUILDSYNTAX") == 0
-      || str_NoCaseStrcmp(arg1_str, "BUILDNOCOPY") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOBUILDNOCOPY") == 0
-      || str_NoCaseStrcmp(arg1_str, "ENABLEREVISIONS") == 0
-      || str_NoCaseStrcmp(arg1_str, "NOENABLEREVISIONS") == 0
-      || str_NoCaseStrcmp(arg1_str, "WINDOW") == 0
-      || str_NoCaseStrcmp(arg1_str, "INPUTFOCUS") == 0
-      || str_NoCaseStrcmp(arg1_str, "COLORTHEME") == 0) {
+  }
+  else if (str_NoCaseStrcmp(arg1_str, "ADVANCEDUSER") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOADVANCEDUSER") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "ALLTOPLEVEL") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOALLTOPLEVEL") == 0 || str_NoCaseStrcmp(arg1_str, "SHOWCLASS") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOSHOWCLASS") == 0 || str_NoCaseStrcmp(arg1_str, "SHOWALIAS") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOSHOWALIAS") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "SHOWDESCRIPTION") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOSHOWDESCRIPTION") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "SHOWOBJREF") == 0 || str_NoCaseStrcmp(arg1_str, "NOSHOWOBJREF") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "SHOWOBJXREF") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOSHOWOBJXREF") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "SHOWATTRREF") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOSHOWATTRREF") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "SHOWATTRXREF") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOSHOWATTRXREF") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "BUILDCROSSREF") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOBUILDCROSSREF") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "BUILDCROSSREFSIM") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOBUILDCROSSREFSIM") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "BUILDCROSSREFGRAPH") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOBUILDCROSSREFGRAPH") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "BUILDMANUAL") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOBUILDMANUAL") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "BUILDDEBUG") == 0 || str_NoCaseStrcmp(arg1_str, "NOBUILDDEBUG") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "BUILDSYNTAX") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOBUILDSYNTAX") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "BUILDNOCOPY") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOBUILDNOCOPY") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "ENABLEREVISIONS") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "NOENABLEREVISIONS") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "WINDOW") == 0 || str_NoCaseStrcmp(arg1_str, "INPUTFOCUS") == 0 ||
+           str_NoCaseStrcmp(arg1_str, "COLORTHEME") == 0)
+  {
     // Compatible with xnav init file
-  } else if (str_NoCaseStrncmp(arg1_str, "ENABLECOMMENT", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "ENABLECOMMENT", strlen(arg1_str)) == 0)
+  {
     graph->disable_log = 0;
-  } else if (str_NoCaseStrncmp(arg1_str, "NOENABLECOMMENT", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NOENABLECOMMENT", strlen(arg1_str)) == 0)
+  {
     graph->disable_log = 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "EDITSETMODE", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "EDITSETMODE", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
 
-    if (str_NoCaseStrcmp(arg2_str, "none") == 0) {
+    if (str_NoCaseStrcmp(arg2_str, "none") == 0)
+    {
       grow_SetEditSetMode(graph->grow->ctx, glow_eEditSetMode_None);
       graph->message('E', "Mode set to None");
-    } else if (str_NoCaseStrcmp(arg2_str, "x0") == 0) {
+    }
+    else if (str_NoCaseStrcmp(arg2_str, "x0") == 0)
+    {
       grow_SetEditSetMode(graph->grow->ctx, glow_eEditSetMode_X0);
       graph->message('E', "Mode set to X0");
-    } else if (str_NoCaseStrcmp(arg2_str, "y0") == 0) {
+    }
+    else if (str_NoCaseStrcmp(arg2_str, "y0") == 0)
+    {
       grow_SetEditSetMode(graph->grow->ctx, glow_eEditSetMode_Y0);
       graph->message('E', "Mode set to Y0");
-    } else if (str_NoCaseStrcmp(arg2_str, "x0y0") == 0) {
+    }
+    else if (str_NoCaseStrcmp(arg2_str, "x0y0") == 0)
+    {
       grow_SetEditSetMode(graph->grow->ctx, glow_eEditSetMode_X0Y0);
       graph->message('E', "Mode set to X0Y0");
-    } else if (str_NoCaseStrcmp(arg2_str, "x1") == 0) {
+    }
+    else if (str_NoCaseStrcmp(arg2_str, "x1") == 0)
+    {
       grow_SetEditSetMode(graph->grow->ctx, glow_eEditSetMode_X1);
       graph->message('E', "Mode set to X1");
-    } else if (str_NoCaseStrcmp(arg2_str, "y1") == 0) {
+    }
+    else if (str_NoCaseStrcmp(arg2_str, "y1") == 0)
+    {
       grow_SetEditSetMode(graph->grow->ctx, glow_eEditSetMode_Y1);
       graph->message('E', "Mode set to Y1");
-    } else if (str_NoCaseStrcmp(arg2_str, "x1y1") == 0) {
+    }
+    else if (str_NoCaseStrcmp(arg2_str, "x1y1") == 0)
+    {
       grow_SetEditSetMode(graph->grow->ctx, glow_eEditSetMode_X1Y1);
       graph->message('E', "Mode set to X1Y1");
-    } else {
+    }
+    else
+    {
       graph->message('E', "No such mode");
       return GE__SYNTAX;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "MODE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "MODE", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
-    if (str_NoCaseStrncmp(arg2_str, "SCRIPTMODULE", strlen(arg1_str)) == 0) {
+    if (str_NoCaseStrncmp(arg2_str, "SCRIPTMODULE", strlen(arg1_str)) == 0)
+    {
       graph->mode_scriptmodule = 1;
-    } else if (str_NoCaseStrncmp(arg1_str, "NOSCRIPTMODULE", strlen(arg1_str)) == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg1_str, "NOSCRIPTMODULE", strlen(arg1_str)) == 0)
+    {
       graph->mode_scriptmodule = 0;
     }
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
   return GE__SUCCESS;
 }
 
-static int graph_two_func(void* client_data, void* client_flag)
-{
-  return GE__SUCCESS;
-}
+static int graph_two_func(void* client_data, void* client_flag) { return GE__SUCCESS; }
 
 static int graph_add_func(void* client_data, void* client_flag)
 {
@@ -1455,7 +1681,8 @@ static int graph_add_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "POLYLINE", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "POLYLINE", strlen(arg1_str)) == 0)
+  {
     char str[80];
     int sts;
     float value;
@@ -1463,32 +1690,37 @@ static int graph_add_func(void* client_data, void* client_flag)
     glow_sPoint points[2];
     int point_cnt;
 
-    if (!graph->current_cmd_object) {
+    if (!graph->current_cmd_object)
+    {
       graph->message('E', "No current object");
       return GE__NOCURRENT;
     }
-    if (grow_GetObjectType(graph->current_cmd_object)
-        != glow_eObjectType_GrowPolyLine) {
+    if (grow_GetObjectType(graph->current_cmd_object) != glow_eObjectType_GrowPolyLine)
+    {
       graph->message('E', "Current object type doesn't support this operation");
       return GE__CURRENT_TYPE;
     }
-    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x = value;
 
-    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
@@ -1497,10 +1729,11 @@ static int graph_add_func(void* client_data, void* client_flag)
     points[0].x = x;
     points[0].y = y;
     point_cnt = 1;
-    grow_AddPolyLinePoints(
-        graph->current_cmd_object, (glow_sPoint*)&points, point_cnt);
+    grow_AddPolyLinePoints(graph->current_cmd_object, (glow_sPoint*)&points, point_cnt);
     grow_SetModified(graph->grow->ctx, 1);
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
@@ -1520,41 +1753,48 @@ static int graph_rotate_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "CURRENTOBJECT", strlen(arg1_str)) == 0) {
-    if (!graph->current_cmd_object) {
+  if (str_NoCaseStrncmp(arg1_str, "CURRENTOBJECT", strlen(arg1_str)) == 0)
+  {
+    if (!graph->current_cmd_object)
+    {
       graph->message('E', "No current object");
       return GE__NOCURRENT;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "SELECTEDOBJECT", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SELECTEDOBJECT", strlen(arg1_str)) == 0)
+  {
     grow_tObject* sel_list;
     int sel_count;
 
     grow_GetSelectList(graph->grow->ctx, &sel_list, &sel_count);
-    if (sel_count != 1) {
+    if (sel_count != 1)
+    {
       graph->message('E', "Select one object");
       return GE__SYNTAX;
     }
     graph->current_cmd_object = sel_list[0];
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
 
-  if (EVEN(dcli_get_qualifier("/ANGLE", str, sizeof(str)))) {
+  if (EVEN(dcli_get_qualifier("/ANGLE", str, sizeof(str))))
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
   sts = sscanf(str, "%f", &value);
-  if (sts != 1) {
+  if (sts != 1)
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
   angle = double(value);
 
   grow_StoreTransform(graph->current_cmd_object);
-  grow_SetObjectRotation(
-      graph->current_cmd_object, angle, 0, 0, glow_eRotationPoint_Center);
+  grow_SetObjectRotation(graph->current_cmd_object, angle, 0, 0, glow_eRotationPoint_Center);
   grow_SetModified(graph->grow->ctx, 1);
 
   return GE__SUCCESS;
@@ -1569,13 +1809,18 @@ static int graph_flip_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "HORIZONTAL", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "HORIZONTAL", strlen(arg1_str)) == 0)
+  {
     grow_FlipSelectedObjects(graph->grow->ctx, glow_eFlipDirection_Horizontal);
     grow_SetModified(graph->grow->ctx, 1);
-  } else if (str_NoCaseStrncmp(arg1_str, "VERTICAL", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "VERTICAL", strlen(arg1_str)) == 0)
+  {
     grow_FlipSelectedObjects(graph->grow->ctx, glow_eFlipDirection_Vertical);
     grow_SetModified(graph->grow->ctx, 1);
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
@@ -1590,28 +1835,39 @@ static int graph_select_func(void* client_data, void* client_flag)
   int arg1_sts;
   char name_str[80];
 
-  if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+  if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+  {
     grow_tObject object;
     int sts;
 
     sts = grow_FindObjectByName(graph->grow->ctx, name_str, &object);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       graph->message('E', "No such object");
       return sts;
     }
     grow_SetHighlight(object, 1);
     grow_SelectInsert(graph->grow->ctx, object);
-  } else {
+  }
+  else
+  {
     arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-    if (str_NoCaseStrncmp(arg1_str, "CURRENTOBJECT", strlen(arg1_str)) == 0) {
+    if (str_NoCaseStrncmp(arg1_str, "CURRENTOBJECT", strlen(arg1_str)) == 0)
+    {
       grow_SetHighlight(graph->current_cmd_object, 1);
       grow_SelectInsert(graph->grow->ctx, graph->current_cmd_object);
-    } else if (str_NoCaseStrncmp(arg1_str, "ALL", strlen(arg1_str)) == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg1_str, "ALL", strlen(arg1_str)) == 0)
+    {
       graph->select_all_objects();
-    } else if (str_NoCaseStrncmp(arg1_str, "CLEAR", strlen(arg1_str)) == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg1_str, "CLEAR", strlen(arg1_str)) == 0)
+    {
       grow_SelectClear(graph->grow->ctx);
-    } else {
+    }
+    else
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
@@ -1628,28 +1884,35 @@ static int graph_export_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "SCRIPT", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "SCRIPT", strlen(arg1_str)) == 0)
+  {
     char name_str[80];
     pwr_tFileName fname;
     int sts;
 
-    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       graph->get_name(name_str);
 
-      if (streq(name_str, "")) {
-	graph->message('E', "Enter name");
-	return GE__FILENAME;
+      if (streq(name_str, ""))
+      {
+        graph->message('E', "Enter name");
+        return GE__FILENAME;
       }
     }
     sprintf(fname, "$pwrp_pop/%s.ge_com", name_str);
     dcli_translate_filename(fname, fname);
 
     sts = graph->export_script(fname);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       graph->message('E', "Export error");
-    } else
+    }
+    else
       graph->message('E', "Graph exported");
-  } else if (str_NoCaseStrncmp(arg1_str, "JAVA", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "JAVA", strlen(arg1_str)) == 0)
+  {
     char filename[120];
     char name[80];
     char graph_name[80];
@@ -1663,36 +1926,49 @@ static int graph_export_func(void* client_data, void* client_flag)
     else
       signature_p = 0;
 
-    if (!graph->get_java_name(name)) {
+    if (!graph->get_java_name(name))
+    {
       // Set default name
       graph->get_name(graph_name);
-      if (!streq(graph_name, "")) {
-        if (str_StartsWith(graph_name, "pwr_c_")) {
+      if (!streq(graph_name, ""))
+      {
+        if (str_StartsWith(graph_name, "pwr_c_"))
+        {
           strcpy(name, "Jopc");
           strcat(name, &graph_name[6]);
           name[4] = _toupper(name[4]);
-        } else if (str_StartsWith(graph_name, "pwr_")) {
+        }
+        else if (str_StartsWith(graph_name, "pwr_"))
+        {
           strcpy(name, "Jop");
           strcat(name, &graph_name[4]);
           name[3] = _toupper(name[3]);
-        } else {
+        }
+        else
+        {
           strcpy(name, graph_name);
           name[0] = _toupper(name[0]);
         }
-      } else {
+      }
+      else
+      {
         graph->message('E', "Graph is unnamed");
         return GE__NONAME;
       }
     }
 
-    if (isdigit(name[0])) {
+    if (isdigit(name[0]))
+    {
       graph->message('E', "Java name syntax error");
       return GE__JAVANAMESYNTAX;
     }
 
-    if (graph->is_subgraph()) {
+    if (graph->is_subgraph())
+    {
       graph->message('E', "Unable to save subgraph as ge java");
-    } else {
+    }
+    else
+    {
       char framename[80];
       char appletname[80];
       char systemname[80];
@@ -1712,47 +1988,53 @@ static int graph_export_func(void* client_data, void* client_flag)
         strcat(filename, ".java");
 
       // Export frame
-      if (graph->is_javaapplication()) {
+      if (graph->is_javaapplication())
+      {
         sts = graph->export_gejava(filename, framename, 0, 0);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           graph->message('E', "Java export error");
           return sts;
         }
 
-        if (sts != GE__ISBASECLASS) {
+        if (sts != GE__ISBASECLASS)
+        {
           // Compile frame
           graph->get_systemname(systemname);
 
-          sprintf(cmd, "$pwr_exe/ge_javac.sh java %s %s \"%s\"", filename,
-              systemname, signature);
+          sprintf(cmd, "$pwr_exe/ge_javac.sh java %s %s \"%s\"", filename, systemname, signature);
           sts = system(cmd);
-          if (sts != 0) {
+          if (sts != 0)
+          {
             graph->message('E', "Java compilation errors");
             return GE__JAVAC;
           }
         }
       }
 
-      if (graph->is_javaapplet()) {
+      if (graph->is_javaapplet())
+      {
         // Export applet
 
         strcpy(filename, appletname);
         strcat(filename, ".java");
 
         sts = graph->export_gejava(filename, appletname, 1, 0);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           graph->message('E', "Java export error");
           return sts;
         }
 
-        if (sts != GE__ISBASECLASS) {
+        if (sts != GE__ISBASECLASS)
+        {
           // Compile applet
           graph->get_systemname(systemname);
 
-          sprintf(cmd, "$pwr_exe/ge_javac.sh java_web %s %s \"%s\"", filename,
-              systemname, signature);
+          sprintf(cmd, "$pwr_exe/ge_javac.sh java_web %s %s \"%s\"", filename, systemname, signature);
           sts = system(cmd);
-          if (sts != 0) {
+          if (sts != 0)
+          {
             graph->message('E', "Java compilation errors");
             return GE__JAVAC;
           }
@@ -1764,7 +2046,8 @@ static int graph_export_func(void* client_data, void* client_flag)
           // str_ToLower( filename, filename);
 
           sts = graph->export_gejava(filename, framename, 0, 1);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             graph->message('E', "Java export error");
             return sts;
           }
@@ -1779,21 +2062,28 @@ static int graph_export_func(void* client_data, void* client_flag)
       else
         graph->message('I', "This graph is not java frame or applet");
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "IMAGE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "IMAGE", strlen(arg1_str)) == 0)
+  {
     char file_str[120];
     int sts;
 
-    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+    {
       graph->message('E', "Enter file");
       return GE__FILENAME;
     }
 
     sts = graph->export_image(file_str);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       graph->message('E', "Export error");
-    } else
+    }
+    else
       graph->message('E', "Graph exported");
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
   }
   return GE__SUCCESS;
@@ -1807,7 +2097,8 @@ static int graph_group_func(void* client_data, void* client_flag)
   char last_group_name[80];
 
   sts = grow_GroupSelect(graph->grow->ctx, &group, last_group_name);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     graph->current_cmd_object = 0;
     graph->message('E', "Group error");
     return sts;
@@ -1833,44 +2124,54 @@ static int graph_scale_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "CURRENTOBJECT", strlen(arg1_str)) == 0) {
-    if (!graph->current_cmd_object) {
+  if (str_NoCaseStrncmp(arg1_str, "CURRENTOBJECT", strlen(arg1_str)) == 0)
+  {
+    if (!graph->current_cmd_object)
+    {
       graph->message('E', "No current object");
       return GE__NOCURRENT;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "SELECTEDOBJECT", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SELECTEDOBJECT", strlen(arg1_str)) == 0)
+  {
     grow_tObject* sel_list;
     int sel_count;
 
     grow_GetSelectList(graph->grow->ctx, &sel_list, &sel_count);
-    if (sel_count != 1) {
+    if (sel_count != 1)
+    {
       graph->message('E', "Select one object");
       return GE__SYNTAX;
     }
     graph->current_cmd_object = sel_list[0];
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
 
-  if (EVEN(dcli_get_qualifier("/SCALEX", str, sizeof(str)))) {
+  if (EVEN(dcli_get_qualifier("/SCALEX", str, sizeof(str))))
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
   sts = sscanf(str, "%f", &value);
-  if (sts != 1) {
+  if (sts != 1)
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
   scalex = double(value);
 
-  if (EVEN(dcli_get_qualifier("/SCALEY", str, sizeof(str)))) {
+  if (EVEN(dcli_get_qualifier("/SCALEY", str, sizeof(str))))
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
   sts = sscanf(str, "%f", &value);
-  if (sts != 1) {
+  if (sts != 1)
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
@@ -1880,9 +2181,11 @@ static int graph_scale_func(void* client_data, void* client_flag)
   x0 = 0;
   y0 = 0;
 
-  if (ODD(dcli_get_qualifier("/X", str, sizeof(str)))) {
+  if (ODD(dcli_get_qualifier("/X", str, sizeof(str))))
+  {
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
@@ -1890,9 +2193,11 @@ static int graph_scale_func(void* client_data, void* client_flag)
     scale_type = glow_eScaleType_FixPoint;
   }
 
-  if (ODD(dcli_get_qualifier("/Y", str, sizeof(str)))) {
+  if (ODD(dcli_get_qualifier("/Y", str, sizeof(str))))
+  {
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
@@ -1901,8 +2206,7 @@ static int graph_scale_func(void* client_data, void* client_flag)
   }
 
   grow_StoreTransform(graph->current_cmd_object);
-  grow_SetObjectScale(
-      graph->current_cmd_object, scalex, scaley, x0, y0, scale_type);
+  grow_SetObjectScale(graph->current_cmd_object, scalex, scaley, x0, y0, scale_type);
   grow_SetModified(graph->grow->ctx, 1);
 
   return GE__SUCCESS;
@@ -1922,63 +2226,83 @@ static int graph_move_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "CURRENTOBJECT", strlen(arg1_str)) == 0) {
-    if (!graph->current_cmd_object) {
+  if (str_NoCaseStrncmp(arg1_str, "CURRENTOBJECT", strlen(arg1_str)) == 0)
+  {
+    if (!graph->current_cmd_object)
+    {
       graph->message('E', "No current object");
       return GE__NOCURRENT;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "SELECTEDOBJECT", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SELECTEDOBJECT", strlen(arg1_str)) == 0)
+  {
     grow_tObject* sel_list;
     int sel_count;
 
     grow_GetSelectList(graph->grow->ctx, &sel_list, &sel_count);
-    if (sel_count != 1) {
+    if (sel_count != 1)
+    {
       graph->message('E', "Select one object");
       return GE__SYNTAX;
     }
     graph->current_cmd_object = sel_list[0];
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
 
-  if (ODD(dcli_get_qualifier("/X", str, sizeof(str)))) {
+  if (ODD(dcli_get_qualifier("/X", str, sizeof(str))))
+  {
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x0 = double(value);
-  } else if (ODD(dcli_get_qualifier("/ABSX", str, sizeof(str)))) {
+  }
+  else if (ODD(dcli_get_qualifier("/ABSX", str, sizeof(str))))
+  {
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     grow_MeasureNode(graph->current_cmd_object, &ll_x, &ll_y, &ur_x, &ur_y);
     x0 = double(value) - ll_x;
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
 
-  if (ODD(dcli_get_qualifier("/Y", str, sizeof(str)))) {
+  if (ODD(dcli_get_qualifier("/Y", str, sizeof(str))))
+  {
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     y0 = double(value);
-  } else if (ODD(dcli_get_qualifier("/ABSY", str, sizeof(str)))) {
+  }
+  else if (ODD(dcli_get_qualifier("/ABSY", str, sizeof(str))))
+  {
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     grow_MeasureNode(graph->current_cmd_object, &ll_x, &ll_y, &ur_x, &ur_y);
     y0 = double(value) - ll_y;
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
@@ -2000,190 +2324,224 @@ static int graph_create_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "RECTANGLE", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "RECTANGLE", strlen(arg1_str)) == 0)
+  {
     char str[80];
     int sts;
     float value;
     double x, y, width, height;
 
-    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x = value;
 
-    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     y = value;
 
-    if (EVEN(dcli_get_qualifier("/WIDTH", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/WIDTH", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     width = value;
 
-    if (EVEN(dcli_get_qualifier("/HEIGHT", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/HEIGHT", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     height = value;
 
-    grow_CreateGrowRect(graph->grow->ctx, "", x, y, width, height,
-        graph->get_border_drawtype(), graph->linewidth, 0, glow_mDisplayLevel_1,
-        graph->fill, graph->border, graph->shadow, graph->get_fill_drawtype(),
-        NULL, &graph->current_cmd_object);
+    grow_CreateGrowRect(graph->grow->ctx, "", x, y, width, height, graph->get_border_drawtype(),
+                        graph->linewidth, 0, glow_mDisplayLevel_1, graph->fill, graph->border, graph->shadow,
+                        graph->get_fill_drawtype(), NULL, &graph->current_cmd_object);
     grow_SetModified(graph->grow->ctx, 1);
-  } else if (str_NoCaseStrncmp(arg1_str, "ARC", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "ARC", strlen(arg1_str)) == 0)
+  {
     char str[80];
     int sts;
     float value;
     double x1, y1, x2, y2;
     int angle1, angle2;
 
-    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x1 = value;
 
-    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     y1 = value;
 
-    if (EVEN(dcli_get_qualifier("/X2", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/X2", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x2 = value;
 
-    if (EVEN(dcli_get_qualifier("/Y2", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/Y2", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     y2 = value;
 
-    if (ODD(dcli_get_qualifier("/ANGLE1", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/ANGLE1", str, sizeof(str))))
+    {
       sts = sscanf(str, "%d", &angle1);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
-    } else
+    }
+    else
       angle1 = 0;
 
-    if (ODD(dcli_get_qualifier("/ANGLE2", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/ANGLE2", str, sizeof(str))))
+    {
       sts = sscanf(str, "%d", &angle2);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
-    } else
+    }
+    else
       angle2 = 360;
 
-    grow_CreateGrowArc(graph->grow->ctx, "", x1, y1, x2, y2, angle1, angle2,
-        graph->get_border_drawtype(), graph->linewidth, graph->fill,
-        graph->border, graph->shadow, graph->get_fill_drawtype(), NULL,
-        &graph->current_cmd_object);
+    grow_CreateGrowArc(graph->grow->ctx, "", x1, y1, x2, y2, angle1, angle2, graph->get_border_drawtype(),
+                       graph->linewidth, graph->fill, graph->border, graph->shadow,
+                       graph->get_fill_drawtype(), NULL, &graph->current_cmd_object);
     grow_SetModified(graph->grow->ctx, 1);
-  } else if (str_NoCaseStrncmp(arg1_str, "LINE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "LINE", strlen(arg1_str)) == 0)
+  {
     char str[80];
     int sts;
     float value;
     double x1, y1, x2, y2;
 
-    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x1 = value;
 
-    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     y1 = value;
 
-    if (EVEN(dcli_get_qualifier("/X2", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/X2", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x2 = value;
 
-    if (EVEN(dcli_get_qualifier("/Y2", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/Y2", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     y2 = value;
 
-    grow_CreateGrowLine(graph->grow->ctx, "", x1, y1, x2, y2,
-        graph->get_border_drawtype(), graph->linewidth, 0, NULL,
-        &graph->current_cmd_object);
+    grow_CreateGrowLine(graph->grow->ctx, "", x1, y1, x2, y2, graph->get_border_drawtype(), graph->linewidth,
+                        0, NULL, &graph->current_cmd_object);
     grow_SetModified(graph->grow->ctx, 1);
-  } else if (str_NoCaseStrncmp(arg1_str, "POLYLINE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "POLYLINE", strlen(arg1_str)) == 0)
+  {
     char str[80];
     int sts;
     float value;
@@ -2191,45 +2549,53 @@ static int graph_create_func(void* client_data, void* client_flag)
     glow_sPoint points[2];
     int point_cnt;
 
-    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x1 = value;
 
-    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     y1 = value;
 
-    if (EVEN(dcli_get_qualifier("/X2", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/X2", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x2 = value;
 
-    if (EVEN(dcli_get_qualifier("/Y2", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/Y2", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
@@ -2240,13 +2606,14 @@ static int graph_create_func(void* client_data, void* client_flag)
     points[1].x = x2;
     points[1].y = y2;
     point_cnt = 2;
-    grow_CreateGrowPolyLine(graph->grow->ctx, "", (glow_sPoint*)&points,
-        point_cnt, graph->get_border_drawtype(), graph->linewidth, 0,
-        graph->fill, graph->border, graph->shadow, graph->get_fill_drawtype(),
-        0, NULL, &graph->current_cmd_object);
+    grow_CreateGrowPolyLine(graph->grow->ctx, "", (glow_sPoint*)&points, point_cnt,
+                            graph->get_border_drawtype(), graph->linewidth, 0, graph->fill, graph->border,
+                            graph->shadow, graph->get_fill_drawtype(), 0, NULL, &graph->current_cmd_object);
 
     grow_SetModified(graph->grow->ctx, 1);
-  } else if (str_NoCaseStrncmp(arg1_str, "TEXT", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "TEXT", strlen(arg1_str)) == 0)
+  {
     char str[80];
     char text_str[80];
     int sts;
@@ -2254,29 +2621,34 @@ static int graph_create_func(void* client_data, void* client_flag)
     double x1, y1;
     glow_eDrawType fill_color, border_color, text_color;
 
-    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x1 = value;
 
-    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     y1 = value;
 
-    if (EVEN(dcli_get_qualifier("/TEXT", text_str, sizeof(text_str)))) {
+    if (EVEN(dcli_get_qualifier("/TEXT", text_str, sizeof(text_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
@@ -2289,7 +2661,8 @@ static int graph_create_func(void* client_data, void* client_flag)
     else
       drawtype = glow_eDrawType_TextHelvetica;
 
-    switch (graph->textsize) {
+    switch (graph->textsize)
+    {
     case 0:
       textsize = 0;
       break;
@@ -2310,14 +2683,14 @@ static int graph_create_func(void* client_data, void* client_flag)
       break;
     }
 
-    (graph->get_current_colors_cb)(
-        graph->parent_ctx, &fill_color, &border_color, &text_color);
+    (graph->get_current_colors_cb)(graph->parent_ctx, &fill_color, &border_color, &text_color);
 
-    grow_CreateGrowText(graph->grow->ctx, "", text_str, x1, y1, drawtype,
-        text_color, textsize, graph->textfont, glow_mDisplayLevel_1, NULL,
-        &graph->current_cmd_object);
+    grow_CreateGrowText(graph->grow->ctx, "", text_str, x1, y1, drawtype, text_color, textsize,
+                        graph->textfont, glow_mDisplayLevel_1, NULL, &graph->current_cmd_object);
     grow_SetModified(graph->grow->ctx, 1);
-  } else if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0)
+  {
     char str[80];
     int sts;
     float value;
@@ -2330,72 +2703,86 @@ static int graph_create_func(void* client_data, void* client_flag)
     double sx, sy;
     double ll_x, ll_y, ur_x, ur_y;
 
-    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x1 = value;
 
-    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     y1 = value;
 
-    if (ODD(dcli_get_qualifier("/X2", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/X2", str, sizeof(str))))
+    {
       sts = sscanf(str, "%f", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
       x2 = value;
-      if (feq(x1, x2)) {
+      if (feq(x1, x2))
+      {
         graph->message('E', "Invalid coordinate");
         return GE__COORDINATE;
       }
       scale_x = 1;
-    } else
+    }
+    else
       scale_x = 0;
 
-    if (ODD(dcli_get_qualifier("/Y2", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/Y2", str, sizeof(str))))
+    {
       sts = sscanf(str, "%f", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
       y2 = value;
-      if (feq(y1, y2)) {
+      if (feq(y1, y2))
+      {
         graph->message('E', "Invalid coordinate");
         return GE__COORDINATE;
       }
       scale_y = 1;
-    } else
+    }
+    else
       scale_y = 0;
 
-    if (EVEN(dcli_get_qualifier(
-            "/SUBGRAPH", subgraph_str, sizeof(subgraph_str)))) {
+    if (EVEN(dcli_get_qualifier("/SUBGRAPH", subgraph_str, sizeof(subgraph_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     // str_ToLower( subgraph_str, subgraph_str);
 
     sts = grow_FindNodeClassByName(graph->grow->ctx, subgraph_str, &nc);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       // Load the subgraph
       grow_OpenSubGraphFromName(graph->grow->ctx, subgraph_str);
     }
     sts = grow_FindNodeClassByName(graph->grow->ctx, subgraph_str, &nc);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       graph->message('E', "Unable to open subgraph");
       return GE__SUBGRAPHLOAD;
     }
@@ -2411,7 +2798,8 @@ static int graph_create_func(void* client_data, void* client_flag)
     grow_SetUserData(n1, (void*)dyn);
 
     grow_MoveNode(n1, x1, y1);
-    if (scale_x || scale_y) {
+    if (scale_x || scale_y)
+    {
       grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
       if (scale_x)
         sx = (x2 - x1) / (ur_x - ll_x);
@@ -2426,7 +2814,9 @@ static int graph_create_func(void* client_data, void* client_flag)
     }
     graph->current_cmd_object = n1;
     grow_SetModified(graph->grow->ctx, 1);
-  } else if (str_NoCaseStrncmp(arg1_str, "BAR", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "BAR", strlen(arg1_str)) == 0)
+  {
     char str[80];
     int sts;
     float value;
@@ -2437,61 +2827,74 @@ static int graph_create_func(void* client_data, void* client_flag)
     double sx, sy;
     double ll_x, ll_y, ur_x, ur_y;
 
-    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x1 = value;
 
-    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     y1 = value;
 
-    if (ODD(dcli_get_qualifier("/X2", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/X2", str, sizeof(str))))
+    {
       sts = sscanf(str, "%f", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
       x2 = value;
-      if (feq(x1, x2)) {
+      if (feq(x1, x2))
+      {
         graph->message('E', "Invalid coordinate");
         return GE__COORDINATE;
       }
       scale_x = 1;
-    } else
+    }
+    else
       scale_x = 0;
 
-    if (ODD(dcli_get_qualifier("/Y2", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/Y2", str, sizeof(str))))
+    {
       sts = sscanf(str, "%f", &value);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         graph->message('E', "Syntax error");
         return GE__SYNTAX;
       }
       y2 = value;
-      if (feq(y1, y2)) {
+      if (feq(y1, y2))
+      {
         graph->message('E', "Invalid coordinate");
         return GE__COORDINATE;
       }
       scale_y = 1;
-    } else
+    }
+    else
       scale_y = 0;
 
     graph->create_bar(&n1, x1, y1, 0);
 
-    if (scale_x || scale_y) {
+    if (scale_x || scale_y)
+    {
       grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
       if (scale_x)
         sx = (x2 - x1) / (ur_x - ll_x);
@@ -2506,7 +2909,9 @@ static int graph_create_func(void* client_data, void* client_flag)
     }
     graph->current_cmd_object = n1;
     grow_SetModified(graph->grow->ctx, 1);
-  } else if (str_NoCaseStrncmp(arg1_str, "IMAGE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "IMAGE", strlen(arg1_str)) == 0)
+  {
     char str[80];
     int sts;
     float value;
@@ -2515,27 +2920,32 @@ static int graph_create_func(void* client_data, void* client_flag)
     char name[80];
     char image_str[80];
 
-    if (EVEN(dcli_get_qualifier("/IMAGE", image_str, sizeof(image_str)))) {
+    if (EVEN(dcli_get_qualifier("/IMAGE", image_str, sizeof(image_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
-    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/X1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     x1 = value;
 
-    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str)))) {
+    if (EVEN(dcli_get_qualifier("/Y1", str, sizeof(str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
     sts = sscanf(str, "%f", &value);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
@@ -2588,7 +2998,9 @@ static int graph_create_func(void* client_data, void* client_flag)
     graph->journal_store(journal_eAction_CreateObject, i1);
     graph->current_cmd_object = i1;
     grow_SetModified(graph->grow->ctx, 1);
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
@@ -2603,13 +3015,15 @@ static int graph_convert_func(void* client_data, void* client_flag)
   int arg1_sts;
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
-  if (str_NoCaseStrncmp(arg1_str, "V45", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "V45", strlen(arg1_str)) == 0)
+  {
     char name[40];
     char msg[80];
     int sts;
 
     sts = graph->convert();
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       grow_GetName(graph->grow->ctx, name);
       sprintf(msg, "Conversion failed, graph %s", name);
       graph->message('E', msg);
@@ -2621,7 +3035,9 @@ static int graph_convert_func(void* client_data, void* client_flag)
 
     grow_UpdateVersion(graph->grow->ctx);
     grow_SetModified(graph->grow->ctx, 1);
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
@@ -2637,10 +3053,13 @@ static int graph_disable_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "LOG", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "LOG", strlen(arg1_str)) == 0)
+  {
     graph->disable_log = 1;
     graph->message('I', "Log disabled");
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
@@ -2656,7 +3075,8 @@ static int graph_replace_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "ATTRIBUTE", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "ATTRIBUTE", strlen(arg1_str)) == 0)
+  {
     grow_tObject* sel_list;
     int sel_count;
     char from_str[120];
@@ -2664,12 +3084,14 @@ static int graph_replace_func(void* client_data, void* client_flag)
     int replace_cnt = 0;
     int strict;
 
-    if (EVEN(dcli_get_qualifier("/FROM", from_str, sizeof(from_str)))) {
+    if (EVEN(dcli_get_qualifier("/FROM", from_str, sizeof(from_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
 
-    if (EVEN(dcli_get_qualifier("/TO", to_str, sizeof(to_str)))) {
+    if (EVEN(dcli_get_qualifier("/TO", to_str, sizeof(to_str))))
+    {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
@@ -2679,26 +3101,30 @@ static int graph_replace_func(void* client_data, void* client_flag)
       str_ToLower(from_str, from_str);
 
     grow_GetSelectList(graph->grow->ctx, &sel_list, &sel_count);
-    for (int i = 0; i < sel_count; i++) {
-      switch (grow_GetObjectType(sel_list[i])) {
+    for (int i = 0; i < sel_count; i++)
+    {
+      switch (grow_GetObjectType(sel_list[i]))
+      {
       case glow_eObjectType_GrowGroup:
-        graph_group_replace_attr(
-            sel_list[i], from_str, to_str, &replace_cnt, strict);
+        graph_group_replace_attr(sel_list[i], from_str, to_str, &replace_cnt, strict);
       // Do this for groups also (no break)
+      /* fall through */
       case glow_eObjectType_GrowNode:
       case glow_eObjectType_GrowSlider:
       case glow_eObjectType_GrowTrend:
       case glow_eObjectType_GrowTable:
       case glow_eObjectType_GrowWindow:
       case glow_eObjectType_GrowFolder:
-      case glow_eObjectType_GrowBar: {
+      case glow_eObjectType_GrowBar:
+      {
         GeDyn* dyn;
 
         grow_GetUserData(sel_list[i], (void**)&dyn);
         dyn->replace_attribute(from_str, to_str, &replace_cnt, strict);
         break;
       }
-      case glow_eObjectType_GrowDashCell: {
+      case glow_eObjectType_GrowDashCell:
+      {
         GeDash* dash;
 
         grow_GetUserData(sel_list[i], (void**)&dash);
@@ -2708,14 +3134,17 @@ static int graph_replace_func(void* client_data, void* client_flag)
       default:;
       }
     }
-    if (replace_cnt) {
+    if (replace_cnt)
+    {
       char msg[80];
       sprintf(msg, "%d attributes replaced", replace_cnt);
       graph->message('I', msg);
-    } else
+    }
+    else
       graph->message('I', "Nothing replaced");
-
-  } else {
+  }
+  else
+  {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
@@ -2728,26 +3157,29 @@ static int graph_nop_func(void* client_data, void* client_flag)
   return GE__SUCCESS;
 }
 
-static void graph_group_replace_attr(grow_tObject group, char* from_str,
-    char* to_str, int* replace_cnt, int strict)
+static void graph_group_replace_attr(grow_tObject group, char* from_str, char* to_str, int* replace_cnt,
+                                     int strict)
 {
   grow_tObject* objectlist;
   int object_cnt;
 
   grow_GetGroupObjectList(group, &objectlist, &object_cnt);
-  for (int i = 0; i < object_cnt; i++) {
-    switch (grow_GetObjectType(objectlist[i])) {
+  for (int i = 0; i < object_cnt; i++)
+  {
+    switch (grow_GetObjectType(objectlist[i]))
+    {
     case glow_eObjectType_GrowGroup:
-      graph_group_replace_attr(
-          objectlist[i], from_str, to_str, replace_cnt, strict);
+      graph_group_replace_attr(objectlist[i], from_str, to_str, replace_cnt, strict);
     // Do this for groups also (no break)
+    /* fall through */
     case glow_eObjectType_GrowNode:
     case glow_eObjectType_GrowSlider:
     case glow_eObjectType_GrowTrend:
     case glow_eObjectType_GrowTable:
     case glow_eObjectType_GrowWindow:
     case glow_eObjectType_GrowFolder:
-    case glow_eObjectType_GrowBar: {
+    case glow_eObjectType_GrowBar:
+    {
       GeDyn* dyn;
 
       grow_GetUserData(objectlist[i], (void**)&dyn);
@@ -2765,7 +3197,8 @@ int Graph::command(char* input_str)
   int sts, sym_sts;
   char symbol_value[80];
 
-  if (input_str[0] == '@') {
+  if (input_str[0] == '@')
+  {
     /* Read command file */
     // char *s;
     // if ( (s = strchr( input_str, ' ')))
@@ -2775,12 +3208,14 @@ int Graph::command(char* input_str)
       return sts;
 
     sts = readcmdfile(&command[1], 0);
-    if (sts == DCLI__NOFILE) {
+    if (sts == DCLI__NOFILE)
+    {
       char tmp[200];
       snprintf(tmp, 200, "Unable to open file \"%s\"", &command[1]);
       message('E', tmp);
       return DCLI__SUCCESS;
-    } else if (EVEN(sts))
+    }
+    else if (EVEN(sts))
       return sts;
     refresh_objects(attr_mRefresh_Objects);
     return DCLI__SUCCESS;
@@ -2791,27 +3226,31 @@ int Graph::command(char* input_str)
   if (EVEN(sts))
     return sts;
 
-  sts = dcli_cli(
-      (dcli_tCmdTable*)&graph_command_table, command, (void*)this, 0);
-  if (sts == DCLI__COM_NODEF) {
+  sts = dcli_cli((dcli_tCmdTable*)&graph_command_table, command, (void*)this, 0);
+  if (sts == DCLI__COM_NODEF)
+  {
     /* Try to find a matching symbol */
     sym_sts = dcli_get_symbol_cmd(command, symbol_value);
-    if (ODD(sym_sts)) {
-      if (symbol_value[0] == '@') {
+    if (ODD(sym_sts))
+    {
+      if (symbol_value[0] == '@')
+      {
         /* Read command file */
         sts = readcmdfile(&symbol_value[1], 0);
-        if (sts == DCLI__NOFILE) {
+        if (sts == DCLI__NOFILE)
+        {
           char tmp[200];
           snprintf(tmp, 200, "Unable to open file \"%s\"", &symbol_value[1]);
           message('E', tmp);
           return DCLI__SUCCESS;
-        } else if (EVEN(sts))
+        }
+        else if (EVEN(sts))
           return sts;
         return DCLI__SUCCESS;
       }
-      sts = dcli_cli(
-          (dcli_tCmdTable*)&graph_command_table, symbol_value, (void*)this, 0);
-    } else if (sym_sts == DCLI__SYMBOL_AMBIG)
+      sts = dcli_cli((dcli_tCmdTable*)&graph_command_table, symbol_value, (void*)this, 0);
+    }
+    else if (sym_sts == DCLI__SYMBOL_AMBIG)
       sts = sym_sts;
   }
   if (sts == DCLI__COM_AMBIG)
@@ -2830,16 +3269,14 @@ int Graph::command(char* input_str)
   return sts;
 }
 
-static int graph_ccm_deffilename_func(
-    char* outfile, char* infile, void* client_data)
+static int graph_ccm_deffilename_func(char* outfile, char* infile, void* client_data)
 {
   dcli_get_defaultfilename(infile, outfile, ".ge_com");
   dcli_translate_filename(outfile, outfile);
   return 1;
 }
 
-static int graph_ccm_errormessage_func(
-    char* msg, int severity, void* client_data)
+static int graph_ccm_errormessage_func(char* msg, int severity, void* client_data)
 {
   Graph* graph = (Graph*)client_data;
 
@@ -2869,14 +3306,17 @@ static int graph_wccm_get_ldhsession_cb(void* ctx, ldh_tSesContext* ldhses)
 
   if (graph->ldhses)
     *ldhses = graph->ldhses;
-  else {
-    if (graph->get_ldhses_cb) {
+  else
+  {
+    if (graph->get_ldhses_cb)
+    {
       sts = (graph->get_ldhses_cb)(graph->parent_ctx, &graph->ldhses, 1);
       if (EVEN(sts))
         return sts;
 
       *ldhses = graph->ldhses;
-    } else
+    }
+    else
       return 0;
   }
   return 1;
@@ -2891,14 +3331,17 @@ static int graph_wccm_get_wbctx_cb(void* ctx, ldh_tWBContext* wbctx)
 
   if (graph->ldhses)
     *wbctx = ldh_SessionToWB(graph->ldhses);
-  else {
-    if (graph->get_ldhses_cb) {
+  else
+  {
+    if (graph->get_ldhses_cb)
+    {
       sts = (graph->get_ldhses_cb)(graph->parent_ctx, &graph->ldhses, 1);
       if (EVEN(sts))
         return sts;
 
       *wbctx = ldh_SessionToWB(graph->ldhses);
-    } else
+    }
+    else
       return 0;
   }
   return 1;
@@ -2906,24 +3349,25 @@ static int graph_wccm_get_wbctx_cb(void* ctx, ldh_tWBContext* wbctx)
 #endif
 
 /************************************************************************
-*
-* Name:		readcmdfile()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		readcmdfile()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int Graph::readcmdfile(char* incommand, char *script)
+int Graph::readcmdfile(char* incommand, char* script)
 {
   char input_str[160];
-  int sts;
+  int sts = 0;
   int appl_sts;
 
-  if (!ccm_func_registred) {
+  if (!ccm_func_registred)
+  {
     ccm_func_registred = 1;
 
     script_func_register();
@@ -2932,7 +3376,6 @@ int Graph::readcmdfile(char* incommand, char *script)
     // Register wb standard functions
     wccm_register(graph_wccm_get_wbctx_cb, graph_wccm_get_ldhsession_cb, 0);
 #endif
-
   }
 
   script_store_graph();
@@ -2943,16 +3386,16 @@ int Graph::readcmdfile(char* incommand, char *script)
     wccm_store_client(this);
 #endif
   // Read and execute the command file
-  if (incommand) {
+  if (incommand)
+  {
     str_trim(input_str, incommand);
-    sts = ccm_file_exec(input_str, graph_externcmd_func,
-        graph_ccm_deffilename_func, graph_ccm_errormessage_func, &appl_sts,
-	verify, 0, NULL, 0, 0, NULL, (void*)this);
+    sts = ccm_file_exec(input_str, graph_externcmd_func, graph_ccm_deffilename_func,
+                        graph_ccm_errormessage_func, &appl_sts, verify, 0, NULL, 0, 0, NULL, (void*)this);
   }
-  else if (script) {
-    sts = ccm_buffer_exec(script, 0, graph_externcmd_func,
-	graph_ccm_deffilename_func, graph_ccm_errormessage_func, &appl_sts, verify,
-	0, NULL, 0, NULL, (void *)this);
+  else if (script)
+  {
+    sts = ccm_buffer_exec(script, 0, graph_externcmd_func, graph_ccm_deffilename_func,
+                          graph_ccm_errormessage_func, &appl_sts, verify, 0, NULL, 0, NULL, (void*)this);
   }
   if (EVEN(sts))
     return sts;

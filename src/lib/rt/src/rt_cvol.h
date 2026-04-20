@@ -42,7 +42,8 @@
 
 #include "rt_gdb.h"
 
-typedef enum {
+typedef enum
+{
   cvol_eHint__ = 0,
   cvol_eHint_child,
   cvol_eHint_name,
@@ -52,10 +53,12 @@ typedef enum {
   cvol_eHint_
 } cvol_eHint;
 
-typedef struct {
+typedef struct
+{
   net_eMsg subtype;
   unsigned int size;
-  union {
+  union
+  {
     net_sNotify hdr;
     net_sCreateObject c;
     net_sDeleteObject d;
@@ -70,14 +73,11 @@ gdb_sObject* cvol_AllocObject(pwr_tStatus* sts, gdb_sNode* np, gdb_sVolume* vp);
 
 void cvol_FlushObject(gdb_sObject* op);
 
-void cvol_FreeObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask link);
+void cvol_FreeObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask link);
 
-gdb_sObject* cvol_LinkObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask link);
+gdb_sObject* cvol_LinkObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask link);
 
-gdb_sObject* cvol_LoadObject(
-    pwr_tStatus* sts, gdb_sNode* np, gdb_sVolume* vp, net_sGobject* gop);
+gdb_sObject* cvol_LoadObject(pwr_tStatus* sts, gdb_sNode* np, gdb_sVolume* vp, net_sGobject* gop);
 
 void cvol_QforcedTrim(gdb_sTouchQ* fqp);
 
@@ -91,7 +91,6 @@ void cvol_Qremove(gdb_sObject* op);
 
 void cvol_Qtrim(gdb_sTouchQ* fqp);
 
-void cvol_UnlinkObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask link);
+void cvol_UnlinkObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask link);
 
 #endif

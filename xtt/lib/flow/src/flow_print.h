@@ -39,40 +39,39 @@
 
 #include "flow.h"
 
-typedef enum {
+typedef enum
+{
   print_eType__,
   print_eType_Postscript,
   print_eType_Pdf
 } print_eType;
 
-class FlowPrint {
+class FlowPrint
+{
 public:
   FlowPrint();
   FlowPrint(char* filename, void* flow_ctx, int page_border, int* sts);
   virtual ~FlowPrint();
   virtual int type();
   virtual int print_page(double ll_x, double ll_y, double ur_x, double ur_y);
-  virtual int rect(double x, double y, double width, double height,
-      flow_eDrawType type, double idx, int highlight);
-  virtual int filled_rect(double x, double y, double width, double height,
-      flow_eDrawType type, double idx);
-  virtual int triangle(double x, double y, double width, double height,
-      flow_eDrawType type, double idx, int highlight);
-  virtual int filled_triangle(double x, double y, double width, double height,
-      flow_eDrawType type, double idx);
-  virtual int arc(double x, double y, double width, double height, int angle1,
-      int angle2, flow_eDrawType type, double idx, int highlight);
-  virtual int line(double x1, double y1, double x2, double y2,
-      flow_eDrawType type, double idx, int highlight);
-  virtual int text(double x, double y, char* text, int len, flow_eDrawType type,
-      double size, int line);
-  virtual int pixmap(
-      double x, double y, flow_sPixmapDataElem* data, void *pixmap, int idx, 
-      flow_eDrawType type);
-  virtual int image(double x, double y, double width, double height,
-      flow_tImImage image, flow_eDrawType type);
-  virtual int arrow(double x1, double y1, double x2, double y2, double x3,
-      double y3, flow_eDrawType type, double idx);
+  virtual int rect(double x, double y, double width, double height, flow_eDrawType type, double idx,
+                   int highlight);
+  virtual int filled_rect(double x, double y, double width, double height, flow_eDrawType type, double idx);
+  virtual int triangle(double x, double y, double width, double height, flow_eDrawType type, double idx,
+                       int highlight);
+  virtual int filled_triangle(double x, double y, double width, double height, flow_eDrawType type,
+                              double idx);
+  virtual int arc(double x, double y, double width, double height, int angle1, int angle2,
+                  flow_eDrawType type, double idx, int highlight);
+  virtual int line(double x1, double y1, double x2, double y2, flow_eDrawType type, double idx,
+                   int highlight);
+  virtual int text(double x, double y, char* text, int len, flow_eDrawType type, double size, int line);
+  virtual int pixmap(double x, double y, flow_sPixmapDataElem* data, void* pixmap, int idx,
+                     flow_eDrawType type);
+  virtual int image(double x, double y, double width, double height, flow_tImImage image,
+                    flow_eDrawType type);
+  virtual int arrow(double x1, double y1, double x2, double y2, double x3, double y3, flow_eDrawType type,
+                    double idx);
   virtual void set_showred(int show);
 };
 

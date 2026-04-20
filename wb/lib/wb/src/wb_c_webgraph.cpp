@@ -57,8 +57,7 @@ static pwr_tStatus OpenGraph(ldh_sMenuCall* ip)
   int size;
   char graph_name[80];
 
-  sts = ldh_GetObjectPar(
-      ip->PointedSession, ip->Pointed.Objid, "RtBody", "Name", &action, &size);
+  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody", "Name", &action, &size);
   if (EVEN(sts))
     return sts;
 
@@ -85,5 +84,4 @@ static pwr_tStatus Build(ldh_sMenuCall* ip)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(WebGraph)
-    = { pwr_BindMethod(OpenGraph), pwr_BindMethod(Build), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(WebGraph) = {pwr_BindMethod(OpenGraph), pwr_BindMethod(Build), pwr_NullMethod};

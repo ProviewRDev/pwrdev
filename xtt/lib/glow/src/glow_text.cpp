@@ -42,9 +42,8 @@
 #include "glow_text.h"
 #include "glow_draw.h"
 
-GlowText::GlowText(GrowCtx* glow_ctx, const char* text1, double x, double y,
-    glow_eDrawType d_type, glow_eDrawType color_d_type, int t_size,
-    glow_mDisplayLevel display_lev)
+GlowText::GlowText(GrowCtx* glow_ctx, const char* text1, double x, double y, glow_eDrawType d_type,
+                   glow_eDrawType color_d_type, int t_size, glow_mDisplayLevel display_lev)
     : GlowArrayElem(glow_ctx), p(glow_ctx, x, y), draw_type(d_type), text_size(t_size),
       display_level(display_lev), color_drawtype(color_d_type)
 {
@@ -52,40 +51,27 @@ GlowText::GlowText(GrowCtx* glow_ctx, const char* text1, double x, double y,
   strcpy(text, text1);
 }
 
-void GlowText::zoom()
-{
-  p.zoom();
-}
+void GlowText::zoom() { p.zoom(); }
 
-void GlowText::nav_zoom()
-{
-  p.nav_zoom();
-}
+void GlowText::nav_zoom() { p.nav_zoom(); }
 
-void GlowText::print_zoom()
-{
-  p.print_zoom();
-}
+void GlowText::print_zoom() { p.print_zoom(); }
 
-void GlowText::traverse(int x, int y)
-{
-  p.traverse(x, y);
-}
+void GlowText::traverse(int x, int y) { p.traverse(x, y); }
 
-void GlowText::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowText::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_Text) << '\n';
   fp << int(glow_eSave_Text_text_size) << FSPACE << text_size << '\n';
   fp << int(glow_eSave_Text_draw_type) << FSPACE << int(draw_type) << '\n';
-  fp << int(glow_eSave_Text_color_drawtype) << FSPACE << int(color_drawtype)
-     << '\n';
+  fp << int(glow_eSave_Text_color_drawtype) << FSPACE << int(color_drawtype) << '\n';
   fp << int(glow_eSave_Text_text) << FSPACE << text << '\n';
   fp << int(glow_eSave_Text_p) << '\n';
   p.save(fp, mode);
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowText::open(std::ifstream& fp)
+void GlowText::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -93,15 +79,18 @@ void GlowText::open(std::ifstream& fp)
   char tmp_text[500];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GlowText: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_Text:
       break;
     case glow_eSave_Text_text_size:
@@ -144,9 +133,9 @@ void GlowText::draw(GlowWind* w, void* pos, int highlight, int hot, void* node)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   ctx->gdraw->text(w, p.z_x + ((GlowPoint*)pos)->z_x - w->offset_x,
-      p.z_y + ((GlowPoint*)pos)->z_y - w->offset_y, text, strlen(text),
-      draw_type, color_drawtype, idx, highlight, 0, glow_eFont_Helvetica,
-      w->zoom_factor_y / w->base_zoom_factor * (8 + 2 * text_size), 0);
+                   p.z_y + ((GlowPoint*)pos)->z_y - w->offset_y, text, strlen(text), draw_type,
+                   color_drawtype, idx, highlight, 0, glow_eFont_Helvetica,
+                   w->zoom_factor_y / w->base_zoom_factor * (8 + 2 * text_size), 0);
 }
 
 void GlowText::erase(GlowWind* w, void* pos, int hot, void* node)
@@ -156,13 +145,12 @@ void GlowText::erase(GlowWind* w, void* pos, int hot, void* node)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   ctx->gdraw->text_erase(w, p.z_x + ((GlowPoint*)pos)->z_x - w->offset_x,
-      p.z_y + ((GlowPoint*)pos)->z_y - w->offset_y, text, strlen(text),
-      draw_type, idx, 0, glow_eFont_Helvetica,
-      w->zoom_factor_y / w->base_zoom_factor * (8 + 2 * text_size), 0);
+                         p.z_y + ((GlowPoint*)pos)->z_y - w->offset_y, text, strlen(text), draw_type, idx, 0,
+                         glow_eFont_Helvetica, w->zoom_factor_y / w->base_zoom_factor * (8 + 2 * text_size),
+                         0);
 }
 
-int GlowText::event_handler(
-    GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node)
+int GlowText::event_handler(GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node)
 {
   GlowPoint* p;
 
@@ -170,8 +158,8 @@ int GlowText::event_handler(
   return 0;
 }
 
-void GlowText::get_borders(double pos_x, double pos_y, double* x_right,
-    double* x_left, double* y_high, double* y_low, void* node)
+void GlowText::get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                           double* y_low, void* node)
 {
 }
 
@@ -183,8 +171,7 @@ void GlowText::move(void* pos, double x, double y, int highlight, int hot)
   nav_zoom();
 }
 
-void GlowText::shift(
-    void* pos, double delta_x, double delta_y, int highlight, int hot)
+void GlowText::shift(void* pos, double delta_x, double delta_y, int highlight, int hot)
 {
   p.x += delta_x;
   p.y += delta_y;

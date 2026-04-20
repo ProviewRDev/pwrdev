@@ -58,15 +58,15 @@ public:
   QLabel* msg_label;
   QLabel* cmd_prompt;
   QTextEdit* help_text;
-  QAction* menubutton_copy;  
+  QAction* menubutton_copy;
   QAction* menubutton_paste;
   QAction* menubutton_changevalue;
   CoWowFocusTimerQt focustimer;
   static CoWowRecall value_recall;
   CoWowEntryQt* cmd_entry;
 
-  GsdmlAttrQt(void* a_parent_ctx, void* a_object, pn_gsdml* a_gsdml,
-      int a_edit_mode, const char* a_data_filename, pwr_tStatus* a_sts);
+  GsdmlAttrQt(void* a_parent_ctx, void* a_object, pn_gsdml* a_gsdml, int a_edit_mode,
+              const char* a_data_filename, pwr_tStatus* a_sts);
   ~GsdmlAttrQt();
 
   void message(char severity, const char* message);
@@ -93,7 +93,7 @@ public slots:
   void activate_ordermoduletype_number();
   void activate_exit();
   void activate_help();
-  void activate_copy();  
+  void activate_copy();
   void activate_paste();
   void activate_viewio(bool);
   void activate_zoom_in();

@@ -75,8 +75,7 @@ GtkWidget* XttMultiViewGtk::error_msg(const char* msg, pwr_tStatus sts)
   return gtk_label_new(str2);
 }
 
-gboolean XttMultiViewGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean XttMultiViewGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   XttMultiViewGtk* multiview = (XttMultiViewGtk*)data;
 
@@ -103,12 +102,12 @@ void XttMultiViewGtk::set_size(int width, int height)
   gtk_window_resize(GTK_WINDOW(toplevel), default_width, default_height);
 
   // This condition is due to a bug in Reflection X 11.0.5...
-  if (!xnav->gbl.no_graph_ratio) {
+  if (!xnav->gbl.no_graph_ratio)
+  {
     // Note, equal min and max aspect will cause recursive resize on LXDE
     geometry.min_aspect = gdouble(default_width) / default_height;
     geometry.max_aspect = gdouble(default_width) / default_height * 1.02;
-    gtk_window_set_geometry_hints(
-        GTK_WINDOW(toplevel), GTK_WIDGET(toplevel), &geometry, GDK_HINT_ASPECT);
+    gtk_window_set_geometry_hints(GTK_WINDOW(toplevel), GTK_WIDGET(toplevel), &geometry, GDK_HINT_ASPECT);
   }
 }
 
@@ -122,43 +121,47 @@ void XttMultiViewGtk::activate_exit(GtkWidget* w, gpointer data)
     delete multiview;
 }
 
-void XttMultiViewGtk::action_resize(
-    GtkWidget* w, GtkAllocation* allocation, gpointer data)
-{
-}
+void XttMultiViewGtk::action_resize(GtkWidget* w, GtkAllocation* allocation, gpointer data) {}
 
 XttMultiViewGtk::~XttMultiViewGtk()
 {
   if (close_cb)
     (close_cb)(parent_ctx, this);
 
-  for (unsigned int i = 0; i < MV_SIZE; i++) {
+  for (unsigned int i = 0; i < MV_SIZE; i++)
+  {
     if (sala[i])
       delete sala[i];
   }
-  for (unsigned int i = 0; i < MV_SIZE; i++) {
+  for (unsigned int i = 0; i < MV_SIZE; i++)
+  {
     if (seve[i])
       delete seve[i];
   }
-  for (unsigned int i = 0; i < MV_SIZE; i++) {
+  for (unsigned int i = 0; i < MV_SIZE; i++)
+  {
     if (gectx[i])
       delete gectx[i];
   }
-  for (unsigned int i = 0; i < MV_SIZE; i++) {
+  for (unsigned int i = 0; i < MV_SIZE; i++)
+  {
     if (mvctx[i])
       delete mvctx[i];
   }
-  for (unsigned int i = 0; i < MV_SIZE; i++) {
+  for (unsigned int i = 0; i < MV_SIZE; i++)
+  {
     if (trend[i])
       delete trend[i];
   }
 
-  for (unsigned int i = 0; i < MV_SIZE; i++) {
+  for (unsigned int i = 0; i < MV_SIZE; i++)
+  {
     if (sevhist[i])
       delete sevhist[i];
   }
 
-  for (unsigned int i = 0; i < MV_SIZE; i++) {
+  for (unsigned int i = 0; i < MV_SIZE; i++)
+  {
     if (strmctx[i])
       delete strmctx[i];
   }
@@ -168,10 +171,7 @@ XttMultiViewGtk::~XttMultiViewGtk()
     gtk_widget_destroy(toplevel);
 }
 
-void XttMultiViewGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void XttMultiViewGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
 static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer ge)
 {
@@ -180,21 +180,18 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer ge)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
-    const char* mv_name, pwr_tAttrRef* mv_aref, int mv_width, int mv_height,
-    int mv_x, int mv_y, unsigned int mv_options, void* basewidget,
-    int mv_color_theme, pwr_tStatus* sts,
-    int (*mv_command_cb)(void*, char*, char*, char *, void*),
-    int (*mv_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-    int (*mv_is_authorized_cb)(void*, unsigned int),
-    void (*mv_keyboard_cb)(void*, void*, int, int))
-    : XttMultiView(mv_parent_ctx, mv_name, mv_aref, mv_width, mv_height, mv_x,
-          mv_y, mv_options, mv_color_theme, mv_command_cb,
-          mv_get_current_objects_cb, mv_is_authorized_cb, mv_keyboard_cb),
+XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx, const char* mv_name,
+                                 pwr_tAttrRef* mv_aref, int mv_width, int mv_height, int mv_x, int mv_y,
+                                 unsigned int mv_options, void* basewidget, int mv_color_theme,
+                                 pwr_tStatus* sts, int (*mv_command_cb)(void*, char*, char*, char*, void*),
+                                 int (*mv_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+                                 int (*mv_is_authorized_cb)(void*, unsigned int),
+                                 void (*mv_keyboard_cb)(void*, void*, int, int))
+    : XttMultiView(mv_parent_ctx, mv_name, mv_aref, mv_width, mv_height, mv_x, mv_y, mv_options,
+                   mv_color_theme, mv_command_cb, mv_get_current_objects_cb, mv_is_authorized_cb,
+                   mv_keyboard_cb),
       parent_wid(mv_parent_wid)
 {
   int window_width = 600;
@@ -222,60 +219,64 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
   if (EVEN(*sts))
     return;
 
-  if (mv_width != 0 && mv_height != 0) {
+  if (mv_width != 0 && mv_height != 0)
+  {
     window_width = mv_width;
     window_height = mv_height;
-  } else if (mv.Width != 0 && mv.Height != 0) {
+  }
+  else if (mv.Width != 0 && mv.Height != 0)
+  {
     window_width = mv.Width;
     window_height = mv.Height;
-  } else {
+  }
+  else
+  {
     window_width = 600;
     window_height = 500;
   }
   orig_width = window_width;
   orig_height = window_height;
 
-  char* titleutf8
-      = g_convert(mv.Title, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  char* titleutf8 = g_convert(mv.Title, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
 
   // Gtk
-  if (!(options & ge_mOptions_Embedded)) {
-    toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-        window_height, "default-width", window_width, "title", titleutf8, NULL);
+  if (!(options & ge_mOptions_Embedded))
+  {
+    toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height, "default-width",
+                                        window_width, "title", titleutf8, NULL);
     g_free(titleutf8);
 
     geometry.min_aspect = gdouble(window_width) / window_height;
     geometry.max_aspect = gdouble(window_width) / window_height * 1.02;
-    gtk_window_set_geometry_hints(
-        GTK_WINDOW(toplevel), GTK_WIDGET(toplevel), &geometry, GDK_HINT_ASPECT);
+    gtk_window_set_geometry_hints(GTK_WINDOW(toplevel), GTK_WIDGET(toplevel), &geometry, GDK_HINT_ASPECT);
 
     if (mv.Options & pwr_mMultiViewOptionsMask_HideDecorations)
       gtk_window_set_decorated(GTK_WINDOW(toplevel), FALSE);
 
-    if (mv.Layout == pwr_eMultiViewLayoutEnum_Fix
-        || mv.Layout == pwr_eMultiViewLayoutEnum_Table)
+    if (mv.Layout == pwr_eMultiViewLayoutEnum_Fix || mv.Layout == pwr_eMultiViewLayoutEnum_Table)
       gtk_window_set_resizable(GTK_WINDOW(toplevel), FALSE);
 
-    if (mv.Options & pwr_mMultiViewOptionsMask_Dialog) {
-      gtk_window_set_type_hint(
-          GTK_WINDOW(toplevel), GDK_WINDOW_TYPE_HINT_DIALOG);
-      gtk_widget_set_size_request(
-          GTK_WIDGET(toplevel), window_width, window_height);
+    if (mv.Options & pwr_mMultiViewOptionsMask_Dialog)
+    {
+      gtk_window_set_type_hint(GTK_WINDOW(toplevel), GDK_WINDOW_TYPE_HINT_DIALOG);
+      gtk_widget_set_size_request(GTK_WIDGET(toplevel), window_width, window_height);
       gtk_window_set_resizable(GTK_WINDOW(toplevel), FALSE);
     }
 
     g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
     g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-    g_signal_connect(
-        toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
+    g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
     CoWowGtk::SetWindowIcon(toplevel);
-  } else {
+  }
+  else
+  {
     toplevel = parent_wid;
     box_widget = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   }
 
-  if (mv.Layout == pwr_eMultiViewLayoutEnum_Fix) {
+  if (mv.Layout == pwr_eMultiViewLayoutEnum_Fix)
+  {
     // g_signal_connect( toplevel, "size_allocate", G_CALLBACK(action_resize),
     // this);
   }
@@ -284,7 +285,8 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
     rows = mv.Rows;
     cols = mv.Columns;
 
-    switch (mv.Layout) {
+    switch (mv.Layout)
+    {
     case pwr_eMultiViewLayoutEnum_Box:
       col_widget = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
       break;
@@ -302,13 +304,15 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
     }
 
     bool escape = false;
-    for (int i = 0; i < cols; i++) {
+    for (int i = 0; i < cols; i++)
+    {
       GtkWidget* row_widget = NULL;
 
       if (mv.Layout == pwr_eMultiViewLayoutEnum_Pane && i > 1)
         break;
 
-      switch (mv.Layout) {
+      switch (mv.Layout)
+      {
       case pwr_eMultiViewLayoutEnum_Box:
         row_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
         break;
@@ -321,11 +325,13 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
       default:;
       }
 
-      for (int j = 0; j < rows; j++) {
+      for (int j = 0; j < rows; j++)
+      {
         pwr_tFileName graph_name;
         int w, h, scrollbar, menu, type;
 
-        if (i * rows + j >= MV_SIZE) {
+        if (i * rows + j >= MV_SIZE)
+        {
           escape = true;
           break;
         }
@@ -336,36 +342,33 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
         h = comp_height[i * rows + j] = mv.Action[i * rows + j].Height;
         comp_x[i * rows + j] = mv.Action[i * rows + j].X;
         comp_y[i * rows + j] = mv.Action[i * rows + j].Y;
-        scrollbar = (mv.Action[i * rows + j].Options
-                        & pwr_mMultiViewElemOptionsMask_Scrollbars)
-            ? 1
-            : 0;
-        menu = (mv.Action[i * rows + j].Options
-                   & pwr_mMultiViewElemOptionsMask_Menu)
-            ? 1
-            : 0;
+        scrollbar = (mv.Action[i * rows + j].Options & pwr_mMultiViewElemOptionsMask_Scrollbars) ? 1 : 0;
+        menu = (mv.Action[i * rows + j].Options & pwr_mMultiViewElemOptionsMask_Menu) ? 1 : 0;
         strcpy(graph_name, mv.Action[i * rows + j].Action);
         type = mv.Action[i * rows + j].Type;
 
-        switch (type) {
-        case pwr_eMultiViewContentEnum_AlarmList: {
-          if (xnav->ev) {
-            sala[i * rows + j]
-                = (EvAlaGtk*)xnav->ev->open_alarmlist_satellite("No title",
-                    &lsts, w, h, 0, 0, mv.Action[i * rows + j].Object[0].Objid,
-                    ev_mAlaOptions_Embedded, toplevel);
+        switch (type)
+        {
+        case pwr_eMultiViewContentEnum_AlarmList:
+        {
+          if (xnav->ev)
+          {
+            sala[i * rows + j] = (EvAlaGtk*)xnav->ev->open_alarmlist_satellite(
+                "No title", &lsts, w, h, 0, 0, mv.Action[i * rows + j].Object[0].Objid,
+                ev_mAlaOptions_Embedded, toplevel);
             if (!sala[i * rows + j])
               continue;
             comp_widget[i * rows + j] = sala[i * rows + j]->get_widget();
           }
           break;
         }
-        case pwr_eMultiViewContentEnum_EventList: {
-          if (xnav->ev) {
-            seve[i * rows + j]
-                = (EvEveGtk*)xnav->ev->open_eventlist_satellite("No title",
-                    &lsts, w, h, 0, 0, mv.Action[i * rows + j].Object[0].Objid,
-                    ev_mAlaOptions_Embedded, toplevel);
+        case pwr_eMultiViewContentEnum_EventList:
+        {
+          if (xnav->ev)
+          {
+            seve[i * rows + j] = (EvEveGtk*)xnav->ev->open_eventlist_satellite(
+                "No title", &lsts, w, h, 0, 0, mv.Action[i * rows + j].Object[0].Objid,
+                ev_mAlaOptions_Embedded, toplevel);
             if (!seve[i * rows + j])
               continue;
             comp_widget[i * rows + j] = seve[i * rows + j]->get_widget();
@@ -373,52 +376,53 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
           break;
         }
         case pwr_eMultiViewContentEnum_Graph:
-        case pwr_eMultiViewContentEnum_ObjectGraph: {
+        case pwr_eMultiViewContentEnum_ObjectGraph:
+        {
           char* objectname_p = 0;
           char objectname[800];
           double borders[4];
           double* bordersp = 0;
           char* s;
 
-          for (int k = 0; k < 4; k++) {
+          for (int k = 0; k < 4; k++)
+          {
             pwr_tAName oname;
 
             if (cdh_ObjidIsNull(mv.Action[i * rows + j].Object[k].Objid))
               break;
-            lsts = gdh_AttrrefToName(&mv.Action[i * rows + j].Object[k], oname,
-                sizeof(oname), cdh_mName_volumeStrict);
+            lsts = gdh_AttrrefToName(&mv.Action[i * rows + j].Object[k], oname, sizeof(oname),
+                                     cdh_mName_volumeStrict);
             if (EVEN(lsts))
               break;
 
             if (k == 0)
               strncpy(objectname, oname, sizeof(objectname));
-            else {
+            else
+            {
               strncat(objectname, ",", sizeof(objectname) - strlen(objectname) - 1);
               strncat(objectname, oname, sizeof(objectname) - strlen(objectname) - 1);
             }
             objectname_p = objectname;
           }
 
-          if (!feqf(mv.Action[i * rows + j].Borders[0], 0.0f)
-              || !feqf(mv.Action[i * rows + j].Borders[1], 0.0f)
-              || !feqf(mv.Action[i * rows + j].Borders[2], 0.0f)
-              || !feqf(mv.Action[i * rows + j].Borders[3], 0.0f)) {
+          if (!feqf(mv.Action[i * rows + j].Borders[0], 0.0f) ||
+              !feqf(mv.Action[i * rows + j].Borders[1], 0.0f) ||
+              !feqf(mv.Action[i * rows + j].Borders[2], 0.0f) ||
+              !feqf(mv.Action[i * rows + j].Borders[3], 0.0f))
+          {
             for (int k = 0; k < 4; k++)
               borders[k] = mv.Action[i * rows + j].Borders[k];
             bordersp = borders;
           }
 
-          gectx[i * rows + j]
-              = new XttGeGtk(toplevel, this, "No title", graph_name, scrollbar,
-                  menu, 0, w, h, mv_x, mv_y, 1.0, objectname_p, 0, 0,
-		  ge_mOptions_Embedded, 0, bordersp, color_theme, 0,
-                  multiview_ge_command_cb, multiview_ge_get_current_objects_cb,
-                  multiview_ge_is_authorized_cb, multiview_keyboard_cb);
+          gectx[i * rows + j] = new XttGeGtk(
+              toplevel, this, "No title", graph_name, scrollbar, menu, 0, w, h, mv_x, mv_y, 1.0, objectname_p,
+              0, 0, ge_mOptions_Embedded, 0, bordersp, color_theme, 0, multiview_ge_command_cb,
+              multiview_ge_get_current_objects_cb, multiview_ge_is_authorized_cb, multiview_keyboard_cb);
 
           gectx[i * rows + j]->close_cb = multiview_ge_close_cb;
           gectx[i * rows + j]->help_cb = multiview_ge_help_cb;
-          gectx[i * rows + j]->display_in_xnav_cb
-              = multiview_ge_display_in_xnav_cb;
+          gectx[i * rows + j]->display_in_xnav_cb = multiview_ge_display_in_xnav_cb;
           gectx[i * rows + j]->popup_menu_cb = multiview_ge_popup_menu_cb;
           gectx[i * rows + j]->call_method_cb = multiview_ge_call_method_cb;
           gectx[i * rows + j]->sound_cb = multiview_ge_sound_cb;
@@ -430,44 +434,41 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
 
           if ((s = strchr(graph_name, '.')))
             *s = 0;
-          appl.insert(applist_eType_Graph, (void*)gectx[i * rows + j],
-              pwr_cNObjid, graph_name, objectname_p);
+          appl.insert(applist_eType_Graph, (void*)gectx[i * rows + j], pwr_cNObjid, graph_name, objectname_p);
 
           break;
         }
-        case pwr_eMultiViewContentEnum_MultiView: {
+        case pwr_eMultiViewContentEnum_MultiView:
+        {
           pwr_tAttrRef graph_aref;
 
           lsts = gdh_NameToAttrref(pwr_cNObjid, graph_name, &graph_aref);
           if (EVEN(lsts))
             break;
 
-          mvctx[i * rows + j]
-              = new XttMultiViewGtk(toplevel, this, "No title", &graph_aref, w,
-                  h, mv_x, mv_y, ge_mOptions_Embedded, 0, color_theme, &lsts,
-                  multiview_ge_command_cb, multiview_ge_get_current_objects_cb,
-                  multiview_ge_is_authorized_cb, multiview_keyboard_cb);
+          mvctx[i * rows + j] = new XttMultiViewGtk(
+              toplevel, this, "No title", &graph_aref, w, h, mv_x, mv_y, ge_mOptions_Embedded, 0, color_theme,
+              &lsts, multiview_ge_command_cb, multiview_ge_get_current_objects_cb,
+              multiview_ge_is_authorized_cb, multiview_keyboard_cb);
 
           mvctx[i * rows + j]->close_cb = multiview_ge_close_cb;
           mvctx[i * rows + j]->help_cb = multiview_ge_help_cb;
-          mvctx[i * rows + j]->display_in_xnav_cb
-              = multiview_ge_display_in_xnav_cb;
+          mvctx[i * rows + j]->display_in_xnav_cb = multiview_ge_display_in_xnav_cb;
           mvctx[i * rows + j]->popup_menu_cb = multiview_ge_popup_menu_cb;
           mvctx[i * rows + j]->call_method_cb = multiview_ge_call_method_cb;
           mvctx[i * rows + j]->sound_cb = multiview_ge_sound_cb;
           mvctx[i * rows + j]->eventlog_cb = multiview_ge_eventlog_cb;
 
-          comp_widget[i * rows + j]
-              = (GtkWidget*)mvctx[i * rows + j]->get_widget();
+          comp_widget[i * rows + j] = (GtkWidget*)mvctx[i * rows + j]->get_widget();
 
           recall_buffer[i * rows + j].insert(graph_name, 0);
 
-          appl.insert(applist_eType_MultiView, (void*)mvctx[i * rows + j],
-              &aref, "", NULL);
+          appl.insert(applist_eType_MultiView, (void*)mvctx[i * rows + j], &aref, "", NULL);
 
           break;
         }
-        case pwr_eMultiViewContentEnum_TrendCurve: {
+        case pwr_eMultiViewContentEnum_TrendCurve:
+        {
           int plotgroup_found = 0;
           pwr_tAttrRef plotgroup;
           pwr_tCid classid;
@@ -475,12 +476,12 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
           pwr_tAttrRef arefv[2];
           int skip = 0;
 
-          lsts
-              = gdh_GetAttrRefTid(&mv.Action[i * rows + j].Object[0], &classid);
+          lsts = gdh_GetAttrRefTid(&mv.Action[i * rows + j].Object[0], &classid);
           if (EVEN(lsts))
             break;
 
-          switch (classid) {
+          switch (classid)
+          {
           case pwr_cClass_DsTrend:
           case pwr_cClass_DsTrendCurve:
             break;
@@ -496,16 +497,18 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
           if (skip)
             break;
 
-          if (plotgroup_found) {
-            trend[i * rows + j] = new XttTrendGtk(this, toplevel,
-                (char*)"No title", &widget, 0, &plotgroup, w, h,
-                (unsigned int)curve_mOptions_Embedded, color_theme, 0, sts);
-          } else {
+          if (plotgroup_found)
+          {
+            trend[i * rows + j] =
+                new XttTrendGtk(this, toplevel, (char*)"No title", &widget, 0, &plotgroup, w, h,
+                                (unsigned int)curve_mOptions_Embedded, color_theme, 0, sts);
+          }
+          else
+          {
             arefv[0] = mv.Action[i * rows + j].Object[0];
             memset(&arefv[1], 0, sizeof(arefv[0]));
-            trend[i * rows + j] = new XttTrendGtk(this, toplevel,
-                (char*)"No title", &widget, arefv, 0, w, h,
-                (unsigned int)curve_mOptions_Embedded, color_theme, 0, sts);
+            trend[i * rows + j] = new XttTrendGtk(this, toplevel, (char*)"No title", &widget, arefv, 0, w, h,
+                                                  (unsigned int)curve_mOptions_Embedded, color_theme, 0, sts);
           }
           if (EVEN(*sts))
             break;
@@ -518,12 +521,12 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
 
           // recall_buffer[i*rows + j].insert(graph_name, objectname_p);
 
-          appl.insert(applist_eType_Trend, (void*)trend[i * rows + j],
-              &arefv[0], "", NULL);
+          appl.insert(applist_eType_Trend, (void*)trend[i * rows + j], &arefv[0], "", NULL);
 
           break;
         }
-        case pwr_eMultiViewContentEnum_SevHistory: {
+        case pwr_eMultiViewContentEnum_SevHistory:
+        {
           pwr_tOid oidv[11];
           pwr_tOName anamev[11];
           pwr_tOName onamev[11];
@@ -553,7 +556,8 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
             break;
           ;
 
-          switch (classid) {
+          switch (classid)
+          {
           case pwr_cClass_SevHist:
             break;
           case pwr_cClass_SevHistObject:
@@ -570,7 +574,8 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
           if (skip)
             break;
 
-          if (plotgroup_found) {
+          if (plotgroup_found)
+          {
             pwr_sClass_PlotGroup plot;
             pwr_tCid cid;
             int j;
@@ -579,7 +584,8 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
             if (EVEN(lsts))
               break;
 
-            for (j = 0; j < 20; j++) {
+            for (j = 0; j < 20; j++)
+            {
               if (cdh_ObjidIsNull(plot.YObjectName[j].Objid))
                 break;
 
@@ -588,19 +594,17 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
               if (EVEN(lsts))
                 break;
 
-              if (cid == pwr_cClass_SevHist) {
-                lsts = gdh_ArefANameToAref(
-                    &sevhist_aref, "Attribute", &attr_aref);
+              if (cid == pwr_cClass_SevHist)
+              {
+                lsts = gdh_ArefANameToAref(&sevhist_aref, "Attribute", &attr_aref);
                 if (EVEN(lsts))
                   break;
 
-                lsts = gdh_GetObjectInfoAttrref(
-                    &attr_aref, &attr_aref, sizeof(attr_aref));
+                lsts = gdh_GetObjectInfoAttrref(&attr_aref, &attr_aref, sizeof(attr_aref));
                 if (EVEN(lsts))
                   break;
 
-                lsts = gdh_AttrrefToName(
-                    &attr_aref, aname, sizeof(aname), cdh_mNName);
+                lsts = gdh_AttrrefToName(&attr_aref, aname, sizeof(aname), cdh_mNName);
                 if (EVEN(lsts))
                   break;
 
@@ -614,26 +618,29 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
                 oidv[oid_cnt] = attr_aref.Objid;
                 sevhistobjectv[oid_cnt] = false;
                 oid_cnt++;
-              } else if (cid == pwr_cClass_SevHistObject) {
+              }
+              else if (cid == pwr_cClass_SevHistObject)
+              {
                 lsts = gdh_ArefANameToAref(&sevhist_aref, "Object", &attr_aref);
                 if (EVEN(lsts))
                   break;
 
-                lsts = gdh_GetObjectInfoAttrref(
-                    &attr_aref, &attr_aref, sizeof(attr_aref));
+                lsts = gdh_GetObjectInfoAttrref(&attr_aref, &attr_aref, sizeof(attr_aref));
                 if (EVEN(lsts))
                   break;
 
-                lsts = gdh_AttrrefToName(
-                    &attr_aref, aname, sizeof(aname), cdh_mNName);
+                lsts = gdh_AttrrefToName(&attr_aref, aname, sizeof(aname), cdh_mNName);
                 if (EVEN(lsts))
                   break;
 
                 s = strchr(aname, '.');
-                if (!s) {
+                if (!s)
+                {
                   // It is a complete object
                   anamev[oid_cnt][0] = '\0';
-                } else {
+                }
+                else
+                {
                   strcpy(anamev[oid_cnt], s + 1);
                   *s = 0;
                 }
@@ -643,27 +650,29 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
                 oid_cnt++;
               }
             }
-          } else if (sevHistObjectFound) {
-            lsts = gdh_ArefANameToAref(
-                &mv.Action[i * rows + j].Object[0], "Object", &attr_aref);
+          }
+          else if (sevHistObjectFound)
+          {
+            lsts = gdh_ArefANameToAref(&mv.Action[i * rows + j].Object[0], "Object", &attr_aref);
             if (EVEN(lsts))
               break;
 
-            lsts = gdh_GetObjectInfoAttrref(
-                &attr_aref, &attr_aref, sizeof(attr_aref));
+            lsts = gdh_GetObjectInfoAttrref(&attr_aref, &attr_aref, sizeof(attr_aref));
             if (EVEN(lsts))
               break;
 
-            lsts = gdh_AttrrefToName(
-                &attr_aref, aname, sizeof(aname), cdh_mNName);
+            lsts = gdh_AttrrefToName(&attr_aref, aname, sizeof(aname), cdh_mNName);
             if (EVEN(lsts))
               break;
 
             s = strchr(aname, '.');
-            if (!s) {
+            if (!s)
+            {
               // It is a complete object
               anamev[oid_cnt][0] = '\0';
-            } else {
+            }
+            else
+            {
               strcpy(anamev[oid_cnt], s + 1);
             }
             oidv[oid_cnt] = attr_aref.Objid;
@@ -671,19 +680,18 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
             strcpy(onamev[oid_cnt], "");
             sevhist_aref = mv.Action[i * rows + j].Object[0];
             oid_cnt = 1;
-          } else {
-            lsts = gdh_ArefANameToAref(
-                &mv.Action[i * rows + j].Object[0], "Attribute", &attr_aref);
+          }
+          else
+          {
+            lsts = gdh_ArefANameToAref(&mv.Action[i * rows + j].Object[0], "Attribute", &attr_aref);
             if (EVEN(lsts))
               break;
 
-            lsts = gdh_GetObjectInfoAttrref(
-                &attr_aref, &attr_aref, sizeof(attr_aref));
+            lsts = gdh_GetObjectInfoAttrref(&attr_aref, &attr_aref, sizeof(attr_aref));
             if (EVEN(lsts))
               break;
 
-            lsts = gdh_AttrrefToName(
-                &attr_aref, aname, sizeof(aname), cdh_mNName);
+            lsts = gdh_AttrrefToName(&attr_aref, aname, sizeof(aname), cdh_mNName);
             if (EVEN(lsts))
               break;
 
@@ -707,23 +715,21 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
           if (EVEN(lsts))
             break;
 
-          lsts = gdh_GetObjectInfoAttrref(
-              &attr_aref, &histthread_oid, sizeof(histthread_oid));
+          lsts = gdh_GetObjectInfoAttrref(&attr_aref, &histthread_oid, sizeof(histthread_oid));
           if (EVEN(lsts))
             break;
 
           histthread_aref = cdh_ObjidToAref(histthread_oid);
-          lsts
-              = gdh_ArefANameToAref(&histthread_aref, "ServerNode", &attr_aref);
+          lsts = gdh_ArefANameToAref(&histthread_aref, "ServerNode", &attr_aref);
           if (EVEN(lsts))
             break;
 
-          lsts = gdh_GetObjectInfoAttrref(
-              &attr_aref, server_node, sizeof(server_node));
+          lsts = gdh_GetObjectInfoAttrref(&attr_aref, server_node, sizeof(server_node));
           if (EVEN(lsts))
             break;
 
-          if (!xnav->scctx) {
+          if (!xnav->scctx)
+          {
             sevcli_init(&lsts, &xnav->scctx);
             if (EVEN(lsts))
               break;
@@ -732,19 +738,17 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
           if (EVEN(lsts))
             break;
 
-          sevhist[i * rows + j] = new XttSevHistGtk(this, toplevel,
-              (char*)"No title", &widget, oidv, anamev, onamev, sevhistobjectv,
-              xnav->scctx, w, h, (unsigned int)curve_mOptions_Embedded,
-              color_theme, time_ePeriod_, 0, sts);
-          if (EVEN(*sts)) {
-            comp_widget[i * rows + j]
-                = error_msg("Unable to load history data", *sts);
+          sevhist[i * rows + j] = new XttSevHistGtk(
+              this, toplevel, (char*)"No title", &widget, oidv, anamev, onamev, sevhistobjectv, xnav->scctx,
+              w, h, (unsigned int)curve_mOptions_Embedded, color_theme, time_ePeriod_, 0, sts);
+          if (EVEN(*sts))
+          {
+            comp_widget[i * rows + j] = error_msg("Unable to load history data", *sts);
             break;
           }
 
           sevhist[i * rows + j]->help_cb = multiview_trend_help_cb;
-          sevhist[i * rows + j]->get_select_cb
-              = multiview_sevhist_get_select_cb;
+          sevhist[i * rows + j]->get_select_cb = multiview_sevhist_get_select_cb;
 
           comp_widget[i * rows + j] = widget;
 
@@ -756,7 +760,8 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
 
           break;
         }
-        case pwr_eMultiViewContentEnum_Camera: {
+        case pwr_eMultiViewContentEnum_Camera:
+        {
           pwr_sClass_XttCamera xttcamera;
           pwr_tObjid objid;
           pwr_tCid cid;
@@ -774,8 +779,7 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
 
           pwr_tAttrRef aref = cdh_ObjidToAref(objid);
 
-          lsts = gdh_GetObjectInfoAttrref(
-              &aref, (pwr_tAddress)&xttcamera, sizeof(xttcamera));
+          lsts = gdh_GetObjectInfoAttrref(&aref, (pwr_tAddress)&xttcamera, sizeof(xttcamera));
           if (EVEN(lsts))
             break;
 
@@ -790,122 +794,109 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
             options |= strm_mOptions_Iconify;
           if (xttcamera.Options & pwr_mCameraOptionsMask_CameraControlPanel)
             options |= strm_mOptions_CameraControlPanel;
-          if (xttcamera.Options
-              & pwr_mCameraOptionsMask_HttpBasicAuthentication)
+          if (xttcamera.Options & pwr_mCameraOptionsMask_HttpBasicAuthentication)
             options |= strm_mOptions_HttpBasicAuthentication;
-          if (xttcamera.Options
-              & pwr_mCameraOptionsMask_CgiParameterAuthentication)
+          if (xttcamera.Options & pwr_mCameraOptionsMask_CgiParameterAuthentication)
             options |= strm_mOptions_CgiParameterAuthentication;
 
-          strmctx[i * rows + j] = new XttStreamGtk(toplevel, this, "No title",
-              xttcamera.URL, mv.Action[i * rows + j].Width,
-              mv.Action[i * rows + j].Height, 0, 0, 0, options, 1, &aref, sts);
+          strmctx[i * rows + j] =
+              new XttStreamGtk(toplevel, this, "No title", xttcamera.URL, mv.Action[i * rows + j].Width,
+                               mv.Action[i * rows + j].Height, 0, 0, 0, options, 1, &aref, sts);
 
           strmctx[i * rows + j]->close_cb = multiview_strm_close_cb;
 
-          comp_widget[i * rows + j]
-              = (GtkWidget*)strmctx[i * rows + j]->get_widget();
+          comp_widget[i * rows + j] = (GtkWidget*)strmctx[i * rows + j]->get_widget();
 
-          appl.insert(applist_eType_Stream, (void*)strmctx[i * rows + j], objid,
-              xttcamera.Title, xttcamera.URL);
+          appl.insert(applist_eType_Stream, (void*)strmctx[i * rows + j], objid, xttcamera.Title,
+                      xttcamera.URL);
 
           break;
         }
         default:;
         }
 
-        if (mv.Action[i * rows + j].Options
-            & pwr_mMultiViewElemOptionsMask_Exchangeable) {
+        if (mv.Action[i * rows + j].Options & pwr_mMultiViewElemOptionsMask_Exchangeable)
+        {
           exchange_widget[i * rows + j] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
           if (comp_widget[i * rows + j])
-            gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]),
-                GTK_WIDGET(comp_widget[i * rows + j]), TRUE, TRUE, 0);
-          switch (mv.Layout) {
+            gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]), GTK_WIDGET(comp_widget[i * rows + j]),
+                               TRUE, TRUE, 0);
+          switch (mv.Layout)
+          {
           case pwr_eMultiViewLayoutEnum_Box:
-            gtk_box_pack_start(GTK_BOX(row_widget),
-                GTK_WIDGET(exchange_widget[i * rows + j]), TRUE, TRUE, 0);
+            gtk_box_pack_start(GTK_BOX(row_widget), GTK_WIDGET(exchange_widget[i * rows + j]), TRUE, TRUE, 0);
             break;
           case pwr_eMultiViewLayoutEnum_Fix:
-            gtk_fixed_put(GTK_FIXED(col_widget),
-                GTK_WIDGET(exchange_widget[i * rows + j]),
-                mv.Action[i * rows + j].X, mv.Action[i * rows + j].Y);
-            gtk_widget_set_size_request(GTK_WIDGET(comp_widget[i * rows + j]),
-                mv.Action[i * rows + j].Width, mv.Action[i * rows + j].Height);
+            gtk_fixed_put(GTK_FIXED(col_widget), GTK_WIDGET(exchange_widget[i * rows + j]),
+                          mv.Action[i * rows + j].X, mv.Action[i * rows + j].Y);
+            gtk_widget_set_size_request(GTK_WIDGET(comp_widget[i * rows + j]), mv.Action[i * rows + j].Width,
+                                        mv.Action[i * rows + j].Height);
             break;
           case pwr_eMultiViewLayoutEnum_Pane:
             if (j == 0)
-              gtk_paned_pack1(GTK_PANED(row_widget),
-                  GTK_WIDGET(exchange_widget[i * rows + j]), TRUE, TRUE);
+              gtk_paned_pack1(GTK_PANED(row_widget), GTK_WIDGET(exchange_widget[i * rows + j]), TRUE, TRUE);
             else
-              gtk_paned_pack2(GTK_PANED(row_widget),
-                  GTK_WIDGET(exchange_widget[i * rows + j]), TRUE, TRUE);
+              gtk_paned_pack2(GTK_PANED(row_widget), GTK_WIDGET(exchange_widget[i * rows + j]), TRUE, TRUE);
             break;
           case pwr_eMultiViewLayoutEnum_Table:
-            gtk_grid_attach(GTK_GRID(col_widget),
-                GTK_WIDGET(exchange_widget[i * rows + j]), j, i, 1, 1);
+            gtk_grid_attach(GTK_GRID(col_widget), GTK_WIDGET(exchange_widget[i * rows + j]), j, i, 1, 1);
             break;
           default:;
           }
-        } else {
-          if (comp_widget[i * rows + j]) {
-            switch (mv.Layout) {
+        }
+        else
+        {
+          if (comp_widget[i * rows + j])
+          {
+            switch (mv.Layout)
+            {
             case pwr_eMultiViewLayoutEnum_Box:
-              gtk_box_pack_start(GTK_BOX(row_widget),
-                  GTK_WIDGET(comp_widget[i * rows + j]), TRUE, TRUE, 0);
+              gtk_box_pack_start(GTK_BOX(row_widget), GTK_WIDGET(comp_widget[i * rows + j]), TRUE, TRUE, 0);
               break;
             case pwr_eMultiViewLayoutEnum_Fix:
-              gtk_fixed_put(GTK_FIXED(col_widget),
-                  GTK_WIDGET(comp_widget[i * rows + j]),
-                  mv.Action[i * rows + j].X, mv.Action[i * rows + j].Y);
+              gtk_fixed_put(GTK_FIXED(col_widget), GTK_WIDGET(comp_widget[i * rows + j]),
+                            mv.Action[i * rows + j].X, mv.Action[i * rows + j].Y);
               gtk_widget_set_size_request(GTK_WIDGET(comp_widget[i * rows + j]),
-                  mv.Action[i * rows + j].Width,
-                  mv.Action[i * rows + j].Height);
+                                          mv.Action[i * rows + j].Width, mv.Action[i * rows + j].Height);
               break;
             case pwr_eMultiViewLayoutEnum_Pane:
               if (j == 0)
-                gtk_paned_pack1(GTK_PANED(row_widget),
-                    GTK_WIDGET(comp_widget[i * rows + j]), TRUE, TRUE);
+                gtk_paned_pack1(GTK_PANED(row_widget), GTK_WIDGET(comp_widget[i * rows + j]), TRUE, TRUE);
               else
-                gtk_paned_pack2(GTK_PANED(row_widget),
-                    GTK_WIDGET(comp_widget[i * rows + j]), TRUE, TRUE);
+                gtk_paned_pack2(GTK_PANED(row_widget), GTK_WIDGET(comp_widget[i * rows + j]), TRUE, TRUE);
               break;
             case pwr_eMultiViewLayoutEnum_Table:
-              gtk_grid_attach(GTK_GRID(col_widget),
-                  GTK_WIDGET(comp_widget[i * rows + j]), j, i, 1, 1);
+              gtk_grid_attach(GTK_GRID(col_widget), GTK_WIDGET(comp_widget[i * rows + j]), j, i, 1, 1);
             default:;
             }
           }
         }
-        if (mv.Layout == pwr_eMultiViewLayoutEnum_Box
-            && ((j + 1) % rows != 0
-                   && mv.Options & pwr_mMultiViewOptionsMask_RowSeparators))
-          gtk_box_pack_start(GTK_BOX(row_widget),
-              GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_HORIZONTAL)), FALSE, FALSE, 0);
+        if (mv.Layout == pwr_eMultiViewLayoutEnum_Box &&
+            ((j + 1) % rows != 0 && mv.Options & pwr_mMultiViewOptionsMask_RowSeparators))
+          gtk_box_pack_start(GTK_BOX(row_widget), GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_HORIZONTAL)),
+                             FALSE, FALSE, 0);
       }
 
-      switch (mv.Layout) {
+      switch (mv.Layout)
+      {
       case pwr_eMultiViewLayoutEnum_Box:
-        gtk_box_pack_start(
-            GTK_BOX(col_widget), GTK_WIDGET(row_widget), TRUE, TRUE, 0);
+        gtk_box_pack_start(GTK_BOX(col_widget), GTK_WIDGET(row_widget), TRUE, TRUE, 0);
         break;
       case pwr_eMultiViewLayoutEnum_Fix:
         break;
       case pwr_eMultiViewLayoutEnum_Pane:
         if (i == 0)
-          gtk_paned_pack1(
-              GTK_PANED(col_widget), GTK_WIDGET(row_widget), TRUE, TRUE);
+          gtk_paned_pack1(GTK_PANED(col_widget), GTK_WIDGET(row_widget), TRUE, TRUE);
         else
-          gtk_paned_pack2(
-              GTK_PANED(col_widget), GTK_WIDGET(row_widget), TRUE, TRUE);
+          gtk_paned_pack2(GTK_PANED(col_widget), GTK_WIDGET(row_widget), TRUE, TRUE);
         break;
       default:;
       }
 
-      if (mv.Layout == pwr_eMultiViewLayoutEnum_Box
-          && (i != cols - 1
-                 && mv.Options & pwr_mMultiViewOptionsMask_ColumnSeparators))
-        gtk_box_pack_start(GTK_BOX(col_widget),
-            GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_VERTICAL)), FALSE, FALSE, 0);
+      if (mv.Layout == pwr_eMultiViewLayoutEnum_Box &&
+          (i != cols - 1 && mv.Options & pwr_mMultiViewOptionsMask_ColumnSeparators))
+        gtk_box_pack_start(GTK_BOX(col_widget), GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_VERTICAL)),
+                           FALSE, FALSE, 0);
 
       if (escape)
         break;
@@ -913,52 +904,55 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
     if (!(options & ge_mOptions_Embedded))
       gtk_container_add(GTK_CONTAINER(toplevel), col_widget);
     else
-      gtk_box_pack_start(
-          GTK_BOX(box_widget), GTK_WIDGET(col_widget), FALSE, FALSE, 0);
+      gtk_box_pack_start(GTK_BOX(box_widget), GTK_WIDGET(col_widget), FALSE, FALSE, 0);
   }
 
-  if (!(options & ge_mOptions_Embedded)) {
+  if (!(options & ge_mOptions_Embedded))
+  {
     gtk_widget_show_all(toplevel);
 
-    if (!(mv_x == 0 && mv_y == 0)) {
+    if (!(mv_x == 0 && mv_y == 0))
+    {
       // Set position
       gtk_window_move(GTK_WINDOW(toplevel), mv_x, mv_y);
-    } else if (!(mv.X == 0 && mv.Y == 0)) {
+    }
+    else if (!(mv.X == 0 && mv.Y == 0))
+    {
       // Set position from object
       gtk_window_move(GTK_WINDOW(toplevel), mv.X, mv.Y);
     }
 
-    for (int i = 0; i < MV_SIZE; i++) {
+    for (int i = 0; i < MV_SIZE; i++)
+    {
       if (trend[i])
         trend[i]->setup();
     }
-    for (int i = 0; i < MV_SIZE; i++) {
+    for (int i = 0; i < MV_SIZE; i++)
+    {
       if (sevhist[i])
         sevhist[i]->setup();
     }
-    for (int i = 0; i < MV_SIZE; i++) {
+    for (int i = 0; i < MV_SIZE; i++)
+    {
       if (strmctx[i])
         strmctx[i]->setup();
     }
-    if (options & ge_mOptions_FullScreen
-        || mv.Options & pwr_mMultiViewOptionsMask_FullScreen)
+    if (options & ge_mOptions_FullScreen || mv.Options & pwr_mMultiViewOptionsMask_FullScreen)
       gtk_window_fullscreen(GTK_WINDOW(toplevel));
-    else if (options & ge_mOptions_Maximize
-        || mv.Options & pwr_mMultiViewOptionsMask_Maximize)
+    else if (options & ge_mOptions_Maximize || mv.Options & pwr_mMultiViewOptionsMask_Maximize)
       gtk_window_maximize(GTK_WINDOW(toplevel)); // TODO
-    else if (options & ge_mOptions_FullMaximize
-        || mv.Options & pwr_mMultiViewOptionsMask_FullMaximize)
+    else if (options & ge_mOptions_FullMaximize || mv.Options & pwr_mMultiViewOptionsMask_FullMaximize)
       gtk_window_maximize(GTK_WINDOW(toplevel));
-    else if (options & ge_mOptions_Iconify
-        || mv.Options & pwr_mMultiViewOptionsMask_Iconify)
+    else if (options & ge_mOptions_Iconify || mv.Options & pwr_mMultiViewOptionsMask_Iconify)
       gtk_window_iconify(GTK_WINDOW(toplevel));
     else if (options & ge_mOptions_Invisible)
       g_object_set(toplevel, "visible", FALSE, NULL);
 
     if (basewidget)
-      gtk_window_set_transient_for(
-          GTK_WINDOW(toplevel), GTK_WINDOW(basewidget));
-  } else {
+      gtk_window_set_transient_for(GTK_WINDOW(toplevel), GTK_WINDOW(basewidget));
+  }
+  else
+  {
     gtk_widget_set_size_request(box_widget, window_width, window_height);
   }
 
@@ -973,8 +967,8 @@ void* XttMultiViewGtk::get_widget()
     return box_widget;
 }
 
-int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
-    char* object, double* borders, int insert, int cont)
+int XttMultiViewGtk::set_subwindow_source(const char* name, char* source, char* object, double* borders,
+                                          int insert, int cont)
 {
   pwr_sClass_XttMultiView mv;
   pwr_tStatus sts;
@@ -990,43 +984,43 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
     return sts;
 
   strncpy(comp_name, name, sizeof(comp_name));
-  if ((sub_name = strchr(comp_name, '.'))) {
+  if ((sub_name = strchr(comp_name, '.')))
+  {
     *sub_name = 0;
     sub_name++;
-  } else
+  }
+  else
     sub_name = 0;
 
-  for (int i = 0; i < cols; i++) {
-    for (int j = 0; j < rows; j++) {
-      if (str_NoCaseStrcmp(comp_name, mv.Action[i * rows + j].Name) == 0) {
-        if (!sub_name) {
+  for (int i = 0; i < cols; i++)
+  {
+    for (int j = 0; j < rows; j++)
+    {
+      if (str_NoCaseStrcmp(comp_name, mv.Action[i * rows + j].Name) == 0)
+      {
+        if (!sub_name)
+        {
           // Replace component
           x = 0;
           y = 0;
           w = mv.Action[i * rows + j].Width;
           h = mv.Action[i * rows + j].Height;
-          scrollbar = (mv.Action[i * rows + j].Options
-                          & pwr_mMultiViewElemOptionsMask_Scrollbars)
-              ? 1
-              : 0;
-          menu = (mv.Action[i * rows + j].Options
-                     & pwr_mMultiViewElemOptionsMask_Menu)
-              ? 1
-              : 0;
+          scrollbar = (mv.Action[i * rows + j].Options & pwr_mMultiViewElemOptionsMask_Scrollbars) ? 1 : 0;
+          menu = (mv.Action[i * rows + j].Options & pwr_mMultiViewElemOptionsMask_Menu) ? 1 : 0;
           type = mv.Action[i * rows + j].Type;
 
-          if (!(mv.Action[i * rows + j].Options
-                  & pwr_mMultiViewElemOptionsMask_Exchangeable))
+          if (!(mv.Action[i * rows + j].Options & pwr_mMultiViewElemOptionsMask_Exchangeable))
             return 0;
 
-          switch (type) {
+          switch (type)
+          {
           case pwr_eMultiViewContentEnum_Graph:
-          case pwr_eMultiViewContentEnum_ObjectGraph: {
-            XttGeGtk* ctx = new XttGeGtk(toplevel, this, "No title", source,
-                scrollbar, menu, 0, w, h, x, y, 1.0, object, 0, 0,
-		ge_mOptions_Embedded, 0, borders, color_theme, 0,
-                multiview_ge_command_cb, multiview_ge_get_current_objects_cb,
-                multiview_ge_is_authorized_cb, multiview_keyboard_cb);
+          case pwr_eMultiViewContentEnum_ObjectGraph:
+          {
+            XttGeGtk* ctx = new XttGeGtk(toplevel, this, "No title", source, scrollbar, menu, 0, w, h, x, y,
+                                         1.0, object, 0, 0, ge_mOptions_Embedded, 0, borders, color_theme, 0,
+                                         multiview_ge_command_cb, multiview_ge_get_current_objects_cb,
+                                         multiview_ge_is_authorized_cb, multiview_keyboard_cb);
 
             ctx->close_cb = multiview_ge_close_cb;
             ctx->help_cb = multiview_ge_help_cb;
@@ -1044,33 +1038,30 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
             // gtk_container_remove(GTK_CONTAINER(exchange_widget[i*rows + j]),
             // comp_widget[i*rows+j]);
             gtk_widget_destroy(comp_widget[i * rows + j]);
-            gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]),
-                GTK_WIDGET(comp_w), TRUE, TRUE, 0);
+            gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]), GTK_WIDGET(comp_w), TRUE, TRUE, 0);
             // gtk_container_add(GTK_CONTAINER(exchange_widget[i*rows + j]),
             // comp_w);
             gtk_widget_show_all(exchange_widget[i * rows + j]);
-            gtk_box_reorder_child(
-                GTK_BOX(exchange_widget[i * rows + j]), comp_w, 0);
+            gtk_box_reorder_child(GTK_BOX(exchange_widget[i * rows + j]), comp_w, 0);
 
             comp_widget[i * rows + j] = comp_w;
             gectx[i * rows + j] = ctx;
             if (insert)
               recall_buffer[i * rows + j].insert(source, object);
-            appl.insert(applist_eType_Graph, (void*)gectx[i * rows + j],
-                pwr_cNObjid, source, object);
+            appl.insert(applist_eType_Graph, (void*)gectx[i * rows + j], pwr_cNObjid, source, object);
             break;
           }
-          case pwr_eMultiViewContentEnum_MultiView: {
+          case pwr_eMultiViewContentEnum_MultiView:
+          {
             pwr_tAttrRef source_aref;
 
             sts = gdh_NameToAttrref(pwr_cNObjid, source, &source_aref);
             if (EVEN(sts))
               break;
 
-            XttMultiViewGtk* ctx = new XttMultiViewGtk(toplevel, this,
-                "No title", &source_aref, w, h, x, y, ge_mOptions_Embedded, 0,
-                color_theme, &sts, multiview_ge_command_cb,
-                multiview_ge_get_current_objects_cb,
+            XttMultiViewGtk* ctx = new XttMultiViewGtk(
+                toplevel, this, "No title", &source_aref, w, h, x, y, ge_mOptions_Embedded, 0, color_theme,
+                &sts, multiview_ge_command_cb, multiview_ge_get_current_objects_cb,
                 multiview_ge_is_authorized_cb, multiview_keyboard_cb);
 
             ctx->close_cb = multiview_ge_close_cb;
@@ -1089,24 +1080,22 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
             // gtk_container_remove(GTK_CONTAINER(exchange_widget[i*rows + j]),
             // comp_widget[i*rows+j]);
             gtk_widget_destroy(comp_widget[i * rows + j]);
-            gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]),
-                GTK_WIDGET(comp_w), TRUE, TRUE, 0);
+            gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]), GTK_WIDGET(comp_w), TRUE, TRUE, 0);
             // gtk_container_add(GTK_CONTAINER(exchange_widget[i*rows + j]),
             // comp_w);
             gtk_widget_show_all(exchange_widget[i * rows + j]);
-            gtk_box_reorder_child(
-                GTK_BOX(exchange_widget[i * rows + j]), comp_w, 0);
+            gtk_box_reorder_child(GTK_BOX(exchange_widget[i * rows + j]), comp_w, 0);
 
             comp_widget[i * rows + j] = comp_w;
             mvctx[i * rows + j] = ctx;
 
             if (insert)
               recall_buffer[i * rows + j].insert(source, object);
-            appl.insert(applist_eType_MultiView, (void*)mvctx[i * rows + j],
-                &source_aref, "", NULL);
+            appl.insert(applist_eType_MultiView, (void*)mvctx[i * rows + j], &source_aref, "", NULL);
             break;
           }
-          case pwr_eMultiViewContentEnum_TrendCurve: {
+          case pwr_eMultiViewContentEnum_TrendCurve:
+          {
             int plotgroup_found = 0;
             pwr_tAttrRef plotgroup;
             pwr_tCid classid;
@@ -1124,7 +1113,8 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
             if (EVEN(lsts))
               break;
 
-            switch (classid) {
+            switch (classid)
+            {
             case pwr_cClass_DsTrend:
             case pwr_cClass_DsTrendCurve:
               break;
@@ -1141,16 +1131,17 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
               break;
 
             XttTrendGtk* ctx;
-            if (plotgroup_found) {
-              ctx = new XttTrendGtk(this, toplevel, (char*)"No title", &comp_w,
-                  0, &plotgroup, w, h, (unsigned int)curve_mOptions_Embedded,
-                  color_theme, 0, &lsts);
-            } else {
+            if (plotgroup_found)
+            {
+              ctx = new XttTrendGtk(this, toplevel, (char*)"No title", &comp_w, 0, &plotgroup, w, h,
+                                    (unsigned int)curve_mOptions_Embedded, color_theme, 0, &lsts);
+            }
+            else
+            {
               arefv[0] = object_aref;
               memset(&arefv[1], 0, sizeof(arefv[0]));
-              ctx = new XttTrendGtk(this, toplevel, (char*)"No title", &comp_w,
-                  arefv, 0, w, h, (unsigned int)curve_mOptions_Embedded,
-                  color_theme, 0, &lsts);
+              ctx = new XttTrendGtk(this, toplevel, (char*)"No title", &comp_w, arefv, 0, w, h,
+                                    (unsigned int)curve_mOptions_Embedded, color_theme, 0, &lsts);
             }
             if (EVEN(lsts))
               break;
@@ -1163,26 +1154,24 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
             delete trend[i * rows + j];
 
             gtk_widget_destroy(comp_widget[i * rows + j]);
-            gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]),
-                GTK_WIDGET(comp_w), TRUE, TRUE, 0);
+            gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]), GTK_WIDGET(comp_w), TRUE, TRUE, 0);
             gtk_widget_show_all(exchange_widget[i * rows + j]);
             ctx->setup();
-            gtk_box_reorder_child(
-                GTK_BOX(exchange_widget[i * rows + j]), comp_w, 0);
+            gtk_box_reorder_child(GTK_BOX(exchange_widget[i * rows + j]), comp_w, 0);
 
             comp_widget[i * rows + j] = comp_w;
             trend[i * rows + j] = ctx;
 
             if (insert)
               recall_buffer[i * rows + j].insert(source, object);
-            appl.insert(applist_eType_Trend, (void*)trend[i * rows + j],
-                &arefv[0], "", NULL);
+            appl.insert(applist_eType_Trend, (void*)trend[i * rows + j], &arefv[0], "", NULL);
 
             mv.Action[i * rows + j].Object[0] = object_aref;
             break;
           }
 
-          case pwr_eMultiViewContentEnum_SevHistory: {
+          case pwr_eMultiViewContentEnum_SevHistory:
+          {
             pwr_tOid oidv[11];
             pwr_tOName anamev[11];
             pwr_tOName onamev[11];
@@ -1213,7 +1202,8 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
               break;
             ;
 
-            switch (classid) {
+            switch (classid)
+            {
             case pwr_cClass_SevHist:
               break;
             case pwr_cClass_SevHistObject:
@@ -1230,7 +1220,8 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
             if (skip)
               break;
 
-            if (plotgroup_found) {
+            if (plotgroup_found)
+            {
               pwr_sClass_PlotGroup plot;
               pwr_tCid cid;
               int j;
@@ -1239,7 +1230,8 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
               if (EVEN(lsts))
                 break;
 
-              for (j = 0; j < 20; j++) {
+              for (j = 0; j < 20; j++)
+              {
                 if (cdh_ObjidIsNull(plot.YObjectName[j].Objid))
                   break;
 
@@ -1248,19 +1240,17 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
                 if (EVEN(lsts))
                   break;
 
-                if (cid == pwr_cClass_SevHist) {
-                  lsts = gdh_ArefANameToAref(
-                      &sevhist_aref, "Attribute", &attr_aref);
+                if (cid == pwr_cClass_SevHist)
+                {
+                  lsts = gdh_ArefANameToAref(&sevhist_aref, "Attribute", &attr_aref);
                   if (EVEN(lsts))
                     break;
 
-                  lsts = gdh_GetObjectInfoAttrref(
-                      &attr_aref, &attr_aref, sizeof(attr_aref));
+                  lsts = gdh_GetObjectInfoAttrref(&attr_aref, &attr_aref, sizeof(attr_aref));
                   if (EVEN(lsts))
                     break;
 
-                  lsts = gdh_AttrrefToName(
-                      &attr_aref, aname, sizeof(aname), cdh_mNName);
+                  lsts = gdh_AttrrefToName(&attr_aref, aname, sizeof(aname), cdh_mNName);
                   if (EVEN(lsts))
                     break;
 
@@ -1274,27 +1264,29 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
                   oidv[oid_cnt] = attr_aref.Objid;
                   sevhistobjectv[oid_cnt] = false;
                   oid_cnt++;
-                } else if (cid == pwr_cClass_SevHistObject) {
-                  lsts = gdh_ArefANameToAref(
-                      &sevhist_aref, "Object", &attr_aref);
+                }
+                else if (cid == pwr_cClass_SevHistObject)
+                {
+                  lsts = gdh_ArefANameToAref(&sevhist_aref, "Object", &attr_aref);
                   if (EVEN(lsts))
                     break;
 
-                  lsts = gdh_GetObjectInfoAttrref(
-                      &attr_aref, &attr_aref, sizeof(attr_aref));
+                  lsts = gdh_GetObjectInfoAttrref(&attr_aref, &attr_aref, sizeof(attr_aref));
                   if (EVEN(lsts))
                     break;
 
-                  lsts = gdh_AttrrefToName(
-                      &attr_aref, aname, sizeof(aname), cdh_mNName);
+                  lsts = gdh_AttrrefToName(&attr_aref, aname, sizeof(aname), cdh_mNName);
                   if (EVEN(lsts))
                     break;
 
                   s = strchr(aname, '.');
-                  if (!s) {
+                  if (!s)
+                  {
                     // It is a complete object
                     anamev[oid_cnt][0] = '\0';
-                  } else {
+                  }
+                  else
+                  {
                     strcpy(anamev[oid_cnt], s + 1);
                     *s = 0;
                   }
@@ -1304,26 +1296,29 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
                   oid_cnt++;
                 }
               }
-            } else if (sevHistObjectFound) {
+            }
+            else if (sevHistObjectFound)
+            {
               lsts = gdh_ArefANameToAref(&object_aref, "Object", &attr_aref);
               if (EVEN(lsts))
                 break;
 
-              lsts = gdh_GetObjectInfoAttrref(
-                  &attr_aref, &attr_aref, sizeof(attr_aref));
+              lsts = gdh_GetObjectInfoAttrref(&attr_aref, &attr_aref, sizeof(attr_aref));
               if (EVEN(lsts))
                 break;
 
-              lsts = gdh_AttrrefToName(
-                  &attr_aref, aname, sizeof(aname), cdh_mNName);
+              lsts = gdh_AttrrefToName(&attr_aref, aname, sizeof(aname), cdh_mNName);
               if (EVEN(lsts))
                 break;
 
               s = strchr(aname, '.');
-              if (!s) {
+              if (!s)
+              {
                 // It is a complete object
                 anamev[oid_cnt][0] = '\0';
-              } else {
+              }
+              else
+              {
                 strcpy(anamev[oid_cnt], s + 1);
               }
               oidv[oid_cnt] = attr_aref.Objid;
@@ -1331,18 +1326,18 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
               strcpy(onamev[oid_cnt], "");
               sevhist_aref = object_aref;
               oid_cnt = 1;
-            } else {
+            }
+            else
+            {
               lsts = gdh_ArefANameToAref(&object_aref, "Attribute", &attr_aref);
               if (EVEN(lsts))
                 break;
 
-              lsts = gdh_GetObjectInfoAttrref(
-                  &attr_aref, &attr_aref, sizeof(attr_aref));
+              lsts = gdh_GetObjectInfoAttrref(&attr_aref, &attr_aref, sizeof(attr_aref));
               if (EVEN(lsts))
                 break;
 
-              lsts = gdh_AttrrefToName(
-                  &attr_aref, aname, sizeof(aname), cdh_mNName);
+              lsts = gdh_AttrrefToName(&attr_aref, aname, sizeof(aname), cdh_mNName);
               if (EVEN(lsts))
                 break;
 
@@ -1367,10 +1362,9 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
             if (!xnav->scctx)
               break;
 
-            ctx = new XttSevHistGtk(this, toplevel, (char*)"No title", &comp_w,
-                oidv, anamev, onamev, sevhistobjectv, xnav->scctx, w, h,
-                (unsigned int)curve_mOptions_Embedded, color_theme,
-                time_ePeriod_, 0, &lsts);
+            ctx = new XttSevHistGtk(this, toplevel, (char*)"No title", &comp_w, oidv, anamev, onamev,
+                                    sevhistobjectv, xnav->scctx, w, h, (unsigned int)curve_mOptions_Embedded,
+                                    color_theme, time_ePeriod_, 0, &lsts);
             if (EVEN(lsts))
               break;
 
@@ -1381,12 +1375,10 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
             delete sevhist[i * rows + j];
 
             gtk_widget_destroy(comp_widget[i * rows + j]);
-            gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]),
-                GTK_WIDGET(comp_w), TRUE, TRUE, 0);
+            gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]), GTK_WIDGET(comp_w), TRUE, TRUE, 0);
             gtk_widget_show_all(exchange_widget[i * rows + j]);
             ctx->setup();
-            gtk_box_reorder_child(
-                GTK_BOX(exchange_widget[i * rows + j]), comp_w, 0);
+            gtk_box_reorder_child(GTK_BOX(exchange_widget[i * rows + j]), comp_w, 0);
 
             comp_widget[i * rows + j] = comp_w;
             sevhist[i * rows + j] = ctx;
@@ -1399,7 +1391,9 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
 
             mv.Action[i * rows + j].Object[0] = object_aref;
           }
-          case pwr_eMultiViewContentEnum_Camera: {
+          /* fall through */
+          case pwr_eMultiViewContentEnum_Camera:
+          {
             pwr_sClass_XttCamera xttcamera;
             pwr_tStatus lsts;
             pwr_tAttrRef object_aref;
@@ -1408,14 +1402,12 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
             if (EVEN(lsts))
               break;
 
-            lsts = gdh_GetObjectInfoAttrref(
-                &object_aref, (pwr_tAddress)&xttcamera, sizeof(xttcamera));
+            lsts = gdh_GetObjectInfoAttrref(&object_aref, (pwr_tAddress)&xttcamera, sizeof(xttcamera));
             if (EVEN(lsts))
               break;
 
-            XttStreamGtk* ctx
-                = new XttStreamGtk(toplevel, this, "No title", xttcamera.URL, w,
-                    h, 0, 0, 0, xttcamera.Options, 1, &object_aref, &lsts);
+            XttStreamGtk* ctx = new XttStreamGtk(toplevel, this, "No title", xttcamera.URL, w, h, 0, 0, 0,
+                                                 xttcamera.Options, 1, &object_aref, &lsts);
 
             GtkWidget* comp_w = (GtkWidget*)ctx->get_widget();
 
@@ -1423,38 +1415,40 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
             delete strmctx[i * rows + j];
 
             gtk_widget_destroy(comp_widget[i * rows + j]);
-            gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]),
-                GTK_WIDGET(comp_w), TRUE, TRUE, 0);
+            gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]), GTK_WIDGET(comp_w), TRUE, TRUE, 0);
             // gtk_container_add(GTK_CONTAINER(exchange_widget[i*rows + j]),
             // comp_w);
             gtk_widget_show_all(exchange_widget[i * rows + j]);
-            gtk_box_reorder_child(
-                GTK_BOX(exchange_widget[i * rows + j]), comp_w, 0);
+            gtk_box_reorder_child(GTK_BOX(exchange_widget[i * rows + j]), comp_w, 0);
 
             comp_widget[i * rows + j] = comp_w;
             strmctx[i * rows + j] = ctx;
             if (insert)
               recall_buffer[i * rows + j].insert(source, object);
 
-            appl.insert(applist_eType_Stream, (void*)strmctx[i * rows + j],
-                object_aref.Objid, xttcamera.Title, xttcamera.URL);
+            appl.insert(applist_eType_Stream, (void*)strmctx[i * rows + j], object_aref.Objid,
+                        xttcamera.Title, xttcamera.URL);
             break;
           }
           default:;
           }
-        } else {
+        }
+        else
+        {
           // Call set_window in component
           type = mv.Action[i * rows + j].Type;
 
-          switch (type) {
+          switch (type)
+          {
           case pwr_eMultiViewContentEnum_Graph:
-          case pwr_eMultiViewContentEnum_ObjectGraph: {
+          case pwr_eMultiViewContentEnum_ObjectGraph:
+          {
             gectx[i * rows + j]->set_subwindow_source(sub_name, source, object);
             break;
           }
-          case pwr_eMultiViewContentEnum_MultiView: {
-            mvctx[i * rows + j]->set_subwindow_source(
-                sub_name, source, object, borders, insert);
+          case pwr_eMultiViewContentEnum_MultiView:
+          {
+            mvctx[i * rows + j]->set_subwindow_source(sub_name, source, object, borders, insert);
           }
           default:;
           }
@@ -1472,12 +1466,16 @@ int XttMultiViewGtk::key_pressed(int key)
 {
   int sts;
 
-  for (int i = 0; i < cols * rows; i++) {
-    if (gectx[i] != 0) {
+  for (int i = 0; i < cols * rows; i++)
+  {
+    if (gectx[i] != 0)
+    {
       sts = gectx[i]->key_pressed(key);
       if (ODD(sts))
         return sts;
-    } else if (mvctx[i] != 0) {
+    }
+    else if (mvctx[i] != 0)
+    {
       sts = mvctx[i]->key_pressed(key);
       if (ODD(sts))
         return sts;
@@ -1488,7 +1486,8 @@ int XttMultiViewGtk::key_pressed(int key)
 
 void XttMultiViewGtk::close_input_all()
 {
-  for (int i = 0; i < cols * rows; i++) {
+  for (int i = 0; i < cols * rows; i++)
+  {
     if (gectx[i] != 0)
       gectx[i]->close_input_all();
     else if (mvctx[i] != 0)
@@ -1505,16 +1504,20 @@ void XttMultiViewGtk::signal_send(char* signalname)
   if (EVEN(sts))
     return;
 
-  for (int i = 0; i < cols; i++) {
-    for (int j = 0; j < rows; j++) {
+  for (int i = 0; i < cols; i++)
+  {
+    for (int j = 0; j < rows; j++)
+    {
       // Call signal_send in component
 
-      switch (mv.Action[i * rows + j].Type) {
+      switch (mv.Action[i * rows + j].Type)
+      {
       case pwr_eMultiViewContentEnum_Graph:
       case pwr_eMultiViewContentEnum_ObjectGraph:
         gectx[i * rows + j]->signal_send(signalname);
         break;
-      case pwr_eMultiViewContentEnum_MultiView: {
+      case pwr_eMultiViewContentEnum_MultiView:
+      {
         mvctx[i * rows + j]->signal_send(signalname);
         break;
       }

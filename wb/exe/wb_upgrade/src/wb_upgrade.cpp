@@ -56,121 +56,212 @@
 #include "wb_env.h"
 #include "wb_session.h"
 
-typedef struct {
+typedef struct
+{
   pwr_tOName cname;
   pwr_tObjName attr[25];
   pwr_tAName value[25];
 } upg_sSigChanCon;
 
 static upg_sSigChanCon upg_sigchancon[] = {
-  { "BaseComponent:Class-BaseFcPPO3",
-      { "StatusWordSW", "ActSpeed", "ControlWordCW", "RefSpeed", "", "", "", "",
-          "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" },
-      { "$IoConnect:BaseComponent-Class-BaseFcPPO3IoModule.I_SW",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO3IoModule.I_ACT",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO3IoModule.O_CW",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO3IoModule.O_REF", "", "", "",
-          "", "", "", "", "", "", "", "", "", "", "", "", "", "" } },
-  { "BaseComponent:Class-BaseFcPPO5",
-      { "InIdPar", "InIndPar", "InValuePar", "StatusWordSW", "ActSpeed",
-          "ActTorque", "ActCurrent", "PZD5", "PZD6", "PZD7", "PZD8", "PZD9",
-          "OutIdPar", "OutIndPar", "OutValuePar", "ControlWordCW", "RefSpeed",
-          "OPZD3", "OPZD4", "OPZD5", "OPZD6", "", "", "", "" },
-      { "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_ID",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_IND",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_VALUE",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_SW",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_ACT",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD4",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD3",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD5",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD6",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD7",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD8",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD9",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_ID",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_IND",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_VALUE",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_CW",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_REF",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_PZD3",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_PZD4",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_PZD5",
-          "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_PZD6", "", "",
-          "", "" } },
-  { "ABB:Class-ABB_ACS800_1",
-      { "InIdPar", "InIndPar", "InValuePar", "ActSpeed", "ActTorque",
-          "ActCurrent", "StatusWordSW", "FaultWord1", "FaultWord2", "Di6_1",
-          "StatusWordSW3", "AlarmWord5", "OutIdPar", "OutIndPar", "OutValuePar",
-          "ControlWordCW", "RefSpeed", "", "", "", "", "", "", "", "" },
-      { "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_ID",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_IND",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_VALUE",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_ACT",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD4",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD3",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_SW",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD5",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD6",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD7",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD9",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD8",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.O_ID",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.O_IND",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.O_VALUE",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.O_CW",
-          "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.O_REF", "", "", "", "",
-          "", "", "", "" } },
-  { "ABB:Class-ABB_ACC800",
-      { "InIdPar", "InIndPar", "InValuePar", "StatusWordSW", "ActSpeed",
-          "ActTorque", "SpeedRef3", "PosActPPU", "ActCurrent", "FaultWord1",
-          "FaultWord2", "AlarmWord", "MotorVolt", "OutIdPar", "OutIndPar",
-          "OutValuePar", "ControlWordCW", "RefSpeed", "TorqRef", "RampRate",
-          "SpeedCorr", "PosPrePPU", "AuxComWord", "LoadMeasRef", "ParValue1" },
-      { "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_ID",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_IND",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_VALUE",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_SW",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_ACT",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD3",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD4",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD5",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD6",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD7",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD8",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD9",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD10",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_ID",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_IND",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_VALUE",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_CW",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_REF",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD3",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD4",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD5",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD6",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD7",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD8",
-          "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD10" } }
-};
+    {"BaseComponent:Class-BaseFcPPO3",
+     {"StatusWordSW",
+      "ActSpeed",
+      "ControlWordCW",
+      "RefSpeed",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""},
+     {"$IoConnect:BaseComponent-Class-BaseFcPPO3IoModule.I_SW",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO3IoModule.I_ACT",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO3IoModule.O_CW",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO3IoModule.O_REF",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""}},
+    {"BaseComponent:Class-BaseFcPPO5",
+     {"InIdPar",
+      "InIndPar",
+      "InValuePar",
+      "StatusWordSW",
+      "ActSpeed",
+      "ActTorque",
+      "ActCurrent",
+      "PZD5",
+      "PZD6",
+      "PZD7",
+      "PZD8",
+      "PZD9",
+      "OutIdPar",
+      "OutIndPar",
+      "OutValuePar",
+      "ControlWordCW",
+      "RefSpeed",
+      "OPZD3",
+      "OPZD4",
+      "OPZD5",
+      "OPZD6",
+      "",
+      "",
+      "",
+      ""},
+     {"$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_ID",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_IND",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_VALUE",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_SW",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_ACT",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD4",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD3",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD5",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD6",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD7",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD8",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.I_PZD9",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_ID",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_IND",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_VALUE",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_CW",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_REF",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_PZD3",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_PZD4",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_PZD5",
+      "$IoConnect:BaseComponent-Class-BaseFcPPO5IoModule.O_PZD6",
+      "",
+      "",
+      "",
+      ""}},
+    {"ABB:Class-ABB_ACS800_1",
+     {"InIdPar",
+      "InIndPar",
+      "InValuePar",
+      "ActSpeed",
+      "ActTorque",
+      "ActCurrent",
+      "StatusWordSW",
+      "FaultWord1",
+      "FaultWord2",
+      "Di6_1",
+      "StatusWordSW3",
+      "AlarmWord5",
+      "OutIdPar",
+      "OutIndPar",
+      "OutValuePar",
+      "ControlWordCW",
+      "RefSpeed",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""},
+     {"$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_ID",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_IND",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_VALUE",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_ACT",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD4",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD3",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_SW",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD5",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD6",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD7",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD9",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.I_PZD8",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.O_ID",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.O_IND",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.O_VALUE",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.O_CW",
+      "$IoConnect:ABB-Class-ABB_ACS_PPO5_IoModule.O_REF",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""}},
+    {"ABB:Class-ABB_ACC800",
+     {"InIdPar",   "InIndPar",    "InValuePar",    "StatusWordSW", "ActSpeed",  "ActTorque", "SpeedRef3",
+      "PosActPPU", "ActCurrent",  "FaultWord1",    "FaultWord2",   "AlarmWord", "MotorVolt", "OutIdPar",
+      "OutIndPar", "OutValuePar", "ControlWordCW", "RefSpeed",     "TorqRef",   "RampRate",  "SpeedCorr",
+      "PosPrePPU", "AuxComWord",  "LoadMeasRef",   "ParValue1"},
+     {"$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_ID",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_IND",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_VALUE",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_SW",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_ACT",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD3",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD4",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD5",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD6",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD7",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD8",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD9",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.I_PZD10",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_ID",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_IND",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_VALUE",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_CW",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_REF",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD3",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD4",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD5",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD6",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD7",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD8",
+      "$IoConnect:ABB-Class-ABB_ACC_PPO5_IoModule.O_PZD10"}}};
 
-static void usage()
-{
-  printf("\nUsage: wb_upgrade -v 'volumename'\n\n");
-}
+static void usage() { printf("\nUsage: wb_upgrade -v 'volumename'\n\n"); }
 
 int main(int argc, char* argv[])
 {
   pwr_tObjName volume;
 
-  for (int i = 1; i < argc; i++) {
-    if (argv[i][0] == '-') {
-      switch (argv[i][1]) {
+  for (int i = 1; i < argc; i++)
+  {
+    if (argv[i][0] == '-')
+    {
+      switch (argv[i][1])
+      {
       case 'h':
         usage();
         exit(0);
       case 'v':
-        if (i + 1 >= argc) {
+        if (i + 1 >= argc)
+        {
           usage();
           exit(0);
         }
@@ -189,9 +280,11 @@ int main(int argc, char* argv[])
   env.load(volume);
 
   wb_volume vol;
-  for (vol = env.volume(); vol.oddSts(); vol.next()) {
-    if (vol.cid() == pwr_eClass_RootVolume || vol.cid() == pwr_eClass_SubVolume
-        || vol.cid() == pwr_eClass_SharedVolume) {
+  for (vol = env.volume(); vol.oddSts(); vol.next())
+  {
+    if (vol.cid() == pwr_eClass_RootVolume || vol.cid() == pwr_eClass_SubVolume ||
+        vol.cid() == pwr_eClass_SharedVolume)
+    {
       break;
     }
   }
@@ -199,7 +292,8 @@ int main(int argc, char* argv[])
     exit(vol.sts());
 
   wb_session session(vol);
-  if (!session.access(ldh_eAccess_ReadWrite)) {
+  if (!session.access(ldh_eAccess_ReadWrite))
+  {
     std::cout << "** No write access\n";
     exit(0);
   }
@@ -209,18 +303,19 @@ int main(int argc, char* argv[])
   pwr_tCid cid;
   pwr_tAttrRef value_aref;
 
-  for (unsigned int i = 0;
-       i < sizeof(upg_sigchancon) / sizeof(upg_sigchancon[0]); i++) {
+  for (unsigned int i = 0; i < sizeof(upg_sigchancon) / sizeof(upg_sigchancon[0]); i++)
+  {
     wb_object co = session.object(upg_sigchancon[i].cname);
-    if (!co) {
+    if (!co)
+    {
       printf("** Class not loaded: %s\n", upg_sigchancon[i].cname);
       continue;
     }
 
     cid = cdh_ClassObjidToId(co.oid());
 
-    for (session.aref(cid, &aref); session.oddSts();
-         session.nextAref(cid, &aref, &aref)) {
+    for (session.aref(cid, &aref); session.oddSts(); session.nextAref(cid, &aref, &aref))
+    {
       wb_attribute a = session.attribute(&aref);
       if (!a)
         continue;
@@ -234,23 +329,24 @@ int main(int argc, char* argv[])
         continue;
 
       wb_attribute a_pbmodule = session.attribute(&value_aref);
-      if (a_pbmodule.oddSts()) {
+      if (a_pbmodule.oddSts())
+      {
         wb_attribute a_iomodule(a_pbmodule, 0, "Io");
-        if (a_iomodule.oddSts()) {
+        if (a_iomodule.oddSts())
+        {
           value_aref = a_iomodule.aref();
           session.writeAttribute(a_ioconnect, &value_aref, sizeof(value_aref));
-          printf("Set %s -> %s\n", a_iomodule.longName().c_str(),
-              a_ioconnect.longName().c_str());
+          printf("Set %s -> %s\n", a_iomodule.longName().c_str(), a_ioconnect.longName().c_str());
         }
       }
 
-      for (unsigned int j = 0; j
-           < sizeof(upg_sigchancon[0].attr) / sizeof(upg_sigchancon[0].attr[0]);
-           j++) {
+      for (unsigned int j = 0; j < sizeof(upg_sigchancon[0].attr) / sizeof(upg_sigchancon[0].attr[0]); j++)
+      {
         if (streq(upg_sigchancon[i].attr[j], ""))
           break;
 
-        try {
+        try
+        {
           wb_attribute a_attr2(a, 0, upg_sigchancon[i].attr[j]);
           if (a_attr2.evenSts())
             continue;
@@ -263,9 +359,9 @@ int main(int argc, char* argv[])
           if (a_attr.evenSts())
             continue;
 
-          if (value_aref.Objid.vid == cdh_cIoConnectVolume) {
-            wb_attribute a_value
-                = session.attribute(upg_sigchancon[i].value[j]);
+          if (value_aref.Objid.vid == cdh_cIoConnectVolume)
+          {
+            wb_attribute a_value = session.attribute(upg_sigchancon[i].value[j]);
             value_aref = a_value.aref();
             if (a_value.evenSts())
               continue;
@@ -274,7 +370,9 @@ int main(int argc, char* argv[])
             // printf( "Updating SigChanCon \"%s\" %s\n",
             // a_attr.longName().c_str(), upg_sigchancon[i].value[j]);
           }
-        } catch (wb_error&) {
+        }
+        catch (wb_error&)
+        {
           continue;
         }
       }

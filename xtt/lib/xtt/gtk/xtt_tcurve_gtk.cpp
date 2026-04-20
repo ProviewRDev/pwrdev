@@ -48,12 +48,10 @@
 #include "xtt_tcurve_gtk.h"
 #include "xtt_xnav.h"
 
-XttTCurveGtk::XttTCurveGtk(void* parent_ctx, GtkWidget* parent_wid,
-    const char* name, GtkWidget** w, pwr_tAttrRef* xn_arefv, int xn_width,
-    int xn_height, unsigned int xn_options, int xn_color_theme,
-    void* basewidget, int* sts)
-    : XttTCurve(parent_ctx, name, xn_arefv, xn_color_theme, sts),
-      parent_widget(parent_wid)
+XttTCurveGtk::XttTCurveGtk(void* parent_ctx, GtkWidget* parent_wid, const char* name, GtkWidget** w,
+                           pwr_tAttrRef* xn_arefv, int xn_width, int xn_height, unsigned int xn_options,
+                           int xn_color_theme, void* basewidget, int* sts)
+    : XttTCurve(parent_ctx, name, xn_arefv, xn_color_theme, sts), parent_widget(parent_wid)
 {
   char title[250];
   strncpy(title, name, sizeof(title));
@@ -64,8 +62,8 @@ XttTCurveGtk::XttTCurveGtk(void* parent_ctx, GtkWidget* parent_wid,
 
   *sts = XNAV__SUCCESS;
 
-  curve = new GeCurveGtk(this, parent_widget, title, NULL, gcd, 1, xn_width,
-      xn_height, xn_options, color_theme, basewidget);
+  curve = new GeCurveGtk(this, parent_widget, title, NULL, gcd, 1, xn_width, xn_height, xn_options,
+                         color_theme, basewidget);
   curve->close_cb = tcurve_close_cb;
   curve->help_cb = tcurve_help_cb;
   curve->increase_period_cb = tcurve_increase_period_cb;
@@ -79,9 +77,9 @@ XttTCurveGtk::XttTCurveGtk(void* parent_ctx, GtkWidget* parent_wid,
   curve->save_cb = tcurve_save_cb;
   curve->remove_cb = tcurve_remove_cb;
   curve->export_cb = tcurve_export_cb;
-  curve->enable(curve_mEnable_Timebox | curve_mEnable_Export | curve_mEnable_New
-      | curve_mEnable_Open | curve_mEnable_Save | curve_mEnable_CurveType
-      | curve_mEnable_CurveTypeSquare | curve_mEnable_FillCurve);
+  curve->enable(curve_mEnable_Timebox | curve_mEnable_Export | curve_mEnable_New | curve_mEnable_Open |
+                curve_mEnable_Save | curve_mEnable_CurveType | curve_mEnable_CurveTypeSquare |
+                curve_mEnable_FillCurve);
 
   wow = new CoWowGtk(parent_widget);
   timerid = wow->timer_new();

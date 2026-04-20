@@ -48,7 +48,8 @@
 #define xattnav_cVersion "X3.3b"
 #define XATTNAV_BROW_MAX 25
 
-typedef enum {
+typedef enum
+{
   xattnav_eType_Object,
   xattnav_eType_CrossRef,
   xattnav_eType_Collect,
@@ -58,11 +59,11 @@ typedef enum {
 class CoWow;
 class CoWowTimer;
 
-class XAttNav {
+class XAttNav
+{
 public:
-  XAttNav(void* xa_parent_ctx, xattnav_eType xa_type, const char* xa_name,
-      pwr_sAttrRef* xa_objar, int xa_advanced_user, void* xa_userdata,
-      pwr_tStatus* status);
+  XAttNav(void* xa_parent_ctx, xattnav_eType xa_type, const char* xa_name, pwr_sAttrRef* xa_objar,
+          int xa_advanced_user, void* xa_userdata, pwr_tStatus* status);
   virtual ~XAttNav();
 
   void* parent_ctx;
@@ -78,8 +79,7 @@ public:
   void (*message_cb)(void*, char, const char*);
   void (*close_cb)(void*);
   void (*change_value_cb)(void*);
-  void (*popup_menu_cb)(
-      void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  void (*popup_menu_cb)(void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
   void (*start_trace_cb)(void*, pwr_tObjid, char*);
   int (*is_authorized_cb)(void*, unsigned int);
   int (*init_cb)(void*);
@@ -87,17 +87,12 @@ public:
   CoWow* wow;
   int scantime;
 
-  virtual void popup_position(int x_event, int y_event, int* x, int* y)
-  {
-  }
-  virtual void set_inputfocus()
-  {
-  }
+  virtual void popup_position(int x_event, int y_event, int* x, int* y) {}
+  virtual void set_inputfocus() {}
 
   void start_trace(pwr_tObjid Objid, char* object_str);
   int set_attr_value(brow_tObject node, char* name, char* value_str);
-  int check_attr(int* multiline, brow_tObject* node, char* name,
-      char** init_value, int* size);
+  int check_attr(int* multiline, brow_tObject* node, char* name, char** init_value, int* size);
   void message(char sev, const char* text);
   void force_trace_scan();
   int object_exist(brow_tObject object);
@@ -107,22 +102,15 @@ public:
   void start_trace();
   void swap(int mode);
   int get_select(pwr_tAttrRef* arp);
-  void set_scantime(int t)
-  {
-    scantime = t;
-  }
-  int get_scantime()
-  {
-    return scantime;
-  }
+  void set_scantime(int t) { scantime = t; }
+  int get_scantime() { return scantime; }
   void zoom(double zoom_factor);
   void get_zoom(double* zoom_factor);
   void unzoom();
 
   static void trace_scan(void* data);
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
-  static int trace_connect_bc(brow_tObject object, char* name, char* attr,
-      flow_eTraceType type, void** p);
+  static int trace_connect_bc(brow_tObject object, char* name, char* attr, flow_eTraceType type, void** p);
   static int trace_disconnect_bc(brow_tObject object);
   static int trace_scan_bc(brow_tObject object, void* p);
   static int init_brow_cb(FlowCtx* fctx, void* client_data);

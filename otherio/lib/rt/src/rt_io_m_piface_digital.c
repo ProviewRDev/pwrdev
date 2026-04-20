@@ -50,12 +50,12 @@
 
 #include <libpiface-1.0/pfio.h>
 
-typedef struct {
+typedef struct
+{
   pwr_tStatus sts;
 } io_sLocal_PiFace;
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal_PiFace* local;
   pwr_sClass_PiFace_Digital* op = (pwr_sClass_PiFace_Digital*)cp->op;
@@ -64,7 +64,8 @@ static pwr_tStatus IoCardInit(
   cp->Local = local;
 
   local->sts = pfio_init();
-  if (local->sts != 0) {
+  if (local->sts != 0)
+  {
     op->Status = IO__INITFAIL;
     return op->Status;
   }
@@ -75,8 +76,7 @@ static pwr_tStatus IoCardInit(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal_PiFace* local = (io_sLocal_PiFace*)cp->Local;
 
@@ -89,8 +89,7 @@ static pwr_tStatus IoCardClose(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal_PiFace* local = (io_sLocal_PiFace*)cp->Local;
   uint8_t value;
@@ -104,7 +103,8 @@ static pwr_tStatus IoCardRead(
   value = pfio_read_input();
 
   m = 1;
-  for (i = 0; i < 8; i++) {
+  for (i = 0; i < 8; i++)
+  {
     if (cp->chanlist[i].sop)
       *(pwr_tBoolean*)cp->chanlist[i].vbp = ((value & m) != 0);
     m = m << 1;
@@ -113,8 +113,7 @@ static pwr_tStatus IoCardRead(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal_PiFace* local = (io_sLocal_PiFace*)cp->Local;
   uint8_t value;
@@ -127,8 +126,10 @@ static pwr_tStatus IoCardWrite(
   // Handle Do
   m = 1;
   value = 0;
-  for (i = 0; i < 8; i++) {
-    if (cp->chanlist[i + 8].sop) {
+  for (i = 0; i < 8; i++)
+  {
+    if (cp->chanlist[i + 8].sop)
+    {
       if (*(pwr_tBoolean*)cp->chanlist[i + 8].vbp)
         value |= m;
     }
@@ -140,23 +141,19 @@ static pwr_tStatus IoCardWrite(
 }
 
 #else
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   return IO__RELEASEBUILD;
 }
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   return IO__RELEASEBUILD;
 }
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   return IO__RELEASEBUILD;
 }
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   return IO__RELEASEBUILD;
 }
@@ -164,6 +161,6 @@ static pwr_tStatus IoCardWrite(
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(PiFace_Digital) = { pwr_BindIoMethod(IoCardInit),
-  pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead),
-  pwr_BindIoMethod(IoCardWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(PiFace_Digital) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                                 pwr_BindIoMethod(IoCardRead), pwr_BindIoMethod(IoCardWrite),
+                                                 pwr_NullMethod};

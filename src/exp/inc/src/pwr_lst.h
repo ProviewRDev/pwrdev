@@ -38,9 +38,10 @@
 #define pwr_lst_h
 
 /* pwr_lst.h -- list macros
-*/
+ */
 
-struct LstHead {
+struct LstHead
+{
   struct LstHead *next, *prev;
 };
 
@@ -57,47 +58,38 @@ struct LstHead {
  * a -> b   (a <-> b -> c)
  * b <- c   (a <-> b <-> c)
  */
-static inline void LstInsert(struct LstHead *p, struct LstHead *e)
+static inline void LstInsert(struct LstHead* p, struct LstHead* e)
 {
-    e->prev = p->prev;
-    e->next = p;
-    p->prev->next = e;
-    p->prev = e;
+  e->prev = p->prev;
+  e->next = p;
+  p->prev->next = e;
+  p->prev = e;
 }
 
 /*
  * LstRemove(s_LstLink_T) removes the element from the linked list, which is
  * done by modifying the next element to point at the previous and vice versa.
  */
-static inline void LstRemove(struct LstHead *p)
+static inline void LstRemove(struct LstHead* p)
 {
-    p->next->prev = p->prev;
-    p->prev->next = p->next;
+  p->next->prev = p->prev;
+  p->prev->next = p->next;
 }
 
 /*
  * LstNull(s_LstLink_T) sets the linked list to NULL.
  */
-static inline void LstNull(struct LstHead *p)
-{
-    p->next = p->prev = NULL;
-}
+static inline void LstNull(struct LstHead* p) { p->next = p->prev = NULL; }
 
 /*
  * LstIsNull(s_LstLink_T) checks if the linked list is NULL.
  */
-static inline int LstIsNull(struct LstHead *p)
-{
-    return (p->next == NULL && p->prev == NULL);
-}
+static inline int LstIsNull(struct LstHead* p) { return (p->next == NULL && p->prev == NULL); }
 
 /*
  * LstInit(s_LstLink_T) initializes the linked list.
  */
-static inline void LstInit(struct LstHead *h)
-{
-    h->next = h->prev = h;
-}
+static inline void LstInit(struct LstHead* h) { h->next = h->prev = h; }
 
 /*
  * LstEntry(s_LstLink_T*, sTimer, ll) fetches the struct sTimer corresponding to
@@ -106,13 +98,15 @@ static inline void LstInit(struct LstHead *h)
  * struct sTimer, and then subtracts that from the list pointer \a ptr.
  */
 #ifndef offsetof
-#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+#define offsetof(TYPE, MEMBER) ((size_t)&((TYPE*)0)->MEMBER)
 #endif
 
 #ifndef container_of
-#define container_of(ptr, type, member) ({			          \
-    const typeof( ((type *)0)->member ) *__mptr = (ptr);	\
-    (type *)( (char *)__mptr - offsetof(type,member) );})
+#define container_of(ptr, type, member)                                                                      \
+  ({                                                                                                         \
+    const typeof(((type*)0)->member)* __mptr = (ptr);                                                        \
+    (type*)((char*)__mptr - offsetof(type, member));                                                         \
+  })
 #endif
 
 #define LstEntry(ptr, type, member) container_of(ptr, type, member)
@@ -120,16 +114,19 @@ static inline void LstInit(struct LstHead *h)
 /*
  * LstEmpty(s_LstLink_T) checks if the linked list is empty.
  */
-static inline int LstEmpty(struct LstHead *h)
-{
-    return h->next == h;
-}
+static inline int LstEmpty(struct LstHead* h) { return h->next == h; }
 
 /*
  * LstForEach(i, listHead) is a convenience macro for:
  * for (i = listHead->next; i != listHead, i = i->next)
  */
-#define LstForEach(pos, head) \
-    for (pos = (head)->next; pos != (head); pos = pos->next)
+#define LstForEach(pos, head) for (pos = (head)->next; pos != (head); pos = pos->next)
+
+/*
+ * LstForEachSafe(pos, n, listHead) is a safe variant that allows
+ * removing or freeing the current element during iteration.
+ */
+#define LstForEachSafe(pos, n, head)                                                                         \
+  for (pos = (head)->next, n = pos->next; pos != (head); pos = n, n = pos->next)
 
 #endif

@@ -102,124 +102,119 @@ void ini_ProcTable(pwr_tStatus* status, ini_sContext* cp)
 
   pwr_dStatus(sts, status, INI__SUCCESS);
 
-  pp = ini_ProcInsert(sts, cp, "pwr_neth", "pwr_neth_%d", 0, 1, "rt_neth",
-      cPrio_neth, 0, 0, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_neth", "pwr_neth_%d", 0, 1, "rt_neth", cPrio_neth, 0, 0, "", 0);
   pp->flags.b.neth = 1;
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_qmon", "pwr_qmon_%d", 0, 1, "rt_qmon",
-      cPrio_qmon, 0, 0, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_qmon", "pwr_qmon_%d", 0, 1, "rt_qmon", cPrio_qmon, 0, 0, "", 0);
   pp->flags.b.qmon = 1;
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_nacp", "pwr_nacp_%d", 0, 1, "rt_neth_acp",
-      cPrio_neth_acp, 0, 0, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_nacp", "pwr_nacp_%d", 0, 1, "rt_neth_acp", cPrio_neth_acp, 0, 0, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_io", "pwr_io_%d", 0, 1, "rt_io_comm",
-      cPrio_io_comm, 0, pwr_cClass_IOHandler, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_io", "pwr_io_%d", 0, 1, "rt_io_comm", cPrio_io_comm, 0,
+                      pwr_cClass_IOHandler, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_tmon", "pwr_tmon_%d", 0, 1, "rt_tmon",
-      cPrio_tmon, 0, 0, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_tmon", "pwr_tmon_%d", 0, 1, "rt_tmon", cPrio_tmon, 0, 0, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_emon", "pwr_emon_%d", 0, 1, "rt_emon",
-      cPrio_emon, 0, 0, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_emon", "pwr_emon_%d", 0, 1, "rt_emon", cPrio_emon, 0, 0, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_alim", "pwr_alim_%d", 0, 1, "rt_alimserver",
-      cPrio_alimserver, 0, 0, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_alim", "pwr_alim_%d", 0, 1, "rt_alimserver", cPrio_alimserver, 0, 0, "",
+                      0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_bck", "pwr_bck_%d", 0, 1, "rt_bck",
-      cPrio_bck, 0, pwr_cClass_Backup_Conf, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_bck", "pwr_bck_%d", 0, 1, "rt_bck", cPrio_bck, 0, pwr_cClass_Backup_Conf,
+                      "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_linksup", "pwr_linksup_%d", 0, 1,
-      "rt_linksup", cPrio_linksup, 0, pwr_cClass_NodeLinkSup, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_linksup", "pwr_linksup_%d", 0, 1, "rt_linksup", cPrio_linksup, 0,
+                      pwr_cClass_NodeLinkSup, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_trend", "pwr_trend_%d", 0, 1, "rt_trend",
-      cPrio_trend, 0, pwr_cClass_DsTrendConf, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_trend", "pwr_trend_%d", 0, 1, "rt_trend", cPrio_trend, 0,
+                      pwr_cClass_DsTrendConf, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_fast", "pwr_fast_%d", 0, 1, "rt_fast",
-      cPrio_fast, 0, pwr_cClass_DsFastConf, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_fast", "pwr_fast_%d", 0, 1, "rt_fast", cPrio_fast, 0,
+                      pwr_cClass_DsFastConf, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_remh", "pwr_remh_%d", 0, 1,
-      "rs_remotehandler", cPrio_remh, 0, pwr_cClass_RemoteConfig, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_remh", "pwr_remh_%d", 0, 1, "rs_remotehandler", cPrio_remh, 0,
+                      pwr_cClass_RemoteConfig, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_remlog", "pwr_remlog_%d", 0, 1,
-      "rs_remote_logg", cPrio_remotelogg, 0, pwr_cClass_LoggConfig, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_remlog", "pwr_remlog_%d", 0, 1, "rs_remote_logg", cPrio_remotelogg, 0,
+                      pwr_cClass_LoggConfig, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_elog", "pwr_elog_%d", 0, 1, "rt_elog",
-      cPrio_elog, 0, 0, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_elog", "pwr_elog_%d", 0, 1, "rt_elog", cPrio_elog, 0, 0, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_sysmon", "pwr_sysmon_%d", 0, 1, "rt_sysmon",
-      cPrio_sysmon, 0, pwr_cClass_SysMonConfig, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_sysmon", "pwr_sysmon_%d", 0, 1, "rt_sysmon", cPrio_sysmon, 0,
+                      pwr_cClass_SysMonConfig, "", 0);
   pp->proc.flags.b.system = 1;
 
   pp = ini_ProcInsert(sts, cp, "pwr_mqtt_server", "pwr_mqtt_server_%d", 0, 1, "rt_mqtt_server",
-      cPrio_mqtt_server, 0, pwr_cClass_MqttServer, "", 0);
+                      cPrio_mqtt_server, 0, pwr_cClass_MqttServer, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_websocketserver", "pwr_websocketserver_%d", 0, 1,
-      "rt_websocketserver.sh", cPrio_websocketserver, 0, pwr_cClass_WebSocketServer, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_websocketserver", "pwr_websocketserver_%d", 0, 1, "rt_websocketserver.sh",
+                      cPrio_websocketserver, 0, pwr_cClass_WebSocketServer, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_opc_server", "pwr_opc_server_%d", 0, 1,
-      "opc_server", cPrio_opc_server, 0, pwr_cClass_Opc_ServerConfig, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_opc_server", "pwr_opc_server_%d", 0, 1, "opc_server", cPrio_opc_server, 0,
+                      pwr_cClass_Opc_ServerConfig, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_statussrv", "pwr_statussrv_%d", 0, 1,
-      "rt_statussrv", cPrio_statussrv, 0, pwr_cClass_StatusServerConfig, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_statussrv", "pwr_statussrv_%d", 0, 1, "rt_statussrv", cPrio_statussrv, 0,
+                      pwr_cClass_StatusServerConfig, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_post", "pwr_post_%d", 0, 1, "rt_post",
-      cPrio_post, 0, pwr_cClass_PostConfig, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_post", "pwr_post_%d", 0, 1, "rt_post", cPrio_post, 0,
+                      pwr_cClass_PostConfig, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_report", "pwr_report_%d", 0, 1, "rt_report",
-      cPrio_report, 0, pwr_cClass_ReportConfig, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_report", "pwr_report_%d", 0, 1, "rt_report", cPrio_report, 0,
+                      pwr_cClass_ReportConfig, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_sevhistmon", "pwr_sevhistmon_%d", 0, 1,
-      "rt_sevhistmon", cPrio_sevhistmon, 0, pwr_cClass_SevHistMonitor, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_sevhistmon", "pwr_sevhistmon_%d", 0, 1, "rt_sevhistmon", cPrio_sevhistmon,
+                      0, pwr_cClass_SevHistMonitor, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_sev_server", "pwr_sev_server_%d", 0, 1,
-      "sev_server", cPrio_sev_server, 0, pwr_cClass_SevServer, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_sev_server", "pwr_sev_server_%d", 0, 1, "sev_server", cPrio_sev_server, 0,
+                      pwr_cClass_SevServer, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_sev_import", "pwr_sev_import_%d", 0, 1,
-      "sev_import", cPrio_sev_import, 0, pwr_cClass_SevImportServer, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_sev_import", "pwr_sev_import_%d", 0, 1, "sev_import", cPrio_sev_import, 0,
+                      pwr_cClass_SevImportServer, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_powerlink", "pwr_powerlink_%d", 0, 1,
-      "rt_powerlink", cPrio_powerlink, 0, pwr_cClass_EplHandler, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_powerlink", "pwr_powerlink_%d", 0, 1, "rt_powerlink", cPrio_powerlink, 0,
+                      pwr_cClass_EplHandler, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_videomgm", "pwr_videomgm_%d", 0, 1,
-      "rt_videomgm", cPrio_videomgm, 0, pwr_cClass_VideoMgmServer, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_videomgm", "pwr_videomgm_%d", 0, 1, "rt_videomgm", cPrio_videomgm, 0,
+                      pwr_cClass_VideoMgmServer, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_redcom", "pwr_redcom_%d", 0, 1, "rt_redcom",
-      cPrio_redcom, 0, pwr_cClass_RedcomConfig, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_redcom", "pwr_redcom_%d", 0, 1, "rt_redcom", cPrio_redcom, 0,
+                      pwr_cClass_RedcomConfig, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_sim", "pwr_sim_%d", 0, 1, "rt_sim",
-      cPrio_sim, 0, pwr_cClass_SimulateConfig, "", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_sim", "pwr_sim_%d", 0, 1, "rt_sim", cPrio_sim, 0,
+                      pwr_cClass_SimulateConfig, "", 0);
   pp->proc.flags.b.system = 1;
 
-  if (!cp->plcfile_cnt) {
+  if (!cp->plcfile_cnt)
+  {
     plc_idx = 0;
-    pp = ini_ProcInsert(sts, cp, "pwr_plc", "pwr_plc_%d", 0, 1, "rt_plc_core",
-        cPrio_plc_init, 0, pwr_cClass_PlcProcess, "", 0);
+    pp = ini_ProcInsert(sts, cp, "pwr_plc", "pwr_plc_%d", 0, 1, "rt_plc_core", cPrio_plc_init, 0,
+                        pwr_cClass_PlcProcess, "", 0);
     pp->flags.b.plc = 1;
     cp->plc = pp;
     pp->proc.flags.b.user = 1;
@@ -227,11 +222,13 @@ void ini_ProcTable(pwr_tStatus* status, ini_sContext* cp)
     pp->proc.k_size = 30;
     cp->plc_sigmask |= ini_mEvent_plc1 << plc_idx;
     plc_idx++;
-  } else {
+  }
+  else
+  {
     plc_idx = 0;
     cp->plc_sigmask = 0;
-    for (lsts = gdh_GetClassList(pwr_cClass_PlcProcess, &oid); ODD(lsts);
-         lsts = gdh_GetNextObject(oid, &oid)) {
+    for (lsts = gdh_GetClassList(pwr_cClass_PlcProcess, &oid); ODD(lsts); lsts = gdh_GetNextObject(oid, &oid))
+    {
       pwr_sClass_PlcProcess* plc;
       pwr_tObjName ppname;
       pwr_tObjName name;
@@ -252,31 +249,34 @@ void ini_ProcTable(pwr_tStatus* status, ini_sContext* cp)
       sprintf(busidstr, "_%04d_", cp->busid);
 
       found = 0;
-      for (i = 0; i < cp->plcfile_cnt; i++) {
+      for (i = 0; i < cp->plcfile_cnt; i++)
+      {
         s = strstr(cp->plcfile[i].name, busidstr);
-        if (s) {
+        if (s)
+        {
           strncpy(name, s + 6, sizeof(name));
           if ((s = strchr(name, '.')))
             *s = 0;
 
-          if (str_NoCaseStrcmp(ppname, name) == 0) {
+          if (str_NoCaseStrcmp(ppname, name) == 0)
+          {
             found = 1;
             break;
           }
         }
       }
 
-      if (!found) {
+      if (!found)
+      {
         plc_idx++;
         continue;
       }
 
       // cp->PlcProcess = plc;
       snprintf(idstr, sizeof(idstr), "pwr_plc_%s", name);
-      snprintf(p_name, sizeof(p_name), "pwr_plc_%s_%%d_%d", name,
-          plc->ChgCount++ % 10);
-      pp = ini_ProcInsert(sts, cp, idstr, p_name, 1, 1, cp->plcfile[i].name,
-          cPrio_plc_init, plc->StartWithDebug, 0, "", plc);
+      snprintf(p_name, sizeof(p_name), "pwr_plc_%s_%%d_%d", name, plc->ChgCount++ % 10);
+      pp = ini_ProcInsert(sts, cp, idstr, p_name, 1, 1, cp->plcfile[i].name, cPrio_plc_init,
+                          plc->StartWithDebug, 0, "", plc);
       pp->flags.b.plc = 1;
       cp->plc = pp;
       pp->proc.flags.b.user = 1;
@@ -287,25 +287,27 @@ void ini_ProcTable(pwr_tStatus* status, ini_sContext* cp)
     }
   }
 
-  for (*sts = gdh_GetClassList(pwr_eClass_Appl, &oid); ODD(*sts);
-       *sts = gdh_GetNextObject(oid, &oid)) {
+  for (*sts = gdh_GetClassList(pwr_eClass_Appl, &oid); ODD(*sts); *sts = gdh_GetNextObject(oid, &oid))
+  {
     pwr_tObjName name;
 
     gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_object);
 
-    if (ODD(*sts = gdh_ObjidToPointer(oid, (pwr_tAddress*)&ap))) {
-      pp = ini_ProcInsert(sts, cp, name, ap->ProgramName, ap->Load, ap->Run,
-          ap->FileName, ap->JobPriority, ap->StartWithDebug, 0, ap->Arg, ap);
+    if (ODD(*sts = gdh_ObjidToPointer(oid, (pwr_tAddress*)&ap)))
+    {
+      pp = ini_ProcInsert(sts, cp, name, ap->ProgramName, ap->Load, ap->Run, ap->FileName, ap->JobPriority,
+                          ap->StartWithDebug, 0, ap->Arg, ap);
       pp->proc.flags.b.user = 1;
     }
   }
 
   f = ini_OpenFile(sts, cp, &cp->applfile);
-  if (f != NULL) {
+  if (f != NULL)
+  {
     if (cp->flags.b.verbose)
-      errh_LogInfo(
-          &cp->log, "Reading Application file %s\n", cp->applfile.name);
-    for (;;) {
+      errh_LogInfo(&cp->log, "Reading Application file %s\n", cp->applfile.name);
+    for (;;)
+    {
       char* nl;
 
       s = fgets(buffer, sizeof(buffer) - 1, f);
@@ -320,7 +322,8 @@ void ini_ProcTable(pwr_tStatus* status, ini_sContext* cp)
       if (buffer[0] == '#')
         continue;
 
-      do {
+      do
+      {
         int i_load = -1;
         int i_run = -1;
         int i_debug = -1;
@@ -398,8 +401,7 @@ void ini_ProcTable(pwr_tStatus* status, ini_sContext* cp)
         else
           i_prio = atoi(prio);
 
-        pp = ini_ProcInsert(
-            sts, cp, id, name, i_load, i_run, file, i_prio, i_debug, 0, arg, 0);
+        pp = ini_ProcInsert(sts, cp, id, name, i_load, i_run, file, i_prio, i_debug, 0, arg, 0);
         if (!pp->proc.flags.b.system && !pp->proc.flags.b.base)
           pp->proc.flags.b.user = 1;
       } while (0);

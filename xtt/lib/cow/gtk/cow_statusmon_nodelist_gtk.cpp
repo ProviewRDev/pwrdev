@@ -61,22 +61,26 @@ void NodelistGtk::valchanged_cmd_input(GtkWidget* w, gpointer data)
   text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  if (nl->command_open) {
+  if (nl->command_open)
+  {
     sts = nl->command(text);
     g_object_set(w, "visible", FALSE, NULL);
     nl->set_prompt("");
     nl->command_open = 0;
-    //nl->set_focus(nl->focused_component);
+    // nl->set_focus(nl->focused_component);
   }
   g_free(text);
 }
 
 void NodelistGtk::set_prompt(const char* prompt)
 {
-  if (streq(prompt, "")) {
+  if (streq(prompt, ""))
+  {
     g_object_set(cmd_prompt, "visible", FALSE, NULL);
     g_object_set(msg_label, "visible", TRUE, NULL);
-  } else {
+  }
+  else
+  {
     g_object_set(msg_label, "visible", FALSE, NULL);
     g_object_set(cmd_prompt, "visible", TRUE, NULL);
     gtk_label_set_text(GTK_LABEL(cmd_prompt), prompt);
@@ -89,28 +93,22 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
-    GtkWidget* nodelist_parent_wid, const char* nodelist_name,
-    int nodelist_mode, nl_mLayout nodelist_layout, int msgw_pop,
-    char *nodelist_conf_file, pwr_tStatus* status)
-    : Nodelist(nodelist_parent_ctx, nodelist_name, nodelist_mode,
-          nodelist_layout, status),
-      parent_wid(nodelist_parent_wid), clock_cursor(0), add_india_widget(0),
-      mod_india_widget(0)
+NodelistGtk::NodelistGtk(void* nodelist_parent_ctx, GtkWidget* nodelist_parent_wid, const char* nodelist_name,
+                         int nodelist_mode, nl_mLayout nodelist_layout, int msgw_pop,
+                         char* nodelist_conf_file, pwr_tStatus* status)
+    : Nodelist(nodelist_parent_ctx, nodelist_name, nodelist_mode, nodelist_layout, status),
+      parent_wid(nodelist_parent_wid), clock_cursor(0), add_india_widget(0), mod_india_widget(0)
 {
   pwr_tStatus sts;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 300,
-      "default-width", 850, "title", nodelist_name, NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 300, "default-width", 850, "title",
+                                      nodelist_name, NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(
-      toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
   int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
 
@@ -120,68 +118,49 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
 
   // Menu
   // Accelerators
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File entry
-  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Close"));
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Close"));
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_add_node
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Add Node"));
-  g_signal_connect(
-      file_add_node, "activate", G_CALLBACK(activate_add_node), this);
+  GtkWidget* file_add_node = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Add Node"));
+  g_signal_connect(file_add_node, "activate", G_CALLBACK(activate_add_node), this);
 
-  GtkWidget* file_modify_node = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Modify Node"));
-  g_signal_connect(
-      file_modify_node, "activate", G_CALLBACK(activate_modify_node), this);
+  GtkWidget* file_modify_node = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Modify Node"));
+  g_signal_connect(file_modify_node, "activate", G_CALLBACK(activate_modify_node), this);
 
-  GtkWidget* file_remove_node = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Remove Node"));
-  g_signal_connect(
-      file_remove_node, "activate", G_CALLBACK(activate_remove_node), this);
+  GtkWidget* file_remove_node = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Remove Node"));
+  g_signal_connect(file_remove_node, "activate", G_CALLBACK(activate_remove_node), this);
 
-  GtkWidget* file_open_xtt = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Open Runtime _Navigator"));
-  g_signal_connect(
-      file_open_xtt, "activate", G_CALLBACK(activate_open_xtt), this);
+  GtkWidget* file_open_xtt =
+      gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Open Runtime _Navigator"));
+  g_signal_connect(file_open_xtt, "activate", G_CALLBACK(activate_open_xtt), this);
 
-  GtkWidget* file_open_opplace = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Open Operatorplace"));
-  g_signal_connect(
-      file_open_opplace, "activate", G_CALLBACK(activate_open_opplace), this);
+  GtkWidget* file_open_opplace =
+      gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Open Operatorplace"));
+  g_signal_connect(file_open_opplace, "activate", G_CALLBACK(activate_open_opplace), this);
 
-  GtkWidget* file_open_rtmon = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Open Runtime _Monitor"));
-  g_signal_connect(
-      file_open_rtmon, "activate", G_CALLBACK(activate_open_rtmon), this);
+  GtkWidget* file_open_rtmon =
+      gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Open Runtime _Monitor"));
+  g_signal_connect(file_open_rtmon, "activate", G_CALLBACK(activate_open_rtmon), this);
 
-  GtkWidget* file_open_map = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("O_pen Map"));
-  g_signal_connect(
-      file_open_map, "activate", G_CALLBACK(activate_open_map), this);
+  GtkWidget* file_open_map = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("O_pen Map"));
+  g_signal_connect(file_open_map, "activate", G_CALLBACK(activate_open_map), this);
 
-  GtkWidget* file_save = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Save Configuration"));
+  GtkWidget* file_save = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Save Configuration"));
   g_signal_connect(file_save, "activate", G_CALLBACK(activate_save), this);
 
-  GtkWidget* file_reconnect = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Reconnect"));
-  g_signal_connect(
-      file_reconnect, "activate", G_CALLBACK(activate_reconnect), this);
+  GtkWidget* file_reconnect = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Reconnect"));
+  g_signal_connect(file_reconnect, "activate", G_CALLBACK(activate_reconnect), this);
 
   GtkWidget* file_command = gtk_menu_item_new_with_mnemonic("_Command");
-  g_signal_connect(
-      file_command, "activate", G_CALLBACK(activate_command), this);
-  gtk_widget_add_accelerator(file_command, "activate", accel_g, 'b',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(file_command, "activate", G_CALLBACK(activate_command), this);
+  gtk_widget_add_accelerator(file_command, "activate", accel_g, 'b', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_save);
@@ -197,35 +176,26 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_command);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
 
-  GtkWidget* file
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
+  GtkWidget* file = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // View menu
-  GtkWidget* view_show_events = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Show _Events"));
-  g_signal_connect(
-      view_show_events, "activate", G_CALLBACK(activate_show_events), this);
+  GtkWidget* view_show_events = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Show _Events"));
+  g_signal_connect(view_show_events, "activate", G_CALLBACK(activate_show_events), this);
 
-  GtkWidget* view_pop_events = gtk_check_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Pop Events"));
-  g_signal_connect(
-      view_pop_events, "activate", G_CALLBACK(activate_pop_events), this);
+  GtkWidget* view_pop_events = gtk_check_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Pop Events"));
+  g_signal_connect(view_pop_events, "activate", G_CALLBACK(activate_pop_events), this);
 
   // Submenu Remote GUI
   GSList* rg_group = NULL;
-  GtkWidget* view_gui_qt
-      = gtk_radio_menu_item_new_with_mnemonic(rg_group, "_QT");
+  GtkWidget* view_gui_qt = gtk_radio_menu_item_new_with_mnemonic(rg_group, "_QT");
   rg_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_gui_qt));
-  g_signal_connect(
-      view_gui_qt, "activate", G_CALLBACK(activate_gui_qt), this);
+  g_signal_connect(view_gui_qt, "activate", G_CALLBACK(activate_gui_qt), this);
 
-  GtkWidget* view_gui_gtk
-      = gtk_radio_menu_item_new_with_mnemonic(rg_group, "_GTK");
+  GtkWidget* view_gui_gtk = gtk_radio_menu_item_new_with_mnemonic(rg_group, "_GTK");
   rg_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_gui_gtk));
-  g_signal_connect(
-      view_gui_gtk, "activate", G_CALLBACK(activate_gui_gtk), this);
+  g_signal_connect(view_gui_gtk, "activate", G_CALLBACK(activate_gui_gtk), this);
 
   GtkWidget* view_gui = gtk_menu_item_new_with_mnemonic("_Remote GUI");
   GtkMenu* view_gui_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
@@ -236,47 +206,29 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
 
   // Submenu Mode
   GSList* mode_group = NULL;
-  GtkWidget* view_mode_systemstatus
-      = gtk_radio_menu_item_new_with_mnemonic(mode_group, "_SystemStatus");
-  mode_group = gtk_radio_menu_item_get_group(
-      GTK_RADIO_MENU_ITEM(view_mode_systemstatus));
-  g_signal_connect(view_mode_systemstatus, "activate",
-      G_CALLBACK(activate_mode_systemstatus), this);
+  GtkWidget* view_mode_systemstatus = gtk_radio_menu_item_new_with_mnemonic(mode_group, "_SystemStatus");
+  mode_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_mode_systemstatus));
+  g_signal_connect(view_mode_systemstatus, "activate", G_CALLBACK(activate_mode_systemstatus), this);
 
-  GtkWidget* view_mode_userstatus1
-      = gtk_radio_menu_item_new_with_mnemonic(mode_group, "UserStatus_1");
-  mode_group = gtk_radio_menu_item_get_group(
-      GTK_RADIO_MENU_ITEM(view_mode_userstatus1));
-  g_signal_connect(view_mode_userstatus1, "activate",
-      G_CALLBACK(activate_mode_userstatus1), this);
+  GtkWidget* view_mode_userstatus1 = gtk_radio_menu_item_new_with_mnemonic(mode_group, "UserStatus_1");
+  mode_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_mode_userstatus1));
+  g_signal_connect(view_mode_userstatus1, "activate", G_CALLBACK(activate_mode_userstatus1), this);
 
-  GtkWidget* view_mode_userstatus2
-      = gtk_radio_menu_item_new_with_mnemonic(mode_group, "UserStatus_2");
-  mode_group = gtk_radio_menu_item_get_group(
-      GTK_RADIO_MENU_ITEM(view_mode_userstatus2));
-  g_signal_connect(view_mode_userstatus2, "activate",
-      G_CALLBACK(activate_mode_userstatus2), this);
+  GtkWidget* view_mode_userstatus2 = gtk_radio_menu_item_new_with_mnemonic(mode_group, "UserStatus_2");
+  mode_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_mode_userstatus2));
+  g_signal_connect(view_mode_userstatus2, "activate", G_CALLBACK(activate_mode_userstatus2), this);
 
-  GtkWidget* view_mode_userstatus3
-      = gtk_radio_menu_item_new_with_mnemonic(mode_group, "UserStatus_3");
-  mode_group = gtk_radio_menu_item_get_group(
-      GTK_RADIO_MENU_ITEM(view_mode_userstatus3));
-  g_signal_connect(view_mode_userstatus3, "activate",
-      G_CALLBACK(activate_mode_userstatus3), this);
+  GtkWidget* view_mode_userstatus3 = gtk_radio_menu_item_new_with_mnemonic(mode_group, "UserStatus_3");
+  mode_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_mode_userstatus3));
+  g_signal_connect(view_mode_userstatus3, "activate", G_CALLBACK(activate_mode_userstatus3), this);
 
-  GtkWidget* view_mode_userstatus4
-      = gtk_radio_menu_item_new_with_mnemonic(mode_group, "UserStatus_4");
-  mode_group = gtk_radio_menu_item_get_group(
-      GTK_RADIO_MENU_ITEM(view_mode_userstatus4));
-  g_signal_connect(view_mode_userstatus4, "activate",
-      G_CALLBACK(activate_mode_userstatus4), this);
+  GtkWidget* view_mode_userstatus4 = gtk_radio_menu_item_new_with_mnemonic(mode_group, "UserStatus_4");
+  mode_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_mode_userstatus4));
+  g_signal_connect(view_mode_userstatus4, "activate", G_CALLBACK(activate_mode_userstatus4), this);
 
-  GtkWidget* view_mode_userstatus5
-      = gtk_radio_menu_item_new_with_mnemonic(mode_group, "UserStatus_5");
-  mode_group = gtk_radio_menu_item_get_group(
-      GTK_RADIO_MENU_ITEM(view_mode_userstatus5));
-  g_signal_connect(view_mode_userstatus5, "activate",
-      G_CALLBACK(activate_mode_userstatus5), this);
+  GtkWidget* view_mode_userstatus5 = gtk_radio_menu_item_new_with_mnemonic(mode_group, "UserStatus_5");
+  mode_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_mode_userstatus5));
+  g_signal_connect(view_mode_userstatus5, "activate", G_CALLBACK(activate_mode_userstatus5), this);
 
   GtkWidget* view_mode = gtk_menu_item_new_with_mnemonic("_Mode");
   GtkMenu* view_mode_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
@@ -287,27 +239,18 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   gtk_menu_shell_append(GTK_MENU_SHELL(view_mode_menu), view_mode_userstatus4);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_mode_menu), view_mode_userstatus5);
 
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(view_mode), GTK_WIDGET(view_mode_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(view_mode), GTK_WIDGET(view_mode_menu));
 
-  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Zoom _In"));
-  g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
-  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _In"));
+  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
+  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Zoom _Out"));
-  g_signal_connect(
-      view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
-  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Out"));
+  g_signal_connect(view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
+  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Zoom _Reset"));
-  g_signal_connect(
-      view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Reset"));
+  g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_show_events);
@@ -318,23 +261,19 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_out);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_reset);
 
-  GtkWidget* view
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
+  GtkWidget* view = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), view);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Menu Help
-  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Help"));
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
-  gtk_widget_add_accelerator(
-      help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
 
-  GtkWidget* help
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+  GtkWidget* help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
@@ -342,53 +281,48 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   msg_window->find_wnav_cb = find_node_cb;
   msg_window->msg('I', "Status Montitor started");
 
-  nodelistnav = new NodelistNavGtk(this, vbox, msg_window, 0, mode,
-      layout, msgw_pop, nodelist_conf_file, &nodelistnav_widget);
+  nodelistnav = new NodelistNavGtk(this, vbox, msg_window, 0, mode, layout, msgw_pop, nodelist_conf_file,
+                                   &nodelistnav_widget);
 
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  wutl_tools_item(tools, 
-      dark_theme ? "$pwr_exe/ico_save_d_30.png" : "$pwr_exe/ico_save_l_30.png", 
-      G_CALLBACK(activate_save), "Save configuration", this, 1, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_save_d_30.png" : "$pwr_exe/ico_save_l_30.png",
+                  G_CALLBACK(activate_save), "Save configuration", this, 1, 1);
 
-  wutl_tools_item(tools, 
-      dark_theme ? "$pwr_exe/ico_add_d_30.png" : "$pwr_exe/ico_add_l_30.png", 
-      G_CALLBACK(activate_add_node), "Add node", this, 1, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_add_d_30.png" : "$pwr_exe/ico_add_l_30.png",
+                  G_CALLBACK(activate_add_node), "Add node", this, 1, 1);
 
-  wutl_tools_item(tools, 
-      dark_theme ? "$pwr_exe/ico_remove_d_30.png" : "$pwr_exe/ico_remove_l_30.png", 
-      G_CALLBACK(activate_remove_node), "Remove node", this, 1, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_remove_d_30.png" : "$pwr_exe/ico_remove_l_30.png",
+                  G_CALLBACK(activate_remove_node), "Remove node", this, 1, 1);
 
-  wutl_tools_item(tools, 
-      dark_theme ? "$pwr_exe/ico_navigator_d_30.png" : "$pwr_exe/ico_navigator_l_30.png", 
-      G_CALLBACK(activate_open_xtt), "Start Runtime Navigator on selected node", this, 1, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_navigator_d_30.png" : "$pwr_exe/ico_navigator_l_30.png",
+                  G_CALLBACK(activate_open_xtt), "Start Runtime Navigator on selected node", this, 1, 1);
 
-  wutl_tools_item(tools, 
-      dark_theme ? "$pwr_exe/ico_opplace_d_30.png" : "$pwr_exe/ico_opplace_l_30.png", 
-      G_CALLBACK(activate_open_opplace), "Start Operatorplace on selected node", this, 1, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_opplace_d_30.png" : "$pwr_exe/ico_opplace_l_30.png",
+                  G_CALLBACK(activate_open_opplace), "Start Operatorplace on selected node", this, 1, 1);
 
-  if (!(layout & nl_mLayout_hide_rtmon)) {
-    wutl_tools_item(tools, 
-        dark_theme ? "$pwr_exe/ico_runtime_monitor_d_30.png" : "$pwr_exe/ico_runtime_monitor_l_30.png", 
+  if (!(layout & nl_mLayout_hide_rtmon))
+  {
+    wutl_tools_item(
+        tools, dark_theme ? "$pwr_exe/ico_runtime_monitor_d_30.png" : "$pwr_exe/ico_runtime_monitor_l_30.png",
         G_CALLBACK(activate_open_rtmon), "Start Runtime Monitor on selected node", this, 1, 1);
   }
 
-  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", G_CALLBACK(activate_zoom_in), 
-      "Zoom in", this, 1, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png",
+                  G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 1);
 
-  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", G_CALLBACK(activate_zoom_out), 
-      "Zoom out", this, 1, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png",
+                  G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 1);
 
-  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", G_CALLBACK(activate_zoom_reset), 
-      "Zoom reset", this, 1, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png",
+                  G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 1, 1);
 
-  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_refresh_d_30.png" : "$pwr_exe/ico_refresh_l_30.png", G_CALLBACK(activate_reconnect), 
-      "Reconnect", this, 1, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_refresh_d_30.png" : "$pwr_exe/ico_refresh_l_30.png",
+                  G_CALLBACK(activate_reconnect), "Reconnect", this, 1, 1);
 
-  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_earth_d_30.png" : "$pwr_exe/ico_earth_l_30.png", G_CALLBACK(activate_open_map), 
-      "Map", this, 1, 1);
-
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_earth_d_30.png" : "$pwr_exe/ico_earth_l_30.png",
+                  G_CALLBACK(activate_open_map), "Map", this, 1, 1);
 
   // Statusbar and cmd input
   GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -402,8 +336,7 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   cmd_input = recall_entry->widget();
 
   gtk_widget_set_size_request(cmd_input, -1, 25);
-  g_signal_connect(
-      cmd_input, "activate", G_CALLBACK(valchanged_cmd_input), this);
+  g_signal_connect(cmd_input, "activate", G_CALLBACK(valchanged_cmd_input), this);
 
   gtk_box_pack_start(GTK_BOX(statusbar), msg_label, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(statusbar), cmd_prompt, FALSE, FALSE, 0);
@@ -412,10 +345,8 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
 
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
-  gtk_box_pack_start(
-      GTK_BOX(vbox), GTK_WIDGET(nodelistnav_widget), TRUE, TRUE, 0);
-  gtk_box_pack_end(
-      GTK_BOX(vbox), GTK_WIDGET(statusbar), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(nodelistnav_widget), TRUE, TRUE, 0);
+  gtk_box_pack_end(GTK_BOX(vbox), GTK_WIDGET(statusbar), FALSE, FALSE, 0);
 
   gtk_container_add(GTK_CONTAINER(toplevel), vbox);
   gtk_widget_show_all(toplevel);
@@ -439,15 +370,11 @@ NodelistGtk::~NodelistGtk()
   gtk_widget_destroy(toplevel);
 }
 
-void NodelistGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void NodelistGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
 void NodelistGtk::message(char severity, const char* message)
 {
-  char* messageutf8
-      = g_convert(message, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  char* messageutf8 = g_convert(message, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
   gtk_label_set_text(GTK_LABEL(msg_label), messageutf8);
   g_free(messageutf8);
 }
@@ -455,17 +382,13 @@ void NodelistGtk::message(char severity, const char* message)
 void NodelistGtk::set_clock_cursor()
 {
   if (!clock_cursor)
-    clock_cursor = gdk_cursor_new_for_display(
-        gtk_widget_get_display(toplevel), GDK_WATCH);
+    clock_cursor = gdk_cursor_new_for_display(gtk_widget_get_display(toplevel), GDK_WATCH);
 
   gdk_window_set_cursor(gtk_widget_get_window(toplevel), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(toplevel));
 }
 
-void NodelistGtk::reset_cursor()
-{
-  gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL);
-}
+void NodelistGtk::reset_cursor() { gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL); }
 
 void NodelistGtk::free_cursor()
 {
@@ -473,8 +396,7 @@ void NodelistGtk::free_cursor()
     g_object_unref(clock_cursor);
 }
 
-gboolean NodelistGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean NodelistGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   NodelistGtk* nodelist = (NodelistGtk*)data;
 
@@ -565,7 +487,8 @@ void NodelistGtk::activate_command(GtkWidget* w, gpointer data)
 {
   NodelistGtk* nodelist = (NodelistGtk*)data;
 
-  if (nodelist->command_open) {
+  if (nodelist->command_open)
+  {
     g_object_set(nodelist->cmd_input, "visible", FALSE, NULL);
     nodelist->set_prompt("");
     nodelist->command_open = 0;
@@ -701,10 +624,10 @@ void NodelistGtk::activate_help(GtkWidget* w, gpointer data)
   nodelist->activate_help();
 }
 
-void NodelistGtk::open_add_input_dialog(const char* text, const char* text2,
-    const char* text3, const char* text4, const char* text5, const char* title, 
-    const char* init_text,
-    void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*))
+void NodelistGtk::open_add_input_dialog(const char* text, const char* text2, const char* text3,
+                                        const char* text4, const char* text5, const char* title,
+                                        const char* init_text,
+                                        void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*))
 {
   create_add_input_dialog();
 
@@ -718,8 +641,7 @@ void NodelistGtk::open_add_input_dialog(const char* text, const char* text2,
 
   gint pos = 0;
   gtk_editable_delete_text(GTK_EDITABLE(add_india_text), 0, -1);
-  gtk_editable_insert_text(
-      GTK_EDITABLE(add_india_text), init_text, strlen(init_text), &pos);
+  gtk_editable_insert_text(GTK_EDITABLE(add_india_text), init_text, strlen(init_text), &pos);
 
   add_india_ok_cb = ok_cb;
 }
@@ -729,33 +651,27 @@ void NodelistGtk::activate_add_india_ok(GtkWidget* w, gpointer data)
   Nodelist* nodelist = (Nodelist*)data;
   char *text, *text2, *text3, *text4, *text5, *textutf8;
 
-  textutf8 = gtk_editable_get_chars(
-      GTK_EDITABLE(((NodelistGtk*)nodelist)->add_india_text), 0, -1);
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(((NodelistGtk*)nodelist)->add_india_text), 0, -1);
   text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  textutf8 = gtk_editable_get_chars(
-      GTK_EDITABLE(((NodelistGtk*)nodelist)->add_india_text2), 0, -1);
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(((NodelistGtk*)nodelist)->add_india_text2), 0, -1);
   text2 = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  textutf8 = gtk_editable_get_chars(
-      GTK_EDITABLE(((NodelistGtk*)nodelist)->add_india_text3), 0, -1);
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(((NodelistGtk*)nodelist)->add_india_text3), 0, -1);
   text3 = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  textutf8 = gtk_editable_get_chars(
-      GTK_EDITABLE(((NodelistGtk*)nodelist)->add_india_text4), 0, -1);
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(((NodelistGtk*)nodelist)->add_india_text4), 0, -1);
   text4 = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  textutf8 = gtk_editable_get_chars(
-      GTK_EDITABLE(((NodelistGtk*)nodelist)->add_india_text5), 0, -1);
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(((NodelistGtk*)nodelist)->add_india_text5), 0, -1);
   text5 = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  g_object_set(
-      ((NodelistGtk*)nodelist)->add_india_widget, "visible", FALSE, NULL);
+  g_object_set(((NodelistGtk*)nodelist)->add_india_widget, "visible", FALSE, NULL);
 
   (nodelist->add_india_ok_cb)(nodelist, text, text2, text3, text4, text5);
   g_free(text);
@@ -769,47 +685,39 @@ void NodelistGtk::activate_add_india_cancel(GtkWidget* w, gpointer data)
 {
   Nodelist* nodelist = (Nodelist*)data;
 
-  g_object_set(
-      ((NodelistGtk*)nodelist)->add_india_widget, "visible", FALSE, NULL);
+  g_object_set(((NodelistGtk*)nodelist)->add_india_widget, "visible", FALSE, NULL);
 }
 
-static gint add_india_delete_event(
-    GtkWidget* w, GdkEvent* event, gpointer nodelist)
+static gint add_india_delete_event(GtkWidget* w, GdkEvent* event, gpointer nodelist)
 {
-  g_object_set(
-      ((NodelistGtk*)nodelist)->add_india_widget, "visible", FALSE, NULL);
+  g_object_set(((NodelistGtk*)nodelist)->add_india_widget, "visible", FALSE, NULL);
   return TRUE;
 }
 
 void NodelistGtk::create_add_input_dialog()
 {
-  if (add_india_widget) {
+  if (add_india_widget)
+  {
     g_object_set(add_india_widget, "visible", TRUE, NULL);
     return;
   }
 
   // Create an input dialog
-  add_india_widget = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      150, "default-width", 600, "title", "Input Dialog", "window-position",
-      GTK_WIN_POS_CENTER, NULL);
-  g_signal_connect(add_india_widget, "delete_event",
-      G_CALLBACK(add_india_delete_event), this);
+  add_india_widget =
+      (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 150, "default-width", 600, "title",
+                               "Input Dialog", "window-position", GTK_WIN_POS_CENTER, NULL);
+  g_signal_connect(add_india_widget, "delete_event", G_CALLBACK(add_india_delete_event), this);
   add_india_text = gtk_entry_new();
   gtk_widget_set_size_request(add_india_text, 250, -1);
-  g_signal_connect(add_india_text, "activate",
-      G_CALLBACK(NodelistGtk::activate_add_india_ok), this);
+  g_signal_connect(add_india_text, "activate", G_CALLBACK(NodelistGtk::activate_add_india_ok), this);
   add_india_text2 = gtk_entry_new();
-  g_signal_connect(add_india_text2, "activate",
-      G_CALLBACK(NodelistGtk::activate_add_india_ok), this);
+  g_signal_connect(add_india_text2, "activate", G_CALLBACK(NodelistGtk::activate_add_india_ok), this);
   add_india_text3 = gtk_entry_new();
-  g_signal_connect(add_india_text3, "activate",
-      G_CALLBACK(NodelistGtk::activate_add_india_ok), this);
+  g_signal_connect(add_india_text3, "activate", G_CALLBACK(NodelistGtk::activate_add_india_ok), this);
   add_india_text4 = gtk_entry_new();
-  g_signal_connect(add_india_text4, "activate",
-      G_CALLBACK(NodelistGtk::activate_add_india_ok), this);
+  g_signal_connect(add_india_text4, "activate", G_CALLBACK(NodelistGtk::activate_add_india_ok), this);
   add_india_text5 = gtk_entry_new();
-  g_signal_connect(add_india_text5, "activate",
-      G_CALLBACK(NodelistGtk::activate_add_india_ok), this);
+  g_signal_connect(add_india_text5, "activate", G_CALLBACK(NodelistGtk::activate_add_india_ok), this);
   add_india_label = gtk_label_new("");
   add_india_label2 = gtk_label_new("");
   add_india_label3 = gtk_label_new("");
@@ -827,12 +735,10 @@ void NodelistGtk::create_add_input_dialog()
 
   GtkWidget* add_india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(add_india_ok, 70, 25);
-  g_signal_connect(add_india_ok, "clicked",
-      G_CALLBACK(NodelistGtk::activate_add_india_ok), this);
+  g_signal_connect(add_india_ok, "clicked", G_CALLBACK(NodelistGtk::activate_add_india_ok), this);
   GtkWidget* add_india_cancel = gtk_button_new_with_label("Cancel");
   gtk_widget_set_size_request(add_india_cancel, 70, 25);
-  g_signal_connect(add_india_cancel, "clicked",
-      G_CALLBACK(NodelistGtk::activate_add_india_cancel), this);
+  g_signal_connect(add_india_cancel, "clicked", G_CALLBACK(NodelistGtk::activate_add_india_cancel), this);
 
   GtkWidget* add_india_grid = gtk_grid_new();
   gtk_grid_set_column_spacing(GTK_GRID(add_india_grid), 30);
@@ -849,76 +755,59 @@ void NodelistGtk::create_add_input_dialog()
   gtk_grid_attach(GTK_GRID(add_india_grid), add_india_text5, 1, 4, 1, 1);
 
   GtkWidget* add_india_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  gtk_box_pack_start(
-      GTK_BOX(add_india_hboxtext), add_india_image, FALSE, FALSE, 40);
-  gtk_box_pack_end(
-      GTK_BOX(add_india_hboxtext), add_india_grid, TRUE, TRUE, 15);
+  gtk_box_pack_start(GTK_BOX(add_india_hboxtext), add_india_image, FALSE, FALSE, 40);
+  gtk_box_pack_end(GTK_BOX(add_india_hboxtext), add_india_grid, TRUE, TRUE, 15);
 
   GtkWidget* add_india_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
-  gtk_box_pack_start(
-      GTK_BOX(add_india_hboxbuttons), add_india_ok, FALSE, FALSE, 30);
-  gtk_box_pack_end(
-      GTK_BOX(add_india_hboxbuttons), add_india_cancel, FALSE, FALSE, 30);
+  gtk_box_pack_start(GTK_BOX(add_india_hboxbuttons), add_india_ok, FALSE, FALSE, 30);
+  gtk_box_pack_end(GTK_BOX(add_india_hboxbuttons), add_india_cancel, FALSE, FALSE, 30);
 
   GtkWidget* add_india_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_box_pack_start(
-      GTK_BOX(add_india_vbox), add_india_hboxtext, TRUE, TRUE, 30);
-  gtk_box_pack_start(
-      GTK_BOX(add_india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
-  gtk_box_pack_end(
-      GTK_BOX(add_india_vbox), add_india_hboxbuttons, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(add_india_vbox), add_india_hboxtext, TRUE, TRUE, 30);
+  gtk_box_pack_start(GTK_BOX(add_india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
+  gtk_box_pack_end(GTK_BOX(add_india_vbox), add_india_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(add_india_widget), add_india_vbox);
   gtk_widget_show_all(add_india_widget);
   g_object_set(add_india_widget, "visible", FALSE, NULL);
 }
 
-void NodelistGtk::open_mod_input_dialog(const char* text, const char* text2,
-    const char* text3, const char* text4, const char *text5, const char* title, 
-    const char* init_text, const char* init_text2, const char* init_text3, 
-    const char* init_text4, const char* init_text5,
-    void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*))
+void NodelistGtk::open_mod_input_dialog(const char* text, const char* text2, const char* text3,
+                                        const char* text4, const char* text5, const char* title,
+                                        const char* init_text, const char* init_text2, const char* init_text3,
+                                        const char* init_text4, const char* init_text5,
+                                        void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*))
 {
   create_mod_input_dialog();
 
   g_object_set(mod_india_widget, "visible", TRUE, "title", title, NULL);
 
-  gtk_label_set_text(
-      GTK_LABEL(mod_india_label), CoWowGtk::translate_utf8(text));
-  gtk_label_set_text(
-      GTK_LABEL(mod_india_label2), CoWowGtk::translate_utf8(text2));
-  gtk_label_set_text(
-      GTK_LABEL(mod_india_label3), CoWowGtk::translate_utf8(text3));
-  gtk_label_set_text(
-      GTK_LABEL(mod_india_label4), CoWowGtk::translate_utf8(text4));
-  gtk_label_set_text(
-      GTK_LABEL(mod_india_label5), CoWowGtk::translate_utf8(text5));
+  gtk_label_set_text(GTK_LABEL(mod_india_label), CoWowGtk::translate_utf8(text));
+  gtk_label_set_text(GTK_LABEL(mod_india_label2), CoWowGtk::translate_utf8(text2));
+  gtk_label_set_text(GTK_LABEL(mod_india_label3), CoWowGtk::translate_utf8(text3));
+  gtk_label_set_text(GTK_LABEL(mod_india_label4), CoWowGtk::translate_utf8(text4));
+  gtk_label_set_text(GTK_LABEL(mod_india_label5), CoWowGtk::translate_utf8(text5));
 
-  gtk_label_set_text(
-      GTK_LABEL(mod_india_text), CoWowGtk::translate_utf8(init_text));
+  gtk_label_set_text(GTK_LABEL(mod_india_text), CoWowGtk::translate_utf8(init_text));
 
   gint pos = 0;
   gtk_editable_delete_text(GTK_EDITABLE(mod_india_text2), 0, -1);
-  gtk_editable_insert_text(GTK_EDITABLE(mod_india_text2),
-      CoWowGtk::convert_utf8(init_text2),
-      strlen(CoWowGtk::convert_utf8(init_text2)), &pos);
+  gtk_editable_insert_text(GTK_EDITABLE(mod_india_text2), CoWowGtk::convert_utf8(init_text2),
+                           strlen(CoWowGtk::convert_utf8(init_text2)), &pos);
 
   pos = 0;
   gtk_editable_delete_text(GTK_EDITABLE(mod_india_text3), 0, -1);
-  gtk_editable_insert_text(GTK_EDITABLE(mod_india_text3),
-      CoWowGtk::convert_utf8(init_text3),
-      strlen(CoWowGtk::convert_utf8(init_text3)), &pos);
+  gtk_editable_insert_text(GTK_EDITABLE(mod_india_text3), CoWowGtk::convert_utf8(init_text3),
+                           strlen(CoWowGtk::convert_utf8(init_text3)), &pos);
 
   pos = 0;
   gtk_editable_delete_text(GTK_EDITABLE(mod_india_text4), 0, -1);
-  gtk_editable_insert_text(GTK_EDITABLE(mod_india_text4),
-      CoWowGtk::convert_utf8(init_text4),
-      strlen(CoWowGtk::convert_utf8(init_text4)), &pos);
+  gtk_editable_insert_text(GTK_EDITABLE(mod_india_text4), CoWowGtk::convert_utf8(init_text4),
+                           strlen(CoWowGtk::convert_utf8(init_text4)), &pos);
 
   pos = 0;
   gtk_editable_delete_text(GTK_EDITABLE(mod_india_text5), 0, -1);
-  gtk_editable_insert_text(GTK_EDITABLE(mod_india_text5),
-      CoWowGtk::convert_utf8(init_text5),
-      strlen(CoWowGtk::convert_utf8(init_text5)), &pos);
+  gtk_editable_insert_text(GTK_EDITABLE(mod_india_text5), CoWowGtk::convert_utf8(init_text5),
+                           strlen(CoWowGtk::convert_utf8(init_text5)), &pos);
 
   mod_india_ok_cb = ok_cb;
 }
@@ -928,33 +817,27 @@ void NodelistGtk::activate_mod_india_ok(GtkWidget* w, gpointer data)
   Nodelist* nodelist = (Nodelist*)data;
   char *text, *text2, *text3, *text4, *text5, *textutf8;
 
-  textutf8 = (char*)gtk_label_get_text(
-      GTK_LABEL(((NodelistGtk*)nodelist)->mod_india_text));
+  textutf8 = (char*)gtk_label_get_text(GTK_LABEL(((NodelistGtk*)nodelist)->mod_india_text));
   text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
-  //g_free(textutf8);
+  // g_free(textutf8);
 
-  textutf8 = gtk_editable_get_chars(
-      GTK_EDITABLE(((NodelistGtk*)nodelist)->mod_india_text2), 0, -1);
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(((NodelistGtk*)nodelist)->mod_india_text2), 0, -1);
   text2 = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  textutf8 = gtk_editable_get_chars(
-      GTK_EDITABLE(((NodelistGtk*)nodelist)->mod_india_text3), 0, -1);
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(((NodelistGtk*)nodelist)->mod_india_text3), 0, -1);
   text3 = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  textutf8 = gtk_editable_get_chars(
-      GTK_EDITABLE(((NodelistGtk*)nodelist)->mod_india_text4), 0, -1);
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(((NodelistGtk*)nodelist)->mod_india_text4), 0, -1);
   text4 = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  textutf8 = gtk_editable_get_chars(
-      GTK_EDITABLE(((NodelistGtk*)nodelist)->mod_india_text5), 0, -1);
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(((NodelistGtk*)nodelist)->mod_india_text5), 0, -1);
   text5 = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  g_object_set(
-      ((NodelistGtk*)nodelist)->mod_india_widget, "visible", FALSE, NULL);
+  g_object_set(((NodelistGtk*)nodelist)->mod_india_widget, "visible", FALSE, NULL);
 
   (nodelist->mod_india_ok_cb)(nodelist, text, text2, text3, text4, text5);
   g_free(text);
@@ -968,31 +851,28 @@ void NodelistGtk::activate_mod_india_cancel(GtkWidget* w, gpointer data)
 {
   Nodelist* nodelist = (Nodelist*)data;
 
-  g_object_set(
-      ((NodelistGtk*)nodelist)->mod_india_widget, "visible", FALSE, NULL);
+  g_object_set(((NodelistGtk*)nodelist)->mod_india_widget, "visible", FALSE, NULL);
 }
 
-static gint mod_india_delete_event(
-    GtkWidget* w, GdkEvent* event, gpointer nodelist)
+static gint mod_india_delete_event(GtkWidget* w, GdkEvent* event, gpointer nodelist)
 {
-  g_object_set(
-      ((NodelistGtk*)nodelist)->mod_india_widget, "visible", FALSE, NULL);
+  g_object_set(((NodelistGtk*)nodelist)->mod_india_widget, "visible", FALSE, NULL);
   return TRUE;
 }
 
 void NodelistGtk::create_mod_input_dialog()
 {
-  if (mod_india_widget) {
+  if (mod_india_widget)
+  {
     g_object_set(mod_india_widget, "visible", TRUE, NULL);
     return;
   }
 
   // Create an input dialog
-  mod_india_widget = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      150, "default-width", 600, "title", "Input Dialog", "window-position",
-      GTK_WIN_POS_CENTER, NULL);
-  g_signal_connect(mod_india_widget, "delete_event",
-      G_CALLBACK(mod_india_delete_event), this);
+  mod_india_widget =
+      (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 150, "default-width", 600, "title",
+                               "Input Dialog", "window-position", GTK_WIN_POS_CENTER, NULL);
+  g_signal_connect(mod_india_widget, "delete_event", G_CALLBACK(mod_india_delete_event), this);
 
   mod_india_text = gtk_label_new("");
   gtk_widget_set_halign(mod_india_text, GTK_ALIGN_START);
@@ -1022,12 +902,10 @@ void NodelistGtk::create_mod_input_dialog()
 
   GtkWidget* mod_india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(mod_india_ok, 70, 25);
-  g_signal_connect(mod_india_ok, "clicked",
-      G_CALLBACK(NodelistGtk::activate_mod_india_ok), this);
+  g_signal_connect(mod_india_ok, "clicked", G_CALLBACK(NodelistGtk::activate_mod_india_ok), this);
   GtkWidget* mod_india_cancel = gtk_button_new_with_label("Cancel");
   gtk_widget_set_size_request(mod_india_cancel, 70, 25);
-  g_signal_connect(mod_india_cancel, "clicked",
-      G_CALLBACK(NodelistGtk::activate_mod_india_cancel), this);
+  g_signal_connect(mod_india_cancel, "clicked", G_CALLBACK(NodelistGtk::activate_mod_india_cancel), this);
 
   GtkWidget* mod_india_grid = gtk_grid_new();
   gtk_grid_set_column_spacing(GTK_GRID(mod_india_grid), 30);
@@ -1044,43 +922,34 @@ void NodelistGtk::create_mod_input_dialog()
   gtk_grid_attach(GTK_GRID(mod_india_grid), mod_india_text5, 1, 4, 1, 1);
 
   GtkWidget* mod_india_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
-  gtk_box_pack_start(
-      GTK_BOX(mod_india_hboxtext), mod_india_image, FALSE, FALSE, 40);
-  gtk_box_pack_start(
-      GTK_BOX(mod_india_hboxtext), mod_india_grid, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(mod_india_hboxtext), mod_india_image, FALSE, FALSE, 40);
+  gtk_box_pack_start(GTK_BOX(mod_india_hboxtext), mod_india_grid, FALSE, FALSE, 15);
 
   GtkWidget* mod_india_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
-  gtk_box_pack_start(
-      GTK_BOX(mod_india_hboxbuttons), mod_india_ok, FALSE, FALSE, 40);
-  gtk_box_pack_end(
-      GTK_BOX(mod_india_hboxbuttons), mod_india_cancel, FALSE, FALSE, 40);
+  gtk_box_pack_start(GTK_BOX(mod_india_hboxbuttons), mod_india_ok, FALSE, FALSE, 40);
+  gtk_box_pack_end(GTK_BOX(mod_india_hboxbuttons), mod_india_cancel, FALSE, FALSE, 40);
 
   GtkWidget* mod_india_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_box_pack_start(
-      GTK_BOX(mod_india_vbox), mod_india_hboxtext, TRUE, TRUE, 30);
+  gtk_box_pack_start(GTK_BOX(mod_india_vbox), mod_india_hboxtext, TRUE, TRUE, 30);
   gtk_box_pack_start(GTK_BOX(mod_india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
-  gtk_box_pack_end(
-      GTK_BOX(mod_india_vbox), mod_india_hboxbuttons, FALSE, FALSE, 15);
+  gtk_box_pack_end(GTK_BOX(mod_india_vbox), mod_india_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(mod_india_widget), mod_india_vbox);
   gtk_widget_show_all(mod_india_widget);
   g_object_set(mod_india_widget, "visible", FALSE, NULL);
 }
 
-CowGe* NodelistGtk::ge_new(const char* name, const char* filename,
-    int scrollbar, int menu, int navigator, int width, int height, int x, int y,
-    double scan_time, const char* object_name, int use_default_access,
-    unsigned int access, unsigned int options, void* basewidget,
-    double* borders, int color_theme, int dashboard,
-    int (*command_cb)(void*, char*, char*, char *, void*),
-    int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-    int (*is_authorized_cb)(void*, unsigned int),
-    void (*keyboard_cb)(void*, void*, int, int),
-    int (*extern_connect_cb)(void*, char*, void**, pwr_tRefId*))
+CowGe* NodelistGtk::ge_new(const char* name, const char* filename, int scrollbar, int menu, int navigator,
+                           int width, int height, int x, int y, double scan_time, const char* object_name,
+                           int use_default_access, unsigned int access, unsigned int options,
+                           void* basewidget, double* borders, int color_theme, int dashboard,
+                           int (*command_cb)(void*, char*, char*, char*, void*),
+                           int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+                           int (*is_authorized_cb)(void*, unsigned int),
+                           void (*keyboard_cb)(void*, void*, int, int),
+                           int (*extern_connect_cb)(void*, char*, void**, pwr_tRefId*))
 {
-  return new CowGeGtk(parent_wid, this, name, filename, scrollbar, menu,
-      navigator, width, height, x, y, scan_time, object_name,
-      use_default_access, access, options, basewidget, borders, color_theme,
-      dashboard, command_cb, get_current_objects_cb, is_authorized_cb, keyboard_cb,
-      extern_connect_cb);
+  return new CowGeGtk(parent_wid, this, name, filename, scrollbar, menu, navigator, width, height, x, y,
+                      scan_time, object_name, use_default_access, access, options, basewidget, borders,
+                      color_theme, dashboard, command_cb, get_current_objects_cb, is_authorized_cb,
+                      keyboard_cb, extern_connect_cb);
 }
-

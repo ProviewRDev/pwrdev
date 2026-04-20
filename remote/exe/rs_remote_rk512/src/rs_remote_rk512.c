@@ -35,48 +35,45 @@
  */
 
 /*************************************************************************
-*
-*                       3 9 6 4 R
-*                       ==========
-**************************************************************************
-*
-* Filename:             rs_remote_rk512.c
-*
-*                       Date    Pgm.    Read.   Remark
-* Modified              010401  ulflj   -       for lynx
-*			010815  ulflj		fixed for pwr 3.3a
-*			020530	ulflj		modified serial parameter
-*						read in lynx version
-*			030814	ulflj		Linux version improved
-*			030830	ulflj		fixed timeouts for
-*DLE-answer/characters
-*			031118	ulflj		set longer char timeout to
-*get magnemag marker to work (longer then specs)
-*
-* Description:          Implements remote transport process RK512.
-*
-**************************************************************************
-**************************************************************************/
+ *
+ *                       3 9 6 4 R
+ *                       ==========
+ **************************************************************************
+ *
+ * Filename:             rs_remote_rk512.c
+ *
+ *                       Date    Pgm.    Read.   Remark
+ * Modified              010401  ulflj   -       for lynx
+ *			010815  ulflj		fixed for pwr 3.3a
+ *			020530	ulflj		modified serial parameter
+ *						read in lynx version
+ *			030814	ulflj		Linux version improved
+ *			030830	ulflj		fixed timeouts for
+ *DLE-answer/characters
+ *			031118	ulflj		set longer char timeout to
+ *get magnemag marker to work (longer then specs)
+ *
+ * Description:          Implements remote transport process RK512.
+ *
+ **************************************************************************
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 
 /*System includes*/
 
-#include <time.h>
-#include <stdio.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <math.h>
-#include <string.h>
-#include <stdlib.h>
 #include <signal.h>
 #include <stdarg.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <errno.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/types.h>
-//#include <uio.h>
+// #include <uio.h>
 #include <termios.h>
 #if defined OS_LINUX
 #include <termio.h>
@@ -88,30 +85,31 @@
 
 /*PWR includes*/
 
+#include "co_cdh.h"
 #include "pwr_baseclasses.h"
 #include "pwr_remoteclasses.h"
-#include "remote_mq.h"
-#include "co_cdh.h"
-#include "rt_gdh.h"
-#include "rt_aproc.h"
-#include "rt_pwr_msg.h"
-#include "rs_remote_msg.h"
 #include "remote.h"
-#include "remote_utils.h"
-#include "remote_remtrans_utils.h"
+#include "remote_mq.h"
 #include "remote_remio_utils.h"
+#include "remote_remtrans_utils.h"
+#include "remote_utils.h"
+#include "rs_remote_msg.h"
+#include "rt_aproc.h"
+#include "rt_gdh.h"
+#include "rt_pwr_msg.h"
 
+#include "co_time.h"
 #include "rt_gdh.h"
 #include "rt_gdh_msg.h"
 #include "rt_plc_utl.h"
-#include "co_time.h"
 
 /*_Function prototypes___________________________________________________*/
 
-void send_pollbuff(remnode_item* remnode, pssupd_buffer_vnet* buf);
-static unsigned int remnode_send(remnode_item* remnode,
-    pwr_sClass_RemTrans* remtrans, char* buf, int buffer_size);
-static unsigned int send_it(char* buf, int buffer_size, int double_dle);
+void send_pollbuff(remnode_item *remnode, pssupd_buffer_vnet *buf);
+static unsigned int remnode_send(remnode_item *remnode,
+                                 pwr_sClass_RemTrans *remtrans, char *buf,
+                                 int buffer_size);
+static unsigned int send_it(char *buf, int buffer_size, int double_dle);
 static unsigned int Receive();
 static unsigned int ReceiveHandler();
 
@@ -157,8 +155,8 @@ static int log_on = 0;
 unsigned int telegram_counter = 0; /* For control of follow on telegrams */
 
 remnode_item rn;
-pwr_sClass_RemnodeRK512* rn_RK512;
-int ser_fd; /* file domininator for serial port */
+pwr_sClass_RemnodeRK512 *rn_RK512;
+int ser_fd;              /* file domininator for serial port */
 unsigned char debug = 0; /* 1 if debug mode activated */
 
 float time_since_poll;
@@ -168,8 +166,7 @@ float time_since_scan;
 int stall_action = 1;
 int use_remote_io;
 
-void load_timeval(struct timeval* tv, float t)
-{
+void load_timeval(struct timeval *tv, float t) {
   tv->tv_sec = t;
   tv->tv_usec = (t - (float)tv->tv_sec) * 1000000;
 }
@@ -180,8 +177,7 @@ short poll_id[2];
 
 static int SendResponseTelegram(unsigned char CODE);
 
-static void rlog(const char* text, int val)
-{
+static void rlog(const char *text, int val) {
   if (log_on) {
     char timstr[20];
 
@@ -204,17 +200,16 @@ static void rlog(const char* text, int val)
 **************************************************************************
 **************************************************************************/
 
-void send_pollbuff(remnode_item* remnode, pssupd_buffer_vnet* buf)
-{
+void send_pollbuff(remnode_item *remnode, pssupd_buffer_vnet *buf) {
   unsigned int sts, buf_size;
 
   /* Fill in remaining data in poll telegram */
-  RemUtils_AsciiToR50("PSSUPD", (short*)&buf->receive_task);
+  RemUtils_AsciiToR50("PSSUPD", (short *)&buf->receive_task);
   buf->common_name[0] = poll_id[0];
   buf->common_name[1] = poll_id[1];
 
   buf_size = buf->length * 2; /*  Convert to bytes  */
-  sts = send_it((char*)buf, buf_size, 1);
+  sts = send_it((char *)buf, buf_size, 1);
 
   return;
 }
@@ -233,9 +228,9 @@ void send_pollbuff(remnode_item* remnode, pssupd_buffer_vnet* buf)
 **************************************************************************
 **************************************************************************/
 
-static unsigned int remnode_send(remnode_item* remnode,
-    pwr_sClass_RemTrans* remtrans, char* buf, int buf_size)
-{
+static unsigned int remnode_send(remnode_item *remnode,
+                                 pwr_sClass_RemTrans *remtrans, char *buf,
+                                 int buf_size) {
   unsigned int sts, i;
   unsigned int size_of_telegram, datasize;
   unsigned int number_of_DLE = 0;
@@ -248,10 +243,10 @@ static unsigned int remnode_send(remnode_item* remnode,
   unsigned char datasize_low_byte, datasize_high_byte;
   unsigned char received_char = '\0';
   unsigned char response_buffer[RESP_MESSAGE_SIZE];
-  unsigned char* restore_buf_ptr = (unsigned char*)buf;
-  static unsigned char sstx[2] = { STX, '\0' };
-  static unsigned char sdle[2] = { DLE, '\0' };
-  static unsigned char snak[2] = { NAK, '\0' };
+  unsigned char *restore_buf_ptr = (unsigned char *)buf;
+  static unsigned char sstx[2] = {STX, '\0'};
+  static unsigned char sdle[2] = {DLE, '\0'};
+  static unsigned char snak[2] = {NAK, '\0'};
   fd_set read_fd;
   struct timeval tv;
 
@@ -291,8 +286,8 @@ static unsigned int remnode_send(remnode_item* remnode,
         if (*buf++ == DLE)
           number_of_DLE += 1;
       }
-      size_of_telegram
-          = HEADER_SIZE + delta_pos + number_of_DLE + NUMBER_OF_STOP_CHAR;
+      size_of_telegram =
+          HEADER_SIZE + delta_pos + number_of_DLE + NUMBER_OF_STOP_CHAR;
 
       /*************************************************************************/
       /**    Fill in the telegram header and calculate BCC. **/
@@ -326,7 +321,7 @@ static unsigned int remnode_send(remnode_item* remnode,
       /*************************************************************************/
       /**   Fill up A-telegram with contents of message and calculate BCC **/
       /*************************************************************************/
-      buf = (char*)restore_buf_ptr;
+      buf = (char *)restore_buf_ptr;
       for (i = 0; i < (delta_pos + number_of_DLE); i++) {
         ch = sendbuffer.telegram[i] = *buf++;
         BCC ^= ch;
@@ -364,14 +359,14 @@ static unsigned int remnode_send(remnode_item* remnode,
       /**    Calculate the size of the follow on telegram. **/
       /*************************************************************************/
       /* Count DLE characters */
-      restore_buf_ptr = (unsigned char*)buf;
+      restore_buf_ptr = (unsigned char *)buf;
       number_of_DLE = 0;
       for (i = 0; i < delta_pos; i++) {
         if (*buf++ == DLE)
           number_of_DLE += 1;
       }
-      size_of_telegram = FOLLOW_ON_HEADER_SIZE + delta_pos + number_of_DLE
-          + NUMBER_OF_STOP_CHAR;
+      size_of_telegram = FOLLOW_ON_HEADER_SIZE + delta_pos + number_of_DLE +
+                         NUMBER_OF_STOP_CHAR;
 
       /*************************************************************************/
       /**    Fill in the follow on telegram header and calculate BCC. **/
@@ -391,7 +386,7 @@ static unsigned int remnode_send(remnode_item* remnode,
       /* Fill up follow on telegram with contents of message and calculate BCC
        */
       /*************************************************************************/
-      buf = (char*)restore_buf_ptr;
+      buf = (char *)restore_buf_ptr;
       for (i = 0; i < (delta_pos + number_of_DLE); i++) {
         ch = follow_on_sendbuffer.telegram[i] = *buf++;
         BCC ^= ch;
@@ -493,8 +488,8 @@ static unsigned int remnode_send(remnode_item* remnode,
                     sts = write(ser_fd, sdle, 1);
                     if (response_buffer[3] != 0) {
                       /* This response contains a error code */
-                      errh_CErrLog(
-                          REM__SIEMENSERROR, errh_ErrArgL(response_buffer[3]));
+                      errh_CErrLog(REM__SIEMENSERROR,
+                                   errh_ErrArgL(response_buffer[3]));
                     }
                   } else {
                     /* Wrong checksum. */
@@ -558,19 +553,18 @@ static unsigned int remnode_send(remnode_item* remnode,
 **************************************************************************
 **************************************************************************/
 
-static unsigned int send_it(char* buf, int buffer_size, int double_dle)
-{
+static unsigned int send_it(char *buf, int buffer_size, int double_dle) {
   int sts, i;
   unsigned int size_of_telegram;
   unsigned int number_of_DLE = 0;
   unsigned char ch;
   unsigned char BCC = DLE ^ ETX;
-  unsigned char* restore_buf_ptr = (unsigned char*)buf;
+  unsigned char *restore_buf_ptr = (unsigned char *)buf;
   unsigned char telegram[MAX_SIZE_TELEGRAM];
   unsigned char buff;
-  static unsigned char sstx[2] = { STX, '\0' };
+  static unsigned char sstx[2] = {STX, '\0'};
   // static unsigned char  sdle[2] = {DLE, '\0'};
-  static unsigned char snak[2] = { NAK, '\0' };
+  static unsigned char snak[2] = {NAK, '\0'};
 
   fd_set read_fd;
   struct timeval tv;
@@ -587,7 +581,7 @@ static unsigned int send_it(char* buf, int buffer_size, int double_dle)
   /*************************************************************************/
   /**   Fill up telegram with contents of message and calculate BCC       **/
   /*************************************************************************/
-  buf = (char*)restore_buf_ptr;
+  buf = (char *)restore_buf_ptr;
   for (i = 0; i < (buffer_size + number_of_DLE); i++) {
     ch = telegram[i] = *buf++;
     BCC ^= ch;
@@ -618,7 +612,7 @@ static unsigned int send_it(char* buf, int buffer_size, int double_dle)
   write(ser_fd, sstx, 1); /*send stx and wait for answer*/
 
   select(ser_fd + 1, &read_fd, NULL, NULL, &tv); /*wait for char or timeout*/
-  sts = read(ser_fd, &buff, 1); /*read port*/
+  sts = read(ser_fd, &buff, 1);                  /*read port*/
 
   if (sts < 1) /*if timeout*/
   {
@@ -674,13 +668,12 @@ static unsigned int send_it(char* buf, int buffer_size, int double_dle)
 **************************************************************************
 **************************************************************************/
 
-static unsigned int Receive()
-{
+static unsigned int Receive() {
   static int sts;
   int rsts = 0;
   unsigned char received_char = NUL;
-  static unsigned char snak[2] = { NAK, NUL };
-  static unsigned char sdle[2] = { DLE, NUL };
+  static unsigned char snak[2] = {NAK, NUL};
+  static unsigned char sdle[2] = {DLE, NUL};
   // static int			error_logged = 0;
 
   fd_set read_fd;
@@ -727,7 +720,7 @@ static unsigned int Receive()
         write(ser_fd, snak, 1);
       errh_Error("RK512 felaktigt meddelande i mottagning, annat starttecken "
                  "än STX (0x%x)",
-          received_char);
+                 received_char);
       sts = 0; // felstatus
     }
 
@@ -753,8 +746,7 @@ static unsigned int Receive()
 **************************************************************************
 **************************************************************************/
 
-static unsigned int ReceiveHandler(int fd)
-{
+static unsigned int ReceiveHandler(int fd) {
   unsigned int sts;
   // unsigned int          nbr_of_bytes_written = 0;
   // unsigned int          nbr_of_bytes_read = 0;
@@ -765,12 +757,12 @@ static unsigned int ReceiveHandler(int fd)
   unsigned char receive_buffer[MAX_SIZE_TELEGRAM];
   unsigned char sdle = DLE;
   unsigned char received_char;
-  remtrans_item* remtrans = NULL;
+  remtrans_item *remtrans = NULL;
   int i;
   unsigned char CODE = '\0';
   static unsigned int datasize;
-  static unsigned char* TelegramBuffer;
-  static unsigned char* TelegramBuffer_ptr;
+  static unsigned char *TelegramBuffer;
+  static unsigned char *TelegramBuffer_ptr;
   unsigned int pos_counter = 0;
   unsigned int delta_pos = 0;
 
@@ -870,10 +862,11 @@ static unsigned int ReceiveHandler(int fd)
     /* Checksum in this telegram is wrong */
     errh_Error("RK512 mottagning, felaktig checksumma, %d, %02x %02x %02x %02x "
                "%02x %02x %02x %02x %02x %02x %02x %02x",
-        data_size, receive_buffer[0], receive_buffer[1], receive_buffer[2],
-        receive_buffer[3], receive_buffer[4], receive_buffer[5],
-        receive_buffer[6], receive_buffer[7], receive_buffer[8],
-        receive_buffer[9], receive_buffer[10], receive_buffer[11]);
+               data_size, receive_buffer[0], receive_buffer[1],
+               receive_buffer[2], receive_buffer[3], receive_buffer[4],
+               receive_buffer[5], receive_buffer[6], receive_buffer[7],
+               receive_buffer[8], receive_buffer[9], receive_buffer[10],
+               receive_buffer[11]);
     if (debug)
       printf("  Checksum error\n");
 
@@ -898,7 +891,7 @@ static unsigned int ReceiveHandler(int fd)
           search_remtrans = false;
       }
       if (search_remtrans)
-        remtrans = (remtrans_item*)remtrans->next;
+        remtrans = (remtrans_item *)remtrans->next;
     }
 
     if (search_remtrans) {
@@ -947,8 +940,8 @@ static unsigned int ReceiveHandler(int fd)
       pos_counter = MAX_SIZE_DATA_BLOCK;
     } else if (!CODE) {
       /* This message contains only one telegram. Treat it! */
-      sts = RemTrans_Receive(
-          remtrans, (char*)&receive_buffer[HEADER_SIZE], datasize);
+      sts = RemTrans_Receive(remtrans, (char *)&receive_buffer[HEADER_SIZE],
+                             datasize);
       if (EVEN(sts)) {
         remtrans->objp->ErrCount++;
         return (1);
@@ -1003,7 +996,7 @@ static unsigned int ReceiveHandler(int fd)
           return (1);
         }
         TelegramBuffer_ptr = TelegramBuffer;
-        sts = RemTrans_Receive(remtrans, (char*)TelegramBuffer_ptr, datasize);
+        sts = RemTrans_Receive(remtrans, (char *)TelegramBuffer_ptr, datasize);
         free(TelegramBuffer);
         if (EVEN(sts)) {
           remtrans->objp->ErrCount++;
@@ -1031,8 +1024,7 @@ static unsigned int ReceiveHandler(int fd)
   }
 }
 
-static int SendResponseTelegram(unsigned char CODE)
-{
+static int SendResponseTelegram(unsigned char CODE) {
   unsigned int sts;
   unsigned char BCC = '\0';
   unsigned char ResponseTelegram[RESP_MESSAGE_SIZE + 1];
@@ -1047,7 +1039,7 @@ static int SendResponseTelegram(unsigned char CODE)
   ResponseTelegram[5] = ETX;
   ResponseTelegram[6] = BCC;
 
-  sts = send_it((char*)ResponseTelegram, 4 /* RESP_MESSAGE_SIZE */, 0);
+  sts = send_it((char *)ResponseTelegram, 4 /* RESP_MESSAGE_SIZE */, 0);
   return sts;
 }
 
@@ -1055,16 +1047,16 @@ static int SendResponseTelegram(unsigned char CODE)
  ******        Main routine        *****************
  ***************************************************/
 
-int main(int argc, char* argv[]) /*argv[2]=remnode name*/
+int main(int argc, char *argv[]) /*argv[2]=remnode name*/
 {
   unsigned int sts; /* Status from function calls etc. */
   char id[32];
   char pname[45];
-  remtrans_item* remtrans;
+  remtrans_item *remtrans;
   int i;
   char first;
-  pssupd_buffer_vnet buff; /* Buffer for 'hello' */
-  pssupd_order_header* header; /* Header for 'hello' */
+  pssupd_buffer_vnet buff;     /* Buffer for 'hello' */
+  pssupd_order_header *header; /* Header for 'hello' */
   char name[80];
 
   /* Read arg number 2, should be id for this instance */
@@ -1108,7 +1100,7 @@ int main(int argc, char* argv[]) /*argv[2]=remnode name*/
 
   /* Get pointer to RemnodeRK512 object and store locally */
 
-  sts = gdh_ObjidToPointer(rn.objid, (pwr_tAddress*)&rn_RK512);
+  sts = gdh_ObjidToPointer(rn.objid, (pwr_tAddress *)&rn_RK512);
   if (EVEN(sts)) {
     errh_Error("cdh_ObjidToPointer, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
@@ -1122,7 +1114,7 @@ int main(int argc, char* argv[]) /*argv[2]=remnode name*/
   name[4] = 'S';
   name[5] = 'S';
   name[6] = 0;
-  RemUtils_AsciiToR50((char*)&name, (short*)&poll_id);
+  RemUtils_AsciiToR50((char *)&name, (short *)&poll_id);
 
   if (debug)
     printf("%s, %d %d\n", name, poll_id[0], poll_id[1]);
@@ -1164,16 +1156,17 @@ int main(int argc, char* argv[]) /*argv[2]=remnode name*/
   i = 0;
   while (remtrans) {
     rn_RK512->RemTransObjects[i++] = remtrans->objid;
-    if (i >= (int)(sizeof(rn_RK512->RemTransObjects)
-                 / sizeof(rn_RK512->RemTransObjects[0])))
+    if (i >= (int)(sizeof(rn_RK512->RemTransObjects) /
+                   sizeof(rn_RK512->RemTransObjects[0])))
       break;
-    remtrans = (remtrans_item*)remtrans->next;
+    remtrans = (remtrans_item *)remtrans->next;
   }
 
   /* Initialize device */
 
   ser_fd = RemUtils_InitSerialDev(rn_RK512->DevName, rn_RK512->Speed,
-      rn_RK512->DataBits, rn_RK512->StopBits, rn_RK512->Parity);
+                                  rn_RK512->DataBits, rn_RK512->StopBits,
+                                  rn_RK512->Parity);
 
   if (!ser_fd) {
     errh_Error("InitDev, %d", ser_fd);
@@ -1208,14 +1201,14 @@ int main(int argc, char* argv[]) /*argv[2]=remnode name*/
 
     if (first && use_remote_io) {
       /* Send Hello to subsystem if we have poll */
-      header = (pssupd_order_header*)&buff.data;
+      header = (pssupd_order_header *)&buff.data;
       header->type = PSS_Switch_Done;
       header->size = 0;
       header->signal = 0;
       buff.no_of_updates = 1;
-      buff.length = (sizeof(pssupd_buffer_vnet) - MAX_ORDER_BUFFERSIZE_VNET
-                        + sizeof(pssupd_order_header) + 1)
-          / 2;
+      buff.length = (sizeof(pssupd_buffer_vnet) - MAX_ORDER_BUFFERSIZE_VNET +
+                     sizeof(pssupd_order_header) + 1) /
+                    2;
       send_pollbuff(&rn, &buff);
     }
 
@@ -1228,9 +1221,8 @@ int main(int argc, char* argv[]) /*argv[2]=remnode name*/
     }
 
     if (use_remote_io) {
-      if ((rn_RK512->LinkUp && time_since_poll >= rn_RK512->ScanTime * 2.0)
-          || (!rn_RK512->LinkUp
-                 && time_since_poll >= rn_RK512->ScanTime * 10.0)) {
+      if ((rn_RK512->LinkUp && time_since_poll >= rn_RK512->ScanTime * 2.0) ||
+          (!rn_RK512->LinkUp && time_since_poll >= rn_RK512->ScanTime * 10.0)) {
         if (debug)
           printf("RemIO Cyclic\n");
         sts = RemIO_Cyclic_3964R(&rn, &send_pollbuff);

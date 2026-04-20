@@ -43,8 +43,8 @@
 
 static pwr_tStatus xdrEvent(XDR* xdrs, mh_eEvent event, mh_sMsgInfo* mp);
 
-pwr_tStatus mh_NetSendMessage(qcom_sQid* qid, co_sPlatform* recPlatform,
-    int prio, int subtype, unsigned int id, mh_sHead* hp, unsigned int size)
+pwr_tStatus mh_NetSendMessage(qcom_sQid* qid, co_sPlatform* recPlatform, int prio, int subtype,
+                              unsigned int id, mh_sHead* hp, unsigned int size)
 {
   pwr_tStatus sts = MH__SUCCESS;
   pwr_tStatus sts2;
@@ -61,15 +61,19 @@ pwr_tStatus mh_NetSendMessage(qcom_sQid* qid, co_sPlatform* recPlatform,
   msg.size = size;
   msg.msg_id = id;
 
-  if (recPlatform == NULL || co_IsXdrNeeded(&hp->platform, recPlatform)) {
+  if (recPlatform == NULL || co_IsXdrNeeded(&hp->platform, recPlatform))
+  {
     hp->xdr = TRUE;
     xdrmem_create(&xdrs, msg.data, size, XDR_ENCODE);
     sts = mh_NetXdrMessage(&xdrs, subtype, hp);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       qcom_Free(&sts2, msg.data);
       return sts;
     }
-  } else {
+  }
+  else
+  {
     hp->xdr = FALSE;
     memcpy(msg.data, hp, size);
   }
@@ -85,11 +89,13 @@ pwr_tStatus mh_NetXdrMessage(XDR* xdrs, int subtype, mh_sHead* hp)
 {
   pwr_tStatus sts;
 
-  if (!xdr_mh_sHead(xdrs, hp)) {
+  if (!xdr_mh_sHead(xdrs, hp))
+  {
     return MH__XDRFAILED;
   }
 
-  switch (hp->type) {
+  switch (hp->type)
+  {
   case mh_eMsg_Event:
     sts = xdrEvent(xdrs, (mh_eEvent)subtype, (mh_sMsgInfo*)(hp + 1));
     if (EVEN(sts))
@@ -111,7 +117,7 @@ pwr_tStatus mh_NetXdrMessage(XDR* xdrs, int subtype, mh_sHead* hp)
   case mh_eMsg_OutunitHello:
     break;
   case mh_eMsg_OutunitInfo:
-    if (!xdr_mh_sOutunitInfo(xdrs, (mh_sOutunitInfo *)(hp + 1)))
+    if (!xdr_mh_sOutunitInfo(xdrs, (mh_sOutunitInfo*)(hp + 1)))
       return MH__XDRFAILED;
     break;
   case mh_eMsg_OutunitSync:
@@ -123,8 +129,7 @@ pwr_tStatus mh_NetXdrMessage(XDR* xdrs, int subtype, mh_sHead* hp)
   case mh_eMsg_Sync:
     break;
   default:
-    errh_Info("Unexpected message type: %d, (%s)", hp->type,
-        qcom_QidToString(NULL, &hp->qid, 1));
+    errh_Info("Unexpected message type: %d, (%s)", hp->type, qcom_QidToString(NULL, &hp->qid, 1));
     return MH__XDRUNEXPECT;
   }
 
@@ -133,7 +138,8 @@ pwr_tStatus mh_NetXdrMessage(XDR* xdrs, int subtype, mh_sHead* hp)
 
 static pwr_tStatus xdrEvent(XDR* xdrs, mh_eEvent event, mh_sMsgInfo* mp)
 {
-  switch (event) {
+  switch (event)
+  {
   case mh_eEvent_Ack:
     if (!xdr_mh_sAck(xdrs, (mh_sAck*)mp))
       return MH__XDRFAILED;
@@ -166,8 +172,8 @@ static pwr_tStatus xdrEvent(XDR* xdrs, mh_eEvent event, mh_sMsgInfo* mp)
       return MH__XDRFAILED;
     break;
 
-  /* mh_eEvent_Missing are not sent, only stored by
-     rt_eventlogger.  */
+    /* mh_eEvent_Missing are not sent, only stored by
+       rt_eventlogger.  */
 
   case mh_eEvent__:
   case mh_eEvent_Missing:

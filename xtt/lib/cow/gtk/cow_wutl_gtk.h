@@ -39,12 +39,12 @@
 
 #include "cow_gtk.h"
 
-GtkToolItem* wutl_tools_item(GtkToolbar *tools, const char *img, GCallback cb, 
-    const char* tooltip, void *ctx, int disable_focus = 1, int translate = 1);
-GtkToolItem* wutl_tools_toggle_button(GtkToolbar *tools, const char *img, GCallback cb, 
-    const char* tooltip, void *ctx, int disable_focus = 1, int translate = 1);
-void wutl_widget_name_suffix_add(GtkWidget *w, const char *suffix);
-void wutl_widget_name_suffix_sub(GtkWidget *w);
-int wutl_get_dark_theme(GtkWidget *toplevel);
+GtkToolItem* wutl_tools_item(GtkToolbar* tools, const char* img, GCallback cb, const char* tooltip, void* ctx,
+                             int disable_focus = 1, int translate = 1);
+GtkToolItem* wutl_tools_toggle_button(GtkToolbar* tools, const char* img, GCallback cb, const char* tooltip,
+                                      void* ctx, int disable_focus = 1, int translate = 1);
+void wutl_widget_name_suffix_add(GtkWidget* w, const char* suffix);
+void wutl_widget_name_suffix_sub(GtkWidget* w);
+int wutl_get_dark_theme(GtkWidget* toplevel);
 int wutl_dark_theme();
 #endif

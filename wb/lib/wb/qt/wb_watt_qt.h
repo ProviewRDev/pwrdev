@@ -49,10 +49,11 @@
 
 class WAttQtWidget;
 
-class WAttQt : public WAtt {
+class WAttQt : public WAtt
+{
 public:
-  WAttQt(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref,
-      int wa_editmode, int wa_advanced_user, int wa_display_objectname);
+  WAttQt(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref, int wa_editmode,
+         int wa_advanced_user, int wa_display_objectname);
   ~WAttQt();
   QWidget* brow_widget;
   QWidget* form_widget;
@@ -79,7 +80,8 @@ private:
   WAttQtWidget* toplevel;
 };
 
-class WAttQtWidget : public QWidget {
+class WAttQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

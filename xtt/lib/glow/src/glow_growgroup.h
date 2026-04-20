@@ -37,6 +37,8 @@
 #ifndef glow_growgroup_h
 #define glow_growgroup_h
 
+#include <iosfwd>
+
 #include "glow_grownode.h"
 
 /*! \file glow_growgroup.h
@@ -50,7 +52,8 @@
   events when the
   object is clicked on, moved etc.
 */
-class GrowGroup : public GrowNode {
+class GrowGroup : public GrowNode
+{
 public:
   //! Constuctor
   /*!
@@ -59,11 +62,10 @@ public:
     \param array	Array with group member objects.
     \param nodraw	Don't draw the object now.
   */
-  GrowGroup(
-      GrowCtx* glow_ctx, const char* name, GlowArray& array, int nodraw = 0);
+  GrowGroup(GrowCtx* glow_ctx, const char* name, GlowArray& array, int nodraw = 0);
 
   //! Noargs constructor.
-  GrowGroup(){}
+  GrowGroup() {}
 
   GrowGroup(GrowCtx* glow_ctx, const char* name);
   ~GrowGroup();
@@ -79,13 +81,13 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Dissolve the group.
   /*! Add the transform of the group to the transformation of all members, and
@@ -144,9 +146,9 @@ public:
     \param direction	Direction of background object.
     \return		Return 1 if the object is found, else 0.
   */
-  int get_background_object_limits(GlowTransform* t, glow_eTraceType type,
-      double x, double y, GlowArrayElem** background, double* min, double* max,
-      glow_eDirection* direction);
+  int get_background_object_limits(GlowTransform* t, glow_eTraceType type, double x, double y,
+                                   GlowArrayElem** background, double* min, double* max,
+                                   glow_eDirection* direction);
 
   //! Find a member object with the specified name.
   /*!
@@ -182,26 +184,17 @@ public:
   }
 
   //! Get next object. */
-  int get_next_object(GlowArrayElem* object, GlowArrayElem** next)
-  {
-    return nc->a.get_next(object, next);
-  }
+  int get_next_object(GlowArrayElem* object, GlowArrayElem** next) { return nc->a.get_next(object, next); }
 
   //! Get first object. */
-  int get_first_object(GlowArrayElem** first)
-  {
-    return nc->a.get_first(first);
-  }
+  int get_first_object(GlowArrayElem** first) { return nc->a.get_first(first); }
 
   int order_object(GlowArrayElem* o, GlowArrayElem* dest, glow_eDest code)
   {
     return nc->a.move(o, dest, code);
   }
 
-  int find_by_name(const char* name, GlowArrayElem** element)
-  {
-    return nc->a.find_by_name(name, element);
-  }
+  int find_by_name(const char* name, GlowArrayElem** element) { return nc->a.find_by_name(name, element); }
   int export_script(GlowExportScript* es, void* o, void* m);
 
   virtual int clear();

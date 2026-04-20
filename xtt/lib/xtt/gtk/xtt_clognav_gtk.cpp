@@ -50,8 +50,7 @@
 #include "xtt_clognav_gtk.h"
 #include "xtt_menu.h"
 
-CLogNavGtk::CLogNavGtk(
-    void* clog_parent_ctx, GtkWidget* clog_parent_wid, GtkWidget** w)
+CLogNavGtk::CLogNavGtk(void* clog_parent_ctx, GtkWidget* clog_parent_wid, GtkWidget** w)
     : CLogNav(clog_parent_ctx), parent_wid(clog_parent_wid)
 {
   form_widget = scrolledbrowwidgetgtk_new(init_brow_cb, this, &brow_widget);
@@ -70,7 +69,4 @@ CLogNavGtk::~CLogNavGtk()
   gtk_widget_destroy(form_widget);
 }
 
-void CLogNavGtk::set_input_focus()
-{
-  gtk_widget_grab_focus(brow_widget);
-}
+void CLogNavGtk::set_input_focus() { gtk_widget_grab_focus(brow_widget); }

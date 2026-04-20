@@ -42,7 +42,8 @@
 #include "wb_vldh.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #define GCG_PRINT_ALLPAR 0
@@ -61,9 +62,9 @@ extern "C" {
 
 #define GCG_MAXFILES 6
 
-#define GCG_MAX_NO_TIMEBASE                                                    \
-  150 /* Max no of timebases that the module can                               \
-      * handle */
+#define GCG_MAX_NO_TIMEBASE                                                                                  \
+  150                                 /* Max no of timebases that the module can                             \
+                                       * handle */
 #define GCG_MAX_NO_TIMEBASE_LINUX 150 /* Max no of allowed LINUX timebases. */
 
 #define GCGM0_MAXFILES 1
@@ -102,147 +103,142 @@ extern "C" {
 
 #define IF_PR if (gcgctx->print)
 
-typedef FILE* gcg_t_files[GCG_MAXFILES];
+  typedef FILE* gcg_t_files[GCG_MAXFILES];
 
-typedef union {
-  int bo;
-  float fl;
-  char str[80];
-  pwr_tTime atime;
-  pwr_tDeltaTime dtime;
-} gcg_t_nocondef;
+  typedef union
+  {
+    int bo;
+    float fl;
+    char str[80];
+    pwr_tTime atime;
+    pwr_tDeltaTime dtime;
+  } gcg_t_nocondef;
 
-typedef struct {
-  pwr_tObjid objdid;
-  pwr_tObjid thread;
-  unsigned long executeorder;
-  pwr_tOName name;
-} gcg_t_plclist;
+  typedef struct
+  {
+    pwr_tObjid objdid;
+    pwr_tObjid thread;
+    unsigned long executeorder;
+    pwr_tOName name;
+  } gcg_t_plclist;
 
-typedef struct {
-  pwr_tObjid objdid;
-  pwr_tObjid plcproc_oid;
-  float scantime;
-  unsigned long prio;
-  pwr_tOName name;
-} gcg_t_threadlist;
+  typedef struct
+  {
+    pwr_tObjid objdid;
+    pwr_tObjid plcproc_oid;
+    float scantime;
+    unsigned long prio;
+    pwr_tOName name;
+  } gcg_t_threadlist;
 
-typedef struct {
-  pwr_tObjid oid;
-  pwr_tOName name;
-} gcg_t_plcproclist;
+  typedef struct
+  {
+    pwr_tObjid oid;
+    pwr_tOName name;
+  } gcg_t_plcproclist;
 
-typedef struct {
-  pwr_tObjid objdid;
-  char prefix;
-  vldh_t_node node;
-} gcg_t_reflist;
+  typedef struct
+  {
+    pwr_tObjid objdid;
+    char prefix;
+    vldh_t_node node;
+  } gcg_t_reflist;
 
-typedef struct {
-  pwr_sAttrRef attrref;
-  char prefix;
-  vldh_t_node node;
-} gcg_t_areflist;
+  typedef struct
+  {
+    pwr_sAttrRef attrref;
+    char prefix;
+    vldh_t_node node;
+  } gcg_t_areflist;
 
-typedef struct {
-  vldh_t_wind wind;
-  vldh_t_node node;
-  char filenames[GCG_MAXFILES][80];
-  gcg_t_files files;
-  gcg_t_areflist* ioread;
-  unsigned long ioreadcount;
-  gcg_t_areflist* iowrite;
-  unsigned long iowritecount;
-  gcg_t_reflist* ref;
-  unsigned long refcount;
-  gcg_t_areflist* aref;
-  unsigned long arefcount;
-  unsigned long compobjcount;
-  pwr_sAttrRef reset_object;
-  unsigned long reset_checked;
-  unsigned long errorcount;
-  unsigned long warningcount;
-  unsigned long order_comp; /* compilation of an order is going on */
-  unsigned long step_comp; /* compilation of a step is going on */
-  unsigned long print; /* if true code generation, else syntax
-                          control only */
-  ldh_tSesContext ldhses;
-  vldh_t_node current_cmanager;
-  int cmanager_active;
-  std::vector<pwr_tOid> pending_compile;
-} gcg_t_ctx, *gcg_ctx;
+  typedef struct
+  {
+    vldh_t_wind wind;
+    vldh_t_node node;
+    char filenames[GCG_MAXFILES][80];
+    gcg_t_files files;
+    gcg_t_areflist* ioread;
+    unsigned long ioreadcount;
+    gcg_t_areflist* iowrite;
+    unsigned long iowritecount;
+    gcg_t_reflist* ref;
+    unsigned long refcount;
+    gcg_t_areflist* aref;
+    unsigned long arefcount;
+    unsigned long compobjcount;
+    pwr_sAttrRef reset_object;
+    unsigned long reset_checked;
+    unsigned long errorcount;
+    unsigned long warningcount;
+    unsigned long order_comp; /* compilation of an order is going on */
+    unsigned long step_comp;  /* compilation of a step is going on */
+    unsigned long print;      /* if true code generation, else syntax
+                                 control only */
+    ldh_tSesContext ldhses;
+    vldh_t_node current_cmanager;
+    int cmanager_active;
+    std::vector<pwr_tOid> pending_compile;
+  } gcg_t_ctx, *gcg_ctx;
 
-int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
-    unsigned long codetype, unsigned long* errorcount,
-    unsigned long* warningcount, int debug, pwr_tVolumeId* volumelist,
-    int volume_count, unsigned long plc_version, pwr_tFloat32 single_scantime);
+  int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus, unsigned long codetype,
+                      unsigned long* errorcount, unsigned long* warningcount, int debug,
+                      pwr_tVolumeId* volumelist, int volume_count, unsigned long plc_version,
+                      pwr_tFloat32 single_scantime);
 
-int gcg_executeorder_nodes(unsigned long node_count, vldh_t_node* nodelist);
+  int gcg_executeorder_nodes(unsigned long node_count, vldh_t_node* nodelist);
 
-int gcg_get_connected_parameter(vldh_t_node node, unsigned long point,
-    vldh_t_node* conn_node, char* conn_obj, char* conn_par);
+  int gcg_get_connected_parameter(vldh_t_node node, unsigned long point, vldh_t_node* conn_node,
+                                  char* conn_obj, char* conn_par);
 
-int gcg_get_conpoint_nodes(vldh_t_node node, unsigned long point,
-    unsigned long* point_count, vldh_t_conpoint** pointlist,
-    unsigned long conmask);
+  int gcg_get_conpoint_nodes(vldh_t_node node, unsigned long point, unsigned long* point_count,
+                             vldh_t_conpoint** pointlist, unsigned long conmask);
 
-int gcg_get_debug(vldh_t_node node, char* debug_parname, char* conn_obj,
-    char* conn_par, pwr_eType* par_type);
+  int gcg_get_debug(vldh_t_node node, char* debug_parname, char* conn_obj, char* conn_par,
+                    pwr_eType* par_type);
 
-int gcg_get_debug_virtual(vldh_t_node node, char* debug_parname, char* conn_obj,
-    char* conn_par, pwr_eType* par_type, int* par_inverted);
+  int gcg_get_debug_virtual(vldh_t_node node, char* debug_parname, char* conn_obj, char* conn_par,
+                            pwr_eType* par_type, int* par_inverted);
 
-int gcg_get_inputpoint(vldh_t_node node, unsigned long index,
-    unsigned long* pointptr, unsigned long* inverted);
+  int gcg_get_inputpoint(vldh_t_node node, unsigned long index, unsigned long* pointptr,
+                         unsigned long* inverted);
 
-int gcg_get_output(vldh_t_node node, unsigned long point,
-    unsigned long* output_count, vldh_t_node* output_node,
-    unsigned long* output_point, ldh_sParDef* output_bodydef,
-    unsigned long conmask);
+  int gcg_get_output(vldh_t_node node, unsigned long point, unsigned long* output_count,
+                     vldh_t_node* output_node, unsigned long* output_point, ldh_sParDef* output_bodydef,
+                     unsigned long conmask);
 
-int gcg_get_outputstring(gcg_ctx gcgctx, vldh_t_node output_node,
-    ldh_sParDef* output_bodydef, pwr_sAttrRef* parattrref, int* partype,
-    char* parprefix, char* parstring);
+  int gcg_get_outputstring(gcg_ctx gcgctx, vldh_t_node output_node, ldh_sParDef* output_bodydef,
+                           pwr_sAttrRef* parattrref, int* partype, char* parprefix, char* parstring);
 
-int gcg_wind_msg(
-    gcg_ctx gcgctx, unsigned long sts, vldh_t_wind wind, int in_wind);
+  int gcg_wind_msg(gcg_ctx gcgctx, unsigned long sts, vldh_t_wind wind, int in_wind);
 
-int gcg_get_point(vldh_t_node node, unsigned long index,
-    unsigned long* pointptr, unsigned long* inverted);
+  int gcg_get_point(vldh_t_node node, unsigned long index, unsigned long* pointptr, unsigned long* inverted);
 
-int gcg_plc_compile(vldh_t_plc plc, unsigned long codetype,
-    unsigned long* errorcount, unsigned long* warningcount, unsigned long spawn,
-    int debug);
+  int gcg_plc_compile(vldh_t_plc plc, unsigned long codetype, unsigned long* errorcount,
+                      unsigned long* warningcount, unsigned long spawn, int debug);
 
-int gcg_plcpgm_to_operating_system(
-    ldh_tSesContext ldhses, pwr_tObjid plcpgm, pwr_mOpSys* os);
+  int gcg_plcpgm_to_operating_system(ldh_tSesContext ldhses, pwr_tObjid plcpgm, pwr_mOpSys* os);
 
-int gcg_plcwindow_compile(vldh_t_wind wind, unsigned long codetype,
-    unsigned long* errorcount, unsigned long* warningcount, unsigned long spawn,
-    int debug);
+  int gcg_plcwindow_compile(vldh_t_wind wind, unsigned long codetype, unsigned long* errorcount,
+                            unsigned long* warningcount, unsigned long spawn, int debug);
 
-int gcg_print_inputs(gcg_ctx gcgctx, vldh_t_node node, const char* delimstr,
-    unsigned long printtype, gcg_t_nocondef* nocondef,
-    unsigned long* nocontype);
+  int gcg_print_inputs(gcg_ctx gcgctx, vldh_t_node node, const char* delimstr, unsigned long printtype,
+                       gcg_t_nocondef* nocondef, unsigned long* nocontype);
 
-int gcg_wind_check_modification(ldh_tSesContext ldhses, pwr_tObjid objdid);
+  int gcg_wind_check_modification(ldh_tSesContext ldhses, pwr_tObjid objdid);
 
-int gcg_wind_to_operating_system(
-    ldh_tSesContext ldhses, pwr_tObjid wind, pwr_mOpSys* os);
+  int gcg_wind_to_operating_system(ldh_tSesContext ldhses, pwr_tObjid wind, pwr_mOpSys* os);
 
-int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses,
-    pwr_tObjid window, unsigned long codetype, int modified, int debug,
-    int skip_plc);
+  int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses, pwr_tObjid window,
+                        unsigned long codetype, int modified, int debug, int skip_plc);
 
-int gcg_comp_volume(ldh_tSesContext ldhses);
+  int gcg_comp_volume(ldh_tSesContext ldhses);
 
-pwr_tStatus gcg_read_volume_plclist(pwr_tVolumeId volid,
-    unsigned long* plc_count, gcg_t_plclist** plclist,
-    unsigned long* thread_count, gcg_t_threadlist** threadlist,
-    unsigned long* plcproc_count, gcg_t_plcproclist** plcproclist);
+  pwr_tStatus gcg_read_volume_plclist(pwr_tVolumeId volid, unsigned long* plc_count, gcg_t_plclist** plclist,
+                                      unsigned long* thread_count, gcg_t_threadlist** threadlist,
+                                      unsigned long* plcproc_count, gcg_t_plcproclist** plcproclist);
 
-int gcg_comp_plcembed_all(ldh_tSession ldhses, int force);
-int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force);
+  int gcg_comp_plcembed_all(ldh_tSession ldhses, int force);
+  int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force);
 
 #ifdef __cplusplus
 }

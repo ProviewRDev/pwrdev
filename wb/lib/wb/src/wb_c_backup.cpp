@@ -51,8 +51,8 @@
 //
 //  PostCreate
 //
-static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father,
+                              pwr_tClassId Class)
 {
   pwr_tStatus sts;
   int size;
@@ -65,8 +65,7 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
     refer to that attribute.
   */
 
-  sts = ldh_ObjidToName(
-      Session, Father, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
+  sts = ldh_ObjidToName(Session, Father, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
@@ -76,8 +75,7 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
-  sts = ldh_SetObjectPar(Session, Object, "RtBody", "DataName",
-      (char*)&Attribute, sizeof(Attribute));
+  sts = ldh_SetObjectPar(Session, Object, "RtBody", "DataName", (char*)&Attribute, sizeof(Attribute));
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
@@ -88,8 +86,7 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
 //  PostMove
 //
 
-static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father, pwr_tClassId Class)
 {
   pwr_tStatus sts;
   int size;
@@ -101,8 +98,7 @@ static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object,
     refer to this attribute.
   */
 
-  sts = ldh_ObjidToName(
-      Session, Father, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
+  sts = ldh_ObjidToName(Session, Father, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
@@ -112,8 +108,7 @@ static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object,
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
-  sts = ldh_SetObjectPar(
-      Session, Object, "RtBody", "DataName", Name, strlen(Name) + 1);
+  sts = ldh_SetObjectPar(Session, Object, "RtBody", "DataName", Name, strlen(Name) + 1);
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
@@ -123,11 +118,10 @@ static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object,
 //
 //  Syntax check.
 //
-static pwr_tStatus SyntaxCheck(
-    ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
-    int* ErrorCount, /* accumulated error count */
-    int* WarningCount /* accumulated waring count */
-    )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated waring count */
+)
 {
   char* s;
 
@@ -148,14 +142,15 @@ static pwr_tStatus SyntaxCheck(
     return dataname_a.sts();
 
   wb_attribute data_a = sp->attribute(&dataname_aref);
-  if (!data_a) {
-    wsx_error_msg_str(Session, "Bad DataName reference", Object, 'E',
-        ErrorCount, WarningCount);
+  if (!data_a)
+  {
+    wsx_error_msg_str(Session, "Bad DataName reference", Object, 'E', ErrorCount, WarningCount);
     return PWRB__SUCCESS;
   }
 
   // Backup on whole signal objects is not allowed
-  switch (data_a.tid()) {
+  switch (data_a.tid())
+  {
   case pwr_cClass_Do:
   case pwr_cClass_Dv:
   case pwr_cClass_Ao:
@@ -176,14 +171,16 @@ static pwr_tStatus SyntaxCheck(
   pwr_tAName aname;
 
   strncpy(aname, data_a.longName().c_str(), sizeof(aname));
-  if ((s = strchr(aname, '.'))) {
+  if ((s = strchr(aname, '.')))
+  {
     *s = 0;
 
     wb_attribute data_aobject = sp->attribute(aname);
     if (!data_aobject)
       return data_aobject.sts();
 
-    switch (data_aobject.cid()) {
+    switch (data_aobject.cid())
+    {
     case pwr_cClass_Do:
     case pwr_cClass_Dv:
     case pwr_cClass_Ao:
@@ -191,15 +188,16 @@ static pwr_tStatus SyntaxCheck(
     case pwr_cClass_Io:
     case pwr_cClass_Iv:
     case pwr_cClass_Po:
-    case pwr_cClass_Co: {
+    case pwr_cClass_Co:
+    {
       if (!streq(s + 1, "ActualValue"))
-        wsx_error_msg(
-            Session, WSX__BCKINVALID, Object, ErrorCount, WarningCount);
+        wsx_error_msg(Session, WSX__BCKINVALID, Object, ErrorCount, WarningCount);
       break;
     }
     case pwr_cClass_Di:
     case pwr_cClass_Ai:
-    case pwr_cClass_Ii: {
+    case pwr_cClass_Ii:
+    {
       wsx_error_msg(Session, WSX__BCKINVALID, Object, ErrorCount, WarningCount);
       break;
     }
@@ -212,5 +210,5 @@ static pwr_tStatus SyntaxCheck(
 
 //  Every method to be exported to the workbench should be registred here.
 
-pwr_dExport pwr_BindMethods(Backup) = { pwr_BindMethod(PostCreate),
-  pwr_BindMethod(PostMove), pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(Backup) = {pwr_BindMethod(PostCreate), pwr_BindMethod(PostMove),
+                                       pwr_BindMethod(SyntaxCheck), pwr_NullMethod};

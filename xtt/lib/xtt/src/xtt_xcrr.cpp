@@ -50,25 +50,20 @@
 #include "xtt_xnav.h"
 #include "xtt_xnav_crr.h"
 
-XCrr::~XCrr()
-{
-}
+XCrr::~XCrr() {}
 
-XCrr::XCrr(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user,
-    int* xa_sts)
-    : parent_ctx(xa_parent_ctx), objar(*xa_objar), input_open(0),
-      input_multiline(0), close_cb(0), redraw_cb(0), popup_menu_cb(0),
-      start_trace_cb(0), client_data(0)
+XCrr::XCrr(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user, int* xa_sts)
+    : parent_ctx(xa_parent_ctx), objar(*xa_objar), input_open(0), input_multiline(0), close_cb(0),
+      redraw_cb(0), popup_menu_cb(0), start_trace_cb(0), client_data(0)
 {
   *xa_sts = XATT__SUCCESS;
 }
 
-void XCrr::xcrr_popup_menu_cb(void* ctx, pwr_sAttrRef attrref,
-    unsigned long item_type, unsigned long utility, char* arg, int x, int y)
+void XCrr::xcrr_popup_menu_cb(void* ctx, pwr_sAttrRef attrref, unsigned long item_type, unsigned long utility,
+                              char* arg, int x, int y)
 {
   if (((XCrr*)ctx)->popup_menu_cb)
-    (((XCrr*)ctx)->popup_menu_cb)(
-        ((XCrr*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
+    (((XCrr*)ctx)->popup_menu_cb)(((XCrr*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
 }
 
 void XCrr::xcrr_start_trace_cb(void* ctx, pwr_tObjid objid, char* name)
@@ -105,7 +100,8 @@ int XCrr::crossref()
   if (EVEN(sts))
     return sts;
 
-  switch (classid) {
+  switch (classid)
+  {
   case pwr_cClass_Di:
   case pwr_cClass_Dv:
   case pwr_cClass_Do:

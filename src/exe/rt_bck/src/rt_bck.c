@@ -67,8 +67,8 @@
 
 pwr_tStatus bck_print(char*);
 
-#define check4a(sts, str)                                                      \
-  if ((sts) == -1)                                                             \
+#define check4a(sts, str)                                                                                    \
+  if ((sts) == -1)                                                                                           \
   perror(str)
 
 #define A_MODE
@@ -81,28 +81,31 @@ pwr_tStatus bck_print(char*);
 /* An entry in the wrtblkque is a malloced piece of memory
    starting with a cycle header, followed by a number of segments.  */
 
-typedef struct {
+typedef struct
+{
   bck_t_cycleheader cyclehead;
-  struct {
+  struct
+  {
     bck_t_writeheader datahead;
     char data[1];
   } segment[1];
 } BCK_WRTBLK_STRUCT;
 
-typedef struct {
+typedef struct
+{
   bck_t_dataheader head; /* Objid for the object */
-  char* name; /* Class of object */
+  char* name;            /* Class of object */
 } bck_t_datablk;
 
-pthread_mutex_t wrtblkmtx; /* One mutex for both queues */
+pthread_mutex_t wrtblkmtx;       /* One mutex for both queues */
 BCK_WRTBLK_STRUCT* wrtblkque[2]; /* A queue with only one slot */
-pthread_cond_t wrtblkevt; /* There is work to do */
+pthread_cond_t wrtblkevt;        /* There is work to do */
 
 pthread_mutex_t frcactmtx; /* Forced activation mutex */
-pthread_cond_t frcactevt; /* Forced activation cond var */
-pwr_tBoolean frcact[2]; /* Forced activation */
+pthread_cond_t frcactevt;  /* Forced activation cond var */
+pwr_tBoolean frcact[2];    /* Forced activation */
 
-static FILE* bckfile; /* File variable */
+static FILE* bckfile;                /* File variable */
 static BCK_FILEHEAD_STRUCT filehead; /* Memory copy of the file header */
 
 static pwr_tUInt32 slowtick;
@@ -115,28 +118,28 @@ static pwr_sClass_Backup_Conf* backup_confp; /* Backup_Conf object pointer */
 #include $kernelmsg
 
 #define POS_TO_VBN(pos) ((((unsigned int)(pos)) + 511) >> 9) + 1
-#define VBN_TO_POS(vbn) (((vbn)-1) << 9)
+#define VBN_TO_POS(vbn) (((vbn) - 1) << 9)
 #define RFA_TO_VBN(rfa) ((rfa).dap$l_rfa0)
-#define NEWVBN(rfa, len)                                                       \
-  if ((curvbn = RFA_TO_VBN(rfa) + POS_TO_VBN(len) - 1) > endvbn)               \
+#define NEWVBN(rfa, len)                                                                                     \
+  if ((curvbn = RFA_TO_VBN(rfa) + POS_TO_VBN(len) - 1) > endvbn)                                             \
   endvbn = curvbn
-#define CONSISTENCY_CHECK(rfa, vbn)                                            \
-  if ((rfa).dap$l_rfa0 != (vbn)) {                                             \
-    int sts = KER$_BUGCHECK;                                                   \
-    c$$translate(sts);                                                         \
-    lib$signal(sts);                                                           \
-    return sts;                                                                \
+#define CONSISTENCY_CHECK(rfa, vbn)                                                                          \
+  if ((rfa).dap$l_rfa0 != (vbn))                                                                             \
+  {                                                                                                          \
+    int sts = KER$_BUGCHECK;                                                                                 \
+    c$$translate(sts);                                                                                       \
+    lib$signal(sts);                                                                                         \
+    return sts;                                                                                              \
   }
 
-#define RFA_TO_POS(rfa)                                                        \
-  ((((rfa).dap$l_rfa0 - 1) << 9) + ((rfa).dap$w_rfa4 & 511))
-#define POS_TO_RFA(pos, rfa)                                                   \
-  {                                                                            \
-    (rfa).dap$l_rfa0 = (((unsigned int)(pos)) >> 9) + 1;                       \
-    (rfa).dap$w_rfa4 = (pos)&511;                                              \
+#define RFA_TO_POS(rfa) ((((rfa).dap$l_rfa0 - 1) << 9) + ((rfa).dap$w_rfa4 & 511))
+#define POS_TO_RFA(pos, rfa)                                                                                 \
+  {                                                                                                          \
+    (rfa).dap$l_rfa0 = (((unsigned int)(pos)) >> 9) + 1;                                                     \
+    (rfa).dap$w_rfa4 = (pos) & 511;                                                                          \
   }
-#define NEWPOS(rfa, len)                                                       \
-  if ((curpos = RFA_TO_POS(rfa) + (len)) > endpos)                             \
+#define NEWPOS(rfa, len)                                                                                     \
+  if ((curpos = RFA_TO_POS(rfa) + (len)) > endpos)                                                           \
   endpos = curpos
 
 static int dapchan;
@@ -159,33 +162,34 @@ int dapopen(char* filespec, pwr_tBoolean create)
   DAP$R_RFA rfa;
 
   CSTRING_TO_VARYING(filespec, filestring);
-  sts = dap$open(&dapchan, create, /* create */
-      &filestring, /* filespec */
-      DAP$M_GET | DAP$M_PUT | DAP$M_UPD | DAP$M_BRO, /* fac */
-      DAP$M_UPI | DAP$M_SHRGET, /* shr */
-      0, /* fop */
-      0, /* rop */
-      &devchar, /* device_characteristics */
-      &devdep, /* device_dependent_char */
-      &mrs, /* mrs */
-      &rat, /* rat */
-      &rfm, /* rfm */
-      0, /* deq */
-      0, /* file_size */
-      maxbuf, /* bufsize */
-      0, /* fsz */
-      &rhb, /* rhb */
-      FALSE, /* textfile */
-      0, /* owner */
-      &0xffff, /* pro */
-      &attrp, /* file_attributes */
-      0, /* message_ptr */
-      0, /* message_id */
-      0); /* default_filespec */
+  sts = dap$open(&dapchan, create,                              /* create */
+                 &filestring,                                   /* filespec */
+                 DAP$M_GET | DAP$M_PUT | DAP$M_UPD | DAP$M_BRO, /* fac */
+                 DAP$M_UPI | DAP$M_SHRGET,                      /* shr */
+                 0,                                             /* fop */
+                 0,                                             /* rop */
+                 &devchar,                                      /* device_characteristics */
+                 &devdep,                                       /* device_dependent_char */
+                 &mrs,                                          /* mrs */
+                 &rat,                                          /* rat */
+                 &rfm,                                          /* rfm */
+                 0,                                             /* deq */
+                 0,                                             /* file_size */
+                 maxbuf,                                        /* bufsize */
+                 0,                                             /* fsz */
+                 &rhb,                                          /* rhb */
+                 FALSE,                                         /* textfile */
+                 0,                                             /* owner */
+                 &0xffff,                                       /* pro */
+                 &attrp,                                        /* file_attributes */
+                 0,                                             /* message_ptr */
+                 0,                                             /* message_id */
+                 0);                                            /* default_filespec */
 
   if (EVEN(sts))
     c$$translate(sts); /* set errno */
-  else {
+  else
+  {
     endvbn = attr.end_of_file_block + 1;
   }
 
@@ -199,11 +203,11 @@ int dapclose()
   int sts;
 
   sts = dap$close(&dapchan, 0, /* fop */
-      0, /* owner */
-      &0xffff, /* protection */
-      0, /* message_ptr */
-      0, /* message_id */
-      0); /* revision_date */
+                  0,           /* owner */
+                  &0xffff,     /* protection */
+                  0,           /* message_ptr */
+                  0,           /* message_id */
+                  0);          /* revision_date */
   if (EVEN(sts))
     c$$translate(sts); /* set errno */
   return sts;
@@ -239,43 +243,51 @@ int dapwrite(int filepos, char* buf, int buflen)
 
   /* Should we extend the file ? */
 
-  if (filevbn > endvbn) { /* extend file */
+  if (filevbn > endvbn)
+  { /* extend file */
     if (padbuf[0] != '*')
       memset(padbuf, '*', sizeof(padbuf));
-    while (filevbn > curvbn) {
+    while (filevbn > curvbn)
+    {
       sts = dapwrite(VBN_TO_POS(endvbn), padbuf, sizeof(padbuf));
       if (EVEN(sts))
         return sts;
     }
   } /* file extended */
 
-  while (buflen > 0) {
+  while (buflen > 0)
+  {
     thislen = MIN(buflen, maxbuf);
 
     /* Do we need to reposition the file? */
 
-    if (filevbn != curvbn) {
-      if (filevbn == 1) { /* First block needs special treatment */
+    if (filevbn != curvbn)
+    {
+      if (filevbn == 1)
+      { /* First block needs special treatment */
         sts = dap$rewind(dapchan);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           c$$translate(sts); /* set errno */
           return sts;
         }
         curvbn = 1;
       } /* first block */
-      else { /* filevbn not first vbn in file */
-        sts = dap$get(/* position file at block before requested block */
-            dapchan, DAP$K_BLK_VBN, /* rac */
-            filevbn - 1, /* record_number */
-            0, /* rop */
-            voidbuf, /* buffer */
-            sizeof(voidbuf), /* buffer length */
-            &voidlen, /* record length */
-            &rfa, /* rfa */
-            0, /* message_ptr */
-            0); /* message_id */
+      else
+      {                                       /* filevbn not first vbn in file */
+        sts = dap$get(                        /* position file at block before requested block */
+                      dapchan, DAP$K_BLK_VBN, /* rac */
+                      filevbn - 1,            /* record_number */
+                      0,                      /* rop */
+                      voidbuf,                /* buffer */
+                      sizeof(voidbuf),        /* buffer length */
+                      &voidlen,               /* record length */
+                      &rfa,                   /* rfa */
+                      0,                      /* message_ptr */
+                      0);                     /* message_id */
 
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           c$$translate(sts); /* set errno */
           return sts;
         }
@@ -287,14 +299,15 @@ int dapwrite(int filepos, char* buf, int buflen)
     /* The file is at the right place. Just $PUT data onto it */
 
     sts = dap$put(dapchan, DAP$K_BLK_VBN, /* rac */
-        filevbn, /* record number */
-        DAP$M_UIF, /* rop */
-        buf, /* buffer */
-        thislen, /* buffer length */
-        &rfa, /* rfa, output */
-        0, /* message_ptr */
-        0); /* message_id */
-    if (EVEN(sts)) {
+                  filevbn,                /* record number */
+                  DAP$M_UIF,              /* rop */
+                  buf,                    /* buffer */
+                  thislen,                /* buffer length */
+                  &rfa,                   /* rfa, output */
+                  0,                      /* message_ptr */
+                  0);                     /* message_id */
+    if (EVEN(sts))
+    {
       c$$translate(sts); /* set errno */
       return sts;
     }
@@ -318,18 +331,20 @@ int dapread(int filepos, char* buf, int buflen)
 
   filevbn = POS_TO_VBN(filepos);
 
-  while (buflen > 0) {
+  while (buflen > 0)
+  {
     thislen = MIN(buflen, maxbuf);
     sts = dap$get(dapchan, DAP$K_BLK_VBN, /* rac */
-        filevbn, /* record_number */
-        0, /* rop */
-        buf, /* buffer */
-        thislen, /* buffer length */
-        &retlen, /* record length */
-        &rfa, /* rfa */
-        0, /* message_ptr */
-        0); /* message_id */
-    if (EVEN(sts)) {
+                  filevbn,                /* record_number */
+                  0,                      /* rop */
+                  buf,                    /* buffer */
+                  thislen,                /* buffer length */
+                  &retlen,                /* record length */
+                  &rfa,                   /* rfa */
+                  0,                      /* message_ptr */
+                  0);                     /* message_id */
+    if (EVEN(sts))
+    {
       c$$translate(sts); /* set errno */
       return sts;
     }
@@ -344,20 +359,20 @@ int dapread(int filepos, char* buf, int buflen)
 #endif /* seekbug */
 
 /************************************************************************
-*
-* Name: bck_wrtblk_insert
-*
-* Type:	void
-*
-* Type		Parameter	IOGF	Description
-* void *	wrtblk		I	wrtblk to insert
-* pwr_tBoolean	replace		I	Decides if existing wrtblk
-*					should be replaced or not.
-* Description:
-*	The routine handles insertion in the wrtblkque.
-*	The wrtblk is assumed to be a dynamically allocated (malloc'ed)
-*	structure which eventually is free'd after this call.
-*************************************************************************/
+ *
+ * Name: bck_wrtblk_insert
+ *
+ * Type:	void
+ *
+ * Type		Parameter	IOGF	Description
+ * void *	wrtblk		I	wrtblk to insert
+ * pwr_tBoolean	replace		I	Decides if existing wrtblk
+ *					should be replaced or not.
+ * Description:
+ *	The routine handles insertion in the wrtblkque.
+ *	The wrtblk is assumed to be a dynamically allocated (malloc'ed)
+ *	structure which eventually is free'd after this call.
+ *************************************************************************/
 
 void bck_wrtblk_insert(BCK_WRTBLK_STRUCT* wrtblk, pwr_tBoolean replace)
 {
@@ -373,15 +388,21 @@ void bck_wrtblk_insert(BCK_WRTBLK_STRUCT* wrtblk, pwr_tBoolean replace)
   sts4a = pthread_mutex_lock(&wrtblkmtx);
   check4a(sts4a, "pthread_mutex_lock(&wrtblkmtx)");
 
-  if (replace) {
-    if (wrtblkque[c] != NULL) {
+  if (replace)
+  {
+    if (wrtblkque[c] != NULL)
+    {
       free(wrtblkque[c]);
     }
     wrtblkque[c] = wrtblk;
-  } else {
-    if (wrtblkque[c] != NULL) {
+  }
+  else
+  {
+    if (wrtblkque[c] != NULL)
+    {
       free(wrtblk);
-    } else
+    }
+    else
       wrtblkque[c] = wrtblk;
   }
 
@@ -393,19 +414,19 @@ void bck_wrtblk_insert(BCK_WRTBLK_STRUCT* wrtblk, pwr_tBoolean replace)
 }
 
 /************************************************************************
-*
-* Name: bck_wrtblk_wait
-*
-* Type:	BCK_WRTBLK_STRUCT *
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	The routine waits for a nonempty wrtblkque and removes the entry.
-*	The wrtblk is a dynamically allocated (malloc'ed)
-*	structure which eventually must be free'd.
-*
-*************************************************************************/
+ *
+ * Name: bck_wrtblk_wait
+ *
+ * Type:	BCK_WRTBLK_STRUCT *
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	The routine waits for a nonempty wrtblkque and removes the entry.
+ *	The wrtblk is a dynamically allocated (malloc'ed)
+ *	structure which eventually must be free'd.
+ *
+ *************************************************************************/
 
 BCK_WRTBLK_STRUCT* bck_wrtblk_wait()
 {
@@ -417,11 +438,13 @@ BCK_WRTBLK_STRUCT* bck_wrtblk_wait()
   printf("Writebuffer wait...\n");
 #endif
 
-  do {
+  do
+  {
     sts4a = pthread_mutex_lock(&wrtblkmtx);
     check4a(sts4a, "pthread_mutex_lock(&wrtblkmtx)");
 
-    while ((wrtblkque[0] == NULL) && (wrtblkque[1] == NULL)) {
+    while ((wrtblkque[0] == NULL) && (wrtblkque[1] == NULL))
+    {
       sts4a = pthread_cond_wait(&wrtblkevt, &wrtblkmtx);
       check4a(sts4a, "pthread_cond_wait");
     }
@@ -448,20 +471,20 @@ BCK_WRTBLK_STRUCT* bck_wrtblk_wait()
 /**************************/
 
 /************************************************************************
-*
-* Name: bck_file_alloc
-*
-* Type:	pwr_tInt32
-*
-* Type		Parameter	IOGF	Description
-* pwr_tInt32		numbytes	I	# of bytes to reserve space for
-*
-* Description:
-*	The routine allocates an area in the backup file. The area
-*	always starts on a block boundary. The return value is the
-*	file address where things could be written.
-*
-*************************************************************************/
+ *
+ * Name: bck_file_alloc
+ *
+ * Type:	pwr_tInt32
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tInt32		numbytes	I	# of bytes to reserve space for
+ *
+ * Description:
+ *	The routine allocates an area in the backup file. The area
+ *	always starts on a block boundary. The return value is the
+ *	file address where things could be written.
+ *
+ *************************************************************************/
 
 pwr_tInt32 bck_file_alloc(pwr_tUInt32 numbytes)
 {
@@ -479,20 +502,25 @@ pwr_tInt32 bck_file_alloc(pwr_tUInt32 numbytes)
   nblocks = (numbytes + 511) >> 9;
   firstb = b = (sizeof filehead + 511) >> 9; /* Start block */
 
-  for (i = 0; i < 2; i++) {
+  for (i = 0; i < 2; i++)
+  {
     if (filehead.cursize[i] == 0)
       filehead.curdata[i] = firstb << 9;
   }
 
-  if (filehead.curdata[0] < filehead.curdata[1]) {
+  if (filehead.curdata[0] < filehead.curdata[1])
+  {
     j = 0;
     jinc = 1;
-  } else {
+  }
+  else
+  {
     j = 1;
     jinc = -1;
   }
 
-  for (i = 0; i < 2; i++, j += jinc) {
+  for (i = 0; i < 2; i++, j += jinc)
+  {
     allblock[i] = (filehead.curdata[j] + 511) >> 9;
     allsize[i] = (filehead.cursize[j] + 511) >> 9;
     freesize[i] = allblock[i] - b;
@@ -510,18 +538,18 @@ pwr_tInt32 bck_file_alloc(pwr_tUInt32 numbytes)
 }
 
 /************************************************************************
-*
-* Name: bck_file_process
-*
-* Type:	void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	This is the disk process. It handles all the
-*	writes to the logfile.
-*
-*************************************************************************/
+ *
+ * Name: bck_file_process
+ *
+ * Type:	void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	This is the disk process. It handles all the
+ *	writes to the logfile.
+ *
+ *************************************************************************/
 void* bck_file_process(void* arg)
 {
   BCK_WRTBLK_STRUCT* wrtblk;
@@ -537,35 +565,42 @@ void* bck_file_process(void* arg)
   int dapsts;
 #endif
 
-  while (TRUE) {
+  while (TRUE)
+  {
     /* Open the file. If it doesn't exist, create a new one.
        Retry every 10th second.
        Make sure we have the file header in memory */
 
-    for (cnt = 0;; cnt++) {
+    for (cnt = 0;; cnt++)
+    {
       if (cnt != 0)
         sleep(10);
 
       /* See if there is a filename... */
 
-      if (strlen(backup_confp->BackupFile) == 0) {
+      if (strlen(backup_confp->BackupFile) == 0)
+      {
         if (cnt == 0)
           errh_Error("BACKUP has no backup file specified");
         continue;
       }
 
-/* First try an old file */
+      /* First try an old file */
 
 #ifdef seekbug
-      if (backup_confp->DiskStatus == 0) {
+      if (backup_confp->DiskStatus == 0)
+      {
         dapsts = dapopen(backup_confp->BackupFile, FALSE);
-        if (ODD(dapsts)) {
-          errh_Info(
-              "BACKUP opened existing backupfile %s", dapgetname(&tmpstr));
+        if (ODD(dapsts))
+        {
+          errh_Info("BACKUP opened existing backupfile %s", dapgetname(&tmpstr));
           dapsts = dapread(0, &filehead, sizeof filehead);
-          if (EVEN(dapsts)) {
+          if (EVEN(dapsts))
+          {
             perror("BACKUP cannot read header");
-          } else {
+          }
+          else
+          {
             if (filehead.version == BCK_FILE_VERSION)
               break; /* All well */
             errh_Error("BACKUP file version mismatch");
@@ -575,15 +610,20 @@ void* bck_file_process(void* arg)
       }
 #else
 
-      if (backup_confp->DiskStatus == 0) {
+      if (backup_confp->DiskStatus == 0)
+      {
         dcli_translate_filename(fname, backup_confp->BackupFile);
         bckfile = fopen(fname, "r+" A_MODE);
-        if (bckfile != NULL) {
+        if (bckfile != NULL)
+        {
           errh_Info("BACKUP opened existing backupfile %s", FGETNAME);
           csts = fread(&filehead, sizeof filehead, 1, bckfile);
-          if (csts == 0) {
+          if (csts == 0)
+          {
             perror("BACKUP cannot read header");
-          } else {
+          }
+          else
+          {
             if (filehead.version == BCK_FILE_VERSION)
               break; /* All well */
             errh_Error("BACKUP file version mismatch");
@@ -597,7 +637,8 @@ void* bck_file_process(void* arg)
       dapsts = dapopen(backup_confp->BackupFile, TRUE);
       if (EVEN(dapsts))
         perror("BACKUP cannot create backupfile");
-      else {
+      else
+      {
         errh_Info("BACKUP created new backupfile %s", dapgetname(&tmpstr));
 
         memset(&filehead, 0, sizeof filehead);
@@ -622,7 +663,8 @@ void* bck_file_process(void* arg)
       bckfile = fopen(fname, "w+" A_MODE);
       if (bckfile == NULL)
         perror("BACKUP cannot create backupfile");
-      else {
+      else
+      {
         errh_Info("BACKUP created new backupfile %s", FGETNAME);
         memset(&filehead, 0, sizeof filehead);
         time_GetTime(&filehead.creationtime);
@@ -648,7 +690,8 @@ void* bck_file_process(void* arg)
 
     fd = fileno(bckfile);
 
-    while (TRUE) {
+    while (TRUE)
+    {
       /* Wait for work and fetch the writeblock information */
 
       wrtblk = bck_wrtblk_wait();
@@ -723,14 +766,17 @@ void* bck_file_process(void* arg)
       /*
             backup_confp->DiskStatus = 1;
       */
-      if (c == 0) {
+      if (c == 0)
+      {
         backup_confp->CntFast++;
         backup_confp->BytesFast = wrtblk->cyclehead.length;
         backup_confp->SegFast = wrtblk->cyclehead.segments;
         backup_confp->ObjTimeFast = wrtblk->cyclehead.objtime;
 
         aproc_TimeStamp(((float)backup_confp->CycleFast) / 10, 30);
-      } else {
+      }
+      else
+      {
         backup_confp->CntSlow++;
         backup_confp->BytesSlow = wrtblk->cyclehead.length;
         backup_confp->SegSlow = wrtblk->cyclehead.segments;
@@ -750,7 +796,7 @@ void* bck_file_process(void* arg)
 
     bck_wrtblk_insert(wrtblk, FALSE);
 
-/* Close the old backup file */
+    /* Close the old backup file */
 
 #ifdef seekbug
     dapclose();
@@ -766,23 +812,24 @@ void* bck_file_process(void* arg)
 /* Data collection */
 /*******************/
 
-struct BCK_LISTENTRY_STRUCT {
+struct BCK_LISTENTRY_STRUCT
+{
   struct BCK_LISTENTRY_STRUCT* next; /* Next object in list */
-  pwr_sAttrRef bckaref; /* pwr_sAttrRef for this backup object */
-  bck_t_datablk datablk; /* Data header for this entry */
+  pwr_sAttrRef bckaref;              /* pwr_sAttrRef for this backup object */
+  bck_t_datablk datablk;             /* Data header for this entry */
 };
 typedef struct BCK_LISTENTRY_STRUCT BCK_LISTENTRY;
 
-typedef struct {
-  BCK_LISTENTRY* first; /* First object in list */
+typedef struct
+{
+  BCK_LISTENTRY* first;        /* First object in list */
   bck_t_cycleheader cyclehead; /* Header for this list */
 } BCK_LISTHEAD;
 
-void bck_insert_listentry(
-    pwr_tAName objectname, /* Name of data to be backed up */
-    pwr_tAttrRef* attrref, /* Data to be backed up */
-    pwr_sAttrRef* arp, /* Objid of backup object */
-    BCK_LISTHEAD* blhp, pwr_tBoolean dynamic)
+void bck_insert_listentry(pwr_tAName objectname, /* Name of data to be backed up */
+                          pwr_tAttrRef* attrref, /* Data to be backed up */
+                          pwr_sAttrRef* arp,     /* Objid of backup object */
+                          BCK_LISTHEAD* blhp, pwr_tBoolean dynamic)
 {
   BCK_LISTENTRY* blep;
   char* attrname;
@@ -790,15 +837,19 @@ void bck_insert_listentry(
   /* All info is collected, create a list entry.  */
   blep = calloc(1, sizeof(*blep));
 
-  if (dynamic) {
+  if (dynamic)
+  {
     blep->datablk.head.dynamic = dynamic;
     gdh_GetObjectClass(attrref->Objid, &blep->datablk.head.cid);
     blep->datablk.name = calloc(1, strlen(objectname) + 1);
     strcpy(blep->datablk.name, objectname);
     blep->datablk.head.namesize = strlen(objectname);
-  } else {
+  }
+  else
+  {
     attrname = strchr(objectname, '.');
-    if (attrname) {
+    if (attrname)
+    {
       blep->datablk.name = calloc(1, strlen(attrname) + 1);
       strcpy(blep->datablk.name, attrname);
       blep->datablk.head.namesize = strlen(attrname);
@@ -814,14 +865,12 @@ void bck_insert_listentry(
 
   blep->next = blhp->first;
   blhp->first = blep;
-  blhp->cyclehead.length += sizeof(bck_t_writeheader) + attrref->Size
-      + blep->datablk.head.namesize + 1;
+  blhp->cyclehead.length += sizeof(bck_t_writeheader) + attrref->Size + blep->datablk.head.namesize + 1;
   blhp->cyclehead.segments++;
 }
-pwr_tStatus bck_list_insert(
-    pwr_tAName objectname, /* Name of data to be backed up */
-    pwr_sAttrRef* arp, /* Objid of backup object */
-    BCK_LISTHEAD* blhp, pwr_tBoolean first)
+pwr_tStatus bck_list_insert(pwr_tAName objectname, /* Name of data to be backed up */
+                            pwr_sAttrRef* arp,     /* Objid of backup object */
+                            BCK_LISTHEAD* blhp, pwr_tBoolean first)
 {
   pwr_tAName attrname;
   pwr_sAttrRef attrref;
@@ -839,13 +888,15 @@ pwr_tStatus bck_list_insert(
   if (EVEN(sts))
     return sts;
 
-  if (first) {
+  if (first)
+  {
     volobject.vid = attrref.Objid.vid;
     volobject.oix = pwr_cNObjectIx;
     if (ODD(gdh_GetObjectClass(volobject, &volclass)))
       tgtdynamic = volclass == pwr_eClass_DynamicVolume;
 
-    if (tgtdynamic) {
+    if (tgtdynamic)
+    {
       if (attrref.Flags.b.Indirect)
         return GDH__RTDBNULL;
 
@@ -869,14 +920,16 @@ pwr_tStatus bck_list_insert(
   if (EVEN(sts))
     return sts;
 
-  if (cdh_tidIsCid(tid)) {
-    sts = gdh_GetAttributeCharacteristics(
-        objectname, NULL, &size, &offs, &elem);
+  if (cdh_tidIsCid(tid))
+  {
+    sts = gdh_GetAttributeCharacteristics(objectname, NULL, &size, &offs, &elem);
     if (EVEN(sts))
       return sts;
 
-    if (elem > 1) {
-      for (i = 0; i < elem; i++) {
+    if (elem > 1)
+    {
+      for (i = 0; i < elem; i++)
+      {
         strcpy(attrname, objectname);
         sprintf(idx, "[%d]", i);
         strcat(attrname, idx);
@@ -884,16 +937,18 @@ pwr_tStatus bck_list_insert(
         /* call again ... */
         sts = bck_list_insert(attrname, arp, blhp, 0);
       }
-
-    } else {
+    }
+    else
+    {
       sts = gdh_GetObjectBodyDef(tid, &bd, &rows, attrref.Objid);
       if (EVEN(sts))
         return sts;
 
-      for (i = 0; i < rows; i++) {
-        if (bd[i].attr->Param.Info.Flags & PWR_MASK_RTVIRTUAL
-            || (bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE
-                   && bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE))
+      for (i = 0; i < rows; i++)
+      {
+        if (bd[i].attr->Param.Info.Flags & PWR_MASK_RTVIRTUAL ||
+            (bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE &&
+             bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE))
           continue;
 
         if (bd[i].attr->Param.Info.Flags & PWR_MASK_ARRAY)
@@ -901,16 +956,21 @@ pwr_tStatus bck_list_insert(
         else
           elements = 1;
 
-        if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS) {
-          if (elements == 1) {
+        if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS)
+        {
+          if (elements == 1)
+          {
             strcpy(attrname, objectname);
             strcat(attrname, ".");
             strcat(attrname, bd[i].attrName);
 
             /* call again ... */
             sts = bck_list_insert(attrname, arp, blhp, 0);
-          } else {
-            for (j = 0; j < elements; j++) {
+          }
+          else
+          {
+            for (j = 0; j < elements; j++)
+            {
               strcpy(attrname, objectname);
               strcat(attrname, ".");
               strcat(attrname, bd[i].attrName);
@@ -921,9 +981,13 @@ pwr_tStatus bck_list_insert(
               sts = bck_list_insert(attrname, arp, blhp, 0);
             }
           }
-        } else {
-          if (elements > 1) {
-            for (j = 0; j < elements; j++) {
+        }
+        else
+        {
+          if (elements > 1)
+          {
+            for (j = 0; j < elements; j++)
+            {
               strcpy(attrname, objectname);
               strcat(attrname, ".");
               strcat(attrname, bd[i].attrName);
@@ -933,7 +997,9 @@ pwr_tStatus bck_list_insert(
               /* call again ... */
               sts = bck_list_insert(attrname, arp, blhp, 0);
             }
-          } else {
+          }
+          else
+          {
             strcpy(attrname, objectname);
             strcat(attrname, ".");
             strcat(attrname, bd[i].attrName);
@@ -944,14 +1010,17 @@ pwr_tStatus bck_list_insert(
         }
       }
     }
-  } else {
-    sts = gdh_GetAttributeCharacteristics(
-        objectname, &tid, &size, &offs, &elem);
+  }
+  else
+  {
+    sts = gdh_GetAttributeCharacteristics(objectname, &tid, &size, &offs, &elem);
     if (EVEN(sts))
       return sts;
 
-    if (elem > 1) {
-      for (i = 0; i < elem; i++) {
+    if (elem > 1)
+    {
+      for (i = 0; i < elem; i++)
+      {
         strcpy(attrname, objectname);
         sprintf(idx, "[%d]", i);
         strcat(attrname, idx);
@@ -959,7 +1028,9 @@ pwr_tStatus bck_list_insert(
         /* call again ... */
         sts = bck_list_insert(attrname, arp, blhp, 0);
       }
-    } else {
+    }
+    else
+    {
       /* Insert list element */
       bck_insert_listentry(objectname, &attrref, arp, blhp, 0);
     }
@@ -969,19 +1040,19 @@ pwr_tStatus bck_list_insert(
 }
 
 /************************************************************************
-*
-* Name: bck_list_build
-*
-* Type: void
-*
-* Type		Parameter	IOGF	Description
-* pwr_tUInt32	cycle		I	Fast=0, slow=1
-* BCK_LISTHEAD	**list		 O	List of objects for selected cycle
-*
-* Description:
-*	This routine builds a backup list.
-*
-*************************************************************************/
+ *
+ * Name: bck_list_build
+ *
+ * Type: void
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tUInt32	cycle		I	Fast=0, slow=1
+ * BCK_LISTHEAD	**list		 O	List of objects for selected cycle
+ *
+ * Description:
+ *	This routine builds a backup list.
+ *
+ *************************************************************************/
 
 void bck_list_build(pwr_tUInt32 cycle, BCK_LISTHEAD** list)
 {
@@ -1007,8 +1078,10 @@ void bck_list_build(pwr_tUInt32 cycle, BCK_LISTHEAD** list)
   LOCK;
   sts = gdh_GetClassListAttrRef(pwr_cClass_Backup, &aref);
   UNLOCK;
-  while (ODD(sts)) {
-    if (aref.Objid.vid < cdh_cUserVolMin) {
+  while (ODD(sts))
+  {
+    if (aref.Objid.vid < cdh_cUserVolMin)
+    {
       // In template plc, continue
       LOCK;
       sts = gdh_GetNextAttrRef(pwr_cClass_Backup, &aref, &aref);
@@ -1021,12 +1094,13 @@ void bck_list_build(pwr_tUInt32 cycle, BCK_LISTHEAD** list)
     LOCK;
     sts = gdh_AttrRefToPointer(&aref, (pwr_tAddress*)&backup);
     UNLOCK;
-    if (ODD(sts) && (backup != NULL)) {
+    if (ODD(sts) && (backup != NULL))
+    {
       /* Is this the correct cycle time? */
 
-      if (backup->Fast == (cycle == 0)) {
-        sts = gdh_AttrrefToName(&backup->DataName, attrname, sizeof(attrname),
-            cdh_mName_volumeStrict);
+      if (backup->Fast == (cycle == 0))
+      {
+        sts = gdh_AttrrefToName(&backup->DataName, attrname, sizeof(attrname), cdh_mName_volumeStrict);
         backup->Status = bck_list_insert(attrname, &aref, blhp, 1);
       }
     } /* Backup object is local */
@@ -1038,25 +1112,26 @@ void bck_list_build(pwr_tUInt32 cycle, BCK_LISTHEAD** list)
 } /* bck_list_build */
 
 /************************************************************************
-*
-* Name: bck_list_free
-*
-* Type:	void
-*
-* Type		Parameter	IOGF	Description
-* BCK_LISTHEAD	*list		I	List of fast cycle objects
-*
-* Description:
-*	This routine frees a backup list
-*
-*************************************************************************/
+ *
+ * Name: bck_list_free
+ *
+ * Type:	void
+ *
+ * Type		Parameter	IOGF	Description
+ * BCK_LISTHEAD	*list		I	List of fast cycle objects
+ *
+ * Description:
+ *	This routine frees a backup list
+ *
+ *************************************************************************/
 
 void bck_list_free(BCK_LISTHEAD* list)
 {
   BCK_LISTENTRY *blep, *blep2;
 
   blep = list->first;
-  while (blep != NULL) {
+  while (blep != NULL)
+  {
     blep2 = blep->next;
     //    printf("%s\n", blep->datablk.name);
     free(blep->datablk.name);
@@ -1067,18 +1142,18 @@ void bck_list_free(BCK_LISTHEAD* list)
 } /* bck_list_free */
 
 /************************************************************************
-*
-* Name: bck_coll_process
-*
-* Type:	void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	This is the data collection process. It is run in two
-*	versions, one fast (cycle=0) and one slow (cycle=1).
-*
-*************************************************************************/
+ *
+ * Name: bck_coll_process
+ *
+ * Type:	void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	This is the data collection process. It is run in two
+ *	versions, one fast (cycle=0) and one slow (cycle=1).
+ *
+ *************************************************************************/
 
 void* bck_coll_process(void* arg)
 {
@@ -1105,12 +1180,12 @@ void* bck_coll_process(void* arg)
 
   bck_list_build(cycle, &bcklist);
 
-  while (TRUE) {
+  while (TRUE)
+  {
     /* Read the timer time from the Backup conf object.
        Wait for timer, or forced activation  */
 
-    cycletime
-        = (cycle == 0 ? backup_confp->CycleFast : backup_confp->CycleSlow);
+    cycletime = (cycle == 0 ? backup_confp->CycleFast : backup_confp->CycleSlow);
     if (cycletime == 0)
       cycletime = (cycle == 0 ? BCK_DEFAULT_FAST : BCK_DEFAULT_SLOW);
 
@@ -1123,7 +1198,8 @@ void* bck_coll_process(void* arg)
     sts4a = pthread_mutex_lock(&frcactmtx);
     check4a(sts4a, "pthread_mutex_lock(&frcactmtx)");
 
-    if (!frcact[cycle]) {
+    if (!frcact[cycle])
+    {
       struct timespec ts;
       ts.tv_sec = abstime.tv_sec;
       ts.tv_nsec = abstime.tv_nsec;
@@ -1156,7 +1232,8 @@ void* bck_coll_process(void* arg)
     /* If forced activation or slow cycle tick: rebuild the backup list */
 
     //    if ((forced || (slowtick != oldslowtick)) && (cycle == 1)) {
-    if (FALSE) {
+    if (FALSE)
+    {
       oldslowtick = slowtick;
       bck_list_free(bcklist);
       bck_list_build(cycle, &bcklist);
@@ -1172,11 +1249,12 @@ void* bck_coll_process(void* arg)
 
     p = (char*)&wrtblk->segment[0];
     blep = bcklist->first;
-    while (blep != NULL) {
+    while (blep != NULL)
+    {
       /* Copy data header */
 
       dhp = (bck_t_writeheader*)p; /* dhp points to data header */
-      p += sizeof *dhp; /* p points to data part */
+      p += sizeof *dhp;            /* p points to data part */
       dhp->objid = blep->datablk.head.attrref.Objid;
       dhp->cid = blep->datablk.head.cid;
       dhp->dynamic = blep->datablk.head.dynamic;
@@ -1191,15 +1269,15 @@ void* bck_coll_process(void* arg)
       /* Check object existence, set validity flag, move data */
 
       LOCK;
-      sts = gdh_GetObjectInfoAttrref(
-          &blep->datablk.head.attrref, p, blep->datablk.head.attrref.Size);
+      sts = gdh_GetObjectInfoAttrref(&blep->datablk.head.attrref, p, blep->datablk.head.attrref.Size);
       UNLOCK;
       dhp->valid = ODD(sts);
 
       /* Record status code in backup object */
 
       LOCK;
-      if (ODD(gdh_AttrRefToPointer(&blep->bckaref, (pwr_tAddress*)&bckp))) {
+      if (ODD(gdh_AttrRefToPointer(&blep->bckaref, (pwr_tAddress*)&bckp)))
+      {
         bckp->Status = sts;
       } /* Backup object is still there */
       UNLOCK;
@@ -1219,20 +1297,20 @@ void* bck_coll_process(void* arg)
 } /* bck_coll_process */
 
 /************************************************************************
-*
-* Name: bck_init
-*
-* Type:	pwr_tUInt32, returns status code
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	A call to this routine starts the backup package normal operation.
-*	This means that data collation and disk writing starts. This
-*	runs as subprocesses in the context of the job that
-*	calls this routine.
-*
-*************************************************************************/
+ *
+ * Name: bck_init
+ *
+ * Type:	pwr_tUInt32, returns status code
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	A call to this routine starts the backup package normal operation.
+ *	This means that data collation and disk writing starts. This
+ *	runs as subprocesses in the context of the job that
+ *	calls this routine.
+ *
+ *************************************************************************/
 
 pwr_tUInt32 bck_init()
 {
@@ -1270,14 +1348,16 @@ pwr_tUInt32 bck_init()
 
   LOCK;
   sts = gdh_GetClassList(pwr_cClass_Backup_Conf, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectLocation(objid, &local);
     if (ODD(sts) && local)
       break;
     sts = gdh_GetNextObject(objid, &objid);
   }
   UNLOCK;
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Info("No BackupConfig object found, rt_bck will not run");
     errh_SetStatus(0);
     exit(1);
@@ -1297,9 +1377,9 @@ pwr_tUInt32 bck_init()
 
   LOCK;
   sts = gdh_NameToAttrref(pwr_cNObjid, name, &attrref);
-  if (ODD(sts)) {
-    sts = gdh_DLRefObjectInfoAttrref(
-        &attrref, (pwr_tAddress*)&backup_confp, &dlid);
+  if (ODD(sts))
+  {
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&backup_confp, &dlid);
   }
   UNLOCK;
   if (EVEN(sts))
@@ -1313,7 +1393,8 @@ pwr_tUInt32 bck_init()
   sts4a = thread_Create(&thr_file, "bck_file", bck_file_process, NULL);
   check4a(sts4a, "pthread_create thr_file");
 
-  for (c = 0; c < 2; c++) {
+  for (c = 0; c < 2; c++)
+  {
     char name[20];
     sprintf(name, "bck_coll%d", c);
     sts4a = thread_Create(&thr_coll[c], name, bck_coll_process, (void*)(long)c);
@@ -1334,11 +1415,15 @@ int main(int argc, char* argv[])
   int i;
   qcom_sQid my_q = qcom_cNQid;
 
-  for (i = 1; i < argc; i++) {
-    if (streq(argv[i], "-p")) {
+  for (i = 1; i < argc; i++)
+  {
+    if (streq(argv[i], "-p"))
+    {
       bck_print("$pwrp_load/bck.txt");
       exit(1);
-    } else if (streq(argv[i], "-h")) {
+    }
+    else if (streq(argv[i], "-h"))
+    {
       printf("Usage:\nrt_bck -p\nPrint content of backuped objects to "
              "$pwrp_load/bck.txt\n");
       exit(1);
@@ -1356,20 +1441,23 @@ int main(int argc, char* argv[])
     return sts;
 
   sts = bck_init();
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("Initialization error, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
   errh_SetStatus(PWR__SRUN);
 
-  if (!qcom_Init(&sts, NULL, "pwr_bck")) {
+  if (!qcom_Init(&sts, NULL, "pwr_bck"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
-  if (!qcom_CreateQ(&sts, &my_q, NULL, "events")) {
+  if (!qcom_CreateQ(&sts, &my_q, NULL, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -1377,10 +1465,9 @@ int main(int argc, char* argv[])
 
   /* for (;;) {
     while (1) { */
-      qcom_WaitAnd(
-          &sts, &my_q, &qcom_cQini, ini_mEvent_terminate, qcom_cTmoEternal);
-      //      pause();
-      exit(0);
+  qcom_WaitAnd(&sts, &my_q, &qcom_cQini, ini_mEvent_terminate, qcom_cTmoEternal);
+  //      pause();
+  exit(0);
   /* }
 
     // We were activated from the outer world.

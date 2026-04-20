@@ -1303,7 +1303,8 @@ static int graph_getobjecttext_func(void* filectx, ccm_sArg* arg_list, int arg_c
   if (type == glow_eObjectType_GrowText)
   {
     grow_GetObjectText(o, text, sizeof(text));
-    strncpy(return_string, text, sizeof(K_STRING_SIZE));
+    strncpy(return_string, text, K_STRING_SIZE);
+    return_string[K_STRING_SIZE - 1] = 0;
   }
   else
     strcpy(return_string, "");
@@ -1609,6 +1610,7 @@ static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list, int a
     break;
   case glow_eType_TraceColor:
     grow_info_p->type = glow_eType_Color;
+  /* fall through */
   case glow_eType_Direction:
   case glow_eType_Color:
   case glow_eType_Tone:
@@ -1785,6 +1787,7 @@ static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list, int a
     break;
   case glow_eType_TraceColor:
     grow_info_p->type = glow_eType_Color;
+  /* fall through */
   case glow_eType_Direction:
   case glow_eType_Color:
   case glow_eType_Tone:

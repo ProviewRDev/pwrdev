@@ -70,10 +70,9 @@ LOCAL_DATA
 #pragma check_stack(off)
 #endif
 
-FUNCTION LOCAL INT16 fmsgdl_get_ctxt_data_len(
-    IN USIGN8 service,  /* Service              */
-    IN USIGN8 primitive /* Service-Primitive    */
-    )
+FUNCTION LOCAL INT16 fmsgdl_get_ctxt_data_len(IN USIGN8 service,  /* Service              */
+                                              IN USIGN8 primitive /* Service-Primitive    */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -111,10 +110,9 @@ possible return values:
   }
 }
 
-FUNCTION LOCAL INT16 fmsgdl_get_vfd_data_len(
-    IN USIGN8 service,  /* Service              */
-    IN USIGN8 primitive /* Service-Primitive    */
-    )
+FUNCTION LOCAL INT16 fmsgdl_get_vfd_data_len(IN USIGN8 service,  /* Service              */
+                                             IN USIGN8 primitive /* Service-Primitive    */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -173,11 +171,10 @@ possible return values:
   }
 }
 
-FUNCTION LOCAL INT16 fmsgdl_get_od_data_len(
-    IN USIGN8 service,      /* Service              */
-    IN USIGN8 primitive,    /* Service-Primitive    */
-    IN USIGN8 FAR* data_ptr /* pointer to data      */
-    )
+FUNCTION LOCAL INT16 fmsgdl_get_od_data_len(IN USIGN8 service,      /* Service              */
+                                            IN USIGN8 primitive,    /* Service-Primitive    */
+                                            IN USIGN8 FAR* data_ptr /* pointer to data      */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -274,28 +271,21 @@ possible return values:
     if (primitive == REQ)
     {
       T_LOAD_OD_REQ FAR* req = (T_LOAD_OD_REQ FAR*)data_ptr;
-      T_OD_NULL_OBJECT FAR* object =
-          (T_OD_NULL_OBJECT FAR*)&req->obj_descr.id.null_obj_descr;
+      T_OD_NULL_OBJECT FAR* object = (T_OD_NULL_OBJECT FAR*)&req->obj_descr.id.null_obj_descr;
       switch (object->obj_code)
       {
       case TYPE_STRUCT_OBJECT:
         return (sizeof(T_LOAD_OD_REQ) +
-                (req->obj_descr.id.ds_obj_descr.no_of_elements *
-                 sizeof(T_OD_DT_LIST)));
+                (req->obj_descr.id.ds_obj_descr.no_of_elements * sizeof(T_OD_DT_LIST)));
 
       case RECORD_OBJECT:
-        return (sizeof(T_LOAD_OD_REQ) +
-                (req->obj_descr.id.r_var_obj_descr.no_of_address *
-                 sizeof(USIGN32)));
+        return (sizeof(T_LOAD_OD_REQ) + (req->obj_descr.id.r_var_obj_descr.no_of_address * sizeof(USIGN32)));
 
       case VAR_LIST_OBJECT:
-        return (
-            sizeof(T_LOAD_OD_REQ) +
-            (req->obj_descr.id.vlist_obj_descr.no_of_var * sizeof(USIGN16)));
+        return (sizeof(T_LOAD_OD_REQ) + (req->obj_descr.id.vlist_obj_descr.no_of_var * sizeof(USIGN16)));
 
       case INVOCATION_OBJECT:
-        return (sizeof(T_LOAD_OD_REQ) +
-                (req->obj_descr.id.pi_obj_descr.cnt_dom * sizeof(USIGN16)));
+        return (sizeof(T_LOAD_OD_REQ) + (req->obj_descr.id.pi_obj_descr.cnt_dom * sizeof(USIGN16)));
 
       default:
         return (sizeof(T_LOAD_OD_REQ));
@@ -315,11 +305,10 @@ possible return values:
   }
 }
 
-FUNCTION LOCAL INT16 fmsgdl_get_var_data_len(
-    IN USIGN8 service,      /* Service              */
-    IN USIGN8 primitive,    /* Service-Primitive    */
-    IN USIGN8 FAR* data_ptr /* pointer to data      */
-    )
+FUNCTION LOCAL INT16 fmsgdl_get_var_data_len(IN USIGN8 service,      /* Service              */
+                                             IN USIGN8 primitive,    /* Service-Primitive    */
+                                             IN USIGN8 FAR* data_ptr /* pointer to data      */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -366,10 +355,9 @@ possible return values:
     }
     else
     {
-      T_VAR_READ_WITH_TYPE_CNF FAR* rsp =
-          (T_VAR_READ_WITH_TYPE_CNF FAR*)data_ptr;
-      return (sizeof(T_VAR_READ_WITH_TYPE_CNF) +
-              (sizeof(T_TYPE_DESCR) * rsp->no_of_type_descr) + rsp->length);
+      T_VAR_READ_WITH_TYPE_CNF FAR* rsp = (T_VAR_READ_WITH_TYPE_CNF FAR*)data_ptr;
+      return (sizeof(T_VAR_READ_WITH_TYPE_CNF) + (sizeof(T_TYPE_DESCR) * rsp->no_of_type_descr) +
+              rsp->length);
     }
 
   case FMS_WRITE:
@@ -384,10 +372,9 @@ possible return values:
   case FMS_WRITE_WITH_TYPE:
     if (primitive == REQ)
     {
-      T_VAR_WRITE_WITH_TYPE_REQ FAR* req =
-          (T_VAR_WRITE_WITH_TYPE_REQ FAR*)data_ptr;
-      return (sizeof(T_VAR_WRITE_WITH_TYPE_REQ) +
-              (sizeof(T_TYPE_DESCR) * req->no_of_type_descr) + req->length);
+      T_VAR_WRITE_WITH_TYPE_REQ FAR* req = (T_VAR_WRITE_WITH_TYPE_REQ FAR*)data_ptr;
+      return (sizeof(T_VAR_WRITE_WITH_TYPE_REQ) + (sizeof(T_TYPE_DESCR) * req->no_of_type_descr) +
+              req->length);
     }
     else
       return (0);
@@ -404,10 +391,9 @@ possible return values:
   case FMS_INFO_RPT_WITH_TYPE:
     if (primitive == REQ)
     {
-      T_VAR_INFO_RPT_WITH_TYPE_REQ FAR* req =
-          (T_VAR_INFO_RPT_WITH_TYPE_REQ FAR*)data_ptr;
-      return (sizeof(T_VAR_INFO_RPT_WITH_TYPE_REQ) +
-              (sizeof(T_TYPE_DESCR) * req->no_of_type_descr) + req->length);
+      T_VAR_INFO_RPT_WITH_TYPE_REQ FAR* req = (T_VAR_INFO_RPT_WITH_TYPE_REQ FAR*)data_ptr;
+      return (sizeof(T_VAR_INFO_RPT_WITH_TYPE_REQ) + (sizeof(T_TYPE_DESCR) * req->no_of_type_descr) +
+              req->length);
     }
     else
       return (0);
@@ -435,8 +421,7 @@ possible return values:
   case FMS_DEF_VAR_LIST:
     if (primitive == REQ)
     {
-      T_VAR_DEFINE_VAR_LIST_REQ FAR* req =
-          (T_VAR_DEFINE_VAR_LIST_REQ FAR*)data_ptr;
+      T_VAR_DEFINE_VAR_LIST_REQ FAR* req = (T_VAR_DEFINE_VAR_LIST_REQ FAR*)data_ptr;
 
       USIGN8 FAR* d_acc_spec_list = (USIGN8 FAR*)(req + 1);
       USIGN16 offset = 0;
@@ -467,11 +452,10 @@ possible return values:
   }
 }
 
-FUNCTION LOCAL INT16 fmsgdl_get_evn_data_len(
-    IN USIGN8 service,      /* Service              */
-    IN USIGN8 primitive,    /* Service-Primitive    */
-    IN USIGN8 FAR* data_ptr /* pointer to data      */
-    )
+FUNCTION LOCAL INT16 fmsgdl_get_evn_data_len(IN USIGN8 service,      /* Service              */
+                                             IN USIGN8 primitive,    /* Service-Primitive    */
+                                             IN USIGN8 FAR* data_ptr /* pointer to data      */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -506,8 +490,7 @@ possible return values:
   case FMS_EVN_NOTIFY_WITH_TYPE:
     if (primitive == REQ)
     {
-      T_EVENT_NOTIFY_WITH_TYPE_REQ FAR* req =
-          (T_EVENT_NOTIFY_WITH_TYPE_REQ FAR*)data_ptr;
+      T_EVENT_NOTIFY_WITH_TYPE_REQ FAR* req = (T_EVENT_NOTIFY_WITH_TYPE_REQ FAR*)data_ptr;
       return (sizeof(T_EVENT_NOTIFY_WITH_TYPE_REQ) + req->data_length);
     }
     else
@@ -530,11 +513,10 @@ possible return values:
   }
 }
 
-FUNCTION LOCAL INT16 fmsgdl_get_dom_data_len(
-    IN USIGN8 service,      /* Service              */
-    IN USIGN8 primitive,    /* Service-Primitive    */
-    IN USIGN8 FAR* data_ptr /* pointer to data      */
-    )
+FUNCTION LOCAL INT16 fmsgdl_get_dom_data_len(IN USIGN8 service,      /* Service              */
+                                             IN USIGN8 primitive,    /* Service-Primitive    */
+                                             IN USIGN8 FAR* data_ptr /* pointer to data      */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -624,11 +606,10 @@ possible return values:
   }
 }
 
-FUNCTION LOCAL INT16 fmsgdl_get_pi_data_len(
-    IN USIGN8 service,      /* Service              */
-    IN USIGN8 primitive,    /* Service-Primitive    */
-    IN USIGN8 FAR* data_ptr /* pointer to data      */
-    )
+FUNCTION LOCAL INT16 fmsgdl_get_pi_data_len(IN USIGN8 service,      /* Service              */
+                                            IN USIGN8 primitive,    /* Service-Primitive    */
+                                            IN USIGN8 FAR* data_ptr /* pointer to data      */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -726,7 +707,7 @@ possible return values:
 }
 
 FUNCTION LOCAL INT16 fmsgdl_get_error_data_len(IN USIGN8 service /* Service  */
-                                               )
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -829,13 +810,12 @@ possible return values:
   }
 }
 
-FUNCTION PUBLIC INT16 fmsgdl_get_data_len(
-    IN INT16 result,         /* Service-Result */
-    IN USIGN8 service,       /* Service */
-    IN USIGN8 primitive,     /* Service-Primitive */
-    IN USIGN8 FAR* data_ptr, /* pointer to data */
-    OUT INT16* data_len_ptr  /* length of data */
-    )
+FUNCTION PUBLIC INT16 fmsgdl_get_data_len(IN INT16 result,         /* Service-Result */
+                                          IN USIGN8 service,       /* Service */
+                                          IN USIGN8 primitive,     /* Service-Primitive */
+                                          IN USIGN8 FAR* data_ptr, /* pointer to data */
+                                          OUT INT16* data_len_ptr  /* length of data */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION

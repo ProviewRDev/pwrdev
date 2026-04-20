@@ -38,9 +38,8 @@
 #include "wb_vrep.h"
 
 wb_srep::wb_srep(wb_vrep* vrep)
-    : m_access(ldh_eAccess_ReadOnly), m_utility(ldh_eUtility__), m_nUpdate(0),
-      m_refcount(0), m_editorContext(0), m_thisSessionCb(0),
-      m_otherSessionCb(0), m_events(0), m_recix(0)
+    : m_access(ldh_eAccess_ReadOnly), m_utility(ldh_eUtility__), m_nUpdate(0), m_refcount(0),
+      m_editorContext(0), m_thisSessionCb(0), m_otherSessionCb(0), m_events(0), m_recix(0)
 {
   m_vrep = vrep->ref();
   m_vrep->addSrep(this);
@@ -55,20 +54,19 @@ wb_srep::~wb_srep()
 {
   pwr_tStatus sts = LDH__SUCCESS;
 
-  if (m_nUpdate != 0) {
+  if (m_nUpdate != 0)
+  {
     m_vrep->abort(&sts);
   }
 
-  if (m_vrep != 0) {
+  if (m_vrep != 0)
+  {
     m_vrep->unref();
     m_vrep->removeSrep(this);
   }
 }
 
-wb_srep::operator wb_vrep*() const
-{
-  return m_vrep;
-}
+wb_srep::operator wb_vrep*() const { return m_vrep; }
 
 void wb_srep::unref()
 {
@@ -92,27 +90,35 @@ bool wb_srep::access(pwr_tStatus* sts, ldh_eAccess access) // Fix
 {
   pwr_tStatus lsts;
 
-  if (ldh_eAccess__ < access && access < ldh_eAccess_) {
-    if (!m_vrep->accessSupported(access)) {
+  if (ldh_eAccess__ < access && access < ldh_eAccess_)
+  {
+    if (!m_vrep->accessSupported(access))
+    {
       *sts = LDH__ACCESS;
       return false;
     }
 
-    if (access == ldh_eAccess_ReadWrite) {
+    if (access == ldh_eAccess_ReadWrite)
+    {
       // Check that no other session is ReadWrite
-      for (wb_srep* srep = m_vrep->srep(&lsts); srep;
-           srep = m_vrep->nextSrep(&lsts, srep)) {
-        if (srep != this && srep->access(&lsts) == ldh_eAccess_ReadWrite) {
+      for (wb_srep* srep = m_vrep->srep(&lsts); srep; srep = m_vrep->nextSrep(&lsts, srep))
+      {
+        if (srep != this && srep->access(&lsts) == ldh_eAccess_ReadWrite)
+        {
           *sts = LDH__OTHERSESS;
           return false;
         }
       }
-    } else if (access == ldh_eAccess_SharedReadWrite) {
+    }
+    else if (access == ldh_eAccess_SharedReadWrite)
+    {
       // Check that any ReadWrite session is empty
-      for (wb_srep* srep = m_vrep->srep(&lsts); srep;
-           srep = m_vrep->nextSrep(&lsts, srep)) {
-        if (srep != this && srep->access(&lsts) == ldh_eAccess_ReadWrite) {
-          if (!srep->isEmpty(&lsts)) {
+      for (wb_srep* srep = m_vrep->srep(&lsts); srep; srep = m_vrep->nextSrep(&lsts, srep))
+      {
+        if (srep != this && srep->access(&lsts) == ldh_eAccess_ReadWrite)
+        {
+          if (!srep->isEmpty(&lsts))
+          {
             *sts = LDH__SESSNOTEMPTY;
             return false;
           }
@@ -135,7 +141,8 @@ ldh_eUtility wb_srep::utility(pwr_tStatus* sts) const // Fix
 
 bool wb_srep::utility(pwr_tStatus* sts, ldh_eUtility utility) // Fix
 {
-  if (ldh_eUtility__ < utility && utility < ldh_eUtility_) {
+  if (ldh_eUtility__ < utility && utility < ldh_eUtility_)
+  {
     m_utility = utility;
     *sts = LDH__SUCCESS;
     return true;
@@ -144,22 +151,17 @@ bool wb_srep::utility(pwr_tStatus* sts, ldh_eUtility utility) // Fix
   return false;
 }
 
-bool wb_srep::isReadonly(pwr_tStatus* sts) const
-{
-  return (m_access == ldh_eAccess_ReadOnly);
-}
+bool wb_srep::isReadonly(pwr_tStatus* sts) const { return (m_access == ldh_eAccess_ReadOnly); }
 
-bool wb_srep::isEmpty(pwr_tStatus* sts) const
-{
-  return (m_nUpdate == 0);
-}
+bool wb_srep::isEmpty(pwr_tStatus* sts) const { return (m_nUpdate == 0); }
 
 bool wb_srep::commit(pwr_tStatus* sts)
 {
   bool ok;
 
   ok = m_vrep->commit(sts);
-  if (ok) {
+  if (ok)
+  {
     m_nUpdate = 0;
   }
   return ok;
@@ -170,7 +172,8 @@ bool wb_srep::abort(pwr_tStatus* sts) // Fix was inline...
   bool ok;
 
   ok = m_vrep->abort(sts);
-  if (ok) {
+  if (ok)
+  {
     m_nUpdate = 0;
   }
   return ok;
@@ -181,12 +184,14 @@ ldh_sEvent* wb_srep::newEvent()
   ldh_sEvent* e = (ldh_sEvent*)calloc(1, sizeof(ldh_sEvent));
 
   // Add event last in eventlist
-  if (m_events) {
+  if (m_events)
+  {
     ldh_sEvent* ep = m_events;
     while (ep->nep)
       ep = ep->nep;
     ep->nep = e;
-  } else
+  }
+  else
     m_events = e;
   return e;
 }
@@ -195,7 +200,8 @@ void wb_srep::deleteEvents()
 {
   ldh_sEvent* nep;
   ldh_sEvent* ep = m_events;
-  while (ep) {
+  while (ep)
+  {
     nep = ep->nep;
     free(ep);
     ep = nep;
@@ -283,7 +289,8 @@ void wb_srep::eventSendAllSessions(ldh_eEvent event)
   ep->Event = event;
 
   wb_srep* srep = m_vrep->srep(&sts);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     if (srep == this)
       srep->sendThisSession(m_editorContext, ep);
     else
@@ -334,7 +341,4 @@ void wb_srep::recix_clear()
   m_recix = 0;
 }
 
-void wb_srep::recix_set_destination(const char* d)
-{
-  m_recix->set_destination(d);
-}
+void wb_srep::recix_set_destination(const char* d) { m_recix->set_destination(d); }

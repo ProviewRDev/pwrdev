@@ -5,11 +5,12 @@
 #include "rt_gdh.h"
 #include "co_tst_log.h"
 
-class ra_status {
+class ra_status
+{
   pwr_tStatus m_sts;
-  tst_log *m_log;
+  tst_log* m_log;
 
- public:
+public:
   ra_status();
   ~ra_status();
   void test_status();

@@ -728,7 +728,7 @@ void Delay(plc_sThread* tp, pwr_sClass_CompIMC* plant_obj, pwr_tInt16 n,
     Ntime = (int)(0.5 + Delay / (tp->ActualScanTime *
                                  (pwr_tFloat32)MAXCELLS)); // calculate number of time lags to count
     if (plant_obj->DtCtr == 0)
-      for (i = 0; i <= MAXCELLS; i++)
+      for (i = 0; i < MAXCELLS; i++)
         plant_obj->D[i] = plant_obj->S[n]; // reset all the array
     OP = plant_obj->D[MAXCELLS - 1];       // copy last array item to output
     if (plant_obj->DtCtr >= Ntime)         // if time elapsed -> shift array
@@ -1137,7 +1137,7 @@ static float mpc_interpolate(float* curve, unsigned int c_len, float val)
 /* Calculation of linear regression model */
 static float mpc_model(pwr_sClass_CompMPC_Fo* o, pwr_sClass_CompMPC* co, float out, float av0, float timestep)
 {
-  float av;
+  float av = 0;
   switch (co->Algorithm)
   {
   case pwr_eMpcAlgorithm_None:

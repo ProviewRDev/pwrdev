@@ -44,11 +44,11 @@
 #include <QDialog>
 #include <QWidget>
 
-class XttKeyboardQt : public XttKeyboard {
+class XttKeyboardQt : public XttKeyboard
+{
 public:
-  XttKeyboardQt(void* xn_parent_ctx, QWidget* xn_parent_wid,
-      const char* xn_name, QWidget** w, keyboard_eKeymap keymap,
-      keyboard_eType type, int xn_color_theme, pwr_tStatus* status);
+  XttKeyboardQt(void* xn_parent_ctx, QWidget* xn_parent_wid, const char* xn_name, QWidget** w,
+                keyboard_eKeymap keymap, keyboard_eType type, int xn_color_theme, pwr_tStatus* status);
 
   void set_inputfocus();
   void pop();
@@ -62,15 +62,15 @@ private:
   QDialog* toplevel;
 };
 
-class XttKeyboardQtWidget : public QDialog {
+class XttKeyboardQtWidget : public QDialog
+{
 public:
-  XttKeyboardQtWidget(XttKeyboardQt* parent_ctx, QWidget* parent)
-      : QDialog(parent), kb(parent_ctx) {}
+  XttKeyboardQtWidget(XttKeyboardQt* parent_ctx, QWidget* parent) : QDialog(parent), kb(parent_ctx) {}
 
 protected:
   void focusInEvent(QFocusEvent* event);
   void closeEvent(QCloseEvent* event);
-  void resizeEvent(QResizeEvent *event);
+  void resizeEvent(QResizeEvent* event);
 
 private:
   XttKeyboardQt* kb;

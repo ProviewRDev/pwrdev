@@ -44,13 +44,13 @@
 #include "ge_attrnav.h"
 
 //! The navigation area of the attribute editor.
-class AttrNavGtk : public AttrNav {
+class AttrNavGtk : public AttrNav
+{
 public:
-  AttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, attr_eType xn_type,
-      const char* xn_name, attr_sItem* xn_itemlist, int xn_item_cnt,
-      void (*xn_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, 
-      grow_tObject*, int), 
-      GtkWidget** w, pwr_tStatus* status);
+  AttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, attr_eType xn_type, const char* xn_name,
+             attr_sItem* xn_itemlist, int xn_item_cnt,
+             void (*xn_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, grow_tObject*, int),
+             GtkWidget** w, pwr_tStatus* status);
   ~AttrNavGtk();
 
   GtkWidget* parent_wid;

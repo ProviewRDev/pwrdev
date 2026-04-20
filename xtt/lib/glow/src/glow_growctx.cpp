@@ -242,6 +242,7 @@ int GrowCtx::subw_event_handler(glow_eEvent event, int x, int y, int w, int h)
         {
           return sts;
         }
+      /* fall through */
       case glow_eEvent_MB1Click:
       case glow_eEvent_MB2Click:
       case glow_eEvent_MB3Click:
@@ -268,6 +269,7 @@ int GrowCtx::subw_event_handler(glow_eEvent event, int x, int y, int w, int h)
           }
           return sts;
         }
+      /* fall through */
       default:
         sts = layer->a[i]->event_handler(&mw, event, x, y, fx, fy);
         if (sts)
@@ -712,6 +714,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       }
       return 1;
     }
+  /* fall through */
   case glow_eEvent_MB1DoubleClick:
   case glow_eEvent_MB1ClickShift:
   case glow_eEvent_MB1DoubleClickShift:
@@ -2049,7 +2052,7 @@ int GrowCtx::save(char* filename, glow_eSaveMode mode)
   return GlowCtx::save(filename, mode);
 }
 
-void GrowCtx::save_grow(std::ofstream& fp, glow_eSaveMode mode)
+void GrowCtx::save_grow(std::ostream& fp, glow_eSaveMode mode)
 {
   int i;
   char* s;
@@ -2141,7 +2144,7 @@ void GrowCtx::save_grow(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowCtx::save_meta(std::ofstream& fp, glow_eSaveMode mode)
+void GrowCtx::save_meta(std::ostream& fp, glow_eSaveMode mode)
 {
   int default_width = int((x1 - x0) * mw.zoom_factor_x);
   int default_height = int((y1 - y0) * mw.zoom_factor_x);
@@ -2191,7 +2194,7 @@ int GrowCtx::get_dimension(char* filename, int* width, int* height)
   return 0;
 }
 
-void GrowCtx::open_grow(std::ifstream& fp)
+void GrowCtx::open_grow(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -2561,7 +2564,7 @@ int GrowCtx::export_flow(char* filename)
   return ef.export_flow(filename);
 }
 
-int GrowCtx::export_script(char* filename, int (*userdata_cb)(void*, void*, std::ofstream&, char*))
+int GrowCtx::export_script(char* filename, int (*userdata_cb)(void*, void*, std::ostream&, char*))
 {
   GlowExportScript es(this);
 
@@ -3652,7 +3655,7 @@ void GrowCtx::set_javaframe(double* pix_x_right, double* pix_x_left, double* pix
   }
 }
 
-void GrowCtx::export_javabean(std::ofstream& fp, int components)
+void GrowCtx::export_javabean(std::ostream& fp, int components)
 {
   int i;
   int shape_cnt;
@@ -3714,7 +3717,7 @@ void GrowCtx::export_javabean(std::ofstream& fp, int components)
   delete export_jbean;
 }
 
-void GrowCtx::export_nodeclass_javabean(GlowArrayElem* nc, std::ofstream& fp, int components)
+void GrowCtx::export_nodeclass_javabean(GlowArrayElem* nc, std::ostream& fp, int components)
 {
   int i;
   int shape_cnt;
@@ -3904,7 +3907,7 @@ void GrowCtx::export_nodeclass_javabean(GlowArrayElem* nc, std::ofstream& fp, in
   delete export_jbean;
 }
 
-void GrowCtx::export_nc_javabean_font(GlowArrayElem* nc, std::ofstream& fp, int components)
+void GrowCtx::export_nc_javabean_font(GlowArrayElem* nc, std::ostream& fp, int components)
 {
   int i;
 
@@ -4613,7 +4616,7 @@ int GrowCtx::is_visible(GlowArrayElem* element, glow_eVisible type)
   return 0;
 }
 
-void GrowCtx::read_object(std::ifstream& fp, GlowArrayElem** o)
+void GrowCtx::read_object(std::istream& fp, GlowArrayElem** o)
 {
   int type;
   GlowArrayElem* n = 0;

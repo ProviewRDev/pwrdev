@@ -5,16 +5,17 @@
 #include "rt_gdh.h"
 #include "co_tst_log.h"
 
-class ra_nethtest {
+class ra_nethtest
+{
   pwr_tStatus m_sts;
-  tst_log *m_log;
+  tst_log* m_log;
   pwr_tOid m_root;
   pwr_tOid m_child;
   pwr_tOid m_dynroot;
 
   pwr_tStatus check_object(pwr_tOid oid);
 
- public:
+public:
   ra_nethtest();
   ~ra_nethtest();
   void ObjidToName(void);

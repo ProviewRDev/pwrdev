@@ -54,8 +54,8 @@ static char sccsid[] = "@(#)rpc_util.c 1.5 87/06/24 (C) 1987 SMI";
 #include "pdr_util.h"
 
 char curline[MAXLINESIZE]; /* current read line */
-char* where = curline; /* current point in line */
-int linenum = 0; /* current line number */
+char* where = curline;     /* current point in line */
+int linenum = 0;           /* current line number */
 
 char* infilename; /* input filename */
 
@@ -64,7 +64,7 @@ char* outfiles[NFILES]; /* output file names */
 int nfiles;
 
 FILE* fout; /* file pointer of current output */
-FILE* fin; /* file pointer of current input */
+FILE* fin;  /* file pointer of current input */
 
 list* defined; /* list of defined things */
 
@@ -98,8 +98,10 @@ void reinitialize()
 char* findval(list* lst, char* val, int (*cmp)())
 
 {
-  for (; lst != NULL; lst = lst->next) {
-    if ((*cmp)(lst->val, val)) {
+  for (; lst != NULL; lst = lst->next)
+  {
+    if ((*cmp)(lst->val, val))
+    {
       return (lst->val);
     }
   }
@@ -122,20 +124,19 @@ void storeval(list** lstp, char* val)
   *l = lst;
 }
 
-static int findit(definition* def, char* type)
-{
-  return (streq(def->def_name, type));
-}
+static int findit(definition* def, char* type) { return (streq(def->def_name, type)); }
 
 static char* fixit(char* type, char* orig)
 {
   definition* def;
 
   def = (definition*)FINDVAL(defined, type, findit);
-  if (def == NULL || def->def_kind != DEF_TYPEDEF) {
+  if (def == NULL || def->def_kind != DEF_TYPEDEF)
+  {
     return (orig);
   }
-  switch (def->def.ty.rel) {
+  switch (def->def.ty.rel)
+  {
   case REL_VECTOR:
     return (def->def.ty.old_type);
   case REL_ALIAS:
@@ -145,43 +146,55 @@ static char* fixit(char* type, char* orig)
   }
 }
 
-char* fixtype(char* type)
-{
-  return (fixit(type, type));
-}
+char* fixtype(char* type) { return (fixit(type, type)); }
 
 char* stringfix(char* type)
 {
-  if (streq(type, "string")) {
+  if (streq(type, "string"))
+  {
     return ("wrapstring");
-  } else {
+  }
+  else
+  {
     return (type);
   }
 }
 
 void ptype(char* prefix, char* type, int follow)
 {
-  if (prefix != NULL) {
-    if (streq(prefix, "enum")) {
+  if (prefix != NULL)
+  {
+    if (streq(prefix, "enum"))
+    {
       f_print(fout, "enum ");
-    } else {
+    }
+    else
+    {
       f_print(fout, "struct ");
     }
   }
-  if (streq(type, "bool")) {
+  if (streq(type, "bool"))
+  {
     f_print(fout, "bool_t ");
-  } else if (streq(type, "string")) {
+  }
+  else if (streq(type, "string"))
+  {
     f_print(fout, "char *");
-  } else {
+  }
+  else
+  {
     f_print(fout, "%s ", follow ? fixtype(type) : type);
   }
 }
 
 static int typedefed(definition* def, char* type)
 {
-  if (def->def_kind != DEF_TYPEDEF || def->def.ty.old_prefix != NULL) {
+  if (def->def_kind != DEF_TYPEDEF || def->def.ty.old_prefix != NULL)
+  {
     return (0);
-  } else {
+  }
+  else
+  {
     return (streq(def->def_name, type));
   }
 }
@@ -190,8 +203,10 @@ int isvectordef(char* type, relation rel)
 {
   definition* def;
 
-  for (;;) {
-    switch (rel) {
+  for (;;)
+  {
+    switch (rel)
+    {
     case REL_VECTOR:
       return (!streq(type, "string"));
     case REL_ARRAY:
@@ -200,7 +215,8 @@ int isvectordef(char* type, relation rel)
       return (0);
     case REL_ALIAS:
       def = (definition*)FINDVAL(defined, type, typedefed);
-      if (def == NULL) {
+      if (def == NULL)
+      {
         return (0);
       }
       type = def->def.ty.old_type;
@@ -215,17 +231,15 @@ static char* locase(char* str)
   static char buf[100];
   char* p = buf;
 
-  while ((c = *str++)) {
+  while ((c = *str++))
+  {
     *p++ = (c >= 'A' && c <= 'Z') ? (c - 'A' + 'a') : c;
   }
   *p = 0;
   return (buf);
 }
 
-void pvname(char* pname, char* vnum)
-{
-  f_print(fout, "%s_%s", locase(pname), vnum);
-}
+void pvname(char* pname, char* vnum) { f_print(fout, "%s_%s", locase(pname), vnum); }
 
 /*
  * print a useful (?) error message, and then die
@@ -246,7 +260,8 @@ void crash()
 {
   int i;
 
-  for (i = 0; i < nfiles; i++) {
+  for (i = 0; i < nfiles; i++)
+  {
     (void)unlink(outfiles[i]);
   }
   exit(1);
@@ -254,9 +269,12 @@ void crash()
 
 void record_open(char* file)
 {
-  if (nfiles < NFILES) {
+  if (nfiles < NFILES)
+  {
     outfiles[nfiles++] = file;
-  } else {
+  }
+  else
+  {
     f_print(stderr, "too many files!\n");
     crash();
   }
@@ -288,31 +306,31 @@ void expected2(tok_kind exp1, tok_kind exp2)
  */
 void expected3(tok_kind exp1, tok_kind exp2, tok_kind exp3)
 {
-  s_print(expectbuf, "expected '%s', '%s' or '%s'", toktostr(exp1),
-      toktostr(exp2), toktostr(exp3));
+  s_print(expectbuf, "expected '%s', '%s' or '%s'", toktostr(exp1), toktostr(exp2), toktostr(exp3));
   error(expectbuf);
 }
 
 void tabify(FILE* f, int tab)
 {
-  while (tab--) {
+  while (tab--)
+  {
     (void)fputc('\t', f);
   }
 }
 
-static token tokstrings[] = { { TOK_IDENT, "identifier" },
-  { TOK_CONST, "const" }, { TOK_RPAREN, ")" }, { TOK_LPAREN, "(" },
-  { TOK_RBRACE, "}" }, { TOK_LBRACE, "{" }, { TOK_LBRACKET, "[" },
-  { TOK_RBRACKET, "]" }, { TOK_STAR, "*" }, { TOK_COMMA, "," },
-  { TOK_EQUAL, "=" }, { TOK_COLON, ":" }, { TOK_SEMICOLON, ";" },
-  { TOK_UNION, "union" }, { TOK_STRUCT, "struct" }, { TOK_SWITCH, "switch" },
-  { TOK_CASE, "case" }, { TOK_DEFAULT, "default" }, { TOK_ENUM, "enum" },
-  { TOK_TYPEDEF, "typedef" }, { TOK_INT, "int" }, { TOK_SHORT, "short" },
-  { TOK_LONG, "long" }, { TOK_UNSIGNED, "unsigned" }, { TOK_DOUBLE, "double" },
-  { TOK_FLOAT, "float" }, { TOK_CHAR, "char" }, { TOK_STRING, "string" },
-  { TOK_OPAQUE, "opaque" }, { TOK_BOOL, "bool" }, { TOK_VOID, "void" },
-  { TOK_PROGRAM, "program" }, { TOK_VERSION, "pdr_version" },
-  { TOK_EOF, "??????" } };
+static token tokstrings[] = {
+    {TOK_IDENT, "identifier"}, {TOK_CONST, "const"},     {TOK_RPAREN, ")"},
+    {TOK_LPAREN, "("},         {TOK_RBRACE, "}"},        {TOK_LBRACE, "{"},
+    {TOK_LBRACKET, "["},       {TOK_RBRACKET, "]"},      {TOK_STAR, "*"},
+    {TOK_COMMA, ","},          {TOK_EQUAL, "="},         {TOK_COLON, ":"},
+    {TOK_SEMICOLON, ";"},      {TOK_UNION, "union"},     {TOK_STRUCT, "struct"},
+    {TOK_SWITCH, "switch"},    {TOK_CASE, "case"},       {TOK_DEFAULT, "default"},
+    {TOK_ENUM, "enum"},        {TOK_TYPEDEF, "typedef"}, {TOK_INT, "int"},
+    {TOK_SHORT, "short"},      {TOK_LONG, "long"},       {TOK_UNSIGNED, "unsigned"},
+    {TOK_DOUBLE, "double"},    {TOK_FLOAT, "float"},     {TOK_CHAR, "char"},
+    {TOK_STRING, "string"},    {TOK_OPAQUE, "opaque"},   {TOK_BOOL, "bool"},
+    {TOK_VOID, "void"},        {TOK_PROGRAM, "program"}, {TOK_VERSION, "pdr_version"},
+    {TOK_EOF, "??????"}};
 
 static char* toktostr(tok_kind kind)
 {
@@ -331,14 +349,19 @@ static void printbuf()
 
 #define TABSIZE 4
 
-  for (i = 0; (c = curline[i]); i++) {
-    if (c == '\t') {
+  for (i = 0; (c = curline[i]); i++)
+  {
+    if (c == '\t')
+    {
       cnt = 8 - (i % TABSIZE);
       c = ' ';
-    } else {
+    }
+    else
+    {
       cnt = 1;
     }
-    while (cnt--) {
+    while (cnt--)
+    {
       (void)fputc(c, stderr);
     }
   }
@@ -351,14 +374,19 @@ static void printwhere()
   int cnt;
 
   printbuf();
-  for (i = 0; i < where - curline; i++) {
+  for (i = 0; i < where - curline; i++)
+  {
     c = curline[i];
-    if (c == '\t') {
+    if (c == '\t')
+    {
       cnt = 8 - (i % TABSIZE);
-    } else {
+    }
+    else
+    {
       cnt = 1;
     }
-    while (cnt--) {
+    while (cnt--)
+    {
       (void)fputc('^', stderr);
     }
   }

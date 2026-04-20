@@ -77,7 +77,7 @@
 #include "wb_wtt_gtk.h"
 
 #define WTT_PALETTE_WIDTH 160
-//#define MENU_BAR 1
+// #define MENU_BAR 1
 #define MENU_PULLDOWN 2
 #define MENU_POPUP 3
 #define MENU_OPTION 4
@@ -99,17 +99,13 @@ void WttGtk::get_window_char(int* width, int* height)
 void WttGtk::set_clock_cursor()
 {
   if (!clock_cursor)
-    clock_cursor = gdk_cursor_new_for_display(
-        gtk_widget_get_display(toplevel), GDK_WATCH);
+    clock_cursor = gdk_cursor_new_for_display(gtk_widget_get_display(toplevel), GDK_WATCH);
 
   gdk_window_set_cursor(gtk_widget_get_window(toplevel), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(toplevel));
 }
 
-void WttGtk::reset_cursor()
-{
-  gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL);
-}
+void WttGtk::reset_cursor() { gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL); }
 
 void WttGtk::free_cursor()
 {
@@ -119,9 +115,11 @@ void WttGtk::free_cursor()
 
 void WttGtk::menu_setup()
 {
-  switch (wb_type) {
+  switch (wb_type)
+  {
   case wb_eType_Directory:
-    if (editmode) {
+    if (editmode)
+    {
       gtk_widget_set_sensitive(menu_save_w, TRUE);
       gtk_widget_set_sensitive(GTK_WIDGET(tools_save_w), TRUE);
       gtk_widget_set_sensitive(menu_revert_w, TRUE);
@@ -154,7 +152,9 @@ void WttGtk::menu_setup()
       gtk_widget_set_sensitive(menu_classeditor_w, FALSE);
       gtk_widget_set_sensitive(menu_updateclasses_w, TRUE);
       gtk_widget_set_sensitive(menu_clonevolume_w, FALSE);
-    } else {
+    }
+    else
+    {
       gtk_widget_set_sensitive(menu_save_w, FALSE);
       gtk_widget_set_sensitive(GTK_WIDGET(tools_save_w), FALSE);
       gtk_widget_set_sensitive(menu_revert_w, FALSE);
@@ -190,7 +190,8 @@ void WttGtk::menu_setup()
     }
     break;
   case wb_eType_Volume:
-    if (editmode) {
+    if (editmode)
+    {
       gtk_widget_set_sensitive(menu_save_w, TRUE);
       gtk_widget_set_sensitive(GTK_WIDGET(tools_save_w), TRUE);
       gtk_widget_set_sensitive(menu_revert_w, TRUE);
@@ -226,7 +227,9 @@ void WttGtk::menu_setup()
       else
         gtk_widget_set_sensitive(menu_updateclasses_w, TRUE);
       gtk_widget_set_sensitive(menu_clonevolume_w, FALSE);
-    } else {
+    }
+    else
+    {
       gtk_widget_set_sensitive(menu_save_w, FALSE);
       gtk_widget_set_sensitive(GTK_WIDGET(tools_save_w), FALSE);
       gtk_widget_set_sensitive(menu_revert_w, FALSE);
@@ -265,7 +268,8 @@ void WttGtk::menu_setup()
     }
     break;
   case wb_eType_Class:
-    if (editmode) {
+    if (editmode)
+    {
       gtk_widget_set_sensitive(menu_save_w, TRUE);
       gtk_widget_set_sensitive(GTK_WIDGET(tools_save_w), TRUE);
       gtk_widget_set_sensitive(menu_revert_w, TRUE);
@@ -298,7 +302,9 @@ void WttGtk::menu_setup()
       gtk_widget_set_sensitive(menu_classeditor_w, FALSE);
       gtk_widget_set_sensitive(menu_updateclasses_w, FALSE);
       gtk_widget_set_sensitive(menu_clonevolume_w, FALSE);
-    } else {
+    }
+    else
+    {
       gtk_widget_set_sensitive(menu_save_w, FALSE);
       gtk_widget_set_sensitive(GTK_WIDGET(tools_save_w), FALSE);
       gtk_widget_set_sensitive(menu_revert_w, FALSE);
@@ -338,7 +344,8 @@ void WttGtk::menu_setup()
     g_object_set(menu_utilities_w, "visible", FALSE, NULL);
     g_object_set(menu_buildnode_w, "visible", FALSE, NULL);
     g_object_set(menu_classeditor_w, "visible", FALSE, NULL);
-    if (editmode) {
+    if (editmode)
+    {
       gtk_widget_set_sensitive(menu_save_w, TRUE);
       gtk_widget_set_sensitive(GTK_WIDGET(tools_save_w), TRUE);
       gtk_widget_set_sensitive(menu_revert_w, TRUE);
@@ -374,7 +381,9 @@ void WttGtk::menu_setup()
       else
         gtk_widget_set_sensitive(menu_updateclasses_w, FALSE);
       gtk_widget_set_sensitive(menu_clonevolume_w, FALSE);
-    } else {
+    }
+    else
+    {
       gtk_widget_set_sensitive(menu_save_w, FALSE);
       gtk_widget_set_sensitive(GTK_WIDGET(tools_save_w), FALSE);
       gtk_widget_set_sensitive(menu_revert_w, FALSE);
@@ -410,7 +419,8 @@ void WttGtk::menu_setup()
     }
     break;
   case wb_eType_Buffer:
-    if (editmode) {
+    if (editmode)
+    {
       gtk_widget_set_sensitive(menu_save_w, FALSE);
       gtk_widget_set_sensitive(GTK_WIDGET(tools_save_w), FALSE);
       gtk_widget_set_sensitive(menu_revert_w, FALSE);
@@ -443,7 +453,9 @@ void WttGtk::menu_setup()
       gtk_widget_set_sensitive(menu_classeditor_w, FALSE);
       gtk_widget_set_sensitive(menu_updateclasses_w, FALSE);
       gtk_widget_set_sensitive(menu_clonevolume_w, FALSE);
-    } else {
+    }
+    else
+    {
       gtk_widget_set_sensitive(menu_save_w, FALSE);
       gtk_widget_set_sensitive(GTK_WIDGET(tools_save_w), FALSE);
       gtk_widget_set_sensitive(menu_revert_w, FALSE);
@@ -479,7 +491,8 @@ void WttGtk::menu_setup()
     }
     break;
   case wb_eType_ExternVolume:
-    if (editmode) {
+    if (editmode)
+    {
       gtk_widget_set_sensitive(menu_save_w, TRUE);
       gtk_widget_set_sensitive(GTK_WIDGET(tools_save_w), TRUE);
       gtk_widget_set_sensitive(menu_revert_w, TRUE);
@@ -512,7 +525,9 @@ void WttGtk::menu_setup()
       gtk_widget_set_sensitive(menu_classeditor_w, FALSE);
       gtk_widget_set_sensitive(menu_updateclasses_w, FALSE);
       gtk_widget_set_sensitive(menu_clonevolume_w, FALSE);
-    } else {
+    }
+    else
+    {
       gtk_widget_set_sensitive(menu_save_w, FALSE);
       gtk_widget_set_sensitive(GTK_WIDGET(tools_save_w), TRUE);
       gtk_widget_set_sensitive(menu_revert_w, FALSE);
@@ -553,14 +568,12 @@ void WttGtk::menu_setup()
 
 void WttGtk::set_selection_owner()
 {
-  selection_timerid
-      = g_timeout_add(200, WttGtk::set_selection_owner_proc, this);
+  selection_timerid = g_timeout_add(200, WttGtk::set_selection_owner_proc, this);
 }
 
 void WttGtk::set_palette_selection_owner()
 {
-  selection_timerid
-      = g_timeout_add(200, WttGtk::set_palette_selection_owner_proc, this);
+  selection_timerid = g_timeout_add(200, WttGtk::set_palette_selection_owner_proc, this);
 }
 
 gboolean WttGtk::set_selection_owner_proc(void* data)
@@ -595,13 +608,15 @@ int WttGtk::create_popup_menu(pwr_sAttrRef aref, int x, int y)
 
   // Calculate position
   GdkEvent* e = gtk_get_current_event();
-  if (e->any.window == gtk_widget_get_window(((WNavGtk*)wnavnode)->brow_widget)) {
-    CoWowGtk::PopupPosition(
-        ((WNavGtk*)wnavnode)->brow_widget, x, y, &popupmenu_x, &popupmenu_y);
-      } else if (e->any.window == gtk_widget_get_window(((WNavGtk*)wnav)->brow_widget)) {
-    CoWowGtk::PopupPosition(
-        ((WNavGtk*)wnav)->brow_widget, x, y, &popupmenu_x, &popupmenu_y);
-  } else
+  if (e->any.window == gtk_widget_get_window(((WNavGtk*)wnavnode)->brow_widget))
+  {
+    CoWowGtk::PopupPosition(((WNavGtk*)wnavnode)->brow_widget, x, y, &popupmenu_x, &popupmenu_y);
+  }
+  else if (e->any.window == gtk_widget_get_window(((WNavGtk*)wnav)->brow_widget))
+  {
+    CoWowGtk::PopupPosition(((WNavGtk*)wnav)->brow_widget, x, y, &popupmenu_x, &popupmenu_y);
+  }
+  else
     return 0;
   gdk_event_free(e);
   popupmenu_x += 10;
@@ -676,61 +691,77 @@ void WttGtk::set_edit_show()
 
 void WttGtk::set_twowindows(int two, int display_wnav, int display_wnavnode)
 {
-  if (disable_w2) {
+  if (disable_w2)
+  {
     display_wnav = 1;
     display_wnavnode = 0;
     two = 0;
   }
-  if (display_wnav || display_wnavnode) {
-    if (display_wnav && !wnav_mapped) {
+  if (display_wnav || display_wnavnode)
+  {
+    if (display_wnav && !wnav_mapped)
+    {
       g_object_set(wnav_brow_widget, "visible", TRUE, NULL);
       set_focus(wnav);
       wnav_mapped = 1;
     }
-    if (display_wnavnode && !wnavnode_mapped) {
+    if (display_wnavnode && !wnavnode_mapped)
+    {
       g_object_set(wnavnode_brow_widget, "visible", TRUE, NULL);
       set_focus(wnavnode);
       wnavnode_mapped = 1;
     }
-    if (!display_wnav && wnav_mapped) {
+    if (!display_wnav && wnav_mapped)
+    {
       if (realized)
         g_object_set(wnav_brow_widget, "visible", FALSE, NULL);
       set_focus(wnavnode);
       wnav_mapped = 0;
     }
-    if (!display_wnavnode && wnavnode_mapped) {
+    if (!display_wnavnode && wnavnode_mapped)
+    {
       if (realized)
         g_object_set(wnavnode_brow_widget, "visible", FALSE, NULL);
       set_focus(wnav);
       wnavnode_mapped = 0;
     }
     twowindows = display_wnav && display_wnavnode;
-  } else {
+  }
+  else
+  {
     if (two == twowindows)
       return;
 
-    if (!two) {
+    if (!two)
+    {
       // Keep the focused window
-      if (focused_wnav == wnavnode) {
+      if (focused_wnav == wnavnode)
+      {
         if (realized)
           g_object_set(wnav_brow_widget, "visible", FALSE, NULL);
         set_focus(wnavnode);
         wnav_mapped = 0;
         wnavnode_mapped = 1;
-      } else {
+      }
+      else
+      {
         if (realized)
           g_object_set(wnavnode_brow_widget, "visible", FALSE, NULL);
         set_focus(wnav);
         wnav_mapped = 1;
         wnavnode_mapped = 0;
       }
-    } else {
-      if (!wnav_mapped) {
+    }
+    else
+    {
+      if (!wnav_mapped)
+      {
         g_object_set(wnav_brow_widget, "visible", TRUE, NULL);
         set_focus(wnav);
         wnav_mapped = 1;
       }
-      if (!wnavnode_mapped) {
+      if (!wnavnode_mapped)
+      {
         g_object_set(wnavnode_brow_widget, "visible", TRUE, NULL);
         set_focus(wnavnode);
         wnavnode_mapped = 1;
@@ -742,18 +773,20 @@ void WttGtk::set_twowindows(int two, int display_wnav, int display_wnavnode)
 
 void WttGtk::message(char severity, const char* message)
 {
-  char* messageutf8
-      = g_convert(message, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  char* messageutf8 = g_convert(message, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
   gtk_label_set_text(GTK_LABEL(msg_label), messageutf8);
   g_free(messageutf8);
 }
 
 void WttGtk::set_prompt(const char* prompt)
 {
-  if (streq(prompt, "")) {
+  if (streq(prompt, ""))
+  {
     g_object_set(cmd_prompt, "visible", FALSE, NULL);
     g_object_set(msg_label, "visible", TRUE, NULL);
-  } else {
+  }
+  else
+  {
     g_object_set(msg_label, "visible", FALSE, NULL);
     g_object_set(cmd_prompt, "visible", TRUE, "label", prompt, NULL);
   }
@@ -761,22 +794,19 @@ void WttGtk::set_prompt(const char* prompt)
 
 void WttGtk::watt_new(pwr_tAttrRef aref)
 {
-  new WAttGtk(
-      toplevel, this, ldhses, aref, editmode, wnavnode->gbl.advanced_user, 1);
+  new WAttGtk(toplevel, this, ldhses, aref, editmode, wnavnode->gbl.advanced_user, 1);
 }
 
 void WttGtk::wda_new(pwr_tOid oid)
 {
-  new WdaGtk(
-      toplevel, this, ldhses, oid, 0, "", editmode, wnav->gbl.advanced_user, 1);
+  new WdaGtk(toplevel, this, ldhses, oid, 0, "", editmode, wnav->gbl.advanced_user, 1);
 }
 
 Ge* WttGtk::ge_new(char* graph_name)
 {
   Ge* gectx;
 
-  unsigned int opt
-      = wnavnode->gbl.enable_comment ? ge_mOption_EnableComment : 0;
+  unsigned int opt = wnavnode->gbl.enable_comment ? ge_mOption_EnableComment : 0;
   gectx = new GeGtk(this, toplevel, ldhses, 0, opt, graph_name);
   return gectx;
 }
@@ -786,10 +816,7 @@ void WttGtk::wcast_new(pwr_tAttrRef aref, pwr_tStatus* sts)
   new WCastGtk(this, toplevel, "Casting Window", ldhses, aref, sts);
 }
 
-wb_build* WttGtk::build_new()
-{
-  return new wb_build(*(wb_session*)ldhses, focused_wnav);
-}
+wb_build* WttGtk::build_new() { return new wb_build(*(wb_session*)ldhses, focused_wnav); }
 
 void WttGtk::wpkg_new()
 {
@@ -800,14 +827,15 @@ void WttGtk::wpkg_new()
 int WttGtk::ute_new(char* title)
 {
   pwr_tStatus sts;
-  utedctx = new WUtedGtk(this, toplevel, title, "Utilites",
-      ldh_SessionToWB(ldhses), ldhses, editmode, uted_quit_cb, &sts);
+  utedctx = new WUtedGtk(this, toplevel, title, "Utilites", ldh_SessionToWB(ldhses), ldhses, editmode,
+                         uted_quit_cb, &sts);
   return sts;
 }
 
 void WttGtk::close_change_value()
 {
-  if (input_open) {
+  if (input_open)
+  {
     g_object_set(cmd_input, "visible", FALSE, NULL);
     set_prompt("");
     input_open = 0;
@@ -823,7 +851,8 @@ void WttGtk::open_change_value()
   int multiline;
   int input_size = 0;
 
-  if (input_open) {
+  if (input_open)
+  {
     g_object_set(cmd_input, "visible", FALSE, NULL);
     set_prompt("");
     input_open = 0;
@@ -832,18 +861,22 @@ void WttGtk::open_change_value()
   }
 
   sts = wnav->get_selected_nodes(&sellist, &sel_cnt1);
-  if (ODD(sts)) {
-    if (sel_cnt1 != 1) {
+  if (ODD(sts))
+  {
+    if (sel_cnt1 != 1)
+    {
       message('E', "Select one attribute");
       return;
     }
 
     sts = wnav->check_attr_value(sellist[0], &multiline, &value, &input_size);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', wnav_get_message(sts));
       return;
     }
-    if (multiline) {
+    if (multiline)
+    {
       message('E', "Edit multiline attributes in the Object Editor");
       return;
     }
@@ -852,21 +885,26 @@ void WttGtk::open_change_value()
     input_wnav = wnav;
     wnav->node_to_objid(input_node, &input_objid);
     free(sellist);
-  } else {
+  }
+  else
+  {
     sts = wnavnode->get_selected_nodes(&sellist, &sel_cnt2);
-    if (ODD(sts)) {
-      if (sel_cnt2 != 1) {
+    if (ODD(sts))
+    {
+      if (sel_cnt2 != 1)
+      {
         message('E', "Select one attribute");
         return;
       }
 
-      sts = wnavnode->check_attr_value(
-          sellist[0], &multiline, &value, &input_size);
-      if (EVEN(sts)) {
+      sts = wnavnode->check_attr_value(sellist[0], &multiline, &value, &input_size);
+      if (EVEN(sts))
+      {
         message('E', wnav_get_message(sts));
         return;
       }
-      if (multiline) {
+      if (multiline)
+      {
         message('E', "Edit multiline attributes in the attribute editor");
         return;
       }
@@ -877,7 +915,8 @@ void WttGtk::open_change_value()
       free(sellist);
     }
   }
-  if (sel_cnt1 == 0 && sel_cnt2 == 0) {
+  if (sel_cnt1 == 0 && sel_cnt2 == 0)
+  {
     message('E', "Select an attribute");
     return;
   }
@@ -892,19 +931,19 @@ void WttGtk::open_change_value()
   cmd_entry->set_recall_buffer(&value_recall);
   gtk_widget_grab_focus(cmd_input);
 
-  if (value) {
-    char* textutf8
-        = g_convert(value, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  if (value)
+  {
+    char* textutf8 = g_convert(value, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
     gint pos = 0;
     gtk_editable_delete_text(GTK_EDITABLE(cmd_input), 0, -1);
-    gtk_editable_insert_text(
-        GTK_EDITABLE(cmd_input), textutf8, strlen(textutf8), &pos);
+    gtk_editable_insert_text(GTK_EDITABLE(cmd_input), textutf8, strlen(textutf8), &pos);
     g_free(textutf8);
 
     // Select the text
     gtk_editable_set_position(GTK_EDITABLE(cmd_input), -1);
     gtk_editable_select_region(GTK_EDITABLE(cmd_input), 0, -1);
-  } else
+  }
+  else
     gtk_editable_delete_text(GTK_EDITABLE(cmd_input), 0, -1);
 
   set_prompt("value >");
@@ -920,7 +959,8 @@ void WttGtk::open_change_name()
   int size;
   char name[80];
 
-  if (input_open) {
+  if (input_open)
+  {
     g_object_set(cmd_input, "visible", FALSE, NULL);
     set_prompt("");
     input_open = 0;
@@ -928,14 +968,17 @@ void WttGtk::open_change_name()
   }
 
   sts = wnav->get_selected_nodes(&sellist, &sel_cnt1);
-  if (ODD(sts)) {
-    if (sel_cnt1 != 1) {
+  if (ODD(sts))
+  {
+    if (sel_cnt1 != 1)
+    {
       message('E', "Select one object");
       return;
     }
 
     sts = wnav->check_object_name(sellist[0]);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', wnav_get_message(sts));
       return;
     }
@@ -944,16 +987,21 @@ void WttGtk::open_change_name()
     input_wnav = wnav;
     wnav->node_to_objid(input_node, &input_objid);
     free(sellist);
-  } else {
+  }
+  else
+  {
     sts = wnavnode->get_selected_nodes(&sellist, &sel_cnt2);
-    if (ODD(sts)) {
-      if (sel_cnt2 != 1) {
+    if (ODD(sts))
+    {
+      if (sel_cnt2 != 1)
+      {
         message('E', "Select one object");
         return;
       }
 
       sts = wnavnode->check_object_name(sellist[0]);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         message('E', wnav_get_message(sts));
         return;
       }
@@ -964,7 +1012,8 @@ void WttGtk::open_change_name()
       free(sellist);
     }
   }
-  if (sel_cnt1 == 0 && sel_cnt2 == 0) {
+  if (sel_cnt1 == 0 && sel_cnt2 == 0)
+  {
     message('E', "Select an object");
     return;
   }
@@ -979,14 +1028,12 @@ void WttGtk::open_change_name()
   cmd_entry->set_recall_buffer(&name_recall);
   gtk_widget_grab_focus(cmd_input);
 
-  sts = ldh_ObjidToName(
-      ldhses, input_objid, ldh_eName_Object, name, sizeof(name), &size);
+  sts = ldh_ObjidToName(ldhses, input_objid, ldh_eName_Object, name, sizeof(name), &size);
 
   gint pos = 0;
   gtk_editable_delete_text(GTK_EDITABLE(cmd_input), 0, -1);
   char* nameutf8 = g_convert(name, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-  gtk_editable_insert_text(
-      GTK_EDITABLE(cmd_input), nameutf8, strlen(nameutf8), &pos);
+  gtk_editable_insert_text(GTK_EDITABLE(cmd_input), nameutf8, strlen(nameutf8), &pos);
   g_free(nameutf8);
 
   // Select the text
@@ -1011,7 +1058,8 @@ void WttGtk::activate_command(GtkWidget* w, gpointer data)
 {
   Wtt* wtt = (Wtt*)data;
 
-  if (wtt->command_open) {
+  if (wtt->command_open)
+  {
     g_object_set(((WttGtk*)wtt)->cmd_input, "visible", FALSE, NULL);
     wtt->set_prompt("");
     wtt->command_open = 0;
@@ -1025,8 +1073,7 @@ void WttGtk::activate_command(GtkWidget* w, gpointer data)
   else
     g_object_set(((WttGtk*)wtt)->cmd_input, "visible", TRUE, NULL);
 
-  g_object_set(
-      ((WttGtk*)wtt)->cmd_input, "max-length", sizeof(pwr_tCmd) - 1, NULL);
+  g_object_set(((WttGtk*)wtt)->cmd_input, "max-length", sizeof(pwr_tCmd) - 1, NULL);
   wtt->set_prompt("wtt >");
   wtt->message(' ', "");
   ((WttGtk*)wtt)->cmd_entry->set_recall_buffer(&cmd_recall);
@@ -1047,8 +1094,7 @@ void WttGtk::activate_rtmon(GtkWidget* w, gpointer data)
   Wtt* wtt = (Wtt*)data;
   pwr_tStatus sts;
 
-  RtMon* rtmon
-      = new RtMonGtk(wtt, ((WttGtk*)wtt)->toplevel, "Runtime Monitor", 0, &sts);
+  RtMon* rtmon = new RtMonGtk(wtt, ((WttGtk*)wtt)->toplevel, "Runtime Monitor", 0, &sts);
   rtmon->help_cb = wtt_help_cb;
 }
 
@@ -1057,8 +1103,8 @@ void WttGtk::activate_statusmon(GtkWidget* w, gpointer data)
   Wtt* wtt = (Wtt*)data;
   pwr_tStatus sts;
 
-  Nodelist* nl = new NodelistGtk(wtt, ((WttGtk*)wtt)->toplevel,
-      "Supervision Center", nodelist_eMode_SystemStatus, (nl_mLayout)0, 0, 0, &sts);
+  Nodelist* nl = new NodelistGtk(wtt, ((WttGtk*)wtt)->toplevel, "Supervision Center",
+                                 nodelist_eMode_SystemStatus, (nl_mLayout)0, 0, 0, &sts);
   nl->set_scantime(3);
   nl->help_cb = wtt_help_cb;
 }
@@ -1116,15 +1162,13 @@ void WttGtk::activate_history(GtkWidget* w, gpointer data)
 
   oid.oix = 0;
   oid.vid = wtt->volid;
-  sts = ldh_ObjidToName(
-      wtt->ldhses, oid, ldh_eName_Object, vname, sizeof(vname), &size);
+  sts = ldh_ObjidToName(wtt->ldhses, oid, ldh_eName_Object, vname, sizeof(vname), &size);
   if (EVEN(sts))
     return;
 
   strcpy(title, "History Configurator ");
   strcat(title, vname);
-  CoLogWGtk* logw
-      = new CoLogWGtk(wtt, ((WttGtk*)wtt)->parent_wid, title, 0, &sts);
+  CoLogWGtk* logw = new CoLogWGtk(wtt, ((WttGtk*)wtt)->parent_wid, title, 0, &sts);
   logw->show(categories, vname);
 }
 
@@ -1291,8 +1335,8 @@ void WttGtk::activate_openfile_dbs(GtkWidget* w, gpointer data)
   Wtt* wtt = (Wtt*)data;
 
   wtt->set_clock_cursor();
-  wtt->wnav->wow->CreateFileSelDia("Loadfile Selection", (void*)wtt,
-      Wtt::file_selected_cb, wow_eFileSelType_Dbs, wow_eFileSelAction_Open);
+  wtt->wnav->wow->CreateFileSelDia("Loadfile Selection", (void*)wtt, Wtt::file_selected_cb,
+                                   wow_eFileSelType_Dbs, wow_eFileSelAction_Open);
   wtt->reset_cursor();
 }
 
@@ -1301,8 +1345,8 @@ void WttGtk::activate_openfile_wbl(GtkWidget* w, gpointer data)
   Wtt* wtt = (Wtt*)data;
 
   wtt->set_clock_cursor();
-  wtt->wnav->wow->CreateFileSelDia("Loadfile Selection", (void*)wtt,
-      Wtt::file_selected_cb, wow_eFileSelType_Wbl, wow_eFileSelAction_Open);
+  wtt->wnav->wow->CreateFileSelDia("Loadfile Selection", (void*)wtt, Wtt::file_selected_cb,
+                                   wow_eFileSelType_Wbl, wow_eFileSelAction_Open);
   wtt->reset_cursor();
 }
 
@@ -1430,12 +1474,11 @@ void WttGtk::activate_set_alltoplevel(GtkWidget* w, gpointer data)
 {
   Wtt* wtt = (Wtt*)data;
 
-  int set = (int)gtk_check_menu_item_get_active(
-      GTK_CHECK_MENU_ITEM(((WttGtk*)wtt)->view_alltoplevel_w));
-  if (w != ((WttGtk*)wtt)->view_alltoplevel_w) {
+  int set = (int)gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(((WttGtk*)wtt)->view_alltoplevel_w));
+  if (w != ((WttGtk*)wtt)->view_alltoplevel_w)
+  {
     set = !set;
-    gtk_check_menu_item_set_active(
-        GTK_CHECK_MENU_ITEM(((WttGtk*)wtt)->view_alltoplevel_w), set);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(((WttGtk*)wtt)->view_alltoplevel_w), set);
   }
 
   wtt->activate_set_alltoplevel(set);
@@ -1513,35 +1556,39 @@ void WttGtk::valchanged_cmd_input(GtkWidget* w, gpointer data)
   text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  if (!text) {
+  if (!text)
+  {
     wtt->wnav->wow->DisplayError("Input error", "Invalid character");
     return;
   }
 
-  if (wtt->input_open) {
-    switch (wtt->input_mode) {
+  if (wtt->input_open)
+  {
+    switch (wtt->input_mode)
+    {
     case wtt_eInputMode_Attribute:
       wtt->input_wnav->select_object(wtt->input_node);
-      sts = wtt->input_wnav->set_attr_value(
-          wtt->input_node, wtt->input_objid, text);
+      sts = wtt->input_wnav->set_attr_value(wtt->input_node, wtt->input_objid, text);
       if (EVEN(sts))
         wtt->message('E', wnav_get_message(sts));
       break;
     case wtt_eInputMode_ObjectName:
       wtt->input_wnav->select_object(wtt->input_node);
-      sts = wtt->input_wnav->set_object_name(
-          wtt->input_node, wtt->input_objid, text);
+      sts = wtt->input_wnav->set_object_name(wtt->input_node, wtt->input_objid, text);
       if (EVEN(sts))
         wtt->message('E', wnav_get_message(sts));
       break;
     default:;
     }
-    if (wtt->input_open) {
+    if (wtt->input_open)
+    {
       g_object_set(w, "visible", FALSE, NULL);
       wtt->set_prompt("");
       wtt->input_open = 0;
     }
-  } else if (wtt->command_open) {
+  }
+  else if (wtt->command_open)
+  {
     if (!wtt->focused_wnav)
       wtt->set_focus_default();
     wtt->set_clock_cursor();
@@ -1560,8 +1607,7 @@ void WttGtk::activate_india_ok(GtkWidget* w, gpointer data)
   Wtt* wtt = (Wtt*)data;
   char *text, *textutf8;
 
-  textutf8
-      = gtk_editable_get_chars(GTK_EDITABLE(((WttGtk*)wtt)->india_text), 0, -1);
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(((WttGtk*)wtt)->india_text), 0, -1);
   text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
@@ -1609,11 +1655,13 @@ gboolean WttGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   WttGtk* wtt = (WttGtk*)data;
 
-  if (wtt->focustimer.disabled()) {
+  if (wtt->focustimer.disabled())
+  {
     return FALSE;
   }
 
-  if (wtt->focused_wnav) {
+  if (wtt->focused_wnav)
+  {
     wtt->set_focus(wtt->focused_wnav);
   }
   wtt->focustimer.disable(400);
@@ -1625,7 +1673,7 @@ gboolean WttGtk::focused_cmd_input(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   WttGtk* wtt = (WttGtk*)data;
 
-  //if (wtt->accel_g->acceleratables)
+  // if (wtt->accel_g->acceleratables)
   gtk_window_remove_accel_group(GTK_WINDOW(wtt->toplevel), wtt->accel_g);
 
   return FALSE;
@@ -1635,18 +1683,20 @@ gboolean WttGtk::hide_cmd_input(GtkWidget* w, gpointer data)
 {
   WttGtk* wtt = (WttGtk*)data;
 
-  if (wtt->input_open) {
+  if (wtt->input_open)
+  {
     wtt->input_wnav->select_object(wtt->input_node);
     wtt->set_prompt("");
     wtt->input_open = 0;
     gtk_window_add_accel_group(GTK_WINDOW(wtt->toplevel), wtt->accel_g);
-  } else if (wtt->command_open)
+  }
+  else if (wtt->command_open)
     gtk_window_add_accel_group(GTK_WINDOW(wtt->toplevel), wtt->accel_g);
   return FALSE;
 }
 
-void WttGtk::open_input_dialog(const char* text, const char* title,
-    const char* init_text, void (*ok_cb)(Wtt*, char*))
+void WttGtk::open_input_dialog(const char* text, const char* title, const char* init_text,
+                               void (*ok_cb)(Wtt*, char*))
 {
   create_input_dialog();
 
@@ -1656,16 +1706,15 @@ void WttGtk::open_input_dialog(const char* text, const char* title,
 
   gint pos = 0;
   gtk_editable_delete_text(GTK_EDITABLE(india_text), 0, -1);
-  gtk_editable_insert_text(
-      GTK_EDITABLE(india_text), init_text, strlen(init_text), &pos);
+  gtk_editable_insert_text(GTK_EDITABLE(india_text), init_text, strlen(init_text), &pos);
 
   india_ok_cb = ok_cb;
 }
 
-void WttGtk::open_confirm(const char* text, const char* title,
-    void (*ok_cb)(Wtt*), void (*no_cb)(Wtt*))
+void WttGtk::open_confirm(const char* text, const char* title, void (*ok_cb)(Wtt*), void (*no_cb)(Wtt*))
 {
-  if (confirm_open) {
+  if (confirm_open)
+  {
     g_object_set(confirm_widget, "visible", FALSE, NULL);
     confirm_open = 0;
     return;
@@ -1687,54 +1736,55 @@ void WttGtk::activate_selmode(GtkWidget* w, gpointer data)
   Wtt* wtt = (Wtt*)data;
   int set;
 
-  if (w == ((WttGtk*)wtt)->cm_normal_syntax) {
+  if (w == ((WttGtk*)wtt)->cm_normal_syntax)
+  {
     set = (int)gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w));
-    if (!set) {
+    if (!set)
+    {
       return;
     }
     gtk_widget_set_sensitive(((WttGtk*)wtt)->cm_add_type, TRUE);
-    gtk_check_menu_item_set_active(
-        GTK_CHECK_MENU_ITEM(((WttGtk*)wtt)->cm_add_type), FALSE);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(((WttGtk*)wtt)->cm_add_type), FALSE);
     wtt->select_type = 0;
     gtk_widget_set_sensitive(((WttGtk*)wtt)->cm_add_volume, TRUE);
     wtt->select_syntax = wnav_eSelectionMode_Normal;
   }
-  if (w == ((WttGtk*)wtt)->cm_gms_syntax) {
+  if (w == ((WttGtk*)wtt)->cm_gms_syntax)
+  {
     set = (int)gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w));
-    if (!set) {
+    if (!set)
+    {
       return;
     }
     gtk_widget_set_sensitive(((WttGtk*)wtt)->cm_add_type, TRUE);
     gtk_widget_set_sensitive(((WttGtk*)wtt)->cm_add_volume, TRUE);
     wtt->select_syntax = wnav_eSelectionMode_GMS;
   }
-  if (w == ((WttGtk*)wtt)->cm_extern_syntax) {
+  if (w == ((WttGtk*)wtt)->cm_extern_syntax)
+  {
     set = (int)gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w));
-    if (!set) {
+    if (!set)
+    {
       return;
     }
     gtk_widget_set_sensitive(((WttGtk*)wtt)->cm_add_type, FALSE);
-    gtk_check_menu_item_set_active(
-        GTK_CHECK_MENU_ITEM(((WttGtk*)wtt)->cm_add_type), FALSE);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(((WttGtk*)wtt)->cm_add_type), FALSE);
     wtt->select_type = 0;
     gtk_widget_set_sensitive(((WttGtk*)wtt)->cm_add_volume, FALSE);
-    gtk_check_menu_item_set_active(
-        GTK_CHECK_MENU_ITEM(((WttGtk*)wtt)->cm_add_volume), FALSE);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(((WttGtk*)wtt)->cm_add_volume), FALSE);
     wtt->select_syntax = wnav_eSelectionMode_Extern;
     wtt->select_volume = 0;
   }
   if (w == ((WttGtk*)wtt)->cm_add_volume)
-    wtt->select_volume
-        = (int)gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w));
+    wtt->select_volume = (int)gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w));
   if (w == ((WttGtk*)wtt)->cm_add_attribute)
-    wtt->select_attr
-        = (int)gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w));
-  if (w == ((WttGtk*)wtt)->cm_add_type) {
-    wtt->select_type
-        = (int)gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w));
-    if (wtt->select_type && !wtt->select_attr) {
-      gtk_check_menu_item_set_active(
-          GTK_CHECK_MENU_ITEM(((WttGtk*)wtt)->cm_add_attribute), TRUE);
+    wtt->select_attr = (int)gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w));
+  if (w == ((WttGtk*)wtt)->cm_add_type)
+  {
+    wtt->select_type = (int)gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w));
+    if (wtt->select_type && !wtt->select_attr)
+    {
+      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(((WttGtk*)wtt)->cm_add_attribute), TRUE);
       wtt->select_attr = 1;
     }
   }
@@ -1753,20 +1803,21 @@ void WttGtk::open_boot_window()
   pwr_tStatus sts;
 
   // Load the bootlist
-  sts = lfu_volumelist_load(pwr_cNameBootList,
-      (lfu_t_volumelist**)&boot_volumelist, &boot_volumecount);
-  if (sts == FOE__NOFILE) {
+  sts = lfu_volumelist_load(pwr_cNameBootList, (lfu_t_volumelist**)&boot_volumelist, &boot_volumecount);
+  if (sts == FOE__NOFILE)
+  {
     message('E', "Project is not configured");
     return;
-  } else if (EVEN(sts)) {
+  }
+  else if (EVEN(sts))
+  {
     message('E', "Syntax error in bootlist file");
     return;
   }
 
   // Create the dialog
-  boot_dia = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 200,
-      "default-width", 300, "title", "Build Node", "window-position",
-      GTK_WIN_POS_CENTER, NULL);
+  boot_dia = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 200, "default-width", 300, "title",
+                                      "Build Node", "window-position", GTK_WIN_POS_CENTER, NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(boot_delete_cb), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(boot_destroy_cb), this);
@@ -1774,8 +1825,10 @@ void WttGtk::open_boot_window()
 
   strcpy(nodename, "");
   volumelist_ptr = (lfu_t_volumelist*)boot_volumelist;
-  for (i = 0; i < boot_volumecount; i++) {
-    if (strcmp(volumelist_ptr->p1, nodename)) {
+  for (i = 0; i < boot_volumecount; i++)
+  {
+    if (strcmp(volumelist_ptr->p1, nodename))
+    {
       strcpy(nodename, volumelist_ptr->p1);
       gtk_list_store_append(store, &iter);
       gtk_list_store_set(store, &iter, 0, nodename, -1);
@@ -1783,18 +1836,16 @@ void WttGtk::open_boot_window()
     volumelist_ptr++;
   }
 
-  boot_list = (GtkWidget*)g_object_new(GTK_TYPE_TREE_VIEW, "model", store,
-      "rules-hint", TRUE, "headers-visible", FALSE, "reorderable", TRUE,
-      "enable-search", TRUE, "search-column", 0, NULL);
+  boot_list =
+      (GtkWidget*)g_object_new(GTK_TYPE_TREE_VIEW, "model", store, "rules-hint", TRUE, "headers-visible",
+                               FALSE, "reorderable", TRUE, "enable-search", TRUE, "search-column", 0, NULL);
 
   text_renderer = gtk_cell_renderer_text_new();
-  name_column = gtk_tree_view_column_new_with_attributes(
-      "", text_renderer, "text", 0, NULL);
+  name_column = gtk_tree_view_column_new_with_attributes("", text_renderer, "text", 0, NULL);
   g_object_set(name_column, "resizable", TRUE, "clickable", TRUE, NULL);
 
   gtk_tree_view_append_column(GTK_TREE_VIEW(boot_list), name_column);
-  g_signal_connect(boot_list, "row-activated",
-      G_CALLBACK(WttGtk::boot_row_activated_cb), this);
+  g_signal_connect(boot_list, "row-activated", G_CALLBACK(WttGtk::boot_row_activated_cb), this);
 
   GtkWidget* ok_button = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(ok_button, 70, 25);
@@ -1802,8 +1853,7 @@ void WttGtk::open_boot_window()
 
   GtkWidget* cancel_button = gtk_button_new_with_label("Cancel");
   gtk_widget_set_size_request(cancel_button, 70, 25);
-  g_signal_connect(
-      cancel_button, "clicked", G_CALLBACK(WttGtk::boot_cancel_cb), this);
+  g_signal_connect(cancel_button, "clicked", G_CALLBACK(WttGtk::boot_cancel_cb), this);
 
   GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), ok_button, FALSE, FALSE, 20);
@@ -1838,25 +1888,23 @@ void WttGtk::boot_cancel_cb(GtkWidget* w, gpointer data)
 }
 
 // Delete callback
-gint WttGtk::boot_delete_cb(GtkWidget* w, GdkEvent* event, gpointer data)
-{
-  return FALSE;
-}
+gint WttGtk::boot_delete_cb(GtkWidget* w, GdkEvent* event, gpointer data) { return FALSE; }
 
 // Destroy callback
 void WttGtk::boot_destroy_cb(GtkWidget* w, gpointer data)
 {
   Wtt* wtt = (Wtt*)data;
 
-  if (wtt->boot_volumelist && wtt->boot_volumecount) {
+  if (wtt->boot_volumelist && wtt->boot_volumecount)
+  {
     free((char*)wtt->boot_volumelist);
     wtt->boot_volumelist = 0;
   }
   ((WttGtk*)wtt)->boot_dia = 0;
 }
 
-void WttGtk::boot_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path,
-    GtkTreeViewColumn* column, gpointer data)
+void WttGtk::boot_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column,
+                                   gpointer data)
 {
   boot_ok_cb(0, data);
 }
@@ -1886,28 +1934,32 @@ void WttGtk::boot_ok_cb(GtkWidget* w, gpointer data)
 
   g_object_get(((WttGtk*)wtt)->boot_list, "model", &store, NULL);
 
-  GtkTreeSelection* selection
-      = gtk_tree_view_get_selection(GTK_TREE_VIEW(((WttGtk*)wtt)->boot_list));
-  if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(((WttGtk*)wtt)->boot_list));
+  if (gtk_tree_selection_get_selected(selection, NULL, &iter))
+  {
     gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, 0, &text, -1);
     strcpy(nodeconfigname, "");
-    for (j = 0; j < wtt->boot_volumecount; j++) {
-      if (!streq(volumelist_ptr->p1, nodeconfigname)) {
+    for (j = 0; j < wtt->boot_volumecount; j++)
+    {
+      if (!streq(volumelist_ptr->p1, nodeconfigname))
+      {
         nodecount++;
 
         strcpy(nodeconfigname, volumelist_ptr->p1);
-        if (streq(nodeconfigname, text)) {
+        if (streq(nodeconfigname, text))
+        {
           node_type = atoi(volumelist_ptr->p6);
           wb_build build(*(wb_session*)wtt->ldhses, wtt->focused_wnav);
           build.opt = wtt->focused_wnav->gbl.build;
-          build.node(nodeconfigname, node_type, wtt->boot_volumelist,
-              wtt->boot_volumecount);
-          if (build.evenSts()) {
+          build.node(nodeconfigname, node_type, wtt->boot_volumelist, wtt->boot_volumecount);
+          if (build.evenSts())
+          {
             gtk_widget_destroy(((WttGtk*)wtt)->boot_dia);
             sprintf(msg, "Error building node %s", nodeconfigname);
             wtt->message('E', msg);
             return;
-          } else if (build.sts() != PWRB__NOBUILT)
+          }
+          else if (build.sts() != PWRB__NOBUILT)
             bootfile_count++;
         }
       }
@@ -1916,7 +1968,8 @@ void WttGtk::boot_ok_cb(GtkWidget* w, gpointer data)
   }
 
   gtk_widget_destroy(((WttGtk*)wtt)->boot_dia);
-  if (!bootfile_count) {
+  if (!bootfile_count)
+  {
     wtt->message('E', "Nothing to build");
     return;
   }
@@ -1925,20 +1978,18 @@ void WttGtk::boot_ok_cb(GtkWidget* w, gpointer data)
 }
 
 /************************************************************************
-*
-* Name: update_options_form
-*
-* Description: This routine must be called when the configurator/navigator is
-*	       managed.
-*
-*************************************************************************/
+ *
+ * Name: update_options_form
+ *
+ * Description: This routine must be called when the configurator/navigator is
+ *	       managed.
+ *
+ *************************************************************************/
 void WttGtk::update_options_form()
 {
   // Hierarchies
-  gtk_toggle_button_set_active(
-      GTK_TOGGLE_BUTTON(enable_comment_w), enable_comment);
-  gtk_toggle_button_set_active(
-      GTK_TOGGLE_BUTTON(enable_revisions_w), enable_revisions);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(enable_comment_w), enable_comment);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(enable_revisions_w), enable_revisions);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(show_plant_w), wnav_mapped);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(show_node_w), wnavnode_mapped);
 
@@ -1949,20 +2000,17 @@ void WttGtk::update_options_form()
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(show_objref_w), show_objref);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(show_objxref_w), show_objxref);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(show_attrref_w), show_attrref);
-  gtk_toggle_button_set_active(
-      GTK_TOGGLE_BUTTON(show_attrxref_w), show_attrxref);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(show_attrxref_w), show_attrxref);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_force_w), build_force);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_debug_w), build_debug);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_syntax_w), build_syntax);
-  gtk_toggle_button_set_active(
-      GTK_TOGGLE_BUTTON(build_crossref_w), build_crossref);
-  gtk_toggle_button_set_active(
-      GTK_TOGGLE_BUTTON(build_crossrefsim_w), build_crossref_sim);
-  gtk_toggle_button_set_active(
-      GTK_TOGGLE_BUTTON(build_crossrefgraph_w), build_crossref_graph);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_crossref_w), build_crossref);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_crossrefsim_w), build_crossref_sim);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_crossrefgraph_w), build_crossref_graph);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_manual_w), build_manual);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_nocopy_w), build_nocopy);
-  switch (color_theme) {
+  switch (color_theme)
+  {
   case 15:
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dark_theme_w), 0);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(light_theme_w), 1);
@@ -1978,45 +2026,29 @@ void WttGtk::update_options_form()
 }
 
 /************************************************************************
-*
-* Name: set_options
-*
-*
-*************************************************************************/
+ *
+ * Name: set_options
+ *
+ *
+ *************************************************************************/
 void WttGtk::set_options()
 {
-  enable_comment
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(enable_comment_w));
-  enable_revisions = (int)gtk_toggle_button_get_active(
-      GTK_TOGGLE_BUTTON(enable_revisions_w));
-  show_class
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_class_w));
-  show_alias
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_alias_w));
-  show_descrip
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_descrip_w));
-  show_objref
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_objref_w));
-  show_objxref
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_objxref_w));
-  show_attrref
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_attrref_w));
-  show_attrxref
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_attrxref_w));
-  build_force
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_force_w));
-  build_debug
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_debug_w));
-  build_syntax
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_syntax_w));
-  build_crossref
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_crossref_w));
-  build_crossref_sim = (int)gtk_toggle_button_get_active(
-      GTK_TOGGLE_BUTTON(build_crossrefsim_w));
-  build_crossref_graph = (int)gtk_toggle_button_get_active(
-      GTK_TOGGLE_BUTTON(build_crossrefgraph_w));
-  build_manual
-      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_manual_w));
+  enable_comment = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(enable_comment_w));
+  enable_revisions = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(enable_revisions_w));
+  show_class = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_class_w));
+  show_alias = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_alias_w));
+  show_descrip = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_descrip_w));
+  show_objref = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_objref_w));
+  show_objxref = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_objxref_w));
+  show_attrref = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_attrref_w));
+  show_attrxref = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(show_attrxref_w));
+  build_force = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_force_w));
+  build_debug = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_debug_w));
+  build_syntax = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_syntax_w));
+  build_crossref = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_crossref_w));
+  build_crossref_sim = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_crossrefsim_w));
+  build_crossref_graph = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_crossrefgraph_w));
+  build_manual = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_manual_w));
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dark_theme_w)))
     color_theme = 16;
   else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(light_theme_w)))
@@ -2024,15 +2056,14 @@ void WttGtk::set_options()
   else
     color_theme = 0;
 
-  wnav->set_options(enable_comment, enable_revisions, show_class, show_alias,
-      show_descrip, show_objref, show_objxref, show_attrref, show_attrxref,
-      build_force, build_debug, build_syntax, build_crossref, build_crossref_sim,
-      build_crossref_graph, build_manual, build_nocopy, color_theme);
-  wnavnode->set_options(enable_comment, enable_revisions, show_class,
-      show_alias, show_descrip, show_objref, show_objxref, show_attrref,
-      show_attrxref, build_force, build_debug, build_syntax, build_crossref,
-      build_crossref_sim, build_crossref_graph, build_manual, build_nocopy,
-      color_theme);
+  wnav->set_options(enable_comment, enable_revisions, show_class, show_alias, show_descrip, show_objref,
+                    show_objxref, show_attrref, show_attrxref, build_force, build_debug, build_syntax,
+                    build_crossref, build_crossref_sim, build_crossref_graph, build_manual, build_nocopy,
+                    color_theme);
+  wnavnode->set_options(enable_comment, enable_revisions, show_class, show_alias, show_descrip, show_objref,
+                        show_objxref, show_attrref, show_attrxref, build_force, build_debug, build_syntax,
+                        build_crossref, build_crossref_sim, build_crossref_graph, build_manual, build_nocopy,
+                        color_theme);
 }
 
 // Callbacks from the options form
@@ -2044,10 +2075,8 @@ void WttGtk::activate_options_ok(GtkWidget* w, gpointer data)
 
   wtt->message(' ', "");
 
-  plant = (int)gtk_toggle_button_get_active(
-      GTK_TOGGLE_BUTTON(((WttGtk*)wtt)->show_plant_w));
-  node = (int)gtk_toggle_button_get_active(
-      GTK_TOGGLE_BUTTON(((WttGtk*)wtt)->show_node_w));
+  plant = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(((WttGtk*)wtt)->show_plant_w));
+  node = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(((WttGtk*)wtt)->show_node_w));
 
   g_object_set(((WttGtk*)wtt)->options_form, "visible", FALSE, NULL);
   wtt->set_twowindows(0, plant, node);
@@ -2061,10 +2090,8 @@ void WttGtk::activate_options_apply(GtkWidget* w, gpointer data)
 
   wtt->message(' ', "");
 
-  plant = (int)gtk_toggle_button_get_active(
-      GTK_TOGGLE_BUTTON(((WttGtk*)wtt)->show_plant_w));
-  node = (int)gtk_toggle_button_get_active(
-      GTK_TOGGLE_BUTTON(((WttGtk*)wtt)->show_node_w));
+  plant = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(((WttGtk*)wtt)->show_plant_w));
+  node = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(((WttGtk*)wtt)->show_node_w));
 
   wtt->set_twowindows(0, plant, node);
   wtt->set_options();
@@ -2086,19 +2113,15 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer wtt)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
-    const char* wt_name, const char* iconname, void* wt_wbctx,
-    pwr_tVolumeId wt_volid, ldh_tVolume wt_volctx, wnav_sStartMenu* root_menu,
-    pwr_tStatus* status)
-    : Wtt(wt_parent_ctx, wt_name, iconname, wt_wbctx, wt_volid, wt_volctx,
-          root_menu, status),
-      parent_wid(wt_parent_wid), india_widget(0), confirm_widget(0),
-      boot_dia(0), options_form(0), set_focus_disabled(0), disfocus_timerid(0),
-      selection_timerid(0), avoid_deadlock(0), clock_cursor(0), realized(0)
+WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid, const char* wt_name, const char* iconname,
+               void* wt_wbctx, pwr_tVolumeId wt_volid, ldh_tVolume wt_volctx, wnav_sStartMenu* root_menu,
+               pwr_tStatus* status)
+    : Wtt(wt_parent_ctx, wt_name, iconname, wt_wbctx, wt_volid, wt_volctx, root_menu, status),
+      parent_wid(wt_parent_wid), india_widget(0), confirm_widget(0), boot_dia(0), options_form(0),
+      set_focus_disabled(0), disfocus_timerid(0), selection_timerid(0), avoid_deadlock(0), clock_cursor(0),
+      realized(0)
 {
   int window_width = 900;
   int window_height = 800;
@@ -2124,10 +2147,12 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   else
     strcpy(version, "");
 
-  if (wbctx && volid) {
+  if (wbctx && volid)
+  {
     // Get the volume class and decide what type of navigator */
     sts = ldh_GetVolumeClass(wbctx, volid, &volclass);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       *status = sts;
       return;
     }
@@ -2135,13 +2160,16 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
       volclass = pwr_eClass_DirectoryVolume; // Fix
 
     sts = ldh_VolumeIdToName(wbctx, volid, volname, sizeof(volname), &size);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       *status = sts;
       return;
     }
-    if (!volctx) {
+    if (!volctx)
+    {
       sts = ldh_AttachVolume(wbctx, volid, &volctx);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("-- Volume '%s' is already attached\n", volname);
         putchar('\7');
         *status = sts;
@@ -2149,16 +2177,17 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
       }
     }
 
-    sts = ldh_OpenSession(
-        &ldhses, volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Navigator);
-    if (EVEN(sts)) {
+    sts = ldh_OpenSession(&ldhses, volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Navigator);
+    if (EVEN(sts))
+    {
       printf("Navigator: Can't open session\n");
       *status = sts;
       return;
     }
     ldh_AddOtherSessionCallback(ldhses, (void*)this, Wtt::ldh_other_session_cb);
 
-    switch (volclass) {
+    switch (volclass)
+    {
     case pwr_eClass_DirectoryVolume:
       wb_type = wb_eType_Directory;
       sprintf(title, "PwR Directory,   %s  %s", name, version);
@@ -2172,11 +2201,13 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
       break;
     case pwr_eClass_ClassVolume:
     case pwr_eClass_DetachedClassVolume:
-      if (ldh_VolRepType(ldhses) == ldh_eVolRep_Mem
-          || ldh_VolRepType(ldhses) == ldh_eVolRep_Ced) {
+      if (ldh_VolRepType(ldhses) == ldh_eVolRep_Mem || ldh_VolRepType(ldhses) == ldh_eVolRep_Ced)
+      {
         wb_type = wb_eType_ClassEditor;
         sprintf(title, "PwR ClassEditor %s,   %s  %s", volname, name, version);
-      } else {
+      }
+      else
+      {
         wb_type = wb_eType_Class;
         sprintf(title, "PwR %s,   %s  %s", volname, name, version);
       }
@@ -2198,8 +2229,10 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
       window_height = 400;
       disable_w2 = 1;
       break;
-    case pwr_eClass_ExternVolume: {
-      switch (volid) {
+    case pwr_eClass_ExternVolume:
+    {
+      switch (volid)
+      {
       case ldh_cProjectListVolume:
         wb_type = wb_eType_ExternVolume;
         strcpy(layout_w1, "PrListNavigatorW1");
@@ -2256,7 +2289,9 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
       strcpy(title_w2, "Node Configuration");
       sprintf(title, "PwR %s,   %s  %s", volname, name, version);
     }
-  } else {
+  }
+  else
+  {
     strcpy(layout_w1, "NavigatorW1");
     strcpy(layout_w2, "NavigatorW2");
     strcpy(title_w1, "Plant Configuration");
@@ -2265,13 +2300,12 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   }
 
   // Gtk
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      window_height, "default-width", window_width, "title", title, NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height, "default-width",
+                                      window_width, "title", title, NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(
-      toplevel, "focus-in-event", G_CALLBACK(WttGtk::action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(WttGtk::action_inputfocus), this);
 
   int dark_theme = wutl_get_dark_theme(toplevel);
 
@@ -2284,42 +2318,30 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
 
   // File Entry
   GtkWidget* file_open_volume = gtk_menu_item_new_with_mnemonic("_Open Volume");
-  g_signal_connect(file_open_volume, "activate",
-      G_CALLBACK(WttGtk::activate_openvolume), this);
+  g_signal_connect(file_open_volume, "activate", G_CALLBACK(WttGtk::activate_openvolume), this);
 
-  GtkWidget* file_close
-      = gtk_menu_item_new_with_mnemonic("_Close");
-  g_signal_connect(
-      file_close, "activate", G_CALLBACK(WttGtk::activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
+  g_signal_connect(file_close, "activate", G_CALLBACK(WttGtk::activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_open_dbsfile
-      = gtk_menu_item_new_with_mnemonic("_Dbs File...");
-  g_signal_connect(file_open_dbsfile, "activate",
-      G_CALLBACK(WttGtk::activate_openfile_dbs), this);
+  GtkWidget* file_open_dbsfile = gtk_menu_item_new_with_mnemonic("_Dbs File...");
+  g_signal_connect(file_open_dbsfile, "activate", G_CALLBACK(WttGtk::activate_openfile_dbs), this);
 
-  GtkWidget* file_open_wblfile
-      = gtk_menu_item_new_with_mnemonic("_Wbl File...");
-  g_signal_connect(file_open_wblfile, "activate",
-      G_CALLBACK(WttGtk::activate_openfile_wbl), this);
+  GtkWidget* file_open_wblfile = gtk_menu_item_new_with_mnemonic("_Wbl File...");
+  g_signal_connect(file_open_wblfile, "activate", G_CALLBACK(WttGtk::activate_openfile_wbl), this);
 
   GtkWidget* file_open_buffer = gtk_menu_item_new_with_mnemonic("_Buffer...");
-  g_signal_connect(file_open_buffer, "activate",
-      G_CALLBACK(WttGtk::activate_openbuffer), this);
+  g_signal_connect(file_open_buffer, "activate", G_CALLBACK(WttGtk::activate_openbuffer), this);
 
   GtkWidget* file_open_pl = gtk_menu_item_new_with_mnemonic("_ProjectList");
-  g_signal_connect(
-      file_open_pl, "activate", G_CALLBACK(WttGtk::activate_openpl), this);
+  g_signal_connect(file_open_pl, "activate", G_CALLBACK(WttGtk::activate_openpl), this);
 
-  GtkWidget* file_open_gvl
-      = gtk_menu_item_new_with_mnemonic("_GlobalVolumeList");
-  g_signal_connect(
-      file_open_gvl, "activate", G_CALLBACK(WttGtk::activate_opengvl), this);
+  GtkWidget* file_open_gvl = gtk_menu_item_new_with_mnemonic("_GlobalVolumeList");
+  g_signal_connect(file_open_gvl, "activate", G_CALLBACK(WttGtk::activate_opengvl), this);
 
   GtkWidget* file_open_udb = gtk_menu_item_new_with_mnemonic("_UserDataBase");
-  g_signal_connect(
-      file_open_udb, "activate", G_CALLBACK(WttGtk::activate_openudb), this);
+  g_signal_connect(file_open_udb, "activate", G_CALLBACK(WttGtk::activate_openudb), this);
 
   // Submenu Open
   GtkWidget* file_open = gtk_menu_item_new_with_mnemonic("_Open");
@@ -2331,35 +2353,27 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   gtk_menu_shell_append(GTK_MENU_SHELL(file_open_menu), file_open_gvl);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_open_menu), file_open_udb);
 
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(file_open), GTK_WIDGET(file_open_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_open), GTK_WIDGET(file_open_menu));
 
-  GtkWidget* file_volume_attr
-      = gtk_menu_item_new_with_mnemonic("Volume _Attributes...");
-  g_signal_connect(file_volume_attr, "activate",
-      G_CALLBACK(WttGtk::activate_openvolobject), this);
+  GtkWidget* file_volume_attr = gtk_menu_item_new_with_mnemonic("Volume _Attributes...");
+  g_signal_connect(file_volume_attr, "activate", G_CALLBACK(WttGtk::activate_openvolobject), this);
 
   GtkWidget* file_print = gtk_menu_item_new_with_mnemonic("_Print");
-  g_signal_connect(
-      file_print, "activate", G_CALLBACK(WttGtk::activate_print), this);
+  g_signal_connect(file_print, "activate", G_CALLBACK(WttGtk::activate_print), this);
 
   menu_save_w = gtk_menu_item_new_with_mnemonic("_Save");
-  g_signal_connect(
-      menu_save_w, "activate", G_CALLBACK(WttGtk::activate_save), this);
-  gtk_widget_add_accelerator(menu_save_w, "activate", accel_g, 's',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(menu_save_w, "activate", G_CALLBACK(WttGtk::activate_save), this);
+  gtk_widget_add_accelerator(menu_save_w, "activate", accel_g, 's', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   menu_revert_w = gtk_menu_item_new_with_mnemonic("_Revert");
-  g_signal_connect(
-      menu_revert_w, "activate", G_CALLBACK(WttGtk::activate_revert), this);
+  g_signal_connect(menu_revert_w, "activate", G_CALLBACK(WttGtk::activate_revert), this);
 
   GtkWidget* file_history = gtk_menu_item_new_with_mnemonic("_History");
-  g_signal_connect(
-      file_history, "activate", G_CALLBACK(WttGtk::activate_history), this);
+  g_signal_connect(file_history, "activate", G_CALLBACK(WttGtk::activate_history), this);
 
   GtkWidget* file_revisions = gtk_menu_item_new_with_mnemonic("R_evisions");
-  g_signal_connect(
-      file_revisions, "activate", G_CALLBACK(WttGtk::activate_revisions), this);
+  g_signal_connect(file_revisions, "activate", G_CALLBACK(WttGtk::activate_revisions), this);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_volume);
@@ -2378,80 +2392,59 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
 
   // Edit Entry
   menu_edit_w = gtk_menu_item_new_with_mnemonic("_Edit Mode");
-  g_signal_connect(
-      menu_edit_w, "activate", G_CALLBACK(WttGtk::activate_configure), this);
-  gtk_widget_add_accelerator(menu_edit_w, "activate", accel_g, 'e',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(menu_edit_w, "activate", G_CALLBACK(WttGtk::activate_configure), this);
+  gtk_widget_add_accelerator(menu_edit_w, "activate", accel_g, 'e', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   // Submenu Search
-  GtkWidget* edit_search_findobject
-      = gtk_menu_item_new_with_mnemonic("_Find Object");
-  g_signal_connect(edit_search_findobject, "activate",
-      G_CALLBACK(WttGtk::activate_find), this);
+  GtkWidget* edit_search_findobject = gtk_menu_item_new_with_mnemonic("_Find Object");
+  g_signal_connect(edit_search_findobject, "activate", G_CALLBACK(WttGtk::activate_find), this);
   gtk_widget_add_accelerator(edit_search_findobject, "activate", accel_g, 'f',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* edit_search_findregex
-      = gtk_menu_item_new_with_mnemonic("Find _Regular expression");
-  g_signal_connect(edit_search_findregex, "activate",
-      G_CALLBACK(WttGtk::activate_findregex), this);
+  GtkWidget* edit_search_findregex = gtk_menu_item_new_with_mnemonic("Find _Regular expression");
+  g_signal_connect(edit_search_findregex, "activate", G_CALLBACK(WttGtk::activate_findregex), this);
 
-  GtkWidget* edit_search_findnext
-      = gtk_menu_item_new_with_mnemonic("Find _Next");
-  g_signal_connect(edit_search_findnext, "activate",
-      G_CALLBACK(WttGtk::activate_findnext), this);
+  GtkWidget* edit_search_findnext = gtk_menu_item_new_with_mnemonic("Find _Next");
+  g_signal_connect(edit_search_findnext, "activate", G_CALLBACK(WttGtk::activate_findnext), this);
   gtk_widget_add_accelerator(edit_search_findnext, "activate", accel_g, 'f',
-      GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* edit_search = gtk_menu_item_new_with_mnemonic("_Search");
   GtkMenu* edit_search_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(edit_search_menu), edit_search_findobject);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(edit_search_menu), edit_search_findregex);
+  gtk_menu_shell_append(GTK_MENU_SHELL(edit_search_menu), edit_search_findobject);
+  gtk_menu_shell_append(GTK_MENU_SHELL(edit_search_menu), edit_search_findregex);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_search_menu), edit_search_findnext);
 
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(edit_search), GTK_WIDGET(edit_search_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_search), GTK_WIDGET(edit_search_menu));
 
   // Submenu CopyMode
   GSList* cm_group = NULL;
-  cm_normal_syntax
-      = gtk_radio_menu_item_new_with_mnemonic(cm_group, "_Normal Syntax");
-  cm_group
-      = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(cm_normal_syntax));
-  g_signal_connect(
-      cm_normal_syntax, "activate", G_CALLBACK(WttGtk::activate_selmode), this);
+  cm_normal_syntax = gtk_radio_menu_item_new_with_mnemonic(cm_group, "_Normal Syntax");
+  cm_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(cm_normal_syntax));
+  g_signal_connect(cm_normal_syntax, "activate", G_CALLBACK(WttGtk::activate_selmode), this);
 
-  cm_gms_syntax
-      = gtk_radio_menu_item_new_with_mnemonic(cm_group, "_GMS Syntax");
+  cm_gms_syntax = gtk_radio_menu_item_new_with_mnemonic(cm_group, "_GMS Syntax");
   cm_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(cm_gms_syntax));
-  g_signal_connect(
-      cm_gms_syntax, "activate", G_CALLBACK(WttGtk::activate_selmode), this);
+  g_signal_connect(cm_gms_syntax, "activate", G_CALLBACK(WttGtk::activate_selmode), this);
 
-  cm_extern_syntax
-      = gtk_radio_menu_item_new_with_mnemonic(cm_group, "_Extern Syntax");
-  g_signal_connect(
-      cm_extern_syntax, "activate", G_CALLBACK(WttGtk::activate_selmode), this);
+  cm_extern_syntax = gtk_radio_menu_item_new_with_mnemonic(cm_group, "_Extern Syntax");
+  g_signal_connect(cm_extern_syntax, "activate", G_CALLBACK(WttGtk::activate_selmode), this);
 
   cm_add_volume = gtk_check_menu_item_new_with_mnemonic("Add _Volume");
-  g_signal_connect(
-      cm_add_volume, "activate", G_CALLBACK(WttGtk::activate_selmode), this);
+  g_signal_connect(cm_add_volume, "activate", G_CALLBACK(WttGtk::activate_selmode), this);
   cm_add_attribute = gtk_check_menu_item_new_with_mnemonic("_Add Attribute");
-  g_signal_connect(
-      cm_add_attribute, "activate", G_CALLBACK(WttGtk::activate_selmode), this);
+  g_signal_connect(cm_add_attribute, "activate", G_CALLBACK(WttGtk::activate_selmode), this);
 
   cm_add_type = gtk_check_menu_item_new_with_mnemonic("Add _Type");
-  g_signal_connect(
-      cm_add_type, "activate", G_CALLBACK(WttGtk::activate_selmode), this);
+  g_signal_connect(cm_add_type, "activate", G_CALLBACK(WttGtk::activate_selmode), this);
 
   GtkWidget* edit_cm = gtk_menu_item_new_with_mnemonic("_CopyMode");
   GtkMenu* edit_cm_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_cm_menu), cm_normal_syntax);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_cm_menu), cm_gms_syntax);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_cm_menu), cm_extern_syntax);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(edit_cm_menu), gtk_separator_menu_item_new());
+  gtk_menu_shell_append(GTK_MENU_SHELL(edit_cm_menu), gtk_separator_menu_item_new());
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_cm_menu), cm_add_volume);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_cm_menu), cm_add_attribute);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_cm_menu), cm_add_type);
@@ -2460,49 +2453,42 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
 
   // Submenu Create Object
   menu_creaobjafter_w = gtk_menu_item_new_with_mnemonic("_After");
-  g_signal_connect(menu_creaobjafter_w, "activate",
-      G_CALLBACK(WttGtk::activate_creaobjafter), this);
-  gtk_widget_add_accelerator(menu_creaobjafter_w, "activate", accel_g, 'd',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(menu_creaobjafter_w, "activate", G_CALLBACK(WttGtk::activate_creaobjafter), this);
+  gtk_widget_add_accelerator(menu_creaobjafter_w, "activate", accel_g, 'd', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   menu_creaobjfirst_w = gtk_menu_item_new_with_mnemonic("_First Child");
-  g_signal_connect(menu_creaobjfirst_w, "activate",
-      G_CALLBACK(WttGtk::activate_creaobjfirst), this);
+  g_signal_connect(menu_creaobjfirst_w, "activate", G_CALLBACK(WttGtk::activate_creaobjfirst), this);
   gtk_widget_add_accelerator(menu_creaobjfirst_w, "activate", accel_g, 'd',
-      GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* edit_creaobj = gtk_menu_item_new_with_mnemonic("C_reate Object");
   GtkMenu* edit_creaobj_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_creaobj_menu), menu_creaobjafter_w);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_creaobj_menu), menu_creaobjfirst_w);
 
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(edit_creaobj), GTK_WIDGET(edit_creaobj_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_creaobj), GTK_WIDGET(edit_creaobj_menu));
 
   // Submenu Move Object
   menu_moveobjup_w = gtk_menu_item_new_with_mnemonic("_Up");
-  g_signal_connect(menu_moveobjup_w, "activate",
-      G_CALLBACK(WttGtk::activate_moveobjup), this);
+  g_signal_connect(menu_moveobjup_w, "activate", G_CALLBACK(WttGtk::activate_moveobjup), this);
   gtk_widget_add_accelerator(menu_moveobjup_w, "activate", accel_g, GDK_KEY_Up,
-      GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
 
   menu_moveobjdown_w = gtk_menu_item_new_with_mnemonic("_Down");
-  g_signal_connect(menu_moveobjdown_w, "activate",
-      G_CALLBACK(WttGtk::activate_moveobjdown), this);
+  g_signal_connect(menu_moveobjdown_w, "activate", G_CALLBACK(WttGtk::activate_moveobjdown), this);
   gtk_widget_add_accelerator(menu_moveobjdown_w, "activate", accel_g, GDK_KEY_Down,
-      GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
 
   menu_moveobjinto_w = gtk_menu_item_new_with_mnemonic("_Into");
-  g_signal_connect(menu_moveobjinto_w, "activate",
-      G_CALLBACK(WttGtk::activate_moveobjinto), this);
+  g_signal_connect(menu_moveobjinto_w, "activate", G_CALLBACK(WttGtk::activate_moveobjinto), this);
   gtk_widget_add_accelerator(menu_moveobjinto_w, "activate", accel_g, GDK_KEY_Right,
-      GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
 
   menu_moveobjontop_w = gtk_menu_item_new_with_mnemonic("_OnTop");
-  g_signal_connect(menu_moveobjontop_w, "activate",
-      G_CALLBACK(WttGtk::activate_moveobjontop), this);
+  g_signal_connect(menu_moveobjontop_w, "activate", G_CALLBACK(WttGtk::activate_moveobjontop), this);
   gtk_widget_add_accelerator(menu_moveobjontop_w, "activate", accel_g, GDK_KEY_Left,
-      GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* edit_moveobj = gtk_menu_item_new_with_mnemonic("_Move Object");
   GtkMenu* edit_moveobj_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
@@ -2511,52 +2497,43 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_moveobj_menu), menu_moveobjinto_w);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_moveobj_menu), menu_moveobjontop_w);
 
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(edit_moveobj), GTK_WIDGET(edit_moveobj_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_moveobj), GTK_WIDGET(edit_moveobj_menu));
 
   menu_deleteobj_w = gtk_menu_item_new_with_mnemonic("_Delete Object");
-  g_signal_connect(menu_deleteobj_w, "activate",
-      G_CALLBACK(WttGtk::activate_deleteobj), this);
-  gtk_widget_add_accelerator(menu_deleteobj_w, "activate", accel_g, GDK_KEY_Delete,
-      GdkModifierType(0), GTK_ACCEL_VISIBLE);
+  g_signal_connect(menu_deleteobj_w, "activate", G_CALLBACK(WttGtk::activate_deleteobj), this);
+  gtk_widget_add_accelerator(menu_deleteobj_w, "activate", accel_g, GDK_KEY_Delete, GdkModifierType(0),
+                             GTK_ACCEL_VISIBLE);
 
   GtkWidget* edit_collapse = gtk_menu_item_new_with_mnemonic("Co_llapse");
-  g_signal_connect(
-      edit_collapse, "activate", G_CALLBACK(WttGtk::activate_collapse), this);
+  g_signal_connect(edit_collapse, "activate", G_CALLBACK(WttGtk::activate_collapse), this);
 
   menu_cut_w = gtk_menu_item_new_with_mnemonic("C_ut");
-  g_signal_connect(
-      menu_cut_w, "activate", G_CALLBACK(WttGtk::activate_cut), this);
-  gtk_widget_add_accelerator(menu_cut_w, "activate", accel_g, 'x',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(menu_cut_w, "activate", G_CALLBACK(WttGtk::activate_cut), this);
+  gtk_widget_add_accelerator(menu_cut_w, "activate", accel_g, 'x', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   menu_copy_w = gtk_menu_item_new_with_mnemonic("_Copy");
-  g_signal_connect(
-      menu_copy_w, "activate", G_CALLBACK(WttGtk::activate_copy), this);
-  gtk_widget_add_accelerator(menu_copy_w, "activate", accel_g, 'c',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(menu_copy_w, "activate", G_CALLBACK(WttGtk::activate_copy), this);
+  gtk_widget_add_accelerator(menu_copy_w, "activate", accel_g, 'c', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   menu_copykeep_w = gtk_menu_item_new_with_mnemonic("Copy Keep Reference");
-  g_signal_connect(
-      menu_copykeep_w, "activate", G_CALLBACK(WttGtk::activate_copykeep), this);
+  g_signal_connect(menu_copykeep_w, "activate", G_CALLBACK(WttGtk::activate_copykeep), this);
 
   menu_paste_w = gtk_menu_item_new_with_mnemonic("_Paste");
-  g_signal_connect(
-      menu_paste_w, "activate", G_CALLBACK(WttGtk::activate_paste), this);
-  gtk_widget_add_accelerator(menu_paste_w, "activate", accel_g, 'v',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(menu_paste_w, "activate", G_CALLBACK(WttGtk::activate_paste), this);
+  gtk_widget_add_accelerator(menu_paste_w, "activate", accel_g, 'v', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   menu_pasteinto_w = gtk_menu_item_new_with_mnemonic("Paste Into");
-  g_signal_connect(menu_pasteinto_w, "activate",
-      G_CALLBACK(WttGtk::activate_pasteinto), this);
+  g_signal_connect(menu_pasteinto_w, "activate", G_CALLBACK(WttGtk::activate_pasteinto), this);
   gtk_widget_add_accelerator(menu_pasteinto_w, "activate", accel_g, 'v',
-      GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
 
   menu_rename_w = gtk_menu_item_new_with_mnemonic("Rename");
-  g_signal_connect(
-      menu_rename_w, "activate", G_CALLBACK(WttGtk::activate_rename), this);
+  g_signal_connect(menu_rename_w, "activate", G_CALLBACK(WttGtk::activate_rename), this);
   gtk_widget_add_accelerator(menu_rename_w, "activate", accel_g, 'n',
-      GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* edit_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), menu_edit_w);
@@ -2580,139 +2557,104 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   // Functions menu
 
   menu_buildnode_w = gtk_menu_item_new_with_mnemonic("_Build Node");
-  g_signal_connect(menu_buildnode_w, "activate",
-      G_CALLBACK(WttGtk::activate_buildnode), this);
+  g_signal_connect(menu_buildnode_w, "activate", G_CALLBACK(WttGtk::activate_buildnode), this);
   gtk_widget_add_accelerator(menu_buildnode_w, "activate", accel_g, 'b',
-      GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
 
   menu_buildvolume_w = gtk_menu_item_new_with_mnemonic("B_uild Volume");
-  g_signal_connect(menu_buildvolume_w, "activate",
-      G_CALLBACK(WttGtk::activate_buildvolume), this);
+  g_signal_connect(menu_buildvolume_w, "activate", G_CALLBACK(WttGtk::activate_buildvolume), this);
 
   menu_buildobject_w = gtk_menu_item_new_with_mnemonic("Bu_ild Object");
-  g_signal_connect(menu_buildobject_w, "activate",
-      G_CALLBACK(WttGtk::activate_buildobject), this);
+  g_signal_connect(menu_buildobject_w, "activate", G_CALLBACK(WttGtk::activate_buildobject), this);
 
   menu_buildproject_w = gtk_menu_item_new_with_mnemonic("Bui_ld Directories");
-  g_signal_connect(menu_buildproject_w, "activate",
-      G_CALLBACK(WttGtk::activate_builddirectories), this);
+  g_signal_connect(menu_buildproject_w, "activate", G_CALLBACK(WttGtk::activate_builddirectories), this);
 
   menu_buildimport_w = gtk_menu_item_new_with_mnemonic("_Import");
-  g_signal_connect(menu_buildimport_w, "activate",
-      G_CALLBACK(WttGtk::activate_buildimport), this);
+  g_signal_connect(menu_buildimport_w, "activate", G_CALLBACK(WttGtk::activate_buildimport), this);
 
   menu_buildexport_w = gtk_menu_item_new_with_mnemonic("_Export");
-  g_signal_connect(menu_buildexport_w, "activate",
-      G_CALLBACK(WttGtk::activate_buildexport), this);
+  g_signal_connect(menu_buildexport_w, "activate", G_CALLBACK(WttGtk::activate_buildexport), this);
 
   GtkWidget* functions_build = gtk_menu_item_new_with_mnemonic("_Build");
   GtkMenu* functions_build_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(functions_build_menu), menu_buildnode_w);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(functions_build_menu), menu_buildvolume_w);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(functions_build_menu), menu_buildobject_w);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(functions_build_menu), menu_buildproject_w);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(functions_build_menu), menu_buildimport_w);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(functions_build_menu), menu_buildexport_w);
+  gtk_menu_shell_append(GTK_MENU_SHELL(functions_build_menu), menu_buildvolume_w);
+  gtk_menu_shell_append(GTK_MENU_SHELL(functions_build_menu), menu_buildobject_w);
+  gtk_menu_shell_append(GTK_MENU_SHELL(functions_build_menu), menu_buildproject_w);
+  gtk_menu_shell_append(GTK_MENU_SHELL(functions_build_menu), menu_buildimport_w);
+  gtk_menu_shell_append(GTK_MENU_SHELL(functions_build_menu), menu_buildexport_w);
 
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(functions_build), GTK_WIDGET(functions_build_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions_build), GTK_WIDGET(functions_build_menu));
 
   menu_utilities_w = gtk_menu_item_new_with_mnemonic("_Utilities...");
-  g_signal_connect(menu_utilities_w, "activate",
-      G_CALLBACK(WttGtk::activate_utilities), this);
-  gtk_widget_add_accelerator(menu_utilities_w, "activate", accel_g, 'u',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(menu_utilities_w, "activate", G_CALLBACK(WttGtk::activate_utilities), this);
+  gtk_widget_add_accelerator(menu_utilities_w, "activate", accel_g, 'u', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_spreadsheet
-      = gtk_menu_item_new_with_mnemonic("_Spreadsheet...");
-  g_signal_connect(functions_spreadsheet, "activate",
-      G_CALLBACK(WttGtk::activate_spreadsheet), this);
+  GtkWidget* functions_spreadsheet = gtk_menu_item_new_with_mnemonic("_Spreadsheet...");
+  g_signal_connect(functions_spreadsheet, "activate", G_CALLBACK(WttGtk::activate_spreadsheet), this);
 
   menu_distribute_w = gtk_menu_item_new_with_mnemonic("_Distribute...");
-  g_signal_connect(menu_distribute_w, "activate",
-      G_CALLBACK(WttGtk::activate_distribute), this);
+  g_signal_connect(menu_distribute_w, "activate", G_CALLBACK(WttGtk::activate_distribute), this);
 
   menu_utilities_w = gtk_menu_item_new_with_mnemonic("_Utilities...");
-  g_signal_connect(menu_utilities_w, "activate",
-      G_CALLBACK(WttGtk::activate_utilities), this);
-  gtk_widget_add_accelerator(menu_utilities_w, "activate", accel_g, 'u',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(menu_utilities_w, "activate", G_CALLBACK(WttGtk::activate_utilities), this);
+  gtk_widget_add_accelerator(menu_utilities_w, "activate", accel_g, 'u', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_openobject
-      = gtk_menu_item_new_with_mnemonic("_Open Object...");
-  g_signal_connect(functions_openobject, "activate",
-      G_CALLBACK(WttGtk::activate_openobject), this);
+  GtkWidget* functions_openobject = gtk_menu_item_new_with_mnemonic("_Open Object...");
+  g_signal_connect(functions_openobject, "activate", G_CALLBACK(WttGtk::activate_openobject), this);
   gtk_widget_add_accelerator(functions_openobject, "activate", accel_g, 'a',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   menu_openplc_w = gtk_menu_item_new_with_mnemonic("Open _Program");
-  g_signal_connect(
-      menu_openplc_w, "activate", G_CALLBACK(WttGtk::activate_openplc), this);
-  gtk_widget_add_accelerator(menu_openplc_w, "activate", accel_g, 'l',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(menu_openplc_w, "activate", G_CALLBACK(WttGtk::activate_openplc), this);
+  gtk_widget_add_accelerator(menu_openplc_w, "activate", accel_g, 'l', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkWidget* functions_openge = gtk_menu_item_new_with_mnemonic("Open _Ge...");
-  g_signal_connect(
-      functions_openge, "activate", G_CALLBACK(WttGtk::activate_openge), this);
-  gtk_widget_add_accelerator(functions_openge, "activate", accel_g, 'k',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(functions_openge, "activate", G_CALLBACK(WttGtk::activate_openge), this);
+  gtk_widget_add_accelerator(functions_openge, "activate", accel_g, 'k', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   menu_classeditor_w = gtk_menu_item_new_with_mnemonic("Open _ClassEditor");
-  g_signal_connect(menu_classeditor_w, "activate",
-      G_CALLBACK(WttGtk::activate_openclasseditor), this);
+  g_signal_connect(menu_classeditor_w, "activate", G_CALLBACK(WttGtk::activate_openclasseditor), this);
 
   menu_updateclasses_w = gtk_menu_item_new_with_mnemonic("U_pdate Classes");
-  g_signal_connect(menu_updateclasses_w, "activate",
-      G_CALLBACK(WttGtk::activate_updateclasses), this);
+  g_signal_connect(menu_updateclasses_w, "activate", G_CALLBACK(WttGtk::activate_updateclasses), this);
 
-  GtkWidget* functions_showcrossref
-      = gtk_menu_item_new_with_mnemonic("Show C_rossreferences");
-  g_signal_connect(functions_showcrossref, "activate",
-      G_CALLBACK(WttGtk::activate_showcrossref), this);
+  GtkWidget* functions_showcrossref = gtk_menu_item_new_with_mnemonic("Show C_rossreferences");
+  g_signal_connect(functions_showcrossref, "activate", G_CALLBACK(WttGtk::activate_showcrossref), this);
   gtk_widget_add_accelerator(functions_showcrossref, "activate", accel_g, 'r',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_syntax
-      = gtk_menu_item_new_with_mnemonic("S_yntax Check");
-  g_signal_connect(
-      functions_syntax, "activate", G_CALLBACK(WttGtk::activate_syntax), this);
+  GtkWidget* functions_syntax = gtk_menu_item_new_with_mnemonic("S_yntax Check");
+  g_signal_connect(functions_syntax, "activate", G_CALLBACK(WttGtk::activate_syntax), this);
 
   menu_change_value_w = gtk_menu_item_new_with_mnemonic("Change _Value");
-  g_signal_connect(menu_change_value_w, "activate",
-      G_CALLBACK(WttGtk::activate_change_value), this);
-  gtk_widget_add_accelerator(menu_change_value_w, "activate", accel_g, 'q',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(menu_change_value_w, "activate", G_CALLBACK(WttGtk::activate_change_value), this);
+  gtk_widget_add_accelerator(menu_change_value_w, "activate", accel_g, 'q', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkWidget* functions_command = gtk_menu_item_new_with_mnemonic("Co_mmand");
-  g_signal_connect(functions_command, "activate",
-      G_CALLBACK(WttGtk::activate_command), this);
-  gtk_widget_add_accelerator(functions_command, "activate", accel_g, 'b',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(functions_command, "activate", G_CALLBACK(WttGtk::activate_command), this);
+  gtk_widget_add_accelerator(functions_command, "activate", accel_g, 'b', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   // More submenu
   menu_clonevolume_w = gtk_menu_item_new_with_mnemonic("C_lone Volume");
-  g_signal_connect(menu_clonevolume_w, "activate",
-      G_CALLBACK(WttGtk::activate_clonevolume), this);
+  g_signal_connect(menu_clonevolume_w, "activate", G_CALLBACK(WttGtk::activate_clonevolume), this);
 
-  GtkWidget* functions_backupfile
-      = gtk_menu_item_new_with_mnemonic("_Backupfile Utility");
-  g_signal_connect(functions_backupfile, "activate",
-      G_CALLBACK(WttGtk::activate_backupfile), this);
+  GtkWidget* functions_backupfile = gtk_menu_item_new_with_mnemonic("_Backupfile Utility");
+  g_signal_connect(functions_backupfile, "activate", G_CALLBACK(WttGtk::activate_backupfile), this);
 
   GtkWidget* functions_more = gtk_menu_item_new_with_mnemonic("_More");
   GtkMenu* functions_more_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(functions_more_menu), menu_clonevolume_w);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(functions_more_menu), functions_backupfile);
+  gtk_menu_shell_append(GTK_MENU_SHELL(functions_more_menu), menu_clonevolume_w);
+  gtk_menu_shell_append(GTK_MENU_SHELL(functions_more_menu), functions_backupfile);
 
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(functions_more), GTK_WIDGET(functions_more_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions_more), GTK_WIDGET(functions_more_menu));
 
   GtkMenu* functions_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_build);
@@ -2732,40 +2674,30 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
 
   GtkWidget* functions = gtk_menu_item_new_with_mnemonic("F_unctions");
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), functions);
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
 
   // View menu
   GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic("Zoom _in");
-  g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
-  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
+  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic("Zoom _out");
-  g_signal_connect(
-      view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
-  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
+  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic("Zoom _reset");
-  g_signal_connect(
-      view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
+  g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
 
   GtkWidget* view_twowindows = gtk_menu_item_new_with_mnemonic("T_wo Windows");
-  g_signal_connect(view_twowindows, "activate",
-      G_CALLBACK(WttGtk::activate_twowindows), this);
-  gtk_widget_add_accelerator(view_twowindows, "activate", accel_g, 't',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_twowindows, "activate", G_CALLBACK(WttGtk::activate_twowindows), this);
+  gtk_widget_add_accelerator(view_twowindows, "activate", accel_g, 't', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
-  view_alltoplevel_w
-      = gtk_check_menu_item_new_with_mnemonic("V_iew all toplevel");
-  g_signal_connect(view_alltoplevel_w, "activate",
-      G_CALLBACK(activate_set_alltoplevel), this);
+  view_alltoplevel_w = gtk_check_menu_item_new_with_mnemonic("V_iew all toplevel");
+  g_signal_connect(view_alltoplevel_w, "activate", G_CALLBACK(activate_set_alltoplevel), this);
 
   GtkWidget* view_messages = gtk_menu_item_new_with_mnemonic("_Messages");
-  g_signal_connect(
-      view_messages, "activate", G_CALLBACK(WttGtk::activate_messages), this);
+  g_signal_connect(view_messages, "activate", G_CALLBACK(WttGtk::activate_messages), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
@@ -2781,38 +2713,27 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
 
   // Options menu
   GtkWidget* options_settings = gtk_menu_item_new_with_mnemonic("_Settings...");
-  g_signal_connect(
-      options_settings, "activate", G_CALLBACK(WttGtk::activate_view), this);
+  g_signal_connect(options_settings, "activate", G_CALLBACK(WttGtk::activate_view), this);
 
-  GtkWidget* options_savesettings
-      = gtk_menu_item_new_with_mnemonic("S_ave Settings");
-  g_signal_connect(options_savesettings, "activate",
-      G_CALLBACK(WttGtk::activate_savesettings), this);
+  GtkWidget* options_savesettings = gtk_menu_item_new_with_mnemonic("S_ave Settings");
+  g_signal_connect(options_savesettings, "activate", G_CALLBACK(WttGtk::activate_savesettings), this);
 
-  GtkWidget* options_restoresettings
-      = gtk_menu_item_new_with_mnemonic("_Restore Settings");
-  g_signal_connect(options_restoresettings, "activate",
-      G_CALLBACK(WttGtk::activate_restoresettings), this);
+  GtkWidget* options_restoresettings = gtk_menu_item_new_with_mnemonic("_Restore Settings");
+  g_signal_connect(options_restoresettings, "activate", G_CALLBACK(WttGtk::activate_restoresettings), this);
 
   // Submenu Script
-  GtkWidget* options_script_proj
-      = gtk_menu_item_new_with_mnemonic("_Project...");
-  g_signal_connect(options_script_proj, "activate",
-      G_CALLBACK(WttGtk::activate_scriptproj), this);
+  GtkWidget* options_script_proj = gtk_menu_item_new_with_mnemonic("_Project...");
+  g_signal_connect(options_script_proj, "activate", G_CALLBACK(WttGtk::activate_scriptproj), this);
 
   GtkWidget* options_script_base = gtk_menu_item_new_with_mnemonic("_Base...");
-  g_signal_connect(options_script_base, "activate",
-      G_CALLBACK(WttGtk::activate_scriptbase), this);
+  g_signal_connect(options_script_base, "activate", G_CALLBACK(WttGtk::activate_scriptbase), this);
 
   GtkWidget* options_script = gtk_menu_item_new_with_mnemonic("_Script");
   GtkMenu* options_script_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(options_script_menu), options_script_proj);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(options_script_menu), options_script_base);
+  gtk_menu_shell_append(GTK_MENU_SHELL(options_script_menu), options_script_proj);
+  gtk_menu_shell_append(GTK_MENU_SHELL(options_script_menu), options_script_base);
 
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(options_script), GTK_WIDGET(options_script_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(options_script), GTK_WIDGET(options_script_menu));
 
   GtkMenu* options_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(options_menu), options_settings);
@@ -2826,13 +2747,10 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
 
   // Tools menu
   GtkWidget* mtools_rtmon = gtk_menu_item_new_with_mnemonic("_Runtime Monitor");
-  g_signal_connect(
-      mtools_rtmon, "activate", G_CALLBACK(WttGtk::activate_rtmon), this);
+  g_signal_connect(mtools_rtmon, "activate", G_CALLBACK(WttGtk::activate_rtmon), this);
 
-  GtkWidget* mtools_statusmon
-      = gtk_menu_item_new_with_mnemonic("_Supervision Center");
-  g_signal_connect(mtools_statusmon, "activate",
-      G_CALLBACK(WttGtk::activate_statusmon), this);
+  GtkWidget* mtools_statusmon = gtk_menu_item_new_with_mnemonic("_Supervision Center");
+  g_signal_connect(mtools_statusmon, "activate", G_CALLBACK(WttGtk::activate_statusmon), this);
 
   GtkMenu* mtools_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(mtools_menu), mtools_rtmon);
@@ -2844,18 +2762,14 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
 
   // Menu Help
   GtkWidget* help_overview = gtk_menu_item_new_with_mnemonic("_Overview");
-  g_signal_connect(
-      help_overview, "activate", G_CALLBACK(WttGtk::activate_help), this);
-  gtk_widget_add_accelerator(help_overview, "activate", accel_g, 'h',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(help_overview, "activate", G_CALLBACK(WttGtk::activate_help), this);
+  gtk_widget_add_accelerator(help_overview, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* help_project = gtk_menu_item_new_with_mnemonic("_Project");
-  g_signal_connect(help_project, "activate",
-      G_CALLBACK(WttGtk::activate_help_project), this);
+  g_signal_connect(help_project, "activate", G_CALLBACK(WttGtk::activate_help_project), this);
 
   GtkWidget* help_proview = gtk_menu_item_new_with_mnemonic("_About ProviewR");
-  g_signal_connect(help_proview, "activate",
-      G_CALLBACK(WttGtk::activate_help_proview), this);
+  g_signal_connect(help_proview, "activate", G_CALLBACK(WttGtk::activate_help_proview), this);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_overview);
@@ -2869,51 +2783,57 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  tools_save_w = wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_save_d_30.png" : "$pwr_exe/ico_save_l_30.png", 
-      G_CALLBACK(activate_save), "Save", this, 1, 0);
+  tools_save_w =
+      wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_save_d_30.png" : "$pwr_exe/ico_save_l_30.png",
+                      G_CALLBACK(activate_save), "Save", this, 1, 0);
 
-  tools_edit_w = wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_edit_d_30.png" : "$pwr_exe/ico_edit_l_30.png", 
-      G_CALLBACK(activate_configure), "Edit", this, 1, 0);
+  tools_edit_w =
+      wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_edit_d_30.png" : "$pwr_exe/ico_edit_l_30.png",
+                      G_CALLBACK(activate_configure), "Edit", this, 1, 0);
 
-  if (wb_type == wb_eType_ClassEditor
-      || (wbctx && volid && (volclass == pwr_eClass_SharedVolume
-                                || volclass == pwr_eClass_SubVolume))) {
-    tools_buildnode_w = wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_build_d_30.png" : "$pwr_exe/ico_build_l_30.png", 
-       G_CALLBACK(activate_buildvolume), "Build Volume", this, 1, 0);
-  } else {
-    tools_buildnode_w = wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_build_d_30.png" : "$pwr_exe/ico_build_l_30.png", 
-       G_CALLBACK(activate_buildnode), "Build Node", this, 1, 0);
+  if (wb_type == wb_eType_ClassEditor ||
+      (wbctx && volid && (volclass == pwr_eClass_SharedVolume || volclass == pwr_eClass_SubVolume)))
+  {
+    tools_buildnode_w =
+        wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_build_d_30.png" : "$pwr_exe/ico_build_l_30.png",
+                        G_CALLBACK(activate_buildvolume), "Build Volume", this, 1, 0);
+  }
+  else
+  {
+    tools_buildnode_w =
+        wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_build_d_30.png" : "$pwr_exe/ico_build_l_30.png",
+                        G_CALLBACK(activate_buildnode), "Build Node", this, 1, 0);
   }
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_distribute_d_30.png" : "$pwr_exe/ico_distribute_l_30.png", G_CALLBACK(activate_distribute), 
-      "Distribute", this, 0, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_distribute_d_30.png" : "$pwr_exe/ico_distribute_l_30.png",
+                  G_CALLBACK(activate_distribute), "Distribute", this, 0, 1);
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_plc_d_30.png" : "$pwr_exe/ico_plc_l_30.png", 
-      G_CALLBACK(activate_openplc), "Open Program", this, 1, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_plc_d_30.png" : "$pwr_exe/ico_plc_l_30.png",
+                  G_CALLBACK(activate_openplc), "Open Program", this, 1, 0);
 
-  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_ge_d_30.png" : "$pwr_exe/ico_ge_l_30.png", 
-      G_CALLBACK(activate_openge), "Open Ge", this, 1, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_ge_d_30.png" : "$pwr_exe/ico_ge_l_30.png",
+                  G_CALLBACK(activate_openge), "Open Ge", this, 1, 0);
 
-  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_twowind_d_30.png" : "$pwr_exe/ico_twowind_l_30.png", 
-      G_CALLBACK(activate_twowindows), "Two windows/One window", this, 1, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_twowind_d_30.png" : "$pwr_exe/ico_twowind_l_30.png",
+                  G_CALLBACK(activate_twowindows), "Two windows/One window", this, 1, 0);
 
-  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_messages_d_30.png" : "$pwr_exe/ico_messages_l_30.png", 
-      G_CALLBACK(activate_messages), "Show messages", this, 1, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_messages_d_30.png" : "$pwr_exe/ico_messages_l_30.png",
+                  G_CALLBACK(activate_messages), "Show messages", this, 1, 0);
 
-  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_options_d_30.png" : "$pwr_exe/ico_options_l_30.png", 
-      G_CALLBACK(activate_view), "Options", this, 1, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_options_d_30.png" : "$pwr_exe/ico_options_l_30.png",
+                  G_CALLBACK(activate_view), "Options", this, 1, 0);
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", G_CALLBACK(activate_zoom_in), 
-      "Zoom in", this, 0, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png",
+                  G_CALLBACK(activate_zoom_in), "Zoom in", this, 0, 1);
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", G_CALLBACK(activate_zoom_out), 
-      "Zoom out", this, 0, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png",
+                  G_CALLBACK(activate_zoom_out), "Zoom out", this, 0, 1);
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", G_CALLBACK(activate_zoom_reset), 
-      "Zoom reset", this, 0, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png",
+                  G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 0, 1);
 
-  GtkToolItem* tools_set_advuser = wutl_tools_item(tools, "$pwr_exe/xtt_advuser.png", 
-      G_CALLBACK(activate_set_advuser), "Advanced user", this, 1, 0);
+  GtkToolItem* tools_set_advuser = wutl_tools_item(
+      tools, "$pwr_exe/xtt_advuser.png", G_CALLBACK(activate_set_advuser), "Advanced user", this, 1, 0);
 
   // Vertical palette pane
   palette_paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
@@ -2921,16 +2841,15 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
 
   gtk_paned_pack2(GTK_PANED(palette_paned), wnav_paned, TRUE, TRUE);
 
-  palette = new PalGtk(this, palette_paned, "Objects", ldhses, layout_palette,
-      &palette_widget, &sts);
+  palette = new PalGtk(this, palette_paned, "Objects", ldhses, layout_palette, &palette_widget, &sts);
   gtk_widget_set_name(palette_widget, "wbpalette");
   palette->set_focus_cb = &Wtt::set_focus_cb;
   palette->traverse_focus_cb = &Wtt::traverse_focus;
   palette->create_popup_menu_cb = &Wtt::create_pal_popup_menu_cb;
   gtk_paned_pack1(GTK_PANED(palette_paned), palette_widget, FALSE, TRUE);
 
-  wnav = new WNavGtk(this, wnav_paned, title_w1, layout_w1, &wnav_brow_widget,
-      ldhses, root_menu, wnav_eWindowType_W1, &sts);
+  wnav = new WNavGtk(this, wnav_paned, title_w1, layout_w1, &wnav_brow_widget, ldhses, root_menu,
+                     wnav_eWindowType_W1, &sts);
   gtk_widget_set_name(wnav_brow_widget, "wbplant");
   wnav->message_cb = &Wtt::message_cb;
   wnav->close_cb = &Wtt::close;
@@ -2957,8 +2876,8 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   focused_wnav = wnav;
   wnav_mapped = 1;
 
-  wnavnode = new WNavGtk(this, wnav_paned, title_w2, layout_w2,
-      &wnavnode_brow_widget, ldhses, root_menu, wnav_eWindowType_W2, &sts);
+  wnavnode = new WNavGtk(this, wnav_paned, title_w2, layout_w2, &wnavnode_brow_widget, ldhses, root_menu,
+                         wnav_eWindowType_W2, &sts);
   gtk_widget_set_name(wnavnode_brow_widget, "wbnode");
   wnavnode->message_cb = &Wtt::message_cb;
   wnavnode->close_cb = &Wtt::close;
@@ -2998,10 +2917,8 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   cmd_entry->set_hide_on_esc(true);
   cmd_input = cmd_entry->widget();
   gtk_widget_set_size_request(cmd_input, -1, 25);
-  g_signal_connect(
-      cmd_input, "activate", G_CALLBACK(WttGtk::valchanged_cmd_input), this);
-  g_signal_connect(
-      cmd_input, "focus-in-event", G_CALLBACK(WttGtk::focused_cmd_input), this);
+  g_signal_connect(cmd_input, "activate", G_CALLBACK(WttGtk::valchanged_cmd_input), this);
+  g_signal_connect(cmd_input, "focus-in-event", G_CALLBACK(WttGtk::focused_cmd_input), this);
   g_signal_connect(cmd_input, "hide", G_CALLBACK(WttGtk::hide_cmd_input), this);
 
   gtk_box_pack_start(GTK_BOX(statusbar), msg_label, FALSE, FALSE, 20);
@@ -3045,31 +2962,33 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   g_object_set(cmd_input, "visible", FALSE, NULL);
   gtk_paned_set_position(GTK_PANED(wnav_paned), window_width / 2);
 
-  wnav->get_options(&enable_comment, &enable_revisions, &show_class,
-      &show_alias, &show_descrip, &show_objref, &show_objxref, &show_attrref,
-      &show_attrxref, &build_force, &build_debug, &build_syntax, &build_crossref,
-      &build_crossref_sim, &build_crossref_graph, &build_manual, &build_nocopy,
-      &color_theme);
+  wnav->get_options(&enable_comment, &enable_revisions, &show_class, &show_alias, &show_descrip, &show_objref,
+                    &show_objxref, &show_attrref, &show_attrxref, &build_force, &build_debug, &build_syntax,
+                    &build_crossref, &build_crossref_sim, &build_crossref_graph, &build_manual, &build_nocopy,
+                    &color_theme);
 
-  if (wbctx && volid) {
+  if (wbctx && volid)
+  {
     wnav->volume_attached(wbctx, ldhses, 0);
     wnavnode->volume_attached(wbctx, ldhses, 0);
   }
 
-  if ((wb_type == wb_eType_Directory || wb_type == wb_eType_Volume) && ldhses) {
+  if ((wb_type == wb_eType_Directory || wb_type == wb_eType_Volume) && ldhses)
+  {
     // Start configuration wizard if volume is empty
     pwr_tOid oid;
 
     sts = ldh_GetRootList(ldhses, &oid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       pwr_tCid vcid;
 
-      if (wbctx && volid) {
+      if (wbctx && volid)
+      {
         sts = ldh_GetVolumeClass(wbctx, volid, &vcid);
-        if (vcid == pwr_eClass_RootVolume
-            || vcid == pwr_eClass_DirectoryVolume) {
-          wnav->wow
-              ->HideWarranty(); // Warranty window is hidden behind the wizard
+        if (vcid == pwr_eClass_RootVolume || vcid == pwr_eClass_DirectoryVolume)
+        {
+          wnav->wow->HideWarranty(); // Warranty window is hidden behind the wizard
           set_edit();
           start_wizard(this, vcid);
         }
@@ -3082,11 +3001,10 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   menu_setup();
   update_title();
 
-  if (ODD(revsts) && !rev_info.in_end_of_branch) {
-    wnav->wow->DisplayError("Revision",
-        "Revision is not at end o branch.\nNo changes can be made.");
-    CoLogin::reduce_privilege(
-        pwr_mPrv_DevConfig | pwr_mPrv_DevPlc | pwr_mPrv_DevClass);
+  if (ODD(revsts) && !rev_info.in_end_of_branch)
+  {
+    wnav->wow->DisplayError("Revision", "Revision is not at end o branch.\nNo changes can be made.");
+    CoLogin::reduce_privilege(pwr_mPrv_DevConfig | pwr_mPrv_DevPlc | pwr_mPrv_DevClass);
   }
 
   *status = 1;
@@ -3123,13 +3041,9 @@ WttGtk::~WttGtk()
   gtk_widget_destroy(toplevel);
 }
 
-void WttGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void WttGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
-static gboolean options_delete_event(
-    GtkWidget* w, GdkEvent* event, gpointer wtt)
+static gboolean options_delete_event(GtkWidget* w, GdkEvent* event, gpointer wtt)
 {
   ((Wtt*)wtt)->update_options_form();
   g_object_set(((WttGtk*)wtt)->options_form, "visible", FALSE, NULL);
@@ -3138,23 +3052,24 @@ static gboolean options_delete_event(
 
 void WttGtk::create_options_dialog()
 {
-  if (options_form) {
+  if (options_form)
+  {
     g_object_set(options_form, "visible", TRUE, NULL);
     return;
   }
 
   // Create the options dialog
-  options_form = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      450, "default-width", 650, "title", "Options", "window-position",
-      GTK_WIN_POS_CENTER, NULL);
-  g_signal_connect(
-      options_form, "delete_event", G_CALLBACK(options_delete_event), this);
+  options_form = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 450, "default-width", 650,
+                                          "title", "Options", "window-position", GTK_WIN_POS_CENTER, NULL);
+  g_signal_connect(options_form, "delete_event", G_CALLBACK(options_delete_event), this);
 
   GtkWidget* hier_label = gtk_label_new("Hierarchy");
   enable_comment_w = gtk_check_button_new_with_label("Enable Comment");
-  gtk_widget_set_tooltip_text(enable_comment_w, CoWowGtk::convert_utf8("Promp for comment before save or build"));
+  gtk_widget_set_tooltip_text(enable_comment_w,
+                              CoWowGtk::convert_utf8("Promp for comment before save or build"));
   enable_revisions_w = gtk_check_button_new_with_label("Enable Revisions");
-  gtk_widget_set_tooltip_text(enable_revisions_w, CoWowGtk::convert_utf8("Initiate repository for version control"));
+  gtk_widget_set_tooltip_text(enable_revisions_w,
+                              CoWowGtk::convert_utf8("Initiate repository for version control"));
   show_plant_w = gtk_check_button_new_with_label("Plant Configuration");
   gtk_widget_set_tooltip_text(show_plant_w, CoWowGtk::convert_utf8("Show plant hierarchy"));
   show_node_w = gtk_check_button_new_with_label("Node Configuration");
@@ -3180,8 +3095,7 @@ void WttGtk::create_options_dialog()
   gtk_widget_set_tooltip_text(show_objxref_w, CoWowGtk::convert_utf8("Display object cross references"));
   show_attrref_w = gtk_check_button_new_with_label("Attribute Reference");
   gtk_widget_set_tooltip_text(show_attrref_w, CoWowGtk::convert_utf8("Display attribute references"));
-  show_attrxref_w
-      = gtk_check_button_new_with_label("Attribute Cross Reference");
+  show_attrxref_w = gtk_check_button_new_with_label("Attribute Cross Reference");
   gtk_widget_set_tooltip_text(show_attrxref_w, CoWowGtk::convert_utf8("Display attribute cross references"));
 
   GtkWidget* entry_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -3200,13 +3114,15 @@ void WttGtk::create_options_dialog()
   build_debug_w = gtk_check_button_new_with_label("Debug");
   gtk_widget_set_tooltip_text(build_debug_w, CoWowGtk::convert_utf8("Build with debug"));
   build_syntax_w = gtk_check_button_new_with_label("Syntax");
-  gtk_widget_set_tooltip_text(build_syntax_w, CoWowGtk::convert_utf8("Check syntax before building"));  
+  gtk_widget_set_tooltip_text(build_syntax_w, CoWowGtk::convert_utf8("Check syntax before building"));
   build_crossref_w = gtk_check_button_new_with_label("Crossreference");
   gtk_widget_set_tooltip_text(build_crossref_w, CoWowGtk::convert_utf8("Create cross reference files"));
   build_crossrefsim_w = gtk_check_button_new_with_label("      Simulation");
-  gtk_widget_set_tooltip_text(build_crossrefsim_w, CoWowGtk::convert_utf8("Add simulate objects to cross references"));
+  gtk_widget_set_tooltip_text(build_crossrefsim_w,
+                              CoWowGtk::convert_utf8("Add simulate objects to cross references"));
   build_crossrefgraph_w = gtk_check_button_new_with_label("      Graph");
-  gtk_widget_set_tooltip_text(build_crossrefgraph_w, CoWowGtk::convert_utf8("Add cross references in Ge graphs"));
+  gtk_widget_set_tooltip_text(build_crossrefgraph_w,
+                              CoWowGtk::convert_utf8("Add cross references in Ge graphs"));
   build_manual_w = gtk_check_button_new_with_label("Manual");
   gtk_widget_set_tooltip_text(build_manual_w, CoWowGtk::convert_utf8("Don't build deeper levels"));
   build_nocopy_w = gtk_check_button_new_with_label("Disable copy");
@@ -3219,8 +3135,7 @@ void WttGtk::create_options_dialog()
   gtk_box_pack_start(GTK_BOX(build_vbox), build_syntax_w, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(build_vbox), build_crossref_w, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(build_vbox), build_crossrefsim_w, FALSE, FALSE, 7);
-  gtk_box_pack_start(
-      GTK_BOX(build_vbox), build_crossrefgraph_w, FALSE, FALSE, 7);
+  gtk_box_pack_start(GTK_BOX(build_vbox), build_crossrefgraph_w, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(build_vbox), build_manual_w, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(build_vbox), build_nocopy_w, FALSE, FALSE, 7);
 
@@ -3246,30 +3161,23 @@ void WttGtk::create_options_dialog()
 
   GtkWidget* options_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(options_ok, 70, 25);
-  g_signal_connect(
-      options_ok, "clicked", G_CALLBACK(WttGtk::activate_options_ok), this);
+  g_signal_connect(options_ok, "clicked", G_CALLBACK(WttGtk::activate_options_ok), this);
   GtkWidget* options_apply = gtk_button_new_with_label("Apply");
   gtk_widget_set_size_request(options_apply, 70, 25);
-  g_signal_connect(options_apply, "clicked",
-      G_CALLBACK(WttGtk::activate_options_apply), this);
+  g_signal_connect(options_apply, "clicked", G_CALLBACK(WttGtk::activate_options_apply), this);
   GtkWidget* options_cancel = gtk_button_new_with_label("Cancel");
   gtk_widget_set_size_request(options_cancel, 70, 25);
-  g_signal_connect(options_cancel, "clicked",
-      G_CALLBACK(WttGtk::activate_options_cancel), this);
+  g_signal_connect(options_cancel, "clicked", G_CALLBACK(WttGtk::activate_options_cancel), this);
 
   GtkWidget* options_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(options_hboxbuttons), options_ok, FALSE, FALSE, 30);
-  gtk_box_pack_start(
-      GTK_BOX(options_hboxbuttons), options_apply, FALSE, FALSE, 30);
-  gtk_box_pack_end(
-      GTK_BOX(options_hboxbuttons), options_cancel, FALSE, FALSE, 30);
+  gtk_box_pack_start(GTK_BOX(options_hboxbuttons), options_apply, FALSE, FALSE, 30);
+  gtk_box_pack_end(GTK_BOX(options_hboxbuttons), options_cancel, FALSE, FALSE, 30);
 
   GtkWidget* options_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(options_vbox), hbox, TRUE, TRUE, 30);
-  gtk_box_pack_start(
-      GTK_BOX(options_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
-  gtk_box_pack_end(
-      GTK_BOX(options_vbox), options_hboxbuttons, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(options_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
+  gtk_box_pack_end(GTK_BOX(options_vbox), options_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(options_form), options_vbox);
   gtk_widget_show_all(options_form);
 }
@@ -3282,17 +3190,16 @@ static gint confirm_delete_event(GtkWidget* w, GdkEvent* event, gpointer wtt)
 
 void WttGtk::create_confirm_dialog()
 {
-  if (confirm_widget) {
+  if (confirm_widget)
+  {
     g_object_set(confirm_widget, "visible", TRUE, NULL);
     return;
   }
 
   // Create a confirm window
-  confirm_widget = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      150, "default-width", 400, "title", "Confirm", "window-position",
-      GTK_WIN_POS_CENTER, NULL);
-  g_signal_connect(
-      confirm_widget, "delete_event", G_CALLBACK(confirm_delete_event), this);
+  confirm_widget = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 150, "default-width", 400,
+                                            "title", "Confirm", "window-position", GTK_WIN_POS_CENTER, NULL);
+  g_signal_connect(confirm_widget, "delete_event", G_CALLBACK(confirm_delete_event), this);
   confirm_label = gtk_label_new("");
   gtk_widget_set_name(confirm_widget, "confirmdialog");
 
@@ -3302,40 +3209,32 @@ void WttGtk::create_confirm_dialog()
 
   GtkWidget* confirm_ok = gtk_button_new_with_label("Yes");
   gtk_widget_set_size_request(confirm_ok, 70, 25);
-  g_signal_connect(
-      confirm_ok, "clicked", G_CALLBACK(WttGtk::activate_confirm_ok), this);
+  g_signal_connect(confirm_ok, "clicked", G_CALLBACK(WttGtk::activate_confirm_ok), this);
 
   GtkWidget* confirm_no = gtk_button_new_with_label("No");
   gtk_widget_set_size_request(confirm_no, 70, 25);
-  g_signal_connect(
-      confirm_no, "clicked", G_CALLBACK(WttGtk::activate_confirm_no), this);
+  g_signal_connect(confirm_no, "clicked", G_CALLBACK(WttGtk::activate_confirm_no), this);
 
   GtkWidget* confirm_cancel = gtk_button_new_with_label("Cancel");
   gtk_widget_set_size_request(confirm_cancel, 70, 25);
-  g_signal_connect(confirm_cancel, "clicked",
-      G_CALLBACK(WttGtk::activate_confirm_cancel), this);
+  g_signal_connect(confirm_cancel, "clicked", G_CALLBACK(WttGtk::activate_confirm_cancel), this);
 
   GtkWidget* confirm_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  gtk_box_pack_start(
-      GTK_BOX(confirm_hboxtext), confirm_image, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(confirm_hboxtext), confirm_image, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(confirm_hboxtext), confirm_label, TRUE, TRUE, 15);
 
   GtkWidget* confirm_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(confirm_hboxbuttons), confirm_ok, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(confirm_hboxbuttons), confirm_no, FALSE, FALSE, 0);
-  gtk_box_pack_end(
-      GTK_BOX(confirm_hboxbuttons), confirm_cancel, FALSE, FALSE, 0);
+  gtk_box_pack_end(GTK_BOX(confirm_hboxbuttons), confirm_cancel, FALSE, FALSE, 0);
 
   GtkWidget* confirm_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(confirm_vbox), confirm_hboxtext, TRUE, TRUE, 30);
-  gtk_box_pack_start(
-      GTK_BOX(confirm_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
-  gtk_box_pack_end(
-      GTK_BOX(confirm_vbox), confirm_hboxbuttons, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(confirm_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
+  gtk_box_pack_end(GTK_BOX(confirm_vbox), confirm_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(confirm_widget), confirm_vbox);
-  gtk_window_set_transient_for(
-      GTK_WINDOW(gtk_widget_get_toplevel(confirm_widget)),
-      GTK_WINDOW(gtk_widget_get_toplevel(toplevel)));
+  gtk_window_set_transient_for(GTK_WINDOW(gtk_widget_get_toplevel(confirm_widget)),
+                               GTK_WINDOW(gtk_widget_get_toplevel(toplevel)));
   gtk_widget_show_all(confirm_widget);
 }
 
@@ -3347,20 +3246,19 @@ static gint india_delete_event(GtkWidget* w, GdkEvent* event, gpointer wtt)
 
 void WttGtk::create_input_dialog()
 {
-  if (india_widget) {
+  if (india_widget)
+  {
     g_object_set(india_widget, "visible", TRUE, NULL);
     return;
   }
 
   // Create an input dialog
-  india_widget = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      150, "default-width", 350, "title", "Input Dialog", "window-position",
-      GTK_WIN_POS_CENTER, NULL);
-  g_signal_connect(
-      india_widget, "delete_event", G_CALLBACK(india_delete_event), this);
+  india_widget =
+      (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 150, "default-width", 350, "title",
+                               "Input Dialog", "window-position", GTK_WIN_POS_CENTER, NULL);
+  g_signal_connect(india_widget, "delete_event", G_CALLBACK(india_delete_event), this);
   india_text = gtk_entry_new();
-  g_signal_connect(
-      india_text, "activate", G_CALLBACK(WttGtk::activate_india_ok), this);
+  g_signal_connect(india_text, "activate", G_CALLBACK(WttGtk::activate_india_ok), this);
   india_label = gtk_label_new("");
 
   pwr_tFileName fname;
@@ -3369,12 +3267,10 @@ void WttGtk::create_input_dialog()
 
   GtkWidget* india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(india_ok, 70, 25);
-  g_signal_connect(
-      india_ok, "clicked", G_CALLBACK(WttGtk::activate_india_ok), this);
+  g_signal_connect(india_ok, "clicked", G_CALLBACK(WttGtk::activate_india_ok), this);
   GtkWidget* india_cancel = gtk_button_new_with_label("Cancel");
   gtk_widget_set_size_request(india_cancel, 70, 25);
-  g_signal_connect(
-      india_cancel, "clicked", G_CALLBACK(WttGtk::activate_india_cancel), this);
+  g_signal_connect(india_cancel, "clicked", G_CALLBACK(WttGtk::activate_india_cancel), this);
 
   GtkWidget* india_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(india_hboxtext), india_image, FALSE, FALSE, 15);
@@ -3387,15 +3283,13 @@ void WttGtk::create_input_dialog()
 
   GtkWidget* india_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(india_vbox), india_hboxtext, TRUE, TRUE, 30);
-  gtk_box_pack_start(
-      GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(india_vbox), india_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(india_widget), india_vbox);
   gtk_widget_show_all(india_widget);
   g_object_set(india_widget, "visible", FALSE, NULL);
-  gtk_window_set_transient_for(
-      GTK_WINDOW(gtk_widget_get_toplevel(india_widget)),
-      GTK_WINDOW(gtk_widget_get_toplevel(toplevel)));
+  gtk_window_set_transient_for(GTK_WINDOW(gtk_widget_get_toplevel(india_widget)),
+                               GTK_WINDOW(gtk_widget_get_toplevel(toplevel)));
 }
 
 GtkWidget* WttGtk::build_menu()
@@ -3403,8 +3297,8 @@ GtkWidget* WttGtk::build_menu()
   GtkWidget* popup;
   int i = 0;
 
-  popup = build_submenu(wnav_form, MENU_POPUP, "", mcp, popup_button_cb,
-      (void*)this, (ldh_sMenuItem*)mcp->ItemList, &i);
+  popup = build_submenu(wnav_form, MENU_POPUP, "", mcp, popup_button_cb, (void*)this,
+                        (ldh_sMenuItem*)mcp->ItemList, &i);
   //  if (popup != NULL)
   //    XtAddCallback( popup, XmNunmapCallback,
   //		   (XtCallbackProc)popup_unmap_cb, this);
@@ -3412,10 +3306,9 @@ GtkWidget* WttGtk::build_menu()
   return popup;
 }
 
-GtkWidget* WttGtk::build_submenu(GtkWidget* Parent, int MenuType,
-    const char* MenuTitle, void* MenuUserData,
-    void (*Callback)(GtkWidget*, gpointer), void* CallbackData,
-    ldh_sMenuItem* Items, int* idx)
+GtkWidget* WttGtk::build_submenu(GtkWidget* Parent, int MenuType, const char* MenuTitle, void* MenuUserData,
+                                 void (*Callback)(GtkWidget*, gpointer), void* CallbackData,
+                                 ldh_sMenuItem* Items, int* idx)
 {
   GtkWidget *Menu, *W;
   int i;
@@ -3425,33 +3318,43 @@ GtkWidget* WttGtk::build_submenu(GtkWidget* Parent, int MenuType,
 
   Level = Items[*idx].Level;
 
-  for (; Items[*idx].Level != 0 && Items[*idx].Level >= Level; (*idx)++) {
+  for (; Items[*idx].Level != 0 && Items[*idx].Level >= Level; (*idx)++)
+  {
     if (Items[*idx].Disabled)
       continue;
 
-    if (Items[*idx].Item == ldh_eMenuItem_Cascade) {
-      if (MenuType == MENU_OPTION) {
+    if (Items[*idx].Item == ldh_eMenuItem_Cascade)
+    {
+      if (MenuType == MENU_OPTION)
+      {
         printf("You can't have submenus from option menu items.");
         return NULL;
-      } else {
+      }
+      else
+      {
         i = *idx;
         (*idx)++;
         GtkWidget* Item = gtk_menu_item_new_with_label(Items[i].Name);
-        W = build_submenu(Menu, MENU_PULLDOWN, Items[i].Name, MenuUserData,
-            Callback, CallbackData, Items, idx);
+        W = build_submenu(Menu, MENU_PULLDOWN, Items[i].Name, MenuUserData, Callback, CallbackData, Items,
+                          idx);
 
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(Item), GTK_WIDGET(W));
         gtk_menu_shell_append(GTK_MENU_SHELL(Menu), Item);
         gtk_widget_show(Item);
         (*idx)--;
       }
-    } else {
-      if (Items[*idx].Item == ldh_eMenuItem_Separator) {
+    }
+    else
+    {
+      if (Items[*idx].Item == ldh_eMenuItem_Separator)
+      {
         // Separator
         W = gtk_separator_menu_item_new();
         gtk_menu_shell_append(GTK_MENU_SHELL(Menu), W);
         gtk_widget_show(W);
-      } else {
+      }
+      else
+      {
         // Pushbutton
         W = gtk_menu_item_new_with_label(Items[*idx].Name);
         gtk_widget_set_sensitive(W, Items[*idx].Flags.f.Sensitive);
@@ -3467,8 +3370,7 @@ GtkWidget* WttGtk::build_submenu(GtkWidget* Parent, int MenuType,
   return Menu;
 }
 
-void WttGtk::menu_position_func(
-    GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data)
+void WttGtk::menu_position_func(GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data)
 {
   WttGtk* wtt = (WttGtk*)data;
 
@@ -3499,7 +3401,4 @@ void WttGtk::disable_focus()
   focustimer.disabled();
 }
 
-void WttGtk::update_title()
-{
-  CoWowGtk::update_title(toplevel, editmode);
-}
+void WttGtk::update_title() { CoWowGtk::update_title(toplevel, editmode); }

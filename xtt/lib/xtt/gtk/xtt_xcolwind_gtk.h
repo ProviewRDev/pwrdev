@@ -43,11 +43,11 @@
 
 #include "cow_wow_gtk.h"
 
-class XColWindGtk : public XColWind {
+class XColWindGtk : public XColWind
+{
 public:
-  XColWindGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
-      pwr_sAttrRef* xa_objar, char* xa_title, int xa_advanced_user,
-      xcolwind_eType xa_type, int* xa_sts);
+  XColWindGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx, pwr_sAttrRef* xa_objar, char* xa_title,
+              int xa_advanced_user, xcolwind_eType xa_type, int* xa_sts);
   ~XColWindGtk();
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
@@ -102,14 +102,12 @@ public:
   static void activate_scantime4(GtkWidget* w, gpointer data);
   static void activate_scantime5(GtkWidget* w, gpointer data);
   static void activate_help(GtkWidget* w, gpointer data);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void valchanged_cmd_input(GtkWidget* w, gpointer data);
   static void activate_cmd_input(GtkWidget* w, gpointer data);
   static void activate_cmd_scrolled_ok(GtkWidget* w, gpointer data);
   static void activate_cmd_scrolled_ca(GtkWidget* w, gpointer data);
-  static void action_text_inserted(
-      GtkTextBuffer* w, GtkTextIter* iter, gchar* str, gint len, gpointer data);
+  static void action_text_inserted(GtkTextBuffer* w, GtkTextIter* iter, gchar* str, gint len, gpointer data);
 };
 
 #endif

@@ -41,48 +41,30 @@
 #include "flow_draw.h"
 #include "flow_browctx.h"
 
-FlowAnnotPixmap::FlowAnnotPixmap(FlowCtx* flow_ctx, int num, double x, double y,
-    flow_eDrawType d_type, int size, int rel_pos)
-    : ctx(flow_ctx), p(flow_ctx, x, y), number(num), pixmap_size(size),
-      draw_type(d_type), relative_pos(rel_pos)
+FlowAnnotPixmap::FlowAnnotPixmap(FlowCtx* flow_ctx, int num, double x, double y, flow_eDrawType d_type,
+                                 int size, int rel_pos)
+    : ctx(flow_ctx), p(flow_ctx, x, y), number(num), pixmap_size(size), draw_type(d_type),
+      relative_pos(rel_pos)
 {
 }
 
-FlowAnnotPixmap::FlowAnnotPixmap(const FlowAnnotPixmap& p)
-{
-  memcpy((void *)this, (void *)&p, sizeof(p));
-}
+FlowAnnotPixmap::FlowAnnotPixmap(const FlowAnnotPixmap& p) { memcpy((void*)this, (void*)&p, sizeof(p)); }
 
-FlowAnnotPixmap::~FlowAnnotPixmap()
-{
-}
+FlowAnnotPixmap::~FlowAnnotPixmap() {}
 
-void FlowAnnotPixmap::zoom()
-{
-  p.zoom();
-}
+void FlowAnnotPixmap::zoom() { p.zoom(); }
 
-void FlowAnnotPixmap::nav_zoom()
-{
-  p.nav_zoom();
-}
+void FlowAnnotPixmap::nav_zoom() { p.nav_zoom(); }
 
-void FlowAnnotPixmap::print_zoom()
-{
-  p.print_zoom();
-}
+void FlowAnnotPixmap::print_zoom() { p.print_zoom(); }
 
-void FlowAnnotPixmap::traverse(int x, int y)
-{
-  p.traverse(x, y);
-}
+void FlowAnnotPixmap::traverse(int x, int y) { p.traverse(x, y); }
 
 void FlowAnnotPixmap::print(void* pos, void* node, int highlight)
 {
   if (!((FlowNode*)node)->annotpixmapv[number])
     return;
-  int idx = int(
-      ctx->print_zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
+  int idx = int(ctx->print_zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   int size = int(8.0 + 6.0 / 3 * idx);
   double x;
 
@@ -90,48 +72,42 @@ void FlowAnnotPixmap::print(void* pos, void* node, int highlight)
     return;
   idx = MAX(idx, DRAW_TYPE_SIZE - 1);
 
-  if (relative_pos && ((FlowNode*)node)->relative_annot_pos) {
-    x = ((FlowPoint*)pos)->print_z_x
-        + MAX(p.print_z_x, ((FlowNode*)node)->rel_annotpixmap_x[number]
-                  * ctx->print_zoom_factor);
-  } else
+  if (relative_pos && ((FlowNode*)node)->relative_annot_pos)
+  {
+    x = ((FlowPoint*)pos)->print_z_x +
+        MAX(p.print_z_x, ((FlowNode*)node)->rel_annotpixmap_x[number] * ctx->print_zoom_factor);
+  }
+  else
     x = p.print_z_x + ((FlowPoint*)pos)->print_z_x;
   ctx->current_print->pixmap(x, p.print_z_y + ((FlowPoint*)pos)->print_z_y,
-      &((FlowNode*)node)->annotpixmapv[number]->pixmap_data[pixmap_size],
-      ((FlowNode*)node)->annotpixmapv[number]->pixmaps, pixmap_size,
-      draw_type);
+                             &((FlowNode*)node)->annotpixmapv[number]->pixmap_data[pixmap_size],
+                             ((FlowNode*)node)->annotpixmapv[number]->pixmaps, pixmap_size, draw_type);
 }
 
-void FlowAnnotPixmap::save(std::ofstream& fp, flow_eSaveMode mode)
-{
-}
+void FlowAnnotPixmap::save(std::ofstream& fp, flow_eSaveMode mode) {}
 
-void FlowAnnotPixmap::open(std::ifstream& fp)
-{
-}
+void FlowAnnotPixmap::open(std::ifstream& fp) {}
 
-void FlowAnnotPixmap::draw(
-    void* pos, int highlight, int dimmed, int hot, void* node)
+void FlowAnnotPixmap::draw(void* pos, int highlight, int dimmed, int hot, void* node)
 {
   int x;
 
   if (!((FlowNode*)node)->annotpixmapv[number])
     return;
-  int idx
-      = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
+  int idx = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   if (idx < 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  if (relative_pos && ((FlowNode*)node)->relative_annot_pos) {
-    x = int(((FlowPoint*)pos)->z_x - ctx->offset_x
-        + MAX(p.z_x,
-              ((FlowNode*)node)->rel_annotpixmap_x[number] * ctx->zoom_factor));
-  } else
+  if (relative_pos && ((FlowNode*)node)->relative_annot_pos)
+  {
+    x = int(((FlowPoint*)pos)->z_x - ctx->offset_x +
+            MAX(p.z_x, ((FlowNode*)node)->rel_annotpixmap_x[number] * ctx->zoom_factor));
+  }
+  else
     x = p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x;
   ctx->fdraw->pixmap(ctx, x, p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y,
-      &((FlowNode*)node)->annotpixmapv[number]->pixmap_data,
-      ((FlowNode*)node)->annotpixmapv[number]->pixmaps, draw_type, idx,
-      highlight, 0);
+                     &((FlowNode*)node)->annotpixmapv[number]->pixmap_data,
+                     ((FlowNode*)node)->annotpixmapv[number]->pixmaps, draw_type, idx, highlight, 0);
 }
 
 void FlowAnnotPixmap::draw_inverse(void* pos, int hot, void* node)
@@ -140,22 +116,20 @@ void FlowAnnotPixmap::draw_inverse(void* pos, int hot, void* node)
 
   if (!((FlowNode*)node)->annotpixmapv[number])
     return;
-  int idx
-      = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
+  int idx = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   if (idx < 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  if (relative_pos && ((FlowNode*)node)->relative_annot_pos) {
-    x = int(((FlowPoint*)pos)->z_x - ctx->offset_x
-        + MAX(p.z_x,
-              ((FlowNode*)node)->rel_annotpixmap_x[number] * ctx->zoom_factor));
-  } else
+  if (relative_pos && ((FlowNode*)node)->relative_annot_pos)
+  {
+    x = int(((FlowPoint*)pos)->z_x - ctx->offset_x +
+            MAX(p.z_x, ((FlowNode*)node)->rel_annotpixmap_x[number] * ctx->zoom_factor));
+  }
+  else
     x = p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x;
-  ctx->fdraw->pixmap_inverse(ctx, x,
-      p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y,
-      &((FlowNode*)node)->annotpixmapv[number]->pixmap_data,
-      ((FlowNode*)node)->annotpixmapv[number]->pixmaps, ctx->inverse_color, idx,
-      0);
+  ctx->fdraw->pixmap_inverse(ctx, x, p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y,
+                             &((FlowNode*)node)->annotpixmapv[number]->pixmap_data,
+                             ((FlowNode*)node)->annotpixmapv[number]->pixmaps, ctx->inverse_color, idx, 0);
 }
 
 void FlowAnnotPixmap::erase(void* pos, int hot, void* node)
@@ -164,64 +138,54 @@ void FlowAnnotPixmap::erase(void* pos, int hot, void* node)
 
   if (!((FlowNode*)node)->annotpixmapv[number])
     return;
-  int idx
-      = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
+  int idx = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   if (idx < 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  if (relative_pos && ((FlowNode*)node)->relative_annot_pos) {
-    x = int(((FlowPoint*)pos)->z_x - ctx->offset_x
-        + MAX(p.z_x,
-              ((FlowNode*)node)->rel_annotpixmap_x[number] * ctx->zoom_factor));
-  } else
+  if (relative_pos && ((FlowNode*)node)->relative_annot_pos)
+  {
+    x = int(((FlowPoint*)pos)->z_x - ctx->offset_x +
+            MAX(p.z_x, ((FlowNode*)node)->rel_annotpixmap_x[number] * ctx->zoom_factor));
+  }
+  else
     x = p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x;
-  ctx->fdraw->pixmap_erase(ctx, x,
-      p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y,
-      &((FlowNode*)node)->annotpixmapv[number]->pixmap_data,
-      ((FlowNode*)node)->annotpixmapv[number]->pixmaps, draw_type, idx, 0);
+  ctx->fdraw->pixmap_erase(ctx, x, p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y,
+                           &((FlowNode*)node)->annotpixmapv[number]->pixmap_data,
+                           ((FlowNode*)node)->annotpixmapv[number]->pixmaps, draw_type, idx, 0);
 }
 
 void FlowAnnotPixmap::nav_draw(void* pos, int highlight, void* node)
 {
   if (!((FlowNode*)node)->annotpixmapv[number])
     return;
-  int idx = int(
-      ctx->nav_zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
+  int idx = int(ctx->nav_zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   if (idx < 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  ctx->fdraw->nav_pixmap(ctx,
-      p.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
-      p.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y,
-      &((FlowNode*)node)->annotpixmapv[number]->pixmap_data,
-      ((FlowNode*)node)->annotpixmapv[number]->pixmaps, draw_type, idx,
-      highlight, 0);
+  ctx->fdraw->nav_pixmap(ctx, p.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
+                         p.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y,
+                         &((FlowNode*)node)->annotpixmapv[number]->pixmap_data,
+                         ((FlowNode*)node)->annotpixmapv[number]->pixmaps, draw_type, idx, highlight, 0);
 }
 
 void FlowAnnotPixmap::nav_erase(void* pos, void* node)
 {
   if (!((FlowNode*)node)->annotpixmapv[number])
     return;
-  int idx = int(
-      ctx->nav_zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
+  int idx = int(ctx->nav_zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   if (idx < 0)
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  ctx->fdraw->nav_pixmap_erase(ctx,
-      p.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
-      p.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y,
-      &((FlowNode*)node)->annotpixmapv[number]->pixmap_data,
-      ((FlowNode*)node)->annotpixmapv[number]->pixmaps, draw_type, idx, 0);
+  ctx->fdraw->nav_pixmap_erase(ctx, p.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
+                               p.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y,
+                               &((FlowNode*)node)->annotpixmapv[number]->pixmap_data,
+                               ((FlowNode*)node)->annotpixmapv[number]->pixmaps, draw_type, idx, 0);
 }
 
-int FlowAnnotPixmap::event_handler(
-    void* pos, flow_eEvent event, int x, int y, void* node)
-{
-  return 0;
-}
+int FlowAnnotPixmap::event_handler(void* pos, flow_eEvent event, int x, int y, void* node) { return 0; }
 
-void FlowAnnotPixmap::get_borders(double pos_x, double pos_y, double* x_right,
-    double* x_left, double* y_high, double* y_low, void* node)
+void FlowAnnotPixmap::get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                                  double* y_low, void* node)
 {
   /*
     if ( pos_x + p1.x < *x_left)
@@ -243,8 +207,7 @@ void FlowAnnotPixmap::get_borders(double pos_x, double pos_y, double* x_right,
   */
 }
 
-void FlowAnnotPixmap::move(
-    void* pos, double x, double y, int highlight, int dimmed, int hot)
+void FlowAnnotPixmap::move(void* pos, double x, double y, int highlight, int dimmed, int hot)
 {
   erase(pos, hot, NULL);
   nav_erase(pos, NULL);
@@ -256,8 +219,7 @@ void FlowAnnotPixmap::move(
   nav_draw(pos, highlight, NULL);
 }
 
-void FlowAnnotPixmap::shift(void* pos, double delta_x, double delta_y,
-    int highlight, int dimmed, int hot)
+void FlowAnnotPixmap::shift(void* pos, double delta_x, double delta_y, int highlight, int dimmed, int hot)
 {
   erase(pos, hot, NULL);
   nav_erase(pos, NULL);
@@ -278,14 +240,11 @@ void FlowAnnotPixmap::configure_annotations(void* pos, void* node)
     return;
 
   if (relative_pos)
-    ((FlowNode*)node)->rel_annotpixmap_x[number]
-        = ((FlowNode*)node)->relative_annot_x;
-  width = 1.0
-      * ((FlowNode*)node)->annotpixmapv[number]->pixmap_data[pixmap_size].width
-      / ctx->base_zoom_factor;
-  ((FlowNode*)node)->relative_annot_x
-      = MAX(p.x, ((FlowNode*)node)->rel_annotpixmap_x[number]) + width
-      + ((BrowCtx*)ctx)->annotation_space;
+    ((FlowNode*)node)->rel_annotpixmap_x[number] = ((FlowNode*)node)->relative_annot_x;
+  width =
+      1.0 * ((FlowNode*)node)->annotpixmapv[number]->pixmap_data[pixmap_size].width / ctx->base_zoom_factor;
+  ((FlowNode*)node)->relative_annot_x =
+      MAX(p.x, ((FlowNode*)node)->rel_annotpixmap_x[number]) + width + ((BrowCtx*)ctx)->annotation_space;
 }
 
 std::ostream& operator<<(std::ostream& o, const FlowAnnotPixmap t)
@@ -294,8 +253,7 @@ std::ostream& operator<<(std::ostream& o, const FlowAnnotPixmap t)
   return o;
 }
 
-void flow_annot_pixmap_create(
-    FlowCtx* ctx, flow_sPixmapData* pixmap_data, flow_sAnnotPixmap** pixmap)
+void flow_annot_pixmap_create(FlowCtx* ctx, flow_sPixmapData* pixmap_data, flow_sAnnotPixmap** pixmap)
 {
   *pixmap = (flow_sAnnotPixmap*)calloc(1, sizeof(flow_sAnnotPixmap));
   memcpy(&(*pixmap)->pixmap_data, pixmap_data, sizeof(flow_sPixmapData));

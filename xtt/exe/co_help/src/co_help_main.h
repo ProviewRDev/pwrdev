@@ -43,7 +43,8 @@
 
 #include "flow_browapi.h"
 
-class CoHelpMain {
+class CoHelpMain
+{
 public:
   CoHelpMain(int argc, char* argv[], int* return_sts);
   virtual ~CoHelpMain();

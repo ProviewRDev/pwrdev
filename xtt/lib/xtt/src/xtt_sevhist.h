@@ -69,21 +69,21 @@ class XttOTree;
   reconfigure the curves. XttSevHist uses the GeCurve class to display the
   curves.
 */
-class XttSevHist {
+class XttSevHist
+{
 public:
-  void* xnav; //!< Pointer to parent XNav.
+  void* xnav;       //!< Pointer to parent XNav.
   GeCurveData* gcd; //!< Curve data for GeCurve object.
-  GeCurve* curve; //!< Curve window.
-  int rows; //!< Max number of points in curves.
+  GeCurve* curve;   //!< Curve window.
+  int rows;         //!< Max number of points in curves.
   pwr_eType vtype;
   unsigned int vsize;
-  CoWowTimer* timerid; //!< Time id for scan.
-  void (*close_cb)(void*, XttSevHist*); //!< Close callback to parent.
-  void (*help_cb)(void*, const char*); //!< Open help window.
-  int (*get_select_cb)(
-      void*, pwr_tOid*, char*, char*); //!< Get selected SevHist object.
-  bool first_scan; //!< Indicates that this is the first scan.
-  char title[250]; //!< Window title
+  CoWowTimer* timerid;                                  //!< Time id for scan.
+  void (*close_cb)(void*, XttSevHist*);                 //!< Close callback to parent.
+  void (*help_cb)(void*, const char*);                  //!< Open help window.
+  int (*get_select_cb)(void*, pwr_tOid*, char*, char*); //!< Get selected SevHist object.
+  bool first_scan;                                      //!< Indicates that this is the first scan.
+  char title[250];                                      //!< Window title
   sevcli_tCtx scctx;
   pwr_tOName anamev[XTT_SEVHIST_MAX];
   pwr_tOName onamev[XTT_SEVHIST_MAX];
@@ -92,8 +92,7 @@ public:
   CoWow* wow;
   long int time_low_old;
   long int time_high_old;
-  bool
-      sevhistobjectv[XTT_SEVHIST_MAX]; //!< Indicates that it is a SevHistObject
+  bool sevhistobjectv[XTT_SEVHIST_MAX]; //!< Indicates that it is a SevHistObject
   time_ePeriod initial_period;
   int color_theme;
   XttOTree* otree;
@@ -102,12 +101,10 @@ public:
   pwr_tTime to;
 
   //! Constructor
-  XttSevHist(void* xn_parent_ctx, const char* xn_name, pwr_tOid* xn_oidv,
-      pwr_tOName* xn_aname, pwr_tOName* xn_oname, bool* sevhistobjectv,
-      sevcli_tCtx xn_scctx, int xn_color_theme, time_ePeriod xn_time_range,
-      int* sts);
-  XttSevHist(void* parent_ctx, const char* name, char* filename,
-      int xn_color_theme, int* sts);
+  XttSevHist(void* xn_parent_ctx, const char* xn_name, pwr_tOid* xn_oidv, pwr_tOName* xn_aname,
+             pwr_tOName* xn_oname, bool* sevhistobjectv, sevcli_tCtx xn_scctx, int xn_color_theme,
+             time_ePeriod xn_time_range, int* sts);
+  XttSevHist(void* parent_ctx, const char* name, char* filename, int xn_color_theme, int* sts);
 
   //! Destructor
   virtual ~XttSevHist();
@@ -117,18 +114,13 @@ public:
   int get_data(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to);
   int get_objectdata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to);
   int get_multidata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to);
-  void curve_add(
-      pwr_tOid oid, pwr_tOName aname, pwr_tOName oname, bool sevhistobject);
+  void curve_add(pwr_tOid oid, pwr_tOName aname, pwr_tOName oname, bool sevhistobject);
   int read_export(char* filename);
   void setup();
-  void update_color_theme(int ct)
-  {
-    curve->update_color_theme(ct);
-  }
+  void update_color_theme(int ct) { curve->update_color_theme(ct); }
 
-  virtual XttOTree* tree_new(const char* title, pwr_tAttrRef* itemlist,
-      int itemcnt, unsigned int layout,
-      pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
+  virtual XttOTree* tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt, unsigned int layout,
+                             pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
   {
     return 0;
   }
@@ -143,8 +135,7 @@ public:
   static void sevhist_next_period_cb(void* ctx);
   static void sevhist_add_cb(void* ctx);
   static void sevhist_remove_cb(void* ctx);
-  static int sevhist_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to,
-      int rows, int idx, char* filename);
+  static int sevhist_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to, int rows, int idx, char* filename);
   static void sevhist_help_cb(void* ctx);
   static void sevhist_scan(void* data);
 };

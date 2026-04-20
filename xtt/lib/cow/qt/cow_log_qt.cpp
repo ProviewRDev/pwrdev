@@ -41,7 +41,8 @@
 
 CoLogQt::CoLogQt(QWidget* parent, const char* filename) : CoLog(filename)
 {
-  if (parent) {
+  if (parent)
+  {
     m_wow = new CoWowQt(parent);
   }
 }

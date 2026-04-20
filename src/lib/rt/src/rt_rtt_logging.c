@@ -65,21 +65,21 @@ static int log_print(rtt_t_loggtable* entry_ptr, char* format, ...);
 static int log_print_buffer(rtt_t_loggtable* entry_ptr);
 
 /*************************************************************************
-*
-* Name:		rtt_logging_create()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Create an entry in the logging table.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_create()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Create an entry in the logging table.
+ *
+ **************************************************************************/
 
-int rtt_logging_create(menu_ctx ctx, int entry, int logg_time, char* filename,
-    char* parameterstr, char* conditionstr, int logg_type, int insert,
-    int buffer_size, int stop, int priority, int line_size, int shortname)
+int rtt_logging_create(menu_ctx ctx, int entry, int logg_time, char* filename, char* parameterstr,
+                       char* conditionstr, int logg_type, int insert, int buffer_size, int stop, int priority,
+                       int line_size, int shortname)
 {
   int sts;
   int i;
@@ -91,25 +91,32 @@ int rtt_logging_create(menu_ctx ctx, int entry, int logg_time, char* filename,
   char msg[80];
   int type_error;
 
-  if (entry == 0) {
+  if (entry == 0)
+  {
     /* Find a not occupied entry */
     found = 0;
     entry_ptr = rtt_loggtable;
 
-    for (i = 0; i < RTT_LOGG_MAXENTRY; i++) {
-      if (!entry_ptr->occupied) {
+    for (i = 0; i < RTT_LOGG_MAXENTRY; i++)
+    {
+      if (!entry_ptr->occupied)
+      {
         found = 1;
         break;
       }
       entry_ptr++;
     }
-    if (!found) {
+    if (!found)
+    {
       rtt_message('E', "Logging table is full");
       return RTT__HOLDCOMMAND;
     }
-  } else {
+  }
+  else
+  {
     /* Create the selected entry */
-    if ((entry < 1) || (entry > RTT_LOGG_MAXENTRY)) {
+    if ((entry < 1) || (entry > RTT_LOGG_MAXENTRY))
+    {
       rtt_message('E', "Entry out of range");
       return RTT__HOLDCOMMAND;
     }
@@ -117,22 +124,26 @@ int rtt_logging_create(menu_ctx ctx, int entry, int logg_time, char* filename,
     /* Get the entry */
     entry_ptr = rtt_loggtable + entry - 1;
 
-    if (entry_ptr->occupied) {
+    if (entry_ptr->occupied)
+    {
       rtt_message('E', "Entry is already created");
       return RTT__HOLDCOMMAND;
     }
   }
 
-  if (parameterstr != NULL) {
+  if (parameterstr != NULL)
+  {
     /* Check that parameter exists */
     sts = gdh_GetObjectInfo(parameterstr, &buffer, sizeof(buffer));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Parameter doesn't exist");
       return RTT__HOLDCOMMAND;
     }
 
     sts = rtt_get_parinfo(parameterstr, &parinfo);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Parameter doesn't exist");
       return RTT__HOLDCOMMAND;
     }
@@ -148,7 +159,8 @@ int rtt_logging_create(menu_ctx ctx, int entry, int logg_time, char* filename,
 
   /* Allocate a buffer to store logging info in */
   entry_ptr->buffer_ptr = (char*)calloc(1, entry_ptr->buffer_size * 512);
-  if (entry_ptr->buffer_ptr == 0) {
+  if (entry_ptr->buffer_ptr == 0)
+  {
     rtt_message('E', "Buffer is to large, entry is not created");
     return RTT__HOLDCOMMAND;
   }
@@ -157,17 +169,22 @@ int rtt_logging_create(menu_ctx ctx, int entry, int logg_time, char* filename,
   rtt_message('I', "Logging entry created");
 
   /* Insert in the entry */
-  if (filename != NULL) {
+  if (filename != NULL)
+  {
     rtt_get_defaultfilename(filename, entry_ptr->logg_filename, ".dat");
-  } else {
+  }
+  else
+  {
     /* User default file name */
     rtt_get_defaultfilename("rtt_logging", entry_ptr->logg_filename, ".dat");
   }
 
-  if (conditionstr != NULL) {
+  if (conditionstr != NULL)
+  {
     /* Check that parameter exists */
     sts = gdh_GetObjectInfo(conditionstr, &buffer, sizeof(buffer));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Condition doesn't exist");
       return RTT__HOLDCOMMAND;
     }
@@ -193,10 +210,12 @@ int rtt_logging_create(menu_ctx ctx, int entry, int logg_time, char* filename,
   if (shortname != -1)
     entry_ptr->print_shortname = shortname;
 
-  if (priority < -1 || priority > 32) {
+  if (priority < -1 || priority > 32)
+  {
     rtt_message('E', "Priority out of range");
     return RTT__HOLDCOMMAND;
-  } else if (priority == -1)
+  }
+  else if (priority == -1)
     entry_ptr->logg_priority = 0;
   else
     entry_ptr->logg_priority = priority;
@@ -206,15 +225,18 @@ int rtt_logging_create(menu_ctx ctx, int entry, int logg_time, char* filename,
   else
     entry_ptr->intern = 0;
 
-  if (insert) {
+  if (insert)
+  {
     /* Insert from collection picture */
 
     /* Get items in collection picture */
-    if (rtt_collectionmenuctx == 0) {
+    if (rtt_collectionmenuctx == 0)
+    {
       rtt_message('E', "No objects in collection picture");
       return RTT__NOPICTURE;
     }
-    if (rtt_collectionmenuctx->menu == 0) {
+    if (rtt_collectionmenuctx->menu == 0)
+    {
       rtt_message('E', "No objects in collection picture");
       return RTT__NOPICTURE;
     }
@@ -222,14 +244,17 @@ int rtt_logging_create(menu_ctx ctx, int entry, int logg_time, char* filename,
     i = 0;
     type_error = 0;
     menu_ptr = (rtt_t_menu_upd*)rtt_collectionmenuctx->menu;
-    while (menu_ptr->text[0] != '\0') {
-      if (i >= RTT_LOGG_MAXPAR) {
+    while (menu_ptr->text[0] != '\0')
+    {
+      if (i >= RTT_LOGG_MAXPAR)
+      {
         rtt_message('E', "Max number of parameters exceeded");
         break;
       }
       strcpy(entry_ptr->parameterstr[i], menu_ptr->parameter_name);
       entry_ptr->parameter_type[i] = menu_ptr->value_type;
-      switch (entry_ptr->parameter_type[i]) {
+      switch (entry_ptr->parameter_type[i])
+      {
       case pwr_eType_Float32:
       case pwr_eType_Float64:
       case pwr_eType_UInt8:
@@ -260,7 +285,8 @@ int rtt_logging_create(menu_ctx ctx, int entry, int logg_time, char* filename,
 
   /* Count the parameters */
   entry_ptr->parameter_count = 0;
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
     if (entry_ptr->parameterstr[i][0] != 0)
       entry_ptr->parameter_count++;
   }
@@ -269,22 +295,21 @@ int rtt_logging_create(menu_ctx ctx, int entry, int logg_time, char* filename,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_set()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Modify parameter in the logging table.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_set()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Modify parameter in the logging table.
+ *
+ **************************************************************************/
 
-int rtt_logging_set(menu_ctx ctx, int entry, int logg_time, char* filename,
-    char* parameterstr, char* conditionstr, int logg_type, int insert,
-    int buffer_size, int stop, int priority, int create, int line_size,
-    int shortname)
+int rtt_logging_set(menu_ctx ctx, int entry, int logg_time, char* filename, char* parameterstr,
+                    char* conditionstr, int logg_type, int insert, int buffer_size, int stop, int priority,
+                    int create, int line_size, int shortname)
 {
   int i, sts;
   int found, par_index = 0;
@@ -296,41 +321,49 @@ int rtt_logging_set(menu_ctx ctx, int entry, int logg_time, char* filename,
   int type_error;
 
   /* Check the entry */
-  if ((entry < 1) || (entry > RTT_LOGG_MAXENTRY)) {
+  if ((entry < 1) || (entry > RTT_LOGG_MAXENTRY))
+  {
     rtt_message('E', "Entry out of range");
     return RTT__HOLDCOMMAND;
   }
 
   /* Get the entry */
   entry_ptr = rtt_loggtable + entry - 1;
-  if (create) {
-    if (entry_ptr->occupied) {
+  if (create)
+  {
+    if (entry_ptr->occupied)
+    {
       /* Reset the entry */
       if (entry_ptr->buffer_ptr != 0)
         free(entry_ptr->buffer_ptr);
       memset(entry_ptr, 0, sizeof(*entry_ptr));
     }
-    sts = rtt_logging_create(
-        ctx, entry, 0, NULL, NULL, NULL, 0, 0, 0, -1, -1, 0, -1);
-  } else {
-    if (!entry_ptr->occupied) {
+    sts = rtt_logging_create(ctx, entry, 0, NULL, NULL, NULL, 0, 0, 0, -1, -1, 0, -1);
+  }
+  else
+  {
+    if (!entry_ptr->occupied)
+    {
       rtt_message('E', "Entry is not created");
       return RTT__HOLDCOMMAND;
     }
   }
-  if (entry_ptr->active) {
+  if (entry_ptr->active)
+  {
     rtt_message('E', "Unable to modify entry, entry is started");
     return RTT__HOLDCOMMAND;
   }
 
-  if (buffer_size != 0) {
+  if (buffer_size != 0)
+  {
     entry_ptr->buffer_size = buffer_size;
 
     /* Reallocate the buffer to store logging info in */
     if (entry_ptr->buffer_ptr != 0)
       free(entry_ptr->buffer_ptr);
     entry_ptr->buffer_ptr = calloc(1, entry_ptr->buffer_size * 512);
-    if (entry_ptr->buffer_ptr == 0) {
+    if (entry_ptr->buffer_ptr == 0)
+    {
       rtt_message('E', "Buffer is to large");
       /* set default buffer */
       entry_ptr->buffer_size = RTT_BUFFER_DEFSIZE;
@@ -343,33 +376,40 @@ int rtt_logging_set(menu_ctx ctx, int entry, int logg_time, char* filename,
   }
 
   /* Insert in the entry */
-  if (filename != NULL) {
+  if (filename != NULL)
+  {
     rtt_get_defaultfilename(filename, entry_ptr->logg_filename, ".dat");
   }
-  if (parameterstr != NULL) {
+  if (parameterstr != NULL)
+  {
     /* Get a free parameter index */
     found = 0;
-    for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-      if (entry_ptr->parameterstr[i][0] == 0) {
+    for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+    {
+      if (entry_ptr->parameterstr[i][0] == 0)
+      {
         found = 1;
         par_index = i;
         break;
       }
     }
-    if (!found) {
+    if (!found)
+    {
       rtt_message('E', "Max number of parameters exceeded");
       return RTT__HOLDCOMMAND;
     }
 
     /* Check that parameter exists */
     sts = gdh_GetObjectInfo(parameterstr, &buffer, sizeof(buffer));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Parameter doesn't exist");
       return RTT__HOLDCOMMAND;
     }
 
     sts = rtt_get_parinfo(parameterstr, &parinfo);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Parameter doesn't exist");
       return RTT__HOLDCOMMAND;
     }
@@ -378,10 +418,12 @@ int rtt_logging_set(menu_ctx ctx, int entry, int logg_time, char* filename,
     entry_ptr->parameter_size[par_index] = parinfo.Size / parinfo.Elements;
   }
 
-  if (conditionstr != NULL) {
+  if (conditionstr != NULL)
+  {
     /* Check that parameter exists */
     sts = gdh_GetObjectInfo(conditionstr, &buffer, sizeof(buffer));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Condition doesn't exist");
       return RTT__HOLDCOMMAND;
     }
@@ -396,10 +438,12 @@ int rtt_logging_set(menu_ctx ctx, int entry, int logg_time, char* filename,
   if (logg_type != 0)
     entry_ptr->logg_type = logg_type;
 
-  if (priority < -1 || priority > 32) {
+  if (priority < -1 || priority > 32)
+  {
     rtt_message('E', "Priority out of range");
     return RTT__HOLDCOMMAND;
-  } else if (priority != -1)
+  }
+  else if (priority != -1)
     entry_ptr->logg_priority = priority;
 
   if (line_size != 0)
@@ -411,15 +455,18 @@ int rtt_logging_set(menu_ctx ctx, int entry, int logg_time, char* filename,
   if (stop != -1)
     entry_ptr->intern = stop;
 
-  if (insert) {
+  if (insert)
+  {
     /* Insert from collection picture */
 
     /* Get items in collection picture */
-    if (rtt_collectionmenuctx == 0) {
+    if (rtt_collectionmenuctx == 0)
+    {
       rtt_message('E', "No objects in collection picture");
       return RTT__NOPICTURE;
     }
-    if (rtt_collectionmenuctx->menu == 0) {
+    if (rtt_collectionmenuctx->menu == 0)
+    {
       rtt_message('E', "No objects in collection picture");
       return RTT__NOPICTURE;
     }
@@ -429,14 +476,17 @@ int rtt_logging_set(menu_ctx ctx, int entry, int logg_time, char* filename,
     i = 0;
     type_error = 0;
     menu_ptr = (rtt_t_menu_upd*)rtt_collectionmenuctx->menu;
-    while (menu_ptr->text[0] != '\0') {
-      if (i >= RTT_LOGG_MAXPAR) {
+    while (menu_ptr->text[0] != '\0')
+    {
+      if (i >= RTT_LOGG_MAXPAR)
+      {
         rtt_message('E', "Max number of parameters exceeded");
         break;
       }
       strcpy(entry_ptr->parameterstr[i], menu_ptr->parameter_name);
       entry_ptr->parameter_type[i] = menu_ptr->value_type;
-      switch (entry_ptr->parameter_type[i]) {
+      switch (entry_ptr->parameter_type[i])
+      {
       case pwr_eType_Float32:
       case pwr_eType_Float64:
       case pwr_eType_UInt8:
@@ -467,7 +517,8 @@ int rtt_logging_set(menu_ctx ctx, int entry, int logg_time, char* filename,
 
   /* Count the parameters */
   entry_ptr->parameter_count = 0;
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
     if (entry_ptr->parameterstr[i][0] != 0)
       entry_ptr->parameter_count++;
   }
@@ -476,17 +527,17 @@ int rtt_logging_set(menu_ctx ctx, int entry, int logg_time, char* filename,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_show()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Show the entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_show()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Show the entry.
+ *
+ **************************************************************************/
 
 int rtt_logging_show(menu_ctx ctx, int entry)
 {
@@ -498,16 +549,19 @@ int rtt_logging_show(menu_ctx ctx, int entry)
   int buff_cnt;
 
   /* Check the entry */
-  if ((entry < 0) || (entry > RTT_LOGG_MAXENTRY)) {
+  if ((entry < 0) || (entry > RTT_LOGG_MAXENTRY))
+  {
     rtt_message('E', "Entry out of range");
     return RTT__HOLDCOMMAND;
   }
 
-  if (entry > 0) {
+  if (entry > 0)
+  {
     /* Show this entry */
     /* Get the entry */
     entry_ptr = rtt_loggtable + entry - 1;
-    if (!entry_ptr->occupied) {
+    if (!entry_ptr->occupied)
+    {
       rtt_message('E', "Entry is not created");
       return RTT__HOLDCOMMAND;
     }
@@ -521,18 +575,23 @@ int rtt_logging_show(menu_ctx ctx, int entry)
     sts = rtt_view(0, 0, buff, "Show logging entry", RTT_VIEWTYPE_BUF);
     free(buff);
     return sts;
-  } else {
+  }
+  else
+  {
     /* Show all entries */
     /* Check that there is an occupied entry */
     found = 0;
     entry_ptr = rtt_loggtable;
-    for (i = 0; i < RTT_LOGG_MAXENTRY; i++) {
-      if (entry_ptr->occupied) {
+    for (i = 0; i < RTT_LOGG_MAXENTRY; i++)
+    {
+      if (entry_ptr->occupied)
+      {
         found = 1;
       }
       entry_ptr++;
     }
-    if (!found) {
+    if (!found)
+    {
       rtt_message('E', "No entries found");
       return RTT__HOLDCOMMAND;
     }
@@ -542,8 +601,10 @@ int rtt_logging_show(menu_ctx ctx, int entry)
       return RTT__NOMEMORY;
     buff_cnt = 0;
     entry_ptr = rtt_loggtable;
-    for (i = 0; i < RTT_LOGG_MAXENTRY; i++) {
-      if (entry_ptr->occupied) {
+    for (i = 0; i < RTT_LOGG_MAXENTRY; i++)
+    {
+      if (entry_ptr->occupied)
+      {
         rtt_logging_show_entry(i + 1, buff, &buff_cnt);
       }
       entry_ptr++;
@@ -555,17 +616,17 @@ int rtt_logging_show(menu_ctx ctx, int entry)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_show_entry()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Show one entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_show_entry()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Show one entry.
+ *
+ **************************************************************************/
 
 static int rtt_logging_show_entry(int entry, char* buff, int* buff_cnt)
 {
@@ -586,47 +647,41 @@ static int rtt_logging_show_entry(int entry, char* buff, int* buff_cnt)
   else if (entry_ptr->logg_type == RTT_LOGG_CONT)
     (*buff_cnt) += sprintf(buff + *buff_cnt, "   Type:      Cont\n");
 
-  (*buff_cnt) += sprintf(
-      buff + *buff_cnt, "   Time:      %d ms\n", entry_ptr->logg_time);
-  (*buff_cnt) += sprintf(
-      buff + *buff_cnt, "   Buffer:    %d pages\n", entry_ptr->buffer_size);
-  (*buff_cnt) += sprintf(
-      buff + *buff_cnt, "   Priority:  %d\n", entry_ptr->logg_priority);
-  (*buff_cnt)
-      += sprintf(buff + *buff_cnt, "   Line size: %d\n", entry_ptr->line_size);
+  (*buff_cnt) += sprintf(buff + *buff_cnt, "   Time:      %d ms\n", entry_ptr->logg_time);
+  (*buff_cnt) += sprintf(buff + *buff_cnt, "   Buffer:    %d pages\n", entry_ptr->buffer_size);
+  (*buff_cnt) += sprintf(buff + *buff_cnt, "   Priority:  %d\n", entry_ptr->logg_priority);
+  (*buff_cnt) += sprintf(buff + *buff_cnt, "   Line size: %d\n", entry_ptr->line_size);
   if (entry_ptr->intern)
     (*buff_cnt) += sprintf(buff + *buff_cnt, "   Stop when buffer is full\n");
-  (*buff_cnt) += sprintf(
-      buff + *buff_cnt, "   Filename:  %s\n", entry_ptr->logg_filename);
-  (*buff_cnt) += sprintf(buff + *buff_cnt, "   Number of parameters: %d\n",
-      entry_ptr->parameter_count);
+  (*buff_cnt) += sprintf(buff + *buff_cnt, "   Filename:  %s\n", entry_ptr->logg_filename);
+  (*buff_cnt) += sprintf(buff + *buff_cnt, "   Number of parameters: %d\n", entry_ptr->parameter_count);
   par_cnt = 0;
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-    if (entry_ptr->parameterstr[i][0] != 0) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
+    if (entry_ptr->parameterstr[i][0] != 0)
+    {
       par_cnt++;
-      (*buff_cnt) += sprintf(buff + *buff_cnt, "Parameter%d :	%s\n", par_cnt,
-          entry_ptr->parameterstr[i]);
+      (*buff_cnt) += sprintf(buff + *buff_cnt, "Parameter%d :	%s\n", par_cnt, entry_ptr->parameterstr[i]);
     }
   }
-  (*buff_cnt)
-      += sprintf(buff + *buff_cnt, "Condition:	%s\n", entry_ptr->conditionstr);
+  (*buff_cnt) += sprintf(buff + *buff_cnt, "Condition:	%s\n", entry_ptr->conditionstr);
   (*buff_cnt) += sprintf(buff + *buff_cnt, "\n");
 
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_store_entry()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Store one entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_store_entry()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Store one entry.
+ *
+ **************************************************************************/
 
 int rtt_logging_store_entry(int entry, char* filename)
 {
@@ -637,23 +692,27 @@ int rtt_logging_store_entry(int entry, char* filename)
   int found_parameter;
 
   /* Check the entry */
-  if ((entry < 1) || (entry > RTT_LOGG_MAXENTRY)) {
+  if ((entry < 1) || (entry > RTT_LOGG_MAXENTRY))
+  {
     rtt_message('E', "Entry out of range");
     return RTT__HOLDCOMMAND;
   }
 
   entry_ptr = rtt_loggtable + entry - 1;
-  if (!entry_ptr->occupied) {
+  if (!entry_ptr->occupied)
+  {
     rtt_message('E', "Logging entry is not created");
     return RTT__NOPICTURE;
   }
 
   found_parameter = 0;
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
     if (entry_ptr->parameterstr[i][0] != 0)
       found_parameter++;
   }
-  if (!found_parameter) {
+  if (!found_parameter)
+  {
     rtt_message('E', "No parameters found in Logging entry");
     return RTT__NOPICTURE;
   }
@@ -661,24 +720,20 @@ int rtt_logging_store_entry(int entry, char* filename)
   rtt_get_defaultfilename(filename, filename_str, ".rtt_com");
 
   outfile = fopen(filename_str, "w");
-  if (outfile == 0) {
+  if (outfile == 0)
+  {
     char tmp[300];
     snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", filename_str);
     rtt_message('E', tmp);
     return RTT__HOLDCOMMAND;
   }
 
-  fprintf(outfile, "logging set/create/entry=current/file=\"%s\"\n",
-      entry_ptr->logg_filename);
+  fprintf(outfile, "logging set/create/entry=current/file=\"%s\"\n", entry_ptr->logg_filename);
   if (entry_ptr->logg_time != 0)
-    fprintf(
-        outfile, "logging set/entry=current/time=%d\n", entry_ptr->logg_time);
-  fprintf(
-      outfile, "logging set/entry=current/buffer=%d\n", entry_ptr->buffer_size);
-  fprintf(outfile, "logging set/entry=current/line_size=%d\n",
-      entry_ptr->line_size);
-  fprintf(outfile, "logging set/entry=current/priority=%d\n",
-      entry_ptr->logg_priority);
+    fprintf(outfile, "logging set/entry=current/time=%d\n", entry_ptr->logg_time);
+  fprintf(outfile, "logging set/entry=current/buffer=%d\n", entry_ptr->buffer_size);
+  fprintf(outfile, "logging set/entry=current/line_size=%d\n", entry_ptr->line_size);
+  fprintf(outfile, "logging set/entry=current/priority=%d\n", entry_ptr->logg_priority);
   if (entry_ptr->print_shortname)
     fprintf(outfile, "logging set/entry=current/shortname\n");
   else
@@ -689,14 +744,13 @@ int rtt_logging_store_entry(int entry, char* filename)
   else if (entry_ptr->logg_type == RTT_LOGG_CONT)
     fprintf(outfile, "logging set/entry=current/type=cont\n");
 
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
     if (entry_ptr->parameterstr[i][0] != 0)
-      fprintf(outfile, "logging set/entry=current/parameter=\"%s\"\n",
-          entry_ptr->parameterstr[i]);
+      fprintf(outfile, "logging set/entry=current/parameter=\"%s\"\n", entry_ptr->parameterstr[i]);
   }
   if (entry_ptr->conditionstr[0] != 0)
-    fprintf(outfile, "logging set/entry=current/condition=\"%s\"\n",
-        entry_ptr->conditionstr);
+    fprintf(outfile, "logging set/entry=current/condition=\"%s\"\n", entry_ptr->conditionstr);
 
   if (entry_ptr->intern)
     fprintf(outfile, "logging set/entry=current/stop\n");
@@ -712,17 +766,17 @@ int rtt_logging_store_entry(int entry, char* filename)
   return RTT__NOPICTURE;
 }
 /*************************************************************************
-*
-* Name:		rtt_logging_store_all()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Store all entries.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_store_all()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Store all entries.
+ *
+ **************************************************************************/
 
 int rtt_logging_store_all(char* filename)
 {
@@ -735,29 +789,27 @@ int rtt_logging_store_all(char* filename)
   rtt_get_defaultfilename(filename, filename_str, ".rtt_com");
 
   outfile = fopen(filename_str, "w");
-  if (outfile == 0) {
+  if (outfile == 0)
+  {
     char tmp[300];
     snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", filename_str);
     rtt_message('E', tmp);
     return RTT__HOLDCOMMAND;
   }
 
-  for (j = 0; j < RTT_LOGG_MAXENTRY; j++) {
+  for (j = 0; j < RTT_LOGG_MAXENTRY; j++)
+  {
     entry = j + 1;
     entry_ptr = rtt_loggtable + entry - 1;
 
     if (!entry_ptr->occupied)
       continue;
 
-    fprintf(outfile, "logging set/create/entry=%d/file=%s\n", entry,
-        entry_ptr->logg_filename);
+    fprintf(outfile, "logging set/create/entry=%d/file=%s\n", entry, entry_ptr->logg_filename);
     if (entry_ptr->logg_time != 0)
-      fprintf(outfile, "logging set/entry=%d/time=%d\n", entry,
-          entry_ptr->logg_time);
-    fprintf(outfile, "logging set/entry=%d/buffer=%d\n", entry,
-        entry_ptr->buffer_size);
-    fprintf(outfile, "logging set/entry=%d/priority=%d\n", entry,
-        entry_ptr->logg_priority);
+      fprintf(outfile, "logging set/entry=%d/time=%d\n", entry, entry_ptr->logg_time);
+    fprintf(outfile, "logging set/entry=%d/buffer=%d\n", entry, entry_ptr->buffer_size);
+    fprintf(outfile, "logging set/entry=%d/priority=%d\n", entry, entry_ptr->logg_priority);
     if (entry_ptr->print_shortname)
       fprintf(outfile, "logging set/entry=%d/shortname\n", entry);
     else
@@ -768,14 +820,13 @@ int rtt_logging_store_all(char* filename)
     else if (entry_ptr->logg_type == RTT_LOGG_CONT)
       fprintf(outfile, "logging set/entry=%d/type=cont\n", entry);
 
-    for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
+    for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+    {
       if (entry_ptr->parameterstr[i][0] != 0)
-        fprintf(outfile, "logging set/entry=%d/parameter=\"%s\"\n", entry,
-            entry_ptr->parameterstr[i]);
+        fprintf(outfile, "logging set/entry=%d/parameter=\"%s\"\n", entry, entry_ptr->parameterstr[i]);
     }
     if (entry_ptr->conditionstr[0] != 0)
-      fprintf(outfile, "logging set/entry=%d/condition=\"%s\"\n", entry,
-          entry_ptr->conditionstr);
+      fprintf(outfile, "logging set/entry=%d/condition=\"%s\"\n", entry, entry_ptr->conditionstr);
     if (entry_ptr->intern)
       fprintf(outfile, "logging set/entry=%d/stop\n", entry);
     else
@@ -791,17 +842,17 @@ int rtt_logging_store_all(char* filename)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_start()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Start the entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_start()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Start the entry.
+ *
+ **************************************************************************/
 
 int rtt_logging_start(menu_ctx ctx, int entry)
 {
@@ -811,71 +862,85 @@ int rtt_logging_start(menu_ctx ctx, int entry)
   char message[256];
 
   /* Check the entry */
-  if ((entry < 1) || (entry > RTT_LOGG_MAXENTRY)) {
+  if ((entry < 1) || (entry > RTT_LOGG_MAXENTRY))
+  {
     rtt_message('E', "Entry out of range");
     return RTT__HOLDCOMMAND;
   }
 
   entry_ptr = rtt_loggtable + entry - 1;
-  if (!entry_ptr->occupied) {
+  if (!entry_ptr->occupied)
+  {
     rtt_message('E', "Entry is not created");
     return RTT__HOLDCOMMAND;
   }
 
-  if (entry_ptr->active) {
+  if (entry_ptr->active)
+  {
     rtt_message('E', "Entry is already started");
     return RTT__HOLDCOMMAND;
   }
 
   /* Get the parameters */
   found = 0;
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-    if (entry_ptr->parameterstr[i][0] != 0) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
+    if (entry_ptr->parameterstr[i][0] != 0)
+    {
       found = 1;
 
-      sts = gdh_RefObjectInfo(entry_ptr->parameterstr[i],
-          (pwr_tAddress*)&entry_ptr->parameter_ptr[i],
-          &(entry_ptr->parameter_subid[i]), entry_ptr->parameter_size[i]);
-      if (EVEN(sts)) {
+      sts = gdh_RefObjectInfo(entry_ptr->parameterstr[i], (pwr_tAddress*)&entry_ptr->parameter_ptr[i],
+                              &(entry_ptr->parameter_subid[i]), entry_ptr->parameter_size[i]);
+      if (EVEN(sts))
+      {
         rtt_message('E', "Parameter not found");
         return RTT__HOLDCOMMAND;
       }
     }
   }
-  if (!found) {
+  if (!found)
+  {
     rtt_message('E', "Parameter is missing");
     return RTT__HOLDCOMMAND;
   }
 
   /* Get the condition */
-  if (entry_ptr->conditionstr[0] != 0) {
-    sts = gdh_RefObjectInfo(entry_ptr->conditionstr,
-        (pwr_tAddress*)&entry_ptr->condition_ptr, &(entry_ptr->condition_subid),
-        1);
-    if (EVEN(sts)) {
+  if (entry_ptr->conditionstr[0] != 0)
+  {
+    sts = gdh_RefObjectInfo(entry_ptr->conditionstr, (pwr_tAddress*)&entry_ptr->condition_ptr,
+                            &(entry_ptr->condition_subid), 1);
+    if (EVEN(sts))
+    {
       rtt_message('E', "Condition parameter not found");
       return RTT__HOLDCOMMAND;
     }
-  } else {
+  }
+  else
+  {
     entry_ptr->condition_ptr = 0;
   }
 
   /* Open the file */
-  if (entry_ptr->logg_filename[0] != 0) {
+  if (entry_ptr->logg_filename[0] != 0)
+  {
     entry_ptr->logg_file = fopen(entry_ptr->logg_filename, "w");
-    if (entry_ptr->logg_file == 0) {
+    if (entry_ptr->logg_file == 0)
+    {
       char tmp[200];
       snprintf(tmp, 200, "Unable to open file \"%s\"", entry_ptr->logg_filename);
       rtt_message('E', tmp);
       return RTT__HOLDCOMMAND;
     }
-  } else {
+  }
+  else
+  {
     rtt_message('E', "File is missing");
     return RTT__HOLDCOMMAND;
   }
 
   /* Check time */
-  if (entry_ptr->logg_time == 0) {
+  if (entry_ptr->logg_time == 0)
+  {
     rtt_message('E', "Time is missing");
     return RTT__HOLDCOMMAND;
   }
@@ -887,49 +952,51 @@ int rtt_logging_start(menu_ctx ctx, int entry)
   entry_ptr->active = 1;
   entry_ptr->stop = 0;
 
-/* Create a subprocess */
+  /* Create a subprocess */
   sts = pthread_create(&entry_ptr->thread, NULL, /* attr */
-      rtt_logging_logproc, /* start_routine */
-      entry_ptr); /* arg */
+                       rtt_logging_logproc,      /* start_routine */
+                       entry_ptr);               /* arg */
   if (sts != 0)
     return sts;
 
   strcpy(message, "Logg start ");
-  rtt_fgetname(entry_ptr->logg_file, message + strlen(message),
-      entry_ptr->logg_filename);
+  rtt_fgetname(entry_ptr->logg_file, message + strlen(message), entry_ptr->logg_filename);
   rtt_message('I', message);
   return RTT__NOPICTURE;
 }
 /*************************************************************************
-*
-* Name:		rtt_logging_stop()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Stop the entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_stop()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Stop the entry.
+ *
+ **************************************************************************/
 
 int rtt_logging_stop(menu_ctx ctx, int entry)
 {
   rtt_t_loggtable* entry_ptr;
 
   /* Check the entry */
-  if ((entry < 1) || (entry > RTT_LOGG_MAXENTRY)) {
+  if ((entry < 1) || (entry > RTT_LOGG_MAXENTRY))
+  {
     rtt_message('E', "Entry out of range");
     return RTT__HOLDCOMMAND;
   }
 
   entry_ptr = rtt_loggtable + entry - 1;
-  if (!entry_ptr->occupied) {
+  if (!entry_ptr->occupied)
+  {
     rtt_message('E', "Entry is not created");
     return RTT__HOLDCOMMAND;
   }
 
-  if (!entry_ptr->active) {
+  if (!entry_ptr->active)
+  {
     rtt_message('E', "Entry is already stopped");
     return RTT__HOLDCOMMAND;
   }
@@ -941,17 +1008,17 @@ int rtt_logging_stop(menu_ctx ctx, int entry)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_entry_stop()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Stop the entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_entry_stop()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Stop the entry.
+ *
+ **************************************************************************/
 
 static int rtt_logging_entry_stop(rtt_t_loggtable* entry_ptr)
 {
@@ -963,8 +1030,10 @@ static int rtt_logging_entry_stop(rtt_t_loggtable* entry_ptr)
   entry_ptr->stop = 1;
 
   /* Unref from gdh */
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-    if (entry_ptr->parameterstr[i][0] != 0) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
+    if (entry_ptr->parameterstr[i][0] != 0)
+    {
       sts = gdh_UnrefObjectInfo(entry_ptr->parameter_subid[i]);
     }
   }
@@ -975,17 +1044,17 @@ static int rtt_logging_entry_stop(rtt_t_loggtable* entry_ptr)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_delete()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Delete the entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_delete()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Delete the entry.
+ *
+ **************************************************************************/
 
 int rtt_logging_delete(menu_ctx ctx, int entry, char* parameterstr)
 {
@@ -994,29 +1063,36 @@ int rtt_logging_delete(menu_ctx ctx, int entry, char* parameterstr)
   rtt_t_loggtable* entry_ptr;
 
   /* Check the entry */
-  if ((entry < 1) || (entry > RTT_LOGG_MAXENTRY)) {
+  if ((entry < 1) || (entry > RTT_LOGG_MAXENTRY))
+  {
     rtt_message('E', "Entry out of range");
     return RTT__HOLDCOMMAND;
   }
 
   entry_ptr = rtt_loggtable + entry - 1;
-  if (!entry_ptr->occupied) {
+  if (!entry_ptr->occupied)
+  {
     rtt_message('E', "Entry is not created");
     return RTT__HOLDCOMMAND;
   }
 
-  if (parameterstr == NULL) {
+  if (parameterstr == NULL)
+  {
     /* Delete the entire entry */
     /* Free the buffer */
     free(entry_ptr->buffer_ptr);
 
     memset(entry_ptr, 0, sizeof(*entry_ptr));
     rtt_message('E', "Entry deleted");
-  } else {
+  }
+  else
+  {
     /* Remove this parameter only */
     found = 0;
-    for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-      if (streq(entry_ptr->parameterstr[i], parameterstr)) {
+    for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+    {
+      if (streq(entry_ptr->parameterstr[i], parameterstr))
+      {
         /* Parmeter is found, remove it */
         entry_ptr->parameterstr[i][0] = 0;
         rtt_message('I', "Parameter removed");
@@ -1024,7 +1100,8 @@ int rtt_logging_delete(menu_ctx ctx, int entry, char* parameterstr)
         break;
       }
     }
-    if (!found) {
+    if (!found)
+    {
       rtt_message('E', "Parameter not found");
       return RTT__HOLDCOMMAND;
     }
@@ -1034,17 +1111,17 @@ int rtt_logging_delete(menu_ctx ctx, int entry, char* parameterstr)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_logproc()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Logging subprocess.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_logproc()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Logging subprocess.
+ *
+ **************************************************************************/
 
 void* rtt_logging_logproc(void* arg)
 {
@@ -1078,41 +1155,46 @@ void* rtt_logging_logproc(void* arg)
   entry_ptr->starttime = nextime;
 
   /* Print starttime and logged parameters on the file */
-  time_AtoAscii(&entry_ptr->starttime, time_eFormat_DateAndTime, time_str,
-      sizeof(time_str));
+  time_AtoAscii(&entry_ptr->starttime, time_eFormat_DateAndTime, time_str, sizeof(time_str));
 
-  switch (entry_ptr->logg_type) {
+  switch (entry_ptr->logg_type)
+  {
   case RTT_LOGG_CONT:
     if (entry_ptr->logg_file)
       fprintf(entry_ptr->logg_file, "\"\"");
     /* Find a unique shortname for each parameter */
-    for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-      if (entry_ptr->print_shortname) {
-        if (entry_ptr->parameterstr[i][0] != 0) {
+    for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+    {
+      if (entry_ptr->print_shortname)
+      {
+        if (entry_ptr->parameterstr[i][0] != 0)
+        {
           /* Print only last segment and not ActualValue */
-          rtt_cut_segments(
-              entry_ptr->shortname[i], entry_ptr->parameterstr[i], 1);
-          if ((s = strchr(entry_ptr->shortname[i], '.')) != 0) {
+          rtt_cut_segments(entry_ptr->shortname[i], entry_ptr->parameterstr[i], 1);
+          if ((s = strchr(entry_ptr->shortname[i], '.')) != 0)
+          {
             rtt_toupper(parname, s + 1);
             if (streq(parname, "ACTUALVALUE"))
               *s = 0;
           }
           /* Check that this name is unique */
-          for (j = 0; j < RTT_LOGG_MAXPAR; j++) {
-            if (j != i
-                && !strcmp(entry_ptr->shortname[i], entry_ptr->shortname[j])) {
-              for (k = 2; k < 7; k++) {
+          for (j = 0; j < RTT_LOGG_MAXPAR; j++)
+          {
+            if (j != i && !strcmp(entry_ptr->shortname[i], entry_ptr->shortname[j]))
+            {
+              for (k = 2; k < 7; k++)
+              {
                 /* Increase number of segments */
-                rtt_cut_segments(
-                    entry_ptr->shortname[i], entry_ptr->parameterstr[i], k);
-                if ((s = strchr(entry_ptr->shortname[i], '.')) != 0) {
+                rtt_cut_segments(entry_ptr->shortname[i], entry_ptr->parameterstr[i], k);
+                if ((s = strchr(entry_ptr->shortname[i], '.')) != 0)
+                {
                   rtt_toupper(parname, s + 1);
                   if (streq(parname, "ACTUALVALUE"))
                     *s = 0;
                 }
-                rtt_cut_segments(
-                    entry_ptr->shortname[j], entry_ptr->parameterstr[j], k);
-                if ((s = strchr(entry_ptr->shortname[j], '.')) != 0) {
+                rtt_cut_segments(entry_ptr->shortname[j], entry_ptr->parameterstr[j], k);
+                if ((s = strchr(entry_ptr->shortname[j], '.')) != 0)
+                {
                   rtt_toupper(parname, s + 1);
                   if (streq(parname, "ACTUALVALUE"))
                     *s = 0;
@@ -1123,22 +1205,27 @@ void* rtt_logging_logproc(void* arg)
             }
           }
         }
-      } else
+      }
+      else
         strcpy(entry_ptr->shortname[i], entry_ptr->parameterstr[i]);
     }
-    for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-      if (entry_ptr->parameterstr[i][0] != 0) {
-        if (entry_ptr->logg_file) {
-          char_cnt += fprintf(
-              entry_ptr->logg_file, "	%s", entry_ptr->shortname[i]);
-          if (char_cnt + 120 > entry_ptr->line_size) {
+    for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+    {
+      if (entry_ptr->parameterstr[i][0] != 0)
+      {
+        if (entry_ptr->logg_file)
+        {
+          char_cnt += fprintf(entry_ptr->logg_file, "	%s", entry_ptr->shortname[i]);
+          if (char_cnt + 120 > entry_ptr->line_size)
+          {
             fprintf(entry_ptr->logg_file, "\n");
             char_cnt = 0;
           }
         }
       }
     }
-    if (entry_ptr->logg_file) {
+    if (entry_ptr->logg_file)
+    {
       fprintf(entry_ptr->logg_file, "\n");
       char_cnt = 0;
     }
@@ -1147,11 +1234,12 @@ void* rtt_logging_logproc(void* arg)
   case RTT_LOGG_MOD:
     if (entry_ptr->logg_file)
       fprintf(entry_ptr->logg_file, "RTT LOGGING STARTED AT %s\n", time_str);
-    for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-      if (entry_ptr->parameterstr[i][0] != 0) {
+    for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+    {
+      if (entry_ptr->parameterstr[i][0] != 0)
+      {
         if (entry_ptr->logg_file)
-          fprintf(entry_ptr->logg_file, "Parameter: %s\n",
-              entry_ptr->parameterstr[i]);
+          fprintf(entry_ptr->logg_file, "Parameter: %s\n", entry_ptr->parameterstr[i]);
       }
     }
     break;
@@ -1159,19 +1247,24 @@ void* rtt_logging_logproc(void* arg)
 
   time_MsToD(&deltatime, entry_ptr->logg_time);
 
-  if (entry_ptr->logg_priority != 0) {
+  if (entry_ptr->logg_priority != 0)
+  {
     sts = rtt_set_prio(entry_ptr->logg_priority);
   }
 
-  for (;;) {
+  for (;;)
+  {
     /* Calculation of starttime for next loop */
     time_Aadd(&restime, &nextime, &deltatime);
     nextime = restime;
 
-    if (entry_ptr->condition_ptr != 0) {
-      if (entry_ptr->active && !entry_ptr->stop) {
-        if (!*(entry_ptr->condition_ptr)) {
-/*  Don't log, wait until next scan */
+    if (entry_ptr->condition_ptr != 0)
+    {
+      if (entry_ptr->active && !entry_ptr->stop)
+      {
+        if (!*(entry_ptr->condition_ptr))
+        {
+          /*  Don't log, wait until next scan */
           time_GetTime(&time);
           time_Adiff(&wait_time, &nextime, &time);
 
@@ -1185,7 +1278,8 @@ void* rtt_logging_logproc(void* arg)
     }
 
     time_GetTime(&time);
-    switch (entry_ptr->logg_type) {
+    switch (entry_ptr->logg_type)
+    {
     case RTT_LOGG_CONT:
       /* Convert time to seconds since start */
       time_Adiff(&timediff, &time, &entry_ptr->starttime);
@@ -1196,10 +1290,13 @@ void* rtt_logging_logproc(void* arg)
         time_float = 0.;
       /* Print time and the value of the parameter on the file */
       char_cnt += log_print(entry_ptr, "%11.3f", time_float);
-      for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-        if (entry_ptr->parameterstr[i][0] != 0) {
+      for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+      {
+        if (entry_ptr->parameterstr[i][0] != 0)
+        {
           value_ptr = entry_ptr->parameter_ptr[i];
-          switch (entry_ptr->parameter_type[i]) {
+          switch (entry_ptr->parameter_type[i])
+          {
           case pwr_eType_Float32:
             char_cnt += log_print(entry_ptr, "	%f", *(pwr_tFloat32*)value_ptr);
             break;
@@ -1233,43 +1330,36 @@ void* rtt_logging_logproc(void* arg)
             char_cnt += log_print(entry_ptr, "	%d", *(pwr_tUInt32*)value_ptr);
             break;
           case pwr_eType_Int64:
-            char_cnt += log_print(
-                entry_ptr, "	" pwr_dFormatInt64, *(pwr_tInt64*)value_ptr);
+            char_cnt += log_print(entry_ptr, "	" pwr_dFormatInt64, *(pwr_tInt64*)value_ptr);
             break;
           case pwr_eType_UInt64:
-            char_cnt += log_print(
-                entry_ptr, "	" pwr_dFormatUInt64, *(pwr_tUInt64*)value_ptr);
+            char_cnt += log_print(entry_ptr, "	" pwr_dFormatUInt64, *(pwr_tUInt64*)value_ptr);
             break;
           case pwr_eType_Objid:
             objid = *(pwr_tObjid*)value_ptr;
             if (!objid.oix)
-              sts = gdh_ObjidToName(
-                  objid, hiername, sizeof(hiername), cdh_mName_volumeStrict);
+              sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mName_volumeStrict);
             else
-              sts = gdh_ObjidToName(
-                  objid, hiername, sizeof(hiername), cdh_mNName);
+              sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
             if (EVEN(sts))
               strcpy(hiername, "** Unknown objid");
             char_cnt += log_print(entry_ptr, "	%s", hiername);
             break;
           case pwr_eType_AttrRef:
             attrref = (pwr_sAttrRef*)value_ptr;
-            sts = gdh_AttrrefToName(
-                attrref, hiername, sizeof(hiername), cdh_mNName);
+            sts = gdh_AttrrefToName(attrref, hiername, sizeof(hiername), cdh_mNName);
             if (EVEN(sts))
               strcpy(hiername, "** Unknown attrref");
             char_cnt += log_print(entry_ptr, "	%s", hiername);
             break;
           case pwr_eType_Time:
-            sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime,
-                timstr, sizeof(timstr));
+            sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime, timstr, sizeof(timstr));
             if (EVEN(sts))
               strcpy(timstr, "Undefined time");
             char_cnt += log_print(entry_ptr, "	%s", timstr);
             break;
           case pwr_eType_DeltaTime:
-            sts = time_DtoAscii(
-                (pwr_tDeltaTime*)value_ptr, 1, timstr, sizeof(timstr));
+            sts = time_DtoAscii((pwr_tDeltaTime*)value_ptr, 1, timstr, sizeof(timstr));
             if (EVEN(sts))
               strcpy(timstr, "Undefined time");
             char_cnt += log_print(entry_ptr, "	%s", timstr);
@@ -1277,7 +1367,8 @@ void* rtt_logging_logproc(void* arg)
           default:
             char_cnt += log_print(entry_ptr, "	%s", "Type error");
           }
-          if (char_cnt + 10 > entry_ptr->line_size) {
+          if (char_cnt + 10 > entry_ptr->line_size)
+          {
             log_print(entry_ptr, "\n");
             char_cnt = 0;
           }
@@ -1290,17 +1381,19 @@ void* rtt_logging_logproc(void* arg)
 
     case RTT_LOGG_MOD:
       /* Write only if value is changed */
-      for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-        if (entry_ptr->parameterstr[i][0] != 0) {
+      for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+      {
+        if (entry_ptr->parameterstr[i][0] != 0)
+        {
           value_ptr = entry_ptr->parameter_ptr[i];
           old_value_ptr = (char*)&entry_ptr->old_value[i];
-          switch (entry_ptr->parameter_type[i]) {
+          switch (entry_ptr->parameter_type[i])
+          {
           case pwr_eType_Float32:
-            if (!feqf(*(pwr_tFloat32*)value_ptr, *(pwr_tFloat32*)old_value_ptr)
-                || first_scan) {
+            if (!feqf(*(pwr_tFloat32*)value_ptr, *(pwr_tFloat32*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%f\n", *(pwr_tFloat32*)value_ptr);
@@ -1309,8 +1402,8 @@ void* rtt_logging_logproc(void* arg)
             break;
 
           case pwr_eType_Float64:
-            if (!feq(*(pwr_tFloat64*)value_ptr, *(pwr_tFloat64*)old_value_ptr)
-                || first_scan) {
+            if (!feq(*(pwr_tFloat64*)value_ptr, *(pwr_tFloat64*)old_value_ptr) || first_scan)
+            {
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%f\n", *(pwr_tFloat64*)value_ptr);
               *(pwr_tFloat64*)old_value_ptr = *(pwr_tFloat64*)value_ptr;
@@ -1318,11 +1411,10 @@ void* rtt_logging_logproc(void* arg)
             break;
 
           case pwr_eType_Boolean:
-            if ((*(pwr_tBoolean*)value_ptr != *(pwr_tBoolean*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tBoolean*)value_ptr != *(pwr_tBoolean*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%d\n", *(pwr_tBoolean*)value_ptr);
@@ -1330,11 +1422,10 @@ void* rtt_logging_logproc(void* arg)
             }
             break;
           case pwr_eType_Char:
-            if ((*(pwr_tChar*)value_ptr != *(pwr_tChar*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tChar*)value_ptr != *(pwr_tChar*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%c\n", *(pwr_tChar*)value_ptr);
@@ -1342,11 +1433,10 @@ void* rtt_logging_logproc(void* arg)
             }
             break;
           case pwr_eType_UInt8:
-            if ((*(pwr_tUInt8*)value_ptr != *(pwr_tUInt8*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tUInt8*)value_ptr != *(pwr_tUInt8*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%d\n", *(pwr_tUInt8*)value_ptr);
@@ -1354,11 +1444,10 @@ void* rtt_logging_logproc(void* arg)
             }
             break;
           case pwr_eType_Int8:
-            if ((*(pwr_tInt8*)value_ptr != *(pwr_tInt8*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tInt8*)value_ptr != *(pwr_tInt8*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%d\n", *value_ptr);
@@ -1366,11 +1455,10 @@ void* rtt_logging_logproc(void* arg)
             }
             break;
           case pwr_eType_UInt16:
-            if ((*(pwr_tUInt16*)value_ptr != *(pwr_tUInt16*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tUInt16*)value_ptr != *(pwr_tUInt16*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%d\n", *(pwr_tUInt16*)value_ptr);
@@ -1378,11 +1466,10 @@ void* rtt_logging_logproc(void* arg)
             }
             break;
           case pwr_eType_Int16:
-            if ((*(pwr_tInt16*)value_ptr != *(pwr_tInt16*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tInt16*)value_ptr != *(pwr_tInt16*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%d\n", *(pwr_tInt16*)value_ptr);
@@ -1390,11 +1477,10 @@ void* rtt_logging_logproc(void* arg)
             }
             break;
           case pwr_eType_UInt32:
-            if ((*(pwr_tUInt32*)value_ptr != *(pwr_tUInt32*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tUInt32*)value_ptr != *(pwr_tUInt32*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%d\n", *(pwr_tUInt32*)value_ptr);
@@ -1402,11 +1488,10 @@ void* rtt_logging_logproc(void* arg)
             }
             break;
           case pwr_eType_Int32:
-            if ((*(pwr_tInt32*)value_ptr != *(pwr_tInt32*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tInt32*)value_ptr != *(pwr_tInt32*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%d\n", *(pwr_tInt32*)value_ptr);
@@ -1414,11 +1499,10 @@ void* rtt_logging_logproc(void* arg)
             }
             break;
           case pwr_eType_UInt64:
-            if ((*(pwr_tUInt64*)value_ptr != *(pwr_tUInt64*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tUInt64*)value_ptr != *(pwr_tUInt64*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%llu\n", *(pwr_tUInt64*)value_ptr);
@@ -1426,33 +1510,28 @@ void* rtt_logging_logproc(void* arg)
             }
             break;
           case pwr_eType_Int64:
-            if ((*(pwr_tInt64*)value_ptr != *(pwr_tInt64*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tInt64*)value_ptr != *(pwr_tInt64*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
-              log_print(entry_ptr, "	" pwr_dFormatUInt64 "\n",
-                  *(pwr_tInt64*)value_ptr);
+              log_print(entry_ptr, "	" pwr_dFormatUInt64 "\n", *(pwr_tInt64*)value_ptr);
               *(pwr_tInt64*)old_value_ptr = *(pwr_tInt64*)value_ptr;
             }
             break;
           case pwr_eType_Objid:
-            if (memcmp(value_ptr, old_value_ptr, sizeof(pwr_tObjid)) != 0
-                || first_scan) {
+            if (memcmp(value_ptr, old_value_ptr, sizeof(pwr_tObjid)) != 0 || first_scan)
+            {
               /* Value is changed, print */
               objid = *(pwr_tObjid*)value_ptr;
               if (!objid.oix)
-                sts = gdh_ObjidToName(
-                    objid, hiername, sizeof(hiername), cdh_mName_volumeStrict);
+                sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mName_volumeStrict);
               else
-                sts = gdh_ObjidToName(
-                    objid, hiername, sizeof(hiername), cdh_mNName);
+                sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
               if (EVEN(sts))
                 strcpy(hiername, "** Unknown objid");
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%s\n", hiername);
@@ -1463,17 +1542,13 @@ void* rtt_logging_logproc(void* arg)
             attrref = (pwr_sAttrRef*)value_ptr;
             /* There is only space for the objid of the attrref in oldvalue ..
              */
-            if (memcmp(
-                    (char*)&attrref->Objid, old_value_ptr, sizeof(pwr_tObjid))
-                    != 0
-                || first_scan) {
+            if (memcmp((char*)&attrref->Objid, old_value_ptr, sizeof(pwr_tObjid)) != 0 || first_scan)
+            {
               /* At least the objid is changed */
-              sts = gdh_AttrrefToName(
-                  attrref, hiername, sizeof(hiername), cdh_mNName);
+              sts = gdh_AttrrefToName(attrref, hiername, sizeof(hiername), cdh_mNName);
               if (EVEN(sts))
                 strcpy(hiername, "** Unknown attrref");
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%s\n", hiername);
@@ -1481,16 +1556,14 @@ void* rtt_logging_logproc(void* arg)
             }
             break;
           case pwr_eType_Time:
-            if (memcmp(value_ptr, old_value_ptr, sizeof(pwr_tTime)) != 0
-                || first_scan) {
+            if (memcmp(value_ptr, old_value_ptr, sizeof(pwr_tTime)) != 0 || first_scan)
+            {
               /* Value is changed, print */
-              sts = time_AtoAscii((pwr_tTime*)value_ptr,
-                  time_eFormat_DateAndTime, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime, timstr, sizeof(timstr));
               if (EVEN(sts))
                 strcpy(timstr, "Undefined time");
 
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%s\n", timstr);
@@ -1498,16 +1571,14 @@ void* rtt_logging_logproc(void* arg)
             }
             break;
           case pwr_eType_DeltaTime:
-            if (memcmp(value_ptr, old_value_ptr, sizeof(pwr_tTime)) != 0
-                || first_scan) {
+            if (memcmp(value_ptr, old_value_ptr, sizeof(pwr_tTime)) != 0 || first_scan)
+            {
               /* Value is changed, print */
-              sts = time_DtoAscii(
-                  (pwr_tDeltaTime*)value_ptr, 1, timstr, sizeof(timstr));
+              sts = time_DtoAscii((pwr_tDeltaTime*)value_ptr, 1, timstr, sizeof(timstr));
               if (EVEN(sts))
                 strcpy(timstr, "Undefined time");
 
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               log_print(entry_ptr, "%s", &time_str);
               log_print(entry_ptr, "	%s", &(entry_ptr->parameterstr[i]));
               log_print(entry_ptr, "	%s\n", timstr);
@@ -1524,7 +1595,8 @@ void* rtt_logging_logproc(void* arg)
 
     /*  Wait "cytime" ms */
 
-    if (!entry_ptr->active || entry_ptr->stop) {
+    if (!entry_ptr->active || entry_ptr->stop)
+    {
       rtt_logging_entry_stop(entry_ptr);
       log_print_buffer(entry_ptr);
       if (entry_ptr->logg_file)
@@ -1537,7 +1609,8 @@ void* rtt_logging_logproc(void* arg)
       pthread_exit((void*)1);
     }
     time_GetTime(&time);
-    while (time_Acomp(&time, &nextime) > 0) {
+    while (time_Acomp(&time, &nextime) > 0)
+    {
       /* To late for next lap, skip it */
       time_Aadd(&restime, &nextime, &deltatime);
       nextime = restime;
@@ -1552,17 +1625,17 @@ void* rtt_logging_logproc(void* arg)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_ger_parinfo()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get parameter info.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_ger_parinfo()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get parameter info.
+ *
+ **************************************************************************/
 
 static int rtt_get_parinfo(char* parameter_name, pwr_sParInfo* parinfo)
 {
@@ -1580,8 +1653,8 @@ static int rtt_get_parinfo(char* parameter_name, pwr_sParInfo* parinfo)
 
   /* Get object name */
   /* Parse the parameter name into a object and a parameter name */
-  nr = rtt_parse(parameter_name, ".", "", (char*)name_array,
-      sizeof(name_array) / sizeof(name_array[0]), sizeof(name_array[0]), 0);
+  nr = rtt_parse(parameter_name, ".", "", (char*)name_array, sizeof(name_array) / sizeof(name_array[0]),
+                 sizeof(name_array[0]), 0);
   if (nr < 2)
     return RTT__OBJNOTFOUND;
 
@@ -1602,21 +1675,21 @@ static int rtt_get_parinfo(char* parameter_name, pwr_sParInfo* parinfo)
   sts = gdh_GetObjectClass(objid, &class);
   if (EVEN(sts))
     return sts;
-  sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), hiername, sizeof(hiername),
-      cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), hiername, sizeof(hiername), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
   strcat(hiername, "-RtBody");
   sts = gdh_NameToObjid(hiername, &parameter);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     /* Try with sysbody */
-    sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), hiername, sizeof(hiername),
-        cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), hiername, sizeof(hiername), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
     strcat(hiername, "-SysBody");
     sts = gdh_NameToObjid(hiername, &parameter);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Unable to open object");
       return RTT__NOPICTURE;
     }
@@ -1636,20 +1709,20 @@ static int rtt_get_parinfo(char* parameter_name, pwr_sParInfo* parinfo)
 }
 
 /*************************************************************************
-*
-* Name:		log_print()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Print. Equivalent to fprintf but the character string is put
-*	in a buffer and printed when the buffer size is exceeded or
-*	when r_print_buffer is called.
-*	The max size of the character string is 200.
-*
-**************************************************************************/
+ *
+ * Name:		log_print()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Print. Equivalent to fprintf but the character string is put
+ *	in a buffer and printed when the buffer size is exceeded or
+ *	when r_print_buffer is called.
+ *	The max size of the character string is 200.
+ *
+ **************************************************************************/
 
 static int log_print(rtt_t_loggtable* entry_ptr, char* format, ...)
 {
@@ -1666,9 +1739,10 @@ static int log_print(rtt_t_loggtable* entry_ptr, char* format, ...)
   strcpy(s, buff);
   entry_ptr->buffer_count += strlen(buff);
 
-  if (entry_ptr->buffer_count
-      > (entry_ptr->buffer_size * 512 - (int)sizeof(buff))) {
-    if (entry_ptr->intern) {
+  if (entry_ptr->buffer_count > (entry_ptr->buffer_size * 512 - (int)sizeof(buff)))
+  {
+    if (entry_ptr->intern)
+    {
       entry_ptr->stop = 1;
       return 1;
     }
@@ -1678,16 +1752,16 @@ static int log_print(rtt_t_loggtable* entry_ptr, char* format, ...)
 }
 
 /*************************************************************************
-*
-* Name:		log_print_buffer()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		log_print_buffer()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 static int log_print_buffer(rtt_t_loggtable* entry_ptr)
 {
@@ -1697,8 +1771,7 @@ static int log_print_buffer(rtt_t_loggtable* entry_ptr)
           fputs( entry_ptr->buffer_ptr, entry_ptr->logg_file);
   */
   if (entry_ptr->logg_file)
-    fwrite(entry_ptr->buffer_ptr, 1, entry_ptr->buffer_count,
-        entry_ptr->logg_file);
+    fwrite(entry_ptr->buffer_ptr, 1, entry_ptr->buffer_count, entry_ptr->logg_file);
 
   if (entry_ptr->logg_priority != 0)
     rtt_set_prio(entry_ptr->logg_priority);
@@ -1710,27 +1783,30 @@ static int log_print_buffer(rtt_t_loggtable* entry_ptr)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_close_files()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Close all open files.
-*	This file is called at execute termintation to close the files.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_close_files()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Close all open files.
+ *	This file is called at execute termintation to close the files.
+ *
+ **************************************************************************/
 int rtt_logging_close_files()
 {
   int i;
   rtt_t_loggtable* entry_ptr;
 
   entry_ptr = rtt_loggtable;
-  for (i = 0; i < RTT_LOGG_MAXENTRY; i++) {
-    if (entry_ptr->occupied && entry_ptr->active) {
-      if (entry_ptr->logg_file) {
+  for (i = 0; i < RTT_LOGG_MAXENTRY; i++)
+  {
+    if (entry_ptr->occupied && entry_ptr->active)
+    {
+      if (entry_ptr->logg_file)
+      {
         log_print_buffer(entry_ptr);
         fclose(entry_ptr->logg_file);
       }

@@ -49,10 +49,10 @@
 class SubGraphsQtWidget;
 
 //! Display loaded subgraphs.
-class SubGraphsQt : public SubGraphs {
+class SubGraphsQt : public SubGraphs
+{
 public:
-  SubGraphsQt(void* xn_parent_ctx, const char* xn_name, void* grow_ctx,
-      QWidget** w, pwr_tStatus* status);
+  SubGraphsQt(void* xn_parent_ctx, const char* xn_name, void* grow_ctx, QWidget** w, pwr_tStatus* status);
 
   QWidget* brow_widget;
   QWidget* form_widget;
@@ -65,7 +65,8 @@ private:
   SubGraphsQtWidget* toplevel;
 };
 
-class SubGraphsQtWidget : public QWidget {
+class SubGraphsQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

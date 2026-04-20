@@ -6,7 +6,8 @@
 
 #if defined PWRE_CONF_LIBUSB
 
-typedef struct {
+typedef struct
+{
   libusb_device_handle* libusb_device;
 } io_sLocal_K8055;
 

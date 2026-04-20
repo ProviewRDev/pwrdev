@@ -41,33 +41,23 @@
 
 #include "flow_printdraw.h"
 
-class FlowPrintDrawGtk : public FlowPrintDraw {
+class FlowPrintDrawGtk : public FlowPrintDraw
+{
 public:
-  FlowPrintDrawGtk(void* context, const char* title, int page, void* flow_ctx,
-      int page_border, int* sts);
+  FlowPrintDrawGtk(void* context, const char* title, int page, void* flow_ctx, int page_border, int* sts);
   ~FlowPrintDrawGtk();
   int print_page(double ll_x, double ll_y, double ur_x, double ur_y);
-  int rect(double x, double y, double width, double height, flow_eDrawType type,
-      double idx, int highlight);
-  int filled_rect(double x, double y, double width, double height,
-      flow_eDrawType type, double idx);
-  int arc(double x, double y, double width, double height, int angle1,
-      int angle2, flow_eDrawType type, double idx, int highlight);
-  int line(double x1, double y1, double x2, double y2, flow_eDrawType type,
-      double idx, int highlight);
-  int text(double x, double y, char* text, int len, flow_eDrawType type,
-      double size, int line);
-  int pixmap(
-      double x, double y, flow_sPixmapDataElem* data, void *pixmaps, int idx,
-      flow_eDrawType type);
-  int image(double x, double y, double width, double height,
-      flow_tImImage image, flow_eDrawType type);
-  int arrow(double x1, double y1, double x2, double y2, double x3, double y3,
-      flow_eDrawType type, double idx);
-  void set_showred(int show)
-  {
-    show_red = show;
-  }
+  int rect(double x, double y, double width, double height, flow_eDrawType type, double idx, int highlight);
+  int filled_rect(double x, double y, double width, double height, flow_eDrawType type, double idx);
+  int arc(double x, double y, double width, double height, int angle1, int angle2, flow_eDrawType type,
+          double idx, int highlight);
+  int line(double x1, double y1, double x2, double y2, flow_eDrawType type, double idx, int highlight);
+  int text(double x, double y, char* text, int len, flow_eDrawType type, double size, int line);
+  int pixmap(double x, double y, flow_sPixmapDataElem* data, void* pixmaps, int idx, flow_eDrawType type);
+  int image(double x, double y, double width, double height, flow_tImImage image, flow_eDrawType type);
+  int arrow(double x1, double y1, double x2, double y2, double x3, double y3, flow_eDrawType type,
+            double idx);
+  void set_showred(int show) { show_red = show; }
   GtkPrintContext* print_ctx;
   int border;
   FlowCtx* ctx;

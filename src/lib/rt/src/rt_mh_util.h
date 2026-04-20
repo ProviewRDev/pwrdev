@@ -41,17 +41,18 @@
 #include "rt_qcom.h"
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-pwr_tStatus mh_UtilCreateEvent(); /* create the event semaphore */
-pwr_tStatus mh_UtilDestroyEvent(); /* destroy the event semaphore */
+  pwr_tStatus mh_UtilCreateEvent();  /* create the event semaphore */
+  pwr_tStatus mh_UtilDestroyEvent(); /* destroy the event semaphore */
 
-pwr_tBoolean mh_UtilIsStartedMh(); /* is emon started */
-pwr_tStatus mh_UtilStartScanSup(qcom_sQid Source);
-pwr_tStatus mh_UtilStopScanSup(qcom_sQid Source); /* wait for emon to start */
-pwr_tStatus mh_UtilWaitForMh();
-pwr_tStatus mh_UtilWake(); /* wake all waiting for emon to start */
+  pwr_tBoolean mh_UtilIsStartedMh(); /* is emon started */
+  pwr_tStatus mh_UtilStartScanSup(qcom_sQid Source);
+  pwr_tStatus mh_UtilStopScanSup(qcom_sQid Source); /* wait for emon to start */
+  pwr_tStatus mh_UtilWaitForMh();
+  pwr_tStatus mh_UtilWake(); /* wake all waiting for emon to start */
 
 #if defined __cplusplus
 }

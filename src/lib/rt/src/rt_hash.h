@@ -47,7 +47,8 @@
 
 #define hash_cVersion 4 /* Layout version number */
 
-typedef enum {
+typedef enum
+{
   hash_eKey__ = 0,
   hash_eKey_uint16,
   hash_eKey_memcmp,
@@ -77,21 +78,22 @@ typedef pool_sQlink hash_sEntry;
 /* The primary hash table (with `Size' entries) is also stored in pool space.
    It contains only a pool_sRefLink for each entry.  */
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
   pwr_32Bits(pwr_Bits(created, 1),
 
-      pwr_Bits(fill, 31), , , , , , , , , , , , , , , , , , , , , , , , , , , ,
-      , , ) b;
+             pwr_Bits(fill, 31), , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ) b;
 
 #define hash_mGtable__ 0
 #define hash_mGtable_created pwr_Bit(0)
 #define hash_mGtable_ (~hash_mGtable__)
 } hash_mGtable;
 
-typedef struct {
+typedef struct
+{
   hash_mGtable flags;
-  size_t size; /* Primary table size */
+  size_t size;     /* Primary table size */
   pool_tRef table; /* Primary hash table reference */
 
   size_t key_size;
@@ -103,8 +105,8 @@ typedef struct {
 
   /* Hash algorithm statistics */
 
-  pwr_tUInt32 xforms; /* # of key transformations */
-  pwr_tUInt32 comps; /* # of key comparisons */
+  pwr_tUInt32 xforms;    /* # of key transformations */
+  pwr_tUInt32 comps;     /* # of key comparisons */
   pwr_tUInt32 max_depth; /* Top key comparison cnt ever */
   pwr_tUInt32 inserts;
   pwr_tUInt32 removes;
@@ -120,35 +122,32 @@ typedef struct {
 
 /* Job local structure */
 
-typedef struct {
-  hash_sGtable* ghtp; /* GHT data */
-  pool_sHead* php; /* Pool to use for storage.   */
-  pool_sQlink* tp; /* pointer to primary hash table, optimization... */
+typedef struct
+{
+  hash_sGtable* ghtp;    /* GHT data */
+  pool_sHead* php;       /* Pool to use for storage.   */
+  pool_sQlink* tp;       /* pointer to primary hash table, optimization... */
   pwr_tBoolean (*comp_f)(/* Key comparison routine */
-      const void*, void*);
+                         const void*, void*);
   pwr_tUInt32 (*xform_f)(/* Key transformation routine */
-      const void*, size_t);
+                         const void*, size_t);
 } hash_sTable;
 
 void* hash_Search(pwr_tStatus* sts, hash_sTable* htp, const void* key);
 
-void* hash_Insert(pwr_tStatus* sts, hash_sTable* htp,
-    void* ip /* Address of item to be inserted.  */
-    );
+void* hash_Insert(pwr_tStatus* sts, hash_sTable* htp, void* ip /* Address of item to be inserted.  */
+);
 
-void* hash_Remove(pwr_tStatus* sts, hash_sTable* htp,
-    void* ip /* Address of item to be removed.  */
-    );
+void* hash_Remove(pwr_tStatus* sts, hash_sTable* htp, void* ip /* Address of item to be removed.  */
+);
 
-hash_sTable* hash_Create(
-    pwr_tStatus* sts, pool_sHead* php, hash_sTable* htp, hash_sGtable* ghtp,
-    pwr_tBoolean (*comp_f)(const void*, void*), /* Key comparison routine */
-    pwr_tUInt32 (*xform_f)(const void*, size_t) /* Key transformation routine */
-    );
+hash_sTable* hash_Create(pwr_tStatus* sts, pool_sHead* php, hash_sTable* htp, hash_sGtable* ghtp,
+                         pwr_tBoolean (*comp_f)(const void*, void*), /* Key comparison routine */
+                         pwr_tUInt32 (*xform_f)(const void*, size_t) /* Key transformation routine */
+);
 
-void hash_Init(hash_sGtable* p, size_t size, size_t key_size,
-    size_t record_size, ptrdiff_t key_offset, ptrdiff_t link_offset,
-    hash_eKey key_type);
+void hash_Init(hash_sGtable* p, size_t size, size_t key_size, size_t record_size, ptrdiff_t key_offset,
+               ptrdiff_t link_offset, hash_eKey key_type);
 
 void hash_Print(pwr_tStatus* sts, hash_sTable* htp);
 

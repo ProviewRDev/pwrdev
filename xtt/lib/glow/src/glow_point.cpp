@@ -38,8 +38,7 @@
 
 #include "glow_growctx.h"
 
-GlowPoint::GlowPoint(GrowCtx* glow_ctx, double x1, double y1)
-    : GlowArrayElem(glow_ctx), x(x1), y(y1)
+GlowPoint::GlowPoint(GrowCtx* glow_ctx, double x1, double y1) : GlowArrayElem(glow_ctx), x(x1), y(y1)
 {
   (*this).zoom();
 }
@@ -83,11 +82,9 @@ void GlowPoint::print_zoom()
   print_z_y = y * ctx->print_zoom_factor;
 }
 
-void GlowPoint::traverse(int x, int y)
-{
-}
+void GlowPoint::traverse(int x, int y) {}
 
-void GlowPoint::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowPoint::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_Point) << '\n';
   fp << int(glow_eSave_Point_x) << FSPACE << x << '\n';
@@ -95,21 +92,24 @@ void GlowPoint::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowPoint::open(std::ifstream& fp)
+void GlowPoint::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GlowPoint: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_Point:
       break;
     case glow_eSave_Point_x:

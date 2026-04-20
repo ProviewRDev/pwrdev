@@ -43,23 +43,21 @@
 
 #include "xtt_otree_gtk.h"
 
-class XttSevHistGtk : public XttSevHist {
+class XttSevHistGtk : public XttSevHist
+{
 public:
   GtkWidget* parent_widget; //!< Parent widget.
 
-  XttSevHistGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-      const char* xn_name, GtkWidget** w, pwr_tOid* xn_oidv,
-      pwr_tOName* xn_anamev, pwr_tOName* xn_onamev, bool* sevhistobjectv,
-      sevcli_tCtx xn_scctx, int width, int height, unsigned int options,
-      int xn_color_theme, time_ePeriod xn_time_range, void* basewidget,
-      int* sts);
-  XttSevHistGtk(void* parent_ctx, GtkWidget* parent_wid, const char* name,
-      GtkWidget** w, char* filename, int xn_color_theme, void* basewidget,
-      int* sts);
+  XttSevHistGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name, GtkWidget** w,
+                pwr_tOid* xn_oidv, pwr_tOName* xn_anamev, pwr_tOName* xn_onamev, bool* sevhistobjectv,
+                sevcli_tCtx xn_scctx, int width, int height, unsigned int options, int xn_color_theme,
+                time_ePeriod xn_time_range, void* basewidget, int* sts);
+  XttSevHistGtk(void* parent_ctx, GtkWidget* parent_wid, const char* name, GtkWidget** w, char* filename,
+                int xn_color_theme, void* basewidget, int* sts);
   ~XttSevHistGtk();
 
-  XttOTree* tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt,
-      unsigned int layout, pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*));
+  XttOTree* tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt, unsigned int layout,
+                     pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*));
 };
 
 #endif

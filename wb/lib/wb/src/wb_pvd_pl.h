@@ -39,23 +39,23 @@
 
 #include "rt_pvd_file.h"
 
-typedef enum {
+typedef enum
+{
   pl_mFlags_ProjectModified = 1 << 16,
   pl_mFlags_PathModified = 1 << 17,
   pl_mFlags_Disabled = 1 << 18
 } pl_mFlags;
 
-class wb_pvd_pl : public rt_pvd_file {
+class wb_pvd_pl : public rt_pvd_file
+{
 public:
   wb_pvd_pl()
   {
     pwr_tStatus sts;
     load(&sts);
   }
-  void writeAttribute(co_procom* pcom, pwr_tOix oix, unsigned int offset,
-      unsigned int size, char* buffer);
-  void createObject(co_procom* pcom, pwr_tOix destoix, int desttype,
-      pwr_tCid cid, char* name);
+  void writeAttribute(co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size, char* buffer);
+  void createObject(co_procom* pcom, pwr_tOix destoix, int desttype, pwr_tCid cid, char* name);
   void load(pwr_tStatus* sts);
   void save(pwr_tStatus* sts);
   bool check_list(pwr_tStatus* sts);

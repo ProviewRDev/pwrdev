@@ -35,26 +35,26 @@
  */
 
 /*************************************************************************
-*
-* 	PROGRAM		rs_ssabutil_matrix
-*
-*       Modifierad
-*		96 01 26	CS	Skapad
-*
-*	Funktion:
-*		Interpolation i tabeller.
-*
-**************************************************************************/
+ *
+ * 	PROGRAM		rs_ssabutil_matrix
+ *
+ *       Modifierad
+ *		96 01 26	CS	Skapad
+ *
+ *	Funktion:
+ *		Interpolation i tabeller.
+ *
+ **************************************************************************/
 
 /*_Include filer_________________________________________________________*/
 
 #include <stdlib.h>
 
-#include "pwr.h"
 #include "co_math.h"
+#include "pwr.h"
 
-#include "ssabox_ssabutil.h"
 #include "rs_sutl_msg.h"
+#include "ssabox_ssabutil.h"
 
 /*_Globala variabler______________________________________________________*/
 
@@ -63,39 +63,38 @@
 /* Globala procedurer_____________________________________________________*/
 
 /*************************************************************************
-*
-* Name:		ssab_curve
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-* float		x		I	x-värde.
-* float*	y		O	interpolerat y-värde.
-* float*	table		I	tabell.
-* int		size		I	antal punkter i tabellen (n).
-*
-* Beskrivning:
-*		Interpolerar i en tabell av float. Tabellen ska vara
-*		av formatet
-*			float	some_table[n][2] = {
-*				{  x1,	y1},
-*				{  x2,	y2},
-*				{  x3,	y3},
-*				...
-*				{  xn,	yn}};
-*
-*
-**************************************************************************/
+ *
+ * Name:		ssab_curve
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ * float		x		I	x-värde.
+ * float*	y		O	interpolerat y-värde.
+ * float*	table		I	tabell.
+ * int		size		I	antal punkter i tabellen (n).
+ *
+ * Beskrivning:
+ *		Interpolerar i en tabell av float. Tabellen ska vara
+ *		av formatet
+ *			float	some_table[n][2] = {
+ *				{  x1,	y1},
+ *				{  x2,	y2},
+ *				{  x3,	y3},
+ *				...
+ *				{  xn,	yn}};
+ *
+ *
+ **************************************************************************/
 
-int ssab_curve(float x, float* y, float* table, int size)
-{
+int ssab_curve(float x, float *y, float *table, int size) {
   int x_idx;
   int x_found;
-  float* ptr;
+  float *ptr;
   float x1, x2, y1, y2;
 
-#define TABLE_Y(ix) (*(table + 2 * (ix)-1))
-#define TABLE_X(ix) (*(table + 2 * (ix)-2))
+#define TABLE_Y(ix) (*(table + 2 * (ix) - 1))
+#define TABLE_X(ix) (*(table + 2 * (ix) - 2))
 
   /* Get the x point */
   ptr = table;
@@ -126,45 +125,44 @@ int ssab_curve(float x, float* y, float* table, int size)
 }
 
 /*************************************************************************
-*
-* Name:		ssab_curve_2d
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-* float		x		I	x-värde.
-* float		y		I	y-värde.
-* float*	z		O	interpolerat z-värde.
-* float*	table		I	tabell.
-* int		x_size		I	antal rader med x-värden (n) i tabellen.
-* int		y_size		I	antal kolumner med y-värden (m) i
-*					tabellen.
-*
-* Beskrivning:
-*		Interpolerar i en tvådimensionell matris av float.
-*		Första i raden i matrisen ska innehålla x-värden, första
-*		kolumnen y-värden. Övriga element innehåller z-värden som
-*		ges av x-värdet för raden och y-värden för kolumnen.
-*		Element [0][0] används ej.
-*
-*		Tabellen ska vara av formatet
-*
-*			float	temp_tjl_table[n+1][m+1] = {
-*				{   0, 	y1,  y2,  y3, ...,  ym},
-*				{  x1, z11, z12, z13, ..., z1m},
-*				{  x2, z21, z22, z23, ..., z2m},
-*				{  x3, z31, z32, z33, ..., z3m},
-*					...
-*				{  xn, zn1, zn2, zn3, ..., znm}};
-*
-**************************************************************************/
+ *
+ * Name:		ssab_curve_2d
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ * float		x		I	x-värde.
+ * float		y		I	y-värde.
+ * float*	z		O	interpolerat z-värde.
+ * float*	table		I	tabell.
+ * int		x_size		I	antal rader med x-värden (n) i tabellen.
+ * int		y_size		I	antal kolumner med y-värden (m) i
+ *					tabellen.
+ *
+ * Beskrivning:
+ *		Interpolerar i en tvådimensionell matris av float.
+ *		Första i raden i matrisen ska innehålla x-värden, första
+ *		kolumnen y-värden. Övriga element innehåller z-värden som
+ *		ges av x-värdet för raden och y-värden för kolumnen.
+ *		Element [0][0] används ej.
+ *
+ *		Tabellen ska vara av formatet
+ *
+ *			float	temp_tjl_table[n+1][m+1] = {
+ *				{   0, 	y1,  y2,  y3, ...,  ym},
+ *				{  x1, z11, z12, z13, ..., z1m},
+ *				{  x2, z21, z22, z23, ..., z2m},
+ *				{  x3, z31, z32, z33, ..., z3m},
+ *					...
+ *				{  xn, zn1, zn2, zn3, ..., znm}};
+ *
+ **************************************************************************/
 
-int ssab_curve_2d(
-    float x, float y, float* z, float* table, int x_size, int y_size)
-{
+int ssab_curve_2d(float x, float y, float *z, float *table, int x_size,
+                  int y_size) {
   int x_idx, y_idx;
   int x_found, y_found;
-  float* ptr;
+  float *ptr;
   float x1, x2, y1, y2, z1, z2, z11, z12, z21, z22;
 
 #define TABLE2D_Z(ix, iy) (*(table + (iy) * (x_size + 1) + (ix)))
@@ -265,17 +263,17 @@ int ssab_curve_2d(
 }
 
 #ifdef TEST
-main()
-{
+main() {
   int sts;
-  float temp_tjl_table[6][4] = { /* Tjl */
-    { 0, 200, 420, 640 }, /* Anlöpnings Temperaturer */
-    { 20, 11, 14, 25 }, { 25, 13, 17.5, 30 }, { 50, 20, 35, 47 },
-    { 70, 29, 49, 65 }, { 100, 33, 70, 93 }
-  };
-  float temp_step1_table[3][2] = { /* Anlöpnings temp,     Steg1 temp */
-    { 200, 430 }, { 420, 615 }, { 640, 830 }
-  };
+  float temp_tjl_table[6][4] = {
+      /* Tjl */
+      {0, 200, 420, 640}, /* Anlöpnings Temperaturer */
+      {20, 11, 14, 25},   {25, 13, 17.5, 30}, {50, 20, 35, 47},
+      {70, 29, 49, 65},   {100, 33, 70, 93}};
+  float temp_step1_table[3][2] = {/* Anlöpnings temp,     Steg1 temp */
+                                  {200, 430},
+                                  {420, 615},
+                                  {640, 830}};
   float x, y, z;
   int i;
 
@@ -358,12 +356,12 @@ main()
           if  ( i == 14) { x = 	310; 	y = 	69.5; }
 */
 #define SSAB_CURVE_2D(x, y, z, table)                                          \
-  ssab_curve_2d(x, y, z, (float*)&table,                                       \
-      sizeof(table[0]) / sizeof(table[0][0]) - 1,                              \
-      sizeof(table) / sizeof(table[0]) - 1)
+  ssab_curve_2d(x, y, z, (float *)&table,                                      \
+                sizeof(table[0]) / sizeof(table[0][0]) - 1,                    \
+                sizeof(table) / sizeof(table[0]) - 1)
 
 #define SSAB_CURVE(x, y, table)                                                \
-  ssab_curve(x, y, (float*)&table, sizeof(table) / sizeof(table[0]))
+  ssab_curve(x, y, (float *)&table, sizeof(table) / sizeof(table[0]))
 
     sts = SSAB_CURVE_2D(x, y, &z, temp_tjl_table);
     printf("x: %7.2f  y: %7.2f   z: %7.2f\n", x, y, z);

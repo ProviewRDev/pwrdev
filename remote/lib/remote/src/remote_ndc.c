@@ -59,9 +59,11 @@
 
 */
 
-union vax_f_le {
+union vax_f_le
+{
   unsigned int i;
-  struct {
+  struct
+  {
     unsigned int f22_16 : 7;
     unsigned int exp : 8;
     unsigned int sign : 1;
@@ -89,9 +91,11 @@ union vax_f_le {
 
 */
 
-union vax_f_be {
+union vax_f_be
+{
   unsigned int i;
-  struct {
+  struct
+  {
     unsigned int f0_15 : 16;
     unsigned int sign : 1;
     unsigned int exp : 8;
@@ -111,14 +115,17 @@ union vax_f_be {
 
 */
 
-union i3e_s_le {
+union i3e_s_le
+{
   unsigned int i;
-  struct {
+  struct
+  {
     unsigned int f22_0 : 23;
     unsigned int exp : 8;
     unsigned int sign : 1;
   } b;
-  struct {
+  struct
+  {
     unsigned int f15_0 : 16;
     unsigned int f22_16 : 7;
     unsigned int exp : 8;
@@ -138,14 +145,17 @@ union i3e_s_le {
 
 */
 
-union i3e_s_be {
+union i3e_s_be
+{
   unsigned int i;
-  struct {
+  struct
+  {
     unsigned int sign : 1;
     unsigned int exp : 8;
     unsigned int f0_22 : 23;
   } b;
-  struct {
+  struct
+  {
     unsigned int sign : 1;
     unsigned int exp : 8;
     unsigned int f0_6 : 7;
@@ -153,13 +163,15 @@ union i3e_s_be {
   } v;
 };
 
-union {
+union
+{
   float ff;
   int ii;
   short int sii;
   char cc[4];
 } intern;
-union {
+union
+{
   unsigned int ii;
   char cc[4];
 } tmp;
@@ -172,11 +184,11 @@ union {
  *       to vaxF for VAX to AXP and not vaxD and vaxG.
  */
 
-pwr_tBoolean rndc_ConvertData(pwr_tStatus* sts, const gdb_sNode* np,
-    gdb_sClass* cp, void* tp, /* Address of target.  */
-    const void* sp, /* Address of source.  */
-    pwr_tUInt32* size, /* Size of source.  */
-    ndc_eOp op, pwr_tUInt32 offset, pwr_tUInt32 offs)
+pwr_tBoolean rndc_ConvertData(pwr_tStatus* sts, const gdb_sNode* np, gdb_sClass* cp,
+                              void* tp,          /* Address of target.  */
+                              const void* sp,    /* Address of source.  */
+                              pwr_tUInt32* size, /* Size of source.  */
+                              ndc_eOp op, pwr_tUInt32 offset, pwr_tUInt32 offs)
 {
   int i;
   int base;
@@ -188,10 +200,10 @@ pwr_tBoolean rndc_ConvertData(pwr_tStatus* sts, const gdb_sNode* np,
    * The old way, always convert if different OS
    */
 
-  if ((np->netver >= net_cFirstCclassVersion
-          && np->fm.m == gdbroot->my_node->fm.m)
-      || (np->netver < net_cFirstCclassVersion && np->os == gdbroot->my_node->os
-             && np->fm.b.bo == gdbroot->my_node->fm.b.bo)) {
+  if ((np->netver >= net_cFirstCclassVersion && np->fm.m == gdbroot->my_node->fm.m) ||
+      (np->netver < net_cFirstCclassVersion && np->os == gdbroot->my_node->os &&
+       np->fm.b.bo == gdbroot->my_node->fm.b.bo))
+  {
     if (tp != sp)
       memcpy(tp, sp, *size);
     return 1;
@@ -211,10 +223,13 @@ pwr_tBoolean rndc_ConvertData(pwr_tStatus* sts, const gdb_sNode* np,
   else
     base = ap->offs;
 
-  switch (op) {
+  switch (op)
+  {
   case ndc_eOp_encode:
-    for (; i<cp->acount&& * size> 0; i++, ap++) {
-      if (ap->flags.b.isclass) {
+    for (; i < cp->acount && *size > 0; i++, ap++)
+    {
+      if (ap->flags.b.isclass)
+      {
         gdb_sClass* lcp;
 
         lcp = hash_Search(sts, gdbroot->cid_ht, &ap->tid);
@@ -224,18 +239,20 @@ pwr_tBoolean rndc_ConvertData(pwr_tStatus* sts, const gdb_sNode* np,
 
         aoffs = 0; /* Attribute offset - source */
 
-        for (count = ap->elem; count > 0 && *size > 0; count--) {
-          rndc_ConvertData(sts, np, lcp, tp, sp, size, op,
-              (offset - ap->offs) % (ap->size / ap->elem),
-              ap->offs - base + aoffs + offs);
+        for (count = ap->elem; count > 0 && *size > 0; count--)
+        {
+          rndc_ConvertData(sts, np, lcp, tp, sp, size, op, (offset - ap->offs) % (ap->size / ap->elem),
+                           ap->offs - base + aoffs + offs);
           aoffs += ap->size / ap->elem;
         }
       }
     }
     break;
   case ndc_eOp_decode:
-    for (; i<cp->acount&& * size> 0; i++, ap++) {
-      if (ap->flags.b.isclass) {
+    for (; i < cp->acount && *size > 0; i++, ap++)
+    {
+      if (ap->flags.b.isclass)
+      {
         gdb_sClass* lcp;
 
         lcp = hash_Search(sts, gdbroot->cid_ht, &ap->tid);
@@ -245,16 +262,17 @@ pwr_tBoolean rndc_ConvertData(pwr_tStatus* sts, const gdb_sNode* np,
 
         aoffs = 0; /* Attribute offset - source */
 
-        for (count = ap->elem; count > 0 && *size > 0; count--) {
-          rndc_ConvertData(sts, np, lcp, tp, sp, size, op,
-              (offset - ap->offs) % (ap->size / ap->elem),
-              ap->offs - base + aoffs + offs);
+        for (count = ap->elem; count > 0 && *size > 0; count--)
+        {
+          rndc_ConvertData(sts, np, lcp, tp, sp, size, op, (offset - ap->offs) % (ap->size / ap->elem),
+                           ap->offs - base + aoffs + offs);
           aoffs += ap->size / ap->elem;
         }
       }
     }
     break;
-  default: {
+  default:
+  {
     char ebuf[80];
     sprintf(ebuf, "unknown op: %d", op);
     errh_Bugcheck(NDC__OP, ebuf);

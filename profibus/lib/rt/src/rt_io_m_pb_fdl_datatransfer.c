@@ -64,10 +64,8 @@
 
 static unsigned char req_res_buffer[512];
 
-static short fdlif_sda_sdn_sdr_req(io_sAgentLocal* local_agent,
-                                   pwr_sClass_Pb_FDL_SAP* sap,
-                                   pwr_sClass_Pb_FDL_DataTransfer* op,
-                                   io_sFDLCardLocal* local)
+static short fdlif_sda_sdn_sdr_req(io_sAgentLocal* local_agent, pwr_sClass_Pb_FDL_SAP* sap,
+                                   pwr_sClass_Pb_FDL_DataTransfer* op, io_sFDLCardLocal* local)
 
 /*-----------------------------------------------------------------------------
     FUNCTIONAL_DESCRIPTION
@@ -140,10 +138,8 @@ possible return values:
   return ((pwr_tBoolean)(result == E_OK));
 }
 
-static short fdlif_reply_update_mult_req(io_sAgentLocal* local_agent,
-                                         pwr_sClass_Pb_FDL_SAP* sap,
-                                         pwr_sClass_Pb_FDL_DataTransfer* op,
-                                         io_sFDLCardLocal* local)
+static short fdlif_reply_update_mult_req(io_sAgentLocal* local_agent, pwr_sClass_Pb_FDL_SAP* sap,
+                                         pwr_sClass_Pb_FDL_DataTransfer* op, io_sFDLCardLocal* local)
 
 /*-----------------------------------------------------------------------------
     FUNCTIONAL_DESCRIPTION
@@ -196,8 +192,7 @@ possible return values:
 /*----------------------------------------------------------------------------*\
    Init method for the Pb module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                              io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sFDLCardLocal* local;
   pwr_sClass_Pb_FDL_DataTransfer* op = (pwr_sClass_Pb_FDL_DataTransfer*)cp->op;
@@ -213,9 +208,8 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 
   local->byte_ordering = ((pwr_sClass_Pb_FDL_SAP*)rp->op)->ByteOrdering;
 
-  io_bus_card_init(ctx, cp, &input_area_offset, &input_area_chansize,
-                   &output_area_offset, &output_area_chansize,
-                   local->byte_ordering, io_eAlignment_Packed);
+  io_bus_card_init(ctx, cp, &input_area_offset, &input_area_chansize, &output_area_offset,
+                   &output_area_chansize, local->byte_ordering, io_eAlignment_Packed);
 
   local->input_area_size = input_area_offset + input_area_chansize;
   local->output_area_size = output_area_offset + output_area_chansize;
@@ -235,13 +229,11 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 /*----------------------------------------------------------------------------*\
    Read method for the Pb FDL Data transfer module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                              io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sFDLCardLocal* local = (io_sFDLCardLocal*)cp->Local;
 
-  io_bus_card_read(ctx, rp, cp, local->input_area, 0, local->byte_ordering,
-                   local->float_representation);
+  io_bus_card_read(ctx, rp, cp, local->input_area, 0, local->byte_ordering, local->float_representation);
 
   return IO__SUCCESS;
 }
@@ -249,8 +241,7 @@ static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 /*----------------------------------------------------------------------------*\
    Write method for the Pb  FDL Data transfer module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                               io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sAgentLocal* local_agent = (io_sAgentLocal*)ap->Local;
   pwr_sClass_Pb_FDL_DataTransfer* op = (pwr_sClass_Pb_FDL_DataTransfer*)cp->op;
@@ -261,8 +252,7 @@ static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 
   if (op->Status == PB__NORMAL)
   {
-    io_bus_card_write(ctx, cp, local->output_area, local->byte_ordering,
-                      local->float_representation);
+    io_bus_card_write(ctx, cp, local->output_area, local->byte_ordering, local->float_representation);
 
     if (op->SendReq)
     {
@@ -287,8 +277,7 @@ static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 /*----------------------------------------------------------------------------*\
    Close method for the Pb module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                               io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   local = cp->Local;
@@ -304,6 +293,5 @@ static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 \*----------------------------------------------------------------------------*/
 
 pwr_dExport pwr_BindIoMethods(Pb_FDL_DataTransfer) = {
-    pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardRead),
-    pwr_BindIoMethod(IoCardWrite), pwr_BindIoMethod(IoCardClose),
-    pwr_NullMethod};
+    pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardRead), pwr_BindIoMethod(IoCardWrite),
+    pwr_BindIoMethod(IoCardClose), pwr_NullMethod};

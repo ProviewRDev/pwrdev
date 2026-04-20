@@ -44,16 +44,12 @@
 #include "glow_growgroup.h"
 #include "glow_msg.h"
 
-GlowNode::GlowNode(GrowCtx* glow_ctx, const char* name,
-    GlowNodeClass* node_class, double x1, double y1, int nodraw,
-    int rel_annot_pos)
-  : GlowArrayElem(glow_ctx), x_right(x1), x_left(x1), y_high(y1), y_low(y1),
-      s_x_right(x1), s_x_left(x1), 
-      s_y_high(y1), s_y_low(y1), obst_x_right(x1),
-      obst_x_left(x1), obst_y_high(y1), obst_y_low(y1), hot(0),
-      nc(node_class), nc_root(node_class), pos(glow_ctx, x1, y1),
-      stored_pos(glow_ctx, x1, y1), highlight(0), inverse(0), local_nc(0),
-      user_data(0), level(0), node_open(0), relative_annot_pos(rel_annot_pos),
+GlowNode::GlowNode(GrowCtx* glow_ctx, const char* name, GlowNodeClass* node_class, double x1, double y1,
+                   int nodraw, int rel_annot_pos)
+    : GlowArrayElem(glow_ctx), x_right(x1), x_left(x1), y_high(y1), y_low(y1), s_x_right(x1), s_x_left(x1),
+      s_y_high(y1), s_y_low(y1), obst_x_right(x1), obst_x_left(x1), obst_y_high(y1), obst_y_low(y1), hot(0),
+      nc(node_class), nc_root(node_class), pos(glow_ctx, x1, y1), stored_pos(glow_ctx, x1, y1), highlight(0),
+      inverse(0), local_nc(0), user_data(0), level(0), node_open(0), relative_annot_pos(rel_annot_pos),
       relative_annot_x(0), input_active(0), input_focus(0)
 {
   double x_grid, y_grid;
@@ -68,18 +64,22 @@ GlowNode::GlowNode(GrowCtx* glow_ctx, const char* name,
   memset(rel_annot_x, 0, sizeof(rel_annot_x));
   if (!nc)
     return;
-  if (ctx->grid_on) {
+  if (ctx->grid_on)
+  {
     ctx->find_grid(x1, y1, &x_grid, &y_grid);
     pos.posit(x_grid, y_grid);
   }
   x_left = y_low = 1e37;
   x_right = y_high = -1e37;
   get_node_borders();
-  if (nc->group == glow_eNodeGroup_Document) {
+  if (nc->group == glow_eNodeGroup_Document)
+  {
     obst_x_left = obst_y_low = 1e37;
     obst_x_right = obst_y_high = -1e37;
     get_node_obstacle_borders();
-  } else {
+  }
+  else
+  {
     obst_x_left = x_left;
     obst_x_right = x_right;
     obst_y_low = y_low;
@@ -100,16 +100,14 @@ GlowNode::~GlowNode()
 
   ctx->set_defered_redraw();
   ctx->delete_node_cons(this);
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->nav_draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->nav_draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+                y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+                x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+                y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
   ctx->redraw_defered();
   if (hot)
     ctx->gdraw->set_cursor(&ctx->mw, glow_eDrawCursor_Normal);
@@ -120,7 +118,8 @@ int GlowNode::get_conpoint(int num, double* x, double* y, glow_eDirection* dir)
   int sts;
 
   sts = nc->get_conpoint(num, x, y, dir);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     *x += pos.x;
     *y += pos.y;
   }
@@ -129,18 +128,19 @@ int GlowNode::get_conpoint(int num, double* x, double* y, glow_eDirection* dir)
 
 void GlowNode::measure(double* ll_x, double* ll_y, double* ur_x, double* ur_y)
 {
-  if (parent && 
-      (parent->type() == glow_eObjectType_GrowNode
-       || parent->type() == glow_eObjectType_GrowGroup
-       || parent->type() == glow_eObjectType_GrowDashCell)) {
+  if (parent &&
+      (parent->type() == glow_eObjectType_GrowNode || parent->type() == glow_eObjectType_GrowGroup ||
+       parent->type() == glow_eObjectType_GrowDashCell))
+  {
     //    ((GrowNode *)parent)->trf.reverse(x_left, y_low, ll_x, ll_y);
     //    ((GrowNode *)parent)->trf.reverse(x_right, y_high, ur_x, ur_y);
-    *ll_x = ((GrowNode *)parent)->trf.x(x_left, y_low);
-    *ll_y = ((GrowNode *)parent)->trf.y(x_left, y_low);
-    *ur_x = ((GrowNode *)parent)->trf.x(x_right, y_high);
-    *ur_y = ((GrowNode *)parent)->trf.y(x_right, y_high);
+    *ll_x = ((GrowNode*)parent)->trf.x(x_left, y_low);
+    *ll_y = ((GrowNode*)parent)->trf.y(x_left, y_low);
+    *ur_x = ((GrowNode*)parent)->trf.x(x_right, y_high);
+    *ur_y = ((GrowNode*)parent)->trf.y(x_right, y_high);
   }
-  else {
+  else
+  {
     *ll_x = x_left;
     *ll_y = y_low;
     *ur_x = x_right;
@@ -148,13 +148,13 @@ void GlowNode::measure(double* ll_x, double* ll_y, double* ur_x, double* ur_y)
   }
 }
 
-void GlowNode::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowNode::save(std::ostream& fp, glow_eSaveMode mode)
 {
   int i;
   char* s;
 
-  if ((mode == glow_eSaveMode_Trace && nc->group != glow_eNodeGroup_Trace)
-      || (mode == glow_eSaveMode_Edit && nc->group == glow_eNodeGroup_Trace))
+  if ((mode == glow_eSaveMode_Trace && nc->group != glow_eNodeGroup_Trace) ||
+      (mode == glow_eSaveMode_Edit && nc->group == glow_eNodeGroup_Trace))
     return;
 
   fp << int(glow_eSave_Node) << '\n';
@@ -175,10 +175,13 @@ void GlowNode::save(std::ofstream& fp, glow_eSaveMode mode)
   for (i = 0; i < 10; i++)
     fp << annotsize[i] << '\n';
   fp << int(glow_eSave_Node_annotv) << '\n';
-  for (i = 0; i < 10; i++) {
-    if (annotsize[i]) {
+  for (i = 0; i < 10; i++)
+  {
+    if (annotsize[i])
+    {
       fp << "\"";
-      for (s = annotv[i]; *s; s++) {
+      for (s = annotv[i]; *s; s++)
+      {
         if (*s == '"')
           fp << "\\";
         fp << *s;
@@ -198,20 +201,16 @@ void GlowNode::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_Node_trace_data8) << FSPACE << trace.data[7] << '\n';
   fp << int(glow_eSave_Node_trace_data9) << FSPACE << trace.data[8] << '\n';
   fp << int(glow_eSave_Node_trace_data10) << FSPACE << trace.data[9] << '\n';
-  fp << int(glow_eSave_Node_trace_attr_type) << FSPACE << int(trace.attr_type)
-     << '\n';
+  fp << int(glow_eSave_Node_trace_attr_type) << FSPACE << int(trace.attr_type) << '\n';
   fp << int(glow_eSave_Node_trace_color) << FSPACE << int(trace.color) << '\n';
-  fp << int(glow_eSave_Node_trace_color2) << FSPACE << int(trace.color2)
-     << '\n';
-  fp << int(glow_eSave_Node_access) << FSPACE << (unsigned int)(trace.access)
-     << '\n';
-  fp << int(glow_eSave_Node_cycle) << FSPACE << (unsigned int)(trace.cycle)
-     << '\n';
+  fp << int(glow_eSave_Node_trace_color2) << FSPACE << int(trace.color2) << '\n';
+  fp << int(glow_eSave_Node_access) << FSPACE << (unsigned int)(trace.access) << '\n';
+  fp << int(glow_eSave_Node_cycle) << FSPACE << (unsigned int)(trace.cycle) << '\n';
   fp << int(glow_eSave_Node_ref_object) << FSPACE << trace.ref_object << '\n';
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowNode::open(std::ifstream& fp)
+void GlowNode::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -223,46 +222,53 @@ void GlowNode::open(std::ifstream& fp)
   unsigned int utmp;
   int sts;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GlowNode: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_Node:
       break;
     case glow_eSave_Node_nc:
       fp.get();
       fp.getline(nc_name, sizeof(nc_name));
       if (strcmp(nc_name, "__layer_class") == 0)
-	nc = new GlowNodeClass(ctx, "__layer_class");
-      else {
-        if (ctx->type() != glow_eCtxType_Grow
-            || (!(((GrowNode*)this)->type() == glow_eObjectType_GrowGroup ||
-		((GrowNode*)this)->type() == glow_eObjectType_GrowDashCell))) {
+        nc = new GlowNodeClass(ctx, "__layer_class");
+      else
+      {
+        if (ctx->type() != glow_eCtxType_Grow ||
+            (!(((GrowNode*)this)->type() == glow_eObjectType_GrowGroup ||
+               ((GrowNode*)this)->type() == glow_eObjectType_GrowDashCell)))
+        {
           nc = (GlowNodeClass*)ctx->get_nodeclass_from_name(nc_name);
-          if (!nc && ctx->type() == glow_eCtxType_Grow) {
-	    // If grow, load subgraph
-	    sts = ctx->open_subgraph_from_name(nc_name, glow_eSaveMode_SubGraph);
-	    if (ODD(sts)) {
-	      nc = (GlowNodeClass*)ctx->get_nodeclass_from_name(nc_name);
-	      if (nc)
-		nc->nc_extern = 1;
-	    }
-	  }
-	  if (!nc)
-	    std::cout << "GlowNode:nodeclass not found: " << nc_name << '\n';
+          if (!nc && ctx->type() == glow_eCtxType_Grow)
+          {
+            // If grow, load subgraph
+            sts = ctx->open_subgraph_from_name(nc_name, glow_eSaveMode_SubGraph);
+            if (ODD(sts))
+            {
+              nc = (GlowNodeClass*)ctx->get_nodeclass_from_name(nc_name);
+              if (nc)
+                nc->nc_extern = 1;
+            }
+          }
+          if (!nc)
+            std::cout << "GlowNode:nodeclass not found: " << nc_name << '\n';
 
-	  if (nc && ctx->environment == glow_eEnv_Runtime
-              && nc->recursive_trace) {
-	    // Create local copy of nodeclass
-	    nc = new GlowNodeClass(*nc);
-	    local_nc = 1;
-	  }
-	}
+          if (nc && ctx->environment == glow_eEnv_Runtime && nc->recursive_trace)
+          {
+            // Create local copy of nodeclass
+            nc = new GlowNodeClass(*nc);
+            local_nc = 1;
+          }
+        }
         nc_root = nc;
       }
       break;
@@ -304,15 +310,20 @@ void GlowNode::open(std::ifstream& fp)
       break;
     case glow_eSave_Node_annotv:
       fp.getline(dummy, sizeof(dummy));
-      for (i = 0; i < 10; i++) {
-        if (annotsize[i]) {
+      for (i = 0; i < 10; i++)
+      {
+        if (annotsize[i])
+        {
           annotv[i] = (char*)calloc(1, annotsize[i]);
           fp.get();
-          for (j = 0; j < annotsize[i]; j++) {
-            if ((c = fp.get()) == '"') {
+          for (j = 0; j < annotsize[i]; j++)
+          {
+            if ((c = fp.get()) == '"')
+            {
               if (j > 0 && annotv[i][j - 1] == '\\')
                 j--;
-              else {
+              else
+              {
                 annotv[i][j] = 0;
                 break;
               }
@@ -404,17 +415,19 @@ void GlowNode::open(std::ifstream& fp)
     trace_init();
 }
 
-void GlowNode::select_region_insert(double ll_x, double ll_y, double ur_x,
-    double ur_y, glow_eSelectPolicy select_policy)
+void GlowNode::select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
+                                    glow_eSelectPolicy select_policy)
 {
   if (!in_active_layer())
     return;
 
-  if (select_policy == glow_eSelectPolicy_Surround
-      || nc->group == glow_eNodeGroup_Document) {
+  if (select_policy == glow_eSelectPolicy_Surround || nc->group == glow_eNodeGroup_Document)
+  {
     if (x_left > ll_x && x_right < ur_x && y_high < ur_y && y_low > ll_y)
       ctx->select_insert(this);
-  } else {
+  }
+  else
+  {
     if (x_right > ll_x && x_left < ur_x && y_low < ur_y && y_high > ll_y)
       ctx->select_insert(this);
   }
@@ -424,7 +437,8 @@ void GlowNode::get_annotation(int num, char* text, int size)
 {
   if (!annotv[num])
     strcpy(text, "");
-  else {
+  else
+  {
     strncpy(text, annotv[num], size);
     text[size - 1] = 0;
   }
@@ -437,10 +451,7 @@ void GlowNode::conpoint_refcon_reconfig(int conpoint)
   ctx->conpoint_refcon_redraw(this, conpoint);
 }
 
-void GlowNode::remove_notify()
-{
-  ctx->delete_node_cons(this);
-}
+void GlowNode::remove_notify() { ctx->delete_node_cons(this); }
 
 void GlowNode::set_trace_attr(GlowTraceData* attr)
 {
@@ -450,19 +461,16 @@ void GlowNode::set_trace_attr(GlowTraceData* attr)
     ctx->trace_connect_func((void*)this, &trace);
 }
 
-void GlowNode::get_trace_attr(GlowTraceData** attr)
-{
-  *attr = &trace;
-}
+void GlowNode::get_trace_attr(GlowTraceData** attr) { *attr = &trace; }
 
 int GlowNode::trace_scan()
 {
   int sts;
 
-  if (ctx->trace_scan_func && trace.p) {
+  if (ctx->trace_scan_func && trace.p)
+  {
     sts = ctx->trace_scan_func((void*)this, trace.p);
-    if (sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED
-        || sts == GLOW__SWAPTERMINATED)
+    if (sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED)
       return sts;
   }
 
@@ -499,23 +507,20 @@ void GlowNode::trace_close()
     nc->a.trace_close();
 }
 
-int GlowNode::in_vert_line(double x, double l_y, double u_y) {
-  return ((obst_x_left - ctx->draw_delta) < x
-     && (obst_x_right + ctx->draw_delta) > x
-      && (obst_y_low - ctx->draw_delta) < u_y
-      && (obst_y_high + ctx->draw_delta) > l_y);
+int GlowNode::in_vert_line(double x, double l_y, double u_y)
+{
+  return ((obst_x_left - ctx->draw_delta) < x && (obst_x_right + ctx->draw_delta) > x &&
+          (obst_y_low - ctx->draw_delta) < u_y && (obst_y_high + ctx->draw_delta) > l_y);
 }
 
-int GlowNode::in_horiz_line(double y, double l_x, double u_x) {
-  return ((obst_x_left - ctx->draw_delta) < u_x
-      && (obst_x_right + ctx->draw_delta) > l_x
-      && (obst_y_low - ctx->draw_delta) < y
-      && (obst_y_high + ctx->draw_delta) > y);
+int GlowNode::in_horiz_line(double y, double l_x, double u_x)
+{
+  return ((obst_x_left - ctx->draw_delta) < u_x && (obst_x_right + ctx->draw_delta) > l_x &&
+          (obst_y_low - ctx->draw_delta) < y && (obst_y_high + ctx->draw_delta) > y);
 }
 
-int GlowNode::in_area(double ll_x, double ll_y, double ur_x, double ur_y){
-  return ((obst_x_left - ctx->draw_delta) < ur_x
-      && (obst_x_right + ctx->draw_delta) > ll_x
-      && (obst_y_low - ctx->draw_delta) < ur_y
-      && (obst_y_high + ctx->draw_delta) > ll_y);
+int GlowNode::in_area(double ll_x, double ll_y, double ur_x, double ur_y)
+{
+  return ((obst_x_left - ctx->draw_delta) < ur_x && (obst_x_right + ctx->draw_delta) > ll_x &&
+          (obst_y_low - ctx->draw_delta) < ur_y && (obst_y_high + ctx->draw_delta) > ll_y);
 }

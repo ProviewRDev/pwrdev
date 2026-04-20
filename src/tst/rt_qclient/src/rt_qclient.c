@@ -73,7 +73,8 @@ main(int argc, char* argv[])
   if (!qcom_CreateQ(&sts, &qid, NULL))
     exit(sts);
 
-  for (i = 1; i < max; i++) {
+  for (i = 1; i < max; i++)
+  {
     for (j = 0; j < DATA_SIZE; j++)
       ++data[j];
     sp = qcom_Alloc(&sts, sizeof(data));
@@ -92,8 +93,10 @@ main(int argc, char* argv[])
     sp = qcom_Get(&sts, &qid, &get, qcom_cTmoEternal);
     if (sp == NULL)
       continue;
-    for (j = 0; j < DATA_SIZE; j++) {
-      if (data[j] != *(int*)sp) {
+    for (j = 0; j < DATA_SIZE; j++)
+    {
+      if (data[j] != *(int*)sp)
+      {
         printf("index...: %d, (%d)\n", j, data[j]);
         break;
       }

@@ -40,14 +40,12 @@
 
 #include "flow_conclass.h"
 
-FlowConClass::FlowConClass(FlowCtx* flow_ctx, const char* name,
-    flow_eConType contype, flow_eCorner cornertype, flow_eDrawType d_type,
-    int line_w, double arrow_w, double arrow_l, double round_corner_amnt,
-    flow_eConGroup grp)
-    : ctx(flow_ctx), zero(flow_ctx, 0, 0), con_type(contype),
-      corner(cornertype), draw_type(d_type), line_width(line_w),
-      arrow_width(arrow_w), arrow_length(arrow_l),
-      round_corner_amount(round_corner_amnt), group(grp)
+FlowConClass::FlowConClass(FlowCtx* flow_ctx, const char* name, flow_eConType contype,
+                           flow_eCorner cornertype, flow_eDrawType d_type, int line_w, double arrow_w,
+                           double arrow_l, double round_corner_amnt, flow_eConGroup grp)
+    : ctx(flow_ctx), zero(flow_ctx, 0, 0), con_type(contype), corner(cornertype), draw_type(d_type),
+      line_width(line_w), arrow_width(arrow_w), arrow_length(arrow_l), round_corner_amount(round_corner_amnt),
+      group(grp)
 {
   strcpy(cc_name, name);
   zero.nav_zoom();
@@ -56,8 +54,8 @@ FlowConClass::FlowConClass(FlowCtx* flow_ctx, const char* name,
 
 void FlowConClass::save(std::ofstream& fp, flow_eSaveMode mode)
 {
-  if ((mode == flow_eSaveMode_Trace && group != flow_eConGroup_Trace)
-      || (mode == flow_eSaveMode_Edit && group == flow_eConGroup_Trace))
+  if ((mode == flow_eSaveMode_Trace && group != flow_eConGroup_Trace) ||
+      (mode == flow_eSaveMode_Edit && group == flow_eConGroup_Trace))
     return;
   fp << int(flow_eSave_ConClass) << '\n';
   fp << int(flow_eSave_ConClass_cc_name) << FSPACE << cc_name << '\n';
@@ -67,8 +65,7 @@ void FlowConClass::save(std::ofstream& fp, flow_eSaveMode mode)
   fp << int(flow_eSave_ConClass_line_width) << FSPACE << line_width << '\n';
   fp << int(flow_eSave_ConClass_arrow_width) << FSPACE << arrow_width << '\n';
   fp << int(flow_eSave_ConClass_arrow_length) << FSPACE << arrow_length << '\n';
-  fp << int(flow_eSave_ConClass_round_corner_amount) << FSPACE
-     << round_corner_amount << '\n';
+  fp << int(flow_eSave_ConClass_round_corner_amount) << FSPACE << round_corner_amount << '\n';
   fp << int(flow_eSave_ConClass_group) << FSPACE << int(group) << '\n';
   fp << int(flow_eSave_End) << '\n';
 }
@@ -80,9 +77,11 @@ void FlowConClass::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
+  for (;;)
+  {
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case flow_eSave_ConClass:
       break;
     case flow_eSave_ConClass_cc_name:
@@ -129,10 +128,7 @@ void FlowConClass::open(std::ifstream& fp)
   }
 }
 
-void FlowConClass::get_object_name(char* name)
-{
-  strcpy(name, cc_name);
-}
+void FlowConClass::get_object_name(char* name) { strcpy(name, cc_name); }
 
 std::ostream& operator<<(std::ostream& o, const FlowConClass cc)
 {

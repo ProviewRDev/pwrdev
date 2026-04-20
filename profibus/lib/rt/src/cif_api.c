@@ -68,8 +68,7 @@ typedef struct DEV_DPM_SIZEtag
   unsigned int ulDpmIOSize;
 } DEV_DPM_SIZE;
 
-DEV_DPM_SIZE tDevDPMSize[MAX_DEV_BOARDS] = {
-    {0L, 0L}, {0L, 0L}, {0L, 0L}, {0L, 0L}}; // DPM size of each board
+DEV_DPM_SIZE tDevDPMSize[MAX_DEV_BOARDS] = {{0L, 0L}, {0L, 0L}, {0L, 0L}, {0L, 0L}}; // DPM size of each board
 
 /* <ST>
   =================================================================================
@@ -178,11 +177,9 @@ short DevGetBoardInfo(BOARD_INFO* pvData)
   }
   else
   {
-    if ((ptBuffer = (DEVIO_GETBOARDINFOCMD*)malloc(
-             sizeof(DEVIO_GETBOARDINFOCMD))) == NULL)
+    if ((ptBuffer = (DEVIO_GETBOARDINFOCMD*)malloc(sizeof(DEVIO_GETBOARDINFOCMD))) == NULL)
       return DRV_USR_SENDBUF_PTR_NULL;
-    if ((ptBuffer->ptBoardInfo = (BOARD_INFO*)malloc(sizeof(BOARD_INFO))) ==
-        NULL)
+    if ((ptBuffer->ptBoardInfo = (BOARD_INFO*)malloc(sizeof(BOARD_INFO))) == NULL)
     {
       free(ptBuffer);
       return DRV_USR_SENDBUF_PTR_NULL;
@@ -241,12 +238,10 @@ short DevGetBoardInfoEx(BOARD_INFOEX* pvData)
   }
   else
   {
-    if ((ptBuffer = (DEVIO_GETBOARDINFOEXCMD*)malloc(
-             sizeof(DEVIO_GETBOARDINFOEXCMD))) == NULL)
+    if ((ptBuffer = (DEVIO_GETBOARDINFOEXCMD*)malloc(sizeof(DEVIO_GETBOARDINFOEXCMD))) == NULL)
       return DRV_USR_SENDBUF_PTR_NULL;
     ptBuffer->usInfoLen = sizeof(BOARD_INFOEX);
-    if ((ptBuffer->ptBoard = (BOARD_INFOEX*)malloc(sizeof(BOARD_INFOEX))) ==
-        NULL)
+    if ((ptBuffer->ptBoard = (BOARD_INFOEX*)malloc(sizeof(BOARD_INFOEX))) == NULL)
     {
       free(ptBuffer);
       return DRV_USR_SENDBUF_PTR_NULL;
@@ -284,8 +279,7 @@ short DevGetBoardInfoEx(BOARD_INFOEX* pvData)
   =================================================================================
   <En> */
 
-short DevSetOpMode(unsigned short usBoard, unsigned short usMode,
-                   unsigned short* usIrq)
+short DevSetOpMode(unsigned short usBoard, unsigned short usMode, unsigned short* usIrq)
 {
   DEVIO_SETOPMODE tBuffer;
   short sRet = DRV_NO_ERROR;
@@ -368,8 +362,7 @@ short DevInitBoard(unsigned short usDevNumber)
         // Save the DPM size for further function calls and calculate the length
         // of the DPM-IO data area
         tDevDPMSize[usDevNumber].ulDpmSize = tBuffer.ulDpmSize;
-        tDevDPMSize[usDevNumber].ulDpmIOSize =
-            ((tBuffer.ulDpmSize * 1024) - 1024) / 2;
+        tDevDPMSize[usDevNumber].ulDpmIOSize = ((tBuffer.ulDpmSize * 1024) - 1024) / 2;
       }
     }
   }
@@ -391,10 +384,9 @@ short DevInitBoard(unsigned short usDevNumber)
   =================================================================================
   <En> */
 
-short DevReset(unsigned char usDevNumber, unsigned short usMode,
-               unsigned long ulTimeout)
+short DevReset(unsigned char usDevNumber, unsigned short usMode, unsigned long ulTimeout)
 {
-  DEVIO_RESETCMD tBuffer;  
+  DEVIO_RESETCMD tBuffer;
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -406,13 +398,12 @@ short DevReset(unsigned char usDevNumber, unsigned short usMode,
   {
     sRet = DRV_USR_DEV_NUMBER_INVALID;
   }
-  else if ((usMode != COLDSTART) && (usMode != WARMSTART) &&
-           (usMode != BOOTSTART))
+  else if ((usMode != COLDSTART) && (usMode != WARMSTART) && (usMode != BOOTSTART))
   {
     sRet = DRV_USR_MODE_INVALID;
   }
   else
-  {    
+  {
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usMode = usMode;
@@ -450,10 +441,9 @@ short DevReset(unsigned char usDevNumber, unsigned short usMode,
 =================================================================================
 <En> */
 
-short DevGetInfo(unsigned short usDevNumber, unsigned short usInfoArea,
-                 unsigned short usSize, void* pvData)
+short DevGetInfo(unsigned short usDevNumber, unsigned short usInfoArea, unsigned short usSize, void* pvData)
 {
-  DEVIO_GETDEVINFOCMD tBuffer;  
+  DEVIO_GETDEVINFOCMD tBuffer;
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -529,13 +519,12 @@ short DevGetInfo(unsigned short usDevNumber, unsigned short usInfoArea,
     {
       // complete buffer length with return data
       // usDataBufferLen = usSize;
-      
+
       // set output buffer
       tBuffer.usBoard = usDevNumber;
       tBuffer.usInfoArea = usInfoArea;
       tBuffer.usInfoLen = usSize;
-      tBuffer.pabInfoData =
-          pvData; // needed in kernel-space to copy data back to it!
+      tBuffer.pabInfoData = pvData; // needed in kernel-space to copy data back to it!
       tBuffer.sError = sRet;
       // activate function
       if (!ioctl(hDevDrv, CIF_IOCTLGETINFO, (unsigned long)(&tBuffer)))
@@ -571,10 +560,10 @@ short DevGetInfo(unsigned short usDevNumber, unsigned short usInfoArea,
   =================================================================================
   <En> */
 
-short DevPutTaskParameter(unsigned short usDevNumber, unsigned short usNumber,
-                          unsigned short usSize, void* pvData)
+short DevPutTaskParameter(unsigned short usDevNumber, unsigned short usNumber, unsigned short usSize,
+                          void* pvData)
 {
-  DEVIO_PUTPARAMETERCMD tBuffer;  
+  DEVIO_PUTPARAMETERCMD tBuffer;
   short sRet = DRV_NO_ERROR;
   // valid handle available, driver is open
   if (hDevDrv == INVALID_HANDLE_VALUE)
@@ -598,13 +587,12 @@ short DevPutTaskParameter(unsigned short usDevNumber, unsigned short usNumber,
     sRet = DRV_USR_SIZE_TOO_LONG;
   }
   else
-  {    
+  {
     // set command buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usTaskParamNum = usNumber;
     tBuffer.usTaskParamLen = usSize;
-    memcpy((unsigned char*)&(tBuffer.TaskParameter), (unsigned char*)pvData,
-           usSize);
+    memcpy((unsigned char*)&(tBuffer.TaskParameter), (unsigned char*)pvData, usSize);
     tBuffer.sError = sRet;
     // activate function
     if (!ioctl(hDevDrv, CIF_IOCTLPARAMETER, (unsigned long)(&tBuffer)))
@@ -634,10 +622,10 @@ short DevPutTaskParameter(unsigned short usDevNumber, unsigned short usNumber,
   =================================================================================
   <En> */
 
-short DevGetTaskState(unsigned short usDevNumber, unsigned short usNumber,
-                      unsigned short usSize, void* pvData)
+short DevGetTaskState(unsigned short usDevNumber, unsigned short usNumber, unsigned short usSize,
+                      void* pvData)
 {
-  DEVIO_GETTASKSTATECMD tBuffer;  
+  DEVIO_GETTASKSTATECMD tBuffer;
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -662,7 +650,7 @@ short DevGetTaskState(unsigned short usDevNumber, unsigned short usNumber,
     sRet = DRV_USR_SIZE_TOO_LONG;
   }
   else
-  {    
+  {
 
     // set command buffer
     tBuffer.ucBoard = usDevNumber;
@@ -702,7 +690,7 @@ short DevGetTaskState(unsigned short usDevNumber, unsigned short usNumber,
 short DevGetMBXState(unsigned short usDevNumber, unsigned short* pusDevMbxState,
                      unsigned short* pusHostMbxState)
 {
-  DEVIO_MBXINFOCMD tBuffer;  
+  DEVIO_MBXINFOCMD tBuffer;
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -715,7 +703,7 @@ short DevGetMBXState(unsigned short usDevNumber, unsigned short* pusDevMbxState,
     sRet = DRV_USR_DEV_NUMBER_INVALID;
   }
   else
-  {    
+  {
     // set output buffer
     tBuffer.ucBoard = usDevNumber;
     tBuffer.usDevMbxState = 0x00;  //*pusDevMbxState;
@@ -752,8 +740,8 @@ short DevGetMBXState(unsigned short usDevNumber, unsigned short* pusDevMbxState,
             != DRV_NO_ERROR  - function failed
   =================================================================================
   <En> */
-short DevGetMBXData(unsigned short usDevNumber, unsigned short usHostSize,
-                    void* pvHostData, unsigned short usDevSize, void* pvDevData)
+short DevGetMBXData(unsigned short usDevNumber, unsigned short usHostSize, void* pvHostData,
+                    unsigned short usDevSize, void* pvDevData)
 {
   DEVIO_GETMBXCMD tBuffer;
   short sRet = DRV_NO_ERROR;
@@ -777,7 +765,7 @@ short DevGetMBXData(unsigned short usDevNumber, unsigned short usHostSize,
   }
   else
   {
-    // fill in parameter data    
+    // fill in parameter data
     tBuffer.usBoard = usDevNumber;
     tBuffer.usHostLen = usHostSize;
     tBuffer.usDevLen = usDevSize;
@@ -829,7 +817,7 @@ short DevGetMBXData(unsigned short usDevNumber, unsigned short usHostSize,
 
 short DevExitBoard(unsigned short usDevNumber)
 {
-  DEVIO_EXITCMD tBuffer;  
+  DEVIO_EXITCMD tBuffer;
   unsigned short usDrvOpenCount = 0;
   short sRet = DRV_NO_ERROR;
 
@@ -846,7 +834,7 @@ short DevExitBoard(unsigned short usDevNumber)
   {
     // valid handle available, driver is open
     // clear all data buffers
-    
+
     tBuffer.usBoard = usDevNumber; // [in]
     // tBuffer.usDrvOpenCount = usDrvOpenCount; // [out]
     // tBuffer.sError         = sRet;           // [out]
@@ -881,10 +869,10 @@ short DevExitBoard(unsigned short usDevNumber)
   =================================================================================
   <En> */
 
-short DevReadSendData(unsigned short usDevNumber, unsigned short usOffset,
-                      unsigned short usSize, void* pvData)
+short DevReadSendData(unsigned short usDevNumber, unsigned short usOffset, unsigned short usSize,
+                      void* pvData)
 {
-  DEVIO_READSENDCMD tBuffer;  
+  DEVIO_READSENDCMD tBuffer;
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -896,15 +884,13 @@ short DevReadSendData(unsigned short usDevNumber, unsigned short usOffset,
   {
     sRet = DRV_USR_DEV_NUMBER_INVALID;
   }
-  else if ((usSize != 0) &&
-           ((usSize + usOffset) >
-            (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
+  else if ((usSize != 0) && ((usSize + usOffset) > (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
   {
     sRet = DRV_USR_SIZE_TOO_LONG;
   }
   else
   {
-    // fill in parameter data    
+    // fill in parameter data
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usReadOffset = usOffset;
@@ -940,10 +926,9 @@ short DevReadSendData(unsigned short usDevNumber, unsigned short usOffset,
   =================================================================================
   <En> */
 
-short DevTriggerWatchDog(unsigned short usDevNumber, unsigned short usMode,
-                         unsigned short* pusDevWatchDog)
+short DevTriggerWatchDog(unsigned short usDevNumber, unsigned short usMode, unsigned short* pusDevWatchDog)
 {
-  DEVIO_TRIGGERCMD tBuffer;  
+  DEVIO_TRIGGERCMD tBuffer;
   short sRet = DRV_NO_ERROR;
   // valid handle available, driver is open
   if (hDevDrv == INVALID_HANDLE_VALUE)
@@ -960,7 +945,7 @@ short DevTriggerWatchDog(unsigned short usDevNumber, unsigned short usMode,
   }
   else
   {
-    // fill in parameter data    
+    // fill in parameter data
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usMode = usMode;
@@ -997,10 +982,9 @@ short DevTriggerWatchDog(unsigned short usDevNumber, unsigned short usMode,
   =================================================================================
   <En> */
 
-short DevSpecialControl(unsigned short usDevNumber, unsigned short usMode,
-                        unsigned short* pusCtrlAck)
+short DevSpecialControl(unsigned short usDevNumber, unsigned short usMode, unsigned short* pusCtrlAck)
 {
-  DEVIO_TRIGGERCMD tBuffer;  
+  DEVIO_TRIGGERCMD tBuffer;
   short sRet = DRV_NO_ERROR;
   // valid handle available, driver is open
   if (hDevDrv == INVALID_HANDLE_VALUE)
@@ -1017,7 +1001,7 @@ short DevSpecialControl(unsigned short usDevNumber, unsigned short usMode,
   }
   else
   {
-    // fill in parameter data    
+    // fill in parameter data
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usMode = usMode;
@@ -1054,10 +1038,9 @@ short DevSpecialControl(unsigned short usDevNumber, unsigned short usMode,
   =================================================================================
   <En> */
 
-short DevExtendedData(unsigned short usDevNumber, unsigned short usMode,
-                      unsigned short usSize, void* pvData)
+short DevExtendedData(unsigned short usDevNumber, unsigned short usMode, unsigned short usSize, void* pvData)
 {
-  DEVIO_EXTDATACMD tBuffer;  
+  DEVIO_EXTDATACMD tBuffer;
   short sRet = DRV_NO_ERROR;
   // valid handle available, driver is open
   if (hDevDrv == INVALID_HANDLE_VALUE)
@@ -1082,7 +1065,7 @@ short DevExtendedData(unsigned short usDevNumber, unsigned short usMode,
   }
   else
   {
-    // fill in parameter data    
+    // fill in parameter data
 
     tBuffer.usBoard = usDevNumber;
     tBuffer.usMode = usMode;
@@ -1122,10 +1105,10 @@ short DevExtendedData(unsigned short usDevNumber, unsigned short usMode,
   =================================================================================
   <En> */
 
-short DevGetTaskParameter(unsigned short usDevNumber, unsigned short usNumber,
-                          unsigned short usSize, void* pvData)
+short DevGetTaskParameter(unsigned short usDevNumber, unsigned short usNumber, unsigned short usSize,
+                          void* pvData)
 {
-  DEVIO_GETPARAMETERCMD tBuffer;  
+  DEVIO_GETPARAMETERCMD tBuffer;
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -1151,7 +1134,7 @@ short DevGetTaskParameter(unsigned short usDevNumber, unsigned short usNumber,
   }
   else
   {
-    // fill in parameter data    
+    // fill in parameter data
     // set command buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usTaskParamNum = usNumber;
@@ -1166,8 +1149,7 @@ short DevGetTaskParameter(unsigned short usDevNumber, unsigned short usNumber,
     }
     else
     {
-      memcpy((unsigned char*)pvData, (unsigned char*)&(tBuffer.TaskParameter),
-             usSize);
+      memcpy((unsigned char*)pvData, (unsigned char*)&(tBuffer.TaskParameter), usSize);
       sRet = tBuffer.sError;
     }
   }
@@ -1187,11 +1169,10 @@ short DevGetTaskParameter(unsigned short usDevNumber, unsigned short usNumber,
   =================================================================================
   <En> */
 
-short DevReadWriteDPMData(unsigned short usDevNumber, unsigned short usMode,
-                          unsigned short usOffset, unsigned short usSize,
-                          void* pvData)
+short DevReadWriteDPMData(unsigned short usDevNumber, unsigned short usMode, unsigned short usOffset,
+                          unsigned short usSize, void* pvData)
 {
-  DEVIO_RWDPMDATACMD tBuffer;  
+  DEVIO_RWDPMDATACMD tBuffer;
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -1208,15 +1189,14 @@ short DevReadWriteDPMData(unsigned short usDevNumber, unsigned short usMode,
     sRet = DRV_USR_MODE_INVALID;
   }
   else if ((usSize != 0) &&
-           ((usSize + usOffset) >
-            (unsigned short)(tDevDPMSize[usDevNumber].ulDpmSize * 1024)))
+           ((usSize + usOffset) > (unsigned short)(tDevDPMSize[usDevNumber].ulDpmSize * 1024)))
   {
     sRet = DRV_USR_SIZE_TOO_LONG;
     ;
   }
   else
   {
-    // fill in parameter data    
+    // fill in parameter data
     tBuffer.usBoard = usDevNumber;
     tBuffer.usMode = usMode;
     tBuffer.usOffset = usOffset;
@@ -1252,11 +1232,10 @@ short DevReadWriteDPMData(unsigned short usDevNumber, unsigned short usMode,
   =================================================================================
   <En> */
 
-short DevReadWriteDPMRaw(unsigned short usDevNumber, unsigned short usMode,
-                         unsigned short usOffset, unsigned short usSize,
-                         void* pvData)
+short DevReadWriteDPMRaw(unsigned short usDevNumber, unsigned short usMode, unsigned short usOffset,
+                         unsigned short usSize, void* pvData)
 {
-  DEVIO_RWRAWDATACMD tBuffer;  
+  DEVIO_RWRAWDATACMD tBuffer;
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -1278,7 +1257,7 @@ short DevReadWriteDPMRaw(unsigned short usDevNumber, unsigned short usMode,
   }
   else
   {
-    // fill in parameter data    
+    // fill in parameter data
     tBuffer.usBoard = usDevNumber;
     tBuffer.usMode = usMode;
     tBuffer.usOffset = usOffset;
@@ -1313,11 +1292,9 @@ short DevReadWriteDPMRaw(unsigned short usDevNumber, unsigned short usMode,
   =================================================================================
   <En> */
 
-short DevExchangeIO(unsigned short usDevNumber, unsigned short usSendOffset,
-                    unsigned short usSendSize, void* pvSendData,
-                    unsigned short usReceiveOffset,
-                    unsigned short usReceiveSize, void* pvReceiveData,
-                    unsigned long ulTimeout)
+short DevExchangeIO(unsigned short usDevNumber, unsigned short usSendOffset, unsigned short usSendSize,
+                    void* pvSendData, unsigned short usReceiveOffset, unsigned short usReceiveSize,
+                    void* pvReceiveData, unsigned long ulTimeout)
 {
   DEVIO_EXIOCMD tBuffer;
   short sRet = DRV_NO_ERROR;
@@ -1332,20 +1309,18 @@ short DevExchangeIO(unsigned short usDevNumber, unsigned short usSendOffset,
     sRet = DRV_USR_DEV_NUMBER_INVALID;
   }
   else if ((usSendSize != 0) &&
-           ((usSendSize + usSendOffset) >
-            (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
+           ((usSendSize + usSendOffset) > (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
   {
     sRet = DRV_USR_SENDSIZE_TOO_LONG;
   }
   else if ((usReceiveSize != 0) &&
-           ((usReceiveSize + usReceiveOffset) >
-            (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
+           ((usReceiveSize + usReceiveOffset) > (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
   {
     sRet = DRV_USR_RECVSIZE_TOO_LONG;
   }
   else
   {
-    // fill in parameter data    
+    // fill in parameter data
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usReceiveOffset = usReceiveOffset;
@@ -1386,13 +1361,11 @@ short DevExchangeIO(unsigned short usDevNumber, unsigned short usSendOffset,
   =================================================================================
   <En> */
 
-short DevExchangeIOEx(unsigned short usDevNumber, unsigned short usMode,
-                      unsigned short usSendOffset, unsigned short usSendSize,
-                      void* pvSendData, unsigned short usReceiveOffset,
-                      unsigned short usReceiveSize, void* pvReceiveData,
-                      unsigned long ulTimeout)
+short DevExchangeIOEx(unsigned short usDevNumber, unsigned short usMode, unsigned short usSendOffset,
+                      unsigned short usSendSize, void* pvSendData, unsigned short usReceiveOffset,
+                      unsigned short usReceiveSize, void* pvReceiveData, unsigned long ulTimeout)
 {
-  DEVIO_EXIOCMDEX tBuffer;  
+  DEVIO_EXIOCMDEX tBuffer;
   short sRet = DRV_NO_ERROR;
   int lRet = 0;
 
@@ -1406,14 +1379,12 @@ short DevExchangeIOEx(unsigned short usDevNumber, unsigned short usMode,
     sRet = DRV_USR_DEV_NUMBER_INVALID;
   }
   else if ((usSendSize != 0) &&
-           ((usSendSize + usSendOffset) >
-            (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
+           ((usSendSize + usSendOffset) > (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
   {
     sRet = DRV_USR_SENDSIZE_TOO_LONG;
   }
   else if ((usReceiveSize != 0) &&
-           ((usReceiveSize + usReceiveOffset) >
-            (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
+           ((usReceiveSize + usReceiveOffset) > (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
   {
     sRet = DRV_USR_RECVSIZE_TOO_LONG;
   }
@@ -1424,7 +1395,7 @@ short DevExchangeIOEx(unsigned short usDevNumber, unsigned short usMode,
   else
   {
     // fill in parameter data
-    
+
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usReceiveOffset = usReceiveOffset;
@@ -1466,13 +1437,11 @@ short DevExchangeIOEx(unsigned short usDevNumber, unsigned short usMode,
   =================================================================================
   <En> */
 
-short DevExchangeIOErr(unsigned short usDevNumber, unsigned short usSendOffset,
-                       unsigned short usSendSize, void* pvSendData,
-                       unsigned short usReceiveOffset,
-                       unsigned short usReceiveSize, void* pvReceiveData,
-                       COMSTATE* ptState, unsigned long ulTimeout)
+short DevExchangeIOErr(unsigned short usDevNumber, unsigned short usSendOffset, unsigned short usSendSize,
+                       void* pvSendData, unsigned short usReceiveOffset, unsigned short usReceiveSize,
+                       void* pvReceiveData, COMSTATE* ptState, unsigned long ulTimeout)
 {
-  DEVIO_EXIOCMDERR tBuffer;  
+  DEVIO_EXIOCMDERR tBuffer;
   short sRet = DRV_NO_ERROR;
   int lRet = 0;
 
@@ -1486,21 +1455,19 @@ short DevExchangeIOErr(unsigned short usDevNumber, unsigned short usSendOffset,
     sRet = DRV_USR_DEV_NUMBER_INVALID;
   }
   else if ((usSendSize != 0) &&
-           ((usSendSize + usSendOffset) >
-            (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
+           ((usSendSize + usSendOffset) > (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
   {
     sRet = DRV_USR_SENDSIZE_TOO_LONG;
   }
   else if ((usReceiveSize != 0) &&
-           ((usReceiveSize + usReceiveOffset) >
-            (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
+           ((usReceiveSize + usReceiveOffset) > (unsigned short)tDevDPMSize[usDevNumber].ulDpmIOSize))
   {
     sRet = DRV_USR_RECVSIZE_TOO_LONG;
   }
   else
   {
     // fill in parameter data
-    
+
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usReceiveOffset = usReceiveOffset;
@@ -1540,10 +1507,9 @@ short DevExchangeIOErr(unsigned short usDevNumber, unsigned short usSendOffset,
   =================================================================================
   <En> */
 
-short DevSetHostState(unsigned short usDevNumber, unsigned short usMode,
-                      unsigned long ulTimeout)
+short DevSetHostState(unsigned short usDevNumber, unsigned short usMode, unsigned long ulTimeout)
 {
-  DEVIO_TRIGGERCMD tBuffer;  
+  DEVIO_TRIGGERCMD tBuffer;
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -1595,10 +1561,9 @@ short DevSetHostState(unsigned short usDevNumber, unsigned short usMode,
   =================================================================================
   <En> */
 
-short DevPutMessage(unsigned short usDevNumber, MSG_STRUC* ptMessage,
-                    unsigned long ulTimeout)
+short DevPutMessage(unsigned short usDevNumber, MSG_STRUC* ptMessage, unsigned long ulTimeout)
 {
-  DEVIO_PUTMESSAGECMD tBuffer;  
+  DEVIO_PUTMESSAGECMD tBuffer;
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -1648,10 +1613,10 @@ short DevPutMessage(unsigned short usDevNumber, MSG_STRUC* ptMessage,
   =================================================================================
   <En> */
 
-short DevGetMessage(unsigned short usDevNumber, unsigned short usSize,
-                    MSG_STRUC* ptMessage, unsigned long ulTimeout)
+short DevGetMessage(unsigned short usDevNumber, unsigned short usSize, MSG_STRUC* ptMessage,
+                    unsigned long ulTimeout)
 {
-  DEVIO_GETMESSAGECMD tBuffer;  
+  DEVIO_GETMESSAGECMD tBuffer;
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -1669,7 +1634,7 @@ short DevGetMessage(unsigned short usDevNumber, unsigned short usSize,
   }
   else
   {
-    // fill in parameter data    
+    // fill in parameter data
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.ulTimeout = ulTimeout;
@@ -1799,10 +1764,9 @@ short openFile(const char* fileName, FILEDATA* ptFile)
         else
         {
           // Read file data into memory
-          if ((lNumberOfBytesRead = read(
-                   ptFile->fd,        // handle of file to read
-                   ptFile->pabBuffer, // address of buffer that receives data
-                   ptFile->lSize)) < 0)
+          if ((lNumberOfBytesRead = read(ptFile->fd,        // handle of file to read
+                                         ptFile->pabBuffer, // address of buffer that receives data
+                                         ptFile->lSize)) < 0)
           { // number of bytes to read
             // File read into memory failed
             sRet = DRV_USR_FILE_READ_FAILED;
@@ -1829,8 +1793,7 @@ short FreeRecvMailbox(unsigned short usDevNumber)
   usIdx = 0;
   do
   {
-    if ((sRet = DevGetMBXState(usDevNumber, &usDevState, &usHostState)) !=
-        DRV_NO_ERROR)
+    if ((sRet = DevGetMBXState(usDevNumber, &usDevState, &usHostState)) != DRV_NO_ERROR)
     {
       // Something wrong, end function
       break;
@@ -1857,8 +1820,7 @@ short FreeRecvMailbox(unsigned short usDevNumber)
 //----------------------------------------------------------------------------------------
 // Create checksum
 //----------------------------------------------------------------------------------------
-unsigned short CreateChecksum(unsigned char* pabData, int lDataLen,
-                              MSG_STRUC* ptSendMsg)
+unsigned short CreateChecksum(unsigned char* pabData, int lDataLen, MSG_STRUC* ptSendMsg)
 {
   int lIdx, lTempLen;
   unsigned short usCheckSum, usTemp;
@@ -1897,25 +1859,20 @@ unsigned short CreateChecksum(unsigned char* pabData, int lDataLen,
 //----------------------------------------------------------------------------------------
 // Transfer messages
 //----------------------------------------------------------------------------------------
-short TransferMessage(unsigned short usDevNumber, MSG_STRUC* ptSendMsg,
-                      MSG_STRUC* ptRecvMsg, long lTimeout)
+short TransferMessage(unsigned short usDevNumber, MSG_STRUC* ptSendMsg, MSG_STRUC* ptRecvMsg, long lTimeout)
 {
   int lCount = 0;
   short sRet = DRV_NO_ERROR;
 
-  if ((sRet = DevPutMessage(usDevNumber, ptSendMsg, TO_SEND_MSG)) ==
-      DRV_NO_ERROR)
+  if ((sRet = DevPutMessage(usDevNumber, ptSendMsg, TO_SEND_MSG)) == DRV_NO_ERROR)
   {
     do
     {
-      if ((sRet = DevGetMessage(usDevNumber, sizeof(MSG_STRUC), ptRecvMsg,
-                                lTimeout)) == DRV_NO_ERROR)
+      if ((sRet = DevGetMessage(usDevNumber, sizeof(MSG_STRUC), ptRecvMsg, lTimeout)) == DRV_NO_ERROR)
       {
         // Check on message errors
-        if ((ptRecvMsg->tx == ptSendMsg->rx) &&
-            (ptRecvMsg->rx == ptSendMsg->tx) &&
-            (ptRecvMsg->a == ptSendMsg->b) && (ptRecvMsg->b == 0) &&
-            (ptRecvMsg->nr == ptSendMsg->nr))
+        if ((ptRecvMsg->tx == ptSendMsg->rx) && (ptRecvMsg->rx == ptSendMsg->tx) &&
+            (ptRecvMsg->a == ptSendMsg->b) && (ptRecvMsg->b == 0) && (ptRecvMsg->nr == ptSendMsg->nr))
         {
           // Check on message error
           if (ptRecvMsg->f != 0)
@@ -1962,14 +1919,12 @@ short ReadDeviceInformation(unsigned short usDevNumber, const char* fileName)
     tSendMsg.e = 0;
     // Insert data
     tSendMsg.data[0] = MODE_GET_PROJ_WERTE_HW;
-    if ((sRet = TransferMessage(usDevNumber, &tSendMsg, &tRecvMsg,
-                                TO_SEND_MSG)) == DRV_NO_ERROR)
+    if ((sRet = TransferMessage(usDevNumber, &tSendMsg, &tRecvMsg, TO_SEND_MSG)) == DRV_NO_ERROR)
     {
       // Check entry
       dwStrLen = strlen(fileName);
       pInfo = (DEVICE_TYPE_INFO*)&tRecvMsg.data[0];
-      if ((pInfo->bHerstellerkennung !=
-           (char)(toupper(fileName[dwStrLen - 3]))) ||
+      if ((pInfo->bHerstellerkennung != (char)(toupper(fileName[dwStrLen - 3]))) ||
           (pInfo->bDeviceType != (char)(toupper(fileName[dwStrLen - 2]))) ||
           (pInfo->bDeviceModel != (char)(toupper(fileName[dwStrLen - 1]))))
       {
@@ -1993,8 +1948,7 @@ short ReadDeviceInformation(unsigned short usDevNumber, const char* fileName)
   Return  : DRV_NO_ERROR  - Download successfully
   =================================================================================
   <En> */
-short RunFirmwareDownload(unsigned short usDevNumber, FILEDATA* ptFile,
-                          unsigned long* pdwByte)
+short RunFirmwareDownload(unsigned short usDevNumber, FILEDATA* ptFile, unsigned long* pdwByte)
 {
   int lFileLength, lSendLen, lActIdx;
   unsigned short usCheckSum, usTemp;
@@ -2062,8 +2016,7 @@ short RunFirmwareDownload(unsigned short usDevNumber, FILEDATA* ptFile,
       tSendMsg.data[2] = (unsigned char)((usCheckSum >> 8) & 0x00FF);
 
       // Process message
-      if ((sRet = TransferMessage(usDevNumber, &tSendMsg, &tRecvMsg,
-                                  TO_1ST_MSG)) != DRV_NO_ERROR)
+      if ((sRet = TransferMessage(usDevNumber, &tSendMsg, &tRecvMsg, TO_1ST_MSG)) != DRV_NO_ERROR)
       {
         // Could not process this message
         fRet = FALSE;
@@ -2088,15 +2041,13 @@ short RunFirmwareDownload(unsigned short usDevNumber, FILEDATA* ptFile,
         tSendMsg.e = RCS_CONT_MSK;
 
         // Set byte 0 to 63 to byte 1 to 65 of the 1st message
-        memcpy(&tSendMsg.data[0], &tSendMsg.data[1], 64);
+        memmove(&tSendMsg.data[0], &tSendMsg.data[1], 64);
 
         // Insert byte 64 to 239 from the abData[64]
-        memcpy(&tSendMsg.data[64], &pabData[64],
-               (unsigned char)(lSendLen - 64));
+        memcpy(&tSendMsg.data[64], &pabData[64], (unsigned char)(lSendLen - 64));
 
         // Process message
-        if ((sRet = TransferMessage(usDevNumber, &tSendMsg, &tRecvMsg,
-                                    TO_1ST_MSG)) != DRV_NO_ERROR)
+        if ((sRet = TransferMessage(usDevNumber, &tSendMsg, &tRecvMsg, TO_1ST_MSG)) != DRV_NO_ERROR)
         {
           // Could not process this message
           fRet = FALSE;
@@ -2132,8 +2083,7 @@ short RunFirmwareDownload(unsigned short usDevNumber, FILEDATA* ptFile,
       memcpy(&tSendMsg.data[0], &pabData[lActIdx], lSendLen);
 
       // Process message
-      if ((sRet = TransferMessage(usDevNumber, &tSendMsg, &tRecvMsg,
-                                  TO_CONT_MSG)) != DRV_NO_ERROR)
+      if ((sRet = TransferMessage(usDevNumber, &tSendMsg, &tRecvMsg, TO_CONT_MSG)) != DRV_NO_ERROR)
       {
         // Could not process this message
         fRet = FALSE;
@@ -2196,8 +2146,7 @@ short RunFirmwareDownload(unsigned short usDevNumber, FILEDATA* ptFile,
   Return  : DRV_NO_ERROR  - Download successfully
   =================================================================================
   <En> */
-short RunConfigDownload(unsigned short usDevNumber, FILEDATA* ptFile,
-                        unsigned long* pdwByte)
+short RunConfigDownload(unsigned short usDevNumber, FILEDATA* ptFile, unsigned long* pdwByte)
 {
   unsigned int dwState;
   int lSendLen, lActIdx, lOffset, lFileLength;
@@ -2265,8 +2214,7 @@ short RunConfigDownload(unsigned short usDevNumber, FILEDATA* ptFile,
 
       // printf("cifAPI: %ld\n", dwState);
       // Process message
-      if ((sRet = TransferMessage(usDevNumber, &tSendMsg, &tRecvMsg,
-                                  TO_1ST_MSG)) != DRV_NO_ERROR)
+      if ((sRet = TransferMessage(usDevNumber, &tSendMsg, &tRecvMsg, TO_1ST_MSG)) != DRV_NO_ERROR)
       {
         // Could not process this message
         fRet = FALSE;
@@ -2299,8 +2247,7 @@ short RunConfigDownload(unsigned short usDevNumber, FILEDATA* ptFile,
       memcpy(&tSendMsg.data[0], &pabData[lActIdx], lSendLen);
 
       // Process message
-      if ((sRet = TransferMessage(usDevNumber, &tSendMsg, &tRecvMsg,
-                                  TO_CONT_MSG)) != DRV_NO_ERROR)
+      if ((sRet = TransferMessage(usDevNumber, &tSendMsg, &tRecvMsg, TO_CONT_MSG)) != DRV_NO_ERROR)
       {
         // Could not process this message
         fRet = FALSE;
@@ -2366,8 +2313,7 @@ short RunConfigDownload(unsigned short usDevNumber, FILEDATA* ptFile,
   Return  : DRV_NO_ERROR  - Download successfully
   =================================================================================
   <En> */
-short FirmwareDownload(unsigned short usDevNumber, const char* fileName,
-                       unsigned long* pdwByte)
+short FirmwareDownload(unsigned short usDevNumber, const char* fileName, unsigned long* pdwByte)
 {
   short sRet = DRV_NO_ERROR;
   FILEDATA tFileData;
@@ -2398,8 +2344,7 @@ short FirmwareDownload(unsigned short usDevNumber, const char* fileName,
   Return  : DRV_NO_ERROR  - Download successfully
   =================================================================================
   <En> */
-short ConfigDownload(unsigned short usDevNumber, const char* fileName,
-                     unsigned long* pdwByte)
+short ConfigDownload(unsigned short usDevNumber, const char* fileName, unsigned long* pdwByte)
 {
   unsigned short sRet = DRV_NO_ERROR;
   FILEDATA tFileData;
@@ -2427,8 +2372,8 @@ short ConfigDownload(unsigned short usDevNumber, const char* fileName,
   =================================================================================
   <En> */
 
-short DevDownload(unsigned short usDevNumber, unsigned short usMode,
-                  unsigned char* pszFileName, unsigned long* pdwBytes)
+short DevDownload(unsigned short usDevNumber, unsigned short usMode, unsigned char* pszFileName,
+                  unsigned long* pdwBytes)
 {
   short sRet = DRV_NO_ERROR;
 

@@ -55,19 +55,15 @@
 
 /*__Local function prototypes___________________________________________*/
 
-static int rtt_view_get_row_size(
-    char* row, int size, int* number_of_char, char* last_char);
-static int rtt_read_buff(view_ctx ctx, char* buff, int buff_size, int* buffrow,
-    int buffrow_size, int* buffrow_count, int direction, int page_size,
-    int* start_row);
-static int rtt_read_file(view_ctx ctx, char* buff, int buff_size, int* buffrow,
-    int buffrow_size, int* buffrow_count, int direction, int page_size,
-    int* start_row);
+static int rtt_view_get_row_size(char* row, int size, int* number_of_char, char* last_char);
+static int rtt_read_buff(view_ctx ctx, char* buff, int buff_size, int* buffrow, int buffrow_size,
+                         int* buffrow_count, int direction, int page_size, int* start_row);
+static int rtt_read_file(view_ctx ctx, char* buff, int buff_size, int* buffrow, int buffrow_size,
+                         int* buffrow_count, int direction, int page_size, int* start_row);
 
 static char* rttview_gets(char* str, int size, char* inbuff, int* str_offset);
 
-static int rtt_view_get_row_size(
-    char* row, int size, int* number_of_char, char* last_char)
+static int rtt_view_get_row_size(char* row, int size, int* number_of_char, char* last_char)
 
 {
   char* s;
@@ -75,7 +71,8 @@ static int rtt_view_get_row_size(
 
   s = row;
   display_size = 0;
-  for (i = 0; i < size; i++) {
+  for (i = 0; i < size; i++)
+  {
     if (!*s || *s == 12 || *s == 10)
       break;
 
@@ -98,12 +95,16 @@ int rtt_view_search(view_ctx ctx, char* search_string)
   char* s;
   int offset;
 
-  if (!ctx->buff_read_complete) {
+  if (!ctx->buff_read_complete)
+  {
     rtt_message('E', "File too large");
     return RTT__NOPICTURE;
-  } else {
+  }
+  else
+  {
     /* Find the current offset */
-    if (ctx->start_row >= ctx->buffrow_count - 1) {
+    if (ctx->start_row >= ctx->buffrow_count - 1)
+    {
       rtt_message('E', "String not found");
       return RTT__NOPICTURE;
     }
@@ -111,7 +112,8 @@ int rtt_view_search(view_ctx ctx, char* search_string)
     offset = ctx->buffrow[ctx->start_row + 1];
 
     s = strstr(&ctx->buff[offset], search_string);
-    if (!s) {
+    if (!s)
+    {
       rtt_message('E', "String not found");
       return RTT__NOPICTURE;
     }
@@ -119,8 +121,10 @@ int rtt_view_search(view_ctx ctx, char* search_string)
     /* Find the line */
     offset = s - ctx->buff;
 
-    for (i = 0; i < ctx->buffrow_count; i++) {
-      if (ctx->buffrow[i] > offset) {
+    for (i = 0; i < ctx->buffrow_count; i++)
+    {
+      if (ctx->buffrow[i] > offset)
+      {
         ctx->start_row = i - 1;
         if (ctx->start_row < 0)
           ctx->start_row = 0;
@@ -131,9 +135,8 @@ int rtt_view_search(view_ctx ctx, char* search_string)
   return RTT__SUCCESS;
 }
 
-static int rtt_read_file(view_ctx ctx, char* buff, int buff_size, int* buffrow,
-    int buffrow_size, int* buffrow_count, int direction, int page_size,
-    int* start_row)
+static int rtt_read_file(view_ctx ctx, char* buff, int buff_size, int* buffrow, int buffrow_size,
+                         int* buffrow_count, int direction, int page_size, int* start_row)
 {
   int len;
   char str[2000];
@@ -144,13 +147,17 @@ static int rtt_read_file(view_ctx ctx, char* buff, int buff_size, int* buffrow,
   back_jump_rows = buff_size - 50;
   old_buffstart_row = ctx->buffstart_row;
 
-  if (ctx->first) {
+  if (ctx->first)
+  {
     ctx->first = 0;
   }
-  if (direction == 0) {
+  if (direction == 0)
+  {
     /* Forward */
-    if (ctx->read_sts == 0 || ctx->buff_read_complete == 1) {
-      if (*start_row + page_size > *buffrow_count) {
+    if (ctx->read_sts == 0 || ctx->buff_read_complete == 1)
+    {
+      if (*start_row + page_size > *buffrow_count)
+      {
         *start_row = *buffrow_count - page_size;
       }
       if (*start_row < 0)
@@ -158,8 +165,10 @@ static int rtt_read_file(view_ctx ctx, char* buff, int buff_size, int* buffrow,
       return 1;
     }
 
-    if (ctx->start_row + page_size > ctx->buffrow_count) {
-      if (*start_row + page_size > *buffrow_count) {
+    if (ctx->start_row + page_size > ctx->buffrow_count)
+    {
+      if (*start_row + page_size > *buffrow_count)
+      {
         ctx->buffstart_row += *start_row;
         *start_row = 0;
       }
@@ -167,24 +176,32 @@ static int rtt_read_file(view_ctx ctx, char* buff, int buff_size, int* buffrow,
     if (fseek(ctx->infile, 0, 0) != 0)
       return 0;
     /*	  sts = fseek( infile, buffstart_offset, 1);*/
-    for (i = 0; i < ctx->buffstart_row; i++) {
+    for (i = 0; i < ctx->buffstart_row; i++)
+    {
       if (fgets(str, sizeof(str), ctx->infile) == NULL)
         break;
     }
     *buffrow_count = 0;
-  } else {
+  }
+  else
+  {
     /* Backward */
-    if (ctx->buff_read_complete == 1) {
+    if (ctx->buff_read_complete == 1)
+    {
       if (*start_row < 0)
         *start_row = 0;
       return 1;
     }
     ctx->read_sts = (char*)1;
-    if (*start_row < 0) {
-      if (back_jump_rows <= ctx->buffstart_row) {
+    if (*start_row < 0)
+    {
+      if (back_jump_rows <= ctx->buffstart_row)
+      {
         ctx->buffstart_row -= back_jump_rows;
         *start_row += back_jump_rows;
-      } else {
+      }
+      else
+      {
         *start_row += ctx->buffstart_row;
         if (*start_row < 0)
           *start_row = 0;
@@ -195,7 +212,8 @@ static int rtt_read_file(view_ctx ctx, char* buff, int buff_size, int* buffrow,
     if (fseek(ctx->infile, 0, 0) != 0)
       return 0;
     /*	  sts = fseek( infile, buffstart_offset, 1);*/
-    for (i = 0; i < ctx->buffstart_row; i++) {
+    for (i = 0; i < ctx->buffstart_row; i++)
+    {
       if (fgets(str, sizeof(str), ctx->infile) == NULL)
         break;
     }
@@ -203,8 +221,8 @@ static int rtt_read_file(view_ctx ctx, char* buff, int buff_size, int* buffrow,
   }
 
   len = 0;
-  while (ctx->read_sts != NULL && len < buff_size - (int)sizeof(str)
-      && *buffrow_count < buffrow_size) {
+  while (ctx->read_sts != NULL && len < buff_size - (int)sizeof(str) && *buffrow_count < buffrow_size)
+  {
     ctx->read_sts = fgets(str, sizeof(str), ctx->infile);
     if (ctx->read_sts == NULL)
       break;
@@ -216,7 +234,8 @@ static int rtt_read_file(view_ctx ctx, char* buff, int buff_size, int* buffrow,
   if (*start_row > *buffrow_count)
     *start_row = *buffrow_count - page_size;
 
-  if (ctx->read_sts == NULL) {
+  if (ctx->read_sts == NULL)
+  {
     if (*start_row + page_size > *buffrow_count)
       *start_row = *buffrow_count - page_size;
     if (ctx->buffstart_row == 0)
@@ -228,9 +247,8 @@ static int rtt_read_file(view_ctx ctx, char* buff, int buff_size, int* buffrow,
   return 1;
 }
 
-static int rtt_read_buff(view_ctx ctx, char* buff, int buff_size, int* buffrow,
-    int buffrow_size, int* buffrow_count, int direction, int page_size,
-    int* start_row)
+static int rtt_read_buff(view_ctx ctx, char* buff, int buff_size, int* buffrow, int buffrow_size,
+                         int* buffrow_count, int direction, int page_size, int* start_row)
 {
   int len;
   char str[2000];
@@ -243,13 +261,17 @@ static int rtt_read_buff(view_ctx ctx, char* buff, int buff_size, int* buffrow,
   back_jump_rows = buff_size - 50;
   old_buffstart_row = ctx->buffstart_row;
 
-  if (ctx->first) {
+  if (ctx->first)
+  {
     ctx->first = 0;
   }
-  if (direction == 0) {
+  if (direction == 0)
+  {
     /* Forward */
-    if (ctx->read_sts == 0 || ctx->buff_read_complete == 1) {
-      if (*start_row + page_size > *buffrow_count) {
+    if (ctx->read_sts == 0 || ctx->buff_read_complete == 1)
+    {
+      if (*start_row + page_size > *buffrow_count)
+      {
         *start_row = *buffrow_count - page_size;
       }
       if (*start_row < 0)
@@ -257,20 +279,22 @@ static int rtt_read_buff(view_ctx ctx, char* buff, int buff_size, int* buffrow,
       return 1;
     }
 
-    if (*start_row + page_size > *buffrow_count) {
+    if (*start_row + page_size > *buffrow_count)
+    {
       ctx->buffstart_row += *start_row;
       *start_row = 0;
     }
     /*	  sts = fseek( infile, buffstart_offset, 1);*/
-    for (i = 0; i < ctx->buffstart_row; i++) {
+    for (i = 0; i < ctx->buffstart_row; i++)
+    {
       if (rttview_gets(str, sizeof(str), ctx->inbuff, &inbuff_offset) == NULL)
         break;
     }
     *buffrow_count = 0;
   }
   len = 0;
-  while (ctx->read_sts != NULL && len < buff_size - (int)sizeof(str)
-      && *buffrow_count < buffrow_size) {
+  while (ctx->read_sts != NULL && len < buff_size - (int)sizeof(str) && *buffrow_count < buffrow_size)
+  {
     ctx->read_sts = rttview_gets(str, sizeof(str), ctx->inbuff, &inbuff_offset);
     buffrow[*buffrow_count] = len;
     strcpy(buff + len, str);
@@ -280,10 +304,11 @@ static int rtt_read_buff(view_ctx ctx, char* buff, int buff_size, int* buffrow,
   if (*start_row > *buffrow_count)
     *start_row = *buffrow_count - page_size;
 
-  if (ctx->read_sts == NULL) {
+  if (ctx->read_sts == NULL)
+  {
     if (*start_row + page_size > *buffrow_count)
       /*	    *start_row = *buffrow_count - page_size;
-      */
+       */
       if (ctx->buffstart_row == 0)
         ctx->buff_read_complete = 1;
   }
@@ -298,7 +323,8 @@ static char* rttview_gets(char* str, int size, char* inbuff, int* inbuff_offset)
   char* s;
 
   s = inbuff + *inbuff_offset;
-  while (!(*s == 10 || *s == 0)) {
+  while (!(*s == 10 || *s == 0))
+  {
     *str = *s;
     s++;
     str++;
@@ -311,14 +337,15 @@ static char* rttview_gets(char* str, int size, char* inbuff, int* inbuff_offset)
     return NULL;
   s++;
   (*inbuff_offset)++;
-  if (*s == 13) {
+  if (*s == 13)
+  {
     (*inbuff_offset)++;
   }
   return (char*)1;
 }
 
-int rtt_view_buffer(menu_ctx parent_ctx, pwr_tObjid objid, char* filename,
-    char* inbuff, char* intitle, int type)
+int rtt_view_buffer(menu_ctx parent_ctx, pwr_tObjid objid, char* filename, char* inbuff, char* intitle,
+                    int type)
 {
   int sts;
 
@@ -327,25 +354,24 @@ int rtt_view_buffer(menu_ctx parent_ctx, pwr_tObjid objid, char* filename,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_view()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	parent_ctx	I	parents rtt context.
-* rtt_t_menu	**menu_p	I	menu list.
-* char		*title		I	menu title.
-* unsigned long	userdata	I	...
-* unsigned long	flag		I	menu type
-*
-* Description:
-*	Create a view window.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_view()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	parent_ctx	I	parents rtt context.
+ * rtt_t_menu	**menu_p	I	menu list.
+ * char		*title		I	menu title.
+ * unsigned long	userdata	I	...
+ * unsigned long	flag		I	menu type
+ *
+ * Description:
+ *	Create a view window.
+ *
+ **************************************************************************/
 
-int rtt_view(
-    menu_ctx parent_ctx, char* filename, char* inbuff, char* intitle, int type)
+int rtt_view(menu_ctx parent_ctx, char* filename, char* inbuff, char* intitle, int type)
 {
   view_ctx ctx;
   unsigned long terminator;
@@ -365,21 +391,26 @@ int rtt_view(
   char last_char;
   char pagestr[80];
 
-  if (type == RTT_VIEWTYPE_FILE) {
+  if (type == RTT_VIEWTYPE_FILE)
+  {
     infile = fopen(filename, "r");
-    if (!infile) {
+    if (!infile)
+    {
       char tmp[200];
       snprintf(tmp, 200, "Unable to open file \"%s\"", filename);
       rtt_message('E', tmp);
       return RTT__NOPICTURE;
     }
     rtt_fgetname(infile, title, filename);
-  } else {
+  }
+  else
+  {
     strcpy(title, intitle);
   }
 
   ctx = calloc(1, sizeof(*ctx));
-  if (!ctx) {
+  if (!ctx)
+  {
     rtt_message('E', "Unable to allocate memory");
     return RTT__NOPICTURE;
   }
@@ -394,13 +425,15 @@ int rtt_view(
     ctx->inbuff = inbuff;
   ctx->read_sts = (char*)1;
   ctx->buff = calloc(1, RTTVIEW_BUFF_SIZE);
-  if (!ctx->buff) {
+  if (!ctx->buff)
+  {
     rtt_ctx_pop();
     rtt_message('E', "Unable to allocate memory");
     return RTT__NOPICTURE;
   }
   ctx->buffrow = calloc(RTTVIEW_BUFFROW_SIZE, sizeof(*ctx->buffrow));
-  if (!ctx->buffrow) {
+  if (!ctx->buffrow)
+  {
     rtt_ctx_pop();
     rtt_message('E', "Unable to allocate memory");
     return RTT__NOPICTURE;
@@ -411,22 +444,21 @@ int rtt_view(
   row_change = 0;
 
   if (type == RTT_VIEWTYPE_FILE)
-    rtt_read_file(ctx, ctx->buff, RTTVIEW_BUFF_SIZE, ctx->buffrow,
-        RTTVIEW_BUFFROW_SIZE, &ctx->buffrow_count, 0, page_size,
-        &ctx->start_row);
+    rtt_read_file(ctx, ctx->buff, RTTVIEW_BUFF_SIZE, ctx->buffrow, RTTVIEW_BUFFROW_SIZE, &ctx->buffrow_count,
+                  0, page_size, &ctx->start_row);
   else
-    rtt_read_buff(ctx, ctx->buff, RTTVIEW_BUFF_SIZE, ctx->buffrow,
-        RTTVIEW_BUFFROW_SIZE, &ctx->buffrow_count, 0, page_size,
-        &ctx->start_row);
+    rtt_read_buff(ctx, ctx->buff, RTTVIEW_BUFF_SIZE, ctx->buffrow, RTTVIEW_BUFFROW_SIZE, &ctx->buffrow_count,
+                  0, page_size, &ctx->start_row);
 
   option = RTT_OPT_NORECALL | RTT_OPT_NOEDIT | RTT_OPT_NOECHO | RTT_OPT_TIMEOUT;
 
-  while (1) {
-    if (ctx->start_row + page_size > ctx->buffrow_count) {
+  while (1)
+  {
+    if (ctx->start_row + page_size > ctx->buffrow_count)
+    {
       if (type == RTT_VIEWTYPE_FILE)
-        rtt_read_file(ctx, ctx->buff, RTTVIEW_BUFF_SIZE, ctx->buffrow,
-            RTTVIEW_BUFFROW_SIZE, &ctx->buffrow_count, 0, page_size,
-            &ctx->start_row);
+        rtt_read_file(ctx, ctx->buff, RTTVIEW_BUFF_SIZE, ctx->buffrow, RTTVIEW_BUFFROW_SIZE,
+                      &ctx->buffrow_count, 0, page_size, &ctx->start_row);
       else
         ctx->start_row = MAX(0, ctx->buffrow_count - page_size);
       /*
@@ -436,11 +468,12 @@ int rtt_view(
                       0, page_size, &ctx->start_row);
       */
       redraw = 1;
-    } else if (ctx->start_row < 0) {
+    }
+    else if (ctx->start_row < 0)
+    {
       if (type == RTT_VIEWTYPE_FILE)
-        rtt_read_file(ctx, ctx->buff, RTTVIEW_BUFF_SIZE, ctx->buffrow,
-            RTTVIEW_BUFFROW_SIZE, &ctx->buffrow_count, 1, page_size,
-            &ctx->start_row);
+        rtt_read_file(ctx, ctx->buff, RTTVIEW_BUFF_SIZE, ctx->buffrow, RTTVIEW_BUFFROW_SIZE,
+                      &ctx->buffrow_count, 1, page_size, &ctx->start_row);
       else
         ctx->start_row = 0;
       /*
@@ -451,14 +484,17 @@ int rtt_view(
       */
       redraw = 1;
     }
-    if (redraw || row_change != 0) {
+    if (redraw || row_change != 0)
+    {
       redraw = 0;
       rtt_display_erase();
       start_i = ctx->start_row;
       end_i = MIN(ctx->start_row + page_size, ctx->buffrow_count);
       rtt_cursor_abs(1, 22 - page_size);
-      for (i = ctx->start_row; i < end_i; i++) {
-        if (i == ctx->buffrow_count - 1) {
+      for (i = ctx->start_row; i < end_i; i++)
+      {
+        if (i == ctx->buffrow_count - 1)
+        {
           offset = ctx->buffrow[i] + left_marg;
           rtt_view_get_row_size(&ctx->buff[offset], 80, &size, &last_char);
           size = MIN(size, 80);
@@ -470,7 +506,9 @@ int rtt_view(
                           str[80] = 0;
                           r_print("%80s\n", str);
           */
-        } else {
+        }
+        else
+        {
           offset = MIN(ctx->buffrow[i + 1] - 1, ctx->buffrow[i] + left_marg);
           size = MIN(ctx->buffrow[i + 1] - offset, 80);
           rtt_view_get_row_size(&ctx->buff[offset], 80, &size, &last_char);
@@ -487,9 +525,10 @@ int rtt_view(
         sprintf(pagestr, "%d-EOF(%d)", start_i + 1, ctx->buffrow_count);
       else
         sprintf(pagestr, "%d-%d(%d)", start_i + 1, end_i, ctx->buffrow_count);
-      sprintf(str, "                                                 |%12s | "
-                   "Ctrl/R back",
-          pagestr);
+      sprintf(str,
+              "                                                 |%12s | "
+              "Ctrl/R back",
+              pagestr);
       strncpy(&str[1], title, MIN(strlen(title), 49));
       r_print("%80s", str);
       rtt_char_inverse_end();
@@ -503,23 +542,29 @@ int rtt_view(
     row_change = 0;
     r_print_buffer();
 
-    rtt_command_get_input_string((char*)&rtt_chn, input_str, &terminator,
-        maxlen, rtt_recallbuff, option, rtt_scantime, &rtt_scan, ctx, NULL,
-        RTT_COMMAND_PICTURE);
+    rtt_command_get_input_string((char*)&rtt_chn, input_str, &terminator, maxlen, rtt_recallbuff, option,
+                                 rtt_scantime, &rtt_scan, ctx, NULL, RTT_COMMAND_PICTURE);
     rtt_message('S', "");
 
-    switch (terminator) {
+    switch (terminator)
+    {
     case RTT_K_ARROW_UP:
-      if (type == RTT_VIEWTYPE_BUF) {
-        if (ctx->start_row - RTTVIEW_ARROW_INC < 0) {
+      if (type == RTT_VIEWTYPE_BUF)
+      {
+        if (ctx->start_row - RTTVIEW_ARROW_INC < 0)
+        {
           ctx->start_row = 0;
           row_change = RTTVIEW_ARROW_INC - ctx->start_row;
-        } else {
+        }
+        else
+        {
           ctx->start_row -= RTTVIEW_ARROW_INC;
           row_change = -RTTVIEW_ARROW_INC;
         }
         redraw = 0;
-      } else {
+      }
+      else
+      {
         ctx->start_row -= RTTVIEW_ARROW_INC;
         row_change = -RTTVIEW_ARROW_INC;
         redraw = 0;
@@ -558,19 +603,19 @@ int rtt_view(
       /* Top */
       ctx->buffstart_row = 0;
       ctx->start_row = 0;
-      rtt_read_buff(ctx, ctx->buff, RTTVIEW_BUFF_SIZE, ctx->buffrow,
-          RTTVIEW_BUFFROW_SIZE, &ctx->buffrow_count, 1, page_size,
-          &ctx->start_row);
+      rtt_read_buff(ctx, ctx->buff, RTTVIEW_BUFF_SIZE, ctx->buffrow, RTTVIEW_BUFFROW_SIZE,
+                    &ctx->buffrow_count, 1, page_size, &ctx->start_row);
       redraw = 1;
       break;
     case RTT_K_PF2:
       /* Bottom */
       ctx->start_row = MAX(0, ctx->buffrow_count - page_size);
-      if (type == RTT_VIEWTYPE_FILE) {
-        while (ctx->read_sts != NULL) {
-          rtt_read_buff(ctx, ctx->buff, RTTVIEW_BUFF_SIZE, ctx->buffrow,
-              RTTVIEW_BUFFROW_SIZE, &ctx->buffrow_count, 0, page_size,
-              &ctx->start_row);
+      if (type == RTT_VIEWTYPE_FILE)
+      {
+        while (ctx->read_sts != NULL)
+        {
+          rtt_read_buff(ctx, ctx->buff, RTTVIEW_BUFF_SIZE, ctx->buffrow, RTTVIEW_BUFFROW_SIZE,
+                        &ctx->buffrow_count, 0, page_size, &ctx->start_row);
           ctx->start_row = ctx->buffrow_count - page_size + 1;
         }
       }
@@ -604,12 +649,14 @@ int rtt_view(
     case RTT_K_FAST_15:
       rtt_fastkey = terminator - RTT_K_FAST;
       sts = rtt_get_fastkey_type();
-      if (sts == RTT__NOPICTURE) {
+      if (sts == RTT__NOPICTURE)
+      {
         sts = rtt_get_fastkey_picture((menu_ctx)ctx);
         if (EVEN(sts))
           return sts;
         break;
       }
+    /* fall through */
     case RTT_K_CTRLZ:
       if (type == RTT_VIEWTYPE_FILE)
         fclose(ctx->infile);
@@ -639,12 +686,13 @@ int rtt_view(
     case RTT_K_DELETE:
       break;
     case RTT_K_COMMAND:
-      sts = rtt_get_command((menu_ctx)ctx, (char*)&rtt_chn, rtt_recallbuff, 0,
-          0, ctx, "pwr_rtt> ", 0, RTT_ROW_COMMAND, rtt_command_table);
+      sts = rtt_get_command((menu_ctx)ctx, (char*)&rtt_chn, rtt_recallbuff, 0, 0, ctx, "pwr_rtt> ", 0,
+                            RTT_ROW_COMMAND, rtt_command_table);
       /* menu_ptr might have been changed */
       if (EVEN(sts))
         return sts;
-      if (sts == RTT__FASTBACK) {
+      if (sts == RTT__FASTBACK)
+      {
         if (type == RTT_VIEWTYPE_FILE)
           fclose(ctx->infile);
         free(ctx->buff);
@@ -653,7 +701,8 @@ int rtt_view(
         rtt_ctx_pop();
         return RTT__FASTBACK;
       }
-      if (sts == RTT__BACK) {
+      if (sts == RTT__BACK)
+      {
         if (type == RTT_VIEWTYPE_FILE)
           fclose(ctx->infile);
         free(ctx->buff);
@@ -662,7 +711,8 @@ int rtt_view(
         rtt_ctx_pop();
         return RTT__SUCCESS;
       }
-      if (sts == RTT__BACKTOCOLLECT) {
+      if (sts == RTT__BACKTOCOLLECT)
+      {
         if (type == RTT_VIEWTYPE_FILE)
           fclose(ctx->infile);
         free(ctx->buff);
@@ -671,7 +721,8 @@ int rtt_view(
         rtt_ctx_pop();
         return RTT__BACKTOCOLLECT;
       }
-      if (sts != RTT__NOPICTURE) {
+      if (sts != RTT__NOPICTURE)
+      {
         redraw = 1;
       }
       break;
@@ -679,8 +730,7 @@ int rtt_view(
       /* Try to find subject in application help */
       sts = rtt_help(parent_ctx, "VIEW WINDOW", rtt_appl_helptext);
       if (sts == RTT__NOHELPSUBJ)
-        rtt_help(
-            parent_ctx, "OBJECT MENU", (rtt_t_helptext*)rtt_command_helptext);
+        rtt_help(parent_ctx, "OBJECT MENU", (rtt_t_helptext*)rtt_command_helptext);
       redraw = 1;
       break;
     }

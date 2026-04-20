@@ -36,84 +36,46 @@
 
 #include "co_provider.h"
 
-co_provider::co_provider(pvd_eEnv env) : m_env(env)
+co_provider::co_provider(pvd_eEnv env) : m_env(env) {}
+
+co_provider::~co_provider() {}
+
+void co_provider::object(co_procom* pcom) {}
+
+void co_provider::objectOid(co_procom* pcom, pwr_tOix oix) {}
+
+void co_provider::objectName(co_procom* pcom, char* name, pwr_tOix poix) {}
+
+void co_provider::objectBody(co_procom* pcom, pwr_tOix oix) {}
+
+void co_provider::createObject(co_procom* pcom, pwr_tOix destoix, int desttype, pwr_tCid cid, char* name) {}
+
+void co_provider::moveObject(co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, int desttype) {}
+
+void co_provider::copyObject(co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, int desttype, char* name) {}
+
+void co_provider::deleteObject(co_procom* pcom, pwr_tOix oix) {}
+
+void co_provider::deleteFamily(co_procom* pcom, pwr_tOix oix) {}
+
+void co_provider::renameObject(co_procom* pcom, pwr_tOix oix, char* name) {}
+
+void co_provider::writeAttribute(co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size,
+                                 char* buffer)
 {
 }
 
-co_provider::~co_provider()
+void co_provider::readAttribute(co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size) {}
+
+void co_provider::commit(co_procom* pcom) {}
+
+void co_provider::abort(co_procom* pcom) {}
+
+void co_provider::subAssociateBuffer(co_procom* pcom, void** buff, int oix, int offset, int size,
+                                     pwr_tSubid sid)
 {
 }
 
-void co_provider::object(co_procom* pcom)
-{
-}
+void co_provider::subDisassociateBuffer(co_procom* pcom, pwr_tSubid sid) {}
 
-void co_provider::objectOid(co_procom* pcom, pwr_tOix oix)
-{
-}
-
-void co_provider::objectName(co_procom* pcom, char* name, pwr_tOix poix)
-{
-}
-
-void co_provider::objectBody(co_procom* pcom, pwr_tOix oix)
-{
-}
-
-void co_provider::createObject(
-    co_procom* pcom, pwr_tOix destoix, int desttype, pwr_tCid cid, char* name)
-{
-}
-
-void co_provider::moveObject(
-    co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, int desttype)
-{
-}
-
-void co_provider::copyObject(
-    co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, int desttype, char* name)
-{
-}
-
-void co_provider::deleteObject(co_procom* pcom, pwr_tOix oix)
-{
-}
-
-void co_provider::deleteFamily(co_procom* pcom, pwr_tOix oix)
-{
-}
-
-void co_provider::renameObject(co_procom* pcom, pwr_tOix oix, char* name)
-{
-}
-
-void co_provider::writeAttribute(co_procom* pcom, pwr_tOix oix,
-    unsigned int offset, unsigned int size, char* buffer)
-{
-}
-
-void co_provider::readAttribute(
-    co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size)
-{
-}
-
-void co_provider::commit(co_procom* pcom)
-{
-}
-
-void co_provider::abort(co_procom* pcom)
-{
-}
-
-void co_provider::subAssociateBuffer(
-    co_procom* pcom, void** buff, int oix, int offset, int size, pwr_tSubid sid)
-{
-}
-
-void co_provider::subDisassociateBuffer(co_procom* pcom, pwr_tSubid sid)
-{
-}
-
-void co_provider::cyclic(co_procom* pcom)
-{
-}
+void co_provider::cyclic(co_procom* pcom) {}

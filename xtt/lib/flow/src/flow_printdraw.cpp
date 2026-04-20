@@ -36,63 +36,51 @@
 
 #include "flow_printdraw.h"
 
-FlowPrintDraw::FlowPrintDraw() : print_margin_x(40), print_margin_y(40)
-{
-}
+FlowPrintDraw::FlowPrintDraw() : print_margin_x(40), print_margin_y(40) {}
 
-FlowPrintDraw::~FlowPrintDraw()
-{
-}
+FlowPrintDraw::~FlowPrintDraw() {}
 
-int FlowPrintDraw::print_page(
-    double ll_x, double ll_y, double ur_x, double ur_y)
+int FlowPrintDraw::print_page(double ll_x, double ll_y, double ur_x, double ur_y) { return 1; }
+
+int FlowPrintDraw::rect(double x, double y, double width, double height, flow_eDrawType type, double idx,
+                        int highlight)
 {
   return 1;
 }
 
-int FlowPrintDraw::rect(double x, double y, double width, double height,
-    flow_eDrawType type, double idx, int highlight)
+int FlowPrintDraw::filled_rect(double x, double y, double width, double height, flow_eDrawType type,
+                               double idx)
 {
   return 1;
 }
 
-int FlowPrintDraw::filled_rect(double x, double y, double width, double height,
-    flow_eDrawType type, double idx)
+int FlowPrintDraw::arc(double x, double y, double width, double height, int angle1, int angle2,
+                       flow_eDrawType type, double idx, int highlight)
 {
   return 1;
 }
 
-int FlowPrintDraw::arc(double x, double y, double width, double height,
-    int angle1, int angle2, flow_eDrawType type, double idx, int highlight)
+int FlowPrintDraw::line(double x1, double y1, double x2, double y2, flow_eDrawType type, double idx,
+                        int highlight)
 {
   return 1;
 }
 
-int FlowPrintDraw::line(double x1, double y1, double x2, double y2,
-    flow_eDrawType type, double idx, int highlight)
+int FlowPrintDraw::text(double x, double y, char* text, int len, flow_eDrawType type, double size, int line)
 {
   return 1;
 }
 
-int FlowPrintDraw::text(double x, double y, char* text, int len,
-    flow_eDrawType type, double size, int line)
+int FlowPrintDraw::pixmap(double x, double y, flow_sPixmapDataElem* data, void* pixmaps, int idx,
+                          flow_eDrawType type)
 {
   return 1;
 }
 
-int FlowPrintDraw::pixmap(
-    double x, double y, flow_sPixmapDataElem* data, void *pixmaps, int idx,
-    flow_eDrawType type)
+int FlowPrintDraw::arrow(double x1, double y1, double x2, double y2, double x3, double y3,
+                         flow_eDrawType type, double idx)
 {
   return 1;
 }
 
-int FlowPrintDraw::arrow(double x1, double y1, double x2, double y2, double x3,
-    double y3, flow_eDrawType type, double idx)
-{
-  return 1;
-}
-
-void FlowPrintDraw::set_showred(int show)
-{
-}
+void FlowPrintDraw::set_showred(int show) {}

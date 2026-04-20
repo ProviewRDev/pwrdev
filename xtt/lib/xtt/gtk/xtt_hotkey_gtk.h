@@ -42,15 +42,17 @@
 #include <vector>
 #include "pwr.h"
 
-class HotkeyAction {
+class HotkeyAction
+{
 public:
   char m_name[80];
-  void (*m_action)(char*, char *, void*);
+  void (*m_action)(char*, char*, void*);
   HotkeyAction(const char* name, void (*action)(char*, char*, void*));
   HotkeyAction(const HotkeyAction& x);
 };
 
-class HotkeyKey {
+class HotkeyKey
+{
 public:
   int m_mod;
   int m_keysym;
@@ -60,20 +62,20 @@ public:
   void (*m_action)(char*, char*, void*);
   void* m_userdata;
 
-  HotkeyKey(int mod, int keysym, char* action_name, char* action_arg1, char *action_arg2);
+  HotkeyKey(int mod, int keysym, char* action_name, char* action_arg1, char* action_arg2);
   HotkeyKey(const HotkeyKey& x);
   void set_action(HotkeyAction* action, void* userdata);
 };
 
-class XttHotkey {
+class XttHotkey
+{
 public:
   pwr_tFileName m_filename;
   std::vector<HotkeyAction> m_actions;
   std::vector<HotkeyKey> m_keys;
   XttHotkey(const char* filename);
   ~XttHotkey();
-  void register_action(
-     const char* name, void (*action)(char*, char *, void*), void* userdata);
+  void register_action(const char* name, void (*action)(char*, char*, void*), void* userdata);
   int read_file();
   int grab_key(int keysym, int modifier);
   static int event_handler(GdkXEvent* xevent, gpointer data);
@@ -82,27 +84,18 @@ public:
 #else
 // Dummy for other platforms than OS_LINUX
 
-class XttHotkey {
+class XttHotkey
+{
 public:
   // pwr_tFileName m_filename;
   // std::vector<HotkeyAction> m_actions;
   // std::vector<HotkeyKey> m_keys;
-  XttHotkey(const char* filename)
-  {
-  }
-  ~XttHotkey()
-  {
-  }
-  void register_action(
-      const char* name, void (*action)(char*, void*), void* userdata)
-  {
-  }
+  XttHotkey(const char* filename) {}
+  ~XttHotkey() {}
+  void register_action(const char* name, void (*action)(char*, void*), void* userdata) {}
   //  int read_file()
   //  int grab_key( int keysym, int modifier);
-  static int event_handler(GdkXEvent* xevent, gpointer data)
-  {
-    return 1;
-  }
+  static int event_handler(GdkXEvent* xevent, gpointer data) { return 1; }
 };
 #endif
 

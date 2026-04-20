@@ -45,10 +45,10 @@
 
 class XCrrQtWidget;
 
-class XCrrQt : public XCrr {
+class XCrrQt : public XCrr
+{
 public:
-  XCrrQt(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user,
-      int* xa_sts);
+  XCrrQt(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user, int* xa_sts);
   ~XCrrQt();
   QWidget* brow_widget;
   QWidget* form_widget;
@@ -61,7 +61,8 @@ private:
   XCrrQtWidget* toplevel;
 };
 
-class XCrrQtWidget : public QWidget {
+class XCrrQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

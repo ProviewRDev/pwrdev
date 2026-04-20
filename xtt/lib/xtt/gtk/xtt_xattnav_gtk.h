@@ -41,12 +41,12 @@
 
 #include "xtt_xattnav.h"
 
-class XAttNavGtk : public XAttNav {
+class XAttNavGtk : public XAttNav
+{
 public:
-  XAttNavGtk(void* xa_parent_ctx, GtkWidget* xa_parent_wid,
-      xattnav_eType xa_type, const char* xa_name, pwr_sAttrRef* xa_objar,
-      int xa_advanced_user, void* xa_userdata, GtkWidget** w,
-      pwr_tStatus* status);
+  XAttNavGtk(void* xa_parent_ctx, GtkWidget* xa_parent_wid, xattnav_eType xa_type, const char* xa_name,
+             pwr_sAttrRef* xa_objar, int xa_advanced_user, void* xa_userdata, GtkWidget** w,
+             pwr_tStatus* status);
   ~XAttNavGtk();
 
   GtkWidget* parent_wid;

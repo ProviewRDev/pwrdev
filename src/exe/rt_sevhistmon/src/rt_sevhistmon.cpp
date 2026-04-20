@@ -59,15 +59,15 @@
 
 static int plog = 1;
 
-#define evbuf_next_idx(idx)                                  \
-  idx++;                                                     \
-  if (idx >= sizeof(event_buffer) / sizeof(event_buffer[0])) \
+#define evbuf_next_idx(idx)                                                                                  \
+  idx++;                                                                                                     \
+  if (idx >= sizeof(event_buffer) / sizeof(event_buffer[0]))                                                 \
     idx = 0;
 
-#define evbuf_previous_idx(idx)                               \
-  if (idx == 0)                                               \
-    idx = sizeof(event_buffer) / sizeof(event_buffer[0]) - 1; \
-  else                                                        \
+#define evbuf_previous_idx(idx)                                                                              \
+  if (idx == 0)                                                                                              \
+    idx = sizeof(event_buffer) / sizeof(event_buffer[0]) - 1;                                                \
+  else                                                                                                       \
     idx--;
 
 static rt_sevhistmon* shm;
@@ -90,19 +90,18 @@ int rt_sevhistmon::init()
 
   // Get the config object
   sts = gdh_GetClassList(pwr_cClass_SevHistMonitor, &m_confoid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_SetStatus(0);
     errh_CErrLog(PWR__SRVNOTCONF, 0);
     exit(0);
   }
 
-  m_sts = gdh_ObjidToName(
-      m_confoid, oname, sizeof(oname), cdh_mName_volumeStrict);
+  m_sts = gdh_ObjidToName(m_confoid, oname, sizeof(oname), cdh_mName_volumeStrict);
   if (EVEN(m_sts))
     throw co_error(m_sts);
 
-  m_sts = gdh_RefObjectInfo(
-      oname, (void**)&m_confp, &m_conf_refid, sizeof(*m_confp));
+  m_sts = gdh_RefObjectInfo(oname, (void**)&m_confp, &m_conf_refid, sizeof(*m_confp));
   if (EVEN(m_sts))
     throw co_error(m_sts);
 
@@ -121,15 +120,19 @@ int rt_sevhistmon::init()
   attr.type = qcom_eQtype_private;
   attr.quota = 100;
 
-  if (!qcom_CreateQ(&sts, &qid, &attr, "SevClient")) {
-    if (sts == QCOM__QALLREXIST) {
-      if (!qcom_AttachQ(&sts, &qid)) {
+  if (!qcom_CreateQ(&sts, &qid, &attr, "SevClient"))
+  {
+    if (sts == QCOM__QALLREXIST)
+    {
+      if (!qcom_AttachQ(&sts, &qid))
+      {
         if (!qcom_DeleteQ(&sts, &qid))
           throw co_error(sts);
         if (!qcom_CreateQ(&sts, &qid, &attr, "SevClient"))
           throw co_error(sts);
       }
-    } else
+    }
+    else
       throw co_error(sts);
   }
 
@@ -144,7 +147,7 @@ int rt_sevhistmon::init()
 
   sev_node myn;
   pwr_tOid noid;
-  pwr_sNode *np;
+  pwr_sNode* np;
   myn.nid = node.nid;
   strncpy(myn.name, node.name, sizeof(myn.name));
   m_sts = gdh_GetNodeObject(myn.nid, &noid);
@@ -153,13 +156,14 @@ int rt_sevhistmon::init()
   m_sts = gdh_ObjidToPointer(noid, (void**)&np);
   if (EVEN(m_sts))
     throw co_error(m_sts);
-    
+
   if (streq(np->OrigName, myn.name))
     syi_NodeName(&m_sts, myn.realname, sizeof(myn.realname));
 
   m_nodes.push_back(myn);
 
-  for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid) {
+  for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid)
+  {
     sev_node n;
     if (node.nid == m_nodes[0].nid)
       continue;
@@ -192,16 +196,15 @@ int rt_sevhistmon::init_objects()
   // Get all SevHist and SevHistThread objects
   int thread_cnt = 0;
   for (sts = gdh_GetClassList(pwr_cClass_SevHistThread, &hs_oid); ODD(sts);
-       sts = gdh_GetNextObject(hs_oid, &hs_oid)) {
+       sts = gdh_GetNextObject(hs_oid, &hs_oid))
+  {
     sev_sevhistthread hs;
 
-    m_sts
-        = gdh_ObjidToName(hs_oid, oname, sizeof(oname), cdh_mName_volumeStrict);
+    m_sts = gdh_ObjidToName(hs_oid, oname, sizeof(oname), cdh_mName_volumeStrict);
     if (EVEN(m_sts))
       throw co_error(m_sts);
 
-    m_sts = gdh_RefObjectInfo(
-        oname, (void**)&hs.threadp, &hs.refid, sizeof(*hs.threadp));
+    m_sts = gdh_RefObjectInfo(oname, (void**)&hs.threadp, &hs.refid, sizeof(*hs.threadp));
     if (EVEN(m_sts))
       throw co_error(m_sts);
 
@@ -214,40 +217,41 @@ int rt_sevhistmon::init_objects()
     hs.size = 0;
 
     bool found = false;
-    for (unsigned int i = 0; i < m_nodes.size(); i++) {
+    for (unsigned int i = 0; i < m_nodes.size(); i++)
+    {
       if (str_NoCaseStrcmp(hs.nodename, m_nodes[i].name) == 0 ||
-	  str_NoCaseStrcmp(hs.nodename, m_nodes[i].realname) == 0) {
+          str_NoCaseStrcmp(hs.nodename, m_nodes[i].realname) == 0)
+      {
         hs.nid = m_nodes[i].nid;
         found = true;
         break;
       }
     }
-    if (thread_cnt < (int)(sizeof(m_confp->ThreadObjects)
-                         / sizeof(m_confp->ThreadObjects[0])))
+    if (thread_cnt < (int)(sizeof(m_confp->ThreadObjects) / sizeof(m_confp->ThreadObjects[0])))
       m_confp->ThreadObjects[thread_cnt++] = hs_oid;
-    if (!found) {
+    if (!found)
+    {
       pwr_tOName oname;
 
-      m_sts = gdh_ObjidToName(
-          hs_oid, oname, sizeof(oname), cdh_mName_volumeStrict);
+      m_sts = gdh_ObjidToName(hs_oid, oname, sizeof(oname), cdh_mName_volumeStrict);
       if (EVEN(m_sts))
         throw co_error(m_sts);
 
       errh_Error("Unknown nodename, %s", oname);
       hs.threadp->Status = SEV__UNKNOWNNODE;
       hs.configerror = 1;
-    } else
+    }
+    else
       hs.threadp->Status = SEV__INIT;
     m_hs.push_back(hs);
   }
 
-  for (int i = thread_cnt; i < int(sizeof(m_confp->ThreadObjects)
-                                   / sizeof(m_confp->ThreadObjects[0]));
-       i++)
+  for (int i = thread_cnt; i < int(sizeof(m_confp->ThreadObjects) / sizeof(m_confp->ThreadObjects[0])); i++)
     m_confp->ThreadObjects[i] = pwr_cNOid;
 
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_SevHist, &h_aref); ODD(sts);
-       sts = gdh_GetNextAttrRef(pwr_cClass_SevHist, &h_aref, &h_aref)) {
+       sts = gdh_GetNextAttrRef(pwr_cClass_SevHist, &h_aref, &h_aref))
+  {
     sev_sevhist h;
     int hs_idx;
 
@@ -257,26 +261,28 @@ int rt_sevhistmon::init_objects()
 
     h.aref = h.hsp->Attribute;
 
-    m_sts = gdh_AttrrefToName(
-        &h_aref, hname, sizeof(hname), cdh_mName_volumeStrict);
+    m_sts = gdh_AttrrefToName(&h_aref, hname, sizeof(hname), cdh_mName_volumeStrict);
     if (EVEN(m_sts))
       throw co_error(m_sts);
 
     hs_idx = -1;
-    for (int i = 0; i < (int)m_hs.size(); i++) {
-      if (cdh_ObjidIsEqual(h.hsp->ThreadObject, m_hs[i].oid)) {
+    for (int i = 0; i < (int)m_hs.size(); i++)
+    {
+      if (cdh_ObjidIsEqual(h.hsp->ThreadObject, m_hs[i].oid))
+      {
         hs_idx = i;
         break;
       }
     }
-    if (hs_idx == -1) {
+    if (hs_idx == -1)
+    {
       errh_Error("Invalid HistServerObject %s", hname);
       continue;
     }
 
-    m_sts = gdh_GetAttributeCharAttrref(
-        &h.hsp->Attribute, &a_tid, &a_size, &a_offset, &a_dim);
-    if (EVEN(m_sts)) {
+    m_sts = gdh_GetAttributeCharAttrref(&h.hsp->Attribute, &a_tid, &a_size, &a_offset, &a_dim);
+    if (EVEN(m_sts))
+    {
       errh_Error("Invalid SevHist Attribute %s", hname);
       continue;
     }
@@ -291,29 +297,32 @@ int rt_sevhistmon::init_objects()
 
     // Get unit from attribute object
     sts = gdh_ArefANameToAref(&h.hsp->Attribute, "Unit", &uaref);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = gdh_GetObjectInfoAttrref(&uaref, &h.unit, sizeof(h.unit));
       if (EVEN(sts))
         strcpy(h.unit, "");
-    } else
+    }
+    else
       strcpy(h.unit, "");
 
     h.type = (pwr_eType)a_tid;
     h.size = a_size;
     h.scantime = m_hs[hs_idx].scantime;
 
-    if (!correct_histtype(h.type)) {
+    if (!correct_histtype(h.type))
+    {
       errh_Error("Invalid SevHist Attribute type %s", hname);
       continue;
     }
 
-    m_sts = gdh_AttrrefToName(
-        &h.hsp->Attribute, h.aname, sizeof(h.aname), cdh_mName_volumeStrict);
+    m_sts = gdh_AttrrefToName(&h.hsp->Attribute, h.aname, sizeof(h.aname), cdh_mName_volumeStrict);
     if (EVEN(m_sts))
       throw co_error(m_sts);
 
     m_sts = gdh_RefObjectInfo(h.aname, &h.datap, &h.refid, h.size);
-    if (EVEN(m_sts)) {
+    if (EVEN(m_sts))
+    {
       errh_Error("Unable to link to Attribute %s", h.aname);
       continue;
     }
@@ -339,7 +348,8 @@ int rt_sevhistmon::init_sevexport()
   pwr_tAName hname;
 
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_SevExport, &h_aref); ODD(sts);
-       sts = gdh_GetNextAttrRef(pwr_cClass_SevExport, &h_aref, &h_aref)) {
+       sts = gdh_GetNextAttrRef(pwr_cClass_SevExport, &h_aref, &h_aref))
+  {
     sev_sevexport h;
     int hs_idx;
 
@@ -349,26 +359,28 @@ int rt_sevhistmon::init_sevexport()
 
     h.aref = h.hsp->Attribute;
 
-    m_sts = gdh_AttrrefToName(
-        &h_aref, hname, sizeof(hname), cdh_mName_volumeStrict);
+    m_sts = gdh_AttrrefToName(&h_aref, hname, sizeof(hname), cdh_mName_volumeStrict);
     if (EVEN(m_sts))
       throw co_error(m_sts);
 
     hs_idx = -1;
-    for (int i = 0; i < (int)m_hs.size(); i++) {
-      if (cdh_ObjidIsEqual(h.hsp->ThreadObject, m_hs[i].oid)) {
+    for (int i = 0; i < (int)m_hs.size(); i++)
+    {
+      if (cdh_ObjidIsEqual(h.hsp->ThreadObject, m_hs[i].oid))
+      {
         hs_idx = i;
         break;
       }
     }
-    if (hs_idx == -1) {
+    if (hs_idx == -1)
+    {
       errh_Error("Invalid HistServerObject %s", hname);
       continue;
     }
 
-    m_sts = gdh_GetAttributeCharAttrref(
-        &h.hsp->Attribute, &a_tid, &a_size, &a_offset, &a_dim);
-    if (EVEN(m_sts)) {
+    m_sts = gdh_GetAttributeCharAttrref(&h.hsp->Attribute, &a_tid, &a_size, &a_offset, &a_dim);
+    if (EVEN(m_sts))
+    {
       errh_Error("Invalid SevHist Attribute %s", hname);
       continue;
     }
@@ -383,18 +395,19 @@ int rt_sevhistmon::init_sevexport()
     h.size = a_size;
     h.scantime = m_hs[hs_idx].scantime;
 
-    if (!correct_exporttype(h.type)) {
+    if (!correct_exporttype(h.type))
+    {
       errh_Error("Invalid SevHist Attribute type %s", hname);
       continue;
     }
 
-    m_sts = gdh_AttrrefToName(
-        &h.hsp->Attribute, h.aname, sizeof(h.aname), cdh_mName_volumeStrict);
+    m_sts = gdh_AttrrefToName(&h.hsp->Attribute, h.aname, sizeof(h.aname), cdh_mName_volumeStrict);
     if (EVEN(m_sts))
       throw co_error(m_sts);
 
     m_sts = gdh_RefObjectInfo(h.aname, &h.datap, &h.refid, h.size);
-    if (EVEN(m_sts)) {
+    if (EVEN(m_sts))
+    {
       errh_Error("Unable to link to Attribute %s", h.aname);
       continue;
     }
@@ -413,9 +426,9 @@ int rt_sevhistmon::init_sevhistobjects()
   unsigned int a_size, a_offset, a_dim;
   pwr_tAName hname;
 
-  for (sts = gdh_GetClassListAttrRef(pwr_cClass_SevHistObject, &h_aref);
-       ODD(sts);
-       sts = gdh_GetNextAttrRef(pwr_cClass_SevHistObject, &h_aref, &h_aref)) {
+  for (sts = gdh_GetClassListAttrRef(pwr_cClass_SevHistObject, &h_aref); ODD(sts);
+       sts = gdh_GetNextAttrRef(pwr_cClass_SevHistObject, &h_aref, &h_aref))
+  {
     sev_sevhistobject h;
     int hs_idx;
 
@@ -425,26 +438,28 @@ int rt_sevhistmon::init_sevhistobjects()
 
     h.aref = h.hsp->Object;
 
-    m_sts = gdh_AttrrefToName(
-        &h_aref, hname, sizeof(hname), cdh_mName_volumeStrict);
+    m_sts = gdh_AttrrefToName(&h_aref, hname, sizeof(hname), cdh_mName_volumeStrict);
     if (EVEN(m_sts))
       throw co_error(m_sts);
 
     hs_idx = -1;
-    for (int i = 0; i < (int)m_hs.size(); i++) {
-      if (cdh_ObjidIsEqual(h.hsp->ThreadObject, m_hs[i].oid)) {
+    for (int i = 0; i < (int)m_hs.size(); i++)
+    {
+      if (cdh_ObjidIsEqual(h.hsp->ThreadObject, m_hs[i].oid))
+      {
         hs_idx = i;
         break;
       }
     }
-    if (hs_idx == -1) {
+    if (hs_idx == -1)
+    {
       errh_Error("Invalid HistServerObject %s", hname);
       continue;
     }
 
-    m_sts = gdh_GetAttributeCharAttrref(
-        &h.hsp->Object, &a_tid, &a_size, &a_offset, &a_dim);
-    if (EVEN(m_sts)) {
+    m_sts = gdh_GetAttributeCharAttrref(&h.hsp->Object, &a_tid, &a_size, &a_offset, &a_dim);
+    if (EVEN(m_sts))
+    {
       errh_Error("Invalid SevHistObject Attribute %s", hname);
       continue;
     }
@@ -461,8 +476,7 @@ int rt_sevhistmon::init_sevhistobjects()
     h.sevid.rix = m_next_rix++;
 
     // Time to fetch all attributes for the object and put them into a list
-    m_sts = gdh_AttrrefToName(
-        &h.hsp->Object, hname, sizeof(hname), cdh_mName_volumeStrict);
+    m_sts = gdh_AttrrefToName(&h.hsp->Object, hname, sizeof(hname), cdh_mName_volumeStrict);
     if (EVEN(m_sts))
       throw co_error(m_sts);
     strcpy(h.aname, hname);
@@ -472,16 +486,14 @@ int rt_sevhistmon::init_sevhistobjects()
       h.datasize += h.sevhistobjectattrlist[k].size;
 
     // Check if this object have a chance to be stored in one table
-    if (h.datasize >= 65536) {
-      errh_Warning(
-          "SevHistObject Attribute %s is to big(maxsize 65536), ignored",
-          hname);
+    if (h.datasize >= 65536)
+    {
+      errh_Warning("SevHistObject Attribute %s is to big(maxsize 65536), ignored", hname);
       continue;
     }
-    if (h.sevhistobjectattrlist.size() > 200) {
-      errh_Warning(
-          "SevHistObject Attribute %s has to many attributes(max 200), ignored",
-          hname);
+    if (h.sevhistobjectattrlist.size() > 200)
+    {
+      errh_Warning("SevHistObject Attribute %s has to many attributes(max 200), ignored", hname);
       continue;
     }
 
@@ -504,15 +516,16 @@ int rt_sevhistmon::init_sevhistobjects()
 }
 
 void rt_sevhistmon::insert_sevhistobjectattr(pwr_sAttrRef* aref,
-    pwr_tAName objectname, // Name of object,
-    int hs_idx, std::vector<sev_sevhistobjectattr>* listP)
+                                             pwr_tAName objectname, // Name of object,
+                                             int hs_idx, std::vector<sev_sevhistobjectattr>* listP)
 {
   pwr_tTid a_tid;
   unsigned int a_size, a_offset, a_dim;
   sev_sevhistobjectattr oattr;
 
   m_sts = gdh_GetAttributeCharAttrref(aref, &a_tid, &a_size, &a_offset, &a_dim);
-  if (EVEN(m_sts)) {
+  if (EVEN(m_sts))
+  {
     errh_Error("Invalid SevHist Attribute %s", objectname);
     return;
   }
@@ -521,32 +534,33 @@ void rt_sevhistmon::insert_sevhistobjectattr(pwr_sAttrRef* aref,
   oattr.size = a_size;
   oattr.unit[0] = '\0';
 
-  if (!correct_histtype(oattr.type)) {
+  if (!correct_histtype(oattr.type))
+  {
     errh_Error("Invalid SevHist Attribute type %s, ignored\n", objectname);
     return;
   }
   // We ignore description fields
   std::string str = objectname;
-  if (str.find(".Description") != std::string::npos) {
+  if (str.find(".Description") != std::string::npos)
+  {
     errh_Info("Ignoring SevHist Attribute %s\n", objectname);
     return;
   }
 
   strncpy(oattr.aname, objectname, sizeof(pwr_tAName));
 
-  m_sts
-      = gdh_RefObjectInfo(oattr.aname, &oattr.datap, &oattr.refid, oattr.size);
-  if (EVEN(m_sts)) {
+  m_sts = gdh_RefObjectInfo(oattr.aname, &oattr.datap, &oattr.refid, oattr.size);
+  if (EVEN(m_sts))
+  {
     errh_Error("Unable to link to Attribute %s", oattr.aname);
     return;
   }
   listP->push_back(oattr);
 }
 
-int rt_sevhistmon::get_sevhistobjectattributes(
-    pwr_tAName objectname, // Name of object
-    std::vector<sev_sevhistobjectattr>* listP, // Pointer to list
-    int hs_idx, pwr_tBoolean first)
+int rt_sevhistmon::get_sevhistobjectattributes(pwr_tAName objectname,                     // Name of object
+                                               std::vector<sev_sevhistobjectattr>* listP, // Pointer to list
+                                               int hs_idx, pwr_tBoolean first)
 {
   pwr_tAName attrname;
   pwr_sAttrRef attrref;
@@ -564,13 +578,15 @@ int rt_sevhistmon::get_sevhistobjectattributes(
   if (EVEN(sts))
     return sts;
 
-  if (first) {
+  if (first)
+  {
     volobject.vid = attrref.Objid.vid;
     volobject.oix = pwr_cNObjectIx;
     if (ODD(gdh_GetObjectClass(volobject, &volclass)))
       tgtdynamic = volclass == pwr_eClass_DynamicVolume;
 
-    if (tgtdynamic) {
+    if (tgtdynamic)
+    {
       if (attrref.Flags.b.Indirect)
         return 2;
 
@@ -592,14 +608,16 @@ int rt_sevhistmon::get_sevhistobjectattributes(
   if (EVEN(sts))
     return sts;
 
-  if (cdh_tidIsCid(tid)) {
-    sts = gdh_GetAttributeCharacteristics(
-        objectname, NULL, &size, &offs, &elem);
+  if (cdh_tidIsCid(tid))
+  {
+    sts = gdh_GetAttributeCharacteristics(objectname, NULL, &size, &offs, &elem);
     if (EVEN(sts))
       return sts;
 
-    if (elem > 1) {
-      for (i = 0; i < elem; i++) {
+    if (elem > 1)
+    {
+      for (i = 0; i < elem; i++)
+      {
         strcpy(attrname, objectname);
         sprintf(idx, "[%d]", i);
         strcat(attrname, idx);
@@ -607,16 +625,18 @@ int rt_sevhistmon::get_sevhistobjectattributes(
         // call again ...
         sts = get_sevhistobjectattributes(attrname, listP, hs_idx, 0);
       }
-
-    } else {
+    }
+    else
+    {
       gdh_sAttrDef* bd;
       sts = gdh_GetObjectBodyDef(tid, &bd, &rows, attrref.Objid);
       if (EVEN(sts))
         return sts;
 
-      for (int i = 0; (int)i < rows; i++) {
-        if (bd[i].attr->Param.Info.Flags & PWR_MASK_RTVIRTUAL
-            || bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE)
+      for (int i = 0; (int)i < rows; i++)
+      {
+        if (bd[i].attr->Param.Info.Flags & PWR_MASK_RTVIRTUAL ||
+            bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE)
           continue;
 
         if (bd[i].attr->Param.Info.Flags & PWR_MASK_ARRAY)
@@ -624,16 +644,21 @@ int rt_sevhistmon::get_sevhistobjectattributes(
         else
           elements = 1;
 
-        if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS) {
-          if (elements == 1) {
+        if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS)
+        {
+          if (elements == 1)
+          {
             strcpy(attrname, objectname);
             strcat(attrname, ".");
             strcat(attrname, bd[i].attrName);
 
             // call again ...
             sts = get_sevhistobjectattributes(attrname, listP, hs_idx, 0);
-          } else {
-            for (j = 0; j < elements; j++) {
+          }
+          else
+          {
+            for (j = 0; j < elements; j++)
+            {
               strcpy(attrname, objectname);
               strcat(attrname, ".");
               strcat(attrname, bd[i].attrName);
@@ -644,9 +669,13 @@ int rt_sevhistmon::get_sevhistobjectattributes(
               sts = get_sevhistobjectattributes(attrname, listP, hs_idx, 0);
             }
           }
-        } else {
-          if (elements > 1) {
-            for (j = 0; j < elements; j++) {
+        }
+        else
+        {
+          if (elements > 1)
+          {
+            for (j = 0; j < elements; j++)
+            {
               strcpy(attrname, objectname);
               strcat(attrname, ".");
               strcat(attrname, bd[i].attrName);
@@ -656,7 +685,9 @@ int rt_sevhistmon::get_sevhistobjectattributes(
               // call again ...
               sts = get_sevhistobjectattributes(attrname, listP, hs_idx, 0);
             }
-          } else {
+          }
+          else
+          {
             strcpy(attrname, objectname);
             strcat(attrname, ".");
             strcat(attrname, bd[i].attrName);
@@ -668,14 +699,17 @@ int rt_sevhistmon::get_sevhistobjectattributes(
       }
       free((char*)bd);
     }
-  } else {
-    sts = gdh_GetAttributeCharacteristics(
-        objectname, &tid, &size, &offs, &elem);
+  }
+  else
+  {
+    sts = gdh_GetAttributeCharacteristics(objectname, &tid, &size, &offs, &elem);
     if (EVEN(sts))
       return sts;
 
-    if (elem > 1) {
-      for (i = 0; i < elem; i++) {
+    if (elem > 1)
+    {
+      for (i = 0; i < elem; i++)
+      {
         strcpy(attrname, objectname);
         sprintf(idx, "[%d]", i);
         strcat(attrname, idx);
@@ -683,7 +717,9 @@ int rt_sevhistmon::get_sevhistobjectattributes(
         // call again ...
         sts = get_sevhistobjectattributes(attrname, listP, hs_idx, 0);
       }
-    } else {
+    }
+    else
+    {
       // Insert list element
       insert_sevhistobjectattr(&attrref, objectname, hs_idx, listP);
     }
@@ -694,7 +730,8 @@ int rt_sevhistmon::get_sevhistobjectattributes(
 
 bool rt_sevhistmon::correct_histtype(const pwr_eType type)
 {
-  switch (type) {
+  switch (type)
+  {
   case pwr_eType_Boolean:
   case pwr_eType_Int64:
   case pwr_eType_Int32:
@@ -716,7 +753,8 @@ bool rt_sevhistmon::correct_histtype(const pwr_eType type)
 
 bool rt_sevhistmon::correct_exporttype(const pwr_eType type)
 {
-  switch (type) {
+  switch (type)
+  {
   case pwr_eType_Boolean:
   case pwr_eType_Int64:
   case pwr_eType_Int32:
@@ -743,19 +781,23 @@ bool rt_sevhistmon::correct_exporttype(const pwr_eType type)
 
 int rt_sevhistmon::close_objects()
 {
-  for (unsigned int i = 0; i < m_hs.size(); i++) {
-    for (unsigned int j = 0; j < m_hs[i].sevhistlist.size(); j++) {
+  for (unsigned int i = 0; i < m_hs.size(); i++)
+  {
+    for (unsigned int j = 0; j < m_hs[i].sevhistlist.size(); j++)
+    {
       gdh_UnrefObjectInfo(m_hs[i].sevhistlist[j].hs_refid);
       gdh_UnrefObjectInfo(m_hs[i].sevhistlist[j].refid);
     }
-    for (unsigned int j = 0; j < m_hs[i].sevexportlist.size(); j++) {
+    for (unsigned int j = 0; j < m_hs[i].sevexportlist.size(); j++)
+    {
       gdh_UnrefObjectInfo(m_hs[i].sevexportlist[j].hs_refid);
       gdh_UnrefObjectInfo(m_hs[i].sevexportlist[j].refid);
     }
-    for (unsigned int j = 0; j < m_hs[i].sevhistobjectlist.size(); j++) {
+    for (unsigned int j = 0; j < m_hs[i].sevhistobjectlist.size(); j++)
+    {
       gdh_UnrefObjectInfo(m_hs[i].sevhistobjectlist[j].hs_refid);
       for (unsigned int k = 0; k < m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist.size(); k++)
-	gdh_UnrefObjectInfo(m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[k].refid);
+        gdh_UnrefObjectInfo(m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[k].refid);
     }
     gdh_UnrefObjectInfo(m_hs[i].refid);
   }
@@ -787,13 +829,16 @@ int rt_sevhistmon::send_data()
   pwr_tStatus conf_sts = SEV__SUCCESS;
   int connected;
 
-  for (unsigned int i = 0; i < m_hs.size(); i++) {
+  for (unsigned int i = 0; i < m_hs.size(); i++)
+  {
     if (m_hs[i].configerror)
       continue;
 
     connected = 0;
-    for (unsigned int j = 0; j < m_nodes.size(); j++) {
-      if (m_hs[i].nid == m_nodes[j].nid) {
+    for (unsigned int j = 0; j < m_nodes.size(); j++)
+    {
+      if (m_hs[i].nid == m_nodes[j].nid)
+      {
         connected = m_nodes[j].connected;
         break;
       }
@@ -807,12 +852,10 @@ int rt_sevhistmon::send_data()
 
     m_hs[i].threadp->ScanCount++;
 
-    msize = m_hs[i].sevhistlist.size() * (sizeof(*dp) - sizeof(dp->data))
-        + m_hs[i].size;
+    msize = m_hs[i].sevhistlist.size() * (sizeof(*dp) - sizeof(dp->data)) + m_hs[i].size;
     msize += sizeof(*msg) - sizeof(msg->Data);
 
-    unsigned int histobjectsize
-        = (m_hs[i].sevhistobjectlist.size() * (sizeof(*dp) - sizeof(dp->data)));
+    unsigned int histobjectsize = (m_hs[i].sevhistobjectlist.size() * (sizeof(*dp) - sizeof(dp->data)));
     msize += histobjectsize;
 
     msg = (sev_sMsgHistDataStore*)qcom_Alloc(&lsts, msize);
@@ -828,9 +871,12 @@ int rt_sevhistmon::send_data()
     msg->ServerThread = m_hs[i].threadp->ServerThread;
 
     dp = (sev_sHistData*)&msg->Data;
-    for (unsigned int j = 0; j < m_hs[i].sevhistlist.size(); j++) {
-      if (!m_hs[i].sevhistlist[j].hsp->Disable) {
-        if (m_hs[i].sevhistlist[j].hsp->Options & pwr_mSevOptionsMask_Event) {
+    for (unsigned int j = 0; j < m_hs[i].sevhistlist.size(); j++)
+    {
+      if (!m_hs[i].sevhistlist[j].hsp->Disable)
+      {
+        if (m_hs[i].sevhistlist[j].hsp->Options & pwr_mSevOptionsMask_Event)
+        {
           if (m_hs[i].sevhistlist[j].hsp->Trigger)
             m_hs[i].sevhistlist[j].hsp->Trigger = 0;
           else
@@ -840,16 +886,17 @@ int rt_sevhistmon::send_data()
         dp->type = m_hs[i].sevhistlist[j].type;
         dp->size = m_hs[i].sevhistlist[j].size;
         memcpy(&dp->data, m_hs[i].sevhistlist[j].datap, dp->size);
-        dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data)
-            + dp->size);
+        dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data) + dp->size);
       }
     }
 
     void* dpp;
-    for (unsigned int j = 0; j < m_hs[i].sevhistobjectlist.size(); j++) {
-      if (!m_hs[i].sevhistobjectlist[j].hsp->Disable) {
-        if (m_hs[i].sevhistobjectlist[j].hsp->Options
-            & pwr_mSevOptionsMask_Event) {
+    for (unsigned int j = 0; j < m_hs[i].sevhistobjectlist.size(); j++)
+    {
+      if (!m_hs[i].sevhistobjectlist[j].hsp->Disable)
+      {
+        if (m_hs[i].sevhistobjectlist[j].hsp->Options & pwr_mSevOptionsMask_Event)
+        {
           if (m_hs[i].sevhistobjectlist[j].hsp->Trigger)
             m_hs[i].sevhistobjectlist[j].hsp->Trigger = 0;
           else
@@ -859,9 +906,8 @@ int rt_sevhistmon::send_data()
         dp->sevid = m_hs[i].sevhistobjectlist[j].sevid;
         dp->size = m_hs[i].sevhistobjectlist[j].datasize;
         dpp = &(dp->data);
-        for (unsigned int k = 0;
-             k < m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist.size();
-             k++) {
+        for (unsigned int k = 0; k < m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist.size(); k++)
+        {
           // dp->type =
           // m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[k].type;
           // printf("sevhistobj[%d].attrlist[%d].aname: %s size:%d\n", j, k,
@@ -872,14 +918,11 @@ int rt_sevhistmon::send_data()
           //  printf("text:%s\n",
           //  (char*)m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[k].datap);
           //}
-          memcpy(dpp,
-              m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[k].datap,
-              m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[k].size);
-          dpp = (sev_sHistData*)((char*)dpp
-              + m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[k].size);
+          memcpy(dpp, m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[k].datap,
+                 m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[k].size);
+          dpp = (sev_sHistData*)((char*)dpp + m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[k].size);
         }
-        dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data)
-            + dp->size);
+        dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data) + dp->size);
       }
     }
 
@@ -893,12 +936,13 @@ int rt_sevhistmon::send_data()
     put.type.s = (qcom_eStype)sev_eMsgType_HistDataStore;
     put.msg_id = m_msg_id++;
 
-    if (!qcom_Put(&sts, &tgt, &put)) {
+    if (!qcom_Put(&sts, &tgt, &put))
+    {
       m_hs[i].threadp->ErrorCount++;
       if (sts == QCOM__NOQ)
-	m_hs[i].threadp->Status = SEV__HISTDATAQ;
+        m_hs[i].threadp->Status = SEV__HISTDATAQ;
       else
-	m_hs[i].threadp->Status = sts;
+        m_hs[i].threadp->Status = sts;
       conf_sts = sts;
       qcom_Free(&sts, put.data);
       continue;
@@ -924,7 +968,8 @@ int rt_sevhistmon::send_exportdata()
   pwr_tStatus conf_sts = SEV__SUCCESS;
   int connected;
 
-  for (unsigned int i = 0; i < m_hs.size(); i++) {
+  for (unsigned int i = 0; i < m_hs.size(); i++)
+  {
     if (m_hs[i].configerror)
       continue;
 
@@ -932,8 +977,10 @@ int rt_sevhistmon::send_exportdata()
       continue;
 
     connected = 0;
-    for (unsigned int j = 0; j < m_nodes.size(); j++) {
-      if (m_hs[i].nid == m_nodes[j].nid) {
+    for (unsigned int j = 0; j < m_nodes.size(); j++)
+    {
+      if (m_hs[i].nid == m_nodes[j].nid)
+      {
         connected = m_nodes[j].connected;
         break;
       }
@@ -945,8 +992,7 @@ int rt_sevhistmon::send_exportdata()
     if (!stime || m_loopcnt % stime != 0)
       continue;
 
-    msize = m_hs[i].sevexportlist.size() * (sizeof(*dp) - sizeof(dp->data))
-        + m_hs[i].size;
+    msize = m_hs[i].sevexportlist.size() * (sizeof(*dp) - sizeof(dp->data)) + m_hs[i].size;
     msize += sizeof(*msg) - sizeof(msg->Data);
 
     msg = (sev_sMsgExportData*)qcom_Alloc(&lsts, msize);
@@ -961,24 +1007,24 @@ int rt_sevhistmon::send_exportdata()
     msg->Time = net_TimeToNetTime(&current_time);
     msg->ServerThread = m_hs[i].threadp->ServerThread;
 
-
     dp = (sev_sHistData*)&msg->Data;
-    for (unsigned int j = 0; j < m_hs[i].sevexportlist.size(); j++) {
-      if (!m_hs[i].sevexportlist[j].hsp->Disable) {
-        if (m_hs[i].sevexportlist[j].hsp->Options
-            & pwr_mSevExportOptionsMask_Event) {
-	  if (m_hs[i].sevexportlist[j].hsp->Trigger)
-	    m_hs[i].sevexportlist[j].hsp->Trigger = 0;
-	  else
-	    continue;
-	}
+    for (unsigned int j = 0; j < m_hs[i].sevexportlist.size(); j++)
+    {
+      if (!m_hs[i].sevexportlist[j].hsp->Disable)
+      {
+        if (m_hs[i].sevexportlist[j].hsp->Options & pwr_mSevExportOptionsMask_Event)
+        {
+          if (m_hs[i].sevexportlist[j].hsp->Trigger)
+            m_hs[i].sevexportlist[j].hsp->Trigger = 0;
+          else
+            continue;
+        }
 
         dp->sevid = m_hs[i].sevexportlist[j].sevid;
         dp->type = m_hs[i].sevexportlist[j].type;
         dp->size = m_hs[i].sevexportlist[j].size;
         memcpy(&dp->data, m_hs[i].sevexportlist[j].datap, dp->size);
-        dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data)
-            + dp->size);
+        dp = (sev_sHistData*)((char*)dp + sizeof(*dp) - sizeof(dp->data) + dp->size);
       }
     }
 
@@ -992,12 +1038,13 @@ int rt_sevhistmon::send_exportdata()
     put.type.s = (qcom_eStype)sev_eMsgType_ExportData;
     put.msg_id = m_msg_id++;
 
-    if (!qcom_Put(&sts, &tgt, &put)) {
+    if (!qcom_Put(&sts, &tgt, &put))
+    {
       m_hs[i].threadp->ErrorCount++;
       if (sts == QCOM__NOQ)
-	m_hs[i].threadp->Status = SEV__EXPORTQ;
+        m_hs[i].threadp->Status = SEV__EXPORTQ;
       else
-	m_hs[i].threadp->Status = sts;
+        m_hs[i].threadp->Status = sts;
       conf_sts = sts;
       qcom_Free(&sts, put.data);
       continue;
@@ -1014,15 +1061,17 @@ void rt_sevhistmon::set_status()
 {
   pwr_tStatus sts = m_server_status;
 
-  for (unsigned int i = 0; i < m_nodes.size(); i++) {
-    if (m_nodes[i].connected && m_nodes[i].status != 0
-        && errh_Severity(m_nodes[i].status) > errh_Severity(sts))
+  for (unsigned int i = 0; i < m_nodes.size(); i++)
+  {
+    if (m_nodes[i].connected && m_nodes[i].status != 0 &&
+        errh_Severity(m_nodes[i].status) > errh_Severity(sts))
       sts = m_nodes[i].status;
   }
 
-  for (unsigned int i = 0; i < m_hs.size(); i++) {
-    if (EVEN(m_hs[i].threadp->Status)
-        && errh_Severity(m_hs[i].threadp->Status) > errh_Severity(sts)) {
+  for (unsigned int i = 0; i < m_hs.size(); i++)
+  {
+    if (EVEN(m_hs[i].threadp->Status) && errh_Severity(m_hs[i].threadp->Status) > errh_Severity(sts))
+    {
       sts = m_hs[i].threadp->Status;
     }
   }
@@ -1034,7 +1083,8 @@ int rt_sevhistmon::retry_connect()
 {
   pwr_tStatus sts;
 
-  for (unsigned int i = 0; i < m_nodes.size(); i++) {
+  for (unsigned int i = 0; i < m_nodes.size(); i++)
+  {
     if (m_nodes[i].is_server && !m_nodes[i].connected)
       send_connect(m_nodes[i].nid, &sts);
   }
@@ -1045,14 +1095,17 @@ int rt_sevhistmon::connect()
 {
   pwr_tStatus sts;
 
-  for (unsigned int i = 0; i < m_nodes.size(); i++) {
+  for (unsigned int i = 0; i < m_nodes.size(); i++)
+  {
     // Check if this node should be connected
     bool found = false;
-    for (unsigned int j = 0; j < m_hs.size(); j++) {
+    for (unsigned int j = 0; j < m_hs.size(); j++)
+    {
       if (m_hs[j].configerror)
         continue;
       if (str_NoCaseStrcmp(m_nodes[i].name, m_hs[j].nodename) == 0 ||
-	  str_NoCaseStrcmp(m_nodes[i].realname, m_hs[j].nodename) == 0) {
+          str_NoCaseStrcmp(m_nodes[i].realname, m_hs[j].nodename) == 0)
+      {
         found = true;
         break;
       }
@@ -1092,7 +1145,8 @@ bool rt_sevhistmon::send_connect(pwr_tNid nid, pwr_tStatus* sts)
 
   msg->Type = sev_eMsgType_NodeUp;
 
-  if (!qcom_Put(sts, &tgt, &put)) {
+  if (!qcom_Put(sts, &tgt, &put))
+  {
     qcom_Free(&lsts, put.data);
   }
 
@@ -1111,7 +1165,8 @@ bool rt_sevhistmon::send_connect(pwr_tNid nid, pwr_tStatus* sts)
 
   msg->Type = sev_eMsgType_NodeUp;
 
-  if (!qcom_Put(sts, &tgt, &put)) {
+  if (!qcom_Put(sts, &tgt, &put))
+  {
     qcom_Free(&lsts, put.data);
   }
 
@@ -1130,8 +1185,10 @@ bool rt_sevhistmon::send_server_status_request(pwr_tStatus* sts)
   if (!stime || m_loopcnt % stime != 0)
     return false;
 
-  for (unsigned int i = 0; i < m_nodes.size(); i++) {
-    if (m_nodes[i].connected) {
+  for (unsigned int i = 0; i < m_nodes.size(); i++)
+  {
+    if (m_nodes[i].connected)
+    {
       send_server_status_request(m_nodes[i].nid, &send_sts);
       if (EVEN(send_sts))
         *sts = send_sts;
@@ -1162,18 +1219,20 @@ bool rt_sevhistmon::send_server_status_request(pwr_tNid nid, pwr_tStatus* sts)
 
   msg->Type = sev_eMsgType_NodeUp;
 
-  if (!qcom_Put(sts, &tgt, &put)) {
+  if (!qcom_Put(sts, &tgt, &put))
+  {
     qcom_Free(&lsts, put.data);
   }
 
   return ODD(*sts);
 }
 
-void rt_sevhistmon::receive_server_status(
-    sev_sMsgServerStatus* msg, pwr_tNid nid)
+void rt_sevhistmon::receive_server_status(sev_sMsgServerStatus* msg, pwr_tNid nid)
 {
-  for (unsigned int i = 0; i < m_nodes.size(); i++) {
-    if (nid == m_nodes[i].nid) {
+  for (unsigned int i = 0; i < m_nodes.size(); i++)
+  {
+    if (nid == m_nodes[i].nid)
+    {
       m_nodes[i].status = msg->Status;
       break;
     }
@@ -1194,8 +1253,10 @@ int rt_sevhistmon::send_itemlist(pwr_tNid nid)
 
   // Identify node
   bool found = false;
-  for (unsigned int i = 0; i < m_nodes.size(); i++) {
-    if (nid == m_nodes[i].nid) {
+  for (unsigned int i = 0; i < m_nodes.size(); i++)
+  {
+    if (nid == m_nodes[i].nid)
+    {
       found = true;
       m_nodes[i].connected = 1;
       printf("rt_sevhistmon: node %s connected\n", m_nodes[i].name);
@@ -1206,36 +1267,39 @@ int rt_sevhistmon::send_itemlist(pwr_tNid nid)
   int histobjectsize = 0;
 
   // Count items for this node
-  for (unsigned int i = 0; i < m_hs.size(); i++) {
+  for (unsigned int i = 0; i < m_hs.size(); i++)
+  {
     if (m_hs[i].configerror)
       continue;
-    if (nid == m_hs[i].nid) {
+    if (nid == m_hs[i].nid)
+    {
       item_cnt += m_hs[i].sevhistlist.size();
       attr_cnt += m_hs[i].sevhistlist.size();
       objectitem_cnt += m_hs[i].sevhistobjectlist.size();
-      for (size_t j = 0; j < m_hs[i].sevhistobjectlist.size(); j++) {
+      for (size_t j = 0; j < m_hs[i].sevhistobjectlist.size(); j++)
+      {
         attr_cnt += m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist.size();
-        histobjectsize
-            += (m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist.size()
-                * sizeof(sev_sHistAttr));
+        histobjectsize += (m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist.size() * sizeof(sev_sHistAttr));
       }
     }
   }
-  if (m_sevhistevents) {
+  if (m_sevhistevents)
+  {
     item_cnt++;
   }
 
   if (item_cnt == 0 && objectitem_cnt == 0)
     return 1;
 
-  if (item_cnt != 0) {
+  if (item_cnt != 0)
+  {
     size = sizeof(sev_sMsgHistItems) + (item_cnt - 1) * sizeof(sev_sHistItem);
-    size += objectitem_cnt * (sizeof(sev_sHistItem) - sizeof(sev_sHistAttr))
-        + histobjectsize;
-  } else {
-    size += sizeof(sev_sMsgHistItems)
-        + (objectitem_cnt - 1) * (sizeof(sev_sHistItem) - sizeof(sev_sHistAttr))
-        + histobjectsize;
+    size += objectitem_cnt * (sizeof(sev_sHistItem) - sizeof(sev_sHistAttr)) + histobjectsize;
+  }
+  else
+  {
+    size += sizeof(sev_sMsgHistItems) +
+            (objectitem_cnt - 1) * (sizeof(sev_sHistItem) - sizeof(sev_sHistAttr)) + histobjectsize;
   }
 
   put.size = size;
@@ -1249,14 +1313,16 @@ int rt_sevhistmon::send_itemlist(pwr_tNid nid)
   ((sev_sMsgHistItems*)put.data)->NumAttributes = attr_cnt;
 
   int k = 0;
-  for (unsigned int i = 0; i < m_hs.size(); i++) {
+  for (unsigned int i = 0; i < m_hs.size(); i++)
+  {
     if (m_hs[i].configerror)
       continue;
-    if (nid == m_hs[i].nid) {
-      for (unsigned int j = 0; j < m_hs[i].sevhistlist.size(); j++) {
+    if (nid == m_hs[i].nid)
+    {
+      for (unsigned int j = 0; j < m_hs[i].sevhistlist.size(); j++)
+      {
         ((sev_sMsgHistItems*)put.data)->Items[k].attrnum = 1;
-        ((sev_sMsgHistItems*)put.data)->Items[k].oid
-            = m_hs[i].sevhistlist[j].aref.Objid;
+        ((sev_sMsgHistItems*)put.data)->Items[k].oid = m_hs[i].sevhistlist[j].aref.Objid;
         strcpy(aname, m_hs[i].sevhistlist[j].aname);
         s = strchr(aname, '.');
         if (!s)
@@ -1264,93 +1330,78 @@ int rt_sevhistmon::send_itemlist(pwr_tNid nid)
         *s = 0;
         strcpy(((sev_sMsgHistItems*)put.data)->Items[k].oname, aname);
         strcpy(((sev_sMsgHistItems*)put.data)->Items[k].attr[0].aname, s + 1);
-        ((sev_sMsgHistItems*)put.data)->Items[k].storagetime
-            = net_DeltaTimeToNetTime(&m_hs[i].sevhistlist[j].storagetime);
-        ((sev_sMsgHistItems*)put.data)->Items[k].deadband
-            = m_hs[i].sevhistlist[j].deadband;
-        ((sev_sMsgHistItems*)put.data)->Items[k].options
-            = m_hs[i].sevhistlist[j].options;
-        ((sev_sMsgHistItems*)put.data)->Items[k].attr[0].type
-            = m_hs[i].sevhistlist[j].type;
-        ((sev_sMsgHistItems*)put.data)->Items[k].attr[0].size
-            = m_hs[i].sevhistlist[j].size;
-        ((sev_sMsgHistItems*)put.data)->Items[k].sevid
-            = m_hs[i].sevhistlist[j].sevid;
-        strncpy(((sev_sMsgHistItems*)put.data)->Items[k].description,
-            m_hs[i].sevhistlist[j].description,
-            sizeof(((sev_sMsgHistItems*)put.data)->Items[0].description));
-        strncpy(((sev_sMsgHistItems*)put.data)->Items[k].attr[0].unit,
-            m_hs[i].sevhistlist[j].unit,
-            sizeof(((sev_sMsgHistItems*)put.data)->Items[0].attr[0].unit));
-        ((sev_sMsgHistItems*)put.data)->Items[k].scantime
-            = m_hs[i].sevhistlist[j].scantime;
+        ((sev_sMsgHistItems*)put.data)->Items[k].storagetime =
+            net_DeltaTimeToNetTime(&m_hs[i].sevhistlist[j].storagetime);
+        ((sev_sMsgHistItems*)put.data)->Items[k].deadband = m_hs[i].sevhistlist[j].deadband;
+        ((sev_sMsgHistItems*)put.data)->Items[k].options = m_hs[i].sevhistlist[j].options;
+        ((sev_sMsgHistItems*)put.data)->Items[k].attr[0].type = m_hs[i].sevhistlist[j].type;
+        ((sev_sMsgHistItems*)put.data)->Items[k].attr[0].size = m_hs[i].sevhistlist[j].size;
+        ((sev_sMsgHistItems*)put.data)->Items[k].sevid = m_hs[i].sevhistlist[j].sevid;
+        strncpy(((sev_sMsgHistItems*)put.data)->Items[k].description, m_hs[i].sevhistlist[j].description,
+                sizeof(((sev_sMsgHistItems*)put.data)->Items[0].description));
+        strncpy(((sev_sMsgHistItems*)put.data)->Items[k].attr[0].unit, m_hs[i].sevhistlist[j].unit,
+                sizeof(((sev_sMsgHistItems*)put.data)->Items[0].attr[0].unit));
+        ((sev_sMsgHistItems*)put.data)->Items[k].scantime = m_hs[i].sevhistlist[j].scantime;
         k++;
       }
     }
   }
 
-  if (m_sevhistevents) {
+  if (m_sevhistevents)
+  {
     ((sev_sMsgHistItems*)put.data)->Items[k].attrnum = 0;
     ((sev_sMsgHistItems*)put.data)->Items[k].oid = m_sevhistevents->hs_oid;
-    strcpy(
-        ((sev_sMsgHistItems*)put.data)->Items[k].oname, m_sevhistevents->oname);
-    ((sev_sMsgHistItems*)put.data)->Items[k].storagetime
-        = net_DeltaTimeToNetTime(&m_sevhistevents->storagetime);
+    strcpy(((sev_sMsgHistItems*)put.data)->Items[k].oname, m_sevhistevents->oname);
+    ((sev_sMsgHistItems*)put.data)->Items[k].storagetime =
+        net_DeltaTimeToNetTime(&m_sevhistevents->storagetime);
     ((sev_sMsgHistItems*)put.data)->Items[k].deadband = 0;
     ((sev_sMsgHistItems*)put.data)->Items[k].options = m_sevhistevents->options;
     ((sev_sMsgHistItems*)put.data)->Items[k].attr[0].type = (pwr_eType)0;
     ((sev_sMsgHistItems*)put.data)->Items[k].attr[0].size = 0;
     ((sev_sMsgHistItems*)put.data)->Items[k].sevid.nid = m_nodes[0].nid;
     ((sev_sMsgHistItems*)put.data)->Items[k].sevid.rix = 0;
-    strncpy(((sev_sMsgHistItems*)put.data)->Items[k].description,
-        m_sevhistevents->description,
-        sizeof(((sev_sMsgHistItems*)put.data)->Items[0].description));
+    strncpy(((sev_sMsgHistItems*)put.data)->Items[k].description, m_sevhistevents->description,
+            sizeof(((sev_sMsgHistItems*)put.data)->Items[0].description));
     strcpy(((sev_sMsgHistItems*)put.data)->Items[k].attr[0].unit, "");
     // Put the table size in scan time. Only used for hdf5 databases.
-    ((sev_sMsgHistItems*)put.data)->Items[k].scantime
-        = m_sevhistevents->table_size;
+    ((sev_sMsgHistItems*)put.data)->Items[k].scantime = m_sevhistevents->table_size;
     k++;
   }
 
   // Add the objectitems at the end of the message
   sev_sHistItem* buffP = &((sev_sMsgHistItems*)put.data)->Items[k];
-  for (unsigned int i = 0; i < m_hs.size(); i++) {
+  for (unsigned int i = 0; i < m_hs.size(); i++)
+  {
     if (m_hs[i].configerror)
       continue;
-    if (nid == m_hs[i].nid) {
+    if (nid == m_hs[i].nid)
+    {
       int numberOfAttributes;
-      for (unsigned int j = 0; j < m_hs[i].sevhistobjectlist.size(); j++) {
+      for (unsigned int j = 0; j < m_hs[i].sevhistobjectlist.size(); j++)
+      {
         buffP->oid = m_hs[i].sevhistobjectlist[j].aref.Objid;
         strcpy(aname, m_hs[i].sevhistobjectlist[j].aname);
         strcpy(buffP->oname, aname);
-        buffP->storagetime
-            = net_DeltaTimeToNetTime(&m_hs[i].sevhistobjectlist[j].storagetime);
+        buffP->storagetime = net_DeltaTimeToNetTime(&m_hs[i].sevhistobjectlist[j].storagetime);
         buffP->deadband = m_hs[i].sevhistobjectlist[j].deadband;
         buffP->options = m_hs[i].sevhistobjectlist[j].options;
         buffP->sevid = m_hs[i].sevhistobjectlist[j].sevid;
-        strncpy(buffP->description, m_hs[i].sevhistobjectlist[j].description,
-            sizeof(pwr_tString80));
+        strncpy(buffP->description, m_hs[i].sevhistobjectlist[j].description, sizeof(pwr_tString80));
         buffP->scantime = m_hs[i].sevhistobjectlist[j].scantime;
-        buffP->attrnum
-            = m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist.size();
-        for (size_t jj = 0;
-             jj < m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist.size();
-             jj++) {
-          strcpy(aname,
-              m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[jj].aname);
+        buffP->attrnum = m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist.size();
+        for (size_t jj = 0; jj < m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist.size(); jj++)
+        {
+          strcpy(aname, m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[jj].aname);
           // Point out attribute name
           s = strchr(aname, '.');
           if (!s)
             continue;
           *s = 0;
           strcpy(buffP->attr[jj].aname, s + 1);
-          buffP->attr[jj].type
-              = m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[jj].type;
-          buffP->attr[jj].size
-              = m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[jj].size;
-          strncpy(buffP->attr[jj].unit,
-              m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[jj].unit,
-              sizeof(pwr_tString16));
+          buffP->attr[jj].type = m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[jj].type;
+          buffP->attr[jj].size = m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[jj].size;
+          strncpy(buffP->attr[jj].unit, m_hs[i].sevhistobjectlist[j].sevhistobjectattrlist[jj].unit,
+                  sizeof(pwr_tString16));
         }
         numberOfAttributes = buffP->attrnum;
         // buffP points after the last attribute written
@@ -1368,24 +1419,28 @@ int rt_sevhistmon::send_itemlist(pwr_tNid nid)
   put.type.s = (qcom_eStype)sev_eMsgType_HistItems;
   put.msg_id = m_msg_id++;
 
-  if (!qcom_Put(&sts, &tgt, &put)) {
+  if (!qcom_Put(&sts, &tgt, &put))
+  {
     printf("rt_sevhistmon: ItemList send ERROR sts:%d\n", sts);
     qcom_Free(&sts, put.data);
     return 0;
   }
 
   // If all nodes are connected, set running status
-  if (!m_allconnected) {
+  if (!m_allconnected)
+  {
     bool all_conn = true;
-    for (unsigned int i = 0; i < m_nodes.size(); i++) {
-      printf("Sev %s %d %d\n", m_nodes[i].name, m_nodes[i].is_server,
-          m_nodes[i].connected);
-      if (m_nodes[i].is_server && !m_nodes[i].connected) {
+    for (unsigned int i = 0; i < m_nodes.size(); i++)
+    {
+      printf("Sev %s %d %d\n", m_nodes[i].name, m_nodes[i].is_server, m_nodes[i].connected);
+      if (m_nodes[i].is_server && !m_nodes[i].connected)
+      {
         all_conn = false;
         break;
       }
     }
-    if (all_conn) {
+    if (all_conn)
+    {
       m_allconnected = 1;
       m_server_status = PWR__SRUN;
       set_status();
@@ -1408,8 +1463,10 @@ int rt_sevhistmon::send_exportitemlist(pwr_tNid nid)
 
   // Identify node
   bool found = false;
-  for (unsigned int i = 0; i < m_nodes.size(); i++) {
-    if (nid == m_nodes[i].nid) {
+  for (unsigned int i = 0; i < m_nodes.size(); i++)
+  {
+    if (nid == m_nodes[i].nid)
+    {
       found = true;
       m_nodes[i].connected = 1;
       printf("rt_sevhistmon: node %s connected\n", m_nodes[i].name);
@@ -1418,10 +1475,12 @@ int rt_sevhistmon::send_exportitemlist(pwr_tNid nid)
   }
 
   // Count items for this node
-  for (unsigned int i = 0; i < m_hs.size(); i++) {
+  for (unsigned int i = 0; i < m_hs.size(); i++)
+  {
     if (m_hs[i].configerror)
       continue;
-    if (nid == m_hs[i].nid) {
+    if (nid == m_hs[i].nid)
+    {
       item_cnt += m_hs[i].sevexportlist.size();
       attr_cnt += m_hs[i].sevexportlist.size();
     }
@@ -1442,13 +1501,15 @@ int rt_sevhistmon::send_exportitemlist(pwr_tNid nid)
   ((sev_sMsgExportItems*)put.data)->NumItems = item_cnt;
 
   int k = 0;
-  for (unsigned int i = 0; i < m_hs.size(); i++) {
+  for (unsigned int i = 0; i < m_hs.size(); i++)
+  {
     if (m_hs[i].configerror)
       continue;
-    if (nid == m_hs[i].nid) {
-      for (unsigned int j = 0; j < m_hs[i].sevexportlist.size(); j++) {
-        ((sev_sMsgExportItems*)put.data)->Items[k].oid
-            = m_hs[i].sevexportlist[j].aref.Objid;
+    if (nid == m_hs[i].nid)
+    {
+      for (unsigned int j = 0; j < m_hs[i].sevexportlist.size(); j++)
+      {
+        ((sev_sMsgExportItems*)put.data)->Items[k].oid = m_hs[i].sevexportlist[j].aref.Objid;
         strcpy(aname, m_hs[i].sevexportlist[j].aname);
         s = strchr(aname, '.');
         if (!s)
@@ -1456,19 +1517,13 @@ int rt_sevhistmon::send_exportitemlist(pwr_tNid nid)
         *s = 0;
         strcpy(((sev_sMsgExportItems*)put.data)->Items[k].oname, aname);
         strcpy(((sev_sMsgExportItems*)put.data)->Items[k].aname, s + 1);
-        ((sev_sMsgExportItems*)put.data)->Items[k].options
-            = m_hs[i].sevexportlist[j].options;
-        ((sev_sMsgExportItems*)put.data)->Items[k].type
-            = m_hs[i].sevexportlist[j].type;
-        ((sev_sMsgExportItems*)put.data)->Items[k].size
-            = m_hs[i].sevexportlist[j].size;
-        ((sev_sMsgExportItems*)put.data)->Items[k].sevid
-            = m_hs[i].sevexportlist[j].sevid;
-        strncpy(((sev_sMsgExportItems*)put.data)->Items[k].description,
-            m_hs[i].sevexportlist[j].description,
-            sizeof(((sev_sMsgExportItems*)put.data)->Items[0].description));
-        ((sev_sMsgExportItems*)put.data)->Items[k].scantime
-            = m_hs[i].sevexportlist[j].scantime;
+        ((sev_sMsgExportItems*)put.data)->Items[k].options = m_hs[i].sevexportlist[j].options;
+        ((sev_sMsgExportItems*)put.data)->Items[k].type = m_hs[i].sevexportlist[j].type;
+        ((sev_sMsgExportItems*)put.data)->Items[k].size = m_hs[i].sevexportlist[j].size;
+        ((sev_sMsgExportItems*)put.data)->Items[k].sevid = m_hs[i].sevexportlist[j].sevid;
+        strncpy(((sev_sMsgExportItems*)put.data)->Items[k].description, m_hs[i].sevexportlist[j].description,
+                sizeof(((sev_sMsgExportItems*)put.data)->Items[0].description));
+        ((sev_sMsgExportItems*)put.data)->Items[k].scantime = m_hs[i].sevexportlist[j].scantime;
         k++;
       }
     }
@@ -1483,24 +1538,28 @@ int rt_sevhistmon::send_exportitemlist(pwr_tNid nid)
   put.type.s = (qcom_eStype)sev_eMsgType_ExportItems;
   put.msg_id = m_msg_id++;
 
-  if (!qcom_Put(&sts, &tgt, &put)) {
+  if (!qcom_Put(&sts, &tgt, &put))
+  {
     printf("rt_sevhistmon: ExportItemList send ERROR sts:%d\n", sts);
     qcom_Free(&sts, put.data);
     return 0;
   }
 
   // If all nodes are connected, set running status
-  if (!m_allconnected) {
+  if (!m_allconnected)
+  {
     bool all_conn = true;
-    for (unsigned int i = 0; i < m_nodes.size(); i++) {
-      printf("Sev %s %d %d\n", m_nodes[i].name, m_nodes[i].is_server,
-          m_nodes[i].connected);
-      if (m_nodes[i].is_server && !m_nodes[i].connected) {
+    for (unsigned int i = 0; i < m_nodes.size(); i++)
+    {
+      printf("Sev %s %d %d\n", m_nodes[i].name, m_nodes[i].is_server, m_nodes[i].connected);
+      if (m_nodes[i].is_server && !m_nodes[i].connected)
+      {
         all_conn = false;
         break;
       }
     }
-    if (all_conn) {
+    if (all_conn)
+    {
       m_allconnected = 1;
       m_server_status = PWR__SRUN;
       set_status();
@@ -1675,19 +1734,19 @@ pwr_tStatus rt_sevhistmon::mh_clear_alarmlist_bc(pwr_tNodeIndex nix)
   return 1;
 }
 
-pwr_tStatus rt_sevhistmon::mh_clear_blocklist_bc(pwr_tNodeIndex nix)
-{
-  return 1;
-}
+pwr_tStatus rt_sevhistmon::mh_clear_blocklist_bc(pwr_tNodeIndex nix) { return 1; }
 
 void sev_sevhistevents::evbuf_insert(sev_sEvent* ev)
 {
   // Check if event already exist
-  if (evbuf_last != ev_cInit) {
-    for (unsigned int idx = evbuf_last;;) {
-      if (event_buffer[idx].eventid_idx == ev->eventid_idx
-          && event_buffer[idx].eventid_nix == ev->eventid_nix
-          && event_buffer[idx].eventid_birthtime == ev->eventid_birthtime) {
+  if (evbuf_last != ev_cInit)
+  {
+    for (unsigned int idx = evbuf_last;;)
+    {
+      if (event_buffer[idx].eventid_idx == ev->eventid_idx &&
+          event_buffer[idx].eventid_nix == ev->eventid_nix &&
+          event_buffer[idx].eventid_birthtime == ev->eventid_birthtime)
+      {
         return;
       }
       if (idx == evbuf_oldest)
@@ -1696,20 +1755,23 @@ void sev_sevhistevents::evbuf_insert(sev_sEvent* ev)
     }
   }
 
-  if (evbuf_last == ev_cInit) {
+  if (evbuf_last == ev_cInit)
+  {
     // First insert
     evbuf_last = 0;
     evbuf_oldest = 0;
     memcpy(&event_buffer[evbuf_last], ev, sizeof(event_buffer[0]));
-  } else {
+  }
+  else
+  {
     unsigned int idx = evbuf_last;
     evbuf_next_idx(idx);
-    if (idx == evbuf_oldest
-        && ((evbuf_sent == evbuf_oldest) || evbuf_sent == ev_cInit))
+    if (idx == evbuf_oldest && ((evbuf_sent == evbuf_oldest) || evbuf_sent == ev_cInit))
       evbuf_send();
 
     evbuf_next_idx(evbuf_last);
-    if (evbuf_oldest == evbuf_last) {
+    if (evbuf_oldest == evbuf_last)
+    {
       evbuf_next_idx(evbuf_oldest);
     }
     memcpy(&event_buffer[evbuf_last], ev, sizeof(event_buffer[0]));
@@ -1722,18 +1784,19 @@ void sev_sevhistevents::evbuf_send()
     return;
 
   unsigned int num;
-  if (evbuf_sent == ev_cInit) {
+  if (evbuf_sent == ev_cInit)
+  {
     if (evbuf_oldest <= evbuf_last)
       num = evbuf_last - evbuf_oldest + 1;
     else
-      num = sizeof(event_buffer) / sizeof(event_buffer[0]) + evbuf_last
-          - evbuf_oldest + 1;
-  } else {
+      num = sizeof(event_buffer) / sizeof(event_buffer[0]) + evbuf_last - evbuf_oldest + 1;
+  }
+  else
+  {
     if (evbuf_sent <= evbuf_last)
       num = evbuf_last - evbuf_sent;
     else
-      num = sizeof(event_buffer) / sizeof(event_buffer[0]) + evbuf_last
-          - evbuf_sent;
+      num = sizeof(event_buffer) / sizeof(event_buffer[0]) + evbuf_last - evbuf_sent;
   }
   if (!num)
     return;
@@ -1753,23 +1816,26 @@ void sev_sevhistevents::evbuf_send()
   ((sev_sMsgEventsStore*)put.data)->NumEvents = num;
 
   unsigned int ev_cnt = 0;
-  if (evbuf_sent == ev_cInit) {
-    for (unsigned int idx = evbuf_oldest;;) {
+  if (evbuf_sent == ev_cInit)
+  {
+    for (unsigned int idx = evbuf_oldest;;)
+    {
       printf("evbuf_send, %u\n", event_buffer[idx].eventstatus);
-      memcpy(&((sev_sMsgEventsStore*)put.data)->Events[ev_cnt],
-          &event_buffer[idx], sizeof(sev_sEvent));
+      memcpy(&((sev_sMsgEventsStore*)put.data)->Events[ev_cnt], &event_buffer[idx], sizeof(sev_sEvent));
       ev_cnt++;
       evbuf_sent = idx;
       if (idx == evbuf_last)
         break;
       evbuf_next_idx(idx);
     }
-  } else if (evbuf_sent != evbuf_last) {
+  }
+  else if (evbuf_sent != evbuf_last)
+  {
     unsigned int start_idx = evbuf_sent;
     evbuf_next_idx(start_idx);
-    for (unsigned int idx = start_idx;;) {
-      memcpy(&((sev_sMsgEventsStore*)put.data)->Events[ev_cnt],
-          &event_buffer[idx], sizeof(sev_sEvent));
+    for (unsigned int idx = start_idx;;)
+    {
+      memcpy(&((sev_sMsgEventsStore*)put.data)->Events[ev_cnt], &event_buffer[idx], sizeof(sev_sEvent));
       ev_cnt++;
       evbuf_sent = idx;
       if (idx == evbuf_last)
@@ -1787,7 +1853,8 @@ void sev_sevhistevents::evbuf_send()
   put.type.s = (qcom_eStype)sev_eMsgType_EventsStore;
   put.msg_id = monitor->m_msg_id++;
 
-  if (!qcom_Put(&sts, &tgt, &put)) {
+  if (!qcom_Put(&sts, &tgt, &put))
+  {
     monitor->m_hs[event_thread_idx].threadp->ErrorCount++;
     if (sts == QCOM__NOQ)
       monitor->m_hs[event_thread_idx].threadp->Status = SEV__EVENTSQ;
@@ -1808,14 +1875,16 @@ int rt_sevhistmon::init_events()
 
   // Get SevHistEvents objects
   for (sts = gdh_GetClassList(pwr_cClass_SevHistEvents, &he_oid); ODD(sts);
-       sts = gdh_GetNextObject(he_oid, &he_oid)) {
+       sts = gdh_GetNextObject(he_oid, &he_oid))
+  {
     he_cnt++;
 
     sts = gdh_ObjidToName(he_oid, oname, sizeof(oname), cdh_mName_volumeStrict);
     if (EVEN(m_sts))
       throw co_error(m_sts);
 
-    if (he_cnt > 1) {
+    if (he_cnt > 1)
+    {
       errh_Error("SevHistEvents object ignored, %s", oname);
       continue;
     }
@@ -1830,13 +1899,16 @@ int rt_sevhistmon::init_events()
       throw co_error(sts);
 
     hs_idx = -1;
-    for (int i = 0; i < (int)m_hs.size(); i++) {
-      if (cdh_ObjidIsEqual(h->hsp->ThreadObject, m_hs[i].oid)) {
+    for (int i = 0; i < (int)m_hs.size(); i++)
+    {
+      if (cdh_ObjidIsEqual(h->hsp->ThreadObject, m_hs[i].oid))
+      {
         hs_idx = i;
         break;
       }
     }
-    if (hs_idx == -1) {
+    if (hs_idx == -1)
+    {
       errh_Error("Invalid thread object in SevHistEvents, %s", oname);
       continue;
     }
@@ -1855,9 +1927,9 @@ int rt_sevhistmon::init_events()
     // Wait for mh has flagged initizated
     mh_UtilWaitForMh();
 
-    sts = mh_OutunitConnect(he_oid, mh_eOutunitType_SevHistEvents, 0, mh_ack_bc,
-        mh_alarm_bc, mh_block_bc, mh_cancel_bc, mh_clear_alarmlist_bc,
-        mh_clear_blocklist_bc, mh_info_bc, mh_return_bc, 0);
+    sts = mh_OutunitConnect(he_oid, mh_eOutunitType_SevHistEvents, 0, mh_ack_bc, mh_alarm_bc, mh_block_bc,
+                            mh_cancel_bc, mh_clear_alarmlist_bc, mh_clear_blocklist_bc, mh_info_bc,
+                            mh_return_bc, 0);
     if (EVEN(sts))
       return sts;
 
@@ -1880,16 +1952,19 @@ int rt_sevhistmon::mainloop()
 
   shm = this;
 
-  for (;;) {
+  for (;;)
+  {
     memset(&get, 0, sizeof(get));
     mp = qcom_Get(&sts, &qid, &get, tmo);
-    if (sts == QCOM__TMO || !mp) {
+    if (sts == QCOM__TMO || !mp)
+    {
       m_loopcnt++;
       send_data();
       send_exportdata();
       send_server_status_request(&sts);
 
-      if (!m_allconnected) {
+      if (!m_allconnected)
+      {
         int reconnect_time = int(20.0 / m_scantime);
 
         if (m_loopcnt % reconnect_time == 0)
@@ -1897,7 +1972,8 @@ int rt_sevhistmon::mainloop()
       }
       aproc_TimeStamp(m_scantime, 5);
 
-      if (m_sevhistevents) {
+      if (m_sevhistevents)
+      {
         sts = mh_OutunitReceive();
         while (ODD(sts))
           sts = mh_OutunitReceive();
@@ -1908,22 +1984,24 @@ int rt_sevhistmon::mainloop()
       continue;
     }
 
-    switch ((int)get.type.b) {
+    switch ((int)get.type.b)
+    {
     case sev_cMsgClass:
-      switch ((int)get.type.s) {
+      switch ((int)get.type.s)
+      {
       case sev_eMsgType_NodeUp:
-	if (plog)
-	  printf("rt_sevhistmon: Node up received\n");
+        if (plog)
+          printf("rt_sevhistmon: Node up received\n");
         send_itemlist(get.sender.nid);
         break;
       case sev_eMsgType_ExportNodeUp:
-	if (plog)
-	  printf("rt_sevhistmon: Export node up received\n");
+        if (plog)
+          printf("rt_sevhistmon: Export node up received\n");
         send_exportitemlist(get.sender.nid);
         break;
       case sev_eMsgType_HistItemsRequest:
-	if (plog)
-	  printf("rt_sevhistmon: Export histitems request received\n");
+        if (plog)
+          printf("rt_sevhistmon: Export histitems request received\n");
         send_itemlist(get.sender.nid);
         break;
       case sev_eMsgType_ExportItemsRequest:
@@ -1935,29 +2013,38 @@ int rt_sevhistmon::mainloop()
       default:;
       }
       break;
-    case qcom_eBtype_event: {
+    case qcom_eBtype_event:
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop && !m_swap) {
+      if (new_event.b.oldPlcStop && !m_swap)
+      {
         m_swap = 1;
         errh_SetStatus(PWR__SRVRESTART);
         m_confp->Status = PWR__SRVRESTART;
         close();
-      } else if (new_event.b.swapDone && m_swap) {
+      }
+      else if (new_event.b.swapDone && m_swap)
+      {
         m_swap = 0;
-        try {
+        try
+        {
           init_objects();
           connect();
-        } catch (co_error& e) {
+        }
+        catch (co_error& e)
+        {
           errh_Error("SevHistMonitor terminating, %m", e.sts());
           exit(0);
         }
         errh_SetStatus(PWR__SRUN);
         m_confp->Status = PWR__SRUN;
         errh_Info("Warm restart completed");
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         m_confp->Status = PWR__SRVTERM;
         exit(0);
       }
@@ -1974,10 +2061,13 @@ int main()
 {
   rt_sevhistmon client;
 
-  try {
+  try
+  {
     client.init();
     client.connect();
-  } catch (co_error& e) {
+  }
+  catch (co_error& e)
+  {
     errh_Error("SevHistMonitor terminating, %m", e.sts());
     exit(0);
   }

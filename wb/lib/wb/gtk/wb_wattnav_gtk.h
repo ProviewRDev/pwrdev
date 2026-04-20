@@ -41,13 +41,12 @@
 
 #include "wb_wattnav.h"
 
-class WAttNavGtk : public WAttNav {
+class WAttNavGtk : public WAttNav
+{
 public:
-  WAttNavGtk(void* wa_parent_ctx, wattnav_eType wa_type,
-      GtkWidget* wa_parent_wid, const char* wa_name, ldh_tSesContext wa_ldhses,
-      pwr_sAttrRef wa_aref, int wa_editmode, int wa_advanced_user,
-      int wa_display_objectname, wb_eUtility wa_utility, GtkWidget** w,
-      pwr_tStatus* status);
+  WAttNavGtk(void* wa_parent_ctx, wattnav_eType wa_type, GtkWidget* wa_parent_wid, const char* wa_name,
+             ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref, int wa_editmode, int wa_advanced_user,
+             int wa_display_objectname, wb_eUtility wa_utility, GtkWidget** w, pwr_tStatus* status);
   ~WAttNavGtk();
 
   GtkWidget* parent_wid;

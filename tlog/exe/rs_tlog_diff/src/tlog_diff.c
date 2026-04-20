@@ -61,7 +61,8 @@
 #define TLOG_LINE_ATTRIBUTE 15
 #define TLOG_LINE_TYPE 12
 
-enum tlog_ee_logtype {
+enum tlog_ee_logtype
+{
   tlog_logtype_DtLogUp,
   tlog_logtype_DtLogDown,
   tlog_logtype_AtLogUp,
@@ -82,7 +83,8 @@ enum tlog_ee_logtype {
 };
 typedef enum tlog_ee_logtype tlog_e_logtype;
 
-typedef struct {
+typedef struct
+{
   pwr_tString132 line;
   pwr_tDeltaTime time;
   tlog_e_logtype logtype;
@@ -92,7 +94,8 @@ typedef struct {
   int written;
 } tlog_t_linelist;
 
-typedef struct {
+typedef struct
+{
   tlog_t_linelist* new_list;
   tlog_t_linelist* old_list;
   int new_list_count;
@@ -110,77 +113,76 @@ typedef struct {
   int exact;
   char new_filename[80];
   char old_filename[80];
-} * diff_ctx;
+}* diff_ctx;
 
 static int announce = 0;
 
-static int tlog_get_defaultfilename(
-    char* inname, char* outname, char* ext, char* disk);
+static int tlog_get_defaultfilename(char* inname, char* outname, char* ext, char* disk);
 static int tlog_get_modulename(char* inname, char* outname);
-static int tlog_checktime(
-    pwr_tDeltaTime* time_new, pwr_tDeltaTime* time_old, float maxdiff);
-static int tlog_print_line(
-    diff_ctx ctx, tlog_t_linelist* list, int index, int old);
-static int tlog_print_linepar(diff_ctx ctx, tlog_t_linelist* newlist,
-    tlog_t_linelist* oldlist, int newindex, int oldindex);
+static int tlog_checktime(pwr_tDeltaTime* time_new, pwr_tDeltaTime* time_old, float maxdiff);
+static int tlog_print_line(diff_ctx ctx, tlog_t_linelist* list, int index, int old);
+static int tlog_print_linepar(diff_ctx ctx, tlog_t_linelist* newlist, tlog_t_linelist* oldlist, int newindex,
+                              int oldindex);
 static int tlog_lists_cmp_line(diff_ctx ctx);
-static int tlog_line_compare(
-    tlog_t_linelist* newlist_ptr, tlog_t_linelist* oldlist_ptr);
+static int tlog_line_compare(tlog_t_linelist* newlist_ptr, tlog_t_linelist* oldlist_ptr);
 static void tlog_lists_cmp_printparseline(diff_ctx ctx);
 static int tlog_lists_cmp_printnew(diff_ctx ctx, int index, int* lines);
 static int tlog_lists_cmp_printold(diff_ctx ctx, int index, int* lines);
-static int tlog_lists_cmp_printboth(
-    diff_ctx ctx, int newindex, int oldindex, int* newlines, int* oldlines);
+static int tlog_lists_cmp_printboth(diff_ctx ctx, int newindex, int oldindex, int* newlines, int* oldlines);
 static int tlog_lists_cmp(diff_ctx ctx);
 static int tlog_read_line(char* line, int maxsize, FILE* file);
-static pwr_tStatus tlog_line_add(pwr_tString132* line, tlog_t_linelist** list,
-    int* list_count, int* alloc, int line_nr);
-static pwr_tStatus tlog_insert_file(char* filename, tlog_t_linelist** list,
-    int* list_count, char* full_filename);
+static pwr_tStatus tlog_line_add(pwr_tString132* line, tlog_t_linelist** list, int* list_count, int* alloc,
+                                 int line_nr);
+static pwr_tStatus tlog_insert_file(char* filename, tlog_t_linelist** list, int* list_count,
+                                    char* full_filename);
 static pwr_tStatus tlog_qual_to_time(char* in_str, pwr_tTime* time);
 
 /*************************************************************************
-*
-* Name:		tlog_get_defaultfilename()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		tlog_get_defaultfilename()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int tlog_get_defaultfilename(
-    char* inname, char* outname, char* ext, char* disk)
+static int tlog_get_defaultfilename(char* inname, char* outname, char* ext, char* disk)
 {
   char* s;
   char* s2;
   char filename[80];
 
   /* Add default disk if no disk is suplied */
-  if (!(strchr(inname, ':') || strchr(inname, '<') || strchr(inname, '['))) {
+  if (!(strchr(inname, ':') || strchr(inname, '<') || strchr(inname, '[')))
+  {
     strcpy(filename, disk);
     strcat(filename, inname);
     strcpy(outname, filename);
-  } else
+  }
+  else
     strcpy(outname, inname);
 
   /* Look for extention in filename */
-  if (ext != NULL) {
+  if (ext != NULL)
+  {
     s = strrchr(inname, ':');
     if (s == 0)
       s = inname;
 
     s2 = strrchr(s, '>');
-    if (s2 == 0) {
+    if (s2 == 0)
+    {
       s2 = strrchr(s, ']');
       if (s2 == 0)
         s2 = s;
     }
 
     s = strrchr(s2, '.');
-    if (s == 0) {
+    if (s == 0)
+    {
       /* No extention found, add extention */
       strcat(outname, ext);
     }
@@ -190,16 +192,16 @@ static int tlog_get_defaultfilename(
 }
 
 /*************************************************************************
-*
-* Name:		tlog_get_modulename()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		tlog_get_modulename()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 static int tlog_get_modulename(char* inname, char* outname)
 {
@@ -226,20 +228,19 @@ static int tlog_get_modulename(char* inname, char* outname)
 }
 
 /*************************************************************************
-*
-* Name:		tlog_checktime
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*
-*
-**************************************************************************/
+ *
+ * Name:		tlog_checktime
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *
+ *
+ **************************************************************************/
 
-static int tlog_checktime(
-    pwr_tDeltaTime* time_new, pwr_tDeltaTime* time_old, float maxdiff)
+static int tlog_checktime(pwr_tDeltaTime* time_new, pwr_tDeltaTime* time_old, float maxdiff)
 {
   pwr_tDeltaTime tim_maxdiff;
   pwr_tDeltaTime tim_limlow;
@@ -284,52 +285,60 @@ static int tlog_checktime(
 }
 
 /*************************************************************************
-*
-* Name:		tlog_print_line
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*
-*
-**************************************************************************/
+ *
+ * Name:		tlog_print_line
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *
+ *
+ **************************************************************************/
 
-static int tlog_print_line(
-    diff_ctx ctx, tlog_t_linelist* list, int index, int old)
+static int tlog_print_line(diff_ctx ctx, tlog_t_linelist* list, int index, int old)
 {
   pwr_tString132 str;
 
   list += index;
-  if (ctx->parallell) {
-    if (ctx->attribute) {
+  if (ctx->parallell)
+  {
+    if (ctx->attribute)
+    {
       sprintf(str, "%d ", list->line_nr);
-      strncat(str, &list->line[TLOG_LINE_ATTRIBUTE],
-          TLOG_LINE_TEXT - TLOG_LINE_ATTRIBUTE);
+      strncat(str, &list->line[TLOG_LINE_ATTRIBUTE], TLOG_LINE_TEXT - TLOG_LINE_ATTRIBUTE);
       str[TLOG_LINE_TEXT] = 0;
-    } else if (ctx->text) {
+    }
+    else if (ctx->text)
+    {
       sprintf(str, "%d ", list->line_nr);
       strcat(str, &list->line[TLOG_LINE_TEXT]);
-    } else if (ctx->ttext) {
-      sprintf(str, "%d %*.*s", list->line_nr, TLOG_LINE_ATTRIBUTE,
-          TLOG_LINE_ATTRIBUTE, list->line);
+    }
+    else if (ctx->ttext)
+    {
+      sprintf(str, "%d %*.*s", list->line_nr, TLOG_LINE_ATTRIBUTE, TLOG_LINE_ATTRIBUTE, list->line);
       strcat(str, &list->line[TLOG_LINE_TEXT]);
-    } else
+    }
+    else
       sprintf(str, "%d %s", list->line_nr, list->line);
-    if (old) {
+    if (old)
+    {
       if (ctx->outfile)
-        fprintf(ctx->outfile, "					| %-38.38s\n",
-            str);
+        fprintf(ctx->outfile, "					| %-38.38s\n", str);
       else
         printf("					| %-38.38s\n", str);
-    } else {
+    }
+    else
+    {
       if (ctx->outfile)
         fprintf(ctx->outfile, " %-38.38s |\n", str);
       else
         printf(" %-38.38s |\n", str);
     }
-  } else {
+  }
+  else
+  {
     if (ctx->outfile)
       fprintf(ctx->outfile, "%d %s\n", list->line_nr, list->line);
     else
@@ -338,36 +347,39 @@ static int tlog_print_line(
   return TLOG__SUCCESS;
 }
 
-static int tlog_print_linepar(diff_ctx ctx, tlog_t_linelist* newlist,
-    tlog_t_linelist* oldlist, int newindex, int oldindex)
+static int tlog_print_linepar(diff_ctx ctx, tlog_t_linelist* newlist, tlog_t_linelist* oldlist, int newindex,
+                              int oldindex)
 {
   pwr_tString132 strnew;
   pwr_tString132 strold;
 
   newlist += newindex;
   oldlist += oldindex;
-  if (ctx->attribute) {
+  if (ctx->attribute)
+  {
     sprintf(strnew, "%d ", newlist->line_nr);
-    strncat(strnew, &newlist->line[TLOG_LINE_ATTRIBUTE],
-        TLOG_LINE_TEXT - TLOG_LINE_ATTRIBUTE);
+    strncat(strnew, &newlist->line[TLOG_LINE_ATTRIBUTE], TLOG_LINE_TEXT - TLOG_LINE_ATTRIBUTE);
     strnew[TLOG_LINE_TEXT] = 0;
     sprintf(strold, "%d ", oldlist->line_nr);
-    strncat(strold, &oldlist->line[TLOG_LINE_ATTRIBUTE],
-        TLOG_LINE_TEXT - TLOG_LINE_ATTRIBUTE);
+    strncat(strold, &oldlist->line[TLOG_LINE_ATTRIBUTE], TLOG_LINE_TEXT - TLOG_LINE_ATTRIBUTE);
     strold[TLOG_LINE_TEXT] = 0;
-  } else if (ctx->text) {
+  }
+  else if (ctx->text)
+  {
     sprintf(strnew, "%d ", newlist->line_nr);
     strcat(strnew, &newlist->line[TLOG_LINE_TEXT]);
     sprintf(strold, "%d ", oldlist->line_nr);
     strcat(strold, &oldlist->line[TLOG_LINE_TEXT]);
-  } else if (ctx->ttext) {
-    sprintf(strnew, "%d %*.*s", newlist->line_nr, TLOG_LINE_ATTRIBUTE,
-        TLOG_LINE_ATTRIBUTE, newlist->line);
+  }
+  else if (ctx->ttext)
+  {
+    sprintf(strnew, "%d %*.*s", newlist->line_nr, TLOG_LINE_ATTRIBUTE, TLOG_LINE_ATTRIBUTE, newlist->line);
     strcat(strnew, &newlist->line[TLOG_LINE_TEXT]);
-    sprintf(strold, "%d %*.*s", oldlist->line_nr, TLOG_LINE_ATTRIBUTE,
-        TLOG_LINE_ATTRIBUTE, oldlist->line);
+    sprintf(strold, "%d %*.*s", oldlist->line_nr, TLOG_LINE_ATTRIBUTE, TLOG_LINE_ATTRIBUTE, oldlist->line);
     strcat(strold, &oldlist->line[TLOG_LINE_TEXT]);
-  } else {
+  }
+  else
+  {
     sprintf(strnew, "%d %s", newlist->line_nr, newlist->line);
     sprintf(strold, "%d %s", oldlist->line_nr, oldlist->line);
   }
@@ -380,17 +392,17 @@ static int tlog_print_linepar(diff_ctx ctx, tlog_t_linelist* newlist,
 }
 
 /*************************************************************************
-*
-* Name:		tlog_lists_cmp_line
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Compare two lines
-*
-**************************************************************************/
+ *
+ * Name:		tlog_lists_cmp_line
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Compare two lines
+ *
+ **************************************************************************/
 
 static int tlog_lists_cmp_line(diff_ctx ctx)
 {
@@ -404,51 +416,62 @@ static int tlog_lists_cmp_line(diff_ctx ctx)
 
   /* Start with current old and search forward */
   found = 0;
-  for (i = ctx->current_old; i < ctx->old_list_count; i++) {
+  for (i = ctx->current_old; i < ctx->old_list_count; i++)
+  {
     oldlist_ptr = ctx->old_list + i;
-    if (oldlist_ptr->cmp_index == -1) {
-      sts = tlog_checktime(
-          &newlist_ptr->time, &oldlist_ptr->time, ctx->max_difftime);
+    if (oldlist_ptr->cmp_index == -1)
+    {
+      sts = tlog_checktime(&newlist_ptr->time, &oldlist_ptr->time, ctx->max_difftime);
       if (sts == TLOG__TIME_GT)
         break;
-      if (sts == TLOG__TIME_EQ) {
+      if (sts == TLOG__TIME_EQ)
+      {
         sts = tlog_line_compare(newlist_ptr, oldlist_ptr);
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           found = 1;
           break;
         }
       }
     }
   }
-  if (!found && ctx->noorder) {
+  if (!found && ctx->noorder)
+  {
     /* Search backwards */
-    for (i = ctx->current_old - 1; i >= 0; i--) {
+    for (i = ctx->current_old - 1; i >= 0; i--)
+    {
       oldlist_ptr = ctx->old_list + i;
-      if (oldlist_ptr->cmp_index == -1) {
-        sts = tlog_checktime(
-            &newlist_ptr->time, &oldlist_ptr->time, ctx->max_difftime);
+      if (oldlist_ptr->cmp_index == -1)
+      {
+        sts = tlog_checktime(&newlist_ptr->time, &oldlist_ptr->time, ctx->max_difftime);
         if (sts == TLOG__TIME_LT)
           break;
-        if (sts == TLOG__TIME_EQ) {
+        if (sts == TLOG__TIME_EQ)
+        {
           sts = tlog_line_compare(newlist_ptr, oldlist_ptr);
-          if (ODD(sts)) {
+          if (ODD(sts))
+          {
             found = 1;
             break;
           }
         }
       }
     }
-  } else if (!found && !ctx->exact) {
+  }
+  else if (!found && !ctx->exact)
+  {
     /* Search backwards as long as the time is the same*/
-    for (i = ctx->current_old - 1; i >= 0; i--) {
+    for (i = ctx->current_old - 1; i >= 0; i--)
+    {
       oldlist_ptr = ctx->old_list + i;
-      if (oldlist_ptr->cmp_index == -1) {
-        sts = tlog_checktime(
-            &newlist_ptr->time, &oldlist_ptr->time, TLOG_TIME_EPSILON);
+      if (oldlist_ptr->cmp_index == -1)
+      {
+        sts = tlog_checktime(&newlist_ptr->time, &oldlist_ptr->time, TLOG_TIME_EPSILON);
         if (sts == TLOG__TIME_LT)
           break;
         sts = tlog_line_compare(newlist_ptr, oldlist_ptr);
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           found = 1;
           break;
         }
@@ -467,60 +490,59 @@ static int tlog_lists_cmp_line(diff_ctx ctx)
 }
 
 /*************************************************************************
-*
-* Name:		tlog_line_compare
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Compare two lines
-*
-**************************************************************************/
+ *
+ * Name:		tlog_line_compare
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Compare two lines
+ *
+ **************************************************************************/
 
-static int tlog_line_compare(
-    tlog_t_linelist* newlist_ptr, tlog_t_linelist* oldlist_ptr)
+static int tlog_line_compare(tlog_t_linelist* newlist_ptr, tlog_t_linelist* oldlist_ptr)
 {
   /* Compare the text 	*/
-  if (strcmp(&newlist_ptr->line[TLOG_LINE_TEXT],
-          &oldlist_ptr->line[TLOG_LINE_TEXT]))
+  if (strcmp(&newlist_ptr->line[TLOG_LINE_TEXT], &oldlist_ptr->line[TLOG_LINE_TEXT]))
     return TLOG__DIFFTEXT;
 
-  if (strncmp(&newlist_ptr->line[TLOG_LINE_ATTRIBUTE],
-          &oldlist_ptr->line[TLOG_LINE_ATTRIBUTE],
-          TLOG_LINE_TEXT - TLOG_LINE_ATTRIBUTE))
+  if (strncmp(&newlist_ptr->line[TLOG_LINE_ATTRIBUTE], &oldlist_ptr->line[TLOG_LINE_ATTRIBUTE],
+              TLOG_LINE_TEXT - TLOG_LINE_ATTRIBUTE))
     return TLOG__DIFFATTR;
 
   return TLOG__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		tlog_lists_cmp_linelist
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Print a lines in newlist.
-*
-**************************************************************************/
+ *
+ * Name:		tlog_lists_cmp_linelist
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Print a lines in newlist.
+ *
+ **************************************************************************/
 
 static void tlog_lists_cmp_printparseline(diff_ctx ctx)
 {
-  if (ctx->parallell) {
+  if (ctx->parallell)
+  {
     if (ctx->outfile)
       fprintf(ctx->outfile, "----------------------------------------|---------"
                             "------------------------------\n");
     else
       printf("----------------------------------------|------------------------"
              "---------------\n");
-  } else {
+  }
+  else
+  {
     if (ctx->outfile)
-      fprintf(ctx->outfile,
-          "*********************************************************\n");
+      fprintf(ctx->outfile, "*********************************************************\n");
     else
       printf("*********************************************************\n");
   }
@@ -532,14 +554,16 @@ static int tlog_lists_cmp_printnew(diff_ctx ctx, int index, int* lines)
   int i;
 
   tlog_lists_cmp_printparseline(ctx);
-  if (!ctx->parallell) {
+  if (!ctx->parallell)
+  {
     if (ctx->outfile)
       fprintf(ctx->outfile, "--New----------------------------------------\n");
     else
       printf("--New----------------------------------------\n");
   }
   *lines = 0;
-  for (i = index; i < ctx->new_list_count; i++) {
+  for (i = index; i < ctx->new_list_count; i++)
+  {
     newlist_ptr = ctx->new_list + i;
     if (newlist_ptr->cmp_index != -1)
       break;
@@ -556,14 +580,16 @@ static int tlog_lists_cmp_printold(diff_ctx ctx, int index, int* lines)
   int i;
 
   tlog_lists_cmp_printparseline(ctx);
-  if (!ctx->parallell) {
+  if (!ctx->parallell)
+  {
     if (ctx->outfile)
       fprintf(ctx->outfile, "--Old----------------------------------------\n");
     else
       printf("--Old----------------------------------------\n");
   }
   *lines = 0;
-  for (i = index; i < ctx->old_list_count; i++) {
+  for (i = index; i < ctx->old_list_count; i++)
+  {
     oldlist_ptr = ctx->old_list + i;
     if (oldlist_ptr->cmp_index != -1)
       break;
@@ -574,8 +600,7 @@ static int tlog_lists_cmp_printold(diff_ctx ctx, int index, int* lines)
   return TLOG__SUCCESS;
 }
 
-static int tlog_lists_cmp_printboth(
-    diff_ctx ctx, int newindex, int oldindex, int* newlines, int* oldlines)
+static int tlog_lists_cmp_printboth(diff_ctx ctx, int newindex, int oldindex, int* newlines, int* oldlines)
 {
   tlog_t_linelist* newlist_ptr;
   tlog_t_linelist* oldlist_ptr;
@@ -583,14 +608,16 @@ static int tlog_lists_cmp_printboth(
   int print_new;
   int print_old;
 
-  if (!ctx->parallell) {
+  if (!ctx->parallell)
+  {
     tlog_lists_cmp_printparseline(ctx);
     if (ctx->outfile)
       fprintf(ctx->outfile, "--New----------------------------------------\n");
     else
       printf("--New----------------------------------------\n");
     *newlines = 0;
-    for (i = newindex; i < ctx->new_list_count; i++) {
+    for (i = newindex; i < ctx->new_list_count; i++)
+    {
       newlist_ptr = ctx->new_list + i;
       if (newlist_ptr->cmp_index != -1)
         break;
@@ -603,7 +630,8 @@ static int tlog_lists_cmp_printboth(
     else
       printf("--Old----------------------------------------\n");
     *oldlines = 0;
-    for (i = oldindex; i < ctx->old_list_count; i++) {
+    for (i = oldindex; i < ctx->old_list_count; i++)
+    {
       oldlist_ptr = ctx->old_list + i;
       if (oldlist_ptr->cmp_index != -1)
         break;
@@ -611,37 +639,43 @@ static int tlog_lists_cmp_printboth(
       (*oldlines)++;
     }
     ctx->diff_found++;
-  } else {
+  }
+  else
+  {
     *newlines = 0;
     *oldlines = 0;
     tlog_lists_cmp_printparseline(ctx);
     print_old = 1;
     print_new = 1;
-    for (i = 0;; i++) {
+    for (i = 0;; i++)
+    {
       oldlist_ptr = ctx->old_list + oldindex + i;
       newlist_ptr = ctx->new_list + newindex + i;
-      if (print_old && oldindex + i < ctx->old_list_count
-          && oldlist_ptr->cmp_index == -1)
+      if (print_old && oldindex + i < ctx->old_list_count && oldlist_ptr->cmp_index == -1)
         print_old = 1;
       else
         print_old = 0;
-      if (print_new && newindex + i < ctx->new_list_count
-          && newlist_ptr->cmp_index == -1)
+      if (print_new && newindex + i < ctx->new_list_count && newlist_ptr->cmp_index == -1)
         print_new = 1;
       else
         print_new = 0;
-      if (print_new && print_old) {
-        tlog_print_linepar(
-            ctx, ctx->new_list, ctx->old_list, newindex + i, oldindex + i);
+      if (print_new && print_old)
+      {
+        tlog_print_linepar(ctx, ctx->new_list, ctx->old_list, newindex + i, oldindex + i);
         (*oldlines)++;
         (*newlines)++;
-      } else if (print_new) {
+      }
+      else if (print_new)
+      {
         tlog_print_line(ctx, ctx->new_list, newindex + i, 0);
         (*newlines)++;
-      } else if (print_old) {
+      }
+      else if (print_old)
+      {
         tlog_print_line(ctx, ctx->old_list, oldindex + i, 1);
         (*oldlines)++;
-      } else
+      }
+      else
         break;
     }
     ctx->diff_found++;
@@ -650,17 +684,17 @@ static int tlog_lists_cmp_printboth(
 }
 
 /*************************************************************************
-*
-* Name:		tlog_lists_cmp
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Compare to lists.
-*
-**************************************************************************/
+ *
+ * Name:		tlog_lists_cmp
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Compare to lists.
+ *
+ **************************************************************************/
 
 static int tlog_lists_cmp(diff_ctx ctx)
 {
@@ -672,28 +706,34 @@ static int tlog_lists_cmp(diff_ctx ctx)
   int lines, newlines, oldlines;
   int next_new;
 
-  for (i = 0; i < ctx->new_list_count; i++) {
+  for (i = 0; i < ctx->new_list_count; i++)
+  {
     newlist_ptr = ctx->new_list + i;
     newlist_ptr->cmp_index = -1;
   }
-  for (i = 0; i < ctx->old_list_count; i++) {
+  for (i = 0; i < ctx->old_list_count; i++)
+  {
     oldlist_ptr = ctx->old_list + i;
     oldlist_ptr->cmp_index = -1;
   }
 
-  for (i = 0; i < ctx->new_list_count; i++) {
+  for (i = 0; i < ctx->new_list_count; i++)
+  {
     sts = tlog_lists_cmp_line(ctx);
     ctx->current_new++;
   }
 
-  if (announce) {
+  if (announce)
+  {
     printf("Newlist\n");
-    for (i = 0; i < ctx->new_list_count; i++) {
+    for (i = 0; i < ctx->new_list_count; i++)
+    {
       newlist_ptr = ctx->new_list + i;
       printf("%40s %d\n", newlist_ptr->line, newlist_ptr->cmp_index);
     }
     printf("Oldlist\n");
-    for (i = 0; i < ctx->old_list_count; i++) {
+    for (i = 0; i < ctx->old_list_count; i++)
+    {
       oldlist_ptr = ctx->old_list + i;
       printf("%40s %d\n", oldlist_ptr->line, oldlist_ptr->cmp_index);
     }
@@ -701,46 +741,63 @@ static int tlog_lists_cmp(diff_ctx ctx)
 
   /* Start Output */
   ctx->current_old = 0;
-  for (i = 0; i < ctx->new_list_count; i++) {
+  for (i = 0; i < ctx->new_list_count; i++)
+  {
     newlist_ptr = ctx->new_list + i;
-    if (newlist_ptr->cmp_index == -1) {
+    if (newlist_ptr->cmp_index == -1)
+    {
       next_new = 0;
-      while (!next_new) {
+      while (!next_new)
+      {
         /* Check if anything in oldlist should be written */
-        for (j = ctx->current_old; j < ctx->old_list_count; j++) {
+        for (j = ctx->current_old; j < ctx->old_list_count; j++)
+        {
           oldlist_ptr = ctx->old_list + j;
-          if (oldlist_ptr->cmp_index == -1) {
-            if (j == 0 && i == 0) {
+          if (oldlist_ptr->cmp_index == -1)
+          {
+            if (j == 0 && i == 0)
+            {
               next_new = 1;
               tlog_lists_cmp_printboth(ctx, i, j, &newlines, &oldlines);
               i += newlines - 1;
               j += oldlines;
               ctx->current_old = j;
-            } else if (i == 0) {
+            }
+            else if (i == 0)
+            {
               /* Print newlist */
               tlog_lists_cmp_printnew(ctx, i, &lines);
               i += lines - 1;
               next_new = 1;
-            } else if (j == 0) {
+            }
+            else if (j == 0)
+            {
               /* Print oldlist */
               tlog_lists_cmp_printold(ctx, j, &lines);
               j += lines;
               ctx->current_old = j;
-            } else {
+            }
+            else
+            {
               /* Compare the index of the previous old */
               oldlist_ptr--;
-              if (oldlist_ptr->cmp_index < i - 1) {
+              if (oldlist_ptr->cmp_index < i - 1)
+              {
                 /* Print old */
                 tlog_lists_cmp_printold(ctx, j, &lines);
                 j += lines;
                 ctx->current_old = j;
                 next_new = 0;
-              } else if (oldlist_ptr->cmp_index > i - 1) {
+              }
+              else if (oldlist_ptr->cmp_index > i - 1)
+              {
                 /* Print new */
                 tlog_lists_cmp_printnew(ctx, i, &lines);
                 i += lines - 1;
                 next_new = 1;
-              } else {
+              }
+              else
+              {
                 /* Equal, print both */
                 next_new = 1;
                 tlog_lists_cmp_printboth(ctx, i, j, &newlines, &oldlines);
@@ -753,7 +810,8 @@ static int tlog_lists_cmp(diff_ctx ctx)
           }
         }
 
-        if (j == ctx->old_list_count) {
+        if (j == ctx->old_list_count)
+        {
           tlog_lists_cmp_printnew(ctx, i, &lines);
           i += lines - 1;
           next_new = 1;
@@ -762,15 +820,20 @@ static int tlog_lists_cmp(diff_ctx ctx)
     }
   }
 
-  for (j = ctx->current_old; j < ctx->old_list_count; j++) {
+  for (j = ctx->current_old; j < ctx->old_list_count; j++)
+  {
     oldlist_ptr = ctx->old_list + j;
-    if (oldlist_ptr->cmp_index == -1) {
-      if (j == 0) {
+    if (oldlist_ptr->cmp_index == -1)
+    {
+      if (j == 0)
+      {
         /* Print oldlist */
         tlog_lists_cmp_printold(ctx, j, &lines);
         ctx->current_old += lines;
         j += lines;
-      } else {
+      }
+      else
+      {
         /* Print old */
         tlog_lists_cmp_printold(ctx, j, &lines);
         ctx->current_old = j + lines;
@@ -780,13 +843,16 @@ static int tlog_lists_cmp(diff_ctx ctx)
     }
   }
 
-  if (ctx->diff_found) {
+  if (ctx->diff_found)
+  {
     tlog_lists_cmp_printparseline(ctx);
     if (ctx->outfile)
       fprintf(ctx->outfile, "%d differences found\n", ctx->diff_found);
     else
       printf("%d differences found\n", ctx->diff_found);
-  } else {
+  }
+  else
+  {
     if (ctx->outfile)
       fprintf(ctx->outfile, "No differences found\n", ctx->diff_found);
     else
@@ -796,17 +862,17 @@ static int tlog_lists_cmp(diff_ctx ctx)
 }
 
 /*************************************************************************
-*
-* Name:		tlog_read_line()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Read a line in a file.
-*
-**************************************************************************/
+ *
+ * Name:		tlog_read_line()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Read a line in a file.
+ *
+ **************************************************************************/
 
 static int tlog_read_line(char* line, int maxsize, FILE* file)
 {
@@ -822,20 +888,20 @@ static int tlog_read_line(char* line, int maxsize, FILE* file)
 }
 
 /*************************************************************************
-*
-* Name:		tlog_line_add()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Allocate memory and insert a new line in the list.
-*
-**************************************************************************/
+ *
+ * Name:		tlog_line_add()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Allocate memory and insert a new line in the list.
+ *
+ **************************************************************************/
 
-static pwr_tStatus tlog_line_add(pwr_tString132* line, tlog_t_linelist** list,
-    int* list_count, int* alloc, int line_nr)
+static pwr_tStatus tlog_line_add(pwr_tString132* line, tlog_t_linelist** list, int* list_count, int* alloc,
+                                 int line_nr)
 {
   tlog_t_linelist* list_ptr;
   tlog_t_linelist* new_list;
@@ -843,12 +909,15 @@ static pwr_tStatus tlog_line_add(pwr_tString132* line, tlog_t_linelist** list,
   char type_str[10];
   int sts;
 
-  if (*list_count == 0) {
+  if (*list_count == 0)
+  {
     *list = calloc(TLOG_LINEALLOC, sizeof(tlog_t_linelist));
     if (*list == 0)
       return TLOG__NOMEMORY;
     *alloc = TLOG_LINEALLOC;
-  } else if (*alloc <= *list_count) {
+  }
+  else if (*alloc <= *list_count)
+  {
     new_list = calloc(*alloc + TLOG_LINEALLOC, sizeof(tlog_t_linelist));
     if (new_list == 0)
       return TLOG__NOMEMORY;
@@ -907,20 +976,20 @@ static pwr_tStatus tlog_line_add(pwr_tString132* line, tlog_t_linelist** list,
 }
 
 /*************************************************************************
-*
-* Name:		tlog_insert_file()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Read a file and insert it into a list.
-*
-**************************************************************************/
+ *
+ * Name:		tlog_insert_file()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Read a file and insert it into a list.
+ *
+ **************************************************************************/
 
-static pwr_tStatus tlog_insert_file(char* filename, tlog_t_linelist** list,
-    int* list_count, char* full_filename)
+static pwr_tStatus tlog_insert_file(char* filename, tlog_t_linelist** list, int* list_count,
+                                    char* full_filename)
 {
   int sts;
   int alloc = 0;
@@ -934,7 +1003,8 @@ static pwr_tStatus tlog_insert_file(char* filename, tlog_t_linelist** list,
     return TLOG__FILEOPEN;
 
   line_nr = 0;
-  while (1) {
+  while (1)
+  {
     /* Read next line */
     sts = tlog_read_line(line, sizeof(line), infile);
     if (EVEN(sts))
@@ -942,9 +1012,9 @@ static pwr_tStatus tlog_insert_file(char* filename, tlog_t_linelist** list,
     line_nr++;
 
     /* The two first line are comments 	*/
-    if (line_nr > 2) {
-      sts = tlog_line_add(
-          (pwr_tString132*)line, list, list_count, &alloc, line_nr);
+    if (line_nr > 2)
+    {
+      sts = tlog_line_add((pwr_tString132*)line, list, list_count, &alloc, line_nr);
       if (EVEN(sts))
         return sts;
     }
@@ -955,17 +1025,17 @@ static pwr_tStatus tlog_insert_file(char* filename, tlog_t_linelist** list,
 }
 
 /*************************************************************************
-*
-* Name:		tlog_qual_to_time()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Convert a commandline input time to pwr-time.
-*
-**************************************************************************/
+ *
+ * Name:		tlog_qual_to_time()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Convert a commandline input time to pwr-time.
+ *
+ **************************************************************************/
 
 static pwr_tStatus tlog_qual_to_time(char* in_str, pwr_tTime* time)
 {
@@ -976,17 +1046,18 @@ static pwr_tStatus tlog_qual_to_time(char* in_str, pwr_tTime* time)
   char str[64];
   char timstr[64];
 
-  if (!strcmp(in_str, "") || str_StartsWith(in_str, "TODAY")) {
+  if (!strcmp(in_str, "") || str_StartsWith(in_str, "TODAY"))
+  {
     time_GetTime(&current_time);
-    time_AtoAscii(
-        &current_time, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+    time_AtoAscii(&current_time, time_eFormat_DateAndTime, timstr, sizeof(timstr));
     timstr[12] = 0;
     strcat(timstr, " 00:00:00.00");
     sts = time_AsciiToA(timstr, time);
-  } else if (str_StartsWith(in_str, "YESTERDAY")) {
+  }
+  else if (str_StartsWith(in_str, "YESTERDAY"))
+  {
     time_GetTime(&current_time);
-    time_AtoAscii(
-        &current_time, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+    time_AtoAscii(&current_time, time_eFormat_DateAndTime, timstr, sizeof(timstr));
     timstr[12] = 0;
     strcat(timstr, " 00:00:00.00");
     sts = time_AsciiToA(timstr, &current_time);
@@ -994,18 +1065,22 @@ static pwr_tStatus tlog_qual_to_time(char* in_str, pwr_tTime* time)
     sts = time_AsciiToD(timstr, &one_day_time);
     time_Dneg(&one_day_time, &one_day_time);
     time_Aadd(time, &current_time, &one_day_time);
-  } else {
+  }
+  else
+  {
     strcpy(str, in_str);
-    if (s = strchr(str, '-')) {
+    if (s = strchr(str, '-'))
+    {
       /* Date is supplied, replace ':' to space */
       if (s = strchr(str, ':'))
         *s = ' ';
       strcpy(timstr, str);
-    } else {
+    }
+    else
+    {
       /* No date is supplied, add current date as default */
       time_GetTime(&current_time);
-      time_AtoAscii(
-          &current_time, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+      time_AtoAscii(&current_time, time_eFormat_DateAndTime, timstr, sizeof(timstr));
       timstr[12] = 0;
       strcat(timstr, " ");
       strcat(timstr, str);
@@ -1018,21 +1093,20 @@ static pwr_tStatus tlog_qual_to_time(char* in_str, pwr_tTime* time)
 }
 
 /*************************************************************************
-*
-* Name:		tlog_diff()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Examine the differens between the last and an old tlogfile.
-*
-**************************************************************************/
+ *
+ * Name:		tlog_diff()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Examine the differens between the last and an old tlogfile.
+ *
+ **************************************************************************/
 
-pwr_tStatus tlog_diff(char* filestr, char* output, char* timestr, int parallell,
-    int attribute, int text, int ttext, int noorder, int exact, char* since_str,
-    char* before_str)
+pwr_tStatus tlog_diff(char* filestr, char* output, char* timestr, int parallell, int attribute, int text,
+                      int ttext, int noorder, int exact, char* since_str, char* before_str)
 {
   char saved_filename[80];
   char filename[80];
@@ -1068,8 +1142,10 @@ pwr_tStatus tlog_diff(char* filestr, char* output, char* timestr, int parallell,
 
   diff_count = 0;
   first = 1;
-  for (;;) {
-    if (first) {
+  for (;;)
+  {
+    if (first)
+    {
       /* Get the first file */
       search_ctx = 0;
       sts = dir_search_file(&search_ctx, wild_filename, filename);
@@ -1077,36 +1153,44 @@ pwr_tStatus tlog_diff(char* filestr, char* output, char* timestr, int parallell,
         return sts;
 
       /* At least one file is found */
-      if (output != NULL) {
+      if (output != NULL)
+      {
         /* Open the output file */
         outfile = fopen(output, "w");
         if (!outfile)
           return TLOG__FILEOPEN;
-      } else
+      }
+      else
         outfile = 0;
 
-      if (timestr != NULL) {
+      if (timestr != NULL)
+      {
         /* Convert to float */
         nr = sscanf(timestr, "%f", &time);
         if (nr != 1)
           return TLOG__TIMESYNTAX;
-      } else
+      }
+      else
         time = 0.5;
 
-      if (before_str != NULL) {
+      if (before_str != NULL)
+      {
         sts = tlog_qual_to_time(before_str, &before_time);
         if (EVEN(sts))
           return TLOG__BEFOREQUAL;
       }
 
-      if (since_str != NULL) {
+      if (since_str != NULL)
+      {
         sts = tlog_qual_to_time(since_str, &since_time);
         if (EVEN(sts))
           return TLOG__SINCEQUAL;
       }
 
       first = 0;
-    } else {
+    }
+    else
+    {
       /* Get the next file */
       sts = dir_search_file(&search_ctx, wild_filename, filename);
       if (EVEN(sts))
@@ -1115,16 +1199,17 @@ pwr_tStatus tlog_diff(char* filestr, char* output, char* timestr, int parallell,
       /*	    fprintf( outfile, ""); */
     }
 
-    sts = dir_get_fileinfo(
-        filename, (pwr_tTime*)&file_time, &file_size, &file_version, NULL);
+    sts = dir_get_fileinfo(filename, (pwr_tTime*)&file_time, &file_size, &file_version, NULL);
     if (EVEN(sts))
       return sts;
 
-    if (since_str != NULL) {
+    if (since_str != NULL)
+    {
       if (time_Acomp(&file_time, &since_time) < 0)
         continue;
     }
-    if (before_str != NULL) {
+    if (before_str != NULL)
+    {
       if (time_Acomp(&file_time, &before_time) > 0)
         continue;
     }
@@ -1137,11 +1222,15 @@ pwr_tStatus tlog_diff(char* filestr, char* output, char* timestr, int parallell,
     /* Read the new file 	*/
     new_list_count = 0;
     sts = tlog_insert_file(filename, &new_list, &new_list_count, new_filename);
-    if (EVEN(sts)) {
-      if (outfile) {
+    if (EVEN(sts))
+    {
+      if (outfile)
+      {
         fprintf(outfile, "\n\n\nNew file: %s\n", new_filename);
         fprintf(outfile, "%%TLOG-E-NEWOPEN, Unable to open new file\n");
-      } else {
+      }
+      else
+      {
         printf("\n\n\nNew file: %s\n", new_filename);
         printf("%%TLOG-E-NEWOPEN, Unable to open new file\n");
       }
@@ -1154,13 +1243,16 @@ pwr_tStatus tlog_diff(char* filestr, char* output, char* timestr, int parallell,
 
     /* Read the old file 	*/
     old_list_count = 0;
-    sts = tlog_insert_file(
-        saved_filename, &old_list, &old_list_count, old_filename);
-    if (EVEN(sts)) {
-      if (outfile) {
+    sts = tlog_insert_file(saved_filename, &old_list, &old_list_count, old_filename);
+    if (EVEN(sts))
+    {
+      if (outfile)
+      {
         fprintf(outfile, "Old file: %s\n", old_filename);
         fprintf(outfile, "%%TLOG-E-OLDOPEN, Unable to open old file\n");
-      } else {
+      }
+      else
+      {
         printf("Old file: %s\n", old_filename);
         printf("%%TLOG-E-OLDOPEN, Unable to open old file\n");
       }
@@ -1213,17 +1305,17 @@ pwr_tStatus tlog_diff(char* filestr, char* output, char* timestr, int parallell,
 }
 
 /*************************************************************************
-*
-* Name:		tlog_save
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Save the tlog file in library
-*
-**************************************************************************/
+ *
+ * Name:		tlog_save
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Save the tlog file in library
+ *
+ **************************************************************************/
 
 int tlog_save(char* filestr)
 {
@@ -1244,8 +1336,10 @@ int tlog_save(char* filestr)
   tlog_get_defaultfilename(filestr, wild_filename, ".tlog", "pwrp_tlog:");
 
   first = 1;
-  for (;;) {
-    if (first) {
+  for (;;)
+  {
+    if (first)
+    {
       /* Get the first file */
       search_ctx = 0;
       sts = dir_search_file(&search_ctx, wild_filename, filename);
@@ -1253,7 +1347,9 @@ int tlog_save(char* filestr)
         return sts;
 
       first = 0;
-    } else {
+    }
+    else
+    {
       /* Get the next file */
       sts = dir_search_file(&search_ctx, wild_filename, filename);
       if (EVEN(sts))
@@ -1278,17 +1374,17 @@ int tlog_save(char* filestr)
 
 #ifdef TLOG_TEST
 /*************************************************************************
-*
-* Name:		main()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Main program of rs_tlog_diff.
-*
-**************************************************************************/
+ *
+ * Name:		main()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Main program of rs_tlog_diff.
+ *
+ **************************************************************************/
 
 main(int argc, char* argv[])
 {
@@ -1305,23 +1401,28 @@ main(int argc, char* argv[])
   int order = 0;
 
   /* Filename in first argument */
-  if (argc >= 2) {
+  if (argc >= 2)
+  {
     strcpy(filename, argv[1]);
-    if (argc >= 3) {
+    if (argc >= 3)
+    {
       strcpy(timestr, argv[2]);
       timestr_ptr = &timestr;
-      if (argc >= 4) {
+      if (argc >= 4)
+      {
         strcpy(outputname, argv[3]);
         output_ptr = &outputname;
-      } else
+      }
+      else
         output_ptr = NULL;
-    } else
+    }
+    else
       timestr_ptr = NULL;
-  } else
+  }
+  else
     printf("Usage: 'filename' 'output'\n");
 
-  sts = tlog_diff(filename, output_ptr, timestr_ptr, parallell, attribute, text,
-      ttext, order);
+  sts = tlog_diff(filename, output_ptr, timestr_ptr, parallell, attribute, text, ttext, order);
   exit(sts);
 }
 #endif

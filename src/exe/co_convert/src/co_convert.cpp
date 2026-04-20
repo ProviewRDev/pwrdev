@@ -34,7 +34,8 @@
  * General Public License plus this exception.
  */
 
-extern "C" {
+extern "C"
+{
 #include "co_dcli.h"
 #include "co_cdh.h"
 }
@@ -82,11 +83,11 @@ static void usage()
 static int convert_sort_files(const void* file1, const void* file2)
 {
   // Types before classes
-  if ((strstr((char*)file1, "_td_") || strstr((char*)file1, "_t_"))
-      && !(strstr((char*)file2, "_td_") || strstr((char*)file2, "_t_")))
+  if ((strstr((char*)file1, "_td_") || strstr((char*)file1, "_t_")) &&
+      !(strstr((char*)file2, "_td_") || strstr((char*)file2, "_t_")))
     return -1;
-  else if (!(strstr((char*)file1, "_td_") || strstr((char*)file1, "_t_"))
-      && (strstr((char*)file2, "_td_") || strstr((char*)file2, "_t_")))
+  else if (!(strstr((char*)file1, "_td_") || strstr((char*)file1, "_t_")) &&
+           (strstr((char*)file2, "_td_") || strstr((char*)file2, "_t_")))
     return 1;
   return (strcmp((char*)file1, (char*)file2));
 }
@@ -113,16 +114,20 @@ int main(int argc, char* argv[])
   int changelog_from_git = 0;
   char from[80] = "";
 
-  if (argc < 2 || argc > 9) {
+  if (argc < 2 || argc > 9)
+  {
     usage();
     exit(0);
   }
 
   ctx = new CnvCtx();
 
-  for (i = 1; i < argc; i++) {
-    if (streq(argv[i], "-d")) {
-      if (i + 1 >= argc) {
+  for (i = 1; i < argc; i++)
+  {
+    if (streq(argv[i], "-d"))
+    {
+      if (i + 1 >= argc)
+      {
         usage();
         exit(0);
       }
@@ -130,32 +135,45 @@ int main(int argc, char* argv[])
       i++;
       if (ctx->dir[strlen(ctx->dir) - 1] != '/')
         strcat(ctx->dir, "/");
-    } else if (streq(argv[i], "-g")) {
-      if (i + 1 >= argc) {
+    }
+    else if (streq(argv[i], "-g"))
+    {
+      if (i + 1 >= argc)
+      {
         usage();
         exit(0);
       }
       strncpy(ctx->setup_filename, argv[i + 1], sizeof(ctx->setup_filename));
       i++;
-    } else if (streq(argv[i], "-l")) {
-      if (i + 1 >= argc) {
+    }
+    else if (streq(argv[i], "-l"))
+    {
+      if (i + 1 >= argc)
+      {
         usage();
         exit(0);
       }
       Lng::set(argv[i + 1]);
       i++;
-    } else if (streq(argv[i], "-y")) {
-      if (i + 1 >= argc) {
+    }
+    else if (streq(argv[i], "-y"))
+    {
+      if (i + 1 >= argc)
+      {
         usage();
         exit(0);
       }
       strncpy(ctx->depend_filename, argv[i + 1], sizeof(ctx->depend_filename));
       i++;
-    } else if (argv[i][0] == '-') {
+    }
+    else if (argv[i][0] == '-')
+    {
       int next = 0;
       s = &argv[i][1];
-      while (*s) {
-        switch (*s) {
+      while (*s)
+      {
+        switch (*s)
+        {
         case 'h':
           usage();
           exit(0);
@@ -218,8 +236,10 @@ int main(int argc, char* argv[])
         case 'i':
           changelog_from_git = 1;
           break;
-        case '-': {
-          if (streq(s, "-from") && (i + 1 < argc)) {
+        case '-':
+        {
+          if (streq(s, "-from") && (i + 1 < argc))
+          {
             strcpy(from, argv[i + 1]);
             next = 1;
             i++;
@@ -234,25 +254,30 @@ int main(int argc, char* argv[])
           break;
         s++;
       }
-    } else
+    }
+    else
       strcpy(files, argv[i]);
   }
 
   ctx->setup = new CnvSetup();
-  if (!streq(ctx->setup_filename, "")) {
+  if (!streq(ctx->setup_filename, ""))
+  {
     ctx->setup->setup(ctx->setup_filename);
   }
 
-  if (changelog) {
+  if (changelog)
+  {
     CnvChangeLog* c = new CnvChangeLog(ctx, from);
     delete c;
     exit(0);
   }
-  if (changelog_from_git) {
+  if (changelog_from_git)
+  {
     CnvChangeLog::from_git();
     exit(0);
   }
-  if (xtthelp_to_html) {
+  if (xtthelp_to_html)
+  {
     CnvXtthelpToHtml* xtthelpto = new CnvXtthelpToHtml(ctx);
     ctx->rx = new CnvReadXtthelp(files, ctx->dir, xtthelpto);
     ctx->rx->read_xtthelp();
@@ -260,7 +285,8 @@ int main(int argc, char* argv[])
     delete xtthelpto;
     exit(0);
   }
-  if (xtthelp_to_xml) {
+  if (xtthelp_to_xml)
+  {
     CnvXtthelpToXml* xtthelpto = new CnvXtthelpToXml(ctx);
     ctx->rx = new CnvReadXtthelp(files, ctx->dir, xtthelpto);
     ctx->rx->read_xtthelp();
@@ -268,7 +294,8 @@ int main(int argc, char* argv[])
     delete xtthelpto;
     exit(0);
   }
-  if (xtthelp_to_ps) {
+  if (xtthelp_to_ps)
+  {
     CnvXtthelpToPs* xtthelpto = new CnvXtthelpToPs(ctx);
     ctx->rx = new CnvReadXtthelp(files, ctx->dir, xtthelpto);
     ctx->rx->read_xtthelp();
@@ -276,7 +303,8 @@ int main(int argc, char* argv[])
     delete xtthelpto;
     exit(0);
   }
-  if (xtthelp_to_text) {
+  if (xtthelp_to_text)
+  {
     CnvXtthelpToText* xtthelpto = new CnvXtthelpToText(ctx);
     ctx->rx = new CnvReadXtthelp(files, ctx->dir, xtthelpto);
     ctx->rx->read_xtthelp();
@@ -284,13 +312,15 @@ int main(int argc, char* argv[])
     delete xtthelpto;
     exit(0);
   }
-  if (ctx->generate_cdp) {
+  if (ctx->generate_cdp)
+  {
     CnvClassDep* classdep = new CnvClassDep(ctx);
     classdep->read();
     delete classdep;
     exit(0);
   }
-  if (pwg_to_xtthelp) {
+  if (pwg_to_xtthelp)
+  {
     CnvPwgToXtthelp* pwgto = new CnvPwgToXtthelp(ctx);
     delete pwgto;
     exit(0);
@@ -300,13 +330,18 @@ int main(int argc, char* argv[])
   file_cnt = 0;
   allocated = 0;
   sts = dcli_search_file(files, found_file, DCLI_DIR_SEARCH_INIT);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     file_cnt++;
-    if (file_cnt > allocated) {
-      if (allocated == 0) {
+    if (file_cnt > allocated)
+    {
+      if (allocated == 0)
+      {
         allocated = 100;
         file_p = (cnv_tName*)malloc(allocated * sizeof(*file_p));
-      } else {
+      }
+      else
+      {
         old_file_p = file_p;
         old_allocated = allocated;
         allocated += 100;
@@ -320,7 +355,8 @@ int main(int argc, char* argv[])
   }
   dcli_search_file(files, found_file, DCLI_DIR_SEARCH_END);
 
-  if (file_cnt == 0) {
+  if (file_cnt == 0)
+  {
     printf("No files found\n");
     exit(0);
   }
@@ -328,9 +364,12 @@ int main(int argc, char* argv[])
   qsort(file_p, file_cnt, sizeof(*file_p), convert_sort_files);
 
   CnvReadSrc* sr = 0;
-  if (ctx->generate_src) {
+  if (ctx->generate_src)
+  {
     sr = new CnvReadSrc(ctx);
-  } else {
+  }
+  else
+  {
     if (ctx->generate_html)
       ctx->wblto = new CnvWblToHtml(ctx);
     else if (ctx->generate_struct)
@@ -343,16 +382,22 @@ int main(int argc, char* argv[])
     ctx->rw = new CnvReadWbl(ctx, ctx->wblto);
   }
 
-  if (ctx->wblto && ctx->wblto->confpass()) {
+  if (ctx->wblto && ctx->wblto->confpass())
+  {
     ctx->wblto->set_confpass(true);
-    for (i = 0; i < file_cnt; i++) {
+    for (i = 0; i < file_cnt; i++)
+    {
       if (ctx->verbose)
         printf("Configure file %s\n", file_p[i]);
-      if (ctx->generate_src) {
+      if (ctx->generate_src)
+      {
         sr->read_src(file_p[i]);
-      } else {
+      }
+      else
+      {
         sts = ctx->rw->read_wbl(file_p[i]);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           exit_sts = sts;
           break;
         }
@@ -361,14 +406,19 @@ int main(int argc, char* argv[])
     ctx->wblto->set_confpass(false);
     ctx->first_class = 1;
   }
-  for (i = 0; i < file_cnt; i++) {
+  for (i = 0; i < file_cnt; i++)
+  {
     if (ctx->verbose)
       printf("Processing file %s\n", file_p[i]);
-    if (ctx->generate_src) {
+    if (ctx->generate_src)
+    {
       sr->read_src(file_p[i]);
-    } else {
+    }
+    else
+    {
       sts = ctx->rw->read_wbl(file_p[i]);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         exit_sts = sts;
         break;
       }

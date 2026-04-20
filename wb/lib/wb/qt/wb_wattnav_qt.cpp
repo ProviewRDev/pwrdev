@@ -44,15 +44,13 @@
 #include "wb_utility.h"
 #include "wb_wattnav_qt.h"
 
-WAttNavQt::WAttNavQt(void* wa_parent_ctx, wattnav_eType wa_type,
-    const char* wa_name, ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref,
-    int wa_editmode, int wa_advanced_user, int wa_display_objectname,
-    wb_eUtility wa_utility, QWidget** w, pwr_tStatus* status)
-    : WAttNav(wa_parent_ctx, wa_type, wa_name, wa_ldhses, wa_aref, wa_editmode,
-          wa_advanced_user, wa_display_objectname, wa_utility, status)
+WAttNavQt::WAttNavQt(void* wa_parent_ctx, wattnav_eType wa_type, const char* wa_name,
+                     ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref, int wa_editmode, int wa_advanced_user,
+                     int wa_display_objectname, wb_eUtility wa_utility, QWidget** w, pwr_tStatus* status)
+    : WAttNav(wa_parent_ctx, wa_type, wa_name, wa_ldhses, wa_aref, wa_editmode, wa_advanced_user,
+              wa_display_objectname, wa_utility, status)
 {
-  form_widget
-      = scrolledbrowwidgetqt_new(WAttNav::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetqt_new(WAttNav::init_brow_cb, this, &brow_widget);
 
   *w = form_widget;
   *status = 1;
@@ -67,7 +65,8 @@ WAttNavQt::~WAttNavQt()
 pwr_tStatus WAttNavQt::get_selection(char* str, int size)
 {
   pwr_tStatus sts = CoWowQt::GetSelection(str, size, "PWR_OBJID");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     sts = CoWowQt::GetSelection(str, size, "STRING");
   }
   return sts;
@@ -75,7 +74,8 @@ pwr_tStatus WAttNavQt::get_selection(char* str, int size)
 
 void WAttNavQt::set_inputfocus()
 {
-  if (!displayed) {
+  if (!displayed)
+  {
     return;
   }
   brow_widget->setFocus();

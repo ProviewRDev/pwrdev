@@ -37,6 +37,8 @@
 #ifndef glow_rect_h
 #define glow_rect_h
 
+#include <iosfwd>
+
 #include "glow_growctx.h"
 
 /*! \file glow_rect.h
@@ -50,7 +52,8 @@
   GlowCon for drawing reference connections.
 */
 
-class GlowRect : public GlowArrayElem {
+class GlowRect : public GlowArrayElem
+{
 public:
   //! Constuctor
   /*!
@@ -65,13 +68,13 @@ public:
     \param display_lev	Displaylevel when this object is visible.
     \param fill_rect	Rectangle is filled.
   */
-  GlowRect(GrowCtx* glow_ctx, double x = 0, double y = 0, double w = 0,
-      double h = 0, glow_eDrawType d_type = glow_eDrawType_Line, int line_w = 1,
-      int fix_line_w = 0, glow_mDisplayLevel display_lev = glow_mDisplayLevel_1,
-      int fill_rect = 0)
-      : GlowArrayElem(glow_ctx), ll(glow_ctx, x, y), ur(glow_ctx, x + w, y + h),
-        draw_type(d_type), line_width(line_w), fix_line_width(fix_line_w),
-        display_level(display_lev), fill(fill_rect){}
+  GlowRect(GrowCtx* glow_ctx, double x = 0, double y = 0, double w = 0, double h = 0,
+           glow_eDrawType d_type = glow_eDrawType_Line, int line_w = 1, int fix_line_w = 0,
+           glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int fill_rect = 0)
+      : GlowArrayElem(glow_ctx), ll(glow_ctx, x, y), ur(glow_ctx, x + w, y + h), draw_type(d_type),
+        line_width(line_w), fix_line_width(fix_line_w), display_level(display_lev), fill(fill_rect)
+  {
+  }
 
   //! Adjust pixel coordinates to current zoom factor.
   void zoom();
@@ -79,7 +82,7 @@ public:
   //! Adjust pixel coordinates for navigaion window to current zoom factor.
   void nav_zoom();
 
-  void print_zoom(); //!< Not used
+  void print_zoom();           //!< Not used
   void traverse(int x, int y); //!< Not used
 
   //! Event handler
@@ -93,24 +96,23 @@ public:
 
     Detects if the object is hit by the event.
   */
-  int event_handler(
-      GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
+  int event_handler(GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
 
   //! Not implemented
-  void conpoint_select(void* pos, int x, int y, double* distance, void** cp){}
+  void conpoint_select(void* pos, int x, int y, double* distance, void** cp) {}
 
   //! Save the content of the object to file.
   /*!
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Draw the object.
   /*!
@@ -146,8 +148,8 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left,
-      double* y_high, double* y_low, void* node);
+  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,
+                   void* node);
 
   //! Move the rectangle to the specified coordinates.
   /*!
@@ -168,65 +170,46 @@ public:
     \param hot		Draw as hot, with larger line width.
   */
   void shift(void* pos, double delta_x, double delta_y, int highlight, int hot);
-  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir)
-  {
-    return 0;
-  }
+  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir) { return 0; }
   //! Get the object type
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_Rect;
-  }
+  glow_eObjectType type() { return glow_eObjectType_Rect; }
 
   //! Get the width.
   /*!
     \return The width of the rectangle.
   */
-  double width()
-  {
-    return ur.x - ll.x;
-  }
+  double width() { return ur.x - ll.x; }
 
   //! Get the height.
   /*!
     \return The height of the rectangle.
   */
-  double height()
-  {
-    return ur.y - ll.y;
-  }
+  double height() { return ur.y - ll.y; }
 
   //! Set the linewidth.
   /*!
     \param linewidth	Linewidth in range 0 to 8. 0 gives a linewidth of 1
     pixel at original zoom. 1 -> 2 pixel etc.
   */
-  void set_linewidth(int linewidth)
-  {
-    line_width = linewidth;
-  }
+  void set_linewidth(int linewidth) { line_width = linewidth; }
 
   //! Set fill.
   /*!
     \param fillval	If 1 the object will be draw with fill, if 0 the object
     will be drawn without fill.
   */
-  void set_fill(int fillval)
-  {
-    fill = fillval;
-  }
+  void set_fill(int fillval) { fill = fillval; }
 
-  GlowPoint ll; //!< Lower left point of rectangle.
-  GlowPoint ur; //!< Upper right point of rectangle.
-  glow_eDrawType draw_type; //!< Border color.
-  int line_width; //!< Line width.
-  int fix_line_width; //!< Linewidth is independent of zoom factor.
-  glow_mDisplayLevel
-      display_level; //!< Displaylevel when the objects is visible.
-  int fill; //!< The rectangle is filled.
+  GlowPoint ll;                     //!< Lower left point of rectangle.
+  GlowPoint ur;                     //!< Upper right point of rectangle.
+  glow_eDrawType draw_type;         //!< Border color.
+  int line_width;                   //!< Line width.
+  int fix_line_width;               //!< Linewidth is independent of zoom factor.
+  glow_mDisplayLevel display_level; //!< Displaylevel when the objects is visible.
+  int fill;                         //!< The rectangle is filled.
 };
 
 /*@}*/

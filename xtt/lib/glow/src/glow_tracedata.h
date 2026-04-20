@@ -43,7 +43,8 @@
 typedef pwr_mAccess glow_mAccess;
 #define glow_mAccess_RtDefault pwr_mAccess_RtDefault
 
-class GlowTraceData {
+class GlowTraceData
+{
 public:
   GlowTraceData();
 

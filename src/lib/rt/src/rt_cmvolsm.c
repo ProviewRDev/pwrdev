@@ -60,8 +60,7 @@ void cmvolsm_GetCclass(qcom_sGet* get)
   gdb_sObject* cop;
   int i;
   pwr_tBoolean equal = FALSE;
-  const int maxacnt
-      = ((net_cSizeLarge - sizeof(*rmp)) / sizeof(rmp->attr[0])) + 1;
+  const int maxacnt = ((net_cSizeLarge - sizeof(*rmp)) / sizeof(rmp->attr[0])) + 1;
   int maxaidx = 0;
   int acnt = 0;
   pwr_tTime mp_time;
@@ -76,19 +75,22 @@ void cmvolsm_GetCclass(qcom_sGet* get)
 
     cop = pool_Address(NULL, gdbroot->pool, cp->cor);
     mp_time = net_NetTimeToTime(&mp->time);
-    if (time_Acomp(&mp_time, &cop->u.n.time) == 0) {
+    if (time_Acomp(&mp_time, &cop->u.n.time) == 0)
+    {
       equal = TRUE;
       size = sizeof(*rmp);
-    } else {
+    }
+    else
+    {
       acnt = MIN(maxacnt, cp->acount - mp->aidx);
       maxaidx = acnt + mp->aidx;
       size = sizeof(*rmp) + MAX(0, (acnt - 1)) * sizeof(rmp->attr[0]);
     }
 
     rmp = net_Alloc(&sts, &put, size, net_eMsg_getCclassR);
-    if (rmp == NULL) {
-      errh_Error("cmvolsm_GetCclass. net_Alloc, size %d, cid %d, error %m",
-          size, mp->cid, sts);
+    if (rmp == NULL)
+    {
+      errh_Error("cmvolsm_GetCclass. net_Alloc, size %d, cid %d, error %m", size, mp->cid, sts);
       break;
     }
 
@@ -96,7 +98,8 @@ void cmvolsm_GetCclass(qcom_sGet* get)
     rmp->sts = 1;
     rmp->equal = equal;
 
-    if (equal) {
+    if (equal)
+    {
       rmp->acntmsg = 0;
       rmp->cclass.size = 0;
       rmp->cclass.acount = 0;
@@ -109,8 +112,8 @@ void cmvolsm_GetCclass(qcom_sGet* get)
     rmp->cclass.size = cp->size;
     rmp->cclass.acount = cp->acount;
 
-    for (i = mp->aidx, ap = &cp->attr[mp->aidx], cap = rmp->attr; i < maxaidx;
-         i++, ap++, cap++) {
+    for (i = mp->aidx, ap = &cp->attr[mp->aidx], cap = rmp->attr; i < maxaidx; i++, ap++, cap++)
+    {
       cap->aix = ap->aix;
       cap->flags = ap->flags;
       cap->type = ap->type;
@@ -126,11 +129,12 @@ void cmvolsm_GetCclass(qcom_sGet* get)
   }
   gdb_ScopeUnlock;
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rmp = net_Alloc(&lsts, &put, sizeof(*rmp), net_eMsg_getCclassR);
-    if (EVEN(lsts)) {
-      errh_Error("cmvolsm_GetCclass. net_Alloc, size %d, cid %d, error %m",
-          sizeof(*rmp), mp->cid, lsts);
+    if (EVEN(lsts))
+    {
+      errh_Error("cmvolsm_GetCclass. net_Alloc, size %d, cid %d, error %m", sizeof(*rmp), mp->cid, lsts);
       return;
     }
     rmp->ver = net_cVersion;
@@ -165,8 +169,7 @@ void cmvolsm_GetGclass(qcom_sGet* get)
   gdb_sObject* bop;
   gdb_sObject* aop;
   int i;
-  const int maxacnt
-      = ((net_cSizeLarge - sizeof(*rmp)) / sizeof(rmp->attr[0])) + 1;
+  const int maxacnt = ((net_cSizeLarge - sizeof(*rmp)) / sizeof(rmp->attr[0])) + 1;
   int maxaidx;
   int acnt;
 
@@ -189,9 +192,9 @@ void cmvolsm_GetGclass(qcom_sGet* get)
     size = sizeof(*rmp) + MAX(0, (acnt - 1)) * sizeof(rmp->attr[0]);
 
     rmp = net_Alloc(&sts, &put, size, net_eMsg_getGclassR);
-    if (rmp == NULL) {
-      errh_Error("cvolsm_GetGclass. net_Alloc, size %d, cid %d, error %m", size,
-          mp->cid, sts);
+    if (rmp == NULL)
+    {
+      errh_Error("cvolsm_GetGclass. net_Alloc, size %d, cid %d, error %m", size, mp->cid, sts);
       break;
     }
     rmp->ver = net_cVersion;
@@ -201,7 +204,8 @@ void cmvolsm_GetGclass(qcom_sGet* get)
     rmp->gclass.co = cop->g;
     rmp->gclass.dbsFlags = cop->u.n.lflags.m;
 
-    if (mp->aidx == 0) {
+    if (mp->aidx == 0)
+    {
       cbp = pool_Address(&sts, gdbroot->rtdb, cp->cbr);
       if (cbp == NULL)
         break;
@@ -229,8 +233,8 @@ void cmvolsm_GetGclass(qcom_sGet* get)
     rmp->gclass.size = cp->size;
     rmp->gclass.acount = cp->acount;
 
-    for (i = mp->aidx, ap = &cp->attr[mp->aidx], gap = rmp->attr; i < maxaidx;
-         i++, ap++, gap++) {
+    for (i = mp->aidx, ap = &cp->attr[mp->aidx], gap = rmp->attr; i < maxaidx; i++, ap++, gap++)
+    {
       aop = pool_Address(&sts, gdbroot->pool, ap->aor);
       if (aop == NULL)
         break;
@@ -255,14 +259,15 @@ void cmvolsm_GetGclass(qcom_sGet* get)
   }
   gdb_ScopeUnlock;
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     if (rmp != NULL)
       net_Free(NULL, rmp);
 
     rmp = net_Alloc(&lsts, &put, sizeof(*rmp), net_eMsg_getGclassR);
-    if (EVEN(lsts)) {
-      errh_Error("cmvolsm_GetGclass. net_Alloc, size %d, cid %d, error %m",
-          sizeof(*rmp), mp->cid, lsts);
+    if (EVEN(lsts))
+    {
+      errh_Error("cmvolsm_GetGclass. net_Alloc, size %d, cid %d, error %m", sizeof(*rmp), mp->cid, lsts);
       return;
     }
     rmp->ver = net_cVersion;

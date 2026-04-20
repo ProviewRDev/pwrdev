@@ -37,7 +37,8 @@
 #ifndef rt_io_hilscher_cifx_h
 #define rt_io_hilscher_cifx_h
 
-typedef struct {
+typedef struct
+{
   unsigned long channel;
   unsigned long board;
   CIFXHANDLE chan;
@@ -53,12 +54,14 @@ typedef struct {
   void* output_area;
 } io_sLocalHilscher_cifX_Master;
 
-typedef struct {
+typedef struct
+{
   int byte_ordering;
   int float_representation;
 } io_sLocalHilscher_cifX_Device;
 
-typedef struct {
+typedef struct
+{
   unsigned long channel;
   unsigned long board;
   CIFXHANDLE chan;

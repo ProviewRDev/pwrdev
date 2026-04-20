@@ -48,10 +48,10 @@
 
 class RtMonQtWidget;
 
-class RtMonQt : public RtMon {
+class RtMonQt : public RtMon
+{
 public:
-  RtMonQt(void* rtmon_parent_ctx, const char* rtmon_name,
-      const char* rtmon_display, pwr_tStatus* status);
+  RtMonQt(void* rtmon_parent_ctx, const char* rtmon_name, const char* rtmon_display, pwr_tStatus* status);
   ~RtMonQt();
 
   QWidget* nodelistnav_widget;
@@ -61,7 +61,7 @@ public:
   QWidget* bbox_stop;
   QLabel* bbox_image;
   QLabel* bbox_image_gray;
-  QHBoxLayout *bbox_vbox;
+  QHBoxLayout* bbox_vbox;
   QAction* tools_xtt;
   QAction* tools_op;
   QAction* file_xtt;
@@ -72,14 +72,14 @@ public:
   void pop();
   void set_clock_cursor();
   void reset_cursor();
-  void open_input_dialog(
-      char* text, char* title, char* init_text, void (*ok_cb)(RtMon*, char*));
+  void open_input_dialog(char* text, char* title, char* init_text, void (*ok_cb)(RtMon*, char*));
 
 private:
   RtMonQtWidget* toplevel;
 };
 
-class RtMonQtWidget : public QWidget {
+class RtMonQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

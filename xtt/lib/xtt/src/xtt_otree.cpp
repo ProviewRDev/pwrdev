@@ -40,9 +40,8 @@
 
 /* xtt_otree.h -- Object tree viewer */
 
-XttOTree::XttOTree(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist,
-    int xn_item_cnt, unsigned int xn_options,
-    pwr_tStatus (*xn_action_cb)(void*, pwr_tAttrRef*))
+XttOTree::XttOTree(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist, int xn_item_cnt, unsigned int xn_options,
+                   pwr_tStatus (*xn_action_cb)(void*, pwr_tAttrRef*))
     : parent_ctx(xn_parent_ctx), close_cb(0)
 {
   action_cb = xn_action_cb;
@@ -50,13 +49,10 @@ XttOTree::XttOTree(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist,
   // get_object_info, get_node_info);
 }
 
-void XttOTree::pop()
-{
-  cowtree->pop();
-}
+void XttOTree::pop() { cowtree->pop(); }
 
-pwr_tStatus XttOTree::get_object_info(void* ctx, pwr_tAttrRef* aref, char* name,
-    int nsize, char* cname, char* descr, int dsize)
+pwr_tStatus XttOTree::get_object_info(void* ctx, pwr_tAttrRef* aref, char* name, int nsize, char* cname,
+                                      char* descr, int dsize)
 {
   pwr_tStatus sts;
   pwr_tAttrRef daref;
@@ -70,13 +66,13 @@ pwr_tStatus XttOTree::get_object_info(void* ctx, pwr_tAttrRef* aref, char* name,
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_ObjidToName(
-      cdh_ClassIdToObjid(cid), cname, sizeof(pwr_tObjName), cdh_mName_object);
+  sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid), cname, sizeof(pwr_tObjName), cdh_mName_object);
   if (EVEN(sts))
     return sts;
 
   sts = gdh_ArefANameToAref(aref, "Description", &daref);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_GetObjectInfoAttrref(&daref, descr, dsize);
   }
   if (EVEN(sts))
@@ -85,8 +81,7 @@ pwr_tStatus XttOTree::get_object_info(void* ctx, pwr_tAttrRef* aref, char* name,
   return 1;
 }
 
-pwr_tStatus XttOTree::get_node_info(
-    void* ctx, char* name, char* descr, int dsize)
+pwr_tStatus XttOTree::get_node_info(void* ctx, char* name, char* descr, int dsize)
 {
   pwr_tStatus sts;
   pwr_tAName dname;
@@ -118,6 +113,4 @@ void XttOTree::close(void* ctx)
     delete otree;
 }
 
-XttOTree::~XttOTree()
-{
-}
+XttOTree::~XttOTree() {}

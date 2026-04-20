@@ -37,6 +37,8 @@
 #ifndef glow_growannot_h
 #define glow_growannot_h
 
+#include <iosfwd>
+
 #include "glow_annot.h"
 #include "glow_text.h"
 
@@ -55,7 +57,8 @@
   When the
   object is saved as a subgraps in a pwsg-file only the GlowAnnot part is saved.
 */
-class GrowAnnot : public GlowAnnot {
+class GrowAnnot : public GlowAnnot
+{
 public:
   //! Constuctor
   /*!
@@ -72,13 +75,14 @@ public:
     \param nodraw	Don't draw the object now.
   */
   GrowAnnot(GrowCtx* glow_ctx, double x = 0, double y = 0, int annot_num = 0,
-      glow_eDrawType d_type = glow_eDrawType_TextHelveticaBold,
-      glow_eDrawType color_d_type = glow_eDrawType_Line, int t_size = 2,
-      glow_eAnnotType a_type = glow_eAnnotType_OneLine, int rel_pos = 0,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int nodraw = 0)
-      : GlowAnnot(glow_ctx, x, y, annot_num, d_type, color_d_type, t_size,
-            a_type, rel_pos, display_lev),
-        temporary_scale(0), adjustment(glow_eAdjustment_Left){}
+            glow_eDrawType d_type = glow_eDrawType_TextHelveticaBold,
+            glow_eDrawType color_d_type = glow_eDrawType_Line, int t_size = 2,
+            glow_eAnnotType a_type = glow_eAnnotType_OneLine, int rel_pos = 0,
+            glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int nodraw = 0)
+      : GlowAnnot(glow_ctx, x, y, annot_num, d_type, color_d_type, t_size, a_type, rel_pos, display_lev),
+        temporary_scale(0), adjustment(glow_eAdjustment_Left)
+  {
+  }
 
   //! Save the content of the object to file.
   /*!
@@ -88,25 +92,22 @@ public:
     If the mode is glow_eSaveMode_Subgraph only the GlowAnnot part of the
     annoation is saved.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Get the object type
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowAnnot;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowAnnot; }
 
-  GlowTransform trf; //!< Transformation matrix of object.
-  int temporary_scale; //!< Not used.
+  GlowTransform trf;           //!< Transformation matrix of object.
+  int temporary_scale;         //!< Not used.
   glow_eAdjustment adjustment; //!< Text adjustment.
 
   //! Draw the object.
@@ -123,8 +124,8 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Redraw the background of the annotation
   /*!
@@ -145,8 +146,7 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(GlowTransform* t, double* x_right, double* x_left,
-      double* y_high, double* y_low);
+  void get_borders(GlowTransform* t, double* x_right, double* x_left, double* y_high, double* y_low);
 
   //! Export the object as java code.
   /*!
@@ -164,8 +164,8 @@ public:
     used to generate
     java code for the shape.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ostream& fp);
 
   //! Export the font as java code.
   /*!
@@ -176,8 +176,7 @@ public:
 
     GlowExortJBean is used to generate code for the font.
   */
-  void export_javabean_font(
-      GlowTransform* t, void* node, glow_eExportPass pass, std::ofstream& fp);
+  void export_javabean_font(GlowTransform* t, void* node, glow_eExportPass pass, std::ostream& fp);
 
   //! Conversion between different versions of Glow
   /*!
@@ -192,12 +191,11 @@ public:
     \param t_drawtype Annotation text drawtype.
     \param t_color	Annotation text color.
   */
-  void get_annotation_info(void* node, int* t_size, glow_eDrawType* t_drawtype,
-      glow_eDrawType* t_color, glow_eFont* font, glow_eAnnotType* t_type);
+  void get_annotation_info(void* node, int* t_size, glow_eDrawType* t_drawtype, glow_eDrawType* t_color,
+                           glow_eFont* font, glow_eAnnotType* t_type);
 
   int get_text_size(GlowTransform* t, double* tsize);
-  void get_text_extent(
-      GlowTransform* t, void* node, double* width, double* height);
+  void get_text_extent(GlowTransform* t, void* node, double* width, double* height);
 };
 
 /*@}*/

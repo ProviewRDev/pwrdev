@@ -46,8 +46,7 @@
 #include "wb_session.h"
 #include "wb_wsx.h"
 
-static pwr_tStatus PostCreate(
-    ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
 {
   pwr_tStatus sts;
   pwr_tObjName name;
@@ -55,21 +54,19 @@ static pwr_tStatus PostCreate(
   pwr_tBoolean bvalue = 1;
   int size;
 
-  sts = ldh_ObjidToName(
-      Session, Object, ldh_eName_Object, name, sizeof(name), &size);
+  sts = ldh_ObjidToName(Session, Object, ldh_eName_Object, name, sizeof(name), &size);
   if (EVEN(sts))
     return sts;
 
-  if (streq(name, "OpDefault")) {
+  if (streq(name, "OpDefault"))
+  {
     // Set OpHide in OpWindLayout
 
-    sts = ldh_SetObjectPar(Session, Object, "RtBody", "OpWindLayout",
-        (char*)&value, sizeof(value));
+    sts = ldh_SetObjectPar(Session, Object, "RtBody", "OpWindLayout", (char*)&value, sizeof(value));
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_SetObjectPar(Session, Object, "RtBody", "IsDefaultOp",
-        (char*)&value, sizeof(bvalue));
+    sts = ldh_SetObjectPar(Session, Object, "RtBody", "IsDefaultOp", (char*)&value, sizeof(bvalue));
     if (EVEN(sts))
       return sts;
   }
@@ -80,8 +77,8 @@ static pwr_tStatus PostCreate(
 //
 // SyntaxCheck
 //
-static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
-    int* ErrorCount, int* WarningCount)
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, int* ErrorCount,
+                               int* WarningCount)
 {
   wb_session* sp = (wb_session*)Session;
   pwr_tString80 selectlist[40];
@@ -101,16 +98,16 @@ static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
     return selectlist_a.sts();
 
   bool empty = true;
-  for (unsigned int i = 0; i < sizeof(selectlist) / sizeof(selectlist[0]);
-       i++) {
-    if (!streq(selectlist[i], "")) {
+  for (unsigned int i = 0; i < sizeof(selectlist) / sizeof(selectlist[0]); i++)
+  {
+    if (!streq(selectlist[i], ""))
+    {
       empty = false;
       break;
     }
   }
   if (empty)
-    wsx_error_msg_str(Session, "EventSelectList is empty", Object, 'W',
-        ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "EventSelectList is empty", Object, 'W', ErrorCount, WarningCount);
 
   // Check UserName
   wb_attribute username_a(a, 0, "UserName");
@@ -122,11 +119,10 @@ static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
     return username_a.sts();
 
   if (streq(username, ""))
-    wsx_error_msg_str(
-        Session, "UserName is empty", Object, 'W', ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "UserName is empty", Object, 'W', ErrorCount, WarningCount);
 
   return PWRB__SUCCESS;
 }
 
-pwr_dExport pwr_BindMethods(OpPlace) = { pwr_BindMethod(PostCreate),
-  pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(OpPlace) = {pwr_BindMethod(PostCreate), pwr_BindMethod(SyntaxCheck),
+                                        pwr_NullMethod};

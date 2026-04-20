@@ -77,8 +77,7 @@ void WCrrGtk::activate_help(GtkWidget* w, gpointer data)
   // Not yet implemented
 }
 
-gboolean WCrrGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean WCrrGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   WCrrGtk* xcrr = (WCrrGtk*)data;
 
@@ -92,10 +91,7 @@ gboolean WCrrGtk::action_inputfocus(
   return FALSE;
 }
 
-void WCrrGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void WCrrGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
 void WCrrGtk::print()
 {
@@ -110,8 +106,8 @@ void WCrrGtk::print()
 
   strncpy(title, namep, sizeof(title));
 
-  CoWowGtk::CreateBrowPrintDialogGtk(title, xcrrnav->brow->ctx,
-      flow_eOrientation_Portrait, 1.0, (void*)toplevel, &sts);
+  CoWowGtk::CreateBrowPrintDialogGtk(title, xcrrnav->brow->ctx, flow_eOrientation_Portrait, 1.0,
+                                     (void*)toplevel, &sts);
 }
 
 WCrrGtk::~WCrrGtk()
@@ -132,15 +128,11 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
   return FALSE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-WCrrGtk::WCrrGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
-    ldh_tSesContext xa_ldhses, pwr_sAttrRef* xa_objar, int xa_advanced_user,
-    int* xa_sts)
-    : WCrr(xa_parent_ctx, xa_ldhses, xa_objar, xa_advanced_user, xa_sts),
-      parent_wid(xa_parent_wid)
+WCrrGtk::WCrrGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx, ldh_tSesContext xa_ldhses,
+                 pwr_sAttrRef* xa_objar, int xa_advanced_user, int* xa_sts)
+    : WCrr(xa_parent_ctx, xa_ldhses, xa_objar, xa_advanced_user, xa_sts), parent_wid(xa_parent_wid)
 {
   int sts;
   char* namep;
@@ -153,13 +145,12 @@ WCrrGtk::WCrrGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
 
   strncpy(title, namep, sizeof(title));
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 420,
-      "default-width", 600, "title", CoWowGtk::convert_utf8(title), NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 420, "default-width", 600, "title",
+                                      CoWowGtk::convert_utf8(title), NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(
-      toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
@@ -167,8 +158,7 @@ WCrrGtk::WCrrGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
 
   // Menu
   // Accelerators
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
@@ -179,51 +169,45 @@ WCrrGtk::WCrrGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
 
   GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_print);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
 
-  GtkWidget* file
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
+  GtkWidget* file = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // Functions entry
-  GtkWidget* functions_open_plc = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Open _Program"));
-  g_signal_connect(
-      functions_open_plc, "activate", G_CALLBACK(activate_openplc), this);
-  gtk_widget_add_accelerator(functions_open_plc, "activate", accel_g, 'l',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  GtkWidget* functions_open_plc = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Open _Program"));
+  g_signal_connect(functions_open_plc, "activate", G_CALLBACK(activate_openplc), this);
+  gtk_widget_add_accelerator(functions_open_plc, "activate", accel_g, 'l', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* func_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(func_menu), functions_open_plc);
 
-  GtkWidget* functions
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Functions"));
+  GtkWidget* functions = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Functions"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), functions);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(func_menu));
 
   // Help entry
   GtkWidget* help_help = gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
-  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
 
-  GtkWidget* help
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+  GtkWidget* help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
-  xcrrnav = new WAttNavGtk((void*)this, wattnav_eType_CrossRef, vbox, "Plant",
-      xa_ldhses, objar, 0, xa_advanced_user, 1, wb_eUtility_AttributeEditor,
-      &brow_widget, &sts);
+  xcrrnav = new WAttNavGtk((void*)this, wattnav_eType_CrossRef, vbox, "Plant", xa_ldhses, objar, 0,
+                           xa_advanced_user, 1, wb_eUtility_AttributeEditor, &brow_widget, &sts);
   // xcrrnav->popup_menu_cb = &xcrr_popup_menu_cb;
   // xcrrnav->start_trace_cb = &xcrr_start_trace_cb;
   // xcrrnav->close_cb = &xcrr_close_cb;

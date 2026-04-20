@@ -44,7 +44,8 @@
 #define wpkgnav_cVersion "X3.3b"
 #define WPKGNAV_BROW_MAX 25
 
-typedef enum {
+typedef enum
+{
   wpkg_mDisplayMode__ = 0,
   wpkg_mDisplayMode_FileOrderTime = 1 << 0,
   wpkg_mDisplayMode_FileDiff = 1 << 1,
@@ -54,10 +55,10 @@ typedef enum {
 class WItemPkg;
 class WItemPkgPackage;
 
-class WPkgNav {
+class WPkgNav
+{
 public:
-  WPkgNav(void* wa_parent_ctx, const char* wa_name, wb_eUtility wa_utility,
-      pwr_tStatus* status);
+  WPkgNav(void* wa_parent_ctx, const char* wa_name, wb_eUtility wa_utility, pwr_tStatus* status);
   virtual ~WPkgNav();
 
   void* parent_ctx;
@@ -71,18 +72,13 @@ public:
   int displayed;
   int display_mode;
 
-  virtual void set_inputfocus()
-  {
-  }
+  virtual void set_inputfocus() {}
 
   void message(char sev, const char* text);
   int root_objects();
   void redraw();
   void enable_events();
-  void set_display_mode(int mode)
-  {
-    display_mode = mode;
-  }
+  void set_display_mode(int mode) { display_mode = mode; }
   int get_select(WItemPkg*** items, int* item_cnt);
   void refresh_node(WItemPkg* item);
   WItemPkg* get_parent(WItemPkg* item);
@@ -96,34 +92,34 @@ public:
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
 };
 
-class WItemPkg {
+class WItemPkg
+{
 public:
   WItemPkg();
   virtual ~WItemPkg();
-  virtual int open_children(
-      WNavBrow* brow, double x, double y, int display_mode);
+  virtual int open_children(WNavBrow* brow, double x, double y, int display_mode);
   virtual int close(WNavBrow* brow, double x, double y);
 
   brow_tNode node;
   char name[120];
 };
 
-class WItemPkgNode : public WItemPkg {
+class WItemPkgNode : public WItemPkg
+{
 public:
-  WItemPkgNode(WNavBrow* brow, char* item_name, char* item_nodename,
-      int item_bus, pwr_mOpSys item_opsys, brow_tNode dest,
-      flow_eDest dest_code);
+  WItemPkgNode(WNavBrow* brow, char* item_name, char* item_nodename, int item_bus, pwr_mOpSys item_opsys,
+               brow_tNode dest, flow_eDest dest_code);
   int open_children(WNavBrow* brow, double x, double y, int display_mode);
   char nodename[32];
   int bus;
   pwr_mOpSys opsys;
 };
 
-class WItemPkgPackage : public WItemPkg {
+class WItemPkgPackage : public WItemPkg
+{
 public:
-  WItemPkgPackage(WNavBrow* brow, char* item_name, char* item_packagename,
-      pwr_tTime item_time, char* item_nodename, int item_bus, brow_tNode dest,
-      flow_eDest dest_code);
+  WItemPkgPackage(WNavBrow* brow, char* item_name, char* item_packagename, pwr_tTime item_time,
+                  char* item_nodename, int item_bus, brow_tNode dest, flow_eDest dest_code);
   int open_children(WNavBrow* brow, double x, double y, int display_mode);
   char packagename[120];
   pwr_tTime time;
@@ -131,38 +127,41 @@ public:
   int bus;
 };
 
-class WItemPkgFileHier : public WItemPkg {
+class WItemPkgFileHier : public WItemPkg
+{
 public:
-  WItemPkgFileHier(WNavBrow* brow, const char* item_name,
-      char* item_packagename, brow_tNode dest, flow_eDest dest_code);
+  WItemPkgFileHier(WNavBrow* brow, const char* item_name, char* item_packagename, brow_tNode dest,
+                   flow_eDest dest_code);
   int open_children(WNavBrow* brow, double x, double y, int display_mode);
   char packagename[120];
 };
 
-class WItemPkgInfoHier : public WItemPkg {
+class WItemPkgInfoHier : public WItemPkg
+{
 public:
-  WItemPkgInfoHier(WNavBrow* brow, const char* item_name,
-      char* item_packagename, char* item_nodename, int item_bus,
-      brow_tNode dest, flow_eDest dest_code);
+  WItemPkgInfoHier(WNavBrow* brow, const char* item_name, char* item_packagename, char* item_nodename,
+                   int item_bus, brow_tNode dest, flow_eDest dest_code);
   int open_children(WNavBrow* brow, double x, double y, int display_mode);
   char packagename[120];
   char nodename[120];
   int bus;
 };
 
-class WItemPkgInfo : public WItemPkg {
+class WItemPkgInfo : public WItemPkg
+{
 public:
-  WItemPkgInfo(WNavBrow* brow, const char* item_name, char* item_value,
-      brow_tNode dest, flow_eDest dest_code);
+  WItemPkgInfo(WNavBrow* brow, const char* item_name, char* item_value, brow_tNode dest,
+               flow_eDest dest_code);
   virtual ~WItemPkgInfo();
   char name[120];
   char value[120];
 };
 
-class WItemPkgFile : public WItemPkg {
+class WItemPkgFile : public WItemPkg
+{
 public:
-  WItemPkgFile(WNavBrow* brow, const char* item_name, char* item_filename,
-      pwr_tTime item_time, int dmode, brow_tNode dest, flow_eDest dest_code);
+  WItemPkgFile(WNavBrow* brow, const char* item_name, char* item_filename, pwr_tTime item_time, int dmode,
+               brow_tNode dest, flow_eDest dest_code);
   virtual ~WItemPkgFile();
   char filename[120];
   pwr_tTime time;

@@ -49,10 +49,8 @@
 #include "co_syi.h"
 #include "rt_xnav_msg.h"
 
-RtMon::RtMon(void* rtmon_parent_ctx, const char* rtmon_name,
-    const char* rtmon_display, pwr_tStatus* status)
-    : parent_ctx(rtmon_parent_ctx), nodelistnav(NULL), rtmon_displayed(0),
-      help_cb(0), close_cb(0)
+RtMon::RtMon(void* rtmon_parent_ctx, const char* rtmon_name, const char* rtmon_display, pwr_tStatus* status)
+    : parent_ctx(rtmon_parent_ctx), nodelistnav(NULL), rtmon_displayed(0), help_cb(0), close_cb(0)
 {
   pwr_tStatus sts;
 
@@ -68,9 +66,7 @@ RtMon::RtMon(void* rtmon_parent_ctx, const char* rtmon_name,
 //
 //  Delete nodelist
 //
-RtMon::~RtMon()
-{
-}
+RtMon::~RtMon() {}
 
 void RtMon::activate_help()
 {

@@ -65,7 +65,8 @@
 
 #define IO_MAXCHAN 8
 
-typedef struct {
+typedef struct
+{
   unsigned int Address;
   int Qbus_fp;
   pwr_tFloat32 OldValue[IO_MAXCHAN];
@@ -84,33 +85,36 @@ static pwr_tStatus AoRangeToCoef(io_sChannel* chanp)
 
   cop = chanp->cop;
 
-  if (cop) {
+  if (cop)
+  {
     cop->CalculateNewCoef = 0;
 
     /* Coef for ActualValue to RawValue conversion */
-    if (!feqf(cop->ActValRangeHigh, cop->ActValRangeLow)) {
-      cop->SigValPolyCoef1
-          = (cop->SensorSigValRangeHigh - cop->SensorSigValRangeLow)
-          / (cop->ActValRangeHigh - cop->ActValRangeLow);
-      cop->SigValPolyCoef0 = cop->SensorSigValRangeHigh
-          - cop->ActValRangeHigh * cop->SigValPolyCoef1;
-    } else {
-      sts = gdh_ObjidToName(
-          chanp->ChanAref.Objid, buf, sizeof(buf), cdh_mName_volumeStrict);
+    if (!feqf(cop->ActValRangeHigh, cop->ActValRangeLow))
+    {
+      cop->SigValPolyCoef1 = (cop->SensorSigValRangeHigh - cop->SensorSigValRangeLow) /
+                             (cop->ActValRangeHigh - cop->ActValRangeLow);
+      cop->SigValPolyCoef0 = cop->SensorSigValRangeHigh - cop->ActValRangeHigh * cop->SigValPolyCoef1;
+    }
+    else
+    {
+      sts = gdh_ObjidToName(chanp->ChanAref.Objid, buf, sizeof(buf), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       errh_Error("Invalid ActValueRange in Ao channel %s", buf);
       return IO__CHANRANGE;
     }
     /* Coef for ActualValue to SignalValue conversion */
-    if (!feqf(cop->ChannelSigValRangeHigh, 0.0f)) {
+    if (!feqf(cop->ChannelSigValRangeHigh, 0.0f))
+    {
       PolyCoef0 = 0;
       PolyCoef1 = cop->RawValRangeHigh / cop->ChannelSigValRangeHigh;
       cop->OutPolyCoef1 = cop->SigValPolyCoef1 * PolyCoef1;
       cop->OutPolyCoef0 = PolyCoef0 + PolyCoef1 * cop->SigValPolyCoef0;
-    } else {
-      sts = gdh_ObjidToName(
-          chanp->ChanAref.Objid, buf, sizeof(buf), cdh_mName_volumeStrict);
+    }
+    else
+    {
+      sts = gdh_ObjidToName(chanp->ChanAref.Objid, buf, sizeof(buf), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       errh_Error("Invalid SigValueRange in Ao channel %s", buf);
@@ -120,8 +124,7 @@ static pwr_tStatus AoRangeToCoef(io_sChannel* chanp)
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   pwr_sClass_Ao_HVAO4* op;
   io_sChannel* chanp;
@@ -139,7 +142,8 @@ static pwr_tStatus IoCardInit(
 
   /* Caluclate polycoeff */
   chanp = cp->chanlist;
-  for (i = 0; i < cp->ChanListSize; i++) {
+  for (i = 0; i < cp->ChanListSize; i++)
+  {
     AoRangeToCoef(chanp);
     chanp++;
   }
@@ -154,8 +158,7 @@ static pwr_tStatus IoCardInit(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local;
 
@@ -171,8 +174,7 @@ static pwr_tStatus IoCardClose(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local;
   io_sRackLocal* r_local = (io_sRackLocal*)(rp->Local);
@@ -194,8 +196,10 @@ static pwr_tStatus IoCardWrite(
   fixout = ctx->Node->EmergBreakTrue && ctx->Node->EmergBreakSelect == FIXOUT;
 
   chanp = &cp->chanlist[0];
-  for (i = 0; i < cp->ChanListSize; i++) {
-    if (!chanp->cop) {
+  for (i = 0; i < cp->ChanListSize; i++)
+  {
+    if (!chanp->cop)
+    {
       chanp++;
       continue;
     }
@@ -224,38 +228,43 @@ static pwr_tStatus IoCardWrite(
     else
       sop->RawValue = rawvalue - 0.5;
     data = sop->RawValue;
-    
-    if (r_local->Qbus_fp != 0 && r_local->s == 0) {
+
+    if (r_local->Qbus_fp != 0 && r_local->s == 0)
+    {
       wb.Data = data;
       wb.Address = local->Address + 2 * i;
       sts = write(local->Qbus_fp, &wb, sizeof(wb));
-    } else {
+    }
+    else
+    {
       /* Ethernet I/O, Request a write to current address */
-      bfbeth_set_write_req(
-			   r_local, (pwr_tUInt16)(local->Address + 2 * i), data);
+      bfbeth_set_write_req(r_local, (pwr_tUInt16)(local->Address + 2 * i), data);
       sts = 1;
     }
 
-    if (sts == -1) {
+    if (sts == -1)
+    {
       /* Increase error count and check error limits */
       op->ErrorCount++;
 
-      if (op->ErrorCount == op->ErrorSoftLimit) {
-	errh_Error("IO Error soft limit reached on card '%s'", cp->Name);
-	ctx->IOHandler->CardErrorSoftLimit = 1;
-	ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
+      if (op->ErrorCount == op->ErrorSoftLimit)
+      {
+        errh_Error("IO Error soft limit reached on card '%s'", cp->Name);
+        ctx->IOHandler->CardErrorSoftLimit = 1;
+        ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
       }
-      if (op->ErrorCount >= op->ErrorHardLimit) {
-	errh_Error(
-		   "IO Error hard limit reached on card '%s', IO stopped", cp->Name);
-	ctx->Node->EmergBreakTrue = 1;
-	ctx->IOHandler->CardErrorHardLimit = 1;
-	ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
-	return IO__ERRDEVICE;
+      if (op->ErrorCount >= op->ErrorHardLimit)
+      {
+        errh_Error("IO Error hard limit reached on card '%s', IO stopped", cp->Name);
+        ctx->Node->EmergBreakTrue = 1;
+        ctx->IOHandler->CardErrorHardLimit = 1;
+        ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
+        return IO__ERRDEVICE;
       }
       chanp++;
       continue;
-    } else
+    }
+    else
       local->OldValue[i] = value;
 
     local->OldTestOn[i] = cop->TestOn;
@@ -264,7 +273,8 @@ static pwr_tStatus IoCardWrite(
 
   /* Fix for qbus errors */
   local->ErrScanCnt++;
-  if (local->ErrScanCnt >= local->ErrReset) {
+  if (local->ErrScanCnt >= local->ErrReset)
+  {
     local->ErrScanCnt = 0;
     if (op->ErrorCount > op->ErrorSoftLimit)
       op->ErrorCount--;
@@ -277,10 +287,8 @@ static pwr_tStatus IoCardWrite(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Ao_HVAO4)
-    = { pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
-        pwr_BindIoMethod(IoCardWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Ao_HVAO4) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                           pwr_BindIoMethod(IoCardWrite), pwr_NullMethod};
 
-pwr_dExport pwr_BindIoMethods(Ao_AO8uP)
-    = { pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
-        pwr_BindIoMethod(IoCardWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Ao_AO8uP) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                           pwr_BindIoMethod(IoCardWrite), pwr_NullMethod};

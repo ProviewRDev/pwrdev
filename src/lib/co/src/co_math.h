@@ -43,21 +43,21 @@
  */
 
 #ifndef MAX
-/*! \def MAX(Dragon, Eagle) 
+/*! \def MAX(Dragon, Eagle)
     \brief Return the maximum of \a Dragon and \a Eagle
  */
 #define MAX(Dragon, Eagle) ((Dragon) > (Eagle) ? (Dragon) : (Eagle))
 #endif
 
 #ifndef MIN
-/*! \def MIN(Dragon, Eagle) 
+/*! \def MIN(Dragon, Eagle)
     \brief Return the minimum of \a Dragon and \a Eagle
  */
 #define MIN(Dragon, Eagle) ((Dragon) < (Eagle) ? (Dragon) : (Eagle))
 #endif
 
 #ifndef ABS
-/*! \def ABS(Dragon) 
+/*! \def ABS(Dragon)
     \brief Return the absolute value of \a Dragon,
     i.e. removes the sign such that ABS(-1) = 1.
  */
@@ -65,58 +65,61 @@
 #endif
 
 #ifndef CLAMP
-/*! \def CLAMP(x, min, max) 
+/*! \def CLAMP(x, min, max)
     \brief Restricts \a x to be between \a min and \a max
  */
 #define CLAMP(x, min, max) ((x) < (min)) ? (min) : (((x) > (max)) ? (max) : (x))
 #endif
 
-/*! \def SIGN(x) 
+/*! \def SIGN(x)
     \brief Returns the sign of \a x,
     i.e. 1 if \a x is positive or -1 if \a x is negative
  */
 #define SIGN(x) ((x) >= 0 ? 1 : -1)
 
-/*! \def ROUND(x) 
+/*! \def ROUND(x)
     \brief Rounds \a x to the nearest integer,
     where 0.5 is rounded upwards to 1.
  */
-#define ROUND(x) ((x) >= 0 ? (int)((x) + 0.5) : (int)((x)-0.5))
+#define ROUND(x) ((x) >= 0 ? (int)((x) + 0.5) : (int)((x) - 0.5))
 
-/*! \def typecheck(type,x) 
+/*! \def typecheck(type,x)
     \brief Typechecking macro from the Linux kernel
 
     Generates a compile-time warning if x is not of type 'type'
     Usage: typecheck(int, 0.5f) -> warning
            typecheck(int, 10) -> no warning
  */
-#define typecheck(type,x) \
-({	type __dummy; \
-	typeof(x) __dummy2; \
-	(void)(&__dummy == &__dummy2); \
-	1; \
-})
+#define typecheck(type, x)                                                                                   \
+  ({                                                                                                         \
+    type __dummy;                                                                                            \
+    typeof(x) __dummy2;                                                                                      \
+    (void)(&__dummy == &__dummy2);                                                                           \
+    1;                                                                                                       \
+  })
 
-/*! \def feq(a, b) 
+/*! \def feq(a, b)
     \brief Checks whether two doubles \a a and \a b are equal
 
     Use this instead of a == b
  */
-#define feq(a, b) \
-({ typecheck(double, a); \
-   typecheck(double, b); \
-  (ABS((a) - (b)) < DBL_EPSILON); \
-})
+#define feq(a, b)                                                                                            \
+  ({                                                                                                         \
+    typecheck(double, a);                                                                                    \
+    typecheck(double, b);                                                                                    \
+    (ABS((a) - (b)) < DBL_EPSILON);                                                                          \
+  })
 
-/*! \def feqf(a, b) 
+/*! \def feqf(a, b)
     \brief Checks whether two floats \a a and \a b are equal
 
     Use this instead of a == b
  */
-#define feqf(a, b) \
-({ typecheck(float, a); \
-   typecheck(float, b); \
-  (ABS((a) - (b)) < FLT_EPSILON); \
-})
+#define feqf(a, b)                                                                                           \
+  ({                                                                                                         \
+    typecheck(float, a);                                                                                     \
+    typecheck(float, b);                                                                                     \
+    (ABS((a) - (b)) < FLT_EPSILON);                                                                          \
+  })
 
 #endif

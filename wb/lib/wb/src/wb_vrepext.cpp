@@ -43,7 +43,8 @@
 
 #include "pwr_baseclasses.h"
 
-extern "C" {
+extern "C"
+{
 #include "co_dcli.h"
 }
 #include "co_string.h"
@@ -64,8 +65,7 @@ extern "C" {
 #include "wb_vrepref.h"
 
 wb_vrepext::wb_vrepext(wb_erep* erep, pwr_tVid vid)
-    : wb_vrep(vid), m_erep(erep), m_merep(erep->merep()), m_nRef(0),
-      m_connected(0)
+    : wb_vrep(vid), m_erep(erep), m_merep(erep->merep()), m_nRef(0), m_connected(0)
 {
   strcpy(m_providerstr, "");
 
@@ -74,10 +74,9 @@ wb_vrepext::wb_vrepext(wb_erep* erep, pwr_tVid vid)
   createVolumeObject("");
 }
 
-wb_vrepext::wb_vrepext(
-    wb_erep* erep, pwr_tVid vid, const char* name, const char* provider)
-    : wb_vrep(vid), m_erep(erep), m_merep(erep->merep()), m_nRef(0),
-      m_connected(0), m_procom(0), m_ptype(procom_eType_Ipc)
+wb_vrepext::wb_vrepext(wb_erep* erep, pwr_tVid vid, const char* name, const char* provider)
+    : wb_vrep(vid), m_erep(erep), m_merep(erep->merep()), m_nRef(0), m_connected(0), m_procom(0),
+      m_ptype(procom_eType_Ipc)
 {
   strcpy(m_providerstr, provider);
 
@@ -86,40 +85,46 @@ wb_vrepext::wb_vrepext(
   createVolumeObject(name);
   strcpy(m_name, name);
 
-  if (str_NoCaseStrcmp(provider, "ProjectList") == 0) {
+  if (str_NoCaseStrcmp(provider, "ProjectList") == 0)
+  {
     m_ptype = procom_eType_Local;
     m_provider = new wb_pvd_pl();
     m_procom = new wb_procom(provider, m_provider, procom_eType_Local);
-  } else if (str_NoCaseStrcmp(provider, "GlobalVolumeList") == 0) {
+  }
+  else if (str_NoCaseStrcmp(provider, "GlobalVolumeList") == 0)
+  {
     m_ptype = procom_eType_Local;
     m_provider = new wb_pvd_gvl();
     m_procom = new wb_procom(provider, m_provider, procom_eType_Local);
-  } else if (str_NoCaseStrcmp(provider, "UserDatabase") == 0) {
+  }
+  else if (str_NoCaseStrcmp(provider, "UserDatabase") == 0)
+  {
     m_ptype = procom_eType_Local;
     m_provider = new rt_pvd_udb();
     m_procom = new wb_procom(provider, m_provider, procom_eType_Local);
   }
 }
 
-wb_vrepext::~wb_vrepext()
-{
-}
+wb_vrepext::~wb_vrepext() {}
 
 wb_orep* wb_vrepext::object(pwr_tStatus* sts, pwr_tOid oid)
 {
-  if (oid.vid != m_vid) {
+  if (oid.vid != m_vid)
+  {
     *sts = LDH__BADOBJID;
     return 0;
   }
 
-  if (oid.oix == 0) {
+  if (oid.oix == 0)
+  {
     // Volume object
     *sts = LDH__SUCCESS;
     return new wb_orepext(this, volume_object);
   }
 
   // Look in cache
-  if (m_cashe.m_oid.oix == oid.oix) {
+  if (m_cashe.m_oid.oix == oid.oix)
+  {
     wb_orepext* orep = new wb_orepext(this, m_cashe);
     *sts = LDH__SUCCESS;
     return orep;
@@ -137,7 +142,8 @@ wb_orep* wb_vrepext::object(pwr_tStatus* sts, pwr_tOid oid)
   if (EVEN(*sts))
     return 0;
 
-  if (ODD(amsg.Object.Status)) {
+  if (ODD(amsg.Object.Status))
+  {
     *sts = LDH__SUCCESS;
     wb_cdrep* cdrep = m_merep->cdrep(sts, amsg.Object.cid);
     wb_cdef cdef = wb_cdef(cdrep);
@@ -146,7 +152,9 @@ wb_orep* wb_vrepext::object(pwr_tStatus* sts, pwr_tOid oid)
     cashe_insert(exto);
     wb_orepext* orep = new wb_orepext(this, exto);
     return orep;
-  } else {
+  }
+  else
+  {
     *sts = amsg.Object.Status;
     return 0;
   }
@@ -160,7 +168,8 @@ wb_orep* wb_vrepext::object(pwr_tStatus* sts, pwr_tCid cid)
 
 wb_orep* wb_vrepext::object(pwr_tStatus* sts, wb_name& name)
 {
-  if (name.hasVolume() && !name.hasObject()) {
+  if (name.hasVolume() && !name.hasObject())
+  {
     // Volume object
     *sts = LDH__SUCCESS;
     return new wb_orepext(this, volume_object);
@@ -178,7 +187,8 @@ wb_orep* wb_vrepext::object(pwr_tStatus* sts, wb_name& name)
   if (EVEN(*sts))
     return 0;
 
-  if (ODD(amsg.Object.Status)) {
+  if (ODD(amsg.Object.Status))
+  {
     *sts = LDH__SUCCESS;
     wb_cdrep* cdrep = m_merep->cdrep(sts, amsg.Object.cid);
     wb_cdef cdef = wb_cdef(cdrep);
@@ -186,7 +196,9 @@ wb_orep* wb_vrepext::object(pwr_tStatus* sts, wb_name& name)
     ext_object exto(&amsg.Object, m_vid, cdef);
     wb_orepext* orep = new wb_orepext(this, exto);
     return orep;
-  } else {
+  }
+  else
+  {
     *sts = amsg.Object.Status;
     return 0;
   }
@@ -201,8 +213,7 @@ wb_vrep* wb_vrepext::next()
 
 void wb_vrepext::info()
 {
-  std::cout << "Volume : " << volume_name << " " << volume_class << " " << m_vid
-            << '\n';
+  std::cout << "Volume : " << volume_name << " " << volume_class << " " << m_vid << '\n';
 }
 
 void wb_vrepext::unref()
@@ -230,7 +241,8 @@ wb_orep* wb_vrepext::object(pwr_tStatus* sts)
   if (EVEN(*sts))
     return 0;
 
-  if (ODD(amsg.Object.Status)) {
+  if (ODD(amsg.Object.Status))
+  {
     *sts = LDH__SUCCESS;
     wb_cdrep* cdrep = m_merep->cdrep(sts, amsg.Object.cid);
     wb_cdef cdef = wb_cdef(cdrep);
@@ -238,7 +250,9 @@ wb_orep* wb_vrepext::object(pwr_tStatus* sts)
     ext_object exto(&amsg.Object, m_vid, cdef);
     wb_orepext* orep = new wb_orepext(this, exto);
     return orep;
-  } else {
+  }
+  else
+  {
     *sts = amsg.Object.Status;
     return 0;
   }
@@ -253,7 +267,8 @@ wb_orep* wb_vrepext::ancestor(pwr_tStatus* sts, const wb_orep* o)
 
 wb_orep* wb_vrepext::parent(pwr_tStatus* sts, const wb_orep* o)
 {
-  if (o->poid().oix == 0) {
+  if (o->poid().oix == 0)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -262,7 +277,8 @@ wb_orep* wb_vrepext::parent(pwr_tStatus* sts, const wb_orep* o)
 
 wb_orep* wb_vrepext::after(pwr_tStatus* sts, const wb_orep* o)
 {
-  if (o->aoid().oix == 0) {
+  if (o->aoid().oix == 0)
+  {
     *sts = LDH__NO_SIBLING;
     return 0;
   }
@@ -271,7 +287,8 @@ wb_orep* wb_vrepext::after(pwr_tStatus* sts, const wb_orep* o)
 
 wb_orep* wb_vrepext::before(pwr_tStatus* sts, const wb_orep* o)
 {
-  if (o->boid().oix == 0) {
+  if (o->boid().oix == 0)
+  {
     *sts = LDH__NO_SIBLING;
     return 0;
   }
@@ -280,7 +297,8 @@ wb_orep* wb_vrepext::before(pwr_tStatus* sts, const wb_orep* o)
 
 wb_orep* wb_vrepext::first(pwr_tStatus* sts, const wb_orep* o)
 {
-  if (o->foid().oix == 0) {
+  if (o->foid().oix == 0)
+  {
     *sts = LDH__NO_CHILD;
     return 0;
   }
@@ -296,7 +314,8 @@ wb_orep* wb_vrepext::child(pwr_tStatus* sts, const wb_orep* o, wb_name& name)
 
 wb_orep* wb_vrepext::last(pwr_tStatus* sts, const wb_orep* o)
 {
-  if (o->loid().oix == 0) {
+  if (o->loid().oix == 0)
+  {
     *sts = LDH__NO_CHILD;
     return 0;
   }
@@ -309,20 +328,15 @@ wb_orep* wb_vrepext::next(pwr_tStatus* sts, const wb_orep* o)
   return 0;
 }
 
-wb_orep* wb_vrepext::previous(pwr_tStatus* sts, const wb_orep* o)
-{
-  return 0;
-}
+wb_orep* wb_vrepext::previous(pwr_tStatus* sts, const wb_orep* o) { return 0; }
 
-void wb_vrepext::objectName(const wb_orep* o, char* str)
-{
-  *str = 0;
-}
+void wb_vrepext::objectName(const wb_orep* o, char* str) { *str = 0; }
 
-bool wb_vrepext::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix,
-    size_t offset, size_t size, void* p)
+bool wb_vrepext::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, size_t offset, size_t size,
+                                void* p)
 {
-  if (bix != pwr_eBix_rt) {
+  if (bix != pwr_eBix_rt)
+  {
     *sts = LDH__NOSUCHBODY;
     return false;
   }
@@ -343,7 +357,8 @@ bool wb_vrepext::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix,
   if (EVEN(*sts))
     return 0;
 
-  if (EVEN(amsg.Any.Status)) {
+  if (EVEN(amsg.Any.Status))
+  {
     *sts = amsg.Any.Status;
     return false;
   }
@@ -352,14 +367,15 @@ bool wb_vrepext::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix,
   return true;
 }
 
-void* wb_vrepext::readAttribute(pwr_tStatus* sts, const wb_orep* o,
-    pwr_eBix bix, size_t offset, size_t size, void* p)
+void* wb_vrepext::readAttribute(pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, size_t offset, size_t size,
+                                void* p)
 {
   void* body = readBody(sts, o, bix, 0);
   if (EVEN(*sts))
     return 0;
 
-  if (p) {
+  if (p)
+  {
     memcpy(p, (char*)body + offset, size);
     return p;
   }
@@ -372,13 +388,13 @@ bool wb_vrepext::writeBody(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, void* p)
   return false;
 }
 
-void* wb_vrepext::readBody(
-    pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, void* p)
+void* wb_vrepext::readBody(pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, void* p)
 {
   vext_sQMsg qmsg;
   static vext_sAMsg amsg;
 
-  if (bix != pwr_eBix_rt) {
+  if (bix != pwr_eBix_rt)
+  {
     *sts = LDH__NOSUCHBODY;
     return 0;
   }
@@ -392,9 +408,11 @@ void* wb_vrepext::readBody(
   if (EVEN(*sts))
     return 0;
 
-  if (ODD(amsg.ObjectBody.Status)) {
+  if (ODD(amsg.ObjectBody.Status))
+  {
     *sts = LDH__SUCCESS;
-    if (p) {
+    if (p)
+    {
       memcpy(p, &amsg.ObjectBody.body, amsg.ObjectBody.size);
       return p;
     }
@@ -404,10 +422,11 @@ void* wb_vrepext::readBody(
   return 0;
 }
 
-wb_orep* wb_vrepext::createObject(pwr_tStatus* sts, wb_cdef cdef,
-    wb_destination& d, wb_name& name, pwr_tOix oix)
+wb_orep* wb_vrepext::createObject(pwr_tStatus* sts, wb_cdef cdef, wb_destination& d, wb_name& name,
+                                  pwr_tOix oix)
 {
-  if (d.oid().vid != m_vid) {
+  if (d.oid().vid != m_vid)
+  {
     *sts = LDH__BADOBJID;
     return 0;
   }
@@ -431,13 +450,16 @@ wb_orep* wb_vrepext::createObject(pwr_tStatus* sts, wb_cdef cdef,
   if (EVEN(*sts))
     return 0;
 
-  if (ODD(amsg.Object.Status)) {
+  if (ODD(amsg.Object.Status))
+  {
     *sts = LDH__SUCCESS;
     ext_object exto(&amsg.Object, m_vid, cdef);
     cashe_insert(exto);
     wb_orepext* orep = new wb_orepext(this, exto);
     return orep;
-  } else {
+  }
+  else
+  {
     *sts = amsg.Object.Status;
     return 0;
   }
@@ -457,14 +479,16 @@ bool wb_vrepext::createVolumeObject(const char* name)
   exto.m_cid = m_cid;
   exto.m_flags = cdef.flags();
   exto.rbody_size = cdef.size(pwr_eBix_rt);
-  if (exto.rbody_size) {
+  if (exto.rbody_size)
+  {
     exto.rbody = malloc(exto.rbody_size);
     cdef.templateBody(&sts, pwr_eBix_rt, exto.rbody, exto.m_oid);
     if (EVEN(sts))
       return false;
   }
   exto.dbody_size = cdef.size(pwr_eBix_dev);
-  if (exto.dbody_size) {
+  if (exto.dbody_size)
+  {
     exto.dbody = malloc(exto.dbody_size);
     cdef.templateBody(&sts, pwr_eBix_dev, exto.dbody, exto.m_oid);
     if (EVEN(sts))
@@ -476,10 +500,11 @@ bool wb_vrepext::createVolumeObject(const char* name)
   return true;
 }
 
-wb_orep* wb_vrepext::copyObject(pwr_tStatus* sts, const wb_orep* orep,
-    wb_destination& d, wb_name& name, pwr_tOix oix)
+wb_orep* wb_vrepext::copyObject(pwr_tStatus* sts, const wb_orep* orep, wb_destination& d, wb_name& name,
+                                pwr_tOix oix)
 {
-  if (d.oid().vid != m_vid || orep->oid().vid != m_vid) {
+  if (d.oid().vid != m_vid || orep->oid().vid != m_vid)
+  {
     *sts = LDH__BADOBJID;
     return 0;
   }
@@ -503,7 +528,8 @@ wb_orep* wb_vrepext::copyObject(pwr_tStatus* sts, const wb_orep* orep,
   if (EVEN(*sts))
     return 0;
 
-  if (ODD(amsg.Object.Status)) {
+  if (ODD(amsg.Object.Status))
+  {
     *sts = LDH__SUCCESS;
 
     wb_cdrep* cdrep = m_merep->cdrep(sts, amsg.Object.cid);
@@ -513,7 +539,9 @@ wb_orep* wb_vrepext::copyObject(pwr_tStatus* sts, const wb_orep* orep,
     cashe_insert(exto);
     wb_orepext* orep = new wb_orepext(this, exto);
     return orep;
-  } else {
+  }
+  else
+  {
     *sts = amsg.Object.Status;
     return 0;
   }
@@ -521,7 +549,8 @@ wb_orep* wb_vrepext::copyObject(pwr_tStatus* sts, const wb_orep* orep,
 
 bool wb_vrepext::moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d)
 {
-  if (d.oid().vid != m_vid || orep->oid().vid != m_vid) {
+  if (d.oid().vid != m_vid || orep->oid().vid != m_vid)
+  {
     *sts = LDH__BADOBJID;
     return 0;
   }
@@ -541,9 +570,12 @@ bool wb_vrepext::moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d)
   if (EVEN(*sts))
     return 0;
 
-  if (ODD(amsg.Any.Status)) {
+  if (ODD(amsg.Any.Status))
+  {
     *sts = LDH__SUCCESS;
-  } else {
+  }
+  else
+  {
     *sts = amsg.Any.Status;
     return false;
   }
@@ -552,7 +584,8 @@ bool wb_vrepext::moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d)
 
 bool wb_vrepext::deleteObject(pwr_tStatus* sts, wb_orep* orep)
 {
-  if (orep->oid().vid != m_vid) {
+  if (orep->oid().vid != m_vid)
+  {
     *sts = LDH__BADOBJID;
     return 0;
   }
@@ -570,9 +603,12 @@ bool wb_vrepext::deleteObject(pwr_tStatus* sts, wb_orep* orep)
   if (EVEN(*sts))
     return 0;
 
-  if (ODD(amsg.Any.Status)) {
+  if (ODD(amsg.Any.Status))
+  {
     *sts = LDH__SUCCESS;
-  } else {
+  }
+  else
+  {
     *sts = amsg.Any.Status;
     return false;
   }
@@ -581,7 +617,8 @@ bool wb_vrepext::deleteObject(pwr_tStatus* sts, wb_orep* orep)
 
 bool wb_vrepext::deleteFamily(pwr_tStatus* sts, wb_orep* orep)
 {
-  if (orep->oid().vid != m_vid) {
+  if (orep->oid().vid != m_vid)
+  {
     *sts = LDH__BADOBJID;
     return false;
   }
@@ -599,9 +636,12 @@ bool wb_vrepext::deleteFamily(pwr_tStatus* sts, wb_orep* orep)
   if (EVEN(*sts))
     return 0;
 
-  if (ODD(amsg.Any.Status)) {
+  if (ODD(amsg.Any.Status))
+  {
     *sts = LDH__SUCCESS;
-  } else {
+  }
+  else
+  {
     *sts = amsg.Any.Status;
     return false;
   }
@@ -610,11 +650,13 @@ bool wb_vrepext::deleteFamily(pwr_tStatus* sts, wb_orep* orep)
 
 bool wb_vrepext::renameObject(pwr_tStatus* sts, wb_orep* orep, wb_name& name)
 {
-  if (orep->oid().vid != m_vid) {
+  if (orep->oid().vid != m_vid)
+  {
     *sts = LDH__BADOBJID;
     return false;
   }
-  if (!name) {
+  if (!name)
+  {
     *sts = name.sts();
     return false;
   }
@@ -633,9 +675,12 @@ bool wb_vrepext::renameObject(pwr_tStatus* sts, wb_orep* orep, wb_name& name)
   if (EVEN(*sts))
     return 0;
 
-  if (ODD(amsg.Any.Status)) {
+  if (ODD(amsg.Any.Status))
+  {
     *sts = LDH__SUCCESS;
-  } else {
+  }
+  else
+  {
     *sts = amsg.Any.Status;
     return false;
   }
@@ -644,10 +689,7 @@ bool wb_vrepext::renameObject(pwr_tStatus* sts, wb_orep* orep, wb_name& name)
   return true;
 }
 
-void wb_vrepext::cashe_insert(ext_object& eo)
-{
-  m_cashe = eo;
-}
+void wb_vrepext::cashe_insert(ext_object& eo) { m_cashe = eo; }
 
 void wb_vrepext::cashe_remove(pwr_tOix oix)
 {
@@ -669,7 +711,8 @@ bool wb_vrepext::commit(pwr_tStatus* sts)
   if (EVEN(*sts))
     return 0;
 
-  if (EVEN(amsg.Any.Status)) {
+  if (EVEN(amsg.Any.Status))
+  {
     *sts = amsg.Any.Status;
     return false;
   }
@@ -692,7 +735,8 @@ bool wb_vrepext::abort(pwr_tStatus* sts)
   if (EVEN(*sts))
     return 0;
 
-  if (EVEN(amsg.Any.Status)) {
+  if (EVEN(amsg.Any.Status))
+  {
     *sts = amsg.Any.Status;
     return false;
   }
@@ -703,15 +747,18 @@ bool wb_vrepext::abort(pwr_tStatus* sts)
 
 void wb_vrepext::put(vext_sQMsg* msg, int size, pwr_tStatus* sts)
 {
-  switch (m_ptype) {
+  switch (m_ptype)
+  {
   case procom_eType_Ipc:
-    if (!m_connected) {
+    if (!m_connected)
+    {
       vext_sAMsg amsg;
       int fd = -1;
       key_t key;
 
       fd = open(m_providerstr, O_RDWR | O_CREAT, 0777);
-      if (fd < 0) {
+      if (fd < 0)
+      {
         *sts = LDH__NOPROV;
         return;
       }
@@ -719,32 +766,35 @@ void wb_vrepext::put(vext_sQMsg* msg, int size, pwr_tStatus* sts)
 
       key = ftok(m_providerstr, 0);
       m_msgsndid = msgget(key, 0666 /* | IPC_CREAT */);
-      if (m_msgsndid == -1) {
+      if (m_msgsndid == -1)
+      {
         *sts = LDH__MSGGET;
         return;
       }
 
       m_msgrcvid = msgget((key_t)(key + 1), 0666 /* | IPC_CREAT */);
-      if (m_msgrcvid == -1) {
+      if (m_msgrcvid == -1)
+      {
         *sts = LDH__MSGGET;
         return;
       }
       // Clear the receive que
-      while (
-          msgrcv(m_msgrcvid, (void*)&amsg, sizeof(amsg), 0, IPC_NOWAIT) != -1)
+      while (msgrcv(m_msgrcvid, (void*)&amsg, sizeof(amsg), 0, IPC_NOWAIT) != -1)
         ;
 
       m_connected = 1;
     }
 
     msg->Any.message_type = 1;
-    if (msgsnd(m_msgsndid, (void*)msg, size, 0) == -1) {
+    if (msgsnd(m_msgsndid, (void*)msg, size, 0) == -1)
+    {
       *sts = LDH__MSGSND;
       return;
     }
     break;
   case procom_eType_Local:
-    if (m_procom->lmsgsnd(m_msgsndid, (void*)msg, size, 0) == -1) {
+    if (m_procom->lmsgsnd(m_msgsndid, (void*)msg, size, 0) == -1)
+    {
       *sts = LDH__MSGSND;
       return;
     }
@@ -755,15 +805,18 @@ void wb_vrepext::put(vext_sQMsg* msg, int size, pwr_tStatus* sts)
 
 void wb_vrepext::receive(vext_sAMsg* msg, int size, pwr_tStatus* sts)
 {
-  switch (m_ptype) {
+  switch (m_ptype)
+  {
   case procom_eType_Ipc:
-    if (msgrcv(m_msgrcvid, (void*)msg, size, 0, 0) == -1) {
+    if (msgrcv(m_msgrcvid, (void*)msg, size, 0, 0) == -1)
+    {
       *sts = LDH__MSGRCV;
       return;
     }
     break;
   case procom_eType_Local:
-    if (m_procom->lmsgrcv(m_msgrcvid, (void*)msg, size, 0, 0) == -1) {
+    if (m_procom->lmsgrcv(m_msgrcvid, (void*)msg, size, 0, 0) == -1)
+    {
       *sts = LDH__MSGRCV;
       return;
     }

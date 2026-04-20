@@ -78,7 +78,8 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 
   /* Allocate area for local data structure */
   ap->Local = calloc(1, sizeof(io_sAgentLocal));
-  if (!ap->Local) {
+  if (!ap->Local)
+  {
     errh_Error("ERROR config Modbus Master %s - %s", ap->Name, "calloc");
     return IO__ERRINIDEVICE;
   }
@@ -108,24 +109,28 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 
   rp = ap->racklist;
 
-  while (rp) {
+  while (rp)
+  {
     cid = rp->Class;
     while (ODD(gdh_GetSuperClass(cid, &cid, rp->Objid)))
       ;
 
-    switch (cid) {
+    switch (cid)
+    {
     case pwr_cClass_Modbus_TCP_Slave:
 
       sp = (pwr_sClass_Modbus_TCP_Slave*)rp->op;
       local_rack = rp->Local;
 
       /* Start receving old data so the input buffer is flushed */
-      if (sp->Status == MB__NORMAL) {
+      if (sp->Status == MB__NORMAL)
+      {
         sts = mb_recv_data(local_rack, rp, sp);
       }
 
       /* Request new data */
-      if (sp->Status == MB__NORMAL && sp->DisableSlave != 1) {
+      if (sp->Status == MB__NORMAL && sp->DisableSlave != 1)
+      {
         sts = mb_send_data(local_rack, rp, sp, mb_mSendMask_ReadReq);
       }
 
@@ -141,23 +146,17 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 /*----------------------------------------------------------------------------*\
    Write method for the Pb_Profiboard agent
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Modbus_Master) = { pwr_BindIoMethod(IoAgentInit),
-  pwr_BindIoMethod(IoAgentRead), pwr_BindIoMethod(IoAgentWrite),
-  pwr_BindIoMethod(IoAgentClose), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Modbus_Master) = {pwr_BindIoMethod(IoAgentInit), pwr_BindIoMethod(IoAgentRead),
+                                                pwr_BindIoMethod(IoAgentWrite),
+                                                pwr_BindIoMethod(IoAgentClose), pwr_NullMethod};

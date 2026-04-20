@@ -43,7 +43,8 @@
 
 #include "cow_wow_gtk.h"
 
-class WPkgGtk : public WPkg {
+class WPkgGtk : public WPkg
+{
 public:
   WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx);
   ~WPkgGtk();
@@ -74,8 +75,7 @@ public:
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_history(GtkWidget* w, gpointer data);
   static void activate_help(GtkWidget* w, gpointer data);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
 };
 
 #endif

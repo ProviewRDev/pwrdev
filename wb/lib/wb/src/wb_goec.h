@@ -39,21 +39,17 @@
 
 #include "wb_gre.h"
 
-int goec_con_draw(
-    WGre* gre, vldh_t_con con_object, int create_flag, vldh_t_node node);
+int goec_con_draw(WGre* gre, vldh_t_con con_object, int create_flag, vldh_t_node node);
 
 int goec_con_delete(WGre* gre, vldh_t_con con_object);
 
 int goec_con_delete_noredraw(WGre* gre, vldh_t_con con_object);
 
-int goec_con_sethighlight(
-    WGre* gre, vldh_t_con con_object, unsigned long highlight_flag);
+int goec_con_sethighlight(WGre* gre, vldh_t_con con_object, unsigned long highlight_flag);
 
-int goec_con_gethighlight(
-    WGre* gre, vldh_t_con con_object, unsigned long* highlight_flag);
+int goec_con_gethighlight(WGre* gre, vldh_t_con con_object, unsigned long* highlight_flag);
 
-int goec_con_draw_ref(
-    WGre* gre, vldh_t_con con_object, int create_flag, vldh_t_node node);
+int goec_con_draw_ref(WGre* gre, vldh_t_con con_object, int create_flag, vldh_t_node node);
 
 int goec_get_refnodetypeid(WGre* gre, unsigned long* refnode_type_id);
 
@@ -65,7 +61,6 @@ int goec_con_redraw_ref(WGre* gre, vldh_t_node node);
 
 int goec_con_reconfig_ref(WGre* gre, vldh_t_node node);
 
-int goec_conpoint_get_refcons(vldh_t_node node, unsigned long point,
-    unsigned long flag, unsigned long* cons);
+int goec_conpoint_get_refcons(vldh_t_node node, unsigned long point, unsigned long flag, unsigned long* cons);
 
 #endif

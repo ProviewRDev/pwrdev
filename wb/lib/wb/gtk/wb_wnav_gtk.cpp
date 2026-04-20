@@ -36,7 +36,8 @@
 
 /* wb_wnav_gtk.cpp -- Display plant and node hiererachy */
 
-extern "C" {
+extern "C"
+{
 #include "pwr_baseclasses.h"
 #include "co_dcli.h"
 #include "co_msg.h"
@@ -75,7 +76,8 @@ void WNavGtk::pop()
   GtkWidget *parent, *top = NULL;
 
   parent = gtk_widget_get_parent(toplevel);
-  while (parent) {
+  while (parent)
+  {
     top = parent;
     parent = gtk_widget_get_parent(parent);
   }
@@ -85,19 +87,16 @@ void WNavGtk::pop()
 //
 // Create the navigator widget
 //
-WNavGtk::WNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-    const char* xn_name, const char* xn_layout, GtkWidget** w,
-    ldh_tSesContext xn_ldhses, wnav_sStartMenu* root_menu,
-    wnav_eWindowType xn_type, pwr_tStatus* status)
-    : WNav(xn_parent_ctx, xn_name, xn_layout, xn_ldhses, root_menu, xn_type,
-          status),
+WNavGtk::WNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name, const char* xn_layout,
+                 GtkWidget** w, ldh_tSesContext xn_ldhses, wnav_sStartMenu* root_menu,
+                 wnav_eWindowType xn_type, pwr_tStatus* status)
+    : WNav(xn_parent_ctx, xn_name, xn_layout, xn_ldhses, root_menu, xn_type, status),
       parent_wid(xn_parent_wid), trace_timerid(0)
 {
   if (window_type == wnav_eWindowType_No)
     return;
 
-  GtkWidget* scrolledbrow
-      = scrolledbrowwidgetgtk_new(WNav::init_brow_base_cb, this, &brow_widget);
+  GtkWidget* scrolledbrow = scrolledbrowwidgetgtk_new(WNav::init_brow_base_cb, this, &brow_widget);
 
   form_widget = gtk_frame_new(NULL);
   gtk_container_add(GTK_CONTAINER(form_widget), scrolledbrow);
@@ -109,18 +108,13 @@ WNavGtk::WNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
 
   CoWowGtk::GetAtoms(&graph_atom, &objid_atom, &attrref_atom);
   selection_widget = gtk_invisible_new();
-  gtk_selection_add_target(
-      selection_widget, GDK_SELECTION_PRIMARY, GDK_SELECTION_TYPE_STRING, 1);
-  gtk_selection_add_target(
-      selection_widget, GDK_SELECTION_PRIMARY, graph_atom, 1);
-  gtk_selection_add_target(
-      selection_widget, GDK_SELECTION_PRIMARY, objid_atom, 1);
-  gtk_selection_add_target(
-      selection_widget, GDK_SELECTION_PRIMARY, attrref_atom, 1);
-  g_signal_connect(selection_widget, "selection-get",
-      G_CALLBACK(WNavGtk::sel_convert_cb), this);
-  sel_lose_id = g_signal_connect(selection_widget, "selection-clear-event",
-      G_CALLBACK(WNavGtk::sel_lose_cb), this);
+  gtk_selection_add_target(selection_widget, GDK_SELECTION_PRIMARY, GDK_SELECTION_TYPE_STRING, 1);
+  gtk_selection_add_target(selection_widget, GDK_SELECTION_PRIMARY, graph_atom, 1);
+  gtk_selection_add_target(selection_widget, GDK_SELECTION_PRIMARY, objid_atom, 1);
+  gtk_selection_add_target(selection_widget, GDK_SELECTION_PRIMARY, attrref_atom, 1);
+  g_signal_connect(selection_widget, "selection-get", G_CALLBACK(WNavGtk::sel_convert_cb), this);
+  sel_lose_id =
+      g_signal_connect(selection_widget, "selection-clear-event", G_CALLBACK(WNavGtk::sel_lose_cb), this);
 
   gbl.load_config(this);
 
@@ -147,7 +141,8 @@ WNavGtk::~WNavGtk()
 
   menu_tree_free();
   PalFile::config_tree_free(menu);
-  for (int i = 1; i < brow_cnt; i++) {
+  for (int i = 1; i < brow_cnt; i++)
+  {
     brow_DeleteSecondaryCtx(brow_stack[brow_cnt]->ctx);
     brow_stack[brow_cnt]->free_pixmaps();
     delete brow_stack[i];
@@ -162,18 +157,18 @@ void WNavGtk::set_inputfocus(int focus)
   if (!displayed)
     return;
 
-  if (!focus) {
+  if (!focus)
+  {
     wutl_widget_name_suffix_sub(form_widget);
-  } else {
+  }
+  else
+  {
     wutl_widget_name_suffix_add(form_widget, "focus");
     gtk_widget_grab_focus(brow_widget);
   }
 }
 
-void WNavGtk::trace_start()
-{
-  WNavGtk::trace_scan(this);
-}
+void WNavGtk::trace_start() { WNavGtk::trace_scan(this); }
 
 static gboolean wnavgtk_trace_scan(void* data)
 {
@@ -185,7 +180,8 @@ void WNavGtk::trace_scan(WNavGtk* wnav)
 {
   int time = 1000;
 
-  if (wnav->trace_started) {
+  if (wnav->trace_started)
+  {
     brow_TraceScan(wnav->brow->ctx);
 
     wnav->trace_timerid = g_timeout_add(time, wnavgtk_trace_scan, wnav);
@@ -196,8 +192,7 @@ void WNavGtk::print(const char* title)
 {
   pwr_tStatus sts;
 
-  wow->CreateBrowPrintDialog(
-      title, brow->ctx, flow_eOrientation_Portrait, 1.0, (void*)0, &sts);
+  wow->CreateBrowPrintDialog(title, brow->ctx, flow_eOrientation_Portrait, 1.0, (void*)0, &sts);
 }
 
 int WNavGtk::get_selection(char* str, int len)
@@ -215,9 +210,9 @@ void WNavGtk::set_selection_owner()
 {
   gboolean sts;
 
-  sts = gtk_selection_owner_set(
-      selection_widget, GDK_SELECTION_PRIMARY, gtk_get_current_event_time());
-  if (!sts) {
+  sts = gtk_selection_owner_set(selection_widget, GDK_SELECTION_PRIMARY, gtk_get_current_event_time());
+  if (!sts)
+  {
     message('E', "Failed attempting to become primary selection owner");
     brow_SelectClear(brow->ctx);
     return;
@@ -245,8 +240,7 @@ Ge* WNavGtk::ge_new(char* graph_name, int nojournal)
 
 WGe* WNavGtk::wge_new(char* name, char* filename, char* object_name, int modal)
 {
-  WGe* wge = new WGeGtk(parent_wid, this, name, filename, 0, 0, 0, 0, 0, 0, 0,
-      object_name, modal);
+  WGe* wge = new WGeGtk(parent_wid, this, name, filename, 0, 0, 0, 0, 0, 0, 0, object_name, modal);
   return wge;
 }
 
@@ -268,13 +262,16 @@ void WNavGtk::logw_new(char* item, wlog_eCategory* categories, int show_item)
   char title[300];
   pwr_tStatus sts;
 
-  if (categories) {
-    for (unsigned int i = 0;
-         i < sizeof(categories_str) / sizeof(categories_str[0]); i++) {
-      if (categories[i] == wlog_eCategory_) {
+  if (categories)
+  {
+    for (unsigned int i = 0; i < sizeof(categories_str) / sizeof(categories_str[0]); i++)
+    {
+      if (categories[i] == wlog_eCategory_)
+      {
         strcpy(categories_str[i], "");
         break;
-      } else
+      }
+      else
         wb_log::category_to_string(categories[i], categories_str[i]);
     }
   }
@@ -292,8 +289,8 @@ void WNavGtk::logw_new(char* item, wlog_eCategory* categories, int show_item)
     logw->show(0, item);
 }
 
-void WNavGtk::sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
-    guint info, guint time_stamp, gpointer data)
+void WNavGtk::sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data, guint info, guint time_stamp,
+                             gpointer data)
 {
   WNavGtk* wnav = (WNavGtk*)data;
   int sts;
@@ -306,10 +303,9 @@ void WNavGtk::sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
   GdkAtom target;
 
   target = gtk_selection_data_get_target(selection_data);
-  if (target == GDK_TARGET_STRING
-      || target == wnav->graph_atom
-      || target == wnav->objid_atom
-      || target == wnav->attrref_atom) {
+  if (target == GDK_TARGET_STRING || target == wnav->graph_atom || target == wnav->objid_atom ||
+      target == wnav->attrref_atom)
+  {
     brow_tNode* node_list;
     int node_count;
     wnav_eSelectionFormat format;
@@ -329,7 +325,8 @@ void WNavGtk::sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
 
     brow_GetUserData(node_list[0], (void**)&item);
 
-    switch (item->type) {
+    switch (item->type)
+    {
     case wnav_eItemType_Attr:
     case wnav_eItemType_AttrInput:
     case wnav_eItemType_AttrInputInv:
@@ -338,11 +335,12 @@ void WNavGtk::sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
     case wnav_eItemType_AttrArray:
     case wnav_eItemType_AttrArrayOutput:
     case wnav_eItemType_AttrArrayElem:
-    case wnav_eItemType_AttrObject: {
+    case wnav_eItemType_AttrObject:
+    {
       WItemBaseAttr* aitem = (WItemBaseAttr*)item;
 
-      sts = ldh_ObjidToName(wnav->ldhses, item->objid, ldh_eName_Hierarchy,
-          attr_str, sizeof(attr_str), &size);
+      sts =
+          ldh_ObjidToName(wnav->ldhses, item->objid, ldh_eName_Hierarchy, attr_str, sizeof(attr_str), &size);
       if (EVEN(sts))
         break;
 
@@ -351,11 +349,11 @@ void WNavGtk::sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
       sts = ldh_NameToAttrRef(wnav->ldhses, attr_str, &attrref);
       if (EVEN(sts))
         break;
-      sts = (wnav->format_selection_cb)(
-          wnav->parent_ctx, attrref, &buffp, 0, 1, format);
-      if (sts) {
-        gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8,
-            (const guchar*)buffp, strlen(buffp));
+      sts = (wnav->format_selection_cb)(wnav->parent_ctx, attrref, &buffp, 0, 1, format);
+      if (sts)
+      {
+        gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8, (const guchar*)buffp,
+                               strlen(buffp));
         free(node_list);
         return;
       }
@@ -363,26 +361,25 @@ void WNavGtk::sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
     }
     case wnav_eItemType_Object:
       attrref = cdh_ObjidToAref(item->objid);
-      sts = (wnav->format_selection_cb)(
-          wnav->parent_ctx, attrref, &buffp, 0, 0, format);
-      if (sts) {
-        gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8,
-            (const guchar*)buffp, strlen(buffp));
+      sts = (wnav->format_selection_cb)(wnav->parent_ctx, attrref, &buffp, 0, 0, format);
+      if (sts)
+      {
+        gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8, (const guchar*)buffp,
+                               strlen(buffp));
         free(node_list);
         return;
       }
+    /* fall through */
     default:
       brow_GetAnnotation(node_list[0], 0, name, sizeof(name));
-      gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8,
-          (const guchar*)name, strlen(name));
+      gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8, (const guchar*)name, strlen(name));
       free(node_list);
       return;
     }
     free(node_list);
   }
   strcpy(name, "");
-  gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8,
-      (const guchar*)name, strlen(name));
+  gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8, (const guchar*)name, strlen(name));
 }
 
 void WNavGtk::sel_lose_cb(GtkWidget* w, GdkEventSelection* event, gpointer data)
@@ -393,8 +390,8 @@ void WNavGtk::sel_lose_cb(GtkWidget* w, GdkEventSelection* event, gpointer data)
   wnav->selection_owner = 0;
 }
 
-int WNavGtk::open_foe(const char* name, pwr_tOid plcpgm, void** foectx,
-    int map_window, ldh_eAccess access, pwr_tOid oid)
+int WNavGtk::open_foe(const char* name, pwr_tOid plcpgm, void** foectx, int map_window, ldh_eAccess access,
+                      pwr_tOid oid)
 {
   pwr_tStatus sts = 0;
   WFoe* foe;
@@ -408,9 +405,10 @@ int WNavGtk::open_foe(const char* name, pwr_tOid plcpgm, void** foectx,
   foe = WFoe::get(plcpgm);
   if (foe)
     foe->pop();
-  else {
-    foe = new WFoeGtk((void*)this, parent_wid, name, plcpgm, wbctx, ldhses,
-        map_window, access, options, &sts);
+  else
+  {
+    foe =
+        new WFoeGtk((void*)this, parent_wid, name, plcpgm, wbctx, ldhses, map_window, access, options, &sts);
     if (EVEN(sts))
       return sts;
     foe->get_build_options_cb = foe_get_build_options_cb;
@@ -421,18 +419,16 @@ int WNavGtk::open_foe(const char* name, pwr_tOid plcpgm, void** foectx,
   return sts;
 }
 
-void WNavGtk::wda_new(pwr_tOid oid, pwr_tCid cid, char* attribute,
-    int edit_mode, int advuser, int display_objectname)
+void WNavGtk::wda_new(pwr_tOid oid, pwr_tCid cid, char* attribute, int edit_mode, int advuser,
+                      int display_objectname)
 {
-  new WdaGtk(parent_wid, this, ldhses, oid, cid, attribute, edit_mode, advuser,
-      display_objectname);
+  new WdaGtk(parent_wid, this, ldhses, oid, cid, attribute, edit_mode, advuser, display_objectname);
 }
 
-CoLogin* WNavGtk::login_new(const char* name, const char* groupname,
-    void (*bc_success)(void*), void (*bc_cancel)(void*), pwr_tStatus* status)
+CoLogin* WNavGtk::login_new(const char* name, const char* groupname, void (*bc_success)(void*),
+                            void (*bc_cancel)(void*), pwr_tStatus* status)
 {
-  return new CoLoginGtk(
-      this, parent_wid, name, groupname, bc_success, bc_cancel, 0, status);
+  return new CoLoginGtk(this, parent_wid, name, groupname, bc_success, bc_cancel, 0, status);
 }
 
 WCrr* WNavGtk::wcrr_new(pwr_tAttrRef* aref, pwr_tStatus* status)
@@ -450,21 +446,14 @@ WbExpW* WNavGtk::expw_new(char* name, int type, pwr_tStatus* status)
   return new WbExpWGtk(this, parent_wid, ldhses, name, type, 1, status);
 }
 
-WAttText* WNavGtk::watttext_new(
-    pwr_tAttrRef aref, int editmode, pwr_tStatus* status)
+WAttText* WNavGtk::watttext_new(pwr_tAttrRef aref, int editmode, pwr_tStatus* status)
 {
   return new WAttTextGtk(parent_wid, this, ldhses, aref, editmode, status);
 }
 
-void WNavGtk::wge_subwindow_loop(WGe* wge)
-{
-  gtk_main();
-}
+void WNavGtk::wge_subwindow_loop(WGe* wge) { gtk_main(); }
 
-void WNavGtk::wge_modal_loop(WGe* wge)
-{
-  gtk_main();
-}
+void WNavGtk::wge_modal_loop(WGe* wge) { gtk_main(); }
 
 static void wnav_message_dialog_ok(GtkWidget* w, gint arg1, gpointer wnav)
 {
@@ -484,8 +473,7 @@ static void wnav_continue_dialog_cancel(GtkWidget* w, gpointer wnav)
   gtk_main_quit();
 }
 
-static gboolean wnav_message_dialog_delete_event(
-    GtkWidget* w, GdkEvent* event, gpointer wnav)
+static gboolean wnav_message_dialog_delete_event(GtkWidget* w, GdkEvent* event, gpointer wnav)
 {
   ((WNav*)wnav)->dialog_cancel = 1;
   gtk_main_quit();
@@ -498,8 +486,7 @@ static void wnav_message_dialog_read(GtkWidget* w, gpointer data)
   char* value;
 
   wnav->dialog_ok = 1;
-  value = gtk_editable_get_chars(
-      GTK_EDITABLE(((WNavGtk*)wnav)->message_dialog_entry), 0, -1);
+  value = gtk_editable_get_chars(GTK_EDITABLE(((WNavGtk*)wnav)->message_dialog_entry), 0, -1);
   strncpy(wnav->dialog_value, value, sizeof(wnav->dialog_value));
   g_free(value);
   gtk_main_quit();
@@ -517,12 +504,10 @@ void WNavGtk::message_dialog(char* title, char* text)
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
-  GtkWidget* dialog
-      = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(toplevel)),
-          GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, text);
+  GtkWidget* dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(toplevel)), GTK_DIALOG_MODAL,
+                                             GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, text);
 #pragma GCC diagnostic pop
-  g_signal_connect(
-      dialog, "response", G_CALLBACK(wnav_message_dialog_ok), this);
+  g_signal_connect(dialog, "response", G_CALLBACK(wnav_message_dialog_ok), this);
   gtk_window_set_title(GTK_WINDOW(dialog), title);
   gtk_widget_show_all(dialog);
 
@@ -542,22 +527,22 @@ static void wnav_confirm_dialog_cancel(void* ctx, void* data)
   gtk_main_quit();
 }
 
-int WNavGtk::confirm_dialog(
-    char* title, char* text, int display_cancel, int* cancel)
+int WNavGtk::confirm_dialog(char* title, char* text, int display_cancel, int* cancel)
 {
   dialog_ok = 0;
   dialog_cancel = 0;
-  wow->DisplayQuestion(
-      this, title, text, wnav_confirm_dialog_ok, wnav_confirm_dialog_cancel, 0);
+  wow->DisplayQuestion(this, title, text, wnav_confirm_dialog_ok, wnav_confirm_dialog_cancel, 0);
 
   gtk_main();
 
-  if (dialog_ok) {
+  if (dialog_ok)
+  {
     if (display_cancel)
       *cancel = 0;
     return 1;
   }
-  if (dialog_cancel) {
+  if (dialog_cancel)
+  {
     if (display_cancel)
       *cancel = 0;
     return 0;
@@ -568,10 +553,9 @@ int WNavGtk::confirm_dialog(
 int WNavGtk::continue_dialog(char* title, char* text)
 {
   // Create a question window
-  GtkWidget* question_widget = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW,
-      "default-height", 150, "default-width", 400, "title", title, NULL);
-  g_signal_connect(question_widget, "delete_event",
-      G_CALLBACK(wnav_message_dialog_delete_event), this);
+  GtkWidget* question_widget = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 150,
+                                                        "default-width", 400, "title", title, NULL);
+  g_signal_connect(question_widget, "delete_event", G_CALLBACK(wnav_message_dialog_delete_event), this);
   GtkWidget* question_label = gtk_label_new(text);
 
   pwr_tFileName fname;
@@ -580,31 +564,24 @@ int WNavGtk::continue_dialog(char* title, char* text)
 
   GtkWidget* question_ok = gtk_button_new_with_label("Continue");
   gtk_widget_set_size_request(question_ok, 70, 25);
-  g_signal_connect(
-      question_ok, "clicked", G_CALLBACK(wnav_continue_dialog_ok), this);
+  g_signal_connect(question_ok, "clicked", G_CALLBACK(wnav_continue_dialog_ok), this);
 
   GtkWidget* question_no = gtk_button_new_with_label("Quit");
   gtk_widget_set_size_request(question_no, 70, 25);
-  g_signal_connect(
-      question_no, "clicked", G_CALLBACK(wnav_continue_dialog_cancel), this);
+  g_signal_connect(question_no, "clicked", G_CALLBACK(wnav_continue_dialog_cancel), this);
 
   GtkWidget* question_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  gtk_box_pack_start(
-      GTK_BOX(question_hboxtext), question_image, FALSE, FALSE, 15);
-  gtk_box_pack_start(
-      GTK_BOX(question_hboxtext), question_label, TRUE, TRUE, 15);
+  gtk_box_pack_start(GTK_BOX(question_hboxtext), question_image, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(question_hboxtext), question_label, TRUE, TRUE, 15);
 
   GtkWidget* question_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
-  gtk_box_pack_start(
-      GTK_BOX(question_hboxbuttons), question_ok, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(question_hboxbuttons), question_ok, FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(question_hboxbuttons), question_no, FALSE, FALSE, 0);
 
   GtkWidget* question_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(question_vbox), question_hboxtext, TRUE, TRUE, 30);
-  gtk_box_pack_start(
-      GTK_BOX(question_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
-  gtk_box_pack_end(
-      GTK_BOX(question_vbox), question_hboxbuttons, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(question_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
+  gtk_box_pack_end(GTK_BOX(question_vbox), question_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(question_widget), question_vbox);
   gtk_widget_show_all(question_widget);
 
@@ -624,10 +601,9 @@ int WNavGtk::continue_dialog(char* title, char* text)
 int WNavGtk::prompt_dialog(char* title, char* text, char** value)
 {
   // Create an input dialog
-  GtkWidget* india_widget = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW,
-      "default-height", 150, "default-width", 350, "title", title, NULL);
-  g_signal_connect(india_widget, "delete_event",
-      G_CALLBACK(wnav_message_dialog_delete_event), this);
+  GtkWidget* india_widget = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 150, "default-width",
+                                                     350, "title", title, NULL);
+  g_signal_connect(india_widget, "delete_event", G_CALLBACK(wnav_message_dialog_delete_event), this);
   message_dialog_entry = gtk_entry_new();
   GtkWidget* india_label = gtk_label_new(text);
 
@@ -637,18 +613,15 @@ int WNavGtk::prompt_dialog(char* title, char* text, char** value)
 
   GtkWidget* india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(india_ok, 70, 25);
-  g_signal_connect(
-      india_ok, "clicked", G_CALLBACK(wnav_message_dialog_read), this);
+  g_signal_connect(india_ok, "clicked", G_CALLBACK(wnav_message_dialog_read), this);
   GtkWidget* india_cancel = gtk_button_new_with_label("Cancel");
   gtk_widget_set_size_request(india_cancel, 70, 25);
-  g_signal_connect(
-      india_cancel, "clicked", G_CALLBACK(wnav_message_dialog_cancel), this);
+  g_signal_connect(india_cancel, "clicked", G_CALLBACK(wnav_message_dialog_cancel), this);
 
   GtkWidget* india_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(india_hboxtext), india_image, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(india_hboxtext), india_label, FALSE, FALSE, 15);
-  gtk_box_pack_end(
-      GTK_BOX(india_hboxtext), message_dialog_entry, TRUE, TRUE, 30);
+  gtk_box_pack_end(GTK_BOX(india_hboxtext), message_dialog_entry, TRUE, TRUE, 30);
 
   GtkWidget* india_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(india_hboxbuttons), india_ok, FALSE, FALSE, 0);
@@ -656,8 +629,7 @@ int WNavGtk::prompt_dialog(char* title, char* text, char** value)
 
   GtkWidget* india_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(india_vbox), india_hboxtext, TRUE, TRUE, 30);
-  gtk_box_pack_start(
-      GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(india_vbox), india_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(india_widget), india_vbox);
 
@@ -667,12 +639,14 @@ int WNavGtk::prompt_dialog(char* title, char* text, char** value)
   gtk_widget_show_all(india_widget);
   gtk_main();
 
-  if (dialog_ok) {
+  if (dialog_ok)
+  {
     *value = dialog_value;
     gtk_widget_destroy(india_widget);
     return 1;
   }
-  if (dialog_cancel) {
+  if (dialog_cancel)
+  {
     strcpy(dialog_value, "");
     *value = dialog_value;
     gtk_widget_destroy(india_widget);

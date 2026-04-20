@@ -37,22 +37,15 @@
 #include "wb_convert_volume.h"
 
 wb_convert_volume::wb_convert_volume()
-    : m_cidChecked(pwr_cNCid), m_classCount(0), m_instanceCount(0),
-      m_update(false)
+    : m_cidChecked(pwr_cNCid), m_classCount(0), m_instanceCount(0), m_update(false)
 {
 }
 
 wb_convert_volume::wb_convert_volume(bool update)
-    : m_cidChecked(pwr_cNCid), m_classCount(0), m_instanceCount(0),
-      m_update(update), m_needUpdateCount(0)
+    : m_cidChecked(pwr_cNCid), m_classCount(0), m_instanceCount(0), m_update(update), m_needUpdateCount(0)
 {
 }
 
-wb_convert_volume::~wb_convert_volume()
-{
-}
+wb_convert_volume::~wb_convert_volume() {}
 
-void wb_convert_volume::setUpdate(bool update)
-{
-  m_update = update;
-}
+void wb_convert_volume::setUpdate(bool update) { m_update = update; }

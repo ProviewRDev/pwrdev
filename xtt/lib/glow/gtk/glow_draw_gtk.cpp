@@ -3658,7 +3658,10 @@ int GlowDrawGtk::gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h, 
 
   cairo_pattern_t* pat;
   if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, transparency, &pat))
+  {
+    end_cairo(wind, cr);
     return 0;
+  }
   cairo_rectangle(cr, x - 1, y - 1, w, h);
   cairo_set_source(cr, pat);
   cairo_fill(cr);
@@ -3686,7 +3689,10 @@ int GlowDrawGtk::gradient_fill_rectrounded(GlowWind* wind, int x, int y, int w, 
 
   cairo_pattern_t* pat;
   if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, transparency, &pat))
+  {
+    end_cairo(wind, cr);
     return 0;
+  }
 
   if (roundamount >= 0)
   {
@@ -3734,7 +3740,10 @@ int GlowDrawGtk::gradient_fill_arc(GlowWind* wind, int x, int y, int w, int h, i
 
   cairo_pattern_t* pat;
   if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, transparency, &pat))
+  {
+    end_cairo(wind, cr);
     return 0;
+  }
 
   cairo_save(cr);
   cairo_translate(cr, double(x) + double(w) / 2, double(y) + double(h) / 2);
@@ -3792,7 +3801,10 @@ int GlowDrawGtk::gradient_fill_polyline(GlowWind* wind, glow_sPointX* points, in
   cairo_pattern_t* pat;
   if (!gradient_create_pattern((int)x0, (int)y0, (int)(x1 - x0), (int)(y1 - y0), d0, d1, d2, gradient,
                                transparency, &pat))
+  {
+    end_cairo(wind, cr);
     return 0;
+  }
   cairo_set_source(cr, pat);
   cairo_fill(cr);
 

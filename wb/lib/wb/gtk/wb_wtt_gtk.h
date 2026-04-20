@@ -43,14 +43,13 @@
 
 #include "wb_wtt.h"
 
-class WttGtk : public Wtt {
+class WttGtk : public Wtt
+{
 public:
-  WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid, const char* wt_name,
-      const char* iconname, ldh_tWBContext wt_wbctx, pwr_tVolumeId wt_volid,
-      ldh_tVolume wt_volctx, wnav_sStartMenu* root_menu, pwr_tStatus* status);
-  WttGtk()
-  {
-  }
+  WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid, const char* wt_name, const char* iconname,
+         ldh_tWBContext wt_wbctx, pwr_tVolumeId wt_volid, ldh_tVolume wt_volctx, wnav_sStartMenu* root_menu,
+         pwr_tStatus* status);
+  WttGtk() {}
 
   GtkWidget* parent_wid;
   GtkWidget* wnav_brow_widget;
@@ -148,10 +147,9 @@ public:
   int realized;
 
   GtkWidget* build_menu();
-  GtkWidget* build_submenu(GtkWidget* Parent, int MenuType,
-      const char* MenuTitle, void* MenuUserData,
-      void (*Callback)(GtkWidget*, gpointer), void* CallbackData,
-      ldh_sMenuItem* Items, int* idx);
+  GtkWidget* build_submenu(GtkWidget* Parent, int MenuType, const char* MenuTitle, void* MenuUserData,
+                           void (*Callback)(GtkWidget*, gpointer), void* CallbackData, ldh_sMenuItem* Items,
+                           int* idx);
 
   virtual void set_clock_cursor();
   virtual void reset_cursor();
@@ -178,10 +176,9 @@ public:
   virtual wb_build* build_new();
   virtual void wpkg_new();
   virtual int ute_new(char* title);
-  virtual void open_input_dialog(const char* text, const char* title,
-      const char* init_text, void (*ok_cb)(Wtt*, char*));
-  virtual void open_confirm(const char* text, const char* title,
-      void (*ok_cb)(Wtt*), void (*no_cb)(Wtt*));
+  virtual void open_input_dialog(const char* text, const char* title, const char* init_text,
+                                 void (*ok_cb)(Wtt*, char*));
+  virtual void open_confirm(const char* text, const char* title, void (*ok_cb)(Wtt*), void (*no_cb)(Wtt*));
   virtual void open_boot_window();
   virtual void update_options_form();
   virtual void set_options();
@@ -277,8 +274,8 @@ public:
   static void boot_cancel_cb(GtkWidget* w, gpointer data);
   static void boot_destroy_cb(GtkWidget* w, gpointer data);
   static gint boot_delete_cb(GtkWidget* w, GdkEvent* event, gpointer data);
-  static void boot_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path,
-      GtkTreeViewColumn* column, gpointer data);
+  static void boot_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column,
+                                    gpointer data);
   static void boot_ok_cb(GtkWidget* w, gpointer data);
   static void activate_options_ok(GtkWidget* w, gpointer data);
   static void activate_options_apply(GtkWidget* w, gpointer data);
@@ -288,18 +285,15 @@ public:
   static void disable_set_focus(Wtt* wtt, int time);
   static void reset_avoid_deadlock(Wtt* wtt);
   static void set_avoid_deadlock(Wtt* wtt, int time);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
-  static gboolean focused_cmd_input(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean focused_cmd_input(GtkWidget* w, GdkEvent* event, gpointer data);
   static gboolean hide_cmd_input(GtkWidget* w, gpointer data);
-  static void menu_position_func(
-      GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data);
+  static void menu_position_func(GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data);
   static void popup_button_cb(GtkWidget* w, gpointer data);
 
   ~WttGtk();
 };
 
 GtkWidget* wtt_create_popup_menu(Wtt* wtt, pwr_sAttrRef aref, pwr_tCid cid,
-    void (*message_cb)(void*, char, char*));
+                                 void (*message_cb)(void*, char, char*));
 #endif

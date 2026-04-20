@@ -47,18 +47,21 @@
 
 class TrItemBase;
 
-typedef enum {
+typedef enum
+{
   treenav_eItemType_Object,
   treenav_eItemType_TreeObject,
   treenav_eItemType_TreeNode,
 } treenav_eItemType;
 
-typedef enum {
+typedef enum
+{
   treenav_mOpen_All = ~0,
   treenav_mOpen_Children = 1 << 0
 } treenav_mOpen;
 
-class TreeNav_object {
+class TreeNav_object
+{
 public:
   pwr_tAttrRef aref;
   pwr_tAName name;
@@ -89,17 +92,17 @@ public:
   }
 };
 
-typedef enum {
+typedef enum
+{
   treenav_eTreeItemType_No,
   treenav_eTreeItemType_Object,
   treenav_eTreeItemType_ObjectAttr
 } treenav_eTreeItemType;
 
-class TreeNode {
+class TreeNode
+{
 public:
-  TreeNode()
-      : fth(0), fch(0), fws(0), bws(0), type(treenav_eTreeItemType_No), idx(0),
-        deleted(0)
+  TreeNode() : fth(0), fch(0), fws(0), bws(0), type(treenav_eTreeItemType_No), idx(0), deleted(0)
   {
     strcpy(sname, "");
     strcpy(descr, "");
@@ -116,9 +119,10 @@ public:
 };
 
 //! Class for handling of brow.
-class TreeNavBrow {
+class TreeNavBrow
+{
 public:
-  TreeNavBrow(BrowCtx* brow_ctx, void* xn) : ctx(brow_ctx), treenav(xn){}
+  TreeNavBrow(BrowCtx* brow_ctx, void* xn) : ctx(brow_ctx), treenav(xn) {}
   ~TreeNavBrow();
 
   BrowCtx* ctx;
@@ -136,14 +140,12 @@ public:
 };
 
 //! The navigation area of the attribute editor.
-class TreeNav {
+class TreeNav
+{
 public:
-  TreeNav(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist, int xn_item_cnt,
-      unsigned int xn_options,
-      pwr_tStatus (*xn_get_object_info)(
-          void*, pwr_tAttrRef*, char*, int, char*, char*, int),
-      pwr_tStatus (*xn_get_node_info)(void*, char*, char*, int),
-      pwr_tStatus* status);
+  TreeNav(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist, int xn_item_cnt, unsigned int xn_options,
+          pwr_tStatus (*xn_get_object_info)(void*, pwr_tAttrRef*, char*, int, char*, char*, int),
+          pwr_tStatus (*xn_get_node_info)(void*, char*, char*, int), pwr_tStatus* status);
   virtual ~TreeNav();
 
   void* parent_ctx;
@@ -154,8 +156,7 @@ public:
   void (*message_cb)(void*, char, const char*);
   std::vector<TreeNode> tree;
   unsigned int options;
-  pwr_tStatus (*get_object_info)(
-      void*, pwr_tAttrRef*, char*, int, char*, char*, int);
+  pwr_tStatus (*get_object_info)(void*, pwr_tAttrRef*, char*, int, char*, char*, int);
   pwr_tStatus (*get_node_info)(void*, char*, char*, int);
 
   void print(char* filename);
@@ -170,19 +171,17 @@ public:
   void show_tree();
   void show_list();
   void delete_item(TreeNav_object* hi);
-  void create_objectlist(
-      pwr_tAttrRef* xn_itemlist, int xn_item_cnt, pwr_tStatus* status);
+  void create_objectlist(pwr_tAttrRef* xn_itemlist, int xn_item_cnt, pwr_tStatus* status);
   void add_item_command(char* name, char* command);
   int get_descr(char* name, int seg, int idx, char* descr);
 
   virtual void message(char sev, const char* text);
-  virtual void set_inputfocus()
-  {
-  }
+  virtual void set_inputfocus() {}
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
 };
 
-class TrItemBase {
+class TrItemBase
+{
 public:
   TrItemBase(treenav_eItemType t);
   virtual ~TrItemBase();
@@ -191,10 +190,10 @@ public:
 };
 
 //! Item for an object in list layout.
-class TrItemObject : public TrItemBase {
+class TrItemObject : public TrItemBase
+{
 public:
-  TrItemObject(TreeNav* treenav, TreeNav_object* item, brow_tNode dest,
-      flow_eDest dest_code);
+  TrItemObject(TreeNav* treenav, TreeNav_object* item, brow_tNode dest, flow_eDest dest_code);
   virtual ~TrItemObject();
 
   TreeNav_object item;
@@ -204,20 +203,20 @@ public:
 };
 
 //! Item for an object in tree layout.
-class TrItemTreeObject : public TrItemObject {
+class TrItemTreeObject : public TrItemObject
+{
 public:
-  TrItemTreeObject(TreeNav* treenav, TreeNav_object* item, int index,
-      brow_tNode dest, flow_eDest dest_code);
+  TrItemTreeObject(TreeNav* treenav, TreeNav_object* item, int index, brow_tNode dest, flow_eDest dest_code);
   virtual ~TrItemTreeObject();
 
   int idx;
 };
 
 //! Item for a tree node.
-class TrItemNode : public TrItemBase {
+class TrItemNode : public TrItemBase
+{
 public:
-  TrItemNode(TreeNav* treenav, char* name, char* descr, int index,
-      brow_tNode dest, flow_eDest dest_code);
+  TrItemNode(TreeNav* treenav, char* name, char* descr, int index, brow_tNode dest, flow_eDest dest_code);
   virtual ~TrItemNode();
 
   brow_tNode node;

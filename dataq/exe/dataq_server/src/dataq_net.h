@@ -41,7 +41,8 @@
 #include "rt_net.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #define dataq_cProcServer 125
@@ -49,127 +50,138 @@ extern "C" {
 #define dataq_cMsgClass 203
 #define dataq_cNetVersion 1
 
-typedef enum {
-  dataq_eMsgType_NodeUp,
-  dataq_eMsgType_NodeUpR,
-  dataq_eMsgType_RDataQInit,
-  dataq_eMsgType_RDataQFeedback,
-  dataq_eMsgType_RDataQReset,
-  dataq_eMsgType_RDataQ,
-  dataq_eMsgType_ROrder,
-  dataq_eMsgType_ROrderInit,
-  dataq_eMsgType_ROrderFeedback,
-  dataq_eMsgType_ROrderStatusReset,
-  dataq_eMsgType_CreateData
-} dataq_eMsgType;
+  typedef enum
+  {
+    dataq_eMsgType_NodeUp,
+    dataq_eMsgType_NodeUpR,
+    dataq_eMsgType_RDataQInit,
+    dataq_eMsgType_RDataQFeedback,
+    dataq_eMsgType_RDataQReset,
+    dataq_eMsgType_RDataQ,
+    dataq_eMsgType_ROrder,
+    dataq_eMsgType_ROrderInit,
+    dataq_eMsgType_ROrderFeedback,
+    dataq_eMsgType_ROrderStatusReset,
+    dataq_eMsgType_CreateData
+  } dataq_eMsgType;
 
-typedef struct {
-  pwr_tUInt32 Type;
-  pwr_tUInt32 Version;
-} dataq_sMsgAny;
+  typedef struct
+  {
+    pwr_tUInt32 Type;
+    pwr_tUInt32 Version;
+  } dataq_sMsgAny;
 
-typedef struct {
-  pwr_tUInt32 Type;
-  pwr_tUInt32 Version;  
-} dataq_sMsgCreateData;
+  typedef struct
+  {
+    pwr_tUInt32 Type;
+    pwr_tUInt32 Version;
+  } dataq_sMsgCreateData;
 
-typedef struct {
-  pwr_tTid TypeId;
-  pwr_tBoolean Feedback;
-  pwr_tUInt32 TargetOffset;
-  pwr_tUInt32 SourceOffset;
-  pwr_tUInt32 Size;
-} dataq_sMsgDataAttr;
+  typedef struct
+  {
+    pwr_tTid TypeId;
+    pwr_tBoolean Feedback;
+    pwr_tUInt32 TargetOffset;
+    pwr_tUInt32 SourceOffset;
+    pwr_tUInt32 Size;
+  } dataq_sMsgDataAttr;
 
-typedef struct {
-  pwr_tAttrRef Aref;
-  pwr_tMask Options;
-  pwr_tUInt32 Start;
-  pwr_tUInt32 End;
-} dataq_sMsgRDataQ_RemoteQ;
+  typedef struct
+  {
+    pwr_tAttrRef Aref;
+    pwr_tMask Options;
+    pwr_tUInt32 Start;
+    pwr_tUInt32 End;
+  } dataq_sMsgRDataQ_RemoteQ;
 
-typedef struct {
-  pwr_tUInt32 Type;
-  pwr_tUInt32 Version;
-  pwr_tOid ROrder;
-  pwr_tCid DataClass;
-  pwr_tOid Target;
-  pwr_tMask Options;
-  pwr_tUInt32 TableVersion;
-  pwr_tUInt32 AttrNum;
-  int Data[1];
-} dataq_sMsgROrderInit;
+  typedef struct
+  {
+    pwr_tUInt32 Type;
+    pwr_tUInt32 Version;
+    pwr_tOid ROrder;
+    pwr_tCid DataClass;
+    pwr_tOid Target;
+    pwr_tMask Options;
+    pwr_tUInt32 TableVersion;
+    pwr_tUInt32 AttrNum;
+    int Data[1];
+  } dataq_sMsgROrderInit;
 
-typedef struct {
-  pwr_tUInt32 Type;
-  pwr_tUInt32 Version;
-  pwr_tOid ROrder;
-  pwr_tOName DataName;
-  pwr_tCid DataClass;
-  pwr_tOid DataSource;
-  pwr_tOid Target;
-  pwr_tUInt32 TableVersion;
-  pwr_tUInt32 AttrNum;
-  int Data[1];
-} dataq_sMsgROrder;
+  typedef struct
+  {
+    pwr_tUInt32 Type;
+    pwr_tUInt32 Version;
+    pwr_tOid ROrder;
+    pwr_tOName DataName;
+    pwr_tCid DataClass;
+    pwr_tOid DataSource;
+    pwr_tOid Target;
+    pwr_tUInt32 TableVersion;
+    pwr_tUInt32 AttrNum;
+    int Data[1];
+  } dataq_sMsgROrder;
 
-typedef struct {
-  pwr_tUInt32 Type;
-  pwr_tUInt32 Version;
-  pwr_tAttrRef RDataQ;
-  pwr_tOName SourceDataName;
-  pwr_tOName DataName;
-  pwr_tCid DataClass;
-  pwr_tOid DataSource;
-  pwr_tMask Options;
-  pwr_tUInt32 TableVersion;
-  pwr_tUInt32 RemoteQNum;
-  pwr_tUInt32 AttrNum;
-  int Data[1];
-} dataq_sMsgRDataQInit;
+  typedef struct
+  {
+    pwr_tUInt32 Type;
+    pwr_tUInt32 Version;
+    pwr_tAttrRef RDataQ;
+    pwr_tOName SourceDataName;
+    pwr_tOName DataName;
+    pwr_tCid DataClass;
+    pwr_tOid DataSource;
+    pwr_tMask Options;
+    pwr_tUInt32 TableVersion;
+    pwr_tUInt32 RemoteQNum;
+    pwr_tUInt32 AttrNum;
+    int Data[1];
+  } dataq_sMsgRDataQInit;
 
-typedef struct {
-   pwr_tUInt32 Type;
-   pwr_tUInt32 Version;
-   pwr_tUInt32 FeedbackData;
-   pwr_tUInt32 FeedbackTrigger;
-   pwr_tAttrRef RDataQ;
-   pwr_tOName DataName;
-   pwr_tUInt32 TableVersion;
-   pwr_tUInt32 AttrNum;
-   int Data[1];
-} dataq_sMsgRDataQFeedback;
+  typedef struct
+  {
+    pwr_tUInt32 Type;
+    pwr_tUInt32 Version;
+    pwr_tUInt32 FeedbackData;
+    pwr_tUInt32 FeedbackTrigger;
+    pwr_tAttrRef RDataQ;
+    pwr_tOName DataName;
+    pwr_tUInt32 TableVersion;
+    pwr_tUInt32 AttrNum;
+    int Data[1];
+  } dataq_sMsgRDataQFeedback;
 
-typedef struct {
-  pwr_tUInt32 Type;
-  pwr_tUInt32 Version;
-  pwr_tAttrRef RDataQ;
-  pwr_tOName DataName;
-  pwr_tCid DataClass;
-  pwr_tOid DataSource;
-  pwr_tAttrRef Target;
-  pwr_tMask Options;
-  pwr_tUInt32 TableVersion;
-  pwr_tUInt32 AttrNum;
-  int Data[1];
-} dataq_sMsgRDataQ;
+  typedef struct
+  {
+    pwr_tUInt32 Type;
+    pwr_tUInt32 Version;
+    pwr_tAttrRef RDataQ;
+    pwr_tOName DataName;
+    pwr_tCid DataClass;
+    pwr_tOid DataSource;
+    pwr_tAttrRef Target;
+    pwr_tMask Options;
+    pwr_tUInt32 TableVersion;
+    pwr_tUInt32 AttrNum;
+    int Data[1];
+  } dataq_sMsgRDataQ;
 
-typedef struct {
-  pwr_tUInt32 Type;
-  pwr_tUInt32 Version;
-  pwr_tOid ROrder;
-  pwr_tOid DataObject;
-  pwr_tUInt32 TableVersion;
-  pwr_tUInt32 AttrNum;
-  int Data[1];
-} dataq_sMsgROrderFeedback;
+  typedef struct
+  {
+    pwr_tUInt32 Type;
+    pwr_tUInt32 Version;
+    pwr_tOid ROrder;
+    pwr_tOid DataObject;
+    pwr_tUInt32 TableVersion;
+    pwr_tUInt32 AttrNum;
+    int Data[1];
+  } dataq_sMsgROrderFeedback;
 
-typedef struct {
-  pwr_tUInt32 Type;
-  pwr_tUInt32 Version;
-  pwr_tAttrRef RemoteDataQ;
-} dataq_sMsgRDataQReset;
-
+  typedef struct
+  {
+    pwr_tUInt32 Type;
+    pwr_tUInt32 Version;
+    pwr_tAttrRef RemoteDataQ;
+  } dataq_sMsgRDataQReset;
 
 #ifdef __cplusplus
 }

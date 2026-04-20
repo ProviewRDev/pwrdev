@@ -37,6 +37,8 @@
 #ifndef glow_growtable_h
 #define glow_growtable_h
 
+#include <iosfwd>
+
 #include "glow_growrect.h"
 
 /*! \file glow_growtable.h
@@ -47,7 +49,8 @@
 class GrowCtx;
 class GrowScrollBar;
 
-typedef enum {
+typedef enum
+{
   glow_mTableOptions_No = 0,
   glow_mTableOptions_ZeroIfHeader = 1 << 0,
   glow_mTableOptions_ZeroIfHeaderIs0 = 1 << 1
@@ -61,7 +64,8 @@ typedef enum {
   object is clicked on, moved etc.
 */
 
-class GrowTable : public GrowRect {
+class GrowTable : public GrowRect
+{
 public:
   //! Constuctor
   /*!
@@ -78,11 +82,10 @@ public:
     \param display_lev	Displaylevel when this object is visible.
     \param nodraw	Don't draw the object now.
   */
-  GrowTable(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0,
-      double w = 0, double h = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      int fill_rect = 0, glow_eDrawType fill_d_type = glow_eDrawType_Line,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int nodraw = 0);
+  GrowTable(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0, double w = 0, double h = 0,
+            glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1, int fill_rect = 0,
+            glow_eDrawType fill_d_type = glow_eDrawType_Line,
+            glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int nodraw = 0);
 
   //! Destructor
   /*! Remove the object from context, and erase it from the screen.
@@ -94,13 +97,13 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Draw the objects if any part is inside the drawing area.
   /*!
@@ -135,58 +138,54 @@ public:
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowTable;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowTable; }
 
-  char file_name[80]; //!< Graph file name.
-  GlowTraceData trace; //!< Obsolete
-  void* user_data; //!< User data.
-  int vertical_scrollbar; //!< Draw vertical scrollbar.
-  int horizontal_scrollbar; //!< Draw horizontal scrollbar.
-  double scrollbar_width; //!< Width of scrollbar objects.
-  GrowScrollBar* v_scrollbar; //!< Vertical scrollbar object.
-  GrowScrollBar* h_scrollbar; //!< Horizontal scrollbar object.
-  double v_value; //!< Value of vertical scrollbar.
-  double h_value; //!< Value of horizontal scrollbar.
-  double table_x0; //!< Coordinate for left border of table.
-  double table_x1; //!< Coordinate for right border of table.
-  double table_y0; //!< Coordinate for low border of table.
-  double table_y1; //!< Coordiante for high border of table.
-  glow_eDrawType scrollbar_color; //!< Color of scrollbar bar.
-  glow_eDrawType scrollbar_bg_color; //!< Color of scrollbar background.
-  double window_scale; //!< Scale of window ctx.
-  double y_low_offs; //!< y low offset.
-  double x_left_offs; //!< x left offset.
-  int rows; //!< Number of rows in the table.
-  int columns; //!< Number of columns in the table.
-  int header_row; //!< Draw header row.
-  int header_column; //!< Draw header column.
-  int text_size; //!< Text size.
-  glow_eDrawType text_drawtype; //!< Text drawtype.
-  glow_eDrawType text_color_drawtype; //!< Text color.
-  int header_text_size; //!< Header row text size.
-  glow_eDrawType header_text_drawtype; //!< Header row text drawtype.
-  glow_eDrawType header_text_color; //!< Header row text color.
-  double header_row_height; //!< Height of header row.
-  double row_height; //!< Row hight.
-  double column_width[TABLE_MAX_COL]; //!< Width of each column.
-  char header_text[TABLE_MAX_COL][40]; //!< Header text for each column.
-  int column_size[TABLE_MAX_COL]; //!< Max length of text in column.
-  glow_eAdjustment
-      column_adjustment[TABLE_MAX_COL]; //!< Text adjustment in column.
-  int value_size; //!< Total size of cell_value.
-  char* cell_value; //!< Contains the cell values.
-  int selected_cell_row; //!< Row of the currently selected cell. -1 of no row
+  char file_name[80];                                //!< Graph file name.
+  GlowTraceData trace;                               //!< Obsolete
+  void* user_data;                                   //!< User data.
+  int vertical_scrollbar;                            //!< Draw vertical scrollbar.
+  int horizontal_scrollbar;                          //!< Draw horizontal scrollbar.
+  double scrollbar_width;                            //!< Width of scrollbar objects.
+  GrowScrollBar* v_scrollbar;                        //!< Vertical scrollbar object.
+  GrowScrollBar* h_scrollbar;                        //!< Horizontal scrollbar object.
+  double v_value;                                    //!< Value of vertical scrollbar.
+  double h_value;                                    //!< Value of horizontal scrollbar.
+  double table_x0;                                   //!< Coordinate for left border of table.
+  double table_x1;                                   //!< Coordinate for right border of table.
+  double table_y0;                                   //!< Coordinate for low border of table.
+  double table_y1;                                   //!< Coordiante for high border of table.
+  glow_eDrawType scrollbar_color;                    //!< Color of scrollbar bar.
+  glow_eDrawType scrollbar_bg_color;                 //!< Color of scrollbar background.
+  double window_scale;                               //!< Scale of window ctx.
+  double y_low_offs;                                 //!< y low offset.
+  double x_left_offs;                                //!< x left offset.
+  int rows;                                          //!< Number of rows in the table.
+  int columns;                                       //!< Number of columns in the table.
+  int header_row;                                    //!< Draw header row.
+  int header_column;                                 //!< Draw header column.
+  int text_size;                                     //!< Text size.
+  glow_eDrawType text_drawtype;                      //!< Text drawtype.
+  glow_eDrawType text_color_drawtype;                //!< Text color.
+  int header_text_size;                              //!< Header row text size.
+  glow_eDrawType header_text_drawtype;               //!< Header row text drawtype.
+  glow_eDrawType header_text_color;                  //!< Header row text color.
+  double header_row_height;                          //!< Height of header row.
+  double row_height;                                 //!< Row hight.
+  double column_width[TABLE_MAX_COL];                //!< Width of each column.
+  char header_text[TABLE_MAX_COL][40];               //!< Header text for each column.
+  int column_size[TABLE_MAX_COL];                    //!< Max length of text in column.
+  glow_eAdjustment column_adjustment[TABLE_MAX_COL]; //!< Text adjustment in column.
+  int value_size;                                    //!< Total size of cell_value.
+  char* cell_value;                                  //!< Contains the cell values.
+  int selected_cell_row;                             //!< Row of the currently selected cell. -1 of no row
   //! is selected.
   int selected_cell_column; //!< Column of the currently selected cell. -1 of no
   //! row is selected.
   glow_eDrawType select_drawtype; //!< Drawtype for selected cell.
-  int input_focus; //!< This object has input focus.
-  int header_text_bold; //!< Header text is bold.
-  glow_mTableOptions options; //!< Options bitmask.
-  glow_eFont font; //!< Text font.
+  int input_focus;                //!< This object has input focus.
+  int header_text_bold;           //!< Header text is bold.
+  glow_mTableOptions options;     //!< Options bitmask.
+  glow_eFont font;                //!< Text font.
 
   //! Draw the object.
   /*!
@@ -202,10 +201,9 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
-  void draw_brief(GlowWind* w, GlowTransform* t, int highlight, int hot,
-      void* node, void* colornode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
+  void draw_brief(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode);
 
   //! Redraw the area inside the objects border.
   void draw();
@@ -243,19 +241,13 @@ public:
   /*!
     \param data User data.
   */
-  void set_user_data(void* data)
-  {
-    user_data = data;
-  }
+  void set_user_data(void* data) { user_data = data; }
 
   //! Get user data.
   /*!
     \param data User data.
   */
-  void get_user_data(void** data)
-  {
-    *data = user_data;
-  }
+  void get_user_data(void** data) { *data = user_data; }
 
   //! Export the object as a javabean.
   /*!
@@ -273,8 +265,8 @@ public:
     used to generate
     java code for the bean.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ostream& fp);
 
   //! Conversion between different versions of Glow
   /*!
@@ -282,8 +274,7 @@ public:
   */
   void convert(glow_eConvert version);
 
-  int event_handler(
-      GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
 
   //! Check if new filename
   void update_attributes();
@@ -295,16 +286,9 @@ public:
   void configure_scrollbars();
 
   void set_transform_from_stored(GlowTransform* t);
-  void set_rotation(
-      double angle, double x0, double y0, glow_eRotationPoint type)
-  {
-  }
-  void flip(double x0, double y0, glow_eFlipDirection dir)
-  {
-  }
-  void set_transform(GlowTransform* t)
-  {
-  }
+  void set_rotation(double angle, double x0, double y0, glow_eRotationPoint type) {}
+  void flip(double x0, double y0, glow_eFlipDirection dir) {}
+  void set_transform(GlowTransform* t) {}
   void set_shadow(int shadowval)
   {
     shadow = shadowval;

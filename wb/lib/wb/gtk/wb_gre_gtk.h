@@ -39,7 +39,8 @@
 
 #include "wb_gre.h"
 
-class WGreGtk : public WGre {
+class WGreGtk : public WGre
+{
 public:
   GtkWidget* parent_wid;
   GtkWidget* gre_window;

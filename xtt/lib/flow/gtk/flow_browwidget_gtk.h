@@ -44,33 +44,27 @@
 #include "flow_browctx.h"
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #define BROWWIDGETGTK_TYPE (browwidgetgtk_get_type())
-#define BROWWIDGETGTK(obj)                                                     \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), BROWWIDGETGTK_TYPE, BrowWidgetGtk))
-#define BROWWIDGETGTK_CLASS(obj)                                               \
-  (G_TYPE_CHECK_CLASS_CAST((obj), BROWWIDGETGTK, BrowWidgetGtkClass))
-#define IS_BROWWIDGETGTK(obj)                                                  \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), BROWWIDGETGTK_TYPE))
-#define IS_BROWWIDGETGTK_CLASS(obj)                                            \
-  (G_TYPE_CHECK_CLASS_TYPE((obj), BROWWIDGETGTK_TYPE))
-#define BROWWIDGETGTK_GET_CLASS                                                \
-  (G_TYPE_INSTANCE_GET_CLASS((obj), BROWWIDGETGTK, BrowWidgetGtkClass))
+#define BROWWIDGETGTK(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), BROWWIDGETGTK_TYPE, BrowWidgetGtk))
+#define BROWWIDGETGTK_CLASS(obj) (G_TYPE_CHECK_CLASS_CAST((obj), BROWWIDGETGTK, BrowWidgetGtkClass))
+#define IS_BROWWIDGETGTK(obj) (G_TYPE_CHECK_INSTANCE_TYPE((obj), BROWWIDGETGTK_TYPE))
+#define IS_BROWWIDGETGTK_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE((obj), BROWWIDGETGTK_TYPE))
+#define BROWWIDGETGTK_GET_CLASS (G_TYPE_INSTANCE_GET_CLASS((obj), BROWWIDGETGTK, BrowWidgetGtkClass))
 
-GType browwidgetgtk_get_type(void);
+  GType browwidgetgtk_get_type(void);
 
-GtkWidget* browwidgetgtk_new(
-    int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data);
-GtkWidget* scrolledbrowwidgetgtk_new(
-    int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
-    GtkWidget** browwidget);
+  GtkWidget* browwidgetgtk_new(int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data);
+  GtkWidget* scrolledbrowwidgetgtk_new(int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
+                                       GtkWidget** browwidget);
 
-GtkWidget* brownavwidgetgtk_new(GtkWidget* main_brow);
+  GtkWidget* brownavwidgetgtk_new(GtkWidget* main_brow);
 
-void browwidgetgtk_get_ctx(GtkWidget* w, void** ctx);
-void browwidgetgtk_modify_ctx(GtkWidget* w, void* ctx);
+  void browwidgetgtk_get_ctx(GtkWidget* w, void** ctx);
+  void browwidgetgtk_modify_ctx(GtkWidget* w, void* ctx);
 
 #if defined __cplusplus
 }

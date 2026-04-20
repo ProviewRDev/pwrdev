@@ -39,10 +39,11 @@
 
 #include "wb_wpkgnav.h"
 
-class WPkgNavQt : public WPkgNav {
+class WPkgNavQt : public WPkgNav
+{
 public:
-  WPkgNavQt(void* wa_parent_ctx, const char* wa_name, wb_eUtility wa_utility,
-      QWidget** w, pwr_tStatus* status);
+  WPkgNavQt(void* wa_parent_ctx, const char* wa_name, wb_eUtility wa_utility, QWidget** w,
+            pwr_tStatus* status);
   ~WPkgNavQt();
 
   QWidget* brow_widget;

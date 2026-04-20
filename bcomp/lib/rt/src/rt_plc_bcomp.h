@@ -41,14 +41,12 @@
 #include "pwr_basecomponentclasses.h"
 
 void RunTimeCounterFo_init(pwr_sClass_RunTimeCounterFo* object);
-void RunTimeCounterFo_exec(
-    plc_sThread* tp, pwr_sClass_RunTimeCounterFo* object);
+void RunTimeCounterFo_exec(plc_sThread* tp, pwr_sClass_RunTimeCounterFo* object);
 void CompModePID_Fo_init(pwr_sClass_CompModePID_Fo* object);
 void CompModePID_Fo_exec(plc_sThread* tp, pwr_sClass_CompModePID_Fo* object);
 void CompPID_Fo_init(pwr_sClass_CompPID_Fo* object);
 void CompPID_Fo_exec(plc_sThread* tp, pwr_sClass_CompPID_Fo* object);
-void CompOnOffBurnerFo_exec(
-    plc_sThread* tp, pwr_sClass_CompOnOffBurnerFo* object);
+void CompOnOffBurnerFo_exec(plc_sThread* tp, pwr_sClass_CompOnOffBurnerFo* object);
 void CompOnOffBurnerFo_init(pwr_sClass_CompOnOffBurnerFo* object);
 void CompOnOffZoneFo_exec(plc_sThread* tp, pwr_sClass_CompOnOffZoneFo* object);
 void CompOnOffZoneFo_init(pwr_sClass_CompOnOffZoneFo* object);
@@ -57,11 +55,9 @@ void CompIMC_Fo_exec(plc_sThread* tp, pwr_sClass_CompIMC_Fo* plc_obj);
 void CompModeIMC_Fo_init(pwr_sClass_CompModeIMC_Fo* plc_obj);
 void CompModeIMC_Fo_exec(plc_sThread* tp, pwr_sClass_CompModeIMC_Fo* plc_obj);
 void CompCurveTabValueFo_init(pwr_sClass_CompCurveTabValueFo* o);
-void CompCurveTabValueFo_exec(
-    plc_sThread* tp, pwr_sClass_CompCurveTabValueFo* o);
+void CompCurveTabValueFo_exec(plc_sThread* tp, pwr_sClass_CompCurveTabValueFo* o);
 void CompCurvePolValueFo_init(pwr_sClass_CompCurvePolValueFo* o);
-void CompCurvePolValueFo_exec(
-    plc_sThread* tp, pwr_sClass_CompCurvePolValueFo* o);
+void CompCurvePolValueFo_exec(plc_sThread* tp, pwr_sClass_CompCurvePolValueFo* o);
 void CompMPC_Fo_init(pwr_sClass_CompMPC_Fo* o);
 void CompMPC_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_Fo* o);
 void CompMPC_MLP_Fo_init(pwr_sClass_CompMPC_MLP_Fo* o);

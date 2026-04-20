@@ -51,8 +51,7 @@ pwr_tStatus plc_UtlWaitForPlc()
   if (!qcom_CreateQ(&sts, &wait_q, NULL, "plcUtlWaitForPlc"))
     return sts;
 
-  qcom_WaitAnd(
-      &sts, &wait_q, &qcom_cQini, ini_mEvent_newPlcStartDone, qcom_cTmoEternal);
+  qcom_WaitAnd(&sts, &wait_q, &qcom_cQini, ini_mEvent_newPlcStartDone, qcom_cTmoEternal);
 
   qcom_DeleteQ(NULL, &wait_q);
 

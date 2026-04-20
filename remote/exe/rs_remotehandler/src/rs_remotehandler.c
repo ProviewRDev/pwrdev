@@ -35,39 +35,39 @@
  */
 
 /************************************************************************
-*
-*                P S S - 9 0 0 0
-*               =================
-*************************************************************************
-*
-* Filename:             remotehandler.c
-*
-*                       Date    Pgm.    Read.   Remark
-* Modified              950307	Hans Werner	ELN
-*			950309  C Jurstrand	VMS
-*			950309  C Jurstrand	VMS
-*			960215  C Jurstrand	3964R and TCP/IP
-*			960927  C Jurstrand	3964R_VNET and name for 1:st
-*process
-*			970602	C Jurstrand	MODBUS and ADLP10
-*			971016	C Jurstrand	DMQ
-*			980610	C Jurstrand	Universal serial prot.
-*			980922	C Jurstrand	MOMENTUM
-*			000330	C Jurstrand	3.0b and LIMAB and UDP/IP
-*			000517	C Jurstrand	Lynx OS
-*			001222  C Jurstrand	Varmomstart, QCOM
-*			010405  C Jurstrand	3.3a, QCOM p� ELN
-*			040303  J Nylund	�ndrat till omgivningsvariabel
-*                                               i s�kv�garna till exe-filerna
-*			040422	C Jurstrand	4.0.0
-*			101209	R Karlsson	Adderat st�d f�r Websphere MQ
-*			111102	cs		RK512 ported from ELN version.
-*
-* Description:
-*       Start and control of transportprocesses for remote communication
-*
-**************************************************************************
-**************************************************************************/
+ *
+ *                P S S - 9 0 0 0
+ *               =================
+ *************************************************************************
+ *
+ * Filename:             remotehandler.c
+ *
+ *                       Date    Pgm.    Read.   Remark
+ * Modified              950307	Hans Werner	ELN
+ *			950309  C Jurstrand	VMS
+ *			950309  C Jurstrand	VMS
+ *			960215  C Jurstrand	3964R and TCP/IP
+ *			960927  C Jurstrand	3964R_VNET and name for 1:st
+ *process
+ *			970602	C Jurstrand	MODBUS and ADLP10
+ *			971016	C Jurstrand	DMQ
+ *			980610	C Jurstrand	Universal serial prot.
+ *			980922	C Jurstrand	MOMENTUM
+ *			000330	C Jurstrand	3.0b and LIMAB and UDP/IP
+ *			000517	C Jurstrand	Lynx OS
+ *			001222  C Jurstrand	Varmomstart, QCOM
+ *			010405  C Jurstrand	3.3a, QCOM p� ELN
+ *			040303  J Nylund	�ndrat till omgivningsvariabel
+ *                                               i s�kv�garna till exe-filerna
+ *			040422	C Jurstrand	4.0.0
+ *			101209	R Karlsson	Adderat st�d f�r Websphere MQ
+ *			111102	cs		RK512 ported from ELN version.
+ *
+ * Description:
+ *       Start and control of transportprocesses for remote communication
+ *
+ **************************************************************************
+ **************************************************************************/
 
 /********* Include files *************************************************/
 
@@ -94,7 +94,8 @@
 #include "rt_pcm.h"
 #include "rt_aproc.h"
 
-typedef struct {
+typedef struct
+{
   char path[64];
   pwr_tObjid objid;
   pwr_tAddress objref;
@@ -138,7 +139,8 @@ static pwr_tFloat32 RestartBackoffDelay(pwr_tUInt32 failure_streak)
   pwr_tFloat32 delay = TRANSPORT_RESTART_BACKOFF_MIN;
   pwr_tUInt32 i;
 
-  for (i = 1; i < failure_streak && delay < TRANSPORT_RESTART_BACKOFF_MAX; i++) {
+  for (i = 1; i < failure_streak && delay < TRANSPORT_RESTART_BACKOFF_MAX; i++)
+  {
     delay *= 2.0F;
   }
 
@@ -171,9 +173,11 @@ static void RecordTransportExit(int idx)
   tp[idx].cpid = -1;
   time_GetTimeMonotonic(&now);
 
-  if (tp[idx].last_start.tv_sec != 0 || tp[idx].last_start.tv_nsec != 0) {
+  if (tp[idx].last_start.tv_sec != 0 || tp[idx].last_start.tv_nsec != 0)
+  {
     runtime = time_AdiffToFloat(&now, &tp[idx].last_start);
-    if (runtime >= TRANSPORT_RESTART_HEALTHY_TIME) {
+    if (runtime >= TRANSPORT_RESTART_HEALTHY_TIME)
+    {
       ResetTransportBackoff(&tp[idx]);
       return;
     }
@@ -185,10 +189,10 @@ static void RecordTransportExit(int idx)
 }
 
 /************************************************************************
-*
-* AddTransport
-*
-************************************************************************/
+ *
+ * AddTransport
+ *
+ ************************************************************************/
 static void AddTransports()
 {
   pwr_tObjid objid;
@@ -205,7 +209,8 @@ static void AddTransports()
   /* Get and configure all WMQ remnodes, one process for each remnode */
 
   sts = gdh_GetClassList(pwr_cClass_RemnodeWMQ, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, &objref);
     sprintf(tp[tpcount].path, "rs_remote_wmq");
     tp[tpcount].id = id++;
@@ -219,7 +224,7 @@ static void AddTransports()
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 
-    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+    if (tpcount < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]))
       remcfgp->RemNodeObjects[tpcount] = objid;
 
     tpcount++;
@@ -229,7 +234,8 @@ static void AddTransports()
   /* Get and configure all MQ remnodes, one process for each remnode */
 
   sts = gdh_GetClassList(pwr_cClass_RemnodeMQ, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, &objref);
     sprintf(tp[tpcount].path, "rs_remote_mq");
     tp[tpcount].id = ((pwr_sClass_RemnodeMQ*)objref)->MyQueue;
@@ -243,7 +249,7 @@ static void AddTransports()
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 
-    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+    if (tpcount < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]))
       remcfgp->RemNodeObjects[tpcount] = objid;
 
     tpcount++;
@@ -253,13 +259,13 @@ static void AddTransports()
   /* Get and configure all RabbitMQ remnodes, one process for each remnode */
 
   sts = gdh_GetClassList(pwr_cClass_RemnodeRabbitMQ, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, &objref);
     sprintf(tp[tpcount].path, "rs_remote_rabbitmq");
     tp[tpcount].id = id++;
     tp[tpcount].disable = &((pwr_sClass_RemnodeRabbitMQ*)objref)->Disable;
-    tp[tpcount].restart_limit
-        = &((pwr_sClass_RemnodeRabbitMQ*)objref)->RestartLimit;
+    tp[tpcount].restart_limit = &((pwr_sClass_RemnodeRabbitMQ*)objref)->RestartLimit;
     tp[tpcount].restarts = &((pwr_sClass_RemnodeRabbitMQ*)objref)->RestartCount;
     ((pwr_sClass_RemnodeRabbitMQ*)objref)->RestartCount = 0;
     tp[tpcount].objid = objid;
@@ -268,7 +274,7 @@ static void AddTransports()
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 
-    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+    if (tpcount < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]))
       remcfgp->RemNodeObjects[tpcount] = objid;
 
     tpcount++;
@@ -278,13 +284,13 @@ static void AddTransports()
   /* Get and configure all MQTT remnodes, one process for each remnode */
 
   sts = gdh_GetClassList(pwr_cClass_RemnodeMQTT, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, &objref);
     sprintf(tp[tpcount].path, "rs_remote_mqtt");
     tp[tpcount].id = id++;
     tp[tpcount].disable = &((pwr_sClass_RemnodeMQTT*)objref)->Disable;
-    tp[tpcount].restart_limit
-        = &((pwr_sClass_RemnodeMQTT*)objref)->RestartLimit;
+    tp[tpcount].restart_limit = &((pwr_sClass_RemnodeMQTT*)objref)->RestartLimit;
     tp[tpcount].restarts = &((pwr_sClass_RemnodeMQTT*)objref)->RestartCount;
     ((pwr_sClass_RemnodeMQTT*)objref)->RestartCount = 0;
     tp[tpcount].objid = objid;
@@ -293,7 +299,7 @@ static void AddTransports()
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 
-    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+    if (tpcount < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]))
       remcfgp->RemNodeObjects[tpcount] = objid;
 
     tpcount++;
@@ -303,13 +309,13 @@ static void AddTransports()
   /* Get and configure all QCom remnodes, one process for each remnode */
 
   sts = gdh_GetClassList(pwr_cClass_RemnodeQCom, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, &objref);
     sprintf(tp[tpcount].path, "rs_remote_qcom");
     tp[tpcount].id = ((pwr_sClass_RemnodeQCom*)objref)->ReceiveQueue;
     tp[tpcount].disable = &((pwr_sClass_RemnodeQCom*)objref)->Disable;
-    tp[tpcount].restart_limit
-        = &((pwr_sClass_RemnodeQCom*)objref)->RestartLimit;
+    tp[tpcount].restart_limit = &((pwr_sClass_RemnodeQCom*)objref)->RestartLimit;
     tp[tpcount].restarts = &((pwr_sClass_RemnodeQCom*)objref)->RestartCount;
     ((pwr_sClass_RemnodeQCom*)objref)->RestartCount = 0;
     tp[tpcount].objid = objid;
@@ -318,7 +324,7 @@ static void AddTransports()
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 
-    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+    if (tpcount < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]))
       remcfgp->RemNodeObjects[tpcount] = objid;
 
     tpcount++;
@@ -328,7 +334,8 @@ static void AddTransports()
   /* Get and configure all UDP remnodes, one process for each remnode */
 
   sts = gdh_GetClassList(pwr_cClass_RemnodeUDP, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, &objref);
     sprintf(tp[tpcount].path, "rs_remote_udpip");
     tp[tpcount].id = ((pwr_sClass_RemnodeUDP*)objref)->LocalPort;
@@ -342,7 +349,7 @@ static void AddTransports()
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 
-    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+    if (tpcount < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]))
       remcfgp->RemNodeObjects[tpcount] = objid;
 
     tpcount++;
@@ -352,7 +359,8 @@ static void AddTransports()
   /* Get and configure all TCP remnodes, one process for each remnode */
 
   sts = gdh_GetClassList(pwr_cClass_RemnodeTCP, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, &objref);
     sprintf(tp[tpcount].path, "rs_remote_tcpip");
     tp[tpcount].id = ((pwr_sClass_RemnodeTCP*)objref)->LocalPort;
@@ -366,7 +374,7 @@ static void AddTransports()
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 
-    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+    if (tpcount < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]))
       remcfgp->RemNodeObjects[tpcount] = objid;
 
     tpcount++;
@@ -379,13 +387,13 @@ static void AddTransports()
      one process */
 
   sts = gdh_GetClassList(pwr_cClass_RemnodeALCM, &objid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, &objref);
     sprintf(tp[tpcount].path, "rs_remote_alcm");
     tp[tpcount].id = 0;
     tp[tpcount].disable = &((pwr_sClass_RemnodeALCM*)objref)->Disable;
-    tp[tpcount].restart_limit
-        = &((pwr_sClass_RemnodeALCM*)objref)->RestartLimit;
+    tp[tpcount].restart_limit = &((pwr_sClass_RemnodeALCM*)objref)->RestartLimit;
     tp[tpcount].restarts = &((pwr_sClass_RemnodeALCM*)objref)->RestartCount;
     ((pwr_sClass_RemnodeALCM*)objref)->RestartCount = 0;
     tp[tpcount].objid = objid;
@@ -394,7 +402,7 @@ static void AddTransports()
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 
-    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+    if (tpcount < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]))
       remcfgp->RemNodeObjects[tpcount] = objid;
 
     tpcount++;
@@ -403,13 +411,13 @@ static void AddTransports()
   /* Get and configure all Serial remnodes, one process for each remnode */
 
   sts = gdh_GetClassList(pwr_cClass_RemnodeSerial, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, &objref);
     sprintf(tp[tpcount].path, "rs_remote_serial");
     tp[tpcount].id = 0;
     tp[tpcount].disable = &((pwr_sClass_RemnodeSerial*)objref)->Disable;
-    tp[tpcount].restart_limit
-        = &((pwr_sClass_RemnodeSerial*)objref)->RestartLimit;
+    tp[tpcount].restart_limit = &((pwr_sClass_RemnodeSerial*)objref)->RestartLimit;
     tp[tpcount].restarts = &((pwr_sClass_RemnodeSerial*)objref)->RestartCount;
     ((pwr_sClass_RemnodeSerial*)objref)->RestartCount = 0;
     tp[tpcount].objid = objid;
@@ -418,7 +426,7 @@ static void AddTransports()
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 
-    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+    if (tpcount < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]))
       remcfgp->RemNodeObjects[tpcount] = objid;
 
     tpcount++;
@@ -428,13 +436,13 @@ static void AddTransports()
   /* Get and configure all Modbus remnodes, one process for each remnode */
 
   sts = gdh_GetClassList(pwr_cClass_RemnodeModbus, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, &objref);
     sprintf(tp[tpcount].path, "rs_remote_modbus");
     tp[tpcount].id = 0;
     tp[tpcount].disable = &((pwr_sClass_RemnodeModbus*)objref)->Disable;
-    tp[tpcount].restart_limit
-        = &((pwr_sClass_RemnodeModbus*)objref)->RestartLimit;
+    tp[tpcount].restart_limit = &((pwr_sClass_RemnodeModbus*)objref)->RestartLimit;
     tp[tpcount].restarts = &((pwr_sClass_RemnodeModbus*)objref)->RestartCount;
     ((pwr_sClass_RemnodeModbus*)objref)->RestartCount = 0;
     tp[tpcount].objid = objid;
@@ -443,7 +451,7 @@ static void AddTransports()
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 
-    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+    if (tpcount < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]))
       remcfgp->RemNodeObjects[tpcount] = objid;
 
     tpcount++;
@@ -453,13 +461,13 @@ static void AddTransports()
   /* Get and configure all 3964R remnodes, one process for each remnode */
 
   sts = gdh_GetClassList(pwr_cClass_Remnode3964R, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, &objref);
     sprintf(tp[tpcount].path, "rs_remote_3964r");
     tp[tpcount].id = 0;
     tp[tpcount].disable = &((pwr_sClass_Remnode3964R*)objref)->Disable;
-    tp[tpcount].restart_limit
-        = &((pwr_sClass_Remnode3964R*)objref)->RestartLimit;
+    tp[tpcount].restart_limit = &((pwr_sClass_Remnode3964R*)objref)->RestartLimit;
     tp[tpcount].restarts = &((pwr_sClass_Remnode3964R*)objref)->RestartCount;
     ((pwr_sClass_Remnode3964R*)objref)->RestartCount = 0;
     tp[tpcount].objid = objid;
@@ -468,7 +476,7 @@ static void AddTransports()
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 
-    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+    if (tpcount < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]))
       remcfgp->RemNodeObjects[tpcount] = objid;
 
     tpcount++;
@@ -476,13 +484,13 @@ static void AddTransports()
   }
 
   sts = gdh_GetClassList(pwr_cClass_RemnodeRK512, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(objid, &objref);
     sprintf(tp[tpcount].path, "rs_remote_rk512");
     tp[tpcount].id = 0;
     tp[tpcount].disable = &((pwr_sClass_Remnode3964R*)objref)->Disable;
-    tp[tpcount].restart_limit
-        = &((pwr_sClass_RemnodeRK512*)objref)->RestartLimit;
+    tp[tpcount].restart_limit = &((pwr_sClass_RemnodeRK512*)objref)->RestartLimit;
     tp[tpcount].restarts = &((pwr_sClass_RemnodeRK512*)objref)->RestartCount;
     ((pwr_sClass_RemnodeRK512*)objref)->RestartCount = 0;
     tp[tpcount].objid = objid;
@@ -491,7 +499,7 @@ static void AddTransports()
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 
-    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+    if (tpcount < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]))
       remcfgp->RemNodeObjects[tpcount] = objid;
 
     tpcount++;
@@ -502,10 +510,10 @@ static void AddTransports()
 }
 
 /************************************************************************
-*
-* StartTransport
-*
-************************************************************************/
+ *
+ * StartTransport
+ *
+ ************************************************************************/
 static int StartTransport(int idx)
 {
   char arg1[65];
@@ -518,14 +526,14 @@ static int StartTransport(int idx)
   if (idx >= tpcount || idx < 0)
     return -1;
 
-  if (*tp[idx].disable
-      || (*tp[idx].restart_limit != 0
-          && *tp[idx].restarts >= *tp[idx].restart_limit)) {
+  if (*tp[idx].disable || (*tp[idx].restart_limit != 0 && *tp[idx].restarts >= *tp[idx].restart_limit))
+  {
     tp[idx].cpid = -1;
     return -1;
   }
 
-  if (!TransportRestartDue(&tp[idx])) {
+  if (!TransportRestartDue(&tp[idx]))
+  {
     tp[idx].cpid = -1;
     return 0;
   }
@@ -546,16 +554,22 @@ static int StartTransport(int idx)
   cdh_OidToString(arg3, sizeof(arg3), tp[idx].objid, 0);
 
   tp[idx].cpid = fork();
-  if (tp[idx].cpid < 0) {
+  if (tp[idx].cpid < 0)
+  {
     errh_Error("Can't fork transport %s, %s", tp[idx].path, strerror(errno));
     RecordTransportExit(idx);
     res = -1;
-  } else if (tp[idx].cpid == 0) {
-    if (execlp(tp[idx].path, arg1, arg2, arg3, (char*)0) < 0) {
+  }
+  else if (tp[idx].cpid == 0)
+  {
+    if (execlp(tp[idx].path, arg1, arg2, arg3, (char*)0) < 0)
+    {
       errh_Warning("Can't start transport %s", tp[idx].path);
       res = -1;
       _exit(0);
-    } else {
+    }
+    else
+    {
       res = 1;
     }
   }
@@ -564,10 +578,10 @@ static int StartTransport(int idx)
 }
 
 /************************************************************************
-*
-* main
-*
-************************************************************************/
+ *
+ * main
+ *
+ ************************************************************************/
 int main()
 {
   int i;
@@ -594,7 +608,8 @@ int main()
 
   /* Qcom init */
 
-  if (!qcom_Init(&status, 0, "rs_remhdl")) {
+  if (!qcom_Init(&status, 0, "rs_remhdl"))
+  {
     errh_Error("qcom_Init, %m", status);
     errh_SetStatus(PWR__SRVTERM);
     exit(status);
@@ -602,14 +617,16 @@ int main()
 
   qattr.type = qcom_eQtype_private;
   qattr.quota = 100;
-  if (!qcom_CreateQ(&status, &qid, &qattr, "Restart")) {
+  if (!qcom_CreateQ(&status, &qid, &qattr, "Restart"))
+  {
     errh_Error("qcom_CreateQ, %m", status);
     errh_SetStatus(PWR__SRVTERM);
     exit(status);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&status, &qid, &qini)) {
+  if (!qcom_Bind(&status, &qid, &qini))
+  {
     errh_Error("qcom_CreateQ, %m", status);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
@@ -618,7 +635,8 @@ int main()
   /* GDH init */
 
   sts = gdh_Init("rs_remhdl");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -626,26 +644,32 @@ int main()
 
   hotswap = 0;
 
-  while (true) {
+  while (true)
+  {
     /* Get RemoteConfig object */
     sts = gdh_GetClassList(pwr_cClass_RemoteConfig, &remcfg_objid);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = gdh_ObjidToPointer(remcfg_objid, (pwr_tAddress*)&remcfgp);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         errh_Error("gdh_ObjidToPointer, %m", sts);
         errh_SetStatus(PWR__SRVTERM);
         exit(sts);
       }
       aproc_RegisterObject(remcfg_objid);
-      if (remcfgp->Disable) {
+      if (remcfgp->Disable)
+      {
         errh_Info("Remote server disabled in RemoteConfig, rs_remotehandler "
                   "will not run");
         errh_SetStatus(0);
         exit(1);
       }
-      for (i = 0; i < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]); i++)
+      for (i = 0; i < sizeof(remcfgp->RemNodeObjects) / sizeof(remcfgp->RemNodeObjects[0]); i++)
         remcfgp->RemNodeObjects[i] = pwr_cNObjid;
-    } else {
+    }
+    else
+    {
       errh_Info("No RemoteConfig object found, rs_remotehandler will not run");
       errh_SetStatus(0);
       exit(1);
@@ -670,49 +694,63 @@ int main()
     */
     new_plc = 0;
 
-    do {
+    do
+    {
       if (!hotswap)
         errh_SetStatus(PWR__SRUN);
       aproc_TimeStamp(0.1, 5);
       get.maxSize = sizeof(mp);
       get.data = mp;
       qcom_Get(&status, &qid, &get, 100); // TMO == 100 ms
-      if (status == QCOM__TMO || status == QCOM__QEMPTY) {
-        if (!hotswap) {
-          while ((cpid = waitpid(-1, NULL, WNOHANG)) > 0) {
-            for (i = 0; i < tpcount; i++) {
-              if (cpid == tp[i].cpid) {
+      if (status == QCOM__TMO || status == QCOM__QEMPTY)
+      {
+        if (!hotswap)
+        {
+          while ((cpid = waitpid(-1, NULL, WNOHANG)) > 0)
+          {
+            for (i = 0; i < tpcount; i++)
+            {
+              if (cpid == tp[i].cpid)
+              {
                 RecordTransportExit(i);
                 break;
               }
             }
           }
-          for (i = 0; i < tpcount; i++) {
-            if (tp[i].cpid == -1) {
+          for (i = 0; i < tpcount; i++)
+          {
+            if (tp[i].cpid == -1)
+            {
               sts = StartTransport(i);
               //              errh_Warning("Transport %s terminated, restarted
               //              by remotehandler", tp[i].path);
             }
           }
         }
-      } else {
+      }
+      else
+      {
         ini_mEvent new_event;
         qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
         new_event.m = ep->mask;
 
         // Reload event?
-        if (new_event.b.swapInit && !hotswap) {
+        if (new_event.b.swapInit && !hotswap)
+        {
           hotswap = 1;
           errh_SetStatus(PWR__SRVRESTART);
-          for (i = 0; i < tpcount; i++) {
-            if (tp[i].cpid > 0) {
+          for (i = 0; i < tpcount; i++)
+          {
+            if (tp[i].cpid > 0)
+            {
               // Kill the process
               kill(tp[i].cpid, 9);
               // On most architecture there's no guarantee that we can wait for this pid.
               // Assume it's already dead...
               cpid = waitpid(tp[i].cpid, NULL, 0);
-              if (cpid <= -1) {
+              if (cpid <= -1)
+              {
                 // If the process does not exists its pretty much expected, so we ignore ECHILD
                 if (errno != ECHILD)
                 {
@@ -725,22 +763,27 @@ int main()
           }
         }
 
-        if (new_event.b.swapDone && hotswap) {
+        if (new_event.b.swapDone && hotswap)
+        {
           hotswap = 0;
           new_plc = 1;
         }
 
         // Terminate event over qCom. ie rt_ini -r
-        if (new_event.b.terminate) {
+        if (new_event.b.terminate)
+        {
           errh_Info("Termination initiated, killing child processes");
-          for (i = 0; i < tpcount; i++) {
-            if (tp[i].cpid > 0) {
+          for (i = 0; i < tpcount; i++)
+          {
+            if (tp[i].cpid > 0)
+            {
               // Kill the process
               kill(tp[i].cpid, 9);
               // On most architecture there's no guarantee that we can wait for this pid.
               // Assume it's already dead...
               cpid = waitpid(tp[i].cpid, NULL, 0);
-              if (cpid <= -1) {
+              if (cpid <= -1)
+              {
                 // If the process does not exists its pretty much expected, so we ignore ECHILD
                 if (errno != ECHILD)
                 {

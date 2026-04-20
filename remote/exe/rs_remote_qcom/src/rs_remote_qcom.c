@@ -117,27 +117,29 @@ unsigned int qcom_receive()
   if (debug)
     printf("Received message %d\n", get.size);
 
-  switch ((int)get.type.b) {
-  case remote_cMsgClass: {
+  switch ((int)get.type.b)
+  {
+  case remote_cMsgClass:
+  {
     search_remtrans = true;
 
     remtrans = rn.remtrans;
-    while (remtrans && search_remtrans) {
-      if (remtrans->objp->Address[0] == get.type.s
-          && remtrans->objp->Direction == REMTRANS_IN) {
+    while (remtrans && search_remtrans)
+    {
+      if (remtrans->objp->Address[0] == get.type.s && remtrans->objp->Direction == REMTRANS_IN)
+      {
         search_remtrans = false;
         sts = RemTrans_Receive(remtrans, (char*)get.data, get.size);
         if (sts != STATUS_OK && sts != STATUS_BUFF)
-          errh_Error("Error from RemTrans_Receive, queue %d, status %d",
-              rn_qcom->ReceiveQueue, sts, 0);
+          errh_Error("Error from RemTrans_Receive, queue %d, status %d", rn_qcom->ReceiveQueue, sts, 0);
         break;
       }
       remtrans = (remtrans_item*)remtrans->next;
     }
-    if (search_remtrans) {
+    if (search_remtrans)
+    {
       rn_qcom->ErrCount++;
-      errh_Info("No remtrans for received message, queue %d, class ",
-          rn_qcom->ReceiveQueue, get.type.s, 0);
+      errh_Info("No remtrans for received message, queue %d, class ", rn_qcom->ReceiveQueue, get.type.s, 0);
     }
 
     if (get.data)
@@ -164,8 +166,7 @@ unsigned int qcom_receive()
 **************************************************************************
 **************************************************************************/
 
-unsigned int qcom_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
-    char* buf, int buf_size)
+unsigned int qcom_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans, char* buf, int buf_size)
 
 {
   pwr_tStatus sts;
@@ -186,10 +187,10 @@ unsigned int qcom_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
     put.msg_id = remtrans->Address[0] + 1;
 
   qcom_Put(&sts, &target_qid, &put);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     remtrans->ErrCount++;
-    errh_Error(
-        "Send failed, queue %d, QCom status %d", rn_qcom->ReceiveQueue, sts, 0);
+    errh_Error("Send failed, queue %d, QCom status %d", rn_qcom->ReceiveQueue, sts, 0);
     if (debug)
       printf("Send failed sts:%d\n", (int)sts);
   }
@@ -240,7 +241,8 @@ int main(int argc, char* argv[])
   if (debug)
     printf("Before gdh_init\n");
   sts = gdh_Init(pname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -252,7 +254,8 @@ int main(int argc, char* argv[])
   sts = 0;
   if (argc >= 3)
     sts = cdh_StringToObjid(argv[2], &rn.objid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("cdh_StringToObjid, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -261,15 +264,16 @@ int main(int argc, char* argv[])
   /* Get pointer to RemnodeQCom object and store locally */
 
   sts = gdh_ObjidToPointer(rn.objid, (pwr_tAddress*)&rn_qcom);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("cdh_ObjidToPointer, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
-  if (!rn_qcom->ReceiveQueue && !rn_qcom->TargetQueue) {
-    errh_Fatal(
-        "Process terminated, neither send or receive queue configured, %s", id);
+  if (!rn_qcom->ReceiveQueue && !rn_qcom->TargetQueue)
+  {
+    errh_Fatal("Process terminated, neither send or receive queue configured, %s", id);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
@@ -284,7 +288,8 @@ int main(int argc, char* argv[])
 
   sts = RemTrans_Init(&rn);
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("RemTrans_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -293,16 +298,17 @@ int main(int argc, char* argv[])
   /* Store remtrans objects objid in remnode_qcom object */
   remtrans = rn.remtrans;
   i = 0;
-  while (remtrans) {
+  while (remtrans)
+  {
     rn_qcom->RemTransObjects[i++] = remtrans->objid;
-    if (i >= (int)(sizeof(rn_qcom->RemTransObjects)
-                 / sizeof(rn_qcom->RemTransObjects[0])))
+    if (i >= (int)(sizeof(rn_qcom->RemTransObjects) / sizeof(rn_qcom->RemTransObjects[0])))
       break;
     remtrans = (remtrans_item*)remtrans->next;
   }
 
   /* Create queue */
-  if (rn_qcom->ReceiveQueue) {
+  if (rn_qcom->ReceiveQueue)
+  {
     qattr.type = qcom_eQtype_private;
     qattr.quota = 100;
 
@@ -312,11 +318,13 @@ int main(int argc, char* argv[])
     sprintf(queue_name, "RemQue%d", rn_qcom->ReceiveQueue);
 
     qcom_CreateQ(&sts, &local_qid, &qattr, queue_name);
-    if (sts == QCOM__QALLREXIST) {
+    if (sts == QCOM__QALLREXIST)
+    {
       qcom_DeleteQ(&sts, &local_qid);
       qcom_CreateQ(&sts, &local_qid, &qattr, queue_name);
     }
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_Fatal("Process terminated, QCom create queue, %d", sts);
       errh_SetStatus(PWR__SRVTERM);
       exit(sts);
@@ -324,22 +332,28 @@ int main(int argc, char* argv[])
   }
 
   /* Get remote queue */
-  if (rn_qcom->TargetQueue != 0) {
+  if (rn_qcom->TargetQueue != 0)
+  {
     qcom_MyNode(&sts, &node);
-    if (str_NoCaseStrcmp(node.name, rn_qcom->TargetNode) == 0) {
+    if (str_NoCaseStrcmp(node.name, rn_qcom->TargetNode) == 0)
+    {
       found = 1;
       nid = node.nid;
-    } else {
-      for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid) {
-        if (str_NoCaseStrcmp(node.name, rn_qcom->TargetNode) == 0) {
+    }
+    else
+    {
+      for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid)
+      {
+        if (str_NoCaseStrcmp(node.name, rn_qcom->TargetNode) == 0)
+        {
           found = 1;
           break;
         }
       }
     }
-    if (!found) {
-      errh_Fatal(
-          "Process terminated, target node not found, %s", rn_qcom->TargetNode);
+    if (!found)
+    {
+      errh_Fatal("Process terminated, target node not found, %s", rn_qcom->TargetNode);
       errh_SetStatus(PWR__SRVTERM);
       exit(sts);
     }
@@ -358,8 +372,10 @@ int main(int argc, char* argv[])
 
   /* Loop forever */
 
-  while (!doomsday) {
-    if (rn_qcom->Disable == 1) {
+  while (!doomsday)
+  {
+    if (rn_qcom->Disable == 1)
+    {
       errh_Fatal("Disabled, exiting");
       errh_SetStatus(PWR__SRVTERM);
       exit(0);
@@ -372,7 +388,8 @@ int main(int argc, char* argv[])
       RemoteSleep(TIME_INCR);
 
     time_since_scan += TIME_INCR;
-    if (time_since_scan >= rn_qcom->ScanTime) {
+    if (time_since_scan >= rn_qcom->ScanTime)
+    {
       if (rn_qcom->TargetQueue)
         sts = RemTrans_Cyclic(&rn, &qcom_send);
       time_since_scan = 0.0;

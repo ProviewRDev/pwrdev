@@ -464,7 +464,8 @@ void FlowDrawGtk::invalidate(int x, int y, int width, int height)
   if (width <= 0 || height <= 0)
     return;
 
-  if (!toplevel || !gtk_widget_get_realized(toplevel)) {
+  if (!toplevel || !gtk_widget_get_realized(toplevel))
+  {
     window = 0;
     return;
   }
@@ -487,7 +488,8 @@ void FlowDrawGtk::invalidate_nav(int x, int y, int width, int height)
   if (width <= 0 || height <= 0)
     return;
 
-  if (!nav_toplevel || !gtk_widget_get_realized(nav_toplevel)) {
+  if (!nav_toplevel || !gtk_widget_get_realized(nav_toplevel))
+  {
     nav_window = 0;
     return;
   }

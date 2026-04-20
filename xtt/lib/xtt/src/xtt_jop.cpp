@@ -41,7 +41,8 @@
 #include <string.h>
 #include <unistd.h>
 
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 #include "co_time.h"
 #include "pwr_baseclasses.h"
@@ -59,10 +60,7 @@ Jop::Jop(void* jop_parent_ctx) : parent_ctx(jop_parent_ctx), command_cb(NULL)
   create_process();
 }
 
-Jop::~Jop()
-{
-  close();
-}
+Jop::~Jop() { close(); }
 
 void Jop::scan()
 {
@@ -70,7 +68,8 @@ void Jop::scan()
   int sts;
 
   sts = que_get(&command);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     printf("Jop received : %s\n", command);
     if (command_cb)
       (command_cb)(parent_ctx, command);
@@ -87,7 +86,8 @@ int Jop::create_que()
 
   attr.type = qcom_eQtype_private;
   attr.quota = 100;
-  if (!qcom_CreateQ(&sts, &qcom_qid, &attr, "XttCommands")) {
+  if (!qcom_CreateQ(&sts, &qcom_qid, &attr, "XttCommands"))
+  {
     printf("Failed to create QCOM que %d\n", sts);
     return sts;
   }
@@ -163,12 +163,14 @@ void Jop::create_process()
   int pid;
 
   pid = fork();
-  if (!pid) {
+  if (!pid)
+  {
     char filename[80];
     char qid_str[20];
     char* s;
 
-    if ((s = getenv("pwr_exe")) == NULL) {
+    if ((s = getenv("pwr_exe")) == NULL)
+    {
       printf("** pwr_exe is not defined\n");
       exit(0);
     }

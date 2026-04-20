@@ -63,7 +63,8 @@ int BlockGtk::execute()
     prio = (mh_eEventPrio)0;
 
   sts = mh_OutunitBlock(oar.Objid, prio);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     char msg[80];
 
     msg_GetMsg(sts, msg, sizeof(msg));
@@ -77,9 +78,9 @@ void BlockGtk::update()
   pwr_tStatus sts;
   mh_uEventInfo block_level;
 
-  sts = gdh_GetAlarmInfo(
-      oar.Objid, NULL, NULL, (pwr_tUInt32*)&block_level, NULL, NULL);
-  switch (block_level.Event.Prio) {
+  sts = gdh_GetAlarmInfo(oar.Objid, NULL, NULL, (pwr_tUInt32*)&block_level, NULL, NULL);
+  switch (block_level.Event.Prio)
+  {
   case mh_eEventPrio_A:
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggleA), TRUE);
     break;
@@ -136,8 +137,8 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
   return TRUE;
 }
 
-BlockGtk::BlockGtk(void* b_parent_ctx, GtkWidget* b_parent_wid,
-    pwr_sAttrRef* b_oar, char* name, unsigned int priv, pwr_tStatus* sts)
+BlockGtk::BlockGtk(void* b_parent_ctx, GtkWidget* b_parent_wid, pwr_sAttrRef* b_oar, char* name,
+                   unsigned int priv, pwr_tStatus* sts)
     : Block(b_parent_ctx, b_oar, name, priv, sts), parent_wid(b_parent_wid)
 {
   char title[400];
@@ -151,8 +152,8 @@ BlockGtk::BlockGtk(void* b_parent_ctx, GtkWidget* b_parent_wid,
   strcat(title, "    ");
   strcat(title, aname);
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 300,
-      "default-width", 500, "title", title, NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 300, "default-width", 500, "title",
+                                      title, NULL);
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
 
   CoWowGtk::SetWindowIcon(toplevel);
@@ -200,7 +201,8 @@ BlockGtk::BlockGtk(void* b_parent_ctx, GtkWidget* b_parent_wid,
   gtk_container_add(GTK_CONTAINER(toplevel), vbox);
   gtk_widget_show_all(toplevel);
 
-  if (!(priv & pwr_mPrv_RtEventsBlock || priv & pwr_mPrv_System)) {
+  if (!(priv & pwr_mPrv_RtEventsBlock || priv & pwr_mPrv_System))
+  {
     gtk_widget_set_sensitive(buttonOk, FALSE);
     gtk_widget_set_sensitive(buttonApply, FALSE);
     gtk_widget_set_sensitive(toggleA, FALSE);

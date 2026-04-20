@@ -49,21 +49,13 @@ wow_eIconType CoWow::m_icon_type = wow_eIconType_Rt;
 int CoWow::m_color_theme = 0;
 int CoWow::m_dark_theme = -1;
 
-CoWowTimer::CoWowTimer()
-{
-}
+CoWowTimer::CoWowTimer() {}
 
-CoWowTimer::~CoWowTimer()
-{
-}
+CoWowTimer::~CoWowTimer() {}
 
-void CoWowTimer::add(int time, void (*callback)(void* data), void* data)
-{
-}
+void CoWowTimer::add(int time, void (*callback)(void* data), void* data) {}
 
-void CoWowTimer::remove()
-{
-}
+void CoWowTimer::remove() {}
 
 CoWowRecall::CoWowRecall() : m_current_recall_line(0), m_current_size(0), m_tmp_size(0)
 {
@@ -72,13 +64,17 @@ CoWowRecall::CoWowRecall() : m_current_recall_line(0), m_current_size(0), m_tmp_
 
 void CoWowRecall::push(const char* src)
 {
-  if (!streq(src, m_recall[0])) {
-    if (m_current_size == 0 || !streq(m_recall[0], "")) {
-      for (int i = m_recall_size - 2; i >= 0; i--) {
+  if (!streq(src, m_recall[0]))
+  {
+    if (m_current_size == 0 || !streq(m_recall[0], ""))
+    {
+      for (int i = m_recall_size - 2; i >= 0; i--)
+      {
         strcpy(m_recall[i + 1], m_recall[i]);
       }
       m_current_size++;
-      if (m_current_size > m_recall_size) {
+      if (m_current_size > m_recall_size)
+      {
         m_current_size = m_recall_size;
       }
     }
@@ -90,7 +86,8 @@ void CoWowRecall::push(const char* src)
 
 void CoWowRecall::resetTmp()
 {
-  for (int i = 0; i < m_recall_size; i++) {
+  for (int i = 0; i < m_recall_size; i++)
+  {
     strncpy(tmp[i], m_recall[i], m_line_size);
   }
   m_current_recall_line = 0;
@@ -99,23 +96,30 @@ void CoWowRecall::resetTmp()
 
 const char* CoWowRecall::popUp(const char* src)
 {
-  if (m_current_recall_line == 0 && !streq(src, tmp[0])) {
-    if (m_tmp_size == 0 || !streq(tmp[0], "")) {
-      for (int i = m_recall_size - 2; i >= 0; i--) {
+  if (m_current_recall_line == 0 && !streq(src, tmp[0]))
+  {
+    if (m_tmp_size == 0 || !streq(tmp[0], ""))
+    {
+      for (int i = m_recall_size - 2; i >= 0; i--)
+      {
         strncpy(tmp[i + 1], tmp[i], m_line_size);
       }
       m_tmp_size++;
-      if (m_tmp_size > m_recall_size) {
+      if (m_tmp_size > m_recall_size)
+      {
         m_tmp_size = m_recall_size;
       }
     }
     strncpy(tmp[0], src, m_line_size);
     tmp[0][m_line_size - 1] = 0;
-  } else {
+  }
+  else
+  {
     strncpy(tmp[m_current_recall_line], src, m_line_size);
   }
   m_current_recall_line++;
-  if (m_current_recall_line > m_tmp_size - 1) {
+  if (m_current_recall_line > m_tmp_size - 1)
+  {
     m_current_recall_line = m_tmp_size - 1;
   }
   return tmp[m_current_recall_line];
@@ -124,84 +128,66 @@ const char* CoWowRecall::popUp(const char* src)
 const char* CoWowRecall::popDown(const char* src)
 {
   strncpy(tmp[m_current_recall_line], src, m_line_size);
-  if (m_current_recall_line <= 0) {
+  if (m_current_recall_line <= 0)
+  {
     return tmp[m_current_recall_line];
   }
   m_current_recall_line--;
   return tmp[m_current_recall_line];
 }
 
-CoWow::CoWow()
-{
-}
+CoWow::CoWow() {}
 
-CoWow::~CoWow()
-{
-}
+CoWow::~CoWow() {}
 
 void CoWow::DisplayQuestion(void* ctx, const char* title, const char* text,
-    void (*questionbox_ok)(void*, void*),
-    void (*questionbox_cancel)(void*, void*), void* data)
+                            void (*questionbox_ok)(void*, void*), void (*questionbox_cancel)(void*, void*),
+                            void* data)
 {
 }
 
-void CoWow::DisplayError(const char* title, const char* text,
-    lng_eCoding coding, int modal)
+void CoWow::DisplayError(const char* title, const char* text, lng_eCoding coding, int modal) {}
+
+void CoWow::DisplayText(const char* title, const char* text, int width, int height, wow_eImage image) {}
+
+void CoWow::CreateInputDialog(void* ctx, const char* title, const char* text,
+                              void (*inputdialogbox_ok)(void*, void*, char*),
+                              void (*inputdialogbox_cancel)(void*, void*), int input_length, char* init_text,
+                              void* data)
 {
 }
 
-void CoWow::DisplayText(
-    const char* title, const char* text, int width, int height, 
-    wow_eImage image)
-{
-}
-
-void CoWow::CreateInputDialog(void* ctx, const char* title,
-    const char* text, void (*inputdialogbox_ok)(void*, void*, char*),
-    void (*inputdialogbox_cancel)(void*, void*), int input_length,
-    char* init_text, void* data)
-{
-}
-
-void* CoWow::CreateList(const char* title, const char* texts,
-    int textsize, void(action_cb)(void*, char*, int), void(cancel_cb)(void*),
-    void* ctx, int show_apply_button)
+void* CoWow::CreateList(const char* title, const char* texts, int textsize,
+                        void(action_cb)(void*, char*, int), void(cancel_cb)(void*), void* ctx,
+                        int show_apply_button)
 {
   return NULL;
 }
 
-void CoWow::PopList(void* ctx)
-{
-}
+void CoWow::PopList(void* ctx) {}
 
-void CoWow::DeleteList(void* ctx)
-{
-}
+void CoWow::DeleteList(void* ctx) {}
 
 void CoWow::CreateFileSelDia(const char* title, void* parent_ctx,
-    void (*file_selected_cb)(void*, char*, wow_eFileSelType),
-    wow_eFileSelType file_type, wow_eFileSelAction action)
+                             void (*file_selected_cb)(void*, char*, wow_eFileSelType),
+                             wow_eFileSelType file_type, wow_eFileSelAction action)
 {
 }
 
-int CoWow::CreateModalDialog(const char* title, const char* text,
-    const char* button1, const char* button2, const char* button3,
-    const char* image)
+int CoWow::CreateModalDialog(const char* title, const char* text, const char* button1, const char* button2,
+                             const char* button3, const char* image)
 {
   return wow_eModalDialogReturn_NYI;
 }
 
-wow_sModalInputDialog* CoWow::CreateModalInputDialog(const char* title,
-    const char* text, const char* button1, const char* button2,
-    const char* button3, const char* image, int input_length,
-    CoWowRecall* recall)
+wow_sModalInputDialog* CoWow::CreateModalInputDialog(const char* title, const char* text, const char* button1,
+                                                     const char* button2, const char* button3,
+                                                     const char* image, int input_length, CoWowRecall* recall)
 {
   return 0;
 }
 
-void CoWow::Wait(float time)
-{
-}
+void CoWow::Wait(float time) {}
 
 int CoWow::HideWarranty()
 {
@@ -214,9 +200,9 @@ int CoWow::HideWarranty()
 
 #define FILELIST_TEXTSIZE 80
 
-void* CoWow::CreateFileList(const char* title, const char* dir,
-    const char* pattern, const char* type, void(action_cb)(void*, char*, int),
-    void(cancel_cb)(void*), void* ctx, int show_apply_button)
+void* CoWow::CreateFileList(const char* title, const char* dir, const char* pattern, const char* type,
+                            void(action_cb)(void*, char*, int), void(cancel_cb)(void*), void* ctx,
+                            int show_apply_button)
 {
   int sts;
   pwr_tFileName found_file, stype, item;
@@ -225,19 +211,23 @@ void* CoWow::CreateFileList(const char* title, const char* dir,
   char* texts;
   int i, cnt;
 
-  if (type) {
-    if (type[0] != '.') {
+  if (type)
+  {
+    if (type[0] != '.')
+    {
       strcpy(stype, ".");
     }
     strncat(stype, type, sizeof(stype) - strlen(stype) - 1);
     sprintf(file_spec, "%s/%s%s", dir, pattern, stype);
-  } else
+  }
+  else
     sprintf(file_spec, "%s/%s", dir, pattern);
 
   // Count number of items
   cnt = 0;
   sts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_INIT);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     cnt++;
     sts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_NEXT);
   }
@@ -247,13 +237,15 @@ void* CoWow::CreateFileList(const char* title, const char* dir,
 
   i = 0;
   sts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_INIT);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     if ((s = strrchr(found_file, '/')))
       strncpy(item, s + 1, sizeof(item));
     else
       strncpy(item, found_file, sizeof(item));
 
-    if (type) {
+    if (type)
+    {
       if ((s = strstr(item, stype)))
         *s = 0;
     }
@@ -263,43 +255,27 @@ void* CoWow::CreateFileList(const char* title, const char* dir,
   }
   dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_END);
 
-  return CreateList(title, texts, FILELIST_TEXTSIZE, action_cb, cancel_cb, ctx,
-      show_apply_button);
+  return CreateList(title, texts, FILELIST_TEXTSIZE, action_cb, cancel_cb, ctx, show_apply_button);
 }
 
-int CoWow::DisplayWarranty()
-{
-  return 0;
-}
+int CoWow::DisplayWarranty() { return 0; }
 
-void CoWow::DisplayLicense()
-{
-}
+void CoWow::DisplayLicense() {}
 
-CoWowTimer* CoWow::timer_new()
-{
-  return 0;
-}
+CoWowTimer* CoWow::timer_new() { return 0; }
 
-pwr_tStatus CoWow::CreateMenuItem(
-    const char* name, void* menu, int pixmap, int append, void* w)
-{
-  return 0;
-}
+pwr_tStatus CoWow::CreateMenuItem(const char* name, void* menu, int pixmap, int append, void* w) { return 0; }
 
-pwr_tStatus CoWow::DeleteMenuItem(const char* name, void* menu)
-{
-  return 0;
-}
+pwr_tStatus CoWow::DeleteMenuItem(const char* name, void* menu) { return 0; }
 
-void CoWow::CreateBrowPrintDialog(const char* title, void* brow_ctx,
-    int orientation, double scale, void* parent_widget, pwr_tStatus* sts)
+void CoWow::CreateBrowPrintDialog(const char* title, void* brow_ctx, int orientation, double scale,
+                                  void* parent_widget, pwr_tStatus* sts)
 {
   *sts = WOW__NYI;
 }
 
-void CoWow::CreateFlowPrintDialog(const char* title, void* flow_ctx,
-    int orientation, double scale, void* parent_widget, pwr_tStatus* sts)
+void CoWow::CreateFlowPrintDialog(const char* title, void* flow_ctx, int orientation, double scale,
+                                  void* parent_widget, pwr_tStatus* sts)
 {
   *sts = WOW__NYI;
 }
@@ -309,32 +285,18 @@ void CoWow::SetDefaultPrinter(const char* printer)
   strncpy(m_default_printer, printer, sizeof(m_default_printer));
 }
 
-void CoWow::DisablePrintDialog()
-{
-  m_printdialog_disable = true;
-}
+void CoWow::DisablePrintDialog() { m_printdialog_disable = true; }
 
-bool CoWow::PrintDialogIsDisabled()
-{
-  return m_printdialog_disable;
-}
+bool CoWow::PrintDialogIsDisabled() { return m_printdialog_disable; }
 
-void CoWow::SetAutoRemove(bool on)
-{
-  m_autoremove = on;
-}
+void CoWow::SetAutoRemove(bool on) { m_autoremove = on; }
 
-void CoWow::SetTransient(void* transient_wid)
-{
-  m_transient_wid = transient_wid;
-}
+void CoWow::SetTransient(void* transient_wid) { m_transient_wid = transient_wid; }
 
-void CoWow::SetIconType(wow_eIconType type)
-{
-  m_icon_type = type;
-}
+void CoWow::SetIconType(wow_eIconType type) { m_icon_type = type; }
 
-int CoWow::SetColorTheme(int color_theme) {
+int CoWow::SetColorTheme(int color_theme)
+{
   if (color_theme == 0)
     m_color_theme = DarkTheme() ? 16 : 15;
   else
@@ -342,7 +304,8 @@ int CoWow::SetColorTheme(int color_theme) {
   return m_color_theme;
 }
 
-int CoWow::DarkTheme() {
+int CoWow::DarkTheme()
+{
   if (m_dark_theme == -1)
     return 0;
   return m_dark_theme;

@@ -53,11 +53,10 @@
 //
 // Create the navigator widget
 //
-XAttNavGtk::XAttNavGtk(void* xa_parent_ctx, GtkWidget* xa_parent_wid,
-    xattnav_eType xa_type, const char* xa_name, pwr_sAttrRef* xa_objar,
-    int xa_advanced_user, void* xa_userdata, GtkWidget** w, pwr_tStatus* status)
-    : XAttNav(xa_parent_ctx, xa_type, xa_name, xa_objar, xa_advanced_user,
-          xa_userdata, status),
+XAttNavGtk::XAttNavGtk(void* xa_parent_ctx, GtkWidget* xa_parent_wid, xattnav_eType xa_type,
+                       const char* xa_name, pwr_sAttrRef* xa_objar, int xa_advanced_user, void* xa_userdata,
+                       GtkWidget** w, pwr_tStatus* status)
+    : XAttNav(xa_parent_ctx, xa_type, xa_name, xa_objar, xa_advanced_user, xa_userdata, status),
       parent_wid(xa_parent_wid)
 {
   form_widget = scrolledbrowwidgetgtk_new(init_brow_cb, this, &brow_widget);

@@ -39,13 +39,15 @@
 
 #include "flow_browapi.h"
 
-typedef enum {
+typedef enum
+{
   wnav_eBrowType_Volume,
   wnav_eBrowType_Setup,
   wnav_eBrowType_Other
 } wnav_eBrowType;
 
-typedef enum {
+typedef enum
+{
   wnav_eMultiobject_Normal,
   wnav_eMultiobject_RedSquare,
   wnav_eMultiobject_YellowSquare,
@@ -61,11 +63,11 @@ typedef enum {
   wnav_eMultiobject_
 } wnav_eMultiobject;
 
-class WNavBrow {
+class WNavBrow
+{
 public:
   WNavBrow(BrowCtx* brow_ctx, void* brow_userdata)
-      : type(wnav_eBrowType_Other), ldh_cb_used(1), ctx(brow_ctx),
-        userdata(brow_userdata)
+      : type(wnav_eBrowType_Other), ldh_cb_used(1), ctx(brow_ctx), userdata(brow_userdata)
   {
   }
 

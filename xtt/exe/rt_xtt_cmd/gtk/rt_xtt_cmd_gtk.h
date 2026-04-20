@@ -39,7 +39,8 @@
 
 #include "rt_xtt_cmd.h"
 
-class XttCmdGtk : public XttCmd {
+class XttCmdGtk : public XttCmd
+{
 public:
   XttCmdGtk(GtkWidget* w);
   GtkWidget* toplevel;

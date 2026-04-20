@@ -44,16 +44,18 @@
 typedef struct s_ASupLstLink sASupLstLink;
 typedef struct s_DSupLstLink sDSupLstLink;
 
-typedef struct io_sSupCtx_ {
+typedef struct io_sSupCtx_
+{
   sASupLstLink* TimerLstP;
   sASupLstLink* ASupAnaLstP;
   sDSupLstLink* DSupDigLstP;
   pwr_tFloat32 TimerTime;
-} * io_tSupCtx;
+}* io_tSupCtx;
 
 #include "rt_plc_timer.h"
 
-struct s_ASupLstLink {
+struct s_ASupLstLink
+{
   sASupLstLink* NextP;
   sASupLstLink* NextTimerP;
   pwr_sClass_ASup* SupP;
@@ -61,7 +63,8 @@ struct s_ASupLstLink {
   plc_sTimer* TimerP;
 };
 
-struct s_DSupLstLink {
+struct s_DSupLstLink
+{
   sDSupLstLink* NextP;
   sDSupLstLink* NextTimerP;
   pwr_sClass_DSup* SupP;
@@ -69,9 +72,9 @@ struct s_DSupLstLink {
   plc_sTimer* TimerP;
 };
 
-pwr_tStatus io_ConnectToSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
-    pwr_tObjid ObjId, pwr_tAddress ObjP /* Pointer to the object */
-    );
+pwr_tStatus io_ConnectToSupLst(io_tSupCtx Ctx, pwr_tClassId Class, pwr_tObjid ObjId,
+                               pwr_tAddress ObjP /* Pointer to the object */
+);
 
 /* Initialize sup lists */
 

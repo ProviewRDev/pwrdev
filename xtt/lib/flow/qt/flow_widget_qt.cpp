@@ -54,7 +54,8 @@ static int flow_init_proc(QWidget* w, FlowCtx* fctx, void* client_data)
   QtScrollWidgetFlow* flow = ((QtScrollWidgetFlow*)w);
   FlowCtx* ctx = (FlowCtx*)flow->parent_ctx;
 
-  if (flow->scroll_h) {
+  if (flow->scroll_h)
+  {
     widget_sScroll* scroll_data = new widget_sScroll();
     scroll_data->parent = w;
     scroll_data->scroll_h = flow->scroll_h;
@@ -67,14 +68,12 @@ static int flow_init_proc(QWidget* w, FlowCtx* fctx, void* client_data)
   return (flow->init_proc)(ctx, client_data);
 }
 
-QWidget* scrolledflowwidgetqt_new(
-    int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
-    QWidget** flowwidget)
+QWidget* scrolledflowwidgetqt_new(int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
+                                  QWidget** flowwidget)
 {
   QtScrollWidgetFlow* w = new QtScrollWidgetFlow();
   *flowwidget = w;
-  return w->initScroll(
-      flow_eCtxType_Flow, init_proc, client_data, flow_init_proc);
+  return w->initScroll(flow_eCtxType_Flow, init_proc, client_data, flow_init_proc);
 }
 
 QWidget* flownavwidgetqt_new(QWidget* main_flow)
@@ -84,7 +83,4 @@ QWidget* flownavwidgetqt_new(QWidget* main_flow)
   return w;
 }
 
-void flowwidgetqt_modify_ctx(QWidget* w, void* ctx)
-{
-  ((QtScrollWidgetFlow*)w)->parent_ctx = ctx;
-}
+void flowwidgetqt_modify_ctx(QWidget* w, void* ctx) { ((QtScrollWidgetFlow*)w)->parent_ctx = ctx; }

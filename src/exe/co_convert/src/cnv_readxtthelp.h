@@ -41,8 +41,9 @@
 
 class CnvXtthelpTo;
 
-class CnvReadXtthelp {
-  public:
+class CnvReadXtthelp
+{
+public:
   CnvReadXtthelp(char* x_name, char* x_directory, CnvXtthelpTo* to);
   std::ofstream fp;
   char directory[80];

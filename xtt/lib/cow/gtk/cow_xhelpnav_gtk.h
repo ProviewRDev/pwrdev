@@ -43,10 +43,11 @@
 
 #include "cow_xhelpnav.h"
 
-class CoXHelpNavGtk : public CoXHelpNav {
+class CoXHelpNavGtk : public CoXHelpNav
+{
 public:
-  CoXHelpNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, char* xn_name,
-      xhelp_eUtility xn_utility, GtkWidget** w, pwr_tStatus* status);
+  CoXHelpNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, char* xn_name, xhelp_eUtility xn_utility,
+                GtkWidget** w, pwr_tStatus* status);
   ~CoXHelpNavGtk();
 
   GtkWidget* parent_wid;

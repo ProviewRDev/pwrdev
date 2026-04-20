@@ -57,14 +57,16 @@ class ItemAlarm;
 #define ALARM_TABLE_SIZE 10
 typedef pwr_tAName ev_sAlarmTableMembers[200];
 
-typedef enum {
+typedef enum
+{
   ev_eType_AlarmList,
   ev_eType_EventList,
   ev_eType_HistList,
   ev_eType_BlockList
 } ev_eType;
 
-typedef enum {
+typedef enum
+{
   evlist_eEventType_Info,
   evlist_eEventType_InfoSuccess,
   evlist_eEventType_Return,
@@ -74,12 +76,14 @@ typedef enum {
   evlist_eEventType_Cancel
 } evlist_eEventType;
 
-typedef enum {
+typedef enum
+{
   evlist_eItemType_Alarm,
   evlist_eItemType_Category
 } evlist_eItemType;
 
-typedef enum {
+typedef enum
+{
   evlist_mOpen_All = ~0,
   evlist_mOpen_Children = 1 << 0
 } evlist_mOpen;
@@ -89,7 +93,8 @@ typedef enum {
 #define ALARM_INFO_C_SIZE 2
 #define ALARM_INFO_D_SIZE 2
 #define ALARM_INFO_I_SIZE 2
-typedef struct {
+typedef struct
+{
   char a_alarm_text[ALARM_INFO_A_SIZE][200];
   char a_alarm_moretext[ALARM_INFO_A_SIZE][256];
   char a_alarm_alias[ALARM_INFO_A_SIZE][40];
@@ -125,9 +130,10 @@ typedef struct {
   int alarms_notacked;
 } evlist_sAlarmInfo;
 
-class EvListBrow {
+class EvListBrow
+{
 public:
-  EvListBrow(BrowCtx* brow_ctx, void* evl) : ctx(brow_ctx), evlist(evl){}
+  EvListBrow(BrowCtx* brow_ctx, void* evl) : ctx(brow_ctx), evlist(evl) {}
   ~EvListBrow();
 
   BrowCtx* ctx;
@@ -166,10 +172,11 @@ public:
   void brow_setup();
 };
 
-class EvList {
+class EvList
+{
 public:
-  EvList(void* ev_parent_ctx, ev_eType ev_type, int ev_size,
-      int ev_eventname_seg, void (*ev_init_cb)(void*) = 0);
+  EvList(void* ev_parent_ctx, ev_eType ev_type, int ev_size, int ev_eventname_seg,
+         void (*ev_init_cb)(void*) = 0);
   virtual ~EvList();
 
   void* parent_ctx;
@@ -184,8 +191,7 @@ public:
   int hide_text;
   void (*start_trace_cb)(void*, pwr_tObjid, char*);
   void (*display_in_xnav_cb)(void*, pwr_tAttrRef*);
-  void (*popup_menu_cb)(
-      void*, pwr_tAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  void (*popup_menu_cb)(void*, pwr_tAttrRef, unsigned long, unsigned long, char*, int x, int y);
   char* (*name_to_alias_cb)(void*, char*);
   int (*sound_cb)(void*, pwr_tAttrRef*);
   void (*selection_changed_cb)(void*);
@@ -207,18 +213,10 @@ public:
   int alarm_table_member_cnt[ALARM_TABLE_SIZE];
   pwr_tRefId alarm_tables_refid[ALARM_TABLE_SIZE];
 
-  virtual void set_input_focus()
-  {
-  }
-  virtual void bell()
-  {
-  }
-  virtual void popup_position(int x_event, int y_event, int* x, int* y)
-  {
-  }
-  virtual void print(const char* title)
-  {
-  }
+  virtual void set_input_focus() {}
+  virtual void bell() {}
+  virtual void popup_position(int x_event, int y_event, int* x, int* y) {}
+  virtual void print(const char* title) {}
 
   void event_info(mh_sMessage* msg);
   void event_alarm(mh_sMessage* msg);
@@ -246,8 +244,8 @@ public:
   void set_hide_object(int value);
   void set_hide_text(int value);
   int get_alarm_info(evlist_sAlarmInfo* info, int backward, int alarmsize);
-  int get_last_not_acked_prio(mh_sEventId** id, unsigned long type, 
-			      unsigned long prio, int backward, int timecheck);
+  int get_last_not_acked_prio(mh_sEventId** id, unsigned long type, unsigned long prio, int backward,
+                              int timecheck);
   int get_selected_event(char* eventname, ItemAlarm** item);
   int get_destination(pwr_tTime time, void** dest);
   void block_remove();
@@ -266,25 +264,23 @@ public:
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
   static int browtree_cb(FlowCtx* ctx, flow_tEvent event);
   static int get_select(void* ctx, pwr_tAttrRef* attrref, int* is_attr);
-  static int get_select_supobject(
-      void* ctx, pwr_tAttrRef* attrref, int* is_attr);
+  static int get_select_supobject(void* ctx, pwr_tAttrRef* attrref, int* is_attr);
 };
 
-class ItemEvBase {
+class ItemEvBase
+{
 public:
   evlist_eItemType type;
 };
 
-class ItemAlarm : public ItemEvBase {
+class ItemAlarm : public ItemEvBase
+{
 public:
-  ItemAlarm(EvList* evlist, const char* item_name, pwr_tTime item_time,
-      const char* item_eventtext, char* item_eventname, int item_eventttype,
-      int item_eventflags, unsigned long item_eventprio,
-      mh_sEventId item_eventid, pwr_tAttrRef* item_object,
-      pwr_tAttrRef* item_eventsound, char* item_eventmoretext,
-      unsigned long item_status, evlist_eEventType item_event_type,
-      pwr_tAttrRef* item_supobject, brow_tNode dest, flow_eDest dest_code,
-      int* rsts);
+  ItemAlarm(EvList* evlist, const char* item_name, pwr_tTime item_time, const char* item_eventtext,
+            char* item_eventname, int item_eventttype, int item_eventflags, unsigned long item_eventprio,
+            mh_sEventId item_eventid, pwr_tAttrRef* item_object, pwr_tAttrRef* item_eventsound,
+            char* item_eventmoretext, unsigned long item_status, evlist_eEventType item_event_type,
+            pwr_tAttrRef* item_supobject, brow_tNode dest, flow_eDest dest_code, int* rsts);
   evlist_eEventType event_type;
   EvList* evlist;
   brow_tNode node;
@@ -309,11 +305,11 @@ public:
   void update_text(int tree_node);
 };
 
-class ItemCategory : public ItemEvBase {
+class ItemCategory : public ItemEvBase
+{
 public:
-  ItemCategory(EvList* evlist, const char* item_name,
-      pwr_sClass_AlarmCategory* cop, brow_tNode dest, flow_eDest dest_code,
-      int* rsts);
+  ItemCategory(EvList* evlist, const char* item_name, pwr_sClass_AlarmCategory* cop, brow_tNode dest,
+               flow_eDest dest_code, int* rsts);
   EvList* evlist;
   brow_tNode node;
   char name[80];

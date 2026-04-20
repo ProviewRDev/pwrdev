@@ -39,7 +39,8 @@
 
 #include "rt_pvd_file.h"
 
-class wb_pvd_gvl : public rt_pvd_file {
+class wb_pvd_gvl : public rt_pvd_file
+{
 public:
   wb_pvd_gvl()
   {

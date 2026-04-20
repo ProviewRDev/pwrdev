@@ -46,7 +46,8 @@ class CnvWblTo;
 
 #define MAX_GROUPS 100
 
-typedef enum {
+typedef enum
+{
   cread_eLine_No,
   cread_eLine_EOF,
   cread_eLine_SObject,
@@ -87,7 +88,8 @@ typedef enum {
   cread_eLine_Unknown
 } cread_eLine;
 
-typedef enum {
+typedef enum
+{
   cread_mState_SObject = 1 << 0,
   cread_mState_ClassDef = 1 << 1,
   cread_mState_ObjBodyDef = 1 << 2,
@@ -119,15 +121,11 @@ typedef enum {
 #define cread_cTmpFile2 "classread2.tmp"
 #define cread_cTmpFile3 "classread3.tmp"
 
-class CnvReadWbl {
-  public:
-  CnvReadWbl(CnvCtx* cnv_ctx, CnvWblTo* cnv_wblto)
-      : ctx(cnv_ctx), wblto(cnv_wblto)
-  {
-  }
-  ~CnvReadWbl()
-  {
-  }
+class CnvReadWbl
+{
+public:
+  CnvReadWbl(CnvCtx* cnv_ctx, CnvWblTo* cnv_wblto) : ctx(cnv_ctx), wblto(cnv_wblto) {}
+  ~CnvReadWbl() {}
 
   CnvCtx* ctx;
   CnvWblTo* wblto;

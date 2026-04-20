@@ -43,11 +43,11 @@
 
 #include "cow_wow_gtk.h"
 
-class WAttGtk : public WAtt {
+class WAttGtk : public WAtt
+{
 public:
-  WAttGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
-      ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref, int wa_editmode,
-      int wa_advanced_user, int wa_display_objectname);
+  WAttGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref,
+          int wa_editmode, int wa_advanced_user, int wa_display_objectname);
   ~WAttGtk();
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
@@ -81,14 +81,13 @@ public:
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_print(GtkWidget* w, gpointer data);
   static void activate_help(GtkWidget* w, gpointer data);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void valchanged_cmd_input(GtkWidget* w, gpointer data);
   static void activate_cmd_input(GtkWidget* w, gpointer data);
   static void activate_cmd_scrolled_ok(GtkWidget* w, gpointer data);
   static void activate_cmd_scrolled_ca(GtkWidget* w, gpointer data);
-  static void action_text_inserted(GtkTextBuffer* w, GtkTextIter* arg1,
-      gchar* arg2, gint arg3, gpointer data);
+  static void action_text_inserted(GtkTextBuffer* w, GtkTextIter* arg1, gchar* arg2, gint arg3,
+                                   gpointer data);
   static void hide_cmd_input(GtkWidget* w, gpointer data);
 };
 

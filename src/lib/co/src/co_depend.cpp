@@ -56,15 +56,9 @@ void CoDepend::add(const char* fname)
   depend.push_back(fnamestr);
 }
 
-void CoDepend::set_dependfile(char* dname)
-{
-  strncpy(dependfile, dname, sizeof(dependfile));
-}
+void CoDepend::set_dependfile(char* dname) { strncpy(dependfile, dname, sizeof(dependfile)); }
 
-void CoDepend::set_filename(char* fname)
-{
-  strncpy(filename, fname, sizeof(filename));
-}
+void CoDepend::set_filename(char* fname) { strncpy(filename, fname, sizeof(filename)); }
 
 void CoDepend::print()
 {

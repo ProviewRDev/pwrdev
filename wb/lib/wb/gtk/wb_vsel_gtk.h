@@ -41,7 +41,8 @@
 
 #include "wb_vsel.h"
 
-struct vsel_widgets {
+struct vsel_widgets
+{
   GtkWidget* toplevel;
   GtkWidget* vsel_window;
   GtkWidget* label;
@@ -54,12 +55,12 @@ struct vsel_widgets {
   GtkWidget* creavolume;
 };
 
-class WVselGtk : public WVsel {
+class WVselGtk : public WVsel
+{
 public:
-  WVselGtk(pwr_tStatus* status, void* wv_parent_ctx, GtkWidget* wv_parent_wid,
-      const char* wv_name, ldh_tWBContext wv_wbctx, char* volumename,
-      int (*bc_success)(void*, pwr_tVolumeId*, int), void (*bc_cancel)(),
-      int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wv_wb_type);
+  WVselGtk(pwr_tStatus* status, void* wv_parent_ctx, GtkWidget* wv_parent_wid, const char* wv_name,
+           ldh_tWBContext wv_wbctx, char* volumename, int (*bc_success)(void*, pwr_tVolumeId*, int),
+           void (*bc_cancel)(), int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wv_wb_type);
   ~WVselGtk();
 
   GtkWidget* parent_wid;

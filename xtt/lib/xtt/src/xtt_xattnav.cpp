@@ -62,14 +62,11 @@ void XAttNav::message(char sev, const char* text)
 //
 // Create the navigator widget
 //
-XAttNav::XAttNav(void* xa_parent_ctx, xattnav_eType xa_type,
-    const char* xa_name, pwr_sAttrRef* xa_objar, int xa_advanced_user,
-    void* xa_userdata, pwr_tStatus* status)
-    : parent_ctx(xa_parent_ctx), type(xa_type), objar(*xa_objar),
-      advanced_user(xa_advanced_user), userdata(xa_userdata), bypass(0),
-      trace_started(0), message_cb(NULL), close_cb(0), change_value_cb(0),
-      popup_menu_cb(0), start_trace_cb(0), is_authorized_cb(0), displayed(0),
-      scantime(500)
+XAttNav::XAttNav(void* xa_parent_ctx, xattnav_eType xa_type, const char* xa_name, pwr_sAttrRef* xa_objar,
+                 int xa_advanced_user, void* xa_userdata, pwr_tStatus* status)
+    : parent_ctx(xa_parent_ctx), type(xa_type), objar(*xa_objar), advanced_user(xa_advanced_user),
+      userdata(xa_userdata), bypass(0), trace_started(0), message_cb(NULL), close_cb(0), change_value_cb(0),
+      popup_menu_cb(0), start_trace_cb(0), is_authorized_cb(0), displayed(0), scantime(500)
 {
   strcpy(name, xa_name);
   *status = 1;
@@ -78,15 +75,12 @@ XAttNav::XAttNav(void* xa_parent_ctx, xattnav_eType xa_type,
 //
 //  Delete a nav context
 //
-XAttNav::~XAttNav()
-{
-}
+XAttNav::~XAttNav() {}
 
 //
 // Check that the current selected item is valid for change
 //
-int XAttNav::check_attr(int* multiline, brow_tObject* node, char* name,
-    char** init_value, int* size)
+int XAttNav::check_attr(int* multiline, brow_tObject* node, char* name, char** init_value, int* size)
 {
   brow_tNode* node_list;
   int node_count;
@@ -104,10 +98,12 @@ int XAttNav::check_attr(int* multiline, brow_tObject* node, char* name,
   *node = node_list[0];
   free(node_list);
 
-  switch (base_item->type) {
+  switch (base_item->type)
+  {
   case xnav_eItemType_Attr:
   case xnav_eItemType_AttrArrayElem:
-  case xnav_eItemType_Collect: {
+  case xnav_eItemType_Collect:
+  {
     pwr_tTypeId a_tid;
     pwr_tUInt32 a_size, a_offs, a_elem;
     ItemBaseAttr* item = (ItemBaseAttr*)base_item;
@@ -117,8 +113,7 @@ int XAttNav::check_attr(int* multiline, brow_tObject* node, char* name,
 
     strcpy(name, item->attr);
 
-    sts = gdh_GetAttributeCharacteristics(
-        name, &a_tid, &a_size, &a_offs, &a_elem);
+    sts = gdh_GetAttributeCharacteristics(name, &a_tid, &a_size, &a_offs, &a_elem);
     if (ODD(sts))
       *size = cdh_TypeToMaxStrSize((pwr_eType)item->type_id, a_size, a_elem);
     else
@@ -139,7 +134,8 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   XAttNav* xattnav;
   Item* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
@@ -148,27 +144,35 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&xattnav);
   xattnav->message(' ', "");
 
-  switch (event->event) {
-  case flow_eEvent_Key_Up: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(xattnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLastVisible(xattnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              xattnav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(xattnav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetLastVisible(xattnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(xattnav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -184,26 +188,33 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(xattnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirstVisible(xattnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              xattnav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(xattnav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetFirstVisible(xattnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(xattnav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -222,15 +233,18 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   case flow_eEvent_SelectClear:
     brow_ResetSelectInverse(xattnav->brow->ctx);
     break;
-  case flow_eEvent_MB1Click: {
+  case flow_eEvent_MB1Click:
+  {
     // Select
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -242,9 +256,12 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(xattnav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(xattnav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(xattnav->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(xattnav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(xattnav->brow->ctx, event->object.object);
@@ -255,23 +272,28 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_Key_PageDown: {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(xattnav->brow->ctx, 0.8);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(xattnav->brow->ctx, -0.8);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(xattnav->brow->ctx, 0.1);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(xattnav->brow->ctx, -0.1);
     break;
   }
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
@@ -284,16 +306,19 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (brow_IsOpen(node_list[0]))
       // Close this node
       object = node_list[0];
-    else {
+    else
+    {
       // Close parent
       sts = brow_GetParent(xattnav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(node_list);
         return 1;
       }
     }
     brow_GetUserData(object, (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case xnav_eItemType_Attr:
       ((ItemAttr*)item)->close(xattnav->brow, 0, 0);
       break;
@@ -316,34 +341,37 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_MB3Down: {
+  case flow_eEvent_MB3Down:
+  {
     brow_SetClickSensitivity(xattnav->brow->ctx, flow_mSensitivity_MB3Press);
     break;
   }
-  case flow_eEvent_MB3Press: {
+  case flow_eEvent_MB3Press:
+  {
     // Popup menu
     int x, y;
     pwr_sAttrRef attrref;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
       if (cdh_ObjidIsNull(item->objid))
         break;
 
-      xattnav->popup_position(
-          event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
+      xattnav->popup_position(event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
 
       memset(&attrref, 0, sizeof(attrref));
-      switch (item->type) {
+      switch (item->type)
+      {
       case xnav_eItemType_Attr:
       case xnav_eItemType_AttrArrayElem:
-      case xnav_eItemType_AttrObject: {
+      case xnav_eItemType_AttrObject:
+      {
         pwr_tAName attr_str;
 
-        sts = gdh_ObjidToName(
-            item->objid, attr_str, sizeof(attr_str), cdh_mName_volumeStrict);
+        sts = gdh_ObjidToName(item->objid, attr_str, sizeof(attr_str), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
 
@@ -353,30 +381,29 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         if (EVEN(sts))
           return sts;
 
-        (xattnav->popup_menu_cb)(xattnav->parent_ctx, attrref,
-            (unsigned long)xmenu_eItemType_Attribute,
-            (unsigned long)xmenu_mUtility_AttrEditor, NULL, x, y);
+        (xattnav->popup_menu_cb)(xattnav->parent_ctx, attrref, (unsigned long)xmenu_eItemType_Attribute,
+                                 (unsigned long)xmenu_mUtility_AttrEditor, NULL, x, y);
 
         break;
       }
-      case xnav_eItemType_Collect: {
+      case xnav_eItemType_Collect:
+      {
         sts = gdh_NameToAttrref(pwr_cNObjid, item->name, &attrref);
         if (EVEN(sts))
           return sts;
 
-        (xattnav->popup_menu_cb)(xattnav->parent_ctx, attrref,
-            (unsigned long)xmenu_eItemType_Attribute,
-            (unsigned long)xmenu_mUtility_AttrEditor, NULL, x, y);
+        (xattnav->popup_menu_cb)(xattnav->parent_ctx, attrref, (unsigned long)xmenu_eItemType_Attribute,
+                                 (unsigned long)xmenu_mUtility_AttrEditor, NULL, x, y);
 
         break;
       }
-      case xnav_eItemType_Crossref: {
+      case xnav_eItemType_Crossref:
+      {
         ItemCrossref* itemc = (ItemCrossref*)item;
 
         attrref = cdh_ObjidToAref(itemc->objid);
-        (xattnav->popup_menu_cb)(xattnav->parent_ctx, attrref,
-            (unsigned long)xmenu_eItemType_Crossref,
-            (unsigned long)xmenu_mUtility_AttrEditor, itemc->ref_name, x, y);
+        (xattnav->popup_menu_cb)(xattnav->parent_ctx, attrref, (unsigned long)xmenu_eItemType_Crossref,
+                                 (unsigned long)xmenu_mUtility_AttrEditor, itemc->ref_name, x, y);
         break;
       }
       default:;
@@ -386,7 +413,8 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     int node_count;
     pwr_tStatus sts;
@@ -396,7 +424,8 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       return 1;
 
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case xnav_eItemType_Attr:
     case xnav_eItemType_AttrArrayElem:
     case xnav_eItemType_Collect:
@@ -427,32 +456,31 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_MB1DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
 
-      switch (item->type) {
+      switch (item->type)
+      {
       case xnav_eItemType_Attr:
-        ((ItemAttr*)item)
-            ->open_children(xattnav->brow, event->object.x, event->object.y);
+        ((ItemAttr*)item)->open_children(xattnav->brow, event->object.x, event->object.y);
         break;
       case xnav_eItemType_AttrArray:
-        ((ItemAttrArray*)item)
-            ->open_attributes(xattnav->brow, event->object.x, event->object.y);
+        ((ItemAttrArray*)item)->open_attributes(xattnav->brow, event->object.x, event->object.y);
         break;
       case xnav_eItemType_AttrObject:
-        ((ItemAttrObject*)item)
-            ->open_attributes(xattnav->brow, event->object.x, event->object.y);
+        ((ItemAttrObject*)item)->open_attributes(xattnav->brow, event->object.x, event->object.y);
         break;
       case xnav_eItemType_AttrArrayElem:
-        ((ItemAttrArrayElem*)item)
-            ->open_children(xattnav->brow, event->object.x, event->object.y);
+        ((ItemAttrArrayElem*)item)->open_children(xattnav->brow, event->object.x, event->object.y);
         break;
       case xnav_eItemType_Crossref:
-        if (xattnav->start_trace_cb) {
-          (xattnav->start_trace_cb)(xattnav->parent_ctx, item->objid,
-              ((ItemCrossref*)item)->ref_name);
-          if (xattnav->close_cb) {
+        if (xattnav->start_trace_cb)
+        {
+          (xattnav->start_trace_cb)(xattnav->parent_ctx, item->objid, ((ItemCrossref*)item)->ref_name);
+          if (xattnav->close_cb)
+          {
             (xattnav->close_cb)(xattnav->parent_ctx);
             return FLOW__TERMINATED;
           }
@@ -464,11 +492,14 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
     break;
-  case flow_eEvent_Radiobutton: {
-    switch (event->object.object_type) {
+  case flow_eEvent_Radiobutton:
+  {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case xnav_eItemType_Enum:
         if (!event->radiobutton.value)
           ((ItemEnum*)item)->set_value();
@@ -483,7 +514,8 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_Map: {
+  case flow_eEvent_Map:
+  {
     xattnav->displayed = 1;
     break;
   }
@@ -493,8 +525,7 @@ int XAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   return 1;
 }
 
-int XAttNav::trace_connect_bc(
-    brow_tObject object, char* name, char* attr, flow_eTraceType type, void** p)
+int XAttNav::trace_connect_bc(brow_tObject object, char* name, char* attr, flow_eTraceType type, void** p)
 {
   pwr_tAName attr_str;
   int sts;
@@ -506,12 +537,14 @@ int XAttNav::trace_connect_bc(
     return 1;
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type) {
+  switch (base_item->type)
+  {
   case xnav_eItemType_Attr:
   case xnav_eItemType_Enum:
   case xnav_eItemType_Mask:
   case xnav_eItemType_AttrArrayElem:
-  case xnav_eItemType_Collect: {
+  case xnav_eItemType_Collect:
+  {
     ItemAttr* item;
 
     item = (ItemAttr*)base_item;
@@ -533,9 +566,11 @@ int XAttNav::trace_disconnect_bc(brow_tObject object)
   Item* base_item;
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type) {
+  switch (base_item->type)
+  {
   case xnav_eItemType_Attr:
-  case xnav_eItemType_AttrArrayElem: {
+  case xnav_eItemType_AttrArrayElem:
+  {
     ItemAttr* item = (ItemAttr*)base_item;
 
     gdh_UnrefObjectInfo(item->subid);
@@ -553,52 +588,60 @@ int XAttNav::trace_scan_bc(brow_tObject object, void* p)
   int len;
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type) {
+  switch (base_item->type)
+  {
   case xnav_eItemType_Attr:
   case xnav_eItemType_AttrArrayElem:
-  case xnav_eItemType_Collect: {
+  case xnav_eItemType_Collect:
+  {
     ItemAttr* item;
 
     item = (ItemAttr*)base_item;
 
-    if (item->type == xnav_eItemType_Collect) {
+    if (item->type == xnav_eItemType_Collect)
+    {
       // Add signal flags
       XAttNav* xattnav;
       brow_GetCtxUserData(brow_GetCtx(item->node), (void**)&xattnav);
-      try {
+      try
+      {
         ((ItemCollect*)item)->set_signal_flags(xattnav->brow);
-      } catch (co_error&) {
+      }
+      catch (co_error&)
+      {
       }
     }
 
-    if (!item->first_scan) {
-      if (item->size > (int)sizeof(item->old_value)
-          && item->type_id == pwr_eType_String
-          && strlen((char*)p) < sizeof(item->old_value)
-          && streq((char*)p, item->old_value))
+    if (!item->first_scan)
+    {
+      if (item->size > (int)sizeof(item->old_value) && item->type_id == pwr_eType_String &&
+          strlen((char*)p) < sizeof(item->old_value) && streq((char*)p, item->old_value))
         // No change since last time
         return 1;
       else if (memcmp(item->old_value, p, item->size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       item->first_scan = 0;
 
-    XNav::attrvalue_to_string(item->type_id, item->tid, p, buf, sizeof(buf),
-        &len, NULL, item->conversion);
+    XNav::attrvalue_to_string(item->type_id, item->tid, p, buf, sizeof(buf), &len, NULL, item->conversion);
     brow_SetAnnotation(object, 1, buf, len);
     memcpy(item->old_value, p, MIN(item->size, (int)sizeof(item->old_value)));
     break;
   }
-  case xnav_eItemType_Enum: {
+  case xnav_eItemType_Enum:
+  {
     ItemEnum* item;
 
     item = (ItemEnum*)base_item;
-    if (!item->first_scan) {
+    if (!item->first_scan)
+    {
       if (memcmp(item->old_value, p, sizeof(pwr_tEnum)) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       item->first_scan = 0;
 
     if (*(pwr_tEnum*)p == item->num)
@@ -608,15 +651,18 @@ int XAttNav::trace_scan_bc(brow_tObject object, void* p)
     memcpy(item->old_value, p, sizeof(pwr_tEnum));
     break;
   }
-  case xnav_eItemType_Mask: {
+  case xnav_eItemType_Mask:
+  {
     ItemMask* item;
 
     item = (ItemMask*)base_item;
-    if (!item->first_scan) {
+    if (!item->first_scan)
+    {
       if (memcmp(item->old_value, p, sizeof(pwr_tMask)) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       item->first_scan = 0;
 
     if (*(pwr_tMask*)p & item->num)
@@ -635,7 +681,8 @@ void XAttNav::trace_scan(void* data)
 {
   XAttNav* xattnav = (XAttNav*)data;
 
-  if (xattnav->trace_started) {
+  if (xattnav->trace_started)
+  {
     brow_TraceScan(xattnav->brow->ctx);
 
     xattnav->trace_timerid->add(xattnav->scantime, trace_scan, xattnav);
@@ -644,40 +691,23 @@ void XAttNav::trace_scan(void* data)
 
 void XAttNav::enable_events()
 {
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Map, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Map, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, brow_cb);
 }
 
 //
@@ -700,8 +730,7 @@ int XAttNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   if (xattnav->init_cb)
     (xattnav->init_cb)(xattnav->parent_ctx);
 
-  sts = brow_TraceInit(
-      ctx, trace_connect_bc, trace_disconnect_bc, trace_scan_bc);
+  sts = brow_TraceInit(ctx, trace_connect_bc, trace_disconnect_bc, trace_scan_bc);
   xattnav->trace_started = 1;
 
   trace_scan(xattnav);
@@ -716,7 +745,8 @@ int XAttNav::object_exist(brow_tObject object)
   int i;
 
   brow_GetObjectList(brow->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     if (object_list[i] == object)
       return 1;
   }
@@ -734,9 +764,10 @@ int XAttNav::set_attr_value(brow_tObject node, char* name, char* value_str)
   pwr_tAName attr_str;
 
   // Check authorization
-  if (is_authorized_cb) {
-    if (!(is_authorized_cb(
-            parent_ctx, pwr_mAccess_RtWrite | pwr_mAccess_System))) {
+  if (is_authorized_cb)
+  {
+    if (!(is_authorized_cb(parent_ctx, pwr_mAccess_RtWrite | pwr_mAccess_System)))
+    {
       message('E', "Not authorized for this operation");
       return XATT__NOTAUTHORIZED;
     }
@@ -748,28 +779,29 @@ int XAttNav::set_attr_value(brow_tObject node, char* name, char* value_str)
 
   brow_GetUserData(node, (void**)&base_item);
 
-  switch (base_item->type) {
+  switch (base_item->type)
+  {
   case xnav_eItemType_AttrArrayElem:
   case xnav_eItemType_Attr:
-  case xnav_eItemType_Collect: {
+  case xnav_eItemType_Collect:
+  {
     ItemAttr* item = (ItemAttr*)base_item;
 
     // Check that objid is still the same
     if (!streq(item->attr, name))
       return XATT__DISAPPEARD;
 
-    sts = gdh_ObjidToName(
-        item->objid, attr_str, sizeof(attr_str), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(item->objid, attr_str, sizeof(attr_str), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
     strcat(attr_str, ".");
     strcat(attr_str, item->attr);
 
-    sts = XNav::attr_string_to_value(
-        item->type_id, value_str, buff, sizeof(buff), item->size);
+    sts = XNav::attr_string_to_value(item->type_id, value_str, buff, sizeof(buff), item->size);
     if (EVEN(sts))
       message('E', "Input syntax error");
-    else {
+    else
+    {
       sts = gdh_SetObjectInfo(attr_str, buff, item->size);
       if (EVEN(sts))
         return sts;
@@ -781,10 +813,7 @@ int XAttNav::set_attr_value(brow_tObject node, char* name, char* value_str)
   return 1;
 }
 
-void XAttNav::redraw()
-{
-  brow_Redraw(brow->ctx, 0);
-}
+void XAttNav::redraw() { brow_Redraw(brow->ctx, 0); }
 
 int XAttNav::select_by_name(char* name)
 {
@@ -797,15 +826,19 @@ int XAttNav::select_by_name(char* name)
 
   brow_GetObjectList(brow->ctx, &object_list, &object_cnt);
   found = 0;
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&base_item);
 
-    switch (base_item->type) {
+    switch (base_item->type)
+    {
     case xnav_eItemType_Attr:
-    case xnav_eItemType_AttrArrayElem: {
+    case xnav_eItemType_AttrArrayElem:
+    {
       ItemBaseAttr* item = (ItemBaseAttr*)base_item;
 
-      if (streq(name, item->attr)) {
+      if (streq(name, item->attr))
+      {
         object = object_list[i];
         found = 1;
       }
@@ -838,7 +871,8 @@ void XAttNav::start_trace()
   brow_GetUserData(node_list[0], (void**)&item);
   free(node_list);
 
-  switch (item->type) {
+  switch (item->type)
+  {
   case xnav_eItemType_Crossref:
     if (start_trace_cb)
       (start_trace_cb)(parent_ctx, item->objid, item->ref_name);
@@ -861,7 +895,8 @@ int XAttNav::get_select(pwr_tAttrRef* arp)
   brow_GetUserData(node_list[0], (void**)&item);
   free(node_list);
 
-  switch (item->type) {
+  switch (item->type)
+  {
   case xnav_eItemType_Collect:
     sts = gdh_NameToAttrref(pwr_cNObjid, item->name, arp);
     if (EVEN(sts))
@@ -875,15 +910,19 @@ int XAttNav::get_select(pwr_tAttrRef* arp)
 
 void XAttNav::swap(int mode)
 {
-  if (mode == 0) {
-    if (trace_started) {
+  if (mode == 0)
+  {
+    if (trace_started)
+    {
       brow_TraceClose(brow->ctx);
       trace_timerid->remove();
     }
-  } else if (mode == 1) {
-    if (trace_started) {
-      brow_TraceInit(
-          brow->ctx, trace_connect_bc, trace_disconnect_bc, trace_scan_bc);
+  }
+  else if (mode == 1)
+  {
+    if (trace_started)
+    {
+      brow_TraceInit(brow->ctx, trace_connect_bc, trace_disconnect_bc, trace_scan_bc);
       trace_scan(this);
     }
   }
@@ -892,23 +931,14 @@ void XAttNav::swap(int mode)
 //
 //  Get zoom
 //
-void XAttNav::get_zoom(double* zoom_factor)
-{
-  brow_GetZoom(brow->ctx, zoom_factor);
-}
+void XAttNav::get_zoom(double* zoom_factor) { brow_GetZoom(brow->ctx, zoom_factor); }
 
 //
 //  Zoom
 //
-void XAttNav::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void XAttNav::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void XAttNav::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void XAttNav::unzoom() { brow_UnZoom(brow->ctx); }

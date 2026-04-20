@@ -94,13 +94,14 @@ int WGre::node_gethighlight(vldh_t_node node, unsigned long* highlight_flag)
 //	Get the annotations that should be written in the graphics
 //	for a node.
 //
-int WGre::get_annot_width(flow_tNodeClass nodeclass, float* annot_width,
-    char* annot_str, int annot_count, int annot_size)
+int WGre::get_annot_width(flow_tNodeClass nodeclass, float* annot_width, char* annot_str, int annot_count,
+                          int annot_size)
 {
   int i;
   double width, height;
 
-  for (i = 0; i < annot_count; i++) {
+  for (i = 0; i < annot_count; i++)
+  {
     flow_MeasureAnnotation(nodeclass, i, annot_str, &width, &height);
     *annot_width = width;
     annot_str += annot_size;
@@ -114,8 +115,8 @@ int WGre::get_annot_width(flow_tNodeClass nodeclass, float* annot_width,
 //	for a node.
 //
 
-int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
-    int* annot_count, int annot_max, int annot_size)
+int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr, int* annot_count, int annot_max,
+                          int annot_size)
 {
   int i, j, sts, size;
   pwr_tClassId bodyclass;
@@ -146,13 +147,13 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
 
   /* Get graphbody for this node to fetch the parameter of the
      first annoation */
-  sts = ldh_GetClassBody(ldhses, node->ln.cid, "GraphPlcNode", &bodyclass,
-      (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhses, node->ln.cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
   node->ln.nodewidth = 0;
-  if (graphbody->segname_annotation >= 1) {
+  if (graphbody->segname_annotation >= 1)
+  {
     strncpy(annot_str, node->hn.name, annot_size);
     *annot_nr = graphbody->segname_annotation;
     annot_str += annot_size;
@@ -160,31 +161,38 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
     (*annot_count)++;
   }
 
-  if (!(node->ln.cid == pwr_cClass_order || node->ln.cid == pwr_cClass_QOrder)) {
-    for (j = 0; j < 2; j++) {
+  if (!(node->ln.cid == pwr_cClass_order || node->ln.cid == pwr_cClass_QOrder))
+  {
+    for (j = 0; j < 2; j++)
+    {
       /* Look for annotations in some parameter in devbody or rtbody */
-      if (j == 0) {
+      if (j == 0)
+      {
         if (!graphbody->devbody_annotation)
           continue;
         strcpy(body, "DevBody");
-      } else {
+      }
+      else
+      {
         if (!graphbody->rtbody_annotation)
           continue;
         strcpy(body, "RtBody");
       }
 
-      sts = ldh_GetObjectBodyDef(
-          ldhses, node->ln.cid, body, 1, &bodydef, &rows);
+      sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, body, 1, &bodydef, &rows);
       if (EVEN(sts))
         continue;
 
       if (EVEN(sts))
         return GRE__SUCCESS;
 
-      for (i = 0; i < rows; i++) {
+      for (i = 0; i < rows; i++)
+      {
         annotnr = 0;
-        switch (bodydef[i].ParClass) {
-        case pwr_eClass_Input: {
+        switch (bodydef[i].ParClass)
+        {
+        case pwr_eClass_Input:
+        {
           annotnr = bodydef[i].Par->Input.Graph.NiNaAnnot;
           annotcond = bodydef[i].Par->Input.Graph.NiNaCond;
           annotsegments = bodydef[i].Par->Input.Graph.NiNaSegments;
@@ -192,7 +200,8 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
           parname = bodydef[i].ParName;
           break;
         }
-        case pwr_eClass_Intern: {
+        case pwr_eClass_Intern:
+        {
           annotnr = bodydef[i].Par->Intern.Graph.NiNaAnnot;
           annotcond = bodydef[i].Par->Intern.Graph.NiNaCond;
           annotsegments = bodydef[i].Par->Intern.Graph.NiNaSegments;
@@ -200,7 +209,8 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
           parname = bodydef[i].ParName;
           break;
         }
-        case pwr_eClass_Output: {
+        case pwr_eClass_Output:
+        {
           annotnr = bodydef[i].Par->Output.Graph.NiNaAnnot;
           annotcond = bodydef[i].Par->Output.Graph.NiNaCond;
           annotsegments = bodydef[i].Par->Output.Graph.NiNaSegments;
@@ -210,17 +220,20 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
         }
         default:;
         }
-        if (annotnr != 0) {
-          if (annotcond) {
+        if (annotnr != 0)
+        {
+          if (annotcond)
+          {
             /* Get the condition if the annotation should be shown from
                the parameter Show'parname' in devbody */
             strcpy(condparname, "Show");
             strcat(condparname, parname);
-            sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", condparname,
-                (char**)&condparvalue, &size);
+            sts =
+                ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", condparname, (char**)&condparvalue, &size);
             if (EVEN(sts))
               continue;
-            if (!*condparvalue) {
+            if (!*condparvalue)
+            {
               /* No, this parameter should node be shown this time */
               free((char*)condparvalue);
               continue;
@@ -230,16 +243,18 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
 
           if (!annotsegments)
             annot_segments = 1;
-          else {
+          else
+          {
             /* Get the segments of the annotation that should be shown from
                the parameter 'parname'Segments in devbody */
             strcpy(condparname, parname);
             strcat(condparname, "Segments");
-            sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", condparname,
-                (char**)&segmentsparvalue, &size);
+            sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", condparname, (char**)&segmentsparvalue,
+                                   &size);
             if (EVEN(sts))
               annot_segments = 1;
-            else {
+            else
+            {
               annot_segments = *segmentsparvalue;
               if (annot_segments < 1)
                 annot_segments = 1;
@@ -247,14 +262,15 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
             }
           }
 
-          if (streq(parname, "SigChanCon")) {
+          if (streq(parname, "SigChanCon"))
+          {
             /* Get attribute SigChanCon from previous attrref */
             pwr_tObjid oid;
             char* s;
 
-            if (cdh_ObjidIsNotNull(last_attrref.Objid)) {
-              sts = ldh_AttrRefToName(
-                  ldhses, &last_attrref, cdh_mName_volumeStrict, &name, &size);
+            if (cdh_ObjidIsNotNull(last_attrref.Objid))
+            {
+              sts = ldh_AttrRefToName(ldhses, &last_attrref, cdh_mName_volumeStrict, &name, &size);
               if (EVEN(sts))
                 continue;
 
@@ -267,63 +283,75 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
               if (EVEN(sts))
                 continue;
 
-              sts = ldh_GetObjectPar(
-                  ldhses, oid, "RtBody", s + 1, (char**)&parvalue, &size);
-              if (EVEN(sts)) {
+              sts = ldh_GetObjectPar(ldhses, oid, "RtBody", s + 1, (char**)&parvalue, &size);
+              if (EVEN(sts))
+              {
                 s = strchr(s + 1, '.');
                 if (s == 0)
                   continue;
 
-                sts = ldh_GetObjectPar(
-                    ldhses, oid, "RtBody", s + 1, (char**)&parvalue, &size);
+                sts = ldh_GetObjectPar(ldhses, oid, "RtBody", s + 1, (char**)&parvalue, &size);
                 if (EVEN(sts))
                   continue;
               }
-            } else
+            }
+            else
               continue;
-          } else {
+          }
+          else
+          {
             /* Get the parameter value */
-            sts = ldh_GetObjectPar(ldhses, node->ln.oid, body,
-                bodydef[i].ParName, (char**)&parvalue, &size);
+            sts = ldh_GetObjectPar(ldhses, node->ln.oid, body, bodydef[i].ParName, (char**)&parvalue, &size);
             if (EVEN(sts))
               return sts;
           }
 
-          switch (type) {
+          switch (type)
+          {
           case pwr_eType_String:
-          case pwr_eType_Text: {
+          case pwr_eType_Text:
+          {
             strncpy(annot_str, parvalue, annot_size);
             break;
           }
-          case pwr_eType_Char: {
+          case pwr_eType_Char:
+          {
             *annot_str = *parvalue;
             *(annot_str + 1) = '\0';
             break;
           }
-          case pwr_eType_Float32: {
+          case pwr_eType_Float32:
+          {
             sprintf(annot_str, "%g", *(float*)parvalue);
             break;
           }
-          case pwr_eType_ObjDId: {
+          case pwr_eType_ObjDId:
+          {
             /* Get the object name from ldh */
             parobjdid = (pwr_tObjid*)parvalue;
             if (cdh_ObjidIsNull(*parobjdid))
               strcpy(objid_str, "");
-            else if ((*parobjdid).oix == 0) {
+            else if ((*parobjdid).oix == 0)
+            {
               /* Get the volume name */
-              sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses),
-                  (*parobjdid).vid, objid_str, sizeof(objid_str), &size);
+              sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses), (*parobjdid).vid, objid_str,
+                                       sizeof(objid_str), &size);
               if (EVEN(sts))
                 objid_str[0] = 0;
-            } else {
-              if (annot_segments == 1) {
-                sts = ldh_ObjidToName(ldhses, *parobjdid, ldh_eName_Object,
-                    objid_str, sizeof(objid_str), &size);
+            }
+            else
+            {
+              if (annot_segments == 1)
+              {
+                sts = ldh_ObjidToName(ldhses, *parobjdid, ldh_eName_Object, objid_str, sizeof(objid_str),
+                                      &size);
                 if (EVEN(sts))
                   objid_str[0] = 0;
-              } else {
-                sts = ldh_ObjidToName(ldhses, *parobjdid, ldh_eName_Hierarchy,
-                    objid_str, sizeof(objid_str), &size);
+              }
+              else
+              {
+                sts = ldh_ObjidToName(ldhses, *parobjdid, ldh_eName_Hierarchy, objid_str, sizeof(objid_str),
+                                      &size);
                 if (EVEN(sts))
                   objid_str[0] = 0;
                 else
@@ -333,26 +361,29 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
             strncpy(annot_str, objid_str, annot_size);
             break;
           }
-          case pwr_eType_AttrRef: {
+          case pwr_eType_AttrRef:
+          {
             /* Get the object name from ldh */
             parattrref = (pwr_sAttrRef*)parvalue;
             if (cdh_ObjidIsNull(parattrref->Objid))
               strcpy(objid_str, "");
-            else {
-              if (parattrref->Objid.vid == ldh_cPlcMainVolume
-                  || parattrref->Objid.vid == ldh_cPlcFoVolume) {
-                sts = ldh_AttrRefToName(
-                    ldhses, parattrref, ldh_eName_Ref, &name, &size);
+            else
+            {
+              if (parattrref->Objid.vid == ldh_cPlcMainVolume || parattrref->Objid.vid == ldh_cPlcFoVolume)
+              {
+                sts = ldh_AttrRefToName(ldhses, parattrref, ldh_eName_Ref, &name, &size);
                 if (EVEN(sts))
                   objid_str[0] = 0;
                 else
                   strcpy(objid_str, name);
-              } else {
-                sts = ldh_AttrRefToName(
-                    ldhses, parattrref, ldh_eName_Hierarchy, &name, &size);
+              }
+              else
+              {
+                sts = ldh_AttrRefToName(ldhses, parattrref, ldh_eName_Hierarchy, &name, &size);
                 if (EVEN(sts))
                   objid_str[0] = 0;
-                else {
+                else
+                {
                   utl_cut_segments(objid_str, name, annot_segments);
                   last_attrref = *parattrref;
                 }
@@ -377,7 +408,9 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
       if (*annot_count >= annot_max)
         break;
     }
-  } else {
+  }
+  else
+  {
     char attribute[80];
     int attribute_count;
     pwr_tFloat32* attrtime_p;
@@ -391,29 +424,27 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
     annot_str_next = annot_str + annot_size;
     strcpy(annot_str_next, "");
     /* Check if AttrTime's should be shown */
-    sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "ShowAttrTime",
-        (char**)&condparvalue, &size);
+    sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "ShowAttrTime", (char**)&condparvalue, &size);
     if (EVEN(sts))
       return sts;
     showattrtime = *condparvalue;
     free((char*)condparvalue);
 
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < 6; i++)
+    {
       sprintf(attribute, "Attr%d", i + 1);
-      sts = ldh_GetObjectPar(
-          ldhses, node->ln.oid, "DevBody", attribute, (char**)&parvalue, &size);
+      sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", attribute, (char**)&parvalue, &size);
       if (EVEN(sts))
         return sts;
       sprintf(annot_str + strlen(annot_str), "%c", *parvalue);
-      if (showattrtime && ((*parvalue == 'D' || *parvalue == 'd')
-                              || (*parvalue == 'L' || *parvalue == 'l'))) {
+      if (showattrtime && ((*parvalue == 'D' || *parvalue == 'd') || (*parvalue == 'L' || *parvalue == 'l')))
+      {
         sprintf(attribute, "AttrTime%d", i + 1);
 
         if (attribute_count != 0)
           strcat(annot_str_next, " ");
         sprintf(annot_str_next + strlen(annot_str_next), "%c=", *parvalue);
-        sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", attribute,
-            (char**)&attrtime_p, &size);
+        sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", attribute, (char**)&attrtime_p, &size);
         if (EVEN(sts))
           return sts;
 
@@ -439,10 +470,7 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
 //	Send a message to the gre_message backcallroutine.
 //	( foe_gre_message )
 //
-void WGre::message(const char* message)
-{
-  (gre_message)(this, message);
-}
+void WGre::message(const char* message) { (gre_message)(this, message); }
 
 //
 //  Inits the gre context.
@@ -509,18 +537,17 @@ int WGre::node_annotations_draw(vldh_t_node node, int paste)
 
   /* Get the annotations of this node */
   sts = get_annotations(node, (char*)annot_str, annot_nr, &annot_count,
-      sizeof(annot_str) / sizeof(annot_str[0]), sizeof(annot_str[0]));
+                        sizeof(annot_str) / sizeof(annot_str[0]), sizeof(annot_str[0]));
   if (EVEN(sts))
     return sts;
 
   /* Draw the annotations */
-  for (i = 0; i < annot_count; i++) {
+  for (i = 0; i < annot_count; i++)
+  {
     if (paste)
-      flow_SetPasteNodeAnnotation(node->hn.node_id, annot_nr[i] - 1,
-          annot_str[i], strlen(annot_str[i]));
+      flow_SetPasteNodeAnnotation(node->hn.node_id, annot_nr[i] - 1, annot_str[i], strlen(annot_str[i]));
     else
-      flow_SetAnnotation(node->hn.node_id, annot_nr[i] - 1, annot_str[i],
-          strlen(annot_str[i]));
+      flow_SetAnnotation(node->hn.node_id, annot_nr[i] - 1, annot_str[i], strlen(annot_str[i]));
   }
   return GRE__SUCCESS;
 }
@@ -531,8 +558,7 @@ int WGre::node_annotations_draw(vldh_t_node node, int paste)
 //	Returns the three first annotaions ( the objectname is excluded)
 //	and puts them in a string separated by a ','.
 //
-int WGre::node_annot_message(
-    vldh_t_node node, char* message, int msg_size, int annot_max_size)
+int WGre::node_annot_message(vldh_t_node node, char* message, int msg_size, int annot_max_size)
 {
   int i, sts, size;
   pwr_tClassId bodyclass;
@@ -548,37 +574,41 @@ int WGre::node_annot_message(
   int annotcount;
 
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody((node->hn.wind)->hw.ldhses, node->ln.cid,
-      "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody((node->hn.wind)->hw.ldhses, node->ln.cid, "GraphPlcNode", &bodyclass,
+                         (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
   /* Draw the parameters in devbody that has an annotation nr */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
 
   if (EVEN(sts))
     return GRE__SUCCESS;
 
   *message = '\0';
   annotcount = 0;
-  for (i = 0; i < rows; i++) {
+  for (i = 0; i < rows; i++)
+  {
     strcpy(annot_str, "");
     annotnr = 0;
-    switch (bodydef[i].ParClass) {
-    case pwr_eClass_Input: {
+    switch (bodydef[i].ParClass)
+    {
+    case pwr_eClass_Input:
+    {
       annotnr = bodydef[i].Par->Input.Graph.NiNaAnnot;
       type = bodydef[i].Par->Input.Info.Type;
       parname = bodydef[i].ParName;
       break;
     }
-    case pwr_eClass_Intern: {
+    case pwr_eClass_Intern:
+    {
       annotnr = bodydef[i].Par->Intern.Graph.NiNaAnnot;
       type = bodydef[i].Par->Intern.Info.Type;
       parname = bodydef[i].ParName;
       break;
     }
-    case pwr_eClass_Output: {
+    case pwr_eClass_Output:
+    {
       annotnr = bodydef[i].Par->Output.Graph.NiNaAnnot;
       type = bodydef[i].Par->Output.Info.Type;
       parname = bodydef[i].ParName;
@@ -586,66 +616,74 @@ int WGre::node_annot_message(
     }
     default:;
     }
-    if (annotnr != 0) {
+    if (annotnr != 0)
+    {
       /* Get the parameter value */
-      sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid,
-          "DevBody", bodydef[i].ParName, (char**)&parvalue, &size);
+      sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody", bodydef[i].ParName,
+                             (char**)&parvalue, &size);
       if (EVEN(sts))
         return sts;
 
-      switch (type) {
-      case pwr_eType_Float32: {
+      switch (type)
+      {
+      case pwr_eType_Float32:
+      {
         parfloat = (pwr_tFloat32*)parvalue;
         sprintf(annot_str, "%f", *parfloat);
         break;
       }
       case pwr_eType_String:
-      case pwr_eType_Text: {
-        strncpy(
-            annot_str, parvalue, MIN((int)sizeof(annot_str), annot_max_size));
+      case pwr_eType_Text:
+      {
+        strncpy(annot_str, parvalue, MIN((int)sizeof(annot_str), annot_max_size));
         annot_str[MIN((int)sizeof(annot_str), annot_max_size) - 1] = 0;
         break;
       }
-      case pwr_eType_Char: {
+      case pwr_eType_Char:
+      {
         annot_str[0] = *parvalue;
         annot_str[1] = '\0';
         break;
       }
-      case pwr_eType_Objid: {
+      case pwr_eType_Objid:
+      {
         /* Get the object name from ldh */
         parobjdid = (pwr_tObjid*)parvalue;
         if (cdh_ObjidIsNull(*parobjdid))
           annot_str[0] = '\0';
-        else {
-          sts = ldh_ObjidToName((node->hn.wind)->hw.ldhses, *parobjdid,
-              ldh_eName_Object, annot_str, sizeof(annot_str), &size);
+        else
+        {
+          sts = ldh_ObjidToName((node->hn.wind)->hw.ldhses, *parobjdid, ldh_eName_Object, annot_str,
+                                sizeof(annot_str), &size);
           if (EVEN(sts))
             annot_str[0] = '\0';
         }
         break;
       }
-      case pwr_eType_AttrRef: {
+      case pwr_eType_AttrRef:
+      {
         /* Get the object name from ldh */
         pwr_tAttrRef* arp = (pwr_tAttrRef*)parvalue;
         char* name = 0;
 
         if (cdh_ObjidIsNull(arp->Objid))
           annot_str[0] = '\0';
-        else {
-          sts = ldh_AttrRefToName((node->hn.wind)->hw.ldhses, arp,
-              ldh_eName_ArefObject, &name, &size);
+        else
+        {
+          sts = ldh_AttrRefToName((node->hn.wind)->hw.ldhses, arp, ldh_eName_ArefObject, &name, &size);
           if (EVEN(sts) || !name)
             annot_str[0] = '\0';
-          else {
-            strncpy(annot_str, name,
-                MIN((int)sizeof(annot_str), annot_max_size));
+          else
+          {
+            strncpy(annot_str, name, MIN((int)sizeof(annot_str), annot_max_size));
             annot_str[MIN((int)sizeof(annot_str), annot_max_size) - 1] = 0;
           }
         }
         break;
       }
       }
-      if (!streq(annot_str, "")) {
+      if (!streq(annot_str, ""))
+      {
         if (annotcount != 0)
           strncat(message, ", ", msg_size - strlen(message));
         strncat(message, annot_str, msg_size - strlen(message));
@@ -689,17 +727,15 @@ void WGre::unselect()
 //
 //  Reset any selected connectionpoints
 //
-void WGre::conpoint_unselect()
-{
-  flow_ConPointSelectClear(flow_ctx);
-}
+void WGre::conpoint_unselect() { flow_ConPointSelectClear(flow_ctx); }
 
 //
 //	Delete the search rectangle.
 //
 void WGre::search_rectangle_delete()
 {
-  if (searchrect_node_id != 0) {
+  if (searchrect_node_id != 0)
+  {
     flow_SetInverse(searchrect_node_id, 0);
     searchrect_node_id = 0;
   }
@@ -728,24 +764,25 @@ int WGre::undelete()
   flow_tNode node_id;
 
   /* SG 20.03.91 if nothing has been done say it to the user */
-  if (del_con_count == 0 && del_node_count == 0) {
+  if (del_con_count == 0 && del_node_count == 0)
+  {
     message("Nothing to undelete");
     BEEP;
     return GRE__SUCCESS;
   }
 
   /* Restore nodes in delete_list */
-  for (i = 0; i < del_node_count; i++) {
+  for (i = 0; i < del_node_count; i++)
+  {
     node_class = 0;
-    sts = get_nodeclass(del_node_list[i]->ln.cid,
-        del_node_list[i]->hn.wind->hw.ldhses, del_node_list[i]->ln.object_type,
-        del_node_list[i]->ln.mask, del_node_list[i]->ln.subwindow,
-        del_node_list[i]->ln.nodewidth, &node_class, del_node_list[i]);
+    sts = get_nodeclass(del_node_list[i]->ln.cid, del_node_list[i]->hn.wind->hw.ldhses,
+                        del_node_list[i]->ln.object_type, del_node_list[i]->ln.mask,
+                        del_node_list[i]->ln.subwindow, del_node_list[i]->ln.nodewidth, &node_class,
+                        del_node_list[i]);
     if (EVEN(sts))
       return sts;
-    flow_CreateNode(flow_ctx, del_node_list[i]->hn.name, node_class,
-        del_node_list[i]->ln.x, del_node_list[i]->ln.y, del_node_list[i],
-        &node_id);
+    flow_CreateNode(flow_ctx, del_node_list[i]->hn.name, node_class, del_node_list[i]->ln.x,
+                    del_node_list[i]->ln.y, del_node_list[i], &node_id);
     del_node_list[i]->hn.node_id = node_id;
     sts = node_annotations_draw(del_node_list[i], 0);
     if (EVEN(sts))
@@ -753,7 +790,8 @@ int WGre::undelete()
     vldh_node_undelete(del_node_list[i]);
   }
   /* Restore connections in delete_list */
-  for (i = 0; i < del_con_count; i++) {
+  for (i = 0; i < del_con_count; i++)
+  {
     vldh_con_undelete(del_con_list[i]);
     sts = goec_con_draw(this, del_con_list[i], GRE_CON_CREATE, 0);
   }
@@ -787,13 +825,16 @@ void WGre::delnode_insert(vldh_t_node node_id)
 
   /* Check not aready inserted */
   found = 0;
-  for (i = 0; i < del_node_count; i++) {
-    if (del_node_list[i] == node_id) {
+  for (i = 0; i < del_node_count; i++)
+  {
+    if (del_node_list[i] == node_id)
+    {
       found = 1;
       break;
     }
   }
-  if (!found && (del_node_count < MAX_DEL_NODE)) {
+  if (!found && (del_node_count < MAX_DEL_NODE))
+  {
     /* Insert node in selected node list */
     del_node_list[del_node_count] = node_id;
     del_node_count++;
@@ -812,13 +853,16 @@ void WGre::delcon_insert(vldh_t_con con_id)
 
   /* Check not aready inserted */
   found = 0;
-  for (i = 0; i < del_con_count; i++) {
-    if (del_con_list[i] == con_id) {
+  for (i = 0; i < del_con_count; i++)
+  {
+    if (del_con_list[i] == con_id)
+    {
       found = 1;
       break;
     }
   }
-  if (!found && (del_con_count < MAX_DEL_CON)) {
+  if (!found && (del_con_count < MAX_DEL_CON))
+  {
     /* Insert con in selected con list */
     del_con_list[del_con_count] = con_id;
     del_con_count++;
@@ -849,7 +893,8 @@ void WGre::delete_selected()
   /* SG 20.03.91 if nothing has been done say it to the user */
   flow_GetSelectedNodes(flow_ctx, &fnode_list, &fnode_count);
   flow_GetSelectedCons(flow_ctx, &fcon_list, &fcon_count);
-  if (fnode_count == 0 && fcon_count == 0) {
+  if (fnode_count == 0 && fcon_count == 0)
+  {
     message("Nothing to delete");
     BEEP;
     return;
@@ -857,13 +902,15 @@ void WGre::delete_selected()
 
   /* Delete nodes */
   /* Get all connections connected to every node and delete it */
-  for (i = 0; i < fnode_count; i++) {
+  for (i = 0; i < fnode_count; i++)
+  {
     flow_GetUserData(fnode_list[i], (void**)&node);
 
     /* delete connected connections */
     sts = vldh_get_cons_node(node, &con_count, &con_list);
     con_ptr = con_list;
-    for (j = 0; j < (int)con_count; j++) {
+    for (j = 0; j < (int)con_count; j++)
+    {
       vldh_con_delete(*con_ptr);
       goec_con_delete(this, *con_ptr);
       delcon_insert(*con_ptr);
@@ -884,9 +931,11 @@ void WGre::delete_selected()
 
   /* delete the remaining selected connections */
   flow_GetSelectedCons(flow_ctx, &fcon_list, &fcon_count);
-  for (i = 0; i < fcon_count; i++) {
+  for (i = 0; i < fcon_count; i++)
+  {
     flow_GetUserData(fcon_list[i], (void**)&con);
-    if ((con->hc.status & VLDH_DELETE) == 0) {
+    if ((con->hc.status & VLDH_DELETE) == 0)
+    {
       /* delete the con */
       vldh_con_delete(con);
       goec_con_delete(this, con);
@@ -923,7 +972,8 @@ int WGre::delete_node(vldh_t_node node)
   if (EVEN(sts))
     return sts;
   con_ptr = con_list;
-  for (j = 0; j < (int)con_count; j++) {
+  for (j = 0; j < (int)con_count; j++)
+  {
     vldh_con_delete(*con_ptr);
     goec_con_delete(this, *con_ptr);
     delcon_insert(*con_ptr);
@@ -957,10 +1007,7 @@ void WGre::delete_con(vldh_t_con con)
 //
 //	Inserts the paste signelnode in the current window.
 //
-int WGre::paste_node_exec(float x, float y)
-{
-  return GRE__SUCCESS;
-}
+int WGre::paste_node_exec(float x, float y) { return GRE__SUCCESS; }
 
 //
 //	This routine deletes all selected objects and makes it possible
@@ -982,7 +1029,8 @@ int WGre::cut()
   /* Copy selected objects to pastelist */
   flow_GetSelectedNodes(flow_ctx, &fnode_list, &fnode_count);
   flow_GetSelectedCons(flow_ctx, &fcon_list, &fcon_count);
-  if (fnode_count == 0 && fcon_count == 0) {
+  if (fnode_count == 0 && fcon_count == 0)
+  {
     message("Nothing to cut");
     BEEP;
     return GRE__SUCCESS;
@@ -992,12 +1040,14 @@ int WGre::cut()
   vldh_paste_init();
 
   /* Insert the nodes */
-  for (i = 0; i < fnode_count; i++) {
+  for (i = 0; i < fnode_count; i++)
+  {
     flow_GetUserData(fnode_list[i], (void**)&node);
     vldh_paste_node_insert(wind, node);
   }
   /* Insert the cons */
-  for (i = 0; i < fcon_count; i++) {
+  for (i = 0; i < fcon_count; i++)
+  {
     flow_GetUserData(fcon_list[i], (void**)&con);
     vldh_paste_con_insert(wind, con);
   }
@@ -1055,7 +1105,8 @@ int WGre::copy()
 
   flow_GetSelectedNodes(flow_ctx, &fnode_list, &fnode_count);
   flow_GetSelectedCons(flow_ctx, &fcon_list, &fcon_count);
-  if (fnode_count == 0 && fcon_count == 0) {
+  if (fnode_count == 0 && fcon_count == 0)
+  {
     message("Nothing to copy");
     BEEP;
     return GRE__SUCCESS;
@@ -1065,12 +1116,14 @@ int WGre::copy()
   vldh_paste_init();
 
   /* Insert the nodes */
-  for (i = 0; i < fnode_count; i++) {
+  for (i = 0; i < fnode_count; i++)
+  {
     flow_GetUserData(fnode_list[i], (void**)&node);
     vldh_paste_node_insert(wind, node);
   }
   /* Insert the cons */
-  for (i = 0; i < fcon_count; i++) {
+  for (i = 0; i < fcon_count; i++)
+  {
     flow_GetUserData(fcon_list[i], (void**)&con);
     vldh_paste_con_insert(wind, con);
   }
@@ -1117,17 +1170,17 @@ int WGre::window_draw()
   flow_SetNodraw(flow_ctx);
 
   /* Create the nodes */
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     node_class = 0;
-    sts = get_nodeclass((*node_ptr)->ln.cid, ((*node_ptr)->hn.wind)->hw.ldhses,
-        (*node_ptr)->ln.object_type, (*node_ptr)->ln.mask,
-        (*node_ptr)->ln.subwindow, (*node_ptr)->ln.nodewidth, &node_class,
-        *node_ptr);
+    sts = get_nodeclass((*node_ptr)->ln.cid, ((*node_ptr)->hn.wind)->hw.ldhses, (*node_ptr)->ln.object_type,
+                        (*node_ptr)->ln.mask, (*node_ptr)->ln.subwindow, (*node_ptr)->ln.nodewidth,
+                        &node_class, *node_ptr);
     if (EVEN(sts))
       return sts;
 
-    flow_CreateNode(flow_ctx, (*node_ptr)->hn.name, node_class,
-        (*node_ptr)->ln.x, (*node_ptr)->ln.y, *node_ptr, &node_id);
+    flow_CreateNode(flow_ctx, (*node_ptr)->hn.name, node_class, (*node_ptr)->ln.x, (*node_ptr)->ln.y,
+                    *node_ptr, &node_id);
     (*node_ptr)->hn.node_id = node_id;
 
     sts = node_annotations_draw(*node_ptr, 0);
@@ -1146,7 +1199,8 @@ int WGre::window_draw()
   }
 
   /* Create the neted connections */
-  for (i = 0; i < (int)con_count; i++) {
+  for (i = 0; i < (int)con_count; i++)
+  {
     sts = goec_con_draw(this, *con_ptr, GRE_CON_NONROUTE, 0);
     con_ptr++;
   }
@@ -1182,7 +1236,8 @@ int WGre::get_selnodes(unsigned long* node_count, vldh_t_node** nodelist)
   *nodelist = (vldh_t_node*)calloc(fnode_count, sizeof(node));
 
   /* Insert the nodes */
-  for (i = 0; i < fnode_count; i++) {
+  for (i = 0; i < fnode_count; i++)
+  {
     flow_GetUserData(fnode_list[i], (void**)&node);
     *(*nodelist + *node_count) = node;
     (*node_count)++;
@@ -1211,7 +1266,8 @@ int WGre::get_selcons(unsigned long* con_count, vldh_t_con** conlist)
   *conlist = (vldh_t_con*)calloc(fcon_count, sizeof(con));
 
   /* Insert the cons */
-  for (i = 0; i < fcon_count; i++) {
+  for (i = 0; i < fcon_count; i++)
+  {
     flow_GetUserData(fcon_list[i], (void**)&con);
     *(*conlist + *con_count) = con;
     (*con_count)++;
@@ -1228,9 +1284,9 @@ int WGre::get_selcons(unsigned long* con_count, vldh_t_con** conlist)
 //	If the mask is not the defautlmask a new nodetype is created every
 //	time and not stored.
 //
-int WGre::get_nodeclass(pwr_tClassId cid, ldh_tSesContext ldhses,
-    unsigned long node_type, unsigned int* mask, unsigned long subwindowmark,
-    unsigned long node_width, flow_tNodeClass* node_class, vldh_t_node node)
+int WGre::get_nodeclass(pwr_tClassId cid, ldh_tSesContext ldhses, unsigned long node_type, unsigned int* mask,
+                        unsigned long subwindowmark, unsigned long node_width, flow_tNodeClass* node_class,
+                        vldh_t_node node)
 {
   unsigned char new_nodetype;
   int sts, size;
@@ -1251,35 +1307,37 @@ int WGre::get_nodeclass(pwr_tClassId cid, ldh_tSesContext ldhses,
     /* Always new node type for text objects */
     new_nodetype = TRUE;
 
-  if (!new_nodetype) {
+  if (!new_nodetype)
+  {
     /* Get the defaultmask */
     /* Get graphbody for the class */
-    sts = ldh_GetClassBody(
-        ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+    sts = ldh_GetClassBody(ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
     if (EVEN(sts))
       return sts;
 
     /* Check if the mask is changed */
-    if ((graphbody->default_mask[0] != *mask)
-        || (graphbody->default_mask[1] != *(mask + 1)))
+    if ((graphbody->default_mask[0] != *mask) || (graphbody->default_mask[1] != *(mask + 1)))
       /* New nodetype */
       new_nodetype = TRUE;
   }
 
-  if (!new_nodetype) {
+  if (!new_nodetype)
+  {
     /* Use the standard graphics and save nodetypeid in context */
-    if (nodeclass_list[node_type][subwindowmark] == 0) {
+    if (nodeclass_list[node_type][subwindowmark] == 0)
+    {
       /* Create a new nodetype_id */
-      sts = goen_create_nodetype(flow_ctx, cid, ldhses, mask, subwindowmark,
-          node_width, &nodeclass_list[node_type][subwindowmark], node);
+      sts = goen_create_nodetype(flow_ctx, cid, ldhses, mask, subwindowmark, node_width,
+                                 &nodeclass_list[node_type][subwindowmark], node);
       if (EVEN(sts))
         return sts;
     }
     *node_class = nodeclass_list[node_type][subwindowmark];
-  } else {
+  }
+  else
+  {
     /* create a special nodetype for this node */
-    sts = goen_create_nodetype(flow_ctx, cid, ldhses, mask, subwindowmark,
-        node_width, node_class, node);
+    sts = goen_create_nodetype(flow_ctx, cid, ldhses, mask, subwindowmark, node_width, node_class, node);
     if (EVEN(sts))
       return sts;
   }
@@ -1291,14 +1349,15 @@ int WGre::get_nodeclass(pwr_tClassId cid, ldh_tSesContext ldhses,
 //	stored in contypeidlist in gre context. If not the first time it
 //	is fetched from there.
 //
-int WGre::get_conclass(pwr_tClassId cid, ldh_tSesContext ldhses,
-    unsigned long con_type, flow_tConClass* con_class)
+int WGre::get_conclass(pwr_tClassId cid, ldh_tSesContext ldhses, unsigned long con_type,
+                       flow_tConClass* con_class)
 {
   int sts;
 
   if (cid == 0)
     con_type = MAX_NUMBER_OF_CONTYPES - 1;
-  if (conclass_list[con_type] == 0) {
+  if (conclass_list[con_type] == 0)
+  {
     /* If the connectiontype is not yet created, create it */
     sts = goen_create_contype(flow_ctx, cid, ldhses, &conclass_list[con_type]);
     if (EVEN(sts))
@@ -1328,7 +1387,8 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
 
   gre->search_rectangle_delete();
 
-  if (event->any.type == flow_eEventType_CreateCon) {
+  if (event->any.type == flow_eEventType_CreateCon)
+  {
     if (flow_GetPasteActive(ctx) || flow_GetAutoscrollingActive(ctx))
       return 1;
     flow_GetUserData(event->con_create.source_object, (void**)&source);
@@ -1336,19 +1396,20 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
       flow_GetUserData(event->con_create.dest_object, (void**)&dest);
     else
       dest = 0;
-    (gre->gre_con_created)(gre, event->con_create.x, event->con_create.y,
-        source, event->con_create.source_conpoint, dest,
-        event->con_create.dest_conpoint, 0, &sts);
+    (gre->gre_con_created)(gre, event->con_create.x, event->con_create.y, source,
+                           event->con_create.source_conpoint, dest, event->con_create.dest_conpoint, 0, &sts);
   }
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case flow_eEvent_Init:
     break;
   case flow_eEvent_PasteSequenceStart:
     flow_SetSelectHighlight(ctx);
     break;
   case flow_eEvent_MB2DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       flow_GetUserData(event->object.object, &vobject);
       (gre->gre_delete)(gre, vobject, VLDH_NODE);
@@ -1364,12 +1425,16 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   case flow_eEvent_MB1Click:
     /* Select */
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
     case flow_eObjectType_Con:
-      if (flow_FindSelectedObject(ctx, event->object.object)) {
+      if (flow_FindSelectedObject(ctx, event->object.object))
+      {
         flow_SelectClear(ctx);
-      } else {
+      }
+      else
+      {
         flow_SelectClear(ctx);
         flow_SetHighlight(event->object.object, 1);
         flow_SelectInsert(ctx, event->object.object);
@@ -1383,7 +1448,8 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
       gre->conpoint_lock(0);
     }
     break;
-  case flow_eEvent_ObjectMoved: {
+  case flow_eEvent_ObjectMoved:
+  {
     vldh_t_node vnode;
     vldh_t_con vcon;
     double pos_x, pos_y;
@@ -1391,7 +1457,8 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
     int i, num;
 
     /* Object moved */
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       flow_GetUserData(event->object.object, (void**)&vnode);
       flow_GetNodePosition(event->object.object, &pos_x, &pos_y);
@@ -1401,7 +1468,8 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
 
       (gre->gre_node_moved)(gre);
 
-      if (gre->floating_node && vnode == gre->floating_node) {
+      if (gre->floating_node && vnode == gre->floating_node)
+      {
         if (gre->gre_node_floating_created)
           (gre->gre_node_floating_created)(gre, vnode);
         gre->floating_node = 0;
@@ -1410,7 +1478,8 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
     case flow_eObjectType_Con:
       flow_GetUserData(event->object.object, (void**)&vcon);
       flow_GetConPosition(event->object.object, &x_arr, &y_arr, &num);
-      for (i = 0; i < num; i++) {
+      for (i = 0; i < num; i++)
+      {
         vcon->lc.point[i].x = x_arr[i];
         vcon->lc.point[i].y = y_arr[i];
       }
@@ -1423,13 +1492,17 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
   }
   case flow_eEvent_MB1ClickShift:
     /* Select */
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
     case flow_eObjectType_Con:
-      if (flow_FindSelectedObject(ctx, event->object.object)) {
+      if (flow_FindSelectedObject(ctx, event->object.object))
+      {
         flow_SetHighlight(event->object.object, 0);
         flow_SelectRemove(ctx, event->object.object);
-      } else {
+      }
+      else
+      {
         flow_SetHighlight(event->object.object, 1);
         flow_SelectInsert(ctx, event->object.object);
       }
@@ -1450,7 +1523,8 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
     if (flow_GetAutoscrollingActive(ctx))
       return 1;
 
-    if (flow_GetPasteActive(ctx)) {
+    if (flow_GetPasteActive(ctx))
+    {
       flow_tObject* select_list;
       int select_cnt;
       double pos_x, pos_y;
@@ -1461,10 +1535,12 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
       flow_MoveSelectedNodes(ctx, 0, 0, 1);
 
       flow_GetSelectList(ctx, &select_list, &select_cnt);
-      for (i = 0; i < select_cnt; i++) {
+      for (i = 0; i < select_cnt; i++)
+      {
         flow_GetUserData(select_list[i], (void**)&vnode);
 
-        if (gre->floating_node && vnode == gre->floating_node) {
+        if (gre->floating_node && vnode == gre->floating_node)
+        {
           flow_GetNodePosition(select_list[i], &pos_x, &pos_y);
           vnode->ln.x = pos_x;
           vnode->ln.y = pos_y;
@@ -1480,7 +1556,8 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
       return 1;
     }
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_NoObject:
       (gre->gre_node_created)(gre, dummy, event->object.x, event->object.y);
       break;
@@ -1490,7 +1567,8 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   case flow_eEvent_MB1DoubleClick:
     /* Open attribute editor */
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       gre->popupmenu_mode = GRE_POPUPMENUMODE_OBJECT;
       flow_GetUserData(event->object.object, &vobject);
@@ -1503,7 +1581,8 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   case flow_eEvent_MB1DoubleClickShift:
     /* Open subwindow */
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       gre->popupmenu_mode = GRE_POPUPMENUMODE_OBJECT;
       flow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
@@ -1522,7 +1601,8 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   case flow_eEvent_MB1DoubleClickCtrl:
     /* Insert reference object */
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       gre->popupmenu_mode = GRE_POPUPMENUMODE_OBJECT;
       flow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
@@ -1542,7 +1622,8 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
   case flow_eEvent_MB3Down:
     flow_SetClickSensitivity(gre->flow_ctx, flow_mSensitivity_MB3Press);
     break;
-  case flow_eEvent_MB3Press: {
+  case flow_eEvent_MB3Press:
+  {
     /* Popup menu */
     int x_pix, y_pix;
     vldh_t_node current_node;
@@ -1550,12 +1631,10 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
     int select_cnt;
     int unselect = 0;
 
-    if (flow_GetPasteActive(ctx) || flow_GetAutoscrollingActive(ctx)
-        || flow_GetConCreateActive(ctx))
+    if (flow_GetPasteActive(ctx) || flow_GetAutoscrollingActive(ctx) || flow_GetConCreateActive(ctx))
       return 1;
 
-    flow_PositionToPixel(
-        gre->flow_ctx, event->object.x, event->object.y, &x_pix, &y_pix);
+    flow_PositionToPixel(gre->flow_ctx, event->object.x, event->object.y, &x_pix, &y_pix);
 
     gre->popup_menu_x = x_pix;
     gre->popup_menu_y = y_pix;
@@ -1564,8 +1643,10 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
     current_node = 0;
 
     flow_GetSelectList(ctx, &select_list, &select_cnt);
-    if (!select_cnt) {
-      if (event->object.object_type == flow_eObjectType_Node) {
+    if (!select_cnt)
+    {
+      if (event->object.object_type == flow_eObjectType_Node)
+      {
         /* Get the current object */
         flow_GetUserData(event->object.object, (void**)&current_node);
         unselect = 1;
@@ -1579,33 +1660,41 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
       gre->popupmenu_mode = GRE_POPUPMENUMODE_OBJECT;
     else
       gre->popupmenu_mode = GRE_POPUPMENUMODE_AREA;
-    (gre->gre_popupmenu)(
-        gre, x_pix, y_pix, gre->popupmenu_mode, current_node, unselect);
+    (gre->gre_popupmenu)(gre, x_pix, y_pix, gre->popupmenu_mode, current_node, unselect);
     break;
   }
-  case flow_eEvent_MB1DoubleClickShiftCtrl: {
+  case flow_eEvent_MB1DoubleClickShiftCtrl:
+  {
     /* Copy */
-    if (event->object.object_type == flow_eObjectType_Node) {
+    if (event->object.object_type == flow_eObjectType_Node)
+    {
       /* Copy only this object */
       flow_GetUserData(event->object.object, &vobject);
       (gre->gre_copy)(gre, vobject, VLDH_NODE);
-    } else {
+    }
+    else
+    {
       (gre->gre_copy)(gre, 0, 0);
     }
     break;
   }
-  case flow_eEvent_MB2DoubleClickShiftCtrl: {
+  case flow_eEvent_MB2DoubleClickShiftCtrl:
+  {
     /* Cut */
-    if (event->object.object_type == flow_eObjectType_Node) {
+    if (event->object.object_type == flow_eObjectType_Node)
+    {
       /* Copy only this object */
       flow_GetUserData(event->object.object, &vobject);
       (gre->gre_cut)(gre, vobject, VLDH_NODE);
-    } else {
+    }
+    else
+    {
       (gre->gre_cut)(gre, 0, 0);
     }
     break;
   }
-  case flow_eEvent_MB2ClickShiftCtrl: {
+  case flow_eEvent_MB2ClickShiftCtrl:
+  {
     /* Paste */
     (gre->gre_paste)(gre, event->object.x, event->object.y);
     break;
@@ -1632,19 +1721,14 @@ int WGre::flow_cb(FlowCtx* ctx, flow_tEvent event)
 //
 
 WGre::WGre(void* wg_parent_ctx, const char* name)
-    : parent_ctx(wg_parent_ctx), grid_size(0.05), gridobject(0), grid_on(0),
-      wind(0), conref_nodetypeid(0), display_nodetypeid(0), sel_node_count(0),
-      del_node_count(0), del_con_count(0), searchrect_node_id(0),
-      popupmenu_mode(0), trace_started(0), trace_analyse_nc(0), trace_con_cc(0),
-      trace_changenode(0), conpoint_locked(0), last_selected(0),
-      last_cp_selected(0), last_cp_selected_num(0), floating_node(0)
+    : parent_ctx(wg_parent_ctx), grid_size(0.05), gridobject(0), grid_on(0), wind(0), conref_nodetypeid(0),
+      display_nodetypeid(0), sel_node_count(0), del_node_count(0), del_con_count(0), searchrect_node_id(0),
+      popupmenu_mode(0), trace_started(0), trace_analyse_nc(0), trace_con_cc(0), trace_changenode(0),
+      conpoint_locked(0), last_selected(0), last_cp_selected(0), last_cp_selected_num(0), floating_node(0)
 {
 }
 
-int WGre::init()
-{
-  return GRE__SUCCESS;
-}
+int WGre::init() { return GRE__SUCCESS; }
 
 int WGre::init_flow(FlowCtx* ctx, void* client_data)
 {
@@ -1689,52 +1773,30 @@ int WGre::edit_setup()
   flow_tCtx ctx = flow_ctx;
 
   flow_DisableEventAll(ctx);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1Press, flow_eEventType_MoveNode, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB2Press, flow_eEventType_CreateCon, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1ClickCtrl, flow_eEventType_SelectConPoint, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1Press, flow_eEventType_RegionSelect, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1PressShift, flow_eEventType_RegionAddSelect, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB2DoubleClick, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1ClickShift, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB2Click, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClickCtrl, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1Press, flow_eEventType_MoveNode, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2Press, flow_eEventType_CreateCon, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1ClickCtrl, flow_eEventType_SelectConPoint, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1Press, flow_eEventType_RegionSelect, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1PressShift, flow_eEventType_RegionAddSelect, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2DoubleClick, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1ClickShift, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2Click, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickCtrl, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, flow_cb);
   flow_EnableEvent(ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShiftCtrl,
-      flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(ctx, flow_eEvent_MB2DoubleClickShiftCtrl,
-      flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB2ClickShiftCtrl, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShiftCtrl, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2DoubleClickShiftCtrl, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB2ClickShiftCtrl, flow_eEventType_CallBack, flow_cb);
   flow_EnableEvent(ctx, flow_eEvent_Init, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_PasteSequenceStart, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_ObjectMoved, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_PasteSequenceStart, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_ObjectMoved, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, flow_cb);
   return 1;
 }
 
@@ -1743,231 +1805,216 @@ int WGre::view_setup()
   flow_tCtx ctx = flow_ctx;
 
   flow_DisableEventAll(ctx);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1Press, flow_eEventType_RegionSelect, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1PressShift, flow_eEventType_RegionAddSelect, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1ClickShift, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1Press, flow_eEventType_RegionSelect, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1PressShift, flow_eEventType_RegionAddSelect, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1ClickShift, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1DoubleClickShift, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, flow_cb);
   flow_EnableEvent(ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, flow_cb);
   flow_EnableEvent(ctx, flow_eEvent_Init, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, flow_cb);
-  flow_EnableEvent(
-      ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, flow_cb);
+  flow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, flow_cb);
   return 1;
 }
 
 /*******************************************************************
-*	Store the adresses of the desired backcalls functions in the
-*	gre context.
-* 	Description of backcall routines:
-*
-* static void zzz_gre_setup_window( gre)
-*
-*	Routine called when the neted window is created.
-*	Makes is possible to enable the desired events by the routine
-*	gre_setup_window()
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-*
-* static void zzz_gre_node_created( gre, node_type, x, y)
-*
-*	Routine called when a node creation callback is recieved from neted.
-*	Makes is possible to create of the desired class by gre_create_node.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* unsigned long	node_type	I	Not used.
-* float		x		I	x koordinate ( on grid).
-* float		y		I	y koordinate ( on grid).
-*
-* static void 	zzz_gre_con_created (gre, source_obj, source_point,
-*				destination_obj, destination_point)
-*
-*	Routine called when a connection creation callback is recieved from
-*	neted.
-*	Makes is possible to create a connections of the desired class by
-*	gre_create_con.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* vldh_t_node	source_obj	I	source node.
-* unsigned long	source_point	I	connection point on source node.
-* vldh_t_node	destination_obj	I	destination node.
-* unsigned long	destination_point I	connection point on destination node.
-*
-* static void 	zzz_gre_node_moved (gre)
-*
-* 	Routine called when a node is moved.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-*
-* static void 	zzz_gre_node_moved (gre)
-*
-* 	Routine called when a node is moved.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-*
-* static void 	zzz_gre_delete (gre, object, object_type)
-*
-* 	Routine called when a delete callback is recieved.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* unsigned long	object		I	vldh node or connection,
-*					or zero if no objects is hit by the
-*					click.
-* unsigned long	object_type	I	type of object. VLDH_NODE, VLDH_CON
-*					or zero if no objects is hit by the
-*					click.
-*
-* static void 	zzz_gre_cut (gre, object, object_type)
-*
-* 	Routine called when a cut callback is recieved.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* unsigned long	object		I	vldh node or connection,
-*					or zero if no objects is hit by the
-*					click.
-* unsigned long	object_type	I	type of object. VLDH_NODE, VLDH_CON
-*					or zero if no objects is hit by the
-*					click.
-*
-* static void 	zzz_gre_copy (gre, object, object_type)
-*
-* 	Routine called when a copy callback is recieved.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* unsigned long	object		I	vldh node or
-*					or zero if no objects is hit by the
-*					click.
-* unsigned long	object_type	I	type of object. VLDH_NODE, or zero
-*					if no objects is hit by the
-*					click.
-*
-* static void foe_gre_paste (gre, x, y)
-*
-* 	Routine called when a paste callback is recieved.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* float		x		I	x koordinate ( on grid)
-* float		y		I	y koordinate ( on grid)
-*
-* static void zzz_gre_attribute (gre, object)
-*
-* 	Routine called when a attribute callback is recieved.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* vldh_t_node	object		I	vldh node.
-*
-* static void zzz_gre_subwindow (gre, object, subwindow_nr)
-*
-* 	Routine called when a subwindow callback is recieved.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* vldh_t_node 	object		I	vldh node.
-* unsigned long	subwindow_nr	I	1 if the click is in the left part
-*					of node,
-*					2 in the right part.
-*
-* static void zzz_reserv(gre, x, y)
-*
-* 	Routine called when a reserv callback is recieved.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* float		x		I	x koordinate ( on grid)
-* float		y		I	y koordinate ( on grid)
-*
-* static void foe_gre_popupmenu (gre, x_pix, y_pix)
-*
-* 	Routine called when popupmenu callback is recieved.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* int		x_pix		I	click x koordinate in pixel
-* int		y_pix		I	click y koordinate in pixel
-*
-* static void zzz_gre_getobj (gre , node, index)
-*
-* 	Routine called when a getobj callback is recieved.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* vldh_t_node 	node 		I	vldh node.
-* unsigned long	index		I	0 if the click is in the upper part
-*					of the node.
-*					1 if it is in the lower part.
-*
-* static void zzz_gre_undelete (gre )
-*
-* 	Not yet implemented.
-*
-* static void zzz_gre_unselect (gre )
-*
-* 	Not yet implemented.
-*
-* static void foe_gre_help (gre, help_title)
-*
-* 	Routine called when a help callback is recieved from neted.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* char		*help_title	I	name of the objects class.
-*
-* static void zzz_gre_regionmoved (gre)
-*
-* 	Not yet implemented.
-*
-* static void zzz_gre_message (gre, message)
-*
-* 	Routine called when gre feels he has to send a message to the user.
-*
-* Type		Parameter	IOGF	Description
-* gre_ctx	gre		I	gre context.
-* char		*message	I	text message.
-*
-**************************************************************************/
+ *	Store the adresses of the desired backcalls functions in the
+ *	gre context.
+ * 	Description of backcall routines:
+ *
+ * static void zzz_gre_setup_window( gre)
+ *
+ *	Routine called when the neted window is created.
+ *	Makes is possible to enable the desired events by the routine
+ *	gre_setup_window()
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ *
+ * static void zzz_gre_node_created( gre, node_type, x, y)
+ *
+ *	Routine called when a node creation callback is recieved from neted.
+ *	Makes is possible to create of the desired class by gre_create_node.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * unsigned long	node_type	I	Not used.
+ * float		x		I	x koordinate ( on grid).
+ * float		y		I	y koordinate ( on grid).
+ *
+ * static void 	zzz_gre_con_created (gre, source_obj, source_point,
+ *				destination_obj, destination_point)
+ *
+ *	Routine called when a connection creation callback is recieved from
+ *	neted.
+ *	Makes is possible to create a connections of the desired class by
+ *	gre_create_con.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * vldh_t_node	source_obj	I	source node.
+ * unsigned long	source_point	I	connection point on source node.
+ * vldh_t_node	destination_obj	I	destination node.
+ * unsigned long	destination_point I	connection point on destination node.
+ *
+ * static void 	zzz_gre_node_moved (gre)
+ *
+ * 	Routine called when a node is moved.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ *
+ * static void 	zzz_gre_node_moved (gre)
+ *
+ * 	Routine called when a node is moved.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ *
+ * static void 	zzz_gre_delete (gre, object, object_type)
+ *
+ * 	Routine called when a delete callback is recieved.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * unsigned long	object		I	vldh node or connection,
+ *					or zero if no objects is hit by the
+ *					click.
+ * unsigned long	object_type	I	type of object. VLDH_NODE, VLDH_CON
+ *					or zero if no objects is hit by the
+ *					click.
+ *
+ * static void 	zzz_gre_cut (gre, object, object_type)
+ *
+ * 	Routine called when a cut callback is recieved.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * unsigned long	object		I	vldh node or connection,
+ *					or zero if no objects is hit by the
+ *					click.
+ * unsigned long	object_type	I	type of object. VLDH_NODE, VLDH_CON
+ *					or zero if no objects is hit by the
+ *					click.
+ *
+ * static void 	zzz_gre_copy (gre, object, object_type)
+ *
+ * 	Routine called when a copy callback is recieved.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * unsigned long	object		I	vldh node or
+ *					or zero if no objects is hit by the
+ *					click.
+ * unsigned long	object_type	I	type of object. VLDH_NODE, or zero
+ *					if no objects is hit by the
+ *					click.
+ *
+ * static void foe_gre_paste (gre, x, y)
+ *
+ * 	Routine called when a paste callback is recieved.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * float		x		I	x koordinate ( on grid)
+ * float		y		I	y koordinate ( on grid)
+ *
+ * static void zzz_gre_attribute (gre, object)
+ *
+ * 	Routine called when a attribute callback is recieved.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * vldh_t_node	object		I	vldh node.
+ *
+ * static void zzz_gre_subwindow (gre, object, subwindow_nr)
+ *
+ * 	Routine called when a subwindow callback is recieved.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * vldh_t_node 	object		I	vldh node.
+ * unsigned long	subwindow_nr	I	1 if the click is in the left part
+ *					of node,
+ *					2 in the right part.
+ *
+ * static void zzz_reserv(gre, x, y)
+ *
+ * 	Routine called when a reserv callback is recieved.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * float		x		I	x koordinate ( on grid)
+ * float		y		I	y koordinate ( on grid)
+ *
+ * static void foe_gre_popupmenu (gre, x_pix, y_pix)
+ *
+ * 	Routine called when popupmenu callback is recieved.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * int		x_pix		I	click x koordinate in pixel
+ * int		y_pix		I	click y koordinate in pixel
+ *
+ * static void zzz_gre_getobj (gre , node, index)
+ *
+ * 	Routine called when a getobj callback is recieved.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * vldh_t_node 	node 		I	vldh node.
+ * unsigned long	index		I	0 if the click is in the upper part
+ *					of the node.
+ *					1 if it is in the lower part.
+ *
+ * static void zzz_gre_undelete (gre )
+ *
+ * 	Not yet implemented.
+ *
+ * static void zzz_gre_unselect (gre )
+ *
+ * 	Not yet implemented.
+ *
+ * static void foe_gre_help (gre, help_title)
+ *
+ * 	Routine called when a help callback is recieved from neted.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * char		*help_title	I	name of the objects class.
+ *
+ * static void zzz_gre_regionmoved (gre)
+ *
+ * 	Not yet implemented.
+ *
+ * static void zzz_gre_message (gre, message)
+ *
+ * 	Routine called when gre feels he has to send a message to the user.
+ *
+ * Type		Parameter	IOGF	Description
+ * gre_ctx	gre		I	gre context.
+ * char		*message	I	text message.
+ *
+ **************************************************************************/
 
 int WGre::setup_backcalls(void (*setup_window_bc)(WGre*),
-    void (*node_created_bc)(WGre*, unsigned long, float, float),
-    void (*node_floating_created_bc)(WGre*, vldh_t_node),
-    void (*con_created_bc)(WGre*, double, double, vldh_t_node, unsigned long,
-        vldh_t_node, unsigned long, int, int*),
-    void (*node_moved_bc)(WGre*),
-    void (*delete_bc)(WGre*, void*, unsigned long),
-    void (*cut_bc)(WGre*, void*, unsigned long),
-    void (*copy_bc)(WGre*, void*, unsigned long),
-    void (*paste_bc)(WGre*, float, float),
-    void (*attribute_bc)(WGre*, vldh_t_node),
-    void (*subwindow_bc)(WGre*, vldh_t_node, unsigned long),
-    void (*reserv_bc)(),
-    void (*popupmenu_bc)(WGre*, int, int, int, vldh_t_node, int),
-    void (*getobj_bc)(WGre*, vldh_t_node, unsigned long),
-    void (*undelete_bc)(WGre*), void (*unselect_bc)(WGre*),
-    void (*help_bc)(WGre*, char*), void (*regionmoved_bc)(WGre*),
-    void (*message_bc)(WGre*, const char*))
+                          void (*node_created_bc)(WGre*, unsigned long, float, float),
+                          void (*node_floating_created_bc)(WGre*, vldh_t_node),
+                          void (*con_created_bc)(WGre*, double, double, vldh_t_node, unsigned long,
+                                                 vldh_t_node, unsigned long, int, int*),
+                          void (*node_moved_bc)(WGre*), void (*delete_bc)(WGre*, void*, unsigned long),
+                          void (*cut_bc)(WGre*, void*, unsigned long),
+                          void (*copy_bc)(WGre*, void*, unsigned long), void (*paste_bc)(WGre*, float, float),
+                          void (*attribute_bc)(WGre*, vldh_t_node),
+                          void (*subwindow_bc)(WGre*, vldh_t_node, unsigned long), void (*reserv_bc)(),
+                          void (*popupmenu_bc)(WGre*, int, int, int, vldh_t_node, int),
+                          void (*getobj_bc)(WGre*, vldh_t_node, unsigned long), void (*undelete_bc)(WGre*),
+                          void (*unselect_bc)(WGre*), void (*help_bc)(WGre*, char*),
+                          void (*regionmoved_bc)(WGre*), void (*message_bc)(WGre*, const char*))
 {
   /* Fill in callback addresses */
   gre_setup_window = setup_window_bc;
@@ -1996,18 +2043,14 @@ int WGre::setup_backcalls(void (*setup_window_bc)(WGre*),
 //
 //	Deletes a gre instance.
 //
-WGre::~WGre()
-{
-}
+WGre::~WGre() {}
 
 //
 //	Disables all events in the netedwidget.
 //	The id of these events is given by the gre
 // 	Author: SG 29.04.91
 //
-void WGre::disable_button_events()
-{
-}
+void WGre::disable_button_events() {}
 
 //
 //	Creates a node of specified class.
@@ -2025,16 +2068,15 @@ int WGre::create_node(pwr_tClassId cid, float x, float y, vldh_t_node* node)
   if (EVEN(sts))
     return sts;
 
-  sts = get_nodeclass(cid, (node_object->hn.wind)->hw.ldhses,
-      node_object->ln.object_type, node_object->ln.mask, subwindowmark,
-      node_object->ln.nodewidth, &node_class, node_object);
+  sts =
+      get_nodeclass(cid, (node_object->hn.wind)->hw.ldhses, node_object->ln.object_type, node_object->ln.mask,
+                    subwindowmark, node_object->ln.nodewidth, &node_class, node_object);
   if (EVEN(sts))
     return sts;
 
   DEFERRED_UPDATE;
 
-  flow_CreateNode(flow_ctx, node_object->hn.name, node_class, x, y, node_object,
-      &node_object->hn.node_id);
+  flow_CreateNode(flow_ctx, node_object->hn.name, node_class, x, y, node_object, &node_object->hn.node_id);
   flow_MeasureNode(node_object->hn.node_id, &ll_x, &ll_y, &ur_x, &ur_y);
   node_object->ln.width = ur_x - ll_x;
   node_object->ln.height = ur_y - ll_y;
@@ -2051,7 +2093,8 @@ int WGre::create_node(pwr_tClassId cid, float x, float y, vldh_t_node* node)
   *node = node_object;
 
   /* Update header /CJ 050415 */
-  if (cid == pwr_cClass_Document) {
+  if (cid == pwr_cClass_Document)
+  {
     init_docobjects();
   }
 
@@ -2062,8 +2105,7 @@ int WGre::create_node(pwr_tClassId cid, float x, float y, vldh_t_node* node)
 //	Creates a node of specified class.
 //	A node is created in vldh and drawn in the window.
 //
-int WGre::create_node_floating(
-    pwr_tClassId cid, float x, float y, vldh_t_node* node)
+int WGre::create_node_floating(pwr_tClassId cid, float x, float y, vldh_t_node* node)
 {
   flow_tNodeClass node_class = 0;
   vldh_t_node node_object;
@@ -2078,16 +2120,16 @@ int WGre::create_node_floating(
   if (EVEN(sts))
     return sts;
 
-  sts = get_nodeclass(cid, (node_object->hn.wind)->hw.ldhses,
-      node_object->ln.object_type, node_object->ln.mask, subwindowmark,
-      node_object->ln.nodewidth, &node_class, node_object);
+  sts =
+      get_nodeclass(cid, (node_object->hn.wind)->hw.ldhses, node_object->ln.object_type, node_object->ln.mask,
+                    subwindowmark, node_object->ln.nodewidth, &node_class, node_object);
   if (EVEN(sts))
     return sts;
 
   DEFERRED_UPDATE;
 
-  flow_CreatePasteNode(flow_ctx, node_object->hn.name, node_class, x, y,
-      node_object, &node_object->hn.node_id);
+  flow_CreatePasteNode(flow_ctx, node_object->hn.name, node_class, x, y, node_object,
+                       &node_object->hn.node_id);
   flow_MeasureNode(node_object->hn.node_id, &ll_x, &ll_y, &ur_x, &ur_y);
   node_object->ln.width = ur_x - ll_x;
   node_object->ln.height = ur_y - ll_y;
@@ -2116,7 +2158,8 @@ int WGre::create_node_floating(
   *node = node_object;
 
   /* Update header /CJ 050415 */
-  if (cid == pwr_cClass_Document) {
+  if (cid == pwr_cClass_Document)
+  {
     init_docobjects();
   }
 
@@ -2129,15 +2172,14 @@ int WGre::create_node_floating(
 //	between the source and destination nodes. The user can specify
 //	if the connections should be drawn as a referens connection.
 //
-int WGre::create_con(pwr_tClassId cid, vldh_t_node source_obj,
-    unsigned long source_point, vldh_t_node destination_obj,
-    unsigned long destination_point, unsigned long drawtype)
+int WGre::create_con(pwr_tClassId cid, vldh_t_node source_obj, unsigned long source_point,
+                     vldh_t_node destination_obj, unsigned long destination_point, unsigned long drawtype)
 {
   vldh_t_con con_object;
   int sts;
 
-  sts = vldh_con_create(wind, cid, drawtype, source_obj, source_point,
-      destination_obj, destination_point, &con_object);
+  sts = vldh_con_create(wind, cid, drawtype, source_obj, source_point, destination_obj, destination_point,
+                        &con_object);
   if (EVEN(sts))
     return sts;
 
@@ -2173,8 +2215,7 @@ int WGre::print_docobj(vldh_t_node doc_obj)
 //
 //	Prints an area described by the coordinates.
 //
-int WGre::measure_object(
-    vldh_t_node node, float* ll_x, float* ll_y, float* width, float* height)
+int WGre::measure_object(vldh_t_node node, float* ll_x, float* ll_y, float* width, float* height)
 {
   *ll_x = node->ln.x;
   *ll_y = node->ln.y;
@@ -2186,8 +2227,7 @@ int WGre::measure_object(
 //
 //	Prints an area described by the coordinates.
 //
-int WGre::print_rectangle(
-    float ll_x, float ll_y, float ur_x, float ur_y, char* file_id)
+int WGre::print_rectangle(float ll_x, float ll_y, float ur_x, float ur_y, char* file_id)
 {
   pwr_tFileName filename;
   char cmd[250];
@@ -2207,13 +2247,13 @@ int WGre::print_rectangle(
 //
 //	Prints as pdf an area described by the coordinates.
 //
-int WGre::print_pdf_rectangle(
-    float ll_x, float ll_y, float ur_x, float ur_y, char* file_id)
+int WGre::print_pdf_rectangle(float ll_x, float ll_y, float ur_x, float ur_y, char* file_id)
 {
   pwr_tFileName filename;
   vldh_t_plc plc = wind->hw.plc;
 
-  if (plc->lp.cid == pwr_cClass_PlcTemplate) {
+  if (plc->lp.cid == pwr_cClass_PlcTemplate)
+  {
     pwr_tOid parent;
     pwr_tOName name;
     pwr_tObjName vname;
@@ -2224,13 +2264,11 @@ int WGre::print_pdf_rectangle(
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_VolumeIdToName(ldh_SessionToWB(wind->hw.ldhses), parent.vid,
-        vname, sizeof(vname), &size);
+    sts = ldh_VolumeIdToName(ldh_SessionToWB(wind->hw.ldhses), parent.vid, vname, sizeof(vname), &size);
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_ObjidToName(
-        wind->hw.ldhses, parent, ldh_eName_Object, name, sizeof(name), &size);
+    sts = ldh_ObjidToName(wind->hw.ldhses, parent, ldh_eName_Object, name, sizeof(name), &size);
     if (EVEN(sts))
       return sts;
 
@@ -2239,7 +2277,9 @@ int WGre::print_pdf_rectangle(
     else
       sprintf(filename, "./%s_%s.pdf", vname, name);
     str_ToLower(filename, filename);
-  } else {
+  }
+  else
+  {
     sprintf(filename, "$pwrp_doc/pssdoc%s.pdf", file_id);
   }
   dcli_translate_filename(filename, filename);
@@ -2273,12 +2313,12 @@ void WGre::paste(float cursor_x, float cursor_y, int paste_type)
   flow_PasteClear(flow_ctx);
 
   /* Copy objects from vldh paste */
-  sts = vldh_paste_copy(
-      wind, 0, 0, &node_count, &node_list, &con_count, &con_list);
+  sts = vldh_paste_copy(wind, 0, 0, &node_count, &node_list, &con_count, &con_list);
   if (EVEN(sts))
     return;
 
-  if (node_count == 0 && con_count == 0) {
+  if (node_count == 0 && con_count == 0)
+  {
     /* Paste buffer is empty */
     message("Nothing to paste");
     return;
@@ -2286,17 +2326,17 @@ void WGre::paste(float cursor_x, float cursor_y, int paste_type)
 
   /* Create the objects in flow paste list */
   node_ptr = node_list;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     node_class = 0;
-    sts = get_nodeclass((*node_ptr)->ln.cid, ((*node_ptr)->hn.wind)->hw.ldhses,
-        (*node_ptr)->ln.object_type, (*node_ptr)->ln.mask,
-        (*node_ptr)->ln.subwindow, (*node_ptr)->ln.nodewidth, &node_class,
-        *node_ptr);
+    sts = get_nodeclass((*node_ptr)->ln.cid, ((*node_ptr)->hn.wind)->hw.ldhses, (*node_ptr)->ln.object_type,
+                        (*node_ptr)->ln.mask, (*node_ptr)->ln.subwindow, (*node_ptr)->ln.nodewidth,
+                        &node_class, *node_ptr);
     if (EVEN(sts))
       return;
 
-    flow_CreatePasteNode(flow_ctx, (*node_ptr)->hn.name, node_class,
-        (*node_ptr)->ln.x, (*node_ptr)->ln.y, *node_ptr, &node_id);
+    flow_CreatePasteNode(flow_ctx, (*node_ptr)->hn.name, node_class, (*node_ptr)->ln.x, (*node_ptr)->ln.y,
+                         *node_ptr, &node_id);
     (*node_ptr)->hn.node_id = node_id;
 
     sts = node_annotations_draw(*node_ptr, 1);
@@ -2307,25 +2347,24 @@ void WGre::paste(float cursor_x, float cursor_y, int paste_type)
 
   /* Create the neted connections */
   con_ptr = con_list;
-  for (i = 0; i < (int)con_count; i++) {
-    if ((*con_ptr)->lc.drawtype == GOEN_CONSYSREF
-        || (*con_ptr)->lc.drawtype == GOEN_CONUSERREF)
+  for (i = 0; i < (int)con_count; i++)
+  {
+    if ((*con_ptr)->lc.drawtype == GOEN_CONSYSREF || (*con_ptr)->lc.drawtype == GOEN_CONUSERREF)
       /* This is a fix for backward compatibility */
-      sts = get_conclass(0, ((*con_ptr)->hc.wind)->hw.ldhses,
-          (*con_ptr)->lc.object_type, &con_class);
+      sts = get_conclass(0, ((*con_ptr)->hc.wind)->hw.ldhses, (*con_ptr)->lc.object_type, &con_class);
     else
-      sts = get_conclass((*con_ptr)->lc.cid, ((*con_ptr)->hc.wind)->hw.ldhses,
-          (*con_ptr)->lc.object_type, &con_class);
+      sts = get_conclass((*con_ptr)->lc.cid, ((*con_ptr)->hc.wind)->hw.ldhses, (*con_ptr)->lc.object_type,
+                         &con_class);
 
-    for (j = 0; j < (int)(*con_ptr)->lc.point_count; j++) {
+    for (j = 0; j < (int)(*con_ptr)->lc.point_count; j++)
+    {
       x[j] = (*con_ptr)->lc.point[j].x;
       y[j] = (*con_ptr)->lc.point[j].y;
     }
-    flow_CreatePasteCon(flow_ctx, (*con_ptr)->hc.name, con_class,
-        (*con_ptr)->hc.source_node->hn.node_id,
-        (*con_ptr)->hc.dest_node->hn.node_id, (*con_ptr)->lc.source_point,
-        (*con_ptr)->lc.dest_point, *con_ptr, &(*con_ptr)->hc.con_id,
-        (*con_ptr)->lc.point_count, x, y, &sts);
+    flow_CreatePasteCon(flow_ctx, (*con_ptr)->hc.name, con_class, (*con_ptr)->hc.source_node->hn.node_id,
+                        (*con_ptr)->hc.dest_node->hn.node_id, (*con_ptr)->lc.source_point,
+                        (*con_ptr)->lc.dest_point, *con_ptr, &(*con_ptr)->hc.con_id,
+                        (*con_ptr)->lc.point_count, x, y, &sts);
     con_ptr++;
   }
 
@@ -2358,21 +2397,21 @@ int WGre::subwindow_mark(vldh_t_node object)
   flow_DeleteNode(object->hn.node_id);
 
   /* Create a new node with subwindow mark */
-  sts = get_nodeclass(object->ln.cid, (object->hn.wind)->hw.ldhses,
-      object->ln.object_type, object->ln.mask, object->ln.subwindow,
-      object->ln.nodewidth, &node_class, object);
+  sts = get_nodeclass(object->ln.cid, (object->hn.wind)->hw.ldhses, object->ln.object_type, object->ln.mask,
+                      object->ln.subwindow, object->ln.nodewidth, &node_class, object);
   if (EVEN(sts))
     return sts;
 
-  flow_CreateNode(flow_ctx, object->hn.name, node_class, object->ln.x,
-      object->ln.y, (void**)object, &node_id);
+  flow_CreateNode(flow_ctx, object->hn.name, node_class, object->ln.x, object->ln.y, (void**)object,
+                  &node_id);
   object->hn.node_id = node_id;
   sts = node_annotations_draw(object, 0);
   if (EVEN(sts))
     return sts;
 
   /* Set permanent highlight if selected */
-  if (highlight_flag) {
+  if (highlight_flag)
+  {
     flow_SetHighlight(object->hn.node_id, highlight_flag);
     flow_SelectInsert(flow_ctx, object->hn.node_id);
   }
@@ -2385,7 +2424,8 @@ int WGre::subwindow_mark(vldh_t_node object)
     return sts;
 
   con_ptr = con_list;
-  for (j = 0; j < (int)con_count; j++) {
+  for (j = 0; j < (int)con_count; j++)
+  {
     sts = goec_con_draw(this, *con_ptr, GRE_CON_NONROUTE, 0);
     con_ptr++;
   }
@@ -2401,10 +2441,9 @@ int WGre::subwindow_mark(vldh_t_node object)
 //	Returns an array (point_array) where
 //	new_point_nr = point_array[old_point_nr]
 //
-pwr_tStatus WGre::node_update_points(vldh_t_node node,
-    unsigned long old_input_mask, unsigned long old_output_mask,
-    unsigned long new_input_mask, unsigned long new_output_mask,
-    int* point_array, int* point_count)
+pwr_tStatus WGre::node_update_points(vldh_t_node node, unsigned long old_input_mask,
+                                     unsigned long old_output_mask, unsigned long new_input_mask,
+                                     unsigned long new_output_mask, int* point_array, int* point_count)
 {
   int sts, size;
   pwr_tClassId bodyclass;
@@ -2416,8 +2455,8 @@ pwr_tStatus WGre::node_update_points(vldh_t_node node,
   int* point_array_ptr;
   int i;
 
-  sts = ldh_GetClassBody((node->hn.wind)->hw.ldhses, node->ln.cid,
-      "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody((node->hn.wind)->hw.ldhses, node->ln.cid, "GraphPlcNode", &bodyclass,
+                         (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
@@ -2429,8 +2468,10 @@ pwr_tStatus WGre::node_update_points(vldh_t_node node,
   new_point_count = 0;
   point_array_ptr = point_array;
   /* Input points */
-  for (i = 0; i < inputs; i++) {
-    if (old_input_mask & pointmask) {
+  for (i = 0; i < inputs; i++)
+  {
+    if (old_input_mask & pointmask)
+    {
       if (new_input_mask & pointmask)
         /* Point should be converted */
         *point_array_ptr = new_point_count;
@@ -2446,8 +2487,10 @@ pwr_tStatus WGre::node_update_points(vldh_t_node node,
   }
   /* Output points */
   pointmask = 1;
-  for (i = 0; i < outputs; i++) {
-    if (old_output_mask & pointmask) {
+  for (i = 0; i < outputs; i++)
+  {
+    if (old_output_mask & pointmask)
+    {
       if (new_output_mask & pointmask)
         /* Point should be converted */
         *point_array_ptr = new_point_count;
@@ -2520,8 +2563,8 @@ int WGre::node_update(vldh_t_node object)
   flow_GetHighlight(object->hn.node_id, &highlight_flag);
 
   /* Get the object name from ldh */
-  sts = ldh_ObjidToName((object->hn.wind)->hw.ldhses, object->ln.oid,
-      ldh_eName_Object, object->hn.name, sizeof(object->hn.name), &size);
+  sts = ldh_ObjidToName((object->hn.wind)->hw.ldhses, object->ln.oid, ldh_eName_Object, object->hn.name,
+                        sizeof(object->hn.name), &size);
   if (EVEN(sts))
     return sts;
 
@@ -2529,21 +2572,21 @@ int WGre::node_update(vldh_t_node object)
   nodewidth_changed = TRUE;
 
   /* Get the ldh graphbuffer of the node */
-  sts = ldh_GetObjectBuffer((object->hn.wind)->hw.ldhses, object->ln.oid,
-      "DevBody", "PlcNode", &cid, (char**)&nodebuffer, &size);
+  sts = ldh_GetObjectBuffer((object->hn.wind)->hw.ldhses, object->ln.oid, "DevBody", "PlcNode", &cid,
+                            (char**)&nodebuffer, &size);
   if (EVEN(sts))
     return sts;
 
   /* Check if the mask is changed */
-  if ((nodebuffer->mask[0] != object->ln.mask[0])
-      || (nodebuffer->mask[1] != object->ln.mask[1])) {
+  if ((nodebuffer->mask[0] != object->ln.mask[0]) || (nodebuffer->mask[1] != object->ln.mask[1]))
+  {
     graphmask_changed = TRUE;
-    sts = node_update_points(object, object->ln.mask[0], object->ln.mask[1],
-        nodebuffer->mask[0], nodebuffer->mask[1], point_conv,
-        &point_conv_count);
+    sts = node_update_points(object, object->ln.mask[0], object->ln.mask[1], nodebuffer->mask[0],
+                             nodebuffer->mask[1], point_conv, &point_conv_count);
     if (EVEN(sts))
       return sts;
-  } else
+  }
+  else
     graphmask_changed = FALSE;
 
   if ((object->ln.object_type == 11) || (object->ln.object_type >= 250))
@@ -2560,14 +2603,16 @@ int WGre::node_update(vldh_t_node object)
   object->ln.mask[1] = nodebuffer->mask[1];
   object->ln.mask[2] = nodebuffer->mask[2];
 
-  if (nodewidth_changed || graphmask_changed || invertmask_changed) {
+  if (nodewidth_changed || graphmask_changed || invertmask_changed)
+  {
     /* The node has to be redrawn */
     /* For the moment delete all connections and redraw the node */
     sts = vldh_get_cons_node(object, &con_count, &con_list);
     if (EVEN(sts))
       return sts;
     con_ptr = con_list;
-    for (i = 0; i < (int)con_count; i++) {
+    for (i = 0; i < (int)con_count; i++)
+    {
       goec_con_delete_noredraw(this, *con_ptr);
       (*con_ptr)->lc.point_count = 0;
       (*con_ptr)->hc.redrawn = 0;
@@ -2580,15 +2625,14 @@ int WGre::node_update(vldh_t_node object)
     flow_DeleteNode(object->hn.node_id);
 
     /* Create a new node */
-    sts = get_nodeclass(object->ln.cid, (object->hn.wind)->hw.ldhses,
-        object->ln.object_type, object->ln.mask, object->ln.subwindow,
-        object->ln.nodewidth, &node_class, object);
+    sts = get_nodeclass(object->ln.cid, (object->hn.wind)->hw.ldhses, object->ln.object_type, object->ln.mask,
+                        object->ln.subwindow, object->ln.nodewidth, &node_class, object);
     if (EVEN(sts))
       return sts;
 
     /* Create the new node on the old place */
-    flow_CreateNode(flow_ctx, object->hn.name, node_class, object->ln.x,
-        object->ln.y, (void**)object, &node_id);
+    flow_CreateNode(flow_ctx, object->hn.name, node_class, object->ln.x, object->ln.y, (void**)object,
+                    &node_id);
     object->hn.node_id = node_id;
 
     /* If the name would be changed, copy it to vldh and redraw the
@@ -2601,61 +2645,68 @@ int WGre::node_update(vldh_t_node object)
     object->ln.width = ur_x - ll_x;
     object->ln.height = ur_y - ll_y;
 
-    if (!graphmask_changed) {
+    if (!graphmask_changed)
+    {
       /* redraw the connections */
       del_con_count = 0;
       del_node_count = 0;
       con_ptr = con_list;
-      for (j = 0; j < (int)con_count; j++) {
+      for (j = 0; j < (int)con_count; j++)
+      {
         sts = goec_con_draw(this, *con_ptr, GRE_CON_CREATE, 0);
         con_ptr++;
       }
-    } else {
+    }
+    else
+    {
       /* redraw the connections */
       del_con_count = 0;
       del_node_count = 0;
       con_ptr = con_list;
       deleted_connections = 0;
-      for (j = 0; j < (int)con_count; j++) {
+      for (j = 0; j < (int)con_count; j++)
+      {
         /* Convert connection point */
-        if ((*con_ptr)->hc.source_node == object
-            && (*con_ptr)->hc.dest_node == object) {
+        if ((*con_ptr)->hc.source_node == object && (*con_ptr)->hc.dest_node == object)
+        {
           int source_point = point_conv[(*con_ptr)->lc.source_point];
           int dest_point = point_conv[(*con_ptr)->lc.dest_point];
-          if ((source_point != (int)(*con_ptr)->lc.source_point
-                  && source_point != -1)
-              || (dest_point != (int)(*con_ptr)->lc.dest_point
-                     && dest_point != -1)) {
+          if ((source_point != (int)(*con_ptr)->lc.source_point && source_point != -1) ||
+              (dest_point != (int)(*con_ptr)->lc.dest_point && dest_point != -1))
+          {
             vldh_node_con_delete(object, (*con_ptr)->lc.source_point, *con_ptr);
             vldh_node_con_delete(object, (*con_ptr)->lc.dest_point, *con_ptr);
             (*con_ptr)->lc.source_point = source_point;
             (*con_ptr)->lc.dest_point = dest_point;
             vldh_conmodified(*con_ptr);
-            vldh_node_con_insert(object, (*con_ptr)->lc.source_point, *con_ptr,
-                VLDH_NODE_SOURCE);
-            vldh_node_con_insert(object, (*con_ptr)->lc.dest_point, *con_ptr,
-                VLDH_NODE_DESTINATION);
+            vldh_node_con_insert(object, (*con_ptr)->lc.source_point, *con_ptr, VLDH_NODE_SOURCE);
+            vldh_node_con_insert(object, (*con_ptr)->lc.dest_point, *con_ptr, VLDH_NODE_DESTINATION);
           }
-        } else if ((*con_ptr)->hc.source_node == object) {
+        }
+        else if ((*con_ptr)->hc.source_node == object)
+        {
           point = point_conv[(*con_ptr)->lc.source_point];
-          if (point != (int)(*con_ptr)->lc.source_point && point != -1) {
+          if (point != (int)(*con_ptr)->lc.source_point && point != -1)
+          {
             vldh_node_con_delete(object, (*con_ptr)->lc.source_point, *con_ptr);
             (*con_ptr)->lc.source_point = point;
             vldh_conmodified(*con_ptr);
-            vldh_node_con_insert(object, (*con_ptr)->lc.source_point, *con_ptr,
-                VLDH_NODE_SOURCE);
+            vldh_node_con_insert(object, (*con_ptr)->lc.source_point, *con_ptr, VLDH_NODE_SOURCE);
           }
-        } else {
+        }
+        else
+        {
           point = point_conv[(*con_ptr)->lc.dest_point];
-          if (point != (int)(*con_ptr)->lc.dest_point && point != -1) {
+          if (point != (int)(*con_ptr)->lc.dest_point && point != -1)
+          {
             vldh_node_con_delete(object, (*con_ptr)->lc.dest_point, *con_ptr);
             (*con_ptr)->lc.dest_point = point;
             vldh_conmodified(*con_ptr);
-            vldh_node_con_insert(object, (*con_ptr)->lc.dest_point, *con_ptr,
-                VLDH_NODE_DESTINATION);
+            vldh_node_con_insert(object, (*con_ptr)->lc.dest_point, *con_ptr, VLDH_NODE_DESTINATION);
           }
         }
-        if (point == -1) {
+        if (point == -1)
+        {
           /* Delete the connection */
           vldh_con_delete(*con_ptr);
           deleted_connections++;
@@ -2666,7 +2717,8 @@ int WGre::node_update(vldh_t_node object)
       if (EVEN(sts))
         return sts;
       con_ptr = con_list;
-      for (i = 0; i < (int)con_count; i++) {
+      for (i = 0; i < (int)con_count; i++)
+      {
         sts = goec_con_draw(this, *con_ptr, GRE_CON_CREATE, 0);
         con_ptr++;
       }
@@ -2679,14 +2731,16 @@ int WGre::node_update(vldh_t_node object)
   free((char*)nodebuffer);
 
   /* Set permanent highlight if selected */
-  if (highlight_flag) {
+  if (highlight_flag)
+  {
     flow_SetHighlight(object->hn.node_id, highlight_flag);
     flow_SelectInsert(flow_ctx, object->hn.node_id);
   }
 
   vldh_nodemodified(object);
 
-  if (graphmask_changed && deleted_connections) {
+  if (graphmask_changed && deleted_connections)
+  {
     sprintf(msg, "Warning, %d connections removed", deleted_connections);
     message(msg);
     BEEP;
@@ -2701,18 +2755,12 @@ int WGre::node_update(vldh_t_node object)
 //
 //	Zoom the display window.
 //
-void WGre::zoom(float zoom)
-{
-  flow_Zoom(flow_ctx, zoom);
-}
+void WGre::zoom(float zoom) { flow_Zoom(flow_ctx, zoom); }
 
 //
 //	Zoom the display window to initial zoom degree.
 //
-void WGre::unzoom()
-{
-  flow_UnZoom(flow_ctx);
-}
+void WGre::unzoom() { flow_UnZoom(flow_ctx); }
 
 //
 //	Enable view of display rectangle.
@@ -2737,8 +2785,7 @@ int WGre::display()
 int WGre::set_display_value(vldh_t_node node, char* string)
 {
   /* Set display annotation */
-  flow_SetAnnotation(
-      node->hn.node_id, GOEN_DISPLAYNODE_ANNOT, string, strlen(string));
+  flow_SetAnnotation(node->hn.node_id, GOEN_DISPLAYNODE_ANNOT, string, strlen(string));
   return GRE__SUCCESS;
 }
 
@@ -2763,10 +2810,13 @@ int WGre::undisplay()
 int WGre::node_select(vldh_t_node node)
 {
   /* Check if a connection is selected or not */
-  if (node->hn.vldhtype == VLDH_CON) {
+  if (node->hn.vldhtype == VLDH_CON)
+  {
     flow_SelectInsert(flow_ctx, ((vldh_t_con)node)->hc.con_id);
     flow_SetHighlight(((vldh_t_con)node)->hc.con_id, 1);
-  } else {
+  }
+  else
+  {
     flow_SelectInsert(flow_ctx, node->hn.node_id);
     flow_SetHighlight(node->hn.node_id, 1);
   }
@@ -2780,10 +2830,13 @@ int WGre::node_select(vldh_t_node node)
 int WGre::node_unselect(vldh_t_node node)
 {
   /* Check if a connection is selected or not */
-  if (node->hn.vldhtype == VLDH_CON) {
+  if (node->hn.vldhtype == VLDH_CON)
+  {
     flow_SelectRemove(flow_ctx, ((vldh_t_con)node)->hc.con_id);
     flow_SetHighlight(((vldh_t_con)node)->hc.con_id, 0);
-  } else {
+  }
+  else
+  {
     flow_SelectRemove(flow_ctx, node->hn.node_id);
     flow_SetHighlight(node->hn.node_id, 0);
   }
@@ -2840,24 +2893,26 @@ int WGre::init_docobjects()
   /* Loop all nodes once first in order to count documents. /CJ 050415 */
   doc_count = 0;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     if (vldh_check_document(wind->hw.ldhses, (*node_ptr)->ln.oid))
       doc_count++;
     node_ptr++;
   }
 
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
-    if (vldh_check_document(wind->hw.ldhses, (*node_ptr)->ln.oid)) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    if (vldh_check_document(wind->hw.ldhses, (*node_ptr)->ln.oid))
+    {
       doc_obj = *node_ptr;
 
       /* System name in annotation nr 0 */
-      flow_SetAnnotation(
-          doc_obj->hn.node_id, 0, systemname, strlen(systemname));
+      flow_SetAnnotation(doc_obj->hn.node_id, 0, systemname, strlen(systemname));
 
       /* Plcname in annot 1 */
-      sts = ldh_ObjidToName(wind->hw.ldhses, plc->lp.oid, ldh_eName_Hierarchy,
-          objname, sizeof(objname), &size);
+      sts =
+          ldh_ObjidToName(wind->hw.ldhses, plc->lp.oid, ldh_eName_Hierarchy, objname, sizeof(objname), &size);
       if (EVEN(sts))
         annot_str[0] = '\0';
 
@@ -2866,8 +2921,8 @@ int WGre::init_docobjects()
 
       /* Windowname in annot 2 */
 
-      sts = ldh_ObjidToName(wind->hw.ldhses, wind->lw.oid, ldh_eName_Hierarchy,
-          windname, sizeof(windname), &size);
+      sts = ldh_ObjidToName(wind->hw.ldhses, wind->lw.oid, ldh_eName_Hierarchy, windname, sizeof(windname),
+                            &size);
       if (EVEN(sts))
         annot_str[0] = '\0';
 
@@ -2876,37 +2931,37 @@ int WGre::init_docobjects()
       windname_ptr = windname;
       strcpy(short_windname, windname_ptr + plclen + 1);
 
-      flow_SetAnnotation(
-          doc_obj->hn.node_id, 2, short_windname, strlen(short_windname));
+      flow_SetAnnotation(doc_obj->hn.node_id, 2, short_windname, strlen(short_windname));
 
       /* Page in annotations nr 3 */
-      sts = ldh_GetObjectPar(wind->hw.ldhses, doc_obj->ln.oid, "DevBody",
-          "Page", (char**)&parvalue, &size);
-      if (ODD(sts)) {
+      sts = ldh_GetObjectPar(wind->hw.ldhses, doc_obj->ln.oid, "DevBody", "Page", (char**)&parvalue, &size);
+      if (ODD(sts))
+      {
         flow_SetAnnotation(doc_obj->hn.node_id, 3, parvalue, strlen(parvalue));
         free((char*)parvalue);
       }
 
       /* PLC Window's Modified Time in annot 4 */
       mod_time_ptr = NULL;
-      sts = ldh_GetObjectPar(wind->hw.ldhses, wind->lw.oid, "DevBody",
-          "Modified", (char**)&mod_time_ptr, &size);
-      if (ODD(sts)) {
+      sts = ldh_GetObjectPar(wind->hw.ldhses, wind->lw.oid, "DevBody", "Modified", (char**)&mod_time_ptr,
+                             &size);
+      if (ODD(sts))
+      {
         memcpy(&mod_time, mod_time_ptr, sizeof(mod_time));
         free((char*)mod_time_ptr);
         mod_time_ptr = &mod_time;
       }
 
-      time_AtoAscii(
-          mod_time_ptr, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+      time_AtoAscii(mod_time_ptr, time_eFormat_DateAndTime, timstr, sizeof(timstr));
 
       timstr[strlen(timstr) - 6] = '\0';
       flow_SetAnnotation(doc_obj->hn.node_id, 4, timstr, strlen(timstr));
 
       /* Signature in annotations nr 5 */
-      sts = ldh_GetObjectPar(wind->hw.ldhses, doc_obj->ln.oid, "DevBody",
-          "Signature", (char**)&parvalue, &size);
-      if (ODD(sts)) {
+      sts = ldh_GetObjectPar(wind->hw.ldhses, doc_obj->ln.oid, "DevBody", "Signature", (char**)&parvalue,
+                             &size);
+      if (ODD(sts))
+      {
         flow_SetAnnotation(doc_obj->hn.node_id, 5, parvalue, strlen(parvalue));
         free((char*)parvalue);
       }
@@ -2949,8 +3004,7 @@ int WGre::set_trace_attributes(char* host)
   pwr_tUInt32* version;
 
   // Set version
-  sts = ldh_GetObjectPar(wind->hw.ldhses, wind->lw.oid, "RtBody", "Version",
-      (char**)&version, &size);
+  sts = ldh_GetObjectPar(wind->hw.ldhses, wind->lw.oid, "RtBody", "Version", (char**)&version, &size);
   if (EVEN(sts))
     return sts;
 
@@ -2962,21 +3016,24 @@ int WGre::set_trace_attributes(char* host)
     return sts;
 
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     inverted = 0;
     options = 0;
     strcpy(attr_str, "");
 
-    sts = trace_get_attributes(
-        this, *node_ptr, object_str, attr_str, &trace_type, &inverted);
-    if (ODD(sts) && sts != TRA__DISCARD) {
-      if (host && str_StartsWith(object_str, host)) {
+    sts = trace_get_attributes(this, *node_ptr, object_str, attr_str, &trace_type, &inverted);
+    if (ODD(sts) && sts != TRA__DISCARD)
+    {
+      if (host && str_StartsWith(object_str, host))
+      {
         char tmp[120];
         strcpy(tmp, "$host");
         strcat(tmp, &object_str[strlen(host)]);
         strcpy(object_str, tmp);
       }
-      switch ((*node_ptr)->ln.cid) {
+      switch ((*node_ptr)->ln.cid)
+      {
       case pwr_cClass_GetDp:
       case pwr_cClass_stodp:
       case pwr_cClass_resdp:
@@ -2986,16 +3043,19 @@ int WGre::set_trace_attributes(char* host)
       default:;
       }
 
-      if (options) {
+      if (options)
+      {
         char options_str[20];
         sprintf(options_str, "#%u", options);
         strcat(attr_str, options_str);
       }
 
-      flow_SetTraceAttr(
-          (*node_ptr)->hn.node_id, object_str, attr_str, trace_type, inverted);
-    } else {
-      switch ((*node_ptr)->ln.cid) {
+      flow_SetTraceAttr((*node_ptr)->hn.node_id, object_str, attr_str, trace_type, inverted);
+    }
+    else
+    {
+      switch ((*node_ptr)->ln.cid)
+      {
       case pwr_cClass_GetAi:
       case pwr_cClass_GetAo:
       case pwr_cClass_GetAv:
@@ -3058,21 +3118,21 @@ int WGre::set_trace_attributes(char* host)
       case pwr_cClass_CStoBoString80:
       case pwr_cClass_GetConstAv:
       case pwr_cClass_GetConstIv:
-        sts = ldh_GetObjectBodyDef(wind->hw.ldhses, (*node_ptr)->ln.cid,
-            "DevBody", 1, &bodydef, &rows);
+        sts = ldh_GetObjectBodyDef(wind->hw.ldhses, (*node_ptr)->ln.cid, "DevBody", 1, &bodydef, &rows);
         if (EVEN(sts))
           return sts;
         strcpy(object_str, "");
-        for (j = 0; j < rows; j++) {
-          if (bodydef[j].Par->Output.Info.Type == pwr_eType_AttrRef) {
+        for (j = 0; j < rows; j++)
+        {
+          if (bodydef[j].Par->Output.Info.Type == pwr_eType_AttrRef)
+          {
             /* Get the objid stored in the parameter */
-            sts = ldh_GetObjectPar(wind->hw.ldhses, (*node_ptr)->ln.oid,
-                "DevBody", bodydef[j].ParName, (char**)&objarp, &size);
+            sts = ldh_GetObjectPar(wind->hw.ldhses, (*node_ptr)->ln.oid, "DevBody", bodydef[j].ParName,
+                                   (char**)&objarp, &size);
             if (EVEN(sts))
               return sts;
 
-            sts = ldh_AttrRefToName(
-                wind->hw.ldhses, objarp, cdh_mNName, &np, &size);
+            sts = ldh_AttrRefToName(wind->hw.ldhses, objarp, cdh_mNName, &np, &size);
             if (EVEN(sts))
               strcpy(object_str, "");
             else
@@ -3085,13 +3145,14 @@ int WGre::set_trace_attributes(char* host)
         break;
       default:
         /* Store object name */
-        sts = ldh_ObjidToName(wind->hw.ldhses, (*node_ptr)->ln.oid,
-            ldh_eName_Hierarchy, object_str, sizeof(object_str), &size);
+        sts = ldh_ObjidToName(wind->hw.ldhses, (*node_ptr)->ln.oid, ldh_eName_Hierarchy, object_str,
+                              sizeof(object_str), &size);
         if (EVEN(sts))
           return sts;
       }
 
-      switch ((*node_ptr)->ln.cid) {
+      switch ((*node_ptr)->ln.cid)
+      {
       case pwr_cClass_GetAp:
       case pwr_cClass_GetIp:
       case pwr_cClass_stoap:
@@ -3126,7 +3187,8 @@ int WGre::set_trace_attributes(char* host)
       case pwr_cClass_CStoBoFloat32:
       case pwr_cClass_CStoBoString80:
         s = strrchr(object_str, '.');
-        if (s) {
+        if (s)
+        {
           strcpy(attr_str, s + 1);
           *s = 0;
 
@@ -3158,21 +3220,22 @@ int WGre::set_trace_attributes(char* host)
       default:;
       }
 
-      if (host && str_StartsWith(object_str, host)) {
+      if (host && str_StartsWith(object_str, host))
+      {
         char tmp[120];
         strcpy(tmp, "$host");
         strcat(tmp, &object_str[strlen(host)]);
         strcpy(object_str, tmp);
       }
 
-      if (options) {
+      if (options)
+      {
         char options_str[20];
         sprintf(options_str, "#%u", options);
         strcat(attr_str, options_str);
       }
 
-      flow_SetTraceAttr((*node_ptr)->hn.node_id, object_str, attr_str,
-          flow_eTraceType_User, inverted);
+      flow_SetTraceAttr((*node_ptr)->hn.node_id, object_str, attr_str, flow_eTraceType_User, inverted);
     }
     node_ptr++;
   }
@@ -3192,10 +3255,12 @@ int WGre::save(char* filename)
   /* Update document headers before saving flow file  /CJ 050415 */
   init_docobjects();
 
-  if (!filename) {
+  if (!filename)
+  {
     sprintf(fname, "pwrp_load:pwr_%s.flw", vldh_IdToStr(0, wind->lw.oid));
     dcli_translate_filename(fname, fname);
-  } else
+  }
+  else
     dcli_translate_filename(fname, filename);
   sts = flow_Save(flow_ctx, fname);
   return sts;
@@ -3244,15 +3309,18 @@ void WGre::select_nextobject(flow_eDirection dir, int add)
   else
     sel = fnode_list[0];
 
-  if ((!sel || add) && last_selected) {
+  if ((!sel || add) && last_selected)
+  {
     // Take last selected
     if (vldh_check_node(wind, last_selected))
       sel = last_selected->hn.node_id;
   }
 
-  if (!sel || !flow_IsVisible(flow_ctx, sel, flow_eVisible_Partial)) {
+  if (!sel || !flow_IsVisible(flow_ctx, sel, flow_eVisible_Partial))
+  {
     sts = flow_GetNextObject(flow_ctx, 0, dir, &next);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message("Unable to find a visible object");
       return;
     }
@@ -3261,9 +3329,12 @@ void WGre::select_nextobject(flow_eDirection dir, int add)
       flow_SelectClear(flow_ctx);
     flow_SetHighlight(next, 1);
     flow_SelectInsert(flow_ctx, next);
-  } else {
+  }
+  else
+  {
     sts = flow_GetNextObject(flow_ctx, sel, dir, &next);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message("Unable to find next object");
       return;
     }
@@ -3293,32 +3364,39 @@ void WGre::select_next_conpoint(flow_eDirection dir)
   flow_GetConPointSelectList(flow_ctx, &select_list, &select_num, &select_cnt);
   if (select_cnt == 0)
     sel = 0;
-  else {
+  else
+  {
     sel = select_list[select_cnt - 1];
     sel_num = select_num[select_cnt - 1];
   }
-  if (!sel) {
+  if (!sel)
+  {
     //
     flow_tNode* fnode_list;
     int fnode_count;
 
     flow_GetSelectedNodes(flow_ctx, &fnode_list, &fnode_count);
-    if (fnode_count != 0) {
+    if (fnode_count != 0)
+    {
       sel = fnode_list[0];
       sel_num = 0;
     }
   }
-  if (!sel && last_cp_selected) {
+  if (!sel && last_cp_selected)
+  {
     // Take last selected
-    if (vldh_check_node(wind, last_cp_selected)) {
+    if (vldh_check_node(wind, last_cp_selected))
+    {
       sel = last_cp_selected->hn.node_id;
       sel_num = last_cp_selected_num;
     }
   }
 
-  if (!sel || !flow_IsVisible(flow_ctx, sel, flow_eVisible_Partial)) {
+  if (!sel || !flow_IsVisible(flow_ctx, sel, flow_eVisible_Partial))
+  {
     sts = flow_GetNextConPoint(flow_ctx, 0, 0, dir, &next, &next_num);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message("Unable to find a visible object");
       return;
     }
@@ -3326,9 +3404,12 @@ void WGre::select_next_conpoint(flow_eDirection dir)
     if (!conpoint_locked)
       flow_ConPointSelectClear(flow_ctx);
     flow_ConPointSelectInsert(flow_ctx, next, next_num);
-  } else {
+  }
+  else
+  {
     sts = flow_GetNextConPoint(flow_ctx, sel, sel_num, dir, &next, &next_num);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message("Unable to find next object");
       return;
     }
@@ -3352,7 +3433,8 @@ void WGre::move_object(flow_eDirection dir)
   unsigned long node_count;
   vldh_t_node* nodelist;
 
-  switch (dir) {
+  switch (dir)
+  {
   case flow_eDirection_Up:
     x = 0;
     y = -grid_size;
@@ -3378,7 +3460,8 @@ void WGre::move_object(flow_eDirection dir)
   flow_PasteStop(flow_ctx);
   flow_MoveSelectedNodes(flow_ctx, x, y, 1);
 
-  for (unsigned int i = 0; i < node_count; i++) {
+  for (unsigned int i = 0; i < node_count; i++)
+  {
     flow_GetNodePosition(nodelist[i]->hn.node_id, &ll_x, &ll_y);
     nodelist[i]->ln.x = ll_x;
     nodelist[i]->ln.y = ll_y;
@@ -3395,10 +3478,13 @@ void WGre::pending_paste_stop()
   int paste_cnt;
   int sts;
 
-  if (flow_PendingPaste(flow_ctx)) {
+  if (flow_PendingPaste(flow_ctx))
+  {
     flow_GetPasteList(flow_ctx, &paste_list, &paste_cnt);
-    for (int i = 0; i < paste_cnt; i++) {
-      if (flow_GetObjectType(paste_list[i]) == flow_eObjectType_Node) {
+    for (int i = 0; i < paste_cnt; i++)
+    {
+      if (flow_GetObjectType(paste_list[i]) == flow_eObjectType_Node)
+      {
         flow_GetUserData(paste_list[i], (void**)&node);
 
         sts = vldh_get_cons_node(node, &con_count, &con_list);
@@ -3413,8 +3499,7 @@ void WGre::pending_paste_stop()
   }
 }
 
-int WGre::get_conpoint_select(
-    unsigned long* node_count, vldh_t_node** nodelist, int** numlist)
+int WGre::get_conpoint_select(unsigned long* node_count, vldh_t_node** nodelist, int** numlist)
 {
   flow_tObject* select_list;
   int* select_num;
@@ -3432,7 +3517,8 @@ int WGre::get_conpoint_select(
   *numlist = (int*)calloc(select_cnt, sizeof(int));
 
   /* Insert the nodes */
-  for (int i = 0; i < select_cnt; i++) {
+  for (int i = 0; i < select_cnt; i++)
+  {
     flow_GetUserData(select_list[i], (void**)&node);
     *(*nodelist + *node_count) = node;
     *(*numlist + *node_count) = select_num[i];
@@ -3441,8 +3527,7 @@ int WGre::get_conpoint_select(
   return GRE__SUCCESS;
 }
 
-int WGre::get_conpoint(
-    vldh_t_node node, int num, double* x, double* y, flow_eDirection* dir)
+int WGre::get_conpoint(vldh_t_node node, int num, double* x, double* y, flow_eDirection* dir)
 {
   return flow_GetConPoint(node->hn.node_id, num, x, y, dir);
 }
@@ -3451,7 +3536,8 @@ void WGre::scroll(flow_eDirection dir)
 {
   double x = 0.0, y = 0.0;
 
-  switch (dir) {
+  switch (dir)
+  {
   case flow_eDirection_Right:
     x = -0.20;
     y = 0;

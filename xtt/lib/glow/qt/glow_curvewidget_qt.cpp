@@ -54,7 +54,8 @@ static int curve_init_proc(QWidget* w, GlowCtx* fctx, void* client_data)
   QtScrollWidgetGlow* curve = ((QtScrollWidgetGlow*)w);
   CurveCtx* ctx = (CurveCtx*)curve->parent_ctx;
 
-  if (curve->scroll_h) {
+  if (curve->scroll_h)
+  {
     widget_sScroll* scroll_data = new widget_sScroll();
     scroll_data->parent = w;
     scroll_data->scroll_h = curve->scroll_h;
@@ -67,8 +68,7 @@ static int curve_init_proc(QWidget* w, GlowCtx* fctx, void* client_data)
   return (curve->init_proc)(ctx, client_data);
 }
 
-QWidget* curvewidgetqt_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data)
+QWidget* curvewidgetqt_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data)
 {
   QtScrollWidgetGlow* w = new QtScrollWidgetGlow();
   w->init(glow_eCtxType_Curve, init_proc, client_data, curve_init_proc);

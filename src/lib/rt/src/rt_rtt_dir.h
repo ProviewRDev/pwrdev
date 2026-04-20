@@ -40,5 +40,4 @@
 
 int rtt_search_file(char* file_name, char* found_file, int new);
 
-int rtt_parse_filename(
-    char* filename, char* dev, char* dir, char* file, char* type, int* version);
+int rtt_parse_filename(char* filename, char* dev, char* dir, char* file, char* type, int* version);

@@ -38,54 +38,56 @@
 #define co_array_h
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #ifndef __STDDEF_LOADED
 #include <stddef.h>
 #endif
 
-/*! \file co_array.h
-    \brief Dynamic-size array, like std::vector from C++ or ArrayList from Java.
-*/
-typedef struct {
-  void* data;
-  int elemsize;
-  int capacity;
-  int alloc_incr;
-  int size;
-} array_sCtx, *array_tCtx;
+  /*! \file co_array.h
+      \brief Dynamic-size array, like std::vector from C++ or ArrayList from Java.
+  */
+  typedef struct
+  {
+    void* data;
+    int elemsize;
+    int capacity;
+    int alloc_incr;
+    int size;
+  } array_sCtx, *array_tCtx;
 
-/*! \fn array_tCtx array_New(int elemsize, int alloc_incr)
-    \brief Allocates a new dynamic array containing elements of size \a elemsize
+  /*! \fn array_tCtx array_New(int elemsize, int alloc_incr)
+      \brief Allocates a new dynamic array containing elements of size \a elemsize
 
-    \param elemsize	The sizeof() an element.
-    \param alloc_incr	How much the dynamic array should grow when it is full.
-    \return 	Returns a new dynamic array.
-*/
-array_tCtx array_New(int elemsize, int alloc_incr);
+      \param elemsize	The sizeof() an element.
+      \param alloc_incr	How much the dynamic array should grow when it is full.
+      \return 	Returns a new dynamic array.
+  */
+  array_tCtx array_New(int elemsize, int alloc_incr);
 
-/*! \fn void array_Delete(array_tCtx arr)
-    \brief Frees the memory held by \a arr
-*/
-void array_Delete(array_tCtx arr);
+  /*! \fn void array_Delete(array_tCtx arr)
+      \brief Frees the memory held by \a arr
+  */
+  void array_Delete(array_tCtx arr);
 
-/*! \fn int array_Push(array_tCtx arr, void* elem)
-    \brief Appends \a elem to the end of the array.
-*/
-int array_Push(array_tCtx arr, void* elem);
+  /*! \fn int array_Push(array_tCtx arr, void* elem)
+      \brief Appends \a elem to the end of the array.
+  */
+  int array_Push(array_tCtx arr, void* elem);
 
-/*! \fn int array_Push(array_tCtx arr, void* elem)
-    \brief Concatenates \a number of elements from the fixed-size array
-    \a elems to the end of the dynamic array \a arr.
-*/
-int array_Concat(array_tCtx arr, void* elems, int number);
+  /*! \fn int array_Push(array_tCtx arr, void* elem)
+      \brief Concatenates \a number of elements from the fixed-size array
+      \a elems to the end of the dynamic array \a arr.
+  */
+  int array_Concat(array_tCtx arr, void* elems, int number);
 
-/*! \fn void* array_Copy(array_tCtx arr)
-    \brief Creates and returns a copy of \a arr.
-    Warning! The returned array must be free() explicitly.
-*/
-void* array_Copy(array_tCtx arr);
+  /*! \fn void* array_Copy(array_tCtx arr)
+      \brief Creates and returns a copy of \a arr.
+      Warning! The returned array must be free() explicitly.
+  */
+  void* array_Copy(array_tCtx arr);
 
 #ifdef __cplusplus
 }

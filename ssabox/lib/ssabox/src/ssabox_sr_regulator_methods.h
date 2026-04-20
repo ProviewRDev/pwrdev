@@ -12,7 +12,8 @@
 #ifndef ssabox_sr_servoreg_structs
 #define ssabox_sr_servoreg_structs
 
-typedef struct SR_RefList {
+typedef struct SR_RefList
+{
   double a;
   double u;
   double x;
@@ -24,7 +25,6 @@ typedef struct SR_RefList {
 /* Prototype declarations of externally visible regulator methods.*/
 
 void SR_addNewRef(SR_RefList** objectRefListp, double aR, double uR, double xR);
-void SR_extractRef(SR_RefList** objectRefListp, int delay, double* aDelayp,
-    double* uDelayp, double* xDelayp);
+void SR_extractRef(SR_RefList** objectRefListp, int delay, double* aDelayp, double* uDelayp, double* xDelayp);
 
 #endif

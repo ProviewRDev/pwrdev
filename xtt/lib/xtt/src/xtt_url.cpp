@@ -38,7 +38,8 @@
 
 #include "xtt_url.h"
 #include "rt_xnav_msg.h"
-extern "C" {
+extern "C"
+{
 #include "rt_gdh.h"
 #include "co_dcli.h"
 #include "pwr_baseclasses.h"
@@ -46,10 +47,8 @@ extern "C" {
 #include "co_lng.h"
 #include "co_string.h"
 
-static int find_symbol(
-    char* name, char* value, pwr_sClass_WebBrowserConfig* config);
-static int replace_symbol(
-    pwr_tURL in, pwr_tURL out, pwr_sClass_WebBrowserConfig* config);
+static int find_symbol(char* name, char* value, pwr_sClass_WebBrowserConfig* config);
+static int replace_symbol(pwr_tURL in, pwr_tURL out, pwr_sClass_WebBrowserConfig* config);
 
 int xnav_open_URL(pwr_tURL url)
 {
@@ -63,22 +62,26 @@ int xnav_open_URL(pwr_tURL url)
   if (ODD(sts))
     sts = gdh_ObjidToPointer(config_objid, (void**)&config_p);
 
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     if (!streq(config_p->WebBrowser, ""))
       strcpy(browser, config_p->WebBrowser);
   }
 
-  if (str_StartsWith(url, "$pwr_lang/")) {
+  if (str_StartsWith(url, "$pwr_lang/"))
+  {
     // If file in $pwr_lang, check if file exist, else take en_us
 
-    if (Lng::current() != lng_eLanguage_en_US) {
+    if (Lng::current() != lng_eLanguage_en_US)
+    {
       pwr_tURL testurl;
       pwr_tTime t;
 
       replace_symbol(url, testurl, config_p);
       dcli_translate_filename(testurl, testurl);
       sts = dcli_file_time(testurl, &t);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         // Try en_us
         strcpy(testurl, "$pwr_doc/en_us/");
         strcat(testurl, &url[10]);
@@ -89,24 +92,27 @@ int xnav_open_URL(pwr_tURL url)
 
   replace_symbol(url, url, config_p);
 
-  if (streq(browser, "mozilla") || streq(browser, "rt_mozilla")) {
+  if (streq(browser, "mozilla") || streq(browser, "rt_mozilla"))
+  {
     // Try remote display first
     sprintf(cmd, "%s -remote \"openurl(%s,new-window)\"", browser, url);
     sts = system(cmd);
-    if (sts) {
+    if (sts)
+    {
       // Not started yet
       sprintf(cmd, "%s %s &", browser, url);
       system(cmd);
     }
-  } else {
+  }
+  else
+  {
     sprintf(cmd, "%s %s &", browser, url);
     system(cmd);
   }
   return XNAV__SUCCESS;
 }
 
-static int replace_symbol(
-    pwr_tURL in, pwr_tURL out, pwr_sClass_WebBrowserConfig* config)
+static int replace_symbol(pwr_tURL in, pwr_tURL out, pwr_sClass_WebBrowserConfig* config)
 {
   char *s, *t;
   char* sym_start;
@@ -116,84 +122,106 @@ static int replace_symbol(
   int skip_sym = 0;
   pwr_tURL url;
 
-  if (str_StartsWith(in, "$pwr_lang/")) {
+  if (str_StartsWith(in, "$pwr_lang/"))
+  {
     strcpy(url, "$pwr_doc/");
     strcat(url, Lng::get_language_str());
     strcat(url, &in[9]);
-  } else
+  }
+  else
     strncpy(url, in, sizeof(pwr_tURL));
 
-  if (!config) {
+  if (!config)
+  {
     strcpy(out, url);
     return XNAV__SUCCESS;
   }
 
   sym_start = 0;
   t = tmp;
-  for (s = url; *s; s++) {
+  for (s = url; *s; s++)
+  {
     if (*s == '\\' && *(s + 1) == '$')
       skip_sym = 1;
-    if (*s == '$' && !skip_sym) {
-      if (sym_start) {
+    if (*s == '$' && !skip_sym)
+    {
+      if (sym_start)
+      {
         strncpy(sym_name, sym_start + 1, s - (sym_start + 1));
         sym_name[s - sym_start - 1] = 0;
-        if (find_symbol(sym_name, sym_value, config)) {
+        if (find_symbol(sym_name, sym_value, config))
+        {
           strcpy(t, sym_value);
           t += strlen(sym_value);
-        } else {
+        }
+        else
+        {
           strncpy(t, sym_start, s - sym_start);
           t += s - sym_start;
         }
       }
       sym_start = s;
-    } else if (*s == '$' && skip_sym) {
+    }
+    else if (*s == '$' && skip_sym)
+    {
       skip_sym = 0;
       *t++ = *s;
-    } else if (sym_start) {
-      if (!(isdigit(*s) || isalpha(*s) || *s == '_')) {
+    }
+    else if (sym_start)
+    {
+      if (!(isdigit(*s) || isalpha(*s) || *s == '_'))
+      {
         // End of symbol
         strncpy(sym_name, sym_start + 1, s - (sym_start + 1));
         sym_name[s - sym_start - 1] = 0;
-        if (find_symbol(sym_name, sym_value, config)) {
+        if (find_symbol(sym_name, sym_value, config))
+        {
           strcpy(t, sym_value);
           t += strlen(sym_value);
-        } else {
+        }
+        else
+        {
           strncpy(t, sym_start, s - sym_start);
           t += s - sym_start;
         }
         sym_start = 0;
         *t++ = *s;
       }
-    } else
+    }
+    else
       *t++ = *s;
   }
-  if (sym_start) {
+  if (sym_start)
+  {
     strcpy(sym_name, sym_start + 1);
     if (find_symbol(sym_name, sym_value, config))
       strcpy(t, sym_value);
     else
       strcpy(t, sym_start);
-  } else
+  }
+  else
     *t = 0;
 
   strcpy(out, tmp);
   return XNAV__SUCCESS;
 }
 
-static int find_symbol(
-    char* name, char* value, pwr_sClass_WebBrowserConfig* config)
+static int find_symbol(char* name, char* value, pwr_sClass_WebBrowserConfig* config)
 {
   char sym_array[2][80];
   int nr;
   int i;
 
-  for (i = 0; i < 10; i++) {
-    if (!streq(config->URL_Symbols[i], "")) {
+  for (i = 0; i < 10; i++)
+  {
+    if (!streq(config->URL_Symbols[i], ""))
+    {
       nr = dcli_parse(config->URL_Symbols[i], " 	", "", (char*)sym_array,
-          sizeof(sym_array) / sizeof(sym_array[0]), sizeof(sym_array[0]), 0);
+                      sizeof(sym_array) / sizeof(sym_array[0]), sizeof(sym_array[0]), 0);
       if (nr != 2)
         continue;
-      if (streq(sym_array[0], name)) {
+      if (streq(sym_array[0], name))
+      {
         strcpy(value, sym_array[1]);
         return 1;
       }

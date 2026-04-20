@@ -38,27 +38,28 @@
 #define rt_aproc_h
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "rt_errh.h"
 
-/*! \file rt_aproc.h
-    \brief Include file for \ref AProc
-*/
+  /*! \file rt_aproc.h
+      \brief Include file for \ref AProc
+  */
 
-/** \addtogroup AProc */
-/** @{ */
+  /** \addtogroup AProc */
+  /** @{ */
 
-/** \defgroup AProc_FC AProc Functions
- *  @{
- */
+  /** \defgroup AProc_FC AProc Functions
+   *  @{
+   */
 
-pwr_tStatus aproc_RegisterObject(pwr_tOid);
-pwr_tStatus aproc_TimeStamp(float scantime, float maxdelay);
+  pwr_tStatus aproc_RegisterObject(pwr_tOid);
+  pwr_tStatus aproc_TimeStamp(float scantime, float maxdelay);
 
-/** @} */
-/** @} */
+  /** @} */
+  /** @} */
 
 #if defined __cplusplus
 }

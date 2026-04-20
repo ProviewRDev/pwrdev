@@ -36,89 +36,72 @@
 
 #include "flow_print.h"
 
-FlowPrint::FlowPrint()
-{
-}
+FlowPrint::FlowPrint() {}
 
-FlowPrint::FlowPrint(char* filename, void* flow_ctx, int page_border, int* sts)
-{
-}
+FlowPrint::FlowPrint(char* filename, void* flow_ctx, int page_border, int* sts) {}
 
-FlowPrint::~FlowPrint()
-{
-}
+FlowPrint::~FlowPrint() {}
 
-int FlowPrint::type()
-{
-  return 0;
-}
+int FlowPrint::type() { return 0; }
 
-int FlowPrint::print_page(double ll_x, double ll_y, double ur_x, double ur_y)
+int FlowPrint::print_page(double ll_x, double ll_y, double ur_x, double ur_y) { return 1; }
+
+int FlowPrint::rect(double x, double y, double width, double height, flow_eDrawType type, double idx,
+                    int highlight)
 {
   return 1;
 }
 
-int FlowPrint::rect(double x, double y, double width, double height,
-    flow_eDrawType type, double idx, int highlight)
+int FlowPrint::filled_rect(double x, double y, double width, double height, flow_eDrawType type, double idx)
 {
   return 1;
 }
 
-int FlowPrint::filled_rect(double x, double y, double width, double height,
-    flow_eDrawType type, double idx)
+int FlowPrint::triangle(double x, double y, double width, double height, flow_eDrawType type, double idx,
+                        int highlight)
 {
   return 1;
 }
 
-int FlowPrint::triangle(double x, double y, double width, double height,
-    flow_eDrawType type, double idx, int highlight)
+int FlowPrint::filled_triangle(double x, double y, double width, double height, flow_eDrawType type,
+                               double idx)
 {
   return 1;
 }
 
-int FlowPrint::filled_triangle(double x, double y, double width, double height,
-    flow_eDrawType type, double idx)
+int FlowPrint::arc(double x, double y, double width, double height, int angle1, int angle2,
+                   flow_eDrawType type, double idx, int highlight)
 {
   return 1;
 }
 
-int FlowPrint::arc(double x, double y, double width, double height, int angle1,
-    int angle2, flow_eDrawType type, double idx, int highlight)
+int FlowPrint::line(double x1, double y1, double x2, double y2, flow_eDrawType type, double idx,
+                    int highlight)
 {
   return 1;
 }
 
-int FlowPrint::line(double x1, double y1, double x2, double y2,
-    flow_eDrawType type, double idx, int highlight)
+int FlowPrint::text(double x, double y, char* text, int len, flow_eDrawType type, double size, int line)
 {
   return 1;
 }
 
-int FlowPrint::text(double x, double y, char* text, int len,
-    flow_eDrawType type, double size, int line)
+int FlowPrint::pixmap(double x, double y, flow_sPixmapDataElem* data, void* pixmap, int idx,
+                      flow_eDrawType type)
 {
   return 1;
 }
 
-int FlowPrint::pixmap(
-    double x, double y, flow_sPixmapDataElem* data, void *pixmap, int idx, 
-    flow_eDrawType type)
+int FlowPrint::image(double x, double y, double width, double height, flow_tImImage image,
+                     flow_eDrawType type)
 {
   return 1;
 }
 
-int FlowPrint::image(double x, double y, double width, double height,
-    flow_tImImage image, flow_eDrawType type)
+int FlowPrint::arrow(double x1, double y1, double x2, double y2, double x3, double y3, flow_eDrawType type,
+                     double idx)
 {
   return 1;
 }
 
-int FlowPrint::arrow(double x1, double y1, double x2, double y2, double x3,
-    double y3, flow_eDrawType type, double idx)
-{
-  return 1;
-}
-
-void FlowPrint::set_showred(int show)
-{
-}
+void FlowPrint::set_showred(int show) {}

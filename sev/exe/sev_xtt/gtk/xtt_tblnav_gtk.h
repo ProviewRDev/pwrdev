@@ -44,11 +44,11 @@
 #include "../src/xtt_tblnav.h"
 
 //! The navigation area of the attribute editor.
-class TblNavGtk : public TblNav {
+class TblNavGtk : public TblNav
+{
 public:
-  TblNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-      sevcli_sHistItem* xn_itemlist, int xn_item_cnt, GtkWidget** w,
-      pwr_tStatus* status);
+  TblNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, sevcli_sHistItem* xn_itemlist, int xn_item_cnt,
+            GtkWidget** w, pwr_tStatus* status);
   ~TblNavGtk();
 
   GtkWidget* parent_wid;

@@ -38,7 +38,7 @@
 #include "rt_sect.h"
 #include "rt_lst.h"
 
-static pwr_tBoolean check(lst_sEntry* link)
+static pwr_tBoolean __attribute__((unused)) check(lst_sEntry* link)
 {
   if (link == NULL || link->blink == NULL || link->flink == NULL)
     return NO;
@@ -48,8 +48,7 @@ static pwr_tBoolean check(lst_sEntry* link)
 
 static pwr_tBoolean checkInit(lst_sEntry* link)
 {
-  if ((link->flink == NULL || link->blink == NULL)
-      && link->flink != link->blink)
+  if ((link->flink == NULL || link->blink == NULL) && link->flink != link->blink)
     return NO;
 
   if (link->flink == NULL)
@@ -82,7 +81,8 @@ lst_sEntry* lst_Init(thread_sMutex* mp, lst_sEntry* link, void* item)
   if (mp != NULL)
     sync_MutexLock(mp);
 
-  if (link != NULL) {
+  if (link != NULL)
+  {
     link->flink = link->blink = link;
     link->item = item;
   }
@@ -94,18 +94,23 @@ lst_sEntry* lst_Init(thread_sMutex* mp, lst_sEntry* link, void* item)
 
 /* Insert 'link' as predecessor to 'succ'.  */
 
-lst_sEntry* lst_InsertPred(
-    thread_sMutex* mp, lst_sEntry* succ, /* Insert before this element */
-    lst_sEntry* link, /* Link to insert */
-    void* item /* Item to insert */
-    )
+lst_sEntry* lst_InsertPred(thread_sMutex* mp, lst_sEntry* succ, /* Insert before this element */
+                           lst_sEntry* link,                    /* Link to insert */
+                           void* item                           /* Item to insert */
+)
 {
   lst_sEntry* pred;
 
   if (mp != NULL)
     sync_MutexLock(mp);
 
-  pwr_Assert(checkInit(link));
+  if (!checkInit(link))
+  {
+    pwr_Assert(0);
+    if (mp != NULL)
+      sync_MutexUnlock(mp);
+    return NULL;
+  }
 
   pred = succ->blink;
 
@@ -127,18 +132,23 @@ lst_sEntry* lst_InsertPred(
 
 /* Insert 'link' as successor to 'pred'.  */
 
-lst_sEntry* lst_InsertSucc(
-    thread_sMutex* mp, lst_sEntry* pred, /* Insert after this element */
-    lst_sEntry* link, /* link to insert */
-    void* item /* Item to insert */
-    )
+lst_sEntry* lst_InsertSucc(thread_sMutex* mp, lst_sEntry* pred, /* Insert after this element */
+                           lst_sEntry* link,                    /* link to insert */
+                           void* item                           /* Item to insert */
+)
 {
   lst_sEntry* succ;
 
   if (mp != NULL)
     sync_MutexLock(mp);
 
-  pwr_Assert(checkInit(link));
+  if (!checkInit(link))
+  {
+    pwr_Assert(0);
+    if (mp != NULL)
+      sync_MutexUnlock(mp);
+    return NULL;
+  }
 
   succ = pred->flink;
 
@@ -186,7 +196,13 @@ pwr_tBoolean lst_IsLinked(thread_sMutex* mp, lst_sEntry* link)
   if (mp != NULL)
     sync_MutexLock(mp);
 
-  pwr_Assert(checkInit(link));
+  if (!checkInit(link))
+  {
+    pwr_Assert(0);
+    if (mp != NULL)
+      sync_MutexUnlock(mp);
+    return NO;
+  }
 
   pred = link->blink;
   succ = link->flink;
@@ -213,8 +229,7 @@ pwr_tBoolean lst_IsNull(thread_sMutex* mp, lst_sEntry* link)
   if (mp != NULL)
     sync_MutexLock(mp);
 
-  pwr_Assert((link->blink == NULL && link->flink == NULL)
-      || (link->blink != NULL && link->flink != NULL));
+  pwr_Assert((link->blink == NULL && link->flink == NULL) || (link->blink != NULL && link->flink != NULL));
 
   is_null = (link->blink == NULL) && (link->flink == NULL);
 
@@ -239,7 +254,8 @@ pwr_tBoolean lst_IsSucc(thread_sMutex* mp, lst_sEntry* pred, lst_sEntry* link)
 
   succ = link->flink;
 
-  if (succ != NULL) {
+  if (succ != NULL)
+  {
     pwr_Assert(check(succ));
     pwr_Assert(succ->blink == link);
     pwr_Assert(link->flink == succ);
@@ -257,13 +273,17 @@ pwr_tBoolean lst_IsSucc(thread_sMutex* mp, lst_sEntry* pred, lst_sEntry* link)
    Return ?  */
 
 lst_sEntry* lst_Move(thread_sMutex* mp, lst_sEntry* old, /* Old queue header */
-    lst_sEntry* new /* New queue header */
-    )
+                     lst_sEntry* new                     /* New queue header */
+)
 {
   lst_sEntry* pred;
   lst_sEntry* succ;
 
-  pwr_Assert(checkInit(new));
+  if (!checkInit(new))
+  {
+    pwr_Assert(0);
+    return NULL;
+  }
 
   pred = old->blink;
   succ = old->flink;
@@ -273,7 +293,8 @@ lst_sEntry* lst_Move(thread_sMutex* mp, lst_sEntry* old, /* Old queue header */
   pwr_Assert(pred->flink == old);
   pwr_Assert(succ->blink == old);
 
-  if (old->flink != old) {
+  if (old->flink != old)
+  {
     new->flink = succ;
     new->blink = pred;
     succ->blink = pred->flink = new;
@@ -297,7 +318,8 @@ void* lst_Pred(thread_sMutex* mp, lst_sEntry* link, lst_sEntry** lp)
 
   pred = link->blink;
 
-  if (pred != NULL) {
+  if (pred != NULL)
+  {
     pwr_Assert(check(pred));
     pwr_Assert(pred->flink == link);
   }
@@ -324,11 +346,13 @@ void* lst_Remove(thread_sMutex* mp, lst_sEntry* link)
   if (mp != NULL)
     sync_MutexLock(mp);
 
-  do { /* Locking scope */
+  do
+  { /* Locking scope */
 
     pwr_Assert(check(link));
 
-    if (link->flink == link || link->blink == link) {
+    if (link->flink == link || link->blink == link)
+    {
       pwr_Assert(link->flink == link->blink);
       break;
     }
@@ -369,11 +393,13 @@ void* lst_RemovePred(thread_sMutex* mp, lst_sEntry* link, lst_sEntry** lp)
   if (mp != NULL)
     sync_MutexLock(mp);
 
-  do { /* Locking scope */
+  do
+  { /* Locking scope */
 
     pwr_Assert(check(link));
 
-    if (link->flink == link || link->blink == link) {
+    if (link->flink == link || link->blink == link)
+    {
       pwr_Assert(link->flink == link->blink);
       if (lp != NULL)
         *lp = NULL;
@@ -422,11 +448,13 @@ void* lst_RemoveSucc(thread_sMutex* mp, lst_sEntry* link, lst_sEntry** lp)
   if (mp != NULL)
     sync_MutexLock(mp);
 
-  do { /* Locking scope */
+  do
+  { /* Locking scope */
 
     pwr_Assert(check(link));
 
-    if (link->flink == link || link->blink == link) {
+    if (link->flink == link || link->blink == link)
+    {
       pwr_Assert(link->flink == link->blink);
       if (lp != NULL)
         *lp = NULL;
@@ -473,7 +501,8 @@ void* lst_Succ(thread_sMutex* mp, lst_sEntry* link, lst_sEntry** lp)
 
   succ = link->flink;
 
-  if (succ != NULL) {
+  if (succ != NULL)
+  {
     pwr_Assert(check(succ));
     pwr_Assert(succ->blink == link);
   }

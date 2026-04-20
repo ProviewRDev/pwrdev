@@ -45,7 +45,8 @@
 
 class CoWow;
 
-class CLog {
+class CLog
+{
 public:
   CLog(void* clog_parent_ctx, const char* clog_name, pwr_tStatus* status);
   virtual ~CLog();
@@ -59,21 +60,11 @@ public:
   bool filesel_loaded;
   CoWow* wow;
 
-  virtual void pop()
-  {
-  }
-  virtual void set_clock_cursor()
-  {
-  }
-  virtual void reset_cursor()
-  {
-  }
-  virtual void free_cursor()
-  {
-  }
-  virtual void print()
-  {
-  }
+  virtual void pop() {}
+  virtual void set_clock_cursor() {}
+  virtual void reset_cursor() {}
+  virtual void free_cursor() {}
+  virtual void print() {}
 
   void activate_next_file();
   void activate_prev_file();

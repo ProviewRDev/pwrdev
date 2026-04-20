@@ -37,6 +37,8 @@
 #ifndef glow_growpie_h
 #define glow_growpie_h
 
+#include <iosfwd>
+
 #include "glow_growarc.h"
 
 /*! \file glow_growpie.h
@@ -53,7 +55,8 @@
   when the
   object is clicked on, moved etc.
 */
-class GrowPie : public GrowArc {
+class GrowPie : public GrowArc
+{
 public:
   //! Constuctor
   /*!
@@ -67,11 +70,10 @@ public:
     \param line_w	Linewidth of border.
     \param nodraw	Don't draw the object now.
   */
-  GrowPie(GrowCtx* glow_ctx, const char* name, double x1 = 0, double y1 = 0,
-      double x2 = 0, double y2 = 0, int ang1 = 0, int ang2 = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      int display_border = 1, int display_shadow = 0,
-      glow_eDrawType fill_d_type = glow_eDrawType_Line, int nodraw = 0);
+  GrowPie(GrowCtx* glow_ctx, const char* name, double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0,
+          int ang1 = 0, int ang2 = 0, glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
+          int display_border = 1, int display_shadow = 0, glow_eDrawType fill_d_type = glow_eDrawType_Line,
+          int nodraw = 0);
 
   //! Destructor
   /*! Remove the object from context, and erase it from the screen.
@@ -83,13 +85,13 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Scan trace
   /*! Calls the trace scan callback for the object.
@@ -139,17 +141,14 @@ public:
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowPie;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowPie; }
 
-  int sectors; //!< Number of sectors.
-  double min_value; //!< Range mininum value
-  double max_value; //!< Range maximum value
+  int sectors;                                  //!< Number of sectors.
+  double min_value;                             //!< Range mininum value
+  double max_value;                             //!< Range maximum value
   glow_eDrawType sector_color[PIE_MAX_SECTORS]; //!< Sector color.
-  double sector_size[PIE_MAX_SECTORS]; //!< Sector size in range 0-1.
-  GlowTraceData trace; //!< Obsolete
+  double sector_size[PIE_MAX_SECTORS];          //!< Sector size in range 0-1.
+  GlowTraceData trace;                          //!< Obsolete
 
   //! Draw the object.
   /*!
@@ -165,8 +164,8 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();
@@ -179,8 +178,7 @@ public:
   */
   void align(double x, double y, glow_eAlignDirection direction);
 
-  void set_conf(
-      int sectors, double min_val, double max_val, glow_eDrawType* color);
+  void set_conf(int sectors, double min_val, double max_val, glow_eDrawType* color);
   void get_conf(int* sectors, double* min_val, double* max_val);
   void set_values(double* values);
 
@@ -200,12 +198,12 @@ public:
     used to generate
     java code for the bean.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ostream& fp);
 
   //! Set configuration values for the pie.
-  void set_conf(double max_val, double min_val, int no_of_lines, int long_quot,
-      int value_quot, double rot, const char* format);
+  void set_conf(double max_val, double min_val, int no_of_lines, int long_quot, int value_quot, double rot,
+                const char* format);
 
   int export_script(GlowExportScript* es, void* o, void* m);
 

@@ -49,25 +49,25 @@ class ConfiguredDeviceReader
 public:
   // Callback function type for activity logging
   using ActivityLogCallback = std::function<void(const std::string&)>;
-  
+
   ConfiguredDeviceReader();
   ~ConfiguredDeviceReader();
 
   // Load configured devices from XML file based on interface name
   bool loadConfiguredDevices(const std::string& interface_name);
-  
+
   // Get the XML document (contains all device nodes)
   const pugi::xml_document& getXMLDocument() const { return m_xml_doc; }
-  
+
   // Get the configuration file path for an interface
   static std::string getConfigFilePath(const std::string& interface_name);
-  
+
   // Check if devices are loaded
   bool hasLoadedDevices() const { return m_devices_loaded; }
-  
+
   // Get current interface name
   const std::string& getCurrentInterface() const { return m_current_interface; }
-  
+
   // Set activity log callback
   void setActivityLogCallback(ActivityLogCallback callback) { m_activity_log_callback = callback; }
 
@@ -76,7 +76,7 @@ private:
   std::string m_current_interface;
   bool m_devices_loaded;
   ActivityLogCallback m_activity_log_callback;
-  
+
   // Log missing file message
   void logMissingFileMessage(const std::string& interface_name) const;
 };

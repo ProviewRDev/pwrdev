@@ -41,10 +41,10 @@
 
 #include "wb_pal.h"
 
-class Nav {
+class Nav
+{
 public:
-  Nav(void* parent_ctx, const char* name, ldh_tSesContext ldhses,
-      const char* root_name, pwr_tStatus* status);
+  Nav(void* parent_ctx, const char* name, ldh_tSesContext ldhses, const char* root_name, pwr_tStatus* status);
   virtual ~Nav();
 
   void* parent_ctx;
@@ -74,12 +74,8 @@ public:
   int selection_owner;
   int show_descrip;
 
-  virtual void set_inputfocus(int focus)
-  {
-  }
-  virtual void set_selection_owner(int set)
-  {
-  }
+  virtual void set_inputfocus(int focus) {}
+  virtual void set_selection_owner(int set) {}
 
   void zoom(double zoom_factor);
   void unzoom();

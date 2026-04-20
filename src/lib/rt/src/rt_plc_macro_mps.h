@@ -44,7 +44,7 @@
 /*	MPSTRPTRIGG							*/
 /*	funktion:	trigger mps transport object			*/
 /*									*/
-#define mpsTrp_exec(obj)                                                       \
-  if (obj->InTriggFlag && !obj->InTriggOld)                                    \
-    obj->TriggFlag = TRUE;                                                     \
+#define mpsTrp_exec(obj)                                                                                     \
+  if (obj->InTriggFlag && !obj->InTriggOld)                                                                  \
+    obj->TriggFlag = TRUE;                                                                                   \
   obj->InTriggOld = obj->InTriggFlag

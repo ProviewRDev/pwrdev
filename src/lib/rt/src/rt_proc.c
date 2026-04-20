@@ -58,22 +58,25 @@ pwr_tStatus proc_Start(proc_sProcess* p)
   char** argv;
 
   p->pid = fork();
-  if (p->pid) {
-    if (p->pid == -1) {
-      errh_Error("Could not start %s, %m\nfile: %s", p->name, errno_GetStatus(),
-          p->file);
-    } else {
-      errh_Info("Started %s, prio: %d, pid: %d\nfile: %s", p->name, p->p_prio,
-          (int)p->pid, p->file);
+  if (p->pid)
+  {
+    if (p->pid == -1)
+    {
+      errh_Error("Could not start %s, %m\nfile: %s", p->name, errno_GetStatus(), p->file);
     }
-  } else {
+    else
+    {
+      errh_Info("Started %s, prio: %d, pid: %d\nfile: %s", p->name, p->p_prio, (int)p->pid, p->file);
+    }
+  }
+  else
+  {
     sts = PROC__SUCCESS;
     if (EVEN(sts))
       errh_Warning("%s: error setprio, %m\nfile: %s", p->name, sts, p->file);
     argv = co_StrToArgv(p->file, p->arg);
     execvp(p->file, argv);
-    errh_Error(
-        "%s: error execvp, %m\nfile: %s", p->name, errno_GetStatus(), p->file);
+    errh_Error("%s: error execvp, %m\nfile: %s", p->name, errno_GetStatus(), p->file);
     exit(EXIT_FAILURE);
   }
 
@@ -96,7 +99,8 @@ pwr_tStatus proc_SchedWait()
 
   pid = getpid();
 
-  while (((sched = sched_getscheduler(pid)) == SCHED_OTHER) && (count < 5)) {
+  while (((sched = sched_getscheduler(pid)) == SCHED_OTHER) && (count < 5))
+  {
     sleep(1);
     count++;
   }

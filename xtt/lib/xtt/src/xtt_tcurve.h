@@ -53,7 +53,8 @@
 class CoWow;
 class CoWowTimer;
 
-typedef struct {
+typedef struct
+{
   pwr_tAName name[XTT_TCURVE_MAX];
   pwr_tAttrRef buf_aref[XTT_TCURVE_MAX];
   pwr_tAttrRef timebuf_aref;
@@ -89,22 +90,22 @@ typedef struct {
   reconfigure the curves. XttTCurve uses the GeCurve class to display the
   curves.
 */
-class XttTCurve {
+class XttTCurve
+{
 public:
-  void* xnav; //!< Pointer to parent XNav.
+  void* xnav;       //!< Pointer to parent XNav.
   GeCurveData* gcd; //!< Curve data for GeCurve object.
-  GeCurve* curve; //!< Curve window.
-  int rows; //!< Max number of points in curves.
+  GeCurve* curve;   //!< Curve window.
+  int rows;         //!< Max number of points in curves.
   pwr_eType vtype;
   unsigned int vsize;
-  CoWowTimer* timerid; //!< Time id for scan.
-  void (*close_cb)(void*, XttTCurve*); //!< Close callback to parent.
-  void (*help_cb)(void*, const char*); //!< Open help window.
-  int (*get_select_cb)(
-      void*, pwr_tOid*, char*, char*); //!< Get selected TCurve object.
-  void (*command_cb)(void*, const char*); //!< Command callback to parent.
-  bool first_scan; //!< Indicates that this is the first scan.
-  char title[250]; //!< Window title
+  CoWowTimer* timerid;                                  //!< Time id for scan.
+  void (*close_cb)(void*, XttTCurve*);                  //!< Close callback to parent.
+  void (*help_cb)(void*, const char*);                  //!< Open help window.
+  int (*get_select_cb)(void*, pwr_tOid*, char*, char*); //!< Get selected TCurve object.
+  void (*command_cb)(void*, const char*);               //!< Command callback to parent.
+  bool first_scan;                                      //!< Indicates that this is the first scan.
+  char title[250];                                      //!< Window title
   pwr_tAttrRef arefv[XTT_TCURVE_MAX];
   int aref_cnt;
   CoWow* wow;
@@ -114,8 +115,7 @@ public:
   int color_theme;
 
   //! Constructor
-  XttTCurve(void* xn_parent_ctx, const char* xn_name, pwr_tAttrRef* xn_arefv,
-      int xn_color_theme, int* sts);
+  XttTCurve(void* xn_parent_ctx, const char* xn_name, pwr_tAttrRef* xn_arefv, int xn_color_theme, int* sts);
 
   //! Destructor
   virtual ~XttTCurve();
@@ -129,10 +129,7 @@ public:
   void save(char* filename);
   void open(char* filename);
   void set_title(const char* str);
-  void update_color_theme(int ct)
-  {
-    curve->update_color_theme(ct);
-  }
+  void update_color_theme(int ct) { curve->update_color_theme(ct); }
 
   static void tcurve_close_cb(void* ctx);
   static void tcurve_new_cb(void* ctx);
@@ -145,8 +142,7 @@ public:
   static void tcurve_next_period_cb(void* ctx);
   static void tcurve_add_cb(void* ctx);
   static void tcurve_remove_cb(void* ctx);
-  static int tcurve_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to,
-      int rows, int idx, char* filename);
+  static int tcurve_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to, int rows, int idx, char* filename);
   static void tcurve_help_cb(void* ctx);
   static void tcurve_file_selected_cb(void* ctx, void* data, char* text);
   static void tcurve_open_file_cb(void* ctx, char* text, int ok_pressed);

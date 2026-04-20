@@ -41,18 +41,17 @@
 
 #include "pwr.h"
 
-class wb_lockfile {
+class wb_lockfile
+{
 public:
-  wb_lockfile(char* name) : removed(false)
-  {
-    strcpy(fname, name);
-  }
+  wb_lockfile(char* name) : removed(false) { strcpy(fname, name); }
   pwr_tFileName fname;
   pwr_tTime date;
   bool removed;
 };
 
-class wb_dblock {
+class wb_dblock
+{
 private:
   static std::vector<wb_lockfile> m_lockfiles;
 

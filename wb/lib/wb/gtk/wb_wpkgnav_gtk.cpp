@@ -51,11 +51,9 @@
 //
 // Create the navigator widget
 //
-WPkgNavGtk::WPkgNavGtk(void* wa_parent_ctx, GtkWidget* wa_parent_wid,
-    const char* wa_name, wb_eUtility wa_utility, GtkWidget** w,
-    pwr_tStatus* status)
-    : WPkgNav(wa_parent_ctx, wa_name, wa_utility, status),
-      parent_wid(wa_parent_wid)
+WPkgNavGtk::WPkgNavGtk(void* wa_parent_ctx, GtkWidget* wa_parent_wid, const char* wa_name,
+                       wb_eUtility wa_utility, GtkWidget** w, pwr_tStatus* status)
+    : WPkgNav(wa_parent_ctx, wa_name, wa_utility, status), parent_wid(wa_parent_wid)
 {
   form_widget = scrolledbrowwidgetgtk_new(init_brow_cb, this, &brow_widget);
 

@@ -52,53 +52,48 @@ void XAtt::message_cb(void* xatt, char severity, const char* message)
   ((XAtt*)xatt)->message(severity, message);
 }
 
-void XAtt::change_value_cb(void* xatt)
-{
-  ((XAtt*)xatt)->change_value(1);
-}
+void XAtt::change_value_cb(void* xatt) { ((XAtt*)xatt)->change_value(1); }
 
 //
 //  Callbackfunctions from menu entries
 //
 void XAtt::activate_display_object()
 {
-  if (call_method_cb) {
-    (call_method_cb)(parent_ctx, "$Object-RtNavigator",
-        "$Object-RtNavigatorFilter", objar, xmenu_eItemType_Object,
-        xmenu_mUtility_AttrEditor, NULL);
+  if (call_method_cb)
+  {
+    (call_method_cb)(parent_ctx, "$Object-RtNavigator", "$Object-RtNavigatorFilter", objar,
+                     xmenu_eItemType_Object, xmenu_mUtility_AttrEditor, NULL);
   }
 }
 
 void XAtt::activate_show_cross()
 {
-  if (call_method_cb) {
-    (call_method_cb)(parent_ctx, "$Object-OpenCrossref",
-        "$Object-OpenCrossrefFilter", objar, xmenu_eItemType_Object,
-        xmenu_mUtility_AttrEditor, NULL);
+  if (call_method_cb)
+  {
+    (call_method_cb)(parent_ctx, "$Object-OpenCrossref", "$Object-OpenCrossrefFilter", objar,
+                     xmenu_eItemType_Object, xmenu_mUtility_AttrEditor, NULL);
   }
 }
 
 void XAtt::activate_open_classgraph()
 {
-  if (call_method_cb) {
-    (call_method_cb)(parent_ctx, "$Object-OpenObjectGraph",
-        "$Object-OpenObjectGraphFilter", objar, xmenu_eItemType_Object,
-        xmenu_mUtility_AttrEditor, NULL);
+  if (call_method_cb)
+  {
+    (call_method_cb)(parent_ctx, "$Object-OpenObjectGraph", "$Object-OpenObjectGraphFilter", objar,
+                     xmenu_eItemType_Object, xmenu_mUtility_AttrEditor, NULL);
   }
 }
 
 void XAtt::activate_open_plc()
 {
-  if (call_method_cb) {
-    (call_method_cb)(parent_ctx, "$Object-OpenTrace", "$Object-OpenTraceFilter",
-        objar, xmenu_eItemType_Object, xmenu_mUtility_AttrEditor, NULL);
+  if (call_method_cb)
+  {
+    (call_method_cb)(parent_ctx, "$Object-OpenTrace", "$Object-OpenTraceFilter", objar,
+                     xmenu_eItemType_Object, xmenu_mUtility_AttrEditor, NULL);
   }
 }
 
-void XAtt::activate_print()
-{
-  print();
-}
+void XAtt::activate_print() { print(); }
 
 void XAtt::activate_help()
 {
@@ -117,29 +112,22 @@ int XAtt::open_changevalue(char* name)
   return XATT__SUCCESS;
 }
 
-void XAtt::swap(int mode)
-{
-  xattnav->swap(mode);
-}
+void XAtt::swap(int mode) { xattnav->swap(mode); }
 
-XAtt::~XAtt()
-{
-}
+XAtt::~XAtt() {}
 
-XAtt::XAtt(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user,
-    int* xa_sts)
-    : parent_ctx(xa_parent_ctx), objar(*xa_objar), input_open(0),
-      input_multiline(0), close_cb(0), redraw_cb(0), client_data(0)
+XAtt::XAtt(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user, int* xa_sts)
+    : parent_ctx(xa_parent_ctx), objar(*xa_objar), input_open(0), input_multiline(0), close_cb(0),
+      redraw_cb(0), client_data(0)
 {
   *xa_sts = XATT__SUCCESS;
 }
 
-void XAtt::xatt_popup_menu_cb(void* ctx, pwr_sAttrRef attrref,
-    unsigned long item_type, unsigned long utility, char* arg, int x, int y)
+void XAtt::xatt_popup_menu_cb(void* ctx, pwr_sAttrRef attrref, unsigned long item_type, unsigned long utility,
+                              char* arg, int x, int y)
 {
   if (((XAtt*)ctx)->popup_menu_cb)
-    (((XAtt*)ctx)->popup_menu_cb)(
-        ((XAtt*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
+    (((XAtt*)ctx)->popup_menu_cb)(((XAtt*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
 }
 
 int XAtt::xatt_is_authorized_cb(void* ctx, unsigned int access)
@@ -195,19 +183,19 @@ int XAtt::object_attr()
   if (EVEN(sts))
     return sts;
 
-  for (i = 0; i < rows; i++) {
+  for (i = 0; i < rows; i++)
+  {
     if (bd[i].flags & gdh_mAttrDef_Shadowed)
       continue;
-    if (bd[i].attr->Param.Info.Flags & PWR_MASK_RTVIRTUAL
-        || bd[i].attr->Param.Info.Flags & PWR_MASK_RTHIDE
-        || (bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE
-               && bd[i].attr->Param.Info.Flags & PWR_MASK_POINTER))
+    if (bd[i].attr->Param.Info.Flags & PWR_MASK_RTVIRTUAL || bd[i].attr->Param.Info.Flags & PWR_MASK_RTHIDE ||
+        (bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE && bd[i].attr->Param.Info.Flags & PWR_MASK_POINTER))
       continue;
-    if (bd[i].attr->Param.Info.Type == pwr_eType_CastId
-        || bd[i].attr->Param.Info.Type == pwr_eType_DisableAttr)
+    if (bd[i].attr->Param.Info.Type == pwr_eType_CastId ||
+        bd[i].attr->Param.Info.Type == pwr_eType_DisableAttr)
       continue;
 
-    if (bd[i].attr->Param.Info.Flags & PWR_MASK_DISABLEATTR) {
+    if (bd[i].attr->Param.Info.Flags & PWR_MASK_DISABLEATTR)
+    {
       pwr_sAttrRef aaref;
       pwr_tDisableAttr disabled;
 
@@ -230,30 +218,36 @@ int XAtt::object_attr()
 
     if (streq(aname, ""))
       strcpy(name, attr_name);
-    else {
+    else
+    {
       strcpy(name, aname);
       strcat(name, ".");
       strcat(name, attr_name);
     }
 
     elements = 1;
-    if (bd[i].attr->Param.Info.Flags & PWR_MASK_ARRAY) {
+    if (bd[i].attr->Param.Info.Flags & PWR_MASK_ARRAY)
+    {
       attr_exist = 1;
-      item = (Item*)new ItemAttrArray(xattnav->brow, objar.Objid, 0,
-          flow_eDest_IntoLast, name, bd[i].attr->Param.Info.Elements,
-          bd[i].attr->Param.Info.Type, bd[i].attr->Param.TypeRef,
-          bd[i].attr->Param.Info.Size, bd[i].attr->Param.Info.Flags, 0);
-    } else if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS) {
+      item = (Item*)new ItemAttrArray(xattnav->brow, objar.Objid, 0, flow_eDest_IntoLast, name,
+                                      bd[i].attr->Param.Info.Elements, bd[i].attr->Param.Info.Type,
+                                      bd[i].attr->Param.TypeRef, bd[i].attr->Param.Info.Size,
+                                      bd[i].attr->Param.Info.Flags, 0);
+    }
+    else if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS)
+    {
       attr_exist = 1;
-      item = (Item*)new ItemAttrObject(xattnav->brow, objar.Objid, 0,
-          flow_eDest_IntoLast, name, bd[i].attr->Param.TypeRef,
-          bd[i].attr->Param.Info.Size, bd[i].attr->Param.Info.Flags, 0, 0);
-    } else {
+      item = (Item*)new ItemAttrObject(xattnav->brow, objar.Objid, 0, flow_eDest_IntoLast, name,
+                                       bd[i].attr->Param.TypeRef, bd[i].attr->Param.Info.Size,
+                                       bd[i].attr->Param.Info.Flags, 0, 0);
+    }
+    else
+    {
       attr_exist = 1;
-      item = (Item*)new ItemAttr(xattnav->brow, objar.Objid, 0,
-          flow_eDest_IntoLast, name, bd[i].attr->Param.Info.Type,
-          bd[i].attr->Param.TypeRef, bd[i].attr->Param.Info.Size,
-          bd[i].attr->Param.Info.Flags, 0, item_eDisplayType_Attr);
+      item = (Item*)new ItemAttr(xattnav->brow, objar.Objid, 0, flow_eDest_IntoLast, name,
+                                 bd[i].attr->Param.Info.Type, bd[i].attr->Param.TypeRef,
+                                 bd[i].attr->Param.Info.Size, bd[i].attr->Param.Info.Flags, 0,
+                                 item_eDisplayType_Attr);
     }
   }
   free((char*)bd);

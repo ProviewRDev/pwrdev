@@ -39,43 +39,37 @@
 
 #include "wb_foe.h"
 
-class wb_utl {
+class wb_utl
+{
 public:
   wb_utl();
   virtual ~wb_utl();
   virtual int create_mainwindow(int argc, char** argv);
   virtual int destroy_mainwindow();
-  virtual int utl_foe_new(const char* name, pwr_tOid plcpgm,
-      ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, WFoe** foectx,
-      int map_window, ldh_eAccess access);
-  virtual int utl_foe_new_local(WFoe* foectx, const char* name, pwr_tOid plcpgm,
-      ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
-      vldh_t_node nodeobject, unsigned long windowindex,
-      unsigned long new_window, WFoe** return_foectx, int map_window,
-      ldh_eAccess access, foe_eFuncAccess function_access);
-  int print_plc(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcstring,
-      int document, int overview, int pdf);
-  int print_plc_hier(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
-      char* hiername, char* fromname, int document, int overview, int all,
-      int pdf);
-  int redraw_plc_hier(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
-      char* hiername, char* fromname, int all, int templ);
-  int print_document(pwr_tOid Objdid, ldh_tSesContext ldhses,
-      ldh_tWBContext ldhwb, unsigned long document, unsigned long overview,
-      int pdf, FILE* plclink);
-  int redraw_windows(
-      pwr_tObjid Objdid, ldh_tSesContext ldhses, ldh_tWBContext ldhwb);
-  int exec_plcpgms(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* hiername,
-      char* fromname, int all, int templ, int no_focode,
-      int (*cb)(void*, void*));
-  int exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses,
-      ldh_tWBContext ldhwb, int no_focode, int (*cb)(void*, void*));
-  int create_flow_plc(ldh_tSesContext ldhses, ldh_tWBContext ldhwb,
-      char* hiername, char* fromname, int all, int templ);
+  virtual int utl_foe_new(const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx,
+                          ldh_tSesContext ldhsesctx, WFoe** foectx, int map_window, ldh_eAccess access);
+  virtual int utl_foe_new_local(WFoe* foectx, const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx,
+                                ldh_tSesContext ldhsesctx, vldh_t_node nodeobject, unsigned long windowindex,
+                                unsigned long new_window, WFoe** return_foectx, int map_window,
+                                ldh_eAccess access, foe_eFuncAccess function_access);
+  int print_plc(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* plcstring, int document, int overview,
+                int pdf);
+  int print_plc_hier(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* hiername, char* fromname,
+                     int document, int overview, int all, int pdf);
+  int redraw_plc_hier(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* hiername, char* fromname, int all,
+                      int templ);
+  int print_document(pwr_tOid Objdid, ldh_tSesContext ldhses, ldh_tWBContext ldhwb, unsigned long document,
+                     unsigned long overview, int pdf, FILE* plclink);
+  int redraw_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses, ldh_tWBContext ldhwb);
+  int exec_plcpgms(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* hiername, char* fromname, int all,
+                   int templ, int no_focode, int (*cb)(void*, void*));
+  int exec_plcpgm_windows(pwr_tObjid Objdid, ldh_tSesContext ldhses, ldh_tWBContext ldhwb, int no_focode,
+                          int (*cb)(void*, void*));
+  int create_flow_plc(ldh_tSesContext ldhses, ldh_tWBContext ldhwb, char* hiername, char* fromname, int all,
+                      int templ);
   static int create_flow_cb(void* utl, void* foe);
   static int plc_redraw_cb(void* utl, void* foe);
-  static pwr_tStatus utl_replace_symbol(
-      ldh_tSesContext ldhses, pwr_tObjid oid, pwr_sAttrRef* arp);
+  static pwr_tStatus utl_replace_symbol(ldh_tSesContext ldhses, pwr_tObjid oid, pwr_sAttrRef* arp);
 };
 
 #endif

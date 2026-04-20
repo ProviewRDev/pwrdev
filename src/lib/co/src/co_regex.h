@@ -40,53 +40,56 @@
 #include <stddef.h>
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-typedef struct regex {
-  char* buffer; /* Space holding the compiled pattern commands.  */
-  long allocated; /* Size of space that `buffer' points to. */
-  long used; /* Length of portion of buffer actually occupied  */
-  char* fastmap; /* Pointer to fastmap, if any, or zero if none.  */
-  /* re_search uses the fastmap, if there is one,
-     to skip over totally implausible characters.  */
-  char* translate; /* Translate table to apply to all characters before
-                      comparing, or zero for no translation.
-                      The translation is applied to a pattern when it is
-                      compiled and to data when it is matched.  */
-  char fastmap_accurate;
-  /* Set to zero when a new pattern is stored,
-     set to one when the fastmap is updated from it.  */
-  char can_be_null; /* Set to one by compiling fastmap
-                       if this pattern might match the null string.
-                       It does not necessarily match the null string
-                       in that case, but if this is zero, it cannot.
-                       2 as value means can match null string
-                       but at end of range or before a character
-                       listed in the fastmap.  */
-} regex_t;
+  typedef struct regex
+  {
+    char* buffer;   /* Space holding the compiled pattern commands.  */
+    long allocated; /* Size of space that `buffer' points to. */
+    long used;      /* Length of portion of buffer actually occupied  */
+    char* fastmap;  /* Pointer to fastmap, if any, or zero if none.  */
+    /* re_search uses the fastmap, if there is one,
+       to skip over totally implausible characters.  */
+    char* translate; /* Translate table to apply to all characters before
+                        comparing, or zero for no translation.
+                        The translation is applied to a pattern when it is
+                        compiled and to data when it is matched.  */
+    char fastmap_accurate;
+    /* Set to zero when a new pattern is stored,
+       set to one when the fastmap is updated from it.  */
+    char can_be_null; /* Set to one by compiling fastmap
+                         if this pattern might match the null string.
+                         It does not necessarily match the null string
+                         in that case, but if this is zero, it cannot.
+                         2 as value means can match null string
+                         but at end of range or before a character
+                         listed in the fastmap.  */
+  } regex_t;
 
-typedef struct regmatch {
-  int rm_so;
-  int rm_eo;
-  char* sp;
-  char* ep;
-} regmatch_t;
+  typedef struct regmatch
+  {
+    int rm_so;
+    int rm_eo;
+    char* sp;
+    char* ep;
+  } regmatch_t;
 
-/* Compilation flags  */
+  /* Compilation flags  */
 
 #define REG_EXTENDED 0x0001 /* Use Extended Regular Expressions.	    */
-#define REG_NOSUB 0x0002 /* Report only success/fail in regexec()    */
-#define REG_ICASE 0x0004 /* Ignore case in match.		    */
-#define REG_NEWLINE 0x0008 /* Eliminate any special significance of    */
+#define REG_NOSUB 0x0002    /* Report only success/fail in regexec()    */
+#define REG_ICASE 0x0004    /* Ignore case in match.		    */
+#define REG_NEWLINE 0x0008  /* Eliminate any special significance of    */
 /* <newline>; treat it as a regular char.   */
-#define REG_DELIM 0x0010 /* implementation-private		    */
-#define REG_DEBUG 0x0020 /* implementation-private		    */
+#define REG_DELIM 0x0010  /* implementation-private		    */
+#define REG_DEBUG 0x0020  /* implementation-private		    */
 #define REG_ANCHOR 0x0040 /* implementation-private (for fgrep -x)    */
-#define REG_WORDS 0x0080 /* implementation-private		    */
-#define REG_MUST 0x0100 /* implementation-private		    */
+#define REG_WORDS 0x0080  /* implementation-private		    */
+#define REG_MUST 0x0100   /* implementation-private		    */
 
-/* Execution flags  */
+  /* Execution flags  */
 
 #define REG_NOTBOL 0x0200 /* The first character of the string is not */
 /* the beginning of the line.		    */
@@ -94,40 +97,39 @@ typedef struct regmatch {
 /* the end of the line.			    */
 #define REG_NOOPT 0x0800 /* implementation-private		    */
 
-/* regerror() flags  */
+  /* regerror() flags  */
 
 #define REG_MALLOC 0x80 /* Dynamically allocate storage for message */
-/* text.				    */
+  /* text.				    */
 
-/* Return values  */
+  /* Return values  */
 
-#define REG_OK 0 /* "success" */
-#define REG_NOMATCH 1 /* "failed to match" */
+#define REG_OK 0       /* "success" */
+#define REG_NOMATCH 1  /* "failed to match" */
 #define REG_ECOLLATE 2 /* "invalid collation element" */
-#define REG_EESCAPE 3 /* "trailing \ in pattern" */
+#define REG_EESCAPE 3  /* "trailing \ in pattern" */
 #define REG_ENEWLINE 4 /* "newline found before end of pattern" */
-#define REG_ENSUB 5 /* "more than 9 \( \) pairs" */
-#define REG_ESUBREG 6 /* "number in \[0-9] invalid" */
-#define REG_EBRACK 7 /* "[ ] inbalance or syntax error" */
-#define REG_EPAREN 8 /* "( ) inbalance" */
-#define REG_EBRACE 9 /* "{ } inbalance" */
-#define REG_ERANGE 10 /* "invalid endpoint in range" */
-#define REG_ESPACE 11 /* "out of memory" */
-#define REG_BADRPT 12 /* "invalid  repetition" */
-#define REG_ECTYPE 13 /* "invalid character class type" */
-#define REG_BADPAT 14 /* "syntax error" */
-#define REG_BADBR 15 /* "contents of { } invalid" */
-#define REG_EFATAL 16 /* "internal error" */
-#define REG__LAST 17 /* "unknown regex error" */
+#define REG_ENSUB 5    /* "more than 9 \( \) pairs" */
+#define REG_ESUBREG 6  /* "number in \[0-9] invalid" */
+#define REG_EBRACK 7   /* "[ ] inbalance or syntax error" */
+#define REG_EPAREN 8   /* "( ) inbalance" */
+#define REG_EBRACE 9   /* "{ } inbalance" */
+#define REG_ERANGE 10  /* "invalid endpoint in range" */
+#define REG_ESPACE 11  /* "out of memory" */
+#define REG_BADRPT 12  /* "invalid  repetition" */
+#define REG_ECTYPE 13  /* "invalid character class type" */
+#define REG_BADPAT 14  /* "syntax error" */
+#define REG_BADBR 15   /* "contents of { } invalid" */
+#define REG_EFATAL 16  /* "internal error" */
+#define REG__LAST 17   /* "unknown regex error" */
 
-/* Functions  */
+  /* Functions  */
 
-int regcomp(regex_t* preg, char* pattern, int cflags);
+  int regcomp(regex_t* preg, char* pattern, int cflags);
 
-int regexec(regex_t* preg, char* string, size_t nmatch, regmatch_t pmatch[],
-    int eflags);
+  int regexec(regex_t* preg, char* string, size_t nmatch, regmatch_t pmatch[], int eflags);
 
-void regfree(regex_t* preg);
+  void regfree(regex_t* preg);
 
 #if defined __cplusplus
 }

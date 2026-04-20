@@ -88,38 +88,28 @@ void NodelistNavBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_node, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_node, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_DarkGray);
   brow_AddRect(nc_node, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_node, 2.2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_node, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_node, 25, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_node, 2.2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_node, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_node, 25, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_node, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create attribute nodeclass
 
   brow_CreateNodeClass(ctx, "Attr", flow_eNodeGroup_Common, &nc_attr);
   brow_AddAnnotPixmap(nc_attr, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_attr, 2.2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_attr, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_attr, 2.2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_attr, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_attr, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create system status attribute nodeclass
 
-  brow_CreateNodeClass(
-      ctx, "SysStsAttr", flow_eNodeGroup_Common, &nc_sys_sts_attr);
+  brow_CreateNodeClass(ctx, "SysStsAttr", flow_eNodeGroup_Common, &nc_sys_sts_attr);
   brow_AddAnnotPixmap(nc_sys_sts_attr, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddFilledRect(
-      nc_sys_sts_attr, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_DarkGray);
+  brow_AddFilledRect(nc_sys_sts_attr, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_DarkGray);
   brow_AddRect(nc_sys_sts_attr, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_sys_sts_attr, 2.2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_sys_sts_attr, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddFrame(
-      nc_sys_sts_attr, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
+  brow_AddAnnot(nc_sys_sts_attr, 2.2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_sys_sts_attr, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddFrame(nc_sys_sts_attr, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create system status attribute nodeclass
 
@@ -127,12 +117,9 @@ void NodelistNavBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_sts_attr, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_sts_attr, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_DarkGray);
   brow_AddRect(nc_sts_attr, 1.3, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_sts_attr, 2.2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_sts_attr, 5, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_sts_attr, 10, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_sts_attr, 2.2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_sts_attr, 5, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_sts_attr, 10, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_sts_attr, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 
@@ -149,38 +136,22 @@ void NodelistNavBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, nodelistnav);
 
-  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, NodelistNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, NodelistNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, NodelistNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack,
-      NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, NodelistNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, NodelistNav::brow_cb);
 }
 
 //
@@ -198,14 +169,15 @@ int NodelistNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   nodelistnav->brow->brow_setup();
   nodelistnav->brow->create_nodeclasses();
 
-  if (!streq(nodelistnav->nodename, "")) {
+  if (!streq(nodelistnav->nodename, ""))
+  {
     nodelistnav->add_node(nodelistnav->nodename, "", 0, "", "");
     nodelistnav->node_list[0].item->open_children(nodelistnav, 0, 0);
-  } else
+  }
+  else
     nodelistnav->read();
 
-  sts = brow_TraceInit(
-      ctx, trace_connect_bc, trace_disconnect_bc, trace_scan_bc);
+  sts = brow_TraceInit(ctx, trace_connect_bc, trace_disconnect_bc, trace_scan_bc);
   nodelistnav->trace_started = 1;
 
   nodelistnav->trace_start();
@@ -213,13 +185,11 @@ int NodelistNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   return 1;
 }
 
-NodelistNav::NodelistNav(void* nodelist_parent_ctx,
-    MsgWindow* nodelistnav_msg_window, char* nodelistnav_nodename,
-    int nodelistnav_mode, nl_mLayout nodelistnav_layout,
-    int nodelistnav_msgw_pop, char *nodelistnav_conf_file)
-    : parent_ctx(nodelist_parent_ctx), nodelist_size(0), trace_started(0),
-      scantime(4000), first_scan(1), msg_window(nodelistnav_msg_window),
-      msgw_pop(nodelistnav_msgw_pop), mode(nodelistnav_mode),
+NodelistNav::NodelistNav(void* nodelist_parent_ctx, MsgWindow* nodelistnav_msg_window,
+                         char* nodelistnav_nodename, int nodelistnav_mode, nl_mLayout nodelistnav_layout,
+                         int nodelistnav_msgw_pop, char* nodelistnav_conf_file)
+    : parent_ctx(nodelist_parent_ctx), nodelist_size(0), trace_started(0), scantime(4000), first_scan(1),
+      msg_window(nodelistnav_msg_window), msgw_pop(nodelistnav_msgw_pop), mode(nodelistnav_mode),
       layout(nodelistnav_layout)
 {
   if (nodelistnav_nodename)
@@ -233,14 +203,9 @@ NodelistNav::NodelistNav(void* nodelist_parent_ctx,
 //
 //  Delete ev
 //
-NodelistNav::~NodelistNav()
-{
-}
+NodelistNav::~NodelistNav() {}
 
-NodelistNavBrow::~NodelistNavBrow()
-{
-  free_pixmaps();
-}
+NodelistNavBrow::~NodelistNavBrow() { free_pixmaps(); }
 
 void NodelistNav::read()
 {
@@ -257,7 +222,8 @@ void NodelistNav::read()
   if (!fp)
     return;
 
-  while (1) {
+  while (1)
+  {
     sts = dcli_read_line(line, sizeof(line), fp);
     if (!sts)
       break;
@@ -267,8 +233,8 @@ void NodelistNav::read()
     if (line[0] == 0 || line[0] == '#' || line[0] == '!')
       continue;
 
-    int num = dcli_parse(line, " ", "", (char*)line_part,
-        sizeof(line_part) / sizeof(line_part[0]), sizeof(line_part[0]), 0);
+    int num = dcli_parse(line, " ", "", (char*)line_part, sizeof(line_part) / sizeof(line_part[0]),
+                         sizeof(line_part[0]), 0);
 
     NodelistNode node(line_part[0]);
     if (num >= 2)
@@ -287,9 +253,9 @@ void NodelistNav::read()
   brow_SetNodraw(brow->ctx);
   brow_DeleteAll(brow->ctx);
 
-  for (int i = 0; i < (int)node_list.size(); i++) {
-    item = new ItemNode(this, i, node_list[i].node_name, node_list[i].description,
-        dest, flow_eDest_After);
+  for (int i = 0; i < (int)node_list.size(); i++)
+  {
+    item = new ItemNode(this, i, node_list[i].node_name, node_list[i].description, dest, flow_eDest_After);
     dest = item->node;
     node_list[i].item = item;
   }
@@ -301,28 +267,16 @@ void NodelistNav::read()
 //
 //  Zoom
 //
-void NodelistNav::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void NodelistNav::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void NodelistNav::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void NodelistNav::unzoom() { brow_UnZoom(brow->ctx); }
 
-void NodelistNav::set_mode(int nodelist_mode)
-{
-  mode = nodelist_mode;
-}
+void NodelistNav::set_mode(int nodelist_mode) { mode = nodelist_mode; }
 
-void NodelistNav::set_nodraw()
-{
-  brow_SetNodraw(brow->ctx);
-}
+void NodelistNav::set_nodraw() { brow_SetNodraw(brow->ctx); }
 
 void NodelistNav::reset_nodraw()
 {
@@ -338,36 +292,46 @@ int NodelistNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   NodelistNav* nodelistnav;
   ItemNode* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
   }
 
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&nodelistnav);
-  switch (event->event) {
-  case flow_eEvent_Key_Up: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* nodelist;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(nodelistnav->brow->ctx, &nodelist, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLastVisible(nodelistnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              nodelistnav->brow->ctx, nodelist[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(nodelistnav->brow->ctx, nodelist[0], flow_eVisible_Partial))
+      {
         sts = brow_GetLastVisible(nodelistnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(nodelistnav->brow->ctx, nodelist[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           sts = brow_GetLast(nodelistnav->brow->ctx, &object);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             if (node_count)
               free(nodelist);
             return 1;
@@ -384,28 +348,36 @@ int NodelistNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(nodelist);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* nodelist;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(nodelistnav->brow->ctx, &nodelist, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirstVisible(nodelistnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              nodelistnav->brow->ctx, nodelist[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(nodelistnav->brow->ctx, nodelist[0], flow_eVisible_Partial))
+      {
         sts = brow_GetFirstVisible(nodelistnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(nodelistnav->brow->ctx, nodelist[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           sts = brow_GetFirst(nodelistnav->brow->ctx, &object);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             if (node_count)
               free(nodelist);
             return 1;
@@ -422,19 +394,23 @@ int NodelistNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(nodelist);
     break;
   }
-  case flow_eEvent_Key_PageDown: {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(nodelistnav->brow->ctx, 0.9);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(nodelistnav->brow->ctx, -0.9);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(nodelistnav->brow->ctx, 0.1);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(nodelistnav->brow->ctx, -0.1);
     break;
   }
@@ -443,12 +419,14 @@ int NodelistNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   case flow_eEvent_MB1Click:
     // Select
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       double ll_x, ll_y, ur_x, ur_y;
 
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
         int sts;
@@ -461,10 +439,12 @@ int NodelistNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(
-              nodelistnav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(nodelistnav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(nodelistnav->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(nodelistnav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(nodelistnav->brow->ctx, event->object.object);
@@ -474,7 +454,8 @@ int NodelistNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       brow_SelectClear(nodelistnav->brow->ctx);
     }
     break;
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* nodelist;
     int node_count;
 
@@ -488,7 +469,8 @@ int NodelistNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(nodelist);
     break;
   }
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* nodelist;
     int node_count;
     brow_tObject object;
@@ -501,10 +483,12 @@ int NodelistNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (brow_IsOpen(nodelist[0]))
       // Close this node
       object = nodelist[0];
-    else {
+    else
+    {
       // Close parent
       sts = brow_GetParent(nodelistnav->brow->ctx, nodelist[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(nodelist);
         return 1;
       }
@@ -519,8 +503,10 @@ int NodelistNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(nodelist);
     break;
   }
-  case flow_eEvent_MB1DoubleClick: {
-    switch (event->object.object_type) {
+  case flow_eEvent_MB1DoubleClick:
+  {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
       item->open_children(nodelistnav, event->object.x, event->object.y);
@@ -529,9 +515,9 @@ int NodelistNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_MB3Down: {
-    brow_SetClickSensitivity(
-        nodelistnav->brow->ctx, flow_mSensitivity_MB3Press);
+  case flow_eEvent_MB3Down:
+  {
+    brow_SetClickSensitivity(nodelistnav->brow->ctx, flow_mSensitivity_MB3Press);
     break;
   }
   default:;
@@ -546,24 +532,26 @@ int NodelistNav::trace_scan_bc(brow_tObject object, void* p)
   int len;
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type) {
-  case nodelistnav_eItemType_Attr: {
+  switch (base_item->type)
+  {
+  case nodelistnav_eItemType_Attr:
+  {
     ItemAttr* item = (ItemAttr*)base_item;
 
     if (item->size == 0)
       break;
 
-    if (!item->first_scan) {
-      if (item->size > (int)sizeof(item->old_value)
-          && item->type_id == pwr_eType_String
-          && strlen((char*)p) < sizeof(item->old_value)
-          && streq((char*)p, item->old_value))
+    if (!item->first_scan)
+    {
+      if (item->size > (int)sizeof(item->old_value) && item->type_id == pwr_eType_String &&
+          strlen((char*)p) < sizeof(item->old_value) && streq((char*)p, item->old_value))
         // No change since last time
         return 1;
       else if (memcmp(item->old_value, p, item->size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       item->first_scan = 0;
 
     attrvalue_to_string(item->type_id, p, buf, sizeof(buf), &len, NULL);
@@ -571,23 +559,24 @@ int NodelistNav::trace_scan_bc(brow_tObject object, void* p)
     memcpy(item->old_value, p, MIN(item->size, (int)sizeof(item->old_value)));
     break;
   }
-  case nodelistnav_eItemType_AttrSysSts: {
+  case nodelistnav_eItemType_AttrSysSts:
+  {
     ItemAttrSysSts* item = (ItemAttrSysSts*)base_item;
 
     if (item->size == 0)
       break;
 
-    if (!item->first_scan) {
-      if (item->size > (int)sizeof(item->old_value)
-          && item->type_id == pwr_eType_String
-          && strlen((char*)p) < sizeof(item->old_value)
-          && streq((char*)p, item->old_value))
+    if (!item->first_scan)
+    {
+      if (item->size > (int)sizeof(item->old_value) && item->type_id == pwr_eType_String &&
+          strlen((char*)p) < sizeof(item->old_value) && streq((char*)p, item->old_value))
         // No change since last time
         return 1;
       else if (memcmp(item->old_value, p, item->size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       item->first_scan = 0;
 
     attrvalue_to_string(item->type_id, p, buf, sizeof(buf), &len, NULL);
@@ -599,8 +588,10 @@ int NodelistNav::trace_scan_bc(brow_tObject object, void* p)
 
     if (sts == 0)
       color = flow_eDrawType_DarkGray;
-    else {
-      switch (sts & 7) {
+    else
+    {
+      switch (sts & 7)
+      {
       case 3:
       case 1:
         color = flow_eDrawType_Green;
@@ -621,15 +612,17 @@ int NodelistNav::trace_scan_bc(brow_tObject object, void* p)
 
     break;
   }
-  case nodelistnav_eItemType_AttrSts: {
+  case nodelistnav_eItemType_AttrSts:
+  {
     ItemAttrSts* item = (ItemAttrSts*)base_item;
 
-    if (!item->first_scan) {
-      if (streq((char*)p, item->old_value)
-          && streq(item->name_p, item->old_name))
+    if (!item->first_scan)
+    {
+      if (streq((char*)p, item->old_value) && streq(item->name_p, item->old_name))
         // No change since last time
         return 1;
-    } else
+    }
+    else
       item->first_scan = 0;
 
     attrvalue_to_string(item->type_id, p, buf, sizeof(buf), &len, NULL);
@@ -643,8 +636,10 @@ int NodelistNav::trace_scan_bc(brow_tObject object, void* p)
 
     if (sts == 0)
       color = flow_eDrawType_DarkGray;
-    else {
-      switch (sts & 7) {
+    else
+    {
+      switch (sts & 7)
+      {
       case 3:
       case 1:
         color = flow_eDrawType_Green;
@@ -670,8 +665,7 @@ int NodelistNav::trace_scan_bc(brow_tObject object, void* p)
   return 1;
 }
 
-int NodelistNav::trace_connect_bc(
-    brow_tObject object, char* name, char* attr, flow_eTraceType type, void** p)
+int NodelistNav::trace_connect_bc(brow_tObject object, char* name, char* attr, flow_eTraceType type, void** p)
 {
   ItemBase* base_item;
 
@@ -679,8 +673,10 @@ int NodelistNav::trace_connect_bc(
     return 1;
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type) {
-  case nodelistnav_eItemType_Attr: {
+  switch (base_item->type)
+  {
+  case nodelistnav_eItemType_Attr:
+  {
     ItemAttr* item = (ItemAttr*)base_item;
 
     if (item->size == 0)
@@ -689,7 +685,8 @@ int NodelistNav::trace_connect_bc(
     *p = item->value_p;
     break;
   }
-  case nodelistnav_eItemType_AttrSysSts: {
+  case nodelistnav_eItemType_AttrSysSts:
+  {
     ItemAttrSysSts* item = (ItemAttrSysSts*)base_item;
 
     if (item->size == 0)
@@ -698,7 +695,8 @@ int NodelistNav::trace_connect_bc(
     *p = item->value_p;
     break;
   }
-  case nodelistnav_eItemType_AttrSts: {
+  case nodelistnav_eItemType_AttrSts:
+  {
     ItemAttrSts* item = (ItemAttrSts*)base_item;
 
     *p = item->value_p;
@@ -709,10 +707,7 @@ int NodelistNav::trace_connect_bc(
   return 1;
 }
 
-int NodelistNav::trace_disconnect_bc(brow_tObject object)
-{
-  return 1;
-}
+int NodelistNav::trace_disconnect_bc(brow_tObject object) { return 1; }
 
 void NodelistNav::force_trace_scan()
 {
@@ -720,19 +715,20 @@ void NodelistNav::force_trace_scan()
     brow_TraceScan(brow->ctx);
 }
 
-void NodelistNav::message(
-    pwr_tStatus sts, const char* node, int idx, const char* text)
+void NodelistNav::message(pwr_tStatus sts, const char* node, int idx, const char* text)
 {
   int severity;
   char msg[200];
-  pwr_tOid oid = { 0, 1 };
+  pwr_tOid oid = {0, 1};
 
   if (!msg_window)
     return;
 
-  switch (sts & 7) {
+  switch (sts & 7)
+  {
   case 3:
     severity = 'S';
+    break;
   case 1:
     severity = 'I';
     break;
@@ -765,9 +761,10 @@ void NodelistNav::message(
     beep();
 }
 
-int NodelistNav::select_node(char *name)
+int NodelistNav::select_node(char* name)
 {
-  for (int i = 0; i < node_list.size(); i++) {
+  for (int i = 0; i < node_list.size(); i++)
+  {
     if (streq(name, node_list[i].node_name))
       return select_node(i);
   }
@@ -793,33 +790,35 @@ int NodelistNav::select_node(int idx)
 int NodelistNav::update_nodes()
 {
   pwr_tStatus sts = 1;
-  stssrv_sRespondStatus *response;
-  stssrv_sRespondExtStatus *xdata;
+  stssrv_sRespondStatus* response;
+  stssrv_sRespondExtStatus* xdata;
   stssrv_eMsgType type;
   int nodraw = 0;
   pwr_tStatus current_status = 0;
   char current_status_str[120];
   pwr_tTime time1;
 
-  for (int i = 0; i < (int)node_list.size(); i++) {
-    if (!node_list[i].cli) {
+  for (int i = 0; i < (int)node_list.size(); i++)
+  {
+    if (!node_list[i].cli)
+    {
       node_list[i].cli = new statussrv_client();
       if (!streq(node_list[i].address, ""))
-	node_list[i].cli->set_address(node_list[i].address);
+        node_list[i].cli->set_address(node_list[i].address);
       else
-	node_list[i].cli->set_address(node_list[i].node_name);
+        node_list[i].cli->set_address(node_list[i].node_name);
       node_list[i].cli->set_busid(node_list[i].busid);
       node_list[i].cli->server_connect();
       node_list[i].connection_sts = node_list[i].cli->m_sts;
     }
 
-    if (node_list[i].network_timeout) {
+    if (node_list[i].network_timeout)
+    {
       node_list[i].cli->server_connect();
       node_list[i].network_timeout = 0;
     }
 
-    if (!connect && !first_scan && EVEN(node_list[i].connection_sts)
-	&& node_list[i].network_timeout)
+    if (!connect && !first_scan && EVEN(node_list[i].connection_sts) && node_list[i].network_timeout)
       continue;
 
     time_GetTime(&time1);
@@ -830,7 +829,7 @@ int NodelistNav::update_nodes()
       sts = statussrv_GetStatus(node_list[i].node_name, &response);
 #endif
     node_list[i].cli->send_request(stssrv_eMsgType_Status);
-    node_list[i].cli->receive(&type, (char **)&response);
+    node_list[i].cli->receive(&type, (char**)&response);
 
 #if 0
     time_GetTime(&time2);
@@ -846,78 +845,78 @@ int NodelistNav::update_nodes()
 #endif
 
     sts = node_list[i].cli->m_sts;
-    if (EVEN(node_list[i].connection_sts)) {
+    if (EVEN(node_list[i].connection_sts))
+    {
       node_list[i].network_timeout = 1;
-      strcpy(response->SystemStatusStr, "Network timeout");    
+      strcpy(response->SystemStatusStr, "Network timeout");
       response->SystemStatus = PWR__SRVCONNECTION;
-      strcpy(response->SystemTime, ""); 
-      strcpy(response->BootTime, ""); 
-      strcpy(response->RestartTime, ""); 
+      strcpy(response->SystemTime, "");
+      strcpy(response->BootTime, "");
+      strcpy(response->RestartTime, "");
     }
 
     if (!first_scan && ODD(sts) && EVEN(node_list[i].connection_sts))
       message(sts, node_list[i].node_name, i, "Connection up to server");
-    else if ((!first_scan && EVEN(sts) && ODD(node_list[i].connection_sts))
-        || (first_scan && EVEN(sts)))
+    else if ((!first_scan && EVEN(sts) && ODD(node_list[i].connection_sts)) || (first_scan && EVEN(sts)))
       message(sts, node_list[i].node_name, i, "Connection down to server");
     node_list[i].connection_sts = sts;
 
-    if (ODD(sts)) {
-      if (memcmp(&node_list[i].item->data.BootTime, response->BootTime,
-              sizeof(pwr_tTime))
-          && node_list[i].init_done) {
+    if (ODD(sts))
+    {
+      if (memcmp(&node_list[i].item->data.BootTime, response->BootTime, sizeof(pwr_tTime)) &&
+          node_list[i].init_done)
+      {
         // System restarted
         message(2, node_list[i].node_name, i, "Proview restarted");
       }
-      if (memcmp(&node_list[i].item->data.RestartTime, response->RestartTime,
-              sizeof(pwr_tTime))
-          && node_list[i].init_done) {
+      if (memcmp(&node_list[i].item->data.RestartTime, response->RestartTime, sizeof(pwr_tTime)) &&
+          node_list[i].init_done)
+      {
         // System restarted
         message(2, node_list[i].node_name, i, "Proview restarted");
       }
     }
 
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       current_status = response->SystemStatus;
-      strncpy(current_status_str, response->SystemStatusStr,
-          sizeof(current_status_str));
-    } else {
-      switch (mode) {
+      strncpy(current_status_str, response->SystemStatusStr, sizeof(current_status_str));
+    }
+    else
+    {
+      switch (mode)
+      {
       case nodelist_eMode_SystemStatus:
         current_status = response->SystemStatus;
-        strncpy(current_status_str, response->SystemStatusStr,
-            sizeof(current_status_str));
+        strncpy(current_status_str, response->SystemStatusStr, sizeof(current_status_str));
         break;
       case nodelist_eMode_Status1:
         current_status = response->UserStatus1;
-        strncpy(current_status_str, response->UserStatus1Str,
-            sizeof(current_status_str));
+        strncpy(current_status_str, response->UserStatus1Str, sizeof(current_status_str));
         break;
       case nodelist_eMode_Status2:
         current_status = response->UserStatus2;
-        strncpy(current_status_str, response->UserStatus2Str,
-            sizeof(current_status_str));
+        strncpy(current_status_str, response->UserStatus2Str, sizeof(current_status_str));
         break;
       case nodelist_eMode_Status3:
         current_status = response->UserStatus3;
-        strncpy(current_status_str, response->UserStatus3Str,
-            sizeof(current_status_str));
+        strncpy(current_status_str, response->UserStatus3Str, sizeof(current_status_str));
         break;
       case nodelist_eMode_Status4:
         current_status = response->UserStatus4;
-        strncpy(current_status_str, response->UserStatus4Str,
-            sizeof(current_status_str));
+        strncpy(current_status_str, response->UserStatus4Str, sizeof(current_status_str));
         break;
       case nodelist_eMode_Status5:
         current_status = response->UserStatus5;
-        strncpy(current_status_str, response->UserStatus5Str,
-            sizeof(current_status_str));
+        strncpy(current_status_str, response->UserStatus5Str, sizeof(current_status_str));
         break;
       }
     }
-    if (node_list[i].item->data.CurrentStatus != current_status) {
+    if (node_list[i].item->data.CurrentStatus != current_status)
+    {
       // Change color
-      if (!nodraw) {
+      if (!nodraw)
+      {
         brow_SetNodraw(brow->ctx);
         nodraw = 1;
       }
@@ -925,38 +924,36 @@ int NodelistNav::update_nodes()
       node_list[i].item->update_color(this, current_status);
 
       // Message if switch to error
-      if (!first_scan && ODD(sts)) {
+      if (!first_scan && ODD(sts))
+      {
         message(current_status, node_list[i].node_name, i, current_status_str);
-      } else if (EVEN(current_status) && ODD(sts))
+      }
+      else if (EVEN(current_status) && ODD(sts))
         // Message even status first scan
         message(current_status, node_list[i].node_name, i, current_status_str);
     }
 
-    if (strcmp(node_list[i].item->data.CurrentStatusStr, current_status_str)
-        != 0)
-      brow_SetAnnotation(node_list[i].item->node, 2, current_status_str,
-          strlen(current_status_str));
+    if (strcmp(node_list[i].item->data.CurrentStatusStr, current_status_str) != 0)
+      brow_SetAnnotation(node_list[i].item->node, 2, current_status_str, strlen(current_status_str));
 
     node_list[i].item->data.CurrentStatus = current_status;
     strncpy(node_list[i].item->data.CurrentStatusStr, current_status_str,
-        sizeof(node_list[i].item->data.SystemStatusStr));
+            sizeof(node_list[i].item->data.SystemStatusStr));
 
     node_list[i].item->data.SystemStatus = response->SystemStatus;
     strncpy(node_list[i].item->data.SystemStatusStr, response->SystemStatusStr,
-        sizeof(node_list[i].item->data.SystemStatusStr));
+            sizeof(node_list[i].item->data.SystemStatusStr));
 
-    if (ODD(sts)) {
-      if (!streq(node_list[i].item->data.Description, response->Description)
-          && !(layout & nl_mLayout_view_node_descr)
-          && streq(node_list[i].item->node_descr, ""))
-        brow_SetAnnotation(node_list[i].item->node, 1, response->Description,
-            strlen(response->Description));
+    if (ODD(sts))
+    {
+      if (!streq(node_list[i].item->data.Description, response->Description) &&
+          !(layout & nl_mLayout_view_node_descr) && streq(node_list[i].item->node_descr, ""))
+        brow_SetAnnotation(node_list[i].item->node, 1, response->Description, strlen(response->Description));
 
       strncpy(node_list[i].item->data.Description, response->Description,
-          sizeof(node_list[i].item->data.Description));
-      strncpy(node_list[i].item->data.Version, response->Version,
-          sizeof(node_list[i].item->data.Version));
-      
+              sizeof(node_list[i].item->data.Description));
+      strncpy(node_list[i].item->data.Version, response->Version, sizeof(node_list[i].item->data.Version));
+
       time_AsciiToA(response->SystemTime, &node_list[i].item->data.SystemTime);
       time_AsciiToA(response->BootTime, &node_list[i].item->data.BootTime);
       time_AsciiToA(response->RestartTime, &node_list[i].item->data.RestartTime);
@@ -964,22 +961,24 @@ int NodelistNav::update_nodes()
 
       if (!node_list[i].init_done)
         node_list[i].init_done = 1;
-      if (node_list[i].item->syssts_open) {
+      if (node_list[i].item->syssts_open)
+      {
 #if 0
         statussrv_GetExtStatus(
             node_list[i].node_name, &node_list[i].item->xdata);
 #endif
-	node_list[i].cli->send_request(stssrv_eMsgType_ExtStatus);
-	node_list[i].cli->receive(&type, (char**)&xdata);
-	if (ODD(node_list[i].cli->m_sts))
-	  memcpy(&node_list[i].item->xdata, xdata, sizeof(node_list[i].item->xdata));
+        node_list[i].cli->send_request(stssrv_eMsgType_ExtStatus);
+        node_list[i].cli->receive(&type, (char**)&xdata);
+        if (ODD(node_list[i].cli->m_sts))
+          memcpy(&node_list[i].item->xdata, xdata, sizeof(node_list[i].item->xdata));
       }
     }
   }
   if (connect)
     connect = 0;
 
-  if (nodraw) {
+  if (nodraw)
+  {
     brow_ResetNodraw(brow->ctx);
     brow_Redraw(brow->ctx, 0);
   }
@@ -997,10 +996,10 @@ void NodelistNav::save()
   if (!fp)
     return;
 
-  for (int i = 0; i < (int)node_list.size(); i++) {
-    fprintf(fp, "%s \"%s\" \"%s\" \"%s\" %d\n", node_list[i].node_name, 
-	node_list[i].address, node_list[i].opplace,
-	node_list[i].description, node_list[i].busid);
+  for (int i = 0; i < (int)node_list.size(); i++)
+  {
+    fprintf(fp, "%s \"%s\" \"%s\" \"%s\" %d\n", node_list[i].node_name, node_list[i].address,
+            node_list[i].opplace, node_list[i].description, node_list[i].busid);
   }
 
   fclose(fp);
@@ -1042,8 +1041,10 @@ int NodelistNav::get_selected_node_idx(int* idx)
   if (item->type != nodelistnav_eItemType_Node)
     return 0;
 
-  for (int i = 0; i < node_list.size(); i++) {
-    if (item == node_list[i].item) {
+  for (int i = 0; i < node_list.size(); i++)
+  {
+    if (item == node_list[i].item)
+    {
       *idx = i;
       return 1;
     }
@@ -1067,12 +1068,14 @@ int NodelistNav::get_selected_opplace(char* address, int* busid, char* opplace, 
   if (item->type != nodelistnav_eItemType_Node)
     return 0;
 
-  for (int i = 0; i < (int)node_list.size(); i++) {
-    if (node_list[i].item == item) {
+  for (int i = 0; i < (int)node_list.size(); i++)
+  {
+    if (node_list[i].item == item)
+    {
       if (address)
         strcpy(address, node_list[i].address);
       if (busid)
-	*busid = node_list[i].busid;
+        *busid = node_list[i].busid;
       if (opplace)
         strcpy(opplace, node_list[i].opplace);
       if (descr)
@@ -1085,8 +1088,10 @@ int NodelistNav::get_selected_opplace(char* address, int* busid, char* opplace, 
 
 int NodelistNav::get_node(char* name, int* idx)
 {
-  for (int i = 0; i < node_list.size(); i++) {
-    if (str_NoCaseStrcmp(name, node_list[i].node_name) == 0) {
+  for (int i = 0; i < node_list.size(); i++)
+  {
+    if (str_NoCaseStrcmp(name, node_list[i].node_name) == 0)
+    {
       *idx = i;
       return 1;
     }
@@ -1094,8 +1099,8 @@ int NodelistNav::get_node(char* name, int* idx)
   return 0;
 }
 
-int NodelistNav::get_node_data(int idx, char* node_name, char* address, int* busid,
-    char* opplace, char* descr)
+int NodelistNav::get_node_data(int idx, char* node_name, char* address, int* busid, char* opplace,
+                               char* descr)
 {
   if (idx >= node_list.size() || idx < 0)
     return 0;
@@ -1112,8 +1117,7 @@ int NodelistNav::get_node_data(int idx, char* node_name, char* address, int* bus
   return 1;
 }
 
-int NodelistNav::set_node_data(int idx, char* node_name, char* address, int busid,
-    char* opplace, char* descr)
+int NodelistNav::set_node_data(int idx, char* node_name, char* address, int busid, char* opplace, char* descr)
 {
   if (idx >= node_list.size() || idx < 0)
     return 0;
@@ -1129,8 +1133,10 @@ int NodelistNav::set_node_data(int idx, char* node_name, char* address, int busi
 
 void NodelistNav::remove_node(char* name)
 {
-  for (int i = 0; i < (int)node_list.size(); i++) {
-    if (str_NoCaseStrcmp(name, node_list[i].node_name) == 0) {
+  for (int i = 0; i < (int)node_list.size(); i++)
+  {
+    if (str_NoCaseStrcmp(name, node_list[i].node_name) == 0)
+    {
       brow_DeleteNode(brow->ctx, node_list[i].item->node);
 
       for (int j = i; j < (int)node_list.size() - 1; j++)
@@ -1141,9 +1147,8 @@ void NodelistNav::remove_node(char* name)
   }
 }
 
-void NodelistNav::add_node(
-    const char* name, const char* address, const int busid, const char* description, 
-    const char* opplace)
+void NodelistNav::add_node(const char* name, const char* address, const int busid, const char* description,
+                           const char* opplace)
 {
   brow_tNode* nodelist;
   int node_count;
@@ -1156,11 +1161,14 @@ void NodelistNav::add_node(
 
   brow_GetSelectedNodes(brow->ctx, &nodelist, &node_count);
 
-  if (node_count > 0) {
+  if (node_count > 0)
+  {
     // Get index for selected node
     found = false;
-    for (int i = 0; i < (int)node_list.size(); i++) {
-      if (node_list[i].item->node == nodelist[0]) {
+    for (int i = 0; i < (int)node_list.size(); i++)
+    {
+      if (node_list[i].item->node == nodelist[0])
+      {
         idx = i + 1;
         found = true;
         break;
@@ -1177,19 +1185,22 @@ void NodelistNav::add_node(
 
     if (idx == (int)node_list.size())
       node_list.push_back(node);
-    else {
+    else
+    {
       node_list.push_back(node_list[node_list.size() - 1]);
-      for (int i = node_list.size() - 1; i > idx; i--) {
+      for (int i = node_list.size() - 1; i > idx; i--)
+      {
         node_list[i] = node_list[i - 1];
       }
 
       node_list[idx] = node;
     }
 
-    item = new ItemNode(
-	 this, idx, name, node_list[idx].description, nodelist[0], flow_eDest_After);
+    item = new ItemNode(this, idx, name, node_list[idx].description, nodelist[0], flow_eDest_After);
     node_list[idx].item = item;
-  } else {
+  }
+  else
+  {
     // Nothing selected, insert last
     NodelistNode node(name);
     strncpy(node.address, address, sizeof(node.address));
@@ -1206,48 +1217,54 @@ void NodelistNav::add_node(
 //
 // Convert attribute value to string
 //
-void NodelistNav::attrvalue_to_string(
-    int type_id, void* value_ptr, char* str, int size, int* len, char* format)
+void NodelistNav::attrvalue_to_string(int type_id, void* value_ptr, char* str, int size, int* len,
+                                      char* format)
 {
-  if (value_ptr == 0) {
+  if (value_ptr == 0)
+  {
     strcpy(str, "UNDEFINED");
     return;
   }
 
-  switch (type_id) {
-  case pwr_eType_Boolean: {
+  switch (type_id)
+  {
+  case pwr_eType_Boolean:
+  {
     if (!format)
       *len = sprintf(str, "%d", *(pwr_tBoolean*)value_ptr);
     else
       *len = sprintf(str, format, *(pwr_tBoolean*)value_ptr);
     break;
   }
-  case pwr_eType_Float32: {
+  case pwr_eType_Float32:
+  {
     if (!format)
       *len = sprintf(str, "%f", *(pwr_tFloat32*)value_ptr);
     else
       *len = sprintf(str, format, *(pwr_tFloat32*)value_ptr);
     break;
   }
-  case pwr_eType_Int32: {
+  case pwr_eType_Int32:
+  {
     if (!format)
       *len = sprintf(str, "%d", *(pwr_tInt32*)value_ptr);
     else
       *len = sprintf(str, format, *(pwr_tInt32*)value_ptr);
     break;
   }
-  case pwr_eType_String: {
+  case pwr_eType_String:
+  {
     strncpy(str, (char*)value_ptr, size);
     str[size - 1] = 0;
     *len = strlen(str);
     break;
   }
-  case pwr_eType_Time: {
+  case pwr_eType_Time:
+  {
     char timstr[40];
     pwr_tStatus sts;
 
-    sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime, timstr,
-        sizeof(timstr));
+    sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime, timstr, sizeof(timstr));
     if (EVEN(sts))
       strcpy(timstr, "-");
     *len = sprintf(str, "%s", timstr);
@@ -1257,28 +1274,19 @@ void NodelistNav::attrvalue_to_string(
   }
 }
 
-ItemBase::ItemBase(NodelistNav* item_nodelistnav, const char* item_name)
-    : nodelistnav(item_nodelistnav)
+ItemBase::ItemBase(NodelistNav* item_nodelistnav, const char* item_name) : nodelistnav(item_nodelistnav)
 {
   strcpy(name, item_name);
 }
 
-ItemBase::~ItemBase()
-{
-}
+ItemBase::~ItemBase() {}
 
-int ItemBase::open_children(NodelistNav* nodelistnav, double x, double y)
-{
-  return 1;
-}
+int ItemBase::open_children(NodelistNav* nodelistnav, double x, double y) { return 1; }
 
-int ItemBase::close(NodelistNav* nodelistnav, double x, double y)
-{
-  return 1;
-}
+int ItemBase::close(NodelistNav* nodelistnav, double x, double y) { return 1; }
 
 ItemNode::ItemNode(NodelistNav* item_nodelistnav, int item_idx, const char* item_name,
-    const char* item_node_descr, brow_tNode dest, flow_eDest dest_code)
+                   const char* item_node_descr, brow_tNode dest, flow_eDest dest_code)
     : ItemBase(item_nodelistnav, item_name), idx(item_idx), syssts_open(0)
 {
   type = nodelistnav_eItemType_Node;
@@ -1286,8 +1294,8 @@ ItemNode::ItemNode(NodelistNav* item_nodelistnav, int item_idx, const char* item
   strcpy(node_descr, item_node_descr);
   memset(&xdata, 0, sizeof(xdata));
 
-  brow_CreateNode(nodelistnav->brow->ctx, item_name, nodelistnav->brow->nc_node,
-      dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(nodelistnav->brow->ctx, item_name, nodelistnav->brow->nc_node, dest, dest_code, (void*)this,
+                  1, &node);
 
   brow_SetAnnotation(node, 0, name, strlen(name));
   if ((nodelistnav->layout & nl_mLayout_view_node_descr) || !streq(node_descr, ""))
@@ -1303,8 +1311,10 @@ int ItemNode::update_color(NodelistNav* nodelistnav, pwr_tStatus system_status)
 
   if (system_status == 0)
     color = flow_eDrawType_DarkGray;
-  else {
-    switch (system_status & 7) {
+  else
+  {
+    switch (system_status & 7)
+    {
     case 3:
     case 1:
       color = flow_eDrawType_Green;
@@ -1331,7 +1341,8 @@ int ItemNode::open_children(NodelistNav* nodelistnav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(nodelistnav->brow->ctx);
     brow_CloseNode(nodelistnav->brow->ctx, node);
@@ -1339,30 +1350,32 @@ int ItemNode::open_children(NodelistNav* nodelistnav, double x, double y)
     brow_ResetOpen(node, 1);
     brow_ResetNodraw(nodelistnav->brow->ctx);
     brow_Redraw(nodelistnav->brow->ctx, node_y);
-  } else {
+  }
+  else
+  {
     brow_SetNodraw(nodelistnav->brow->ctx);
 
-    new ItemAttr(nodelistnav, "Description", "Description", pwr_eType_String,
-        sizeof(data.Description), data.Description, node, flow_eDest_IntoLast);
+    new ItemAttr(nodelistnav, "Description", "Description", pwr_eType_String, sizeof(data.Description),
+                 data.Description, node, flow_eDest_IntoLast);
 
-    new ItemAttrSysSts(nodelistnav, "SystemStatus", "SystemStatus",
-        pwr_eType_String, sizeof(data.SystemStatusStr), &data.SystemStatusStr,
-        &data.SystemStatus, this, node, flow_eDest_IntoLast);
+    new ItemAttrSysSts(nodelistnav, "SystemStatus", "SystemStatus", pwr_eType_String,
+                       sizeof(data.SystemStatusStr), &data.SystemStatusStr, &data.SystemStatus, this, node,
+                       flow_eDest_IntoLast);
 
-    new ItemAttr(nodelistnav, "SystemTime", "SystemTime", pwr_eType_Time,
-        sizeof(data.SystemTime), &data.SystemTime, node, flow_eDest_IntoLast);
+    new ItemAttr(nodelistnav, "SystemTime", "SystemTime", pwr_eType_Time, sizeof(data.SystemTime),
+                 &data.SystemTime, node, flow_eDest_IntoLast);
 
-    new ItemAttr(nodelistnav, "BootTime", "BootTime", pwr_eType_Time,
-        sizeof(data.BootTime), &data.BootTime, node, flow_eDest_IntoLast);
+    new ItemAttr(nodelistnav, "BootTime", "BootTime", pwr_eType_Time, sizeof(data.BootTime), &data.BootTime,
+                 node, flow_eDest_IntoLast);
 
-    new ItemAttr(nodelistnav, "RestartTime", "RestartTime", pwr_eType_Time,
-        sizeof(data.RestartTime), &data.RestartTime, node, flow_eDest_IntoLast);
+    new ItemAttr(nodelistnav, "RestartTime", "RestartTime", pwr_eType_Time, sizeof(data.RestartTime),
+                 &data.RestartTime, node, flow_eDest_IntoLast);
 
-    new ItemAttr(nodelistnav, "Restarts", "Restarts", pwr_eType_Int32,
-        sizeof(data.Restarts), &data.Restarts, node, flow_eDest_IntoLast);
+    new ItemAttr(nodelistnav, "Restarts", "Restarts", pwr_eType_Int32, sizeof(data.Restarts), &data.Restarts,
+                 node, flow_eDest_IntoLast);
 
-    new ItemAttr(nodelistnav, "Version", "Version", pwr_eType_String,
-        sizeof(data.Version), &data.Version, node, flow_eDest_IntoLast);
+    new ItemAttr(nodelistnav, "Version", "Version", pwr_eType_String, sizeof(data.Version), &data.Version,
+                 node, flow_eDest_IntoLast);
 
     brow_SetOpen(node, 1);
     brow_SetAnnotPixmap(node, 0, nodelistnav->brow->pixmap_openmap);
@@ -1378,7 +1391,8 @@ int ItemNode::close(NodelistNav* nodelistnav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(nodelistnav->brow->ctx);
     brow_CloseNode(nodelistnav->brow->ctx, node);
@@ -1390,19 +1404,18 @@ int ItemNode::close(NodelistNav* nodelistnav, double x, double y)
   return 1;
 }
 
-ItemAttr::ItemAttr(NodelistNav* item_nodelistnav, const char* item_name,
-    const char* attr, int attr_type, int attr_size, void* attr_value_p,
-    brow_tNode dest, flow_eDest dest_code)
-    : ItemBase(item_nodelistnav, item_name), value_p(attr_value_p),
-      first_scan(1), type_id(attr_type), size(attr_size)
+ItemAttr::ItemAttr(NodelistNav* item_nodelistnav, const char* item_name, const char* attr, int attr_type,
+                   int attr_size, void* attr_value_p, brow_tNode dest, flow_eDest dest_code)
+    : ItemBase(item_nodelistnav, item_name), value_p(attr_value_p), first_scan(1), type_id(attr_type),
+      size(attr_size)
 {
   type = nodelistnav_eItemType_Attr;
 
   strcpy(name, item_name);
   memset(old_value, 0, sizeof(old_value));
 
-  brow_CreateNode(nodelistnav->brow->ctx, item_name, nodelistnav->brow->nc_attr,
-      dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(nodelistnav->brow->ctx, item_name, nodelistnav->brow->nc_attr, dest, dest_code, (void*)this,
+                  1, &node);
 
   brow_SetAnnotPixmap(node, 0, nodelistnav->brow->pixmap_attr);
 
@@ -1410,26 +1423,21 @@ ItemAttr::ItemAttr(NodelistNav* item_nodelistnav, const char* item_name,
   brow_SetTraceAttr(node, attr, "", flow_eTraceType_User);
 }
 
-ItemAttr::~ItemAttr()
-{
-}
+ItemAttr::~ItemAttr() {}
 
-ItemAttrSysSts::ItemAttrSysSts(NodelistNav* item_nodelistnav,
-    const char* item_name, const char* attr, int attr_type, int attr_size,
-    void* attr_value_p, void* attr_status_p, ItemNode* attr_parent,
-    brow_tNode dest, flow_eDest dest_code)
-    : ItemBase(item_nodelistnav, item_name), value_p(attr_value_p),
-      status_p(attr_status_p), first_scan(1), type_id(attr_type),
-      size(attr_size), parent(attr_parent)
+ItemAttrSysSts::ItemAttrSysSts(NodelistNav* item_nodelistnav, const char* item_name, const char* attr,
+                               int attr_type, int attr_size, void* attr_value_p, void* attr_status_p,
+                               ItemNode* attr_parent, brow_tNode dest, flow_eDest dest_code)
+    : ItemBase(item_nodelistnav, item_name), value_p(attr_value_p), status_p(attr_status_p), first_scan(1),
+      type_id(attr_type), size(attr_size), parent(attr_parent)
 {
   type = nodelistnav_eItemType_AttrSysSts;
 
   strcpy(name, item_name);
   memset(old_value, 0, sizeof(old_value));
 
-  brow_CreateNode(nodelistnav->brow->ctx, item_name,
-      nodelistnav->brow->nc_sys_sts_attr, dest, dest_code, (void*)this, 1,
-      &node);
+  brow_CreateNode(nodelistnav->brow->ctx, item_name, nodelistnav->brow->nc_sys_sts_attr, dest, dest_code,
+                  (void*)this, 1, &node);
 
   brow_SetAnnotPixmap(node, 0, nodelistnav->brow->pixmap_map);
 
@@ -1441,11 +1449,12 @@ int ItemAttrSysSts::open_children(NodelistNav* nodelistnav, double x, double y)
 {
   double node_x, node_y;
   stssrv_eMsgType type;
-  char *xdata;
+  char* xdata;
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(nodelistnav->brow->ctx);
     brow_CloseNode(nodelistnav->brow->ctx, node);
@@ -1455,176 +1464,168 @@ int ItemAttrSysSts::open_children(NodelistNav* nodelistnav, double x, double y)
     brow_Redraw(nodelistnav->brow->ctx, node_y);
     parent->syssts_open = 0;
     memset(&parent->xdata, 0, sizeof(parent->xdata));
-  } else {
+  }
+  else
+  {
     parent->syssts_open = 1;
     brow_SetNodraw(nodelistnav->brow->ctx);
 
     new ItemAttrSts(nodelistnav, "Sys", "S1", parent->xdata.Server[0].StsStr,
-        (int*)&parent->xdata.Server[0].Sts, parent->xdata.Server[0].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[0].Sts, parent->xdata.Server[0].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S2", parent->xdata.Server[1].StsStr,
-        (int*)&parent->xdata.Server[1].Sts, parent->xdata.Server[1].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[1].Sts, parent->xdata.Server[1].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S3", parent->xdata.Server[2].StsStr,
-        (int*)&parent->xdata.Server[2].Sts, parent->xdata.Server[2].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[2].Sts, parent->xdata.Server[2].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S4", parent->xdata.Server[3].StsStr,
-        (int*)&parent->xdata.Server[3].Sts, parent->xdata.Server[3].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[3].Sts, parent->xdata.Server[3].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S5", parent->xdata.Server[4].StsStr,
-        (int*)&parent->xdata.Server[4].Sts, parent->xdata.Server[4].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[4].Sts, parent->xdata.Server[4].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S6", parent->xdata.Server[5].StsStr,
-        (int*)&parent->xdata.Server[5].Sts, parent->xdata.Server[5].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[5].Sts, parent->xdata.Server[5].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S7", parent->xdata.Server[6].StsStr,
-        (int*)&parent->xdata.Server[6].Sts, parent->xdata.Server[6].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[6].Sts, parent->xdata.Server[6].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S8", parent->xdata.Server[7].StsStr,
-        (int*)&parent->xdata.Server[7].Sts, parent->xdata.Server[7].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[7].Sts, parent->xdata.Server[7].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S9", parent->xdata.Server[8].StsStr,
-        (int*)&parent->xdata.Server[8].Sts, parent->xdata.Server[8].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[8].Sts, parent->xdata.Server[8].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S10", parent->xdata.Server[9].StsStr,
-        (int*)&parent->xdata.Server[9].Sts, parent->xdata.Server[9].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[9].Sts, parent->xdata.Server[9].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S11", parent->xdata.Server[10].StsStr,
-        (int*)&parent->xdata.Server[10].Sts, parent->xdata.Server[10].Name, this,
-        node, flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[10].Sts, parent->xdata.Server[10].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S12", parent->xdata.Server[11].StsStr,
-        (int*)&parent->xdata.Server[11].Sts, parent->xdata.Server[11].Name, this,
-        node, flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[11].Sts, parent->xdata.Server[11].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S13", parent->xdata.Server[12].StsStr,
-        (int*)&parent->xdata.Server[12].Sts, parent->xdata.Server[12].Name, this,
-        node, flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[12].Sts, parent->xdata.Server[12].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S14", parent->xdata.Server[13].StsStr,
-        (int*)&parent->xdata.Server[13].Sts, parent->xdata.Server[13].Name, this,
-        node, flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[13].Sts, parent->xdata.Server[13].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S15", parent->xdata.Server[14].StsStr,
-        (int*)&parent->xdata.Server[14].Sts, parent->xdata.Server[14].Name, this,
-        node, flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[14].Sts, parent->xdata.Server[14].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S16", parent->xdata.Server[15].StsStr,
-        (int*)&parent->xdata.Server[15].Sts, parent->xdata.Server[15].Name, this,
-        node, flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[15].Sts, parent->xdata.Server[15].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S17", parent->xdata.Server[16].StsStr,
-        (int*)&parent->xdata.Server[16].Sts, parent->xdata.Server[16].Name, this,
-        node, flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[16].Sts, parent->xdata.Server[16].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S18", parent->xdata.Server[17].StsStr,
-        (int*)&parent->xdata.Server[17].Sts, parent->xdata.Server[17].Name, this,
-        node, flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[17].Sts, parent->xdata.Server[17].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S19", parent->xdata.Server[18].StsStr,
-        (int*)&parent->xdata.Server[18].Sts, parent->xdata.Server[18].Name, this,
-        node, flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[18].Sts, parent->xdata.Server[18].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Sys", "S20", parent->xdata.Server[19].StsStr,
-        (int*)&parent->xdata.Server[19].Sts, parent->xdata.Server[19].Name, this,
-        node, flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Server[19].Sts, parent->xdata.Server[19].Name, this, node,
+                    flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A1", parent->xdata.Appl[0].StsStr,
-        (int*)&parent->xdata.Appl[0].Sts, parent->xdata.Appl[0].Name, this, node,
-        flow_eDest_IntoLast);
+    new ItemAttrSts(nodelistnav, "Appl", "A1", parent->xdata.Appl[0].StsStr, (int*)&parent->xdata.Appl[0].Sts,
+                    parent->xdata.Appl[0].Name, this, node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A2", parent->xdata.Appl[1].StsStr,
-        (int*)&parent->xdata.Appl[1].Sts, parent->xdata.Appl[1].Name, this, node,
-        flow_eDest_IntoLast);
+    new ItemAttrSts(nodelistnav, "Appl", "A2", parent->xdata.Appl[1].StsStr, (int*)&parent->xdata.Appl[1].Sts,
+                    parent->xdata.Appl[1].Name, this, node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A3", parent->xdata.Appl[2].StsStr,
-        (int*)&parent->xdata.Appl[2].Sts, parent->xdata.Appl[2].Name, this, node,
-        flow_eDest_IntoLast);
+    new ItemAttrSts(nodelistnav, "Appl", "A3", parent->xdata.Appl[2].StsStr, (int*)&parent->xdata.Appl[2].Sts,
+                    parent->xdata.Appl[2].Name, this, node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A4", parent->xdata.Appl[3].StsStr,
-        (int*)&parent->xdata.Appl[3].Sts, parent->xdata.Appl[3].Name, this, node,
-        flow_eDest_IntoLast);
+    new ItemAttrSts(nodelistnav, "Appl", "A4", parent->xdata.Appl[3].StsStr, (int*)&parent->xdata.Appl[3].Sts,
+                    parent->xdata.Appl[3].Name, this, node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A5", parent->xdata.Appl[4].StsStr,
-        (int*)&parent->xdata.Appl[4].Sts, parent->xdata.Appl[4].Name, this, node,
-        flow_eDest_IntoLast);
+    new ItemAttrSts(nodelistnav, "Appl", "A5", parent->xdata.Appl[4].StsStr, (int*)&parent->xdata.Appl[4].Sts,
+                    parent->xdata.Appl[4].Name, this, node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A6", parent->xdata.Appl[5].StsStr,
-        (int*)&parent->xdata.Appl[5].Sts, parent->xdata.Appl[5].Name, this, node,
-        flow_eDest_IntoLast);
+    new ItemAttrSts(nodelistnav, "Appl", "A6", parent->xdata.Appl[5].StsStr, (int*)&parent->xdata.Appl[5].Sts,
+                    parent->xdata.Appl[5].Name, this, node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A7", parent->xdata.Appl[6].StsStr,
-        (int*)&parent->xdata.Appl[6].Sts, parent->xdata.Appl[6].Name, this, node,
-        flow_eDest_IntoLast);
+    new ItemAttrSts(nodelistnav, "Appl", "A7", parent->xdata.Appl[6].StsStr, (int*)&parent->xdata.Appl[6].Sts,
+                    parent->xdata.Appl[6].Name, this, node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A8", parent->xdata.Appl[7].StsStr,
-        (int*)&parent->xdata.Appl[7].Sts, parent->xdata.Appl[7].Name, this, node,
-        flow_eDest_IntoLast);
+    new ItemAttrSts(nodelistnav, "Appl", "A8", parent->xdata.Appl[7].StsStr, (int*)&parent->xdata.Appl[7].Sts,
+                    parent->xdata.Appl[7].Name, this, node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A9", parent->xdata.Appl[8].StsStr,
-        (int*)&parent->xdata.Appl[8].Sts, parent->xdata.Appl[8].Name, this, node,
-        flow_eDest_IntoLast);
+    new ItemAttrSts(nodelistnav, "Appl", "A9", parent->xdata.Appl[8].StsStr, (int*)&parent->xdata.Appl[8].Sts,
+                    parent->xdata.Appl[8].Name, this, node, flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Appl", "A10", parent->xdata.Appl[9].StsStr,
-        (int*)&parent->xdata.Appl[9].Sts, parent->xdata.Appl[9].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Appl[9].Sts, parent->xdata.Appl[9].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Appl", "A11", parent->xdata.Appl[10].StsStr,
-        (int*)&parent->xdata.Appl[10].Sts, parent->xdata.Appl[10].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Appl[10].Sts, parent->xdata.Appl[10].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Appl", "A12", parent->xdata.Appl[11].StsStr,
-        (int*)&parent->xdata.Appl[11].Sts, parent->xdata.Appl[11].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Appl[11].Sts, parent->xdata.Appl[11].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Appl", "A13", parent->xdata.Appl[12].StsStr,
-        (int*)&parent->xdata.Appl[12].Sts, parent->xdata.Appl[12].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Appl[12].Sts, parent->xdata.Appl[12].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Appl", "A14", parent->xdata.Appl[13].StsStr,
-        (int*)&parent->xdata.Appl[13].Sts, parent->xdata.Appl[13].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Appl[13].Sts, parent->xdata.Appl[13].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Appl", "A15", parent->xdata.Appl[14].StsStr,
-        (int*)&parent->xdata.Appl[14].Sts, parent->xdata.Appl[14].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Appl[14].Sts, parent->xdata.Appl[14].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "A16", "A16", parent->xdata.Appl[15].StsStr,
-        (int*)&parent->xdata.Appl[15].Sts, parent->xdata.Appl[15].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Appl[15].Sts, parent->xdata.Appl[15].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Appl", "A17", parent->xdata.Appl[16].StsStr,
-        (int*)&parent->xdata.Appl[16].Sts, parent->xdata.Appl[16].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Appl[16].Sts, parent->xdata.Appl[16].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Appl", "A18", parent->xdata.Appl[17].StsStr,
-        (int*)&parent->xdata.Appl[17].Sts, parent->xdata.Appl[17].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Appl[17].Sts, parent->xdata.Appl[17].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Appl", "A19", parent->xdata.Appl[18].StsStr,
-        (int*)&parent->xdata.Appl[18].Sts, parent->xdata.Appl[18].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Appl[18].Sts, parent->xdata.Appl[18].Name, this, node,
+                    flow_eDest_IntoLast);
 
     new ItemAttrSts(nodelistnav, "Appl", "A20", parent->xdata.Appl[19].StsStr,
-        (int*)&parent->xdata.Appl[19].Sts, parent->xdata.Appl[19].Name, this, node,
-        flow_eDest_IntoLast);
+                    (int*)&parent->xdata.Appl[19].Sts, parent->xdata.Appl[19].Name, this, node,
+                    flow_eDest_IntoLast);
 
     brow_SetOpen(node, 1);
     brow_SetAnnotPixmap(node, 0, nodelistnav->brow->pixmap_openmap);
     brow_ResetNodraw(nodelistnav->brow->ctx);
     brow_Redraw(nodelistnav->brow->ctx, node_y);
 
-    
     nodelistnav->node_list[parent->idx].cli->send_request(stssrv_eMsgType_ExtStatus);
     nodelistnav->node_list[parent->idx].cli->receive(&type, (char**)&xdata);
     memcpy(&parent->xdata, xdata, sizeof(parent->xdata));
@@ -1640,7 +1641,8 @@ int ItemAttrSysSts::close(NodelistNav* nodelistnav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(nodelistnav->brow->ctx);
     brow_CloseNode(nodelistnav->brow->ctx, node);
@@ -1654,13 +1656,11 @@ int ItemAttrSysSts::close(NodelistNav* nodelistnav, double x, double y)
   return 1;
 }
 
-ItemAttrSts::ItemAttrSts(NodelistNav* item_nodelistnav, const char* item_name,
-    const char* attr, char* attr_value_p, pwr_tStatus* attr_status_p,
-    char* attr_name_p, ItemAttrSysSts* attr_parent, brow_tNode dest,
-    flow_eDest dest_code)
-    : ItemBase(item_nodelistnav, item_name), value_p(attr_value_p),
-      status_p(attr_status_p), name_p(attr_name_p), first_scan(1),
-      parent(attr_parent)
+ItemAttrSts::ItemAttrSts(NodelistNav* item_nodelistnav, const char* item_name, const char* attr,
+                         char* attr_value_p, pwr_tStatus* attr_status_p, char* attr_name_p,
+                         ItemAttrSysSts* attr_parent, brow_tNode dest, flow_eDest dest_code)
+    : ItemBase(item_nodelistnav, item_name), value_p(attr_value_p), status_p(attr_status_p),
+      name_p(attr_name_p), first_scan(1), parent(attr_parent)
 {
   type = nodelistnav_eItemType_AttrSts;
 
@@ -1668,8 +1668,8 @@ ItemAttrSts::ItemAttrSts(NodelistNav* item_nodelistnav, const char* item_name,
   memset(old_value, 0, sizeof(old_value));
   memset(old_name, 0, sizeof(old_name));
 
-  brow_CreateNode(nodelistnav->brow->ctx, item_name,
-      nodelistnav->brow->nc_sts_attr, dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(nodelistnav->brow->ctx, item_name, nodelistnav->brow->nc_sts_attr, dest, dest_code,
+                  (void*)this, 1, &node);
 
   brow_SetAnnotPixmap(node, 0, nodelistnav->brow->pixmap_attr);
 
@@ -1677,6 +1677,4 @@ ItemAttrSts::ItemAttrSts(NodelistNav* item_nodelistnav, const char* item_name,
   brow_SetTraceAttr(node, attr, "", flow_eTraceType_User);
 }
 
-ItemAttrSts::~ItemAttrSts()
-{
-}
+ItemAttrSts::~ItemAttrSts() {}

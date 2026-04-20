@@ -47,14 +47,14 @@ class CoWowRecall;
 class CoWowEntryGtk;
 class CowTreeNavGtk;
 
-class CowTreeGtk : public CowTree {
+class CowTreeGtk : public CowTree
+{
 public:
-  CowTreeGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, const char* title,
-      pwr_tAttrRef* itemlist, int item_cnt, unsigned int options,
-      pwr_tStatus (*get_object_info)(
-          void*, pwr_tAttrRef*, char*, int, char*, char*, int),
-      pwr_tStatus (*get_node_info)(void*, char*, char*, int),
-      pwr_tStatus (*action)(void*, pwr_tAttrRef*));
+  CowTreeGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, const char* title, pwr_tAttrRef* itemlist,
+             int item_cnt, unsigned int options,
+             pwr_tStatus (*get_object_info)(void*, pwr_tAttrRef*, char*, int, char*, char*, int),
+             pwr_tStatus (*get_node_info)(void*, char*, char*, int),
+             pwr_tStatus (*action)(void*, pwr_tAttrRef*));
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
   GtkWidget* form_widget;

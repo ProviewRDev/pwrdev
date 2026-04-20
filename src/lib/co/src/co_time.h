@@ -40,76 +40,76 @@
 #include "pwr.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* co_time.h -- Time utilities
+  /* co_time.h -- Time utilities
 
-   This include file contains definitions and function prototypes
-   needed to use time functions.
+     This include file contains definitions and function prototypes
+     needed to use time functions.
 
-   time_AtoFormAscii replaces co_TimeToAsc and
-   time_FormAsciiToA replaces co_AscToTime from Comator Lib. */
+     time_AtoFormAscii replaces co_TimeToAsc and
+     time_FormAsciiToA replaces co_AscToTime from Comator Lib. */
 
 #include <time.h>
 
-typedef unsigned int time_tClock;
-typedef pwr_tTime time_tOs;
-typedef pwr_tDeltaTime time_tOsDelta;
+  typedef unsigned int time_tClock;
+  typedef pwr_tTime time_tOs;
+  typedef pwr_tDeltaTime time_tOsDelta;
 
-/*! \file co_time.h
-    \brief Include file for \ref Time.
-*/
+  /*! \file co_time.h
+      \brief Include file for \ref Time.
+  */
 
-/** \addtogroup Time */
-/** @{ */
+  /** \addtogroup Time */
+  /** @{ */
 
-/** \defgroup Time_DS Time Data Structures
- *  @{
- */
+  /** \defgroup Time_DS Time Data Structures
+   *  @{
+   */
 
-//! Time string format
-typedef enum {
-  time_eFormat_DateAndTime
-  = 0, //!< Display date and time, 01-JAN-1970 01:00:00.00
-  time_eFormat_Time = 1, //!< Display time only 01:00:00.00
-  time_eFormat_ComprDateAndTime
-  = 2, //!< Date and time compressed format, 70-01-01 00:00:00
-  time_eFormat_NumDateAndTime
-  = 3, //!< Date and time format, 2005-01-01 00:00:00
-  time_eFormat_FileDateAndTime = 4, //!< Date and time format, 20050101_000000
-  time_eFormat_FileDate = 5, //!< Date format, 20050101
-  time_eFormat_DateAndTimeLoc = 6, //!< Display date and time with local month
-  time_eFormat_TimeAndDate = 7 //!< Time and date format, 01:00:00 30/01/87
-} time_eFormat;
+  //! Time string format
+  typedef enum
+  {
+    time_eFormat_DateAndTime = 0,      //!< Display date and time, 01-JAN-1970 01:00:00.00
+    time_eFormat_Time = 1,             //!< Display time only 01:00:00.00
+    time_eFormat_ComprDateAndTime = 2, //!< Date and time compressed format, 70-01-01 00:00:00
+    time_eFormat_NumDateAndTime = 3,   //!< Date and time format, 2005-01-01 00:00:00
+    time_eFormat_FileDateAndTime = 4,  //!< Date and time format, 20050101_000000
+    time_eFormat_FileDate = 5,         //!< Date format, 20050101
+    time_eFormat_DateAndTimeLoc = 6,   //!< Display date and time with local month
+    time_eFormat_TimeAndDate = 7       //!< Time and date format, 01:00:00 30/01/87
+  } time_eFormat;
 
-typedef enum {
-  time_ePeriod_,
-  time_ePeriod_UserDefined,
-  time_ePeriod_OneSecond,
-  time_ePeriod_10Seconds,
-  time_ePeriod_OneMinute,
-  time_ePeriod_10Minutes,
-  time_ePeriod_OneHour,
-  time_ePeriod_OneDay,
-  time_ePeriod_OneWeek,
-  time_ePeriod_OneMonth,
-  time_ePeriod_OneYear,
-  time_ePeriod_LastSecond,
-  time_ePeriod_Last10Seconds,
-  time_ePeriod_LastMinute,
-  time_ePeriod_Last10Minutes,
-  time_ePeriod_LastHour,
-  time_ePeriod_Today,
-  time_ePeriod_Yesterday,
-  time_ePeriod_ThisWeek,
-  time_ePeriod_LastWeek,
-  time_ePeriod_ThisMonth,
-  time_ePeriod_LastMonth,
-  time_ePeriod_ThisYear,
-  time_ePeriod_AllTime,
-  time_ePeriod__
-} time_ePeriod;
+  typedef enum
+  {
+    time_ePeriod_,
+    time_ePeriod_UserDefined,
+    time_ePeriod_OneSecond,
+    time_ePeriod_10Seconds,
+    time_ePeriod_OneMinute,
+    time_ePeriod_10Minutes,
+    time_ePeriod_OneHour,
+    time_ePeriod_OneDay,
+    time_ePeriod_OneWeek,
+    time_ePeriod_OneMonth,
+    time_ePeriod_OneYear,
+    time_ePeriod_LastSecond,
+    time_ePeriod_Last10Seconds,
+    time_ePeriod_LastMinute,
+    time_ePeriod_Last10Minutes,
+    time_ePeriod_LastHour,
+    time_ePeriod_Today,
+    time_ePeriod_Yesterday,
+    time_ePeriod_ThisWeek,
+    time_ePeriod_LastWeek,
+    time_ePeriod_ThisMonth,
+    time_ePeriod_LastMonth,
+    time_ePeriod_ThisYear,
+    time_ePeriod_AllTime,
+    time_ePeriod__
+  } time_ePeriod;
 
 #define SWE 0
 #define GB 1
@@ -121,84 +121,83 @@ typedef enum {
 #if defined(OS_MACOS)
 #define CLOCK_REALTIME 1
 #define CLOCK_MONOTONIC 2
-typedef int clockid_t;
+  typedef int clockid_t;
 
-int clock_gettime(clockid_t clockid, struct timespec* ts);
+  int clock_gettime(clockid_t clockid, struct timespec* ts);
 
-int clock_getres(clockid_t clockid, struct timespec* tp);
+  int clock_getres(clockid_t clockid, struct timespec* tp);
 #endif
 
-/** @} */
+  /** @} */
 
-/** \defgroup Time_FC Time Functions
- * @{
- */
+  /** \defgroup Time_FC Time Functions
+   * @{
+   */
 
-int time_IsNull(pwr_tTime* t1);
-pwr_tTime* time_Aabs(pwr_tTime*, pwr_tTime*);
-pwr_tTime* time_Aadd(pwr_tTime*, pwr_tTime*, pwr_tDeltaTime*);
-pwr_tTime* time_Aadd_NE(pwr_tTime*, pwr_tTime*, pwr_tDeltaTime*);
-int time_Acomp(pwr_tTime*, pwr_tTime*);
-int time_Acomp_NE(pwr_tTime*, pwr_tTime*);
-pwr_tDeltaTime* time_Adiff(pwr_tDeltaTime*, pwr_tTime*, pwr_tTime*);
-pwr_tDeltaTime* time_Adiff_NE(pwr_tDeltaTime*, pwr_tTime*, pwr_tTime*);
-pwr_tTime* time_Aneg(pwr_tTime*, pwr_tTime*);
-pwr_tTime* time_Asub(pwr_tTime*, pwr_tTime*, pwr_tDeltaTime*);
-pwr_tTime* time_Asub_NE(pwr_tTime*, pwr_tTime*, pwr_tDeltaTime*);
-pwr_tDeltaTime* time_Dabs(pwr_tDeltaTime*, pwr_tDeltaTime*);
-pwr_tDeltaTime* time_Dabs_NE(pwr_tDeltaTime*, pwr_tDeltaTime*);
-pwr_tDeltaTime* time_Dadd(pwr_tDeltaTime*, pwr_tDeltaTime*, pwr_tDeltaTime*);
-pwr_tDeltaTime* time_Dadd_NE(pwr_tDeltaTime*, pwr_tDeltaTime*, pwr_tDeltaTime*);
-pwr_tDeltaTime* time_Dneg(pwr_tDeltaTime*, pwr_tDeltaTime*);
-pwr_tDeltaTime* time_Dneg_NE(pwr_tDeltaTime*, pwr_tDeltaTime*);
-pwr_tDeltaTime* time_Dsub(pwr_tDeltaTime*, pwr_tDeltaTime*, pwr_tDeltaTime*);
-pwr_tDeltaTime* time_Dsub_NE(pwr_tDeltaTime*, pwr_tDeltaTime*, pwr_tDeltaTime*);
+  int time_IsNull(pwr_tTime* t1);
+  pwr_tTime* time_Aabs(pwr_tTime*, pwr_tTime*);
+  pwr_tTime* time_Aadd(pwr_tTime*, pwr_tTime*, pwr_tDeltaTime*);
+  pwr_tTime* time_Aadd_NE(pwr_tTime*, pwr_tTime*, pwr_tDeltaTime*);
+  int time_Acomp(pwr_tTime*, pwr_tTime*);
+  int time_Acomp_NE(pwr_tTime*, pwr_tTime*);
+  pwr_tDeltaTime* time_Adiff(pwr_tDeltaTime*, pwr_tTime*, pwr_tTime*);
+  pwr_tDeltaTime* time_Adiff_NE(pwr_tDeltaTime*, pwr_tTime*, pwr_tTime*);
+  pwr_tTime* time_Aneg(pwr_tTime*, pwr_tTime*);
+  pwr_tTime* time_Asub(pwr_tTime*, pwr_tTime*, pwr_tDeltaTime*);
+  pwr_tTime* time_Asub_NE(pwr_tTime*, pwr_tTime*, pwr_tDeltaTime*);
+  pwr_tDeltaTime* time_Dabs(pwr_tDeltaTime*, pwr_tDeltaTime*);
+  pwr_tDeltaTime* time_Dabs_NE(pwr_tDeltaTime*, pwr_tDeltaTime*);
+  pwr_tDeltaTime* time_Dadd(pwr_tDeltaTime*, pwr_tDeltaTime*, pwr_tDeltaTime*);
+  pwr_tDeltaTime* time_Dadd_NE(pwr_tDeltaTime*, pwr_tDeltaTime*, pwr_tDeltaTime*);
+  pwr_tDeltaTime* time_Dneg(pwr_tDeltaTime*, pwr_tDeltaTime*);
+  pwr_tDeltaTime* time_Dneg_NE(pwr_tDeltaTime*, pwr_tDeltaTime*);
+  pwr_tDeltaTime* time_Dsub(pwr_tDeltaTime*, pwr_tDeltaTime*, pwr_tDeltaTime*);
+  pwr_tDeltaTime* time_Dsub_NE(pwr_tDeltaTime*, pwr_tDeltaTime*, pwr_tDeltaTime*);
 
-int time_Dcomp(pwr_tDeltaTime*, pwr_tDeltaTime*);
-int time_Dcomp_NE(pwr_tDeltaTime*, pwr_tDeltaTime*);
-pwr_tStatus time_DtoAscii(pwr_tDeltaTime*, int, char*, int);
-pwr_tStatus time_AtoAscii(pwr_tTime*, time_eFormat, char*, int);
-pwr_tStatus time_AsciiToD(const char*, pwr_tDeltaTime*);
-pwr_tStatus time_AsciiToA(const char*, pwr_tTime*);
-pwr_tStatus time_TmToAscii(struct tm*, time_eFormat, char*, int);
-pwr_tStatus time_AsciiToTm(const char*, struct tm*);
-pwr_tStatus time_FormAsciiToA(const char*, short, short, pwr_tTime*);
-void time_AtoFormAscii(pwr_tTime*, short, short, char[], int);
-pwr_tDeltaTime* time_MsToD(pwr_tDeltaTime*, pwr_tInt32);
+  int time_Dcomp(pwr_tDeltaTime*, pwr_tDeltaTime*);
+  int time_Dcomp_NE(pwr_tDeltaTime*, pwr_tDeltaTime*);
+  pwr_tStatus time_DtoAscii(pwr_tDeltaTime*, int, char*, int);
+  pwr_tStatus time_AtoAscii(pwr_tTime*, time_eFormat, char*, int);
+  pwr_tStatus time_AsciiToD(const char*, pwr_tDeltaTime*);
+  pwr_tStatus time_AsciiToA(const char*, pwr_tTime*);
+  pwr_tStatus time_TmToAscii(struct tm*, time_eFormat, char*, int);
+  pwr_tStatus time_AsciiToTm(const char*, struct tm*);
+  pwr_tStatus time_FormAsciiToA(const char*, short, short, pwr_tTime*);
+  void time_AtoFormAscii(pwr_tTime*, short, short, char[], int);
+  pwr_tDeltaTime* time_MsToD(pwr_tDeltaTime*, pwr_tInt32);
 
-pwr_tDeltaTime* time_FloatToD(pwr_tDeltaTime*, pwr_tFloat32);
-pwr_tDeltaTime* time_Float64ToD(pwr_tDeltaTime*, pwr_tFloat64);
-pwr_tFloat32 time_DToFloat(pwr_tFloat32*, pwr_tDeltaTime*);
-pwr_tFloat64 time_DToFloat64(pwr_tFloat64*, pwr_tDeltaTime*);
+  pwr_tDeltaTime* time_FloatToD(pwr_tDeltaTime*, pwr_tFloat32);
+  pwr_tDeltaTime* time_Float64ToD(pwr_tDeltaTime*, pwr_tFloat64);
+  pwr_tFloat32 time_DToFloat(pwr_tFloat32*, pwr_tDeltaTime*);
+  pwr_tFloat64 time_DToFloat64(pwr_tFloat64*, pwr_tDeltaTime*);
 
-pwr_tDeltaTime* time_Uptime(pwr_tStatus*, pwr_tDeltaTime*, pwr_tDeltaTime*);
-time_tClock time_Clock(pwr_tStatus*, pwr_tDeltaTime*);
-time_tOs* time_Os(pwr_tStatus*, time_tOs*);
-time_tClock time_DtoClock(pwr_tStatus*, pwr_tDeltaTime*);
-pwr_tDeltaTime* time_ClockToD(pwr_tStatus*, pwr_tDeltaTime*, time_tClock);
-time_tOs* time_AtoOs(pwr_tStatus*, time_tOs*, pwr_tTime*);
-time_tOs* time_DtoOs(pwr_tStatus*, time_tOs*, pwr_tDeltaTime*);
-pwr_tDeltaTime* time_ZeroD(pwr_tDeltaTime*);
-void time_Sleep(float time);
-int time_GetTime(pwr_tTime* ts);
-int time_GetTimeMonotonic(pwr_tTime* ts);
-char* time_GetTimeAscii(time_eFormat format);
-int time_PeriodPreviousMonth(pwr_tTime* time, pwr_tTime* from, pwr_tTime* to);
-int time_PeriodPreviousWeek(pwr_tTime* time, pwr_tTime* from, pwr_tTime* to);
-void time_PreviousDayBreak(pwr_tTime* time, pwr_tTime* daybreak);
-void time_Period(time_ePeriod period, pwr_tTime* from, pwr_tTime* to,
-    pwr_tTime* center, int daybreak);
-void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from,
-    pwr_tTime* prev_to, pwr_tTime* from, pwr_tTime* to);
-void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
-    pwr_tTime* prev_to, pwr_tTime* from, pwr_tTime* to);
-int time_PeriodZoomIn(time_ePeriod* period);
-int time_PeriodZoomOut(time_ePeriod* period);
-int time_PrintA(const char* format, pwr_tTime* ts);
-pwr_tFloat32 time_AdiffToFloat(pwr_tTime* t, pwr_tTime* s);
+  pwr_tDeltaTime* time_Uptime(pwr_tStatus*, pwr_tDeltaTime*, pwr_tDeltaTime*);
+  time_tClock time_Clock(pwr_tStatus*, pwr_tDeltaTime*);
+  time_tOs* time_Os(pwr_tStatus*, time_tOs*);
+  time_tClock time_DtoClock(pwr_tStatus*, pwr_tDeltaTime*);
+  pwr_tDeltaTime* time_ClockToD(pwr_tStatus*, pwr_tDeltaTime*, time_tClock);
+  time_tOs* time_AtoOs(pwr_tStatus*, time_tOs*, pwr_tTime*);
+  time_tOs* time_DtoOs(pwr_tStatus*, time_tOs*, pwr_tDeltaTime*);
+  pwr_tDeltaTime* time_ZeroD(pwr_tDeltaTime*);
+  void time_Sleep(float time);
+  int time_GetTime(pwr_tTime* ts);
+  int time_GetTimeMonotonic(pwr_tTime* ts);
+  char* time_GetTimeAscii(time_eFormat format);
+  int time_PeriodPreviousMonth(pwr_tTime* time, pwr_tTime* from, pwr_tTime* to);
+  int time_PeriodPreviousWeek(pwr_tTime* time, pwr_tTime* from, pwr_tTime* to);
+  void time_PreviousDayBreak(pwr_tTime* time, pwr_tTime* daybreak);
+  void time_Period(time_ePeriod period, pwr_tTime* from, pwr_tTime* to, pwr_tTime* center, int daybreak);
+  void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from, pwr_tTime* prev_to, pwr_tTime* from,
+                           pwr_tTime* to);
+  void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from, pwr_tTime* prev_to, pwr_tTime* from,
+                       pwr_tTime* to);
+  int time_PeriodZoomIn(time_ePeriod* period);
+  int time_PeriodZoomOut(time_ePeriod* period);
+  int time_PrintA(const char* format, pwr_tTime* ts);
+  pwr_tFloat32 time_AdiffToFloat(pwr_tTime* t, pwr_tTime* s);
 
-/** @}*/
-/** @}*/
+  /** @}*/
+  /** @}*/
 
 #ifdef __cplusplus
 }

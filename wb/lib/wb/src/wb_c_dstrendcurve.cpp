@@ -45,11 +45,10 @@
 //
 //  Syntax check.
 //
-static pwr_tStatus SyntaxCheck(
-    ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
-    int* ErrorCount, /* accumulated error count */
-    int* WarningCount /* accumulated waring count */
-    )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated waring count */
+)
 {
   // Check DataName
   wb_session* sp = (wb_session*)Session;
@@ -76,27 +75,30 @@ static pwr_tStatus SyntaxCheck(
   if (!attribute_a)
     return attribute_a.sts();
 
-  for (unsigned int i = 0;
-       i < sizeof(attribute_vect) / sizeof(attribute_vect[0]); i++) {
-    if (cdh_ObjidIsNotNull(attribute_vect[i].Objid)) {
-      if (attribute_vect[i].Flags.b.Object
-          || attribute_vect[i].Flags.b.ObjectAttr) {
-        wsx_error_msg_str(Session, "Bad Attribute reference, invalid type",
-            Object, 'E', ErrorCount, WarningCount);
+  for (unsigned int i = 0; i < sizeof(attribute_vect) / sizeof(attribute_vect[0]); i++)
+  {
+    if (cdh_ObjidIsNotNull(attribute_vect[i].Objid))
+    {
+      if (attribute_vect[i].Flags.b.Object || attribute_vect[i].Flags.b.ObjectAttr)
+      {
+        wsx_error_msg_str(Session, "Bad Attribute reference, invalid type", Object, 'E', ErrorCount,
+                          WarningCount);
         return PWRB__SUCCESS;
       }
 
       if (cdh_ObjidIsNull(buffers_vect[i].Objid))
-        wsx_error_msg_str(Session, "Buffer object not specified", Object, 'E',
-            ErrorCount, WarningCount);
+        wsx_error_msg_str(Session, "Buffer object not specified", Object, 'E', ErrorCount, WarningCount);
 
       wb_attribute data_a = sp->attribute(&attribute_vect[i]);
-      if (!data_a) {
-        wsx_error_msg_str(Session, "Bad Attribute reference", Object, 'E',
-            ErrorCount, WarningCount);
-      } else {
+      if (!data_a)
+      {
+        wsx_error_msg_str(Session, "Bad Attribute reference", Object, 'E', ErrorCount, WarningCount);
+      }
+      else
+      {
         // Check DataName type
-        switch (data_a.tid()) {
+        switch (data_a.tid())
+        {
         case pwr_eType_Boolean:
         case pwr_eType_Float32:
         case pwr_eType_Float64:
@@ -108,8 +110,7 @@ static pwr_tStatus SyntaxCheck(
         case pwr_eType_UInt32:
           break;
         default:
-          wsx_error_msg_str(Session, "Attribute type not supported", Object,
-              'E', ErrorCount, WarningCount);
+          wsx_error_msg_str(Session, "Attribute type not supported", Object, 'E', ErrorCount, WarningCount);
         }
       }
     }
@@ -119,5 +120,4 @@ static pwr_tStatus SyntaxCheck(
 
 //  Every method to be exported to the workbench should be registred here.
 
-pwr_dExport pwr_BindMethods(DsTrendCurve)
-    = { pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(DsTrendCurve) = {pwr_BindMethod(SyntaxCheck), pwr_NullMethod};

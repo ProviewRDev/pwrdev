@@ -37,11 +37,11 @@
 #ifndef wb_build_opt_h
 #define wb_build_opt_h
 
-class wb_build_opt {
+class wb_build_opt
+{
 public:
   wb_build_opt()
-      : force(0), debug(0), crossref(0), crossref_sim(0), crossref_graph(0),
-      manual(0), nocopy(0), syntax(0)
+      : force(0), debug(0), crossref(0), crossref_sim(0), crossref_graph(0), manual(0), nocopy(0), syntax(0)
   {
   }
   int force;

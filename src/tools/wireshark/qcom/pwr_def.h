@@ -1,7 +1,8 @@
 
 /* From rt_qmon.c */
 
-typedef enum {
+typedef enum
+{
   eEvent__ = 0,
   eEvent_connect,
   eEvent_down,
@@ -34,7 +35,8 @@ typedef enum {
 #define qcom_cInacp (1 << 31 | 106)
 #define qcom_cIini (1 << 31 | 107)
 
-typedef enum {
+typedef enum
+{
   qcom_eBtype__ = 0,
   qcom_eBtype_system,
   qcom_eBtype_qcom,
@@ -42,7 +44,8 @@ typedef enum {
   qcom_eBtype_ = 200
 } qcom_eBtype;
 
-typedef enum {
+typedef enum
+{
   qcom_eStype__ = 0,
   qcom_eStype_linkConnect,
   qcom_eStype_linkDisconnect,
@@ -56,28 +59,29 @@ typedef enum {
 /* From rt_mh_net.x */
 #define net_cMsgClass 200
 
-enum net_eMsg {
+enum net_eMsg
+{
   net_eMsg__ = -1,
   net_eMsg_error = 0, /* A network error was detected */
 
-  net_eMsg_id, /* Nethandler identification */
-  net_eMsg_idAck, /* Nethandler identification acknowlege */
+  net_eMsg_id,     /* Nethandler identification */
+  net_eMsg_idAck,  /* Nethandler identification acknowlege */
   net_eMsg_idAck2, /* Nethandler idAck acknowlege */
 
-  net_eMsg_volumes, /*  */
+  net_eMsg_volumes,  /*  */
   net_eMsg_volumesR, /*  */
 
-  net_eMsg_subAdd, /* Add subscription */
+  net_eMsg_subAdd,    /* Add subscription */
   net_eMsg_subRemove, /* Remove subscription */
-  net_eMsg_subData, /* Subscription data transfer */
+  net_eMsg_subData,   /* Subscription data transfer */
 
-  net_eMsg_sanAdd, /* Add subscription */
+  net_eMsg_sanAdd,    /* Add subscription */
   net_eMsg_sanRemove, /* Remove subscription */
   net_eMsg_sanUpdate, /* Subscription data transfer */
 
   net_eMsg_nameToObject, /* Cache inquiry, fetch name */
-  net_eMsg_oidToObject, /* Cache inquiry, fetch objid */
-  net_eMsg_objectR, /* response */
+  net_eMsg_oidToObject,  /* Cache inquiry, fetch objid */
+  net_eMsg_objectR,      /* response */
 
   net_eMsg_getObjectInfo,
   net_eMsg_getObjectInfoR,
@@ -91,7 +95,7 @@ enum net_eMsg {
   net_eMsg_moveObject,
   net_eMsg_renameObject,
 
-  net_eMsg_nodeUp, /* A node is up */
+  net_eMsg_nodeUp,   /* A node is up */
   net_eMsg_nodeDown, /* A node is up */
 
   net_eMsg_getCclass, /* Cached class info*/
@@ -120,7 +124,8 @@ enum net_eMsg {
 /* From rt_mh_net.x */
 #define mh_cMsgClass 201
 
-enum mh_eMsg {
+enum mh_eMsg
+{
   mh_eMsg__ = 0,
   mh_eMsg_ApplConnect = 1,
   mh_eMsg_ApplDisconnect = 2,
@@ -155,7 +160,8 @@ enum mh_eMsg {
   mh_eMsg_ = 28
 };
 
-enum mh_eEvent {
+enum mh_eEvent
+{
   mh_eEvent__ = 0,
   mh_eEvent_Ack = 1,
   mh_eEvent_Block = 2,
@@ -170,7 +176,8 @@ enum mh_eEvent {
   mh_eEvent_ = 65
 };
 
-enum mh_eSupType {
+enum mh_eSupType
+{
   mh_eSupType__ = 0,
   mh_eSupType_Digital = 1,
   mh_eSupType_Analog = 2,
@@ -183,7 +190,8 @@ enum mh_eSupType {
 /* From rt_sev_net.h */
 #define sev_cMsgClass 202
 
-typedef enum {
+typedef enum
+{
   sev_eMsgType_NodeUp,
   sev_eMsgType_HistItemsRequest,
   sev_eMsgType_HistItems,

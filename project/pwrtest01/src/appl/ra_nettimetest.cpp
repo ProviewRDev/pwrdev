@@ -16,31 +16,32 @@
 #include "pwr_basecomponentclasses.h"
 #include "pwr_cvolpwrtest01classes.h"
 
-
-typedef struct {
+typedef struct
+{
   net_sTime nettime;
   pwr_tTime result;
 } sNetTimeToTime;
 
 void ra_nettimetest::NetTimeToTime(void)
 {
-  sNetTimeToTime d[] = {
-    {{2682419400,500000000}, {2682419400,500000000}},
-    {{2145913199,500000000}, {2145913199,500000000}},
-    {{2145913200,000000000}, {2145913200,000000000}}
-  };
-  
+  sNetTimeToTime d[] = {{{2682419400, 500000000}, {2682419400, 500000000}},
+                        {{2145913199, 500000000}, {2145913199, 500000000}},
+                        {{2145913200, 000000000}, {2145913200, 000000000}}};
+
   pwr_tTime result;
   net_sTime nettime;
 
-  for (unsigned int i = 0; i < sizeof(d)/sizeof(d[0]); i++) {
+  for (unsigned int i = 0; i < sizeof(d) / sizeof(d[0]); i++)
+  {
     result = net_NetTimeToTime(&d[i].nettime);
-    if (memcmp(&result, &d[i].result, sizeof(pwr_tTime)) != 0) {
+    if (memcmp(&result, &d[i].result, sizeof(pwr_tTime)) != 0)
+    {
       m_log->vlog('E', "NetTimeToTime, result differs idx %d", i);
       return;
     }
     nettime = net_TimeToNetTime(&result);
-    if (memcmp(&nettime, &d[i].nettime, sizeof(net_sTime)) != 0) {
+    if (memcmp(&nettime, &d[i].nettime, sizeof(net_sTime)) != 0)
+    {
       m_log->vlog('E', "NetTimeToTime, result differs idx %d", i);
       return;
     }
@@ -49,33 +50,35 @@ void ra_nettimetest::NetTimeToTime(void)
   m_log->log('S', "NetTimeToTime", TIME__SUCCESS);
 }
 
-typedef struct {
+typedef struct
+{
   net_sTime nettime;
   pwr_tDeltaTime result;
 } sNetTimeToDeltaTime;
 
 void ra_nettimetest::NetTimeToDeltaTime(void)
 {
-  sNetTimeToDeltaTime d[] = {
-    {{0,1}, {0,1}},
-    {{100,1}, {100,1}},
-    {{0,1}, {0,1}},
-    {{100,0}, {100,0}},
-    {{0,500000000}, {0,500000000}},
-    {{22222,500000000}, {22222,500000000}}
-  };
-  
+  sNetTimeToDeltaTime d[] = {{{0, 1}, {0, 1}},
+                             {{100, 1}, {100, 1}},
+                             {{0, 1}, {0, 1}},
+                             {{100, 0}, {100, 0}},
+                             {{0, 500000000}, {0, 500000000}},
+                             {{22222, 500000000}, {22222, 500000000}}};
+
   pwr_tDeltaTime result;
   net_sTime nettime;
 
-  for (unsigned int i = 0; i < sizeof(d)/sizeof(d[0]); i++) {
+  for (unsigned int i = 0; i < sizeof(d) / sizeof(d[0]); i++)
+  {
     result = net_NetTimeToDeltaTime(&d[i].nettime);
-    if (memcmp(&result, &d[i].result, sizeof(pwr_tTime)) != 0) {
+    if (memcmp(&result, &d[i].result, sizeof(pwr_tTime)) != 0)
+    {
       m_log->vlog('E', "NetTimeToDeltaTime, result differs idx %d", i);
       return;
     }
     nettime = net_DeltaTimeToNetTime(&result);
-    if (memcmp(&nettime, &d[i].nettime, sizeof(net_sTime)) != 0) {
+    if (memcmp(&nettime, &d[i].nettime, sizeof(net_sTime)) != 0)
+    {
       m_log->vlog('E', "NetTimeToDeltaTime, result differs idx %d", i);
       return;
     }
@@ -93,10 +96,7 @@ ra_nettimetest::ra_nettimetest()
 }
 
 // Destructor
-ra_nettimetest::~ra_nettimetest()
-{
-  delete m_log;
-}
+ra_nettimetest::~ra_nettimetest() { delete m_log; }
 
 int main()
 {
@@ -104,13 +104,12 @@ int main()
   pwr_tStatus sts;
 
   sts = gdh_Init("ra_nettimetest");
-  if (EVEN(sts)) {
-    time.log()->log('S', "NetTime gdh_Init", sts);  
+  if (EVEN(sts))
+  {
+    time.log()->log('S', "NetTime gdh_Init", sts);
     exit(0);
   }
 
   time.NetTimeToTime();
   time.NetTimeToDeltaTime();
 }
-
-

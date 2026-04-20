@@ -35,7 +35,7 @@
  */
 
 /* rt_io_user.c -- dummy for user methods.
-*/
+ */
 
 #include "rt_io_base.h"
 
@@ -52,4 +52,4 @@
 /* 	  pwr_NullClass							*/
 /* 	};								*/
 
-pwr_dExport pwr_BindIoUserClasses(User) = { pwr_NullClass };
+pwr_dExport pwr_BindIoUserClasses(User) = {pwr_NullClass};

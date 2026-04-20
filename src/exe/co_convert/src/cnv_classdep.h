@@ -39,7 +39,8 @@
 
 #include "cnv_ctx.h"
 
-class CdpItem {
+class CdpItem
+{
 public:
   CdpItem();
 
@@ -54,7 +55,8 @@ public:
   int bws;
 };
 
-class CnvClassDep {
+class CnvClassDep
+{
 private:
   std::vector<CdpItem> classlist;
 

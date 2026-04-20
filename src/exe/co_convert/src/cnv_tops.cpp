@@ -39,7 +39,8 @@
 
 /*_Include files_________________________________________________________*/
 
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 #include "co_dcli.h"
 }
@@ -49,7 +50,7 @@ extern "C" {
 #include "cnv_image.h"
 #include "cnv_tops.h"
 
-#define ps_cHead                                                               \
+#define ps_cHead                                                                                             \
   "%!PS-Adobe-2.0\n\
 %%Creator: Proview co_convert\n\
 %%EndComments\n\
@@ -127,7 +128,8 @@ save\n"
 
 void CnvToPs::cnv_text(char* to, const char* from)
 {
-  if (!from) {
+  if (!from)
+  {
     strcpy(to, "");
     return;
   }
@@ -135,8 +137,10 @@ void CnvToPs::cnv_text(char* to, const char* from)
   char* t = to;
   char* s = (char*)from;
 
-  for (; *s; s++) {
-    switch (*s) {
+  for (; *s; s++)
+  {
+    switch (*s)
+    {
     case '(':
       *t++ = '\\';
       *t++ = '(';
@@ -162,43 +166,58 @@ void CnvToPs::print_text(const char* text, CnvStyle& style, int mode)
 
   cnv_text(str, text);
 
-  if (style.sidebreak && mode & ps_mPrintMode_Pos) {
-    if (page_number[cf] == 0) {
+  if (style.sidebreak && mode & ps_mPrintMode_Pos)
+  {
+    if (page_number[cf] == 0)
+    {
       // First header, no pagebreak
       page_number[cf] = 1;
-    } else {
+    }
+    else
+    {
       print_pagebreak(1);
       if (EVEN(page_number[cf]))
         print_pagebreak(1);
     }
-  } else if (style.pagebreak && mode & ps_mPrintMode_Pos)
+  }
+  else if (style.pagebreak && mode & ps_mPrintMode_Pos)
     print_pagebreak(1);
 
-  if (mode & ps_mPrintMode_Pos || mode & ps_mPrintMode_Start) {
+  if (mode & ps_mPrintMode_Pos || mode & ps_mPrintMode_Start)
+  {
     y -= style.top_offset;
 
-    if (y - style.bottom_offset < ps_cBottomMargin) {
+    if (y - style.bottom_offset < ps_cBottomMargin)
+    {
       print_pagebreak(1);
     }
-  } else
+  }
+  else
     y += style.bottom_offset;
 
-  if (!(mode & ps_mPrintMode_FixX)) {
-    if (style.alignment == cnv_eAlignment_Center) {
-      x = ps_cLeftMargin / 2 + (ps_cPageWidth - ps_cLeftMargin / 2) / 2
-          - 0.50 * strlen(text) * style.font_size / 2;
+  if (!(mode & ps_mPrintMode_FixX))
+  {
+    if (style.alignment == cnv_eAlignment_Center)
+    {
+      x = ps_cLeftMargin / 2 + (ps_cPageWidth - ps_cLeftMargin / 2) / 2 -
+          0.50 * strlen(text) * style.font_size / 2;
       if (x < ps_cLeftMargin / 2)
         x = ps_cLeftMargin / 2;
-    } else
+    }
+    else
       x = ps_cLeftMargin + style.indentation;
   }
 
   int pmode = mode & 31;
-  if (!conf_pass) {
-    if (!streq(text, "")) {
-      switch (pmode) {
+  if (!conf_pass)
+  {
+    if (!streq(text, ""))
+    {
+      switch (pmode)
+      {
       case ps_mPrintMode_Pos:
-      case ps_mPrintMode_KeepY: {
+      case ps_mPrintMode_KeepY:
+      {
         // Full path with beginning and end
         fp[cf] << "/" << style.font << " findfont\n"
                << style.font_size << " scalefont\n"
@@ -210,7 +229,8 @@ void CnvToPs::print_text(const char* text, CnvStyle& style, int mode)
                << "stroke\n";
         break;
       }
-      case ps_mPrintMode_Start: {
+      case ps_mPrintMode_Start:
+      {
         // Start new path
         fp[cf] << "/" << style.font << " findfont\n"
                << style.font_size << " scalefont\n"
@@ -220,7 +240,8 @@ void CnvToPs::print_text(const char* text, CnvStyle& style, int mode)
                << "(" << str << ") show\n";
         break;
       }
-      case ps_mPrintMode_Continue: {
+      case ps_mPrintMode_Continue:
+      {
         // Continue current path
         fp[cf] << "/" << style.font << " findfont\n"
                << style.font_size << " scalefont\n"
@@ -228,7 +249,8 @@ void CnvToPs::print_text(const char* text, CnvStyle& style, int mode)
                << "(" << str << ") show\n";
         break;
       }
-      case ps_mPrintMode_End: {
+      case ps_mPrintMode_End:
+      {
         // Continue and close current path
         fp[cf] << "/" << style.font << " findfont\n"
                << style.font_size << " scalefont\n"
@@ -240,14 +262,19 @@ void CnvToPs::print_text(const char* text, CnvStyle& style, int mode)
       }
       default:;
       }
-    } else {
-      switch (pmode) {
-      case ps_mPrintMode_Start: {
+    }
+    else
+    {
+      switch (pmode)
+      {
+      case ps_mPrintMode_Start:
+      {
         // Start new path
         fp[cf] << "newpath\n" << x << " " << y << " moveto\n";
         break;
       }
-      case ps_mPrintMode_End: {
+      case ps_mPrintMode_End:
+      {
         // Continue and close current path
         fp[cf] << "closepath\n"
                << "stroke\n";
@@ -262,9 +289,11 @@ void CnvToPs::print_text(const char* text, CnvStyle& style, int mode)
 
 void CnvToPs::print_pagebreak(int printnum)
 {
-  if (printnum && !conf_pass && cf != ps_eFile_Info) {
+  if (printnum && !conf_pass && cf != ps_eFile_Info)
+  {
     double page_x;
-    if (page_number[cf] == 0) {
+    if (page_number[cf] == 0)
+    {
       page_number[cf]++;
       return;
     }
@@ -284,8 +313,7 @@ void CnvToPs::print_pagebreak(int printnum)
            << "10 scalefont\n"
            << "setfont\n"
            << "newpath\n"
-           << ps_cPageWidth / 2 - 10 * 0.5 * strlen(previous_chapter) << " "
-           << ps_cPageNumY << " moveto\n"
+           << ps_cPageWidth / 2 - 10 * 0.5 * strlen(previous_chapter) << " " << ps_cPageNumY << " moveto\n"
            << "(" << previous_chapter << ") show\n"
            << "closepath\n"
            << "stroke\n"
@@ -297,7 +325,8 @@ void CnvToPs::print_pagebreak(int printnum)
   }
   page_number[cf]++;
 
-  if (!conf_pass) {
+  if (!conf_pass)
+  {
     fp[cf] << "save\n"
            << "showpage\n"
            << "restore\n";
@@ -318,7 +347,8 @@ void CnvToPs::print_content()
   print_pagebreak(0);
   print_text(Lng::translate("Contents"), style[ci].h1);
 
-  for (int i = 0; i < (int)content.tab.size(); i++) {
+  for (int i = 0; i < (int)content.tab.size(); i++)
+  {
     char page_str[20];
     CnvStyle* cstyle = &style[ci].boldtext;
 
@@ -329,8 +359,7 @@ void CnvToPs::print_content()
     print_text(content.tab[i].header_number, *cstyle);
     x = ps_cLeftMargin + 30 + content.tab[i].header_level * 5;
     y += cstyle->top_offset + cstyle->bottom_offset;
-    print_text(
-        content.tab[i].text, *cstyle, ps_mPrintMode_Start | ps_mPrintMode_FixX);
+    print_text(content.tab[i].text, *cstyle, ps_mPrintMode_Start | ps_mPrintMode_FixX);
     x = ps_cLeftMargin + 340;
 
     fp[cf] << x << " " << y + cstyle->bottom_offset << " lineto\n"
@@ -346,36 +375,37 @@ void CnvToPs::print_content()
     print_pagebreak(0);
 }
 
-CnvToPs::~CnvToPs()
-{
-}
+CnvToPs::~CnvToPs() {}
 
 void CnvToPs::close()
 {
-  if (ci != ps_eId_Report) {
+  if (ci != ps_eId_Report)
+  {
     cf = ps_eFile_Body;
     print_pagebreak(1);
     cf = ps_eFile_Info;
     print_content();
-  } else
+  }
+  else
     fp[cf] << "showpage\n";
 
-  if (!conf_pass) {
+  if (!conf_pass)
+  {
     fp[ps_eFile_Info].close();
     fp[ps_eFile_Body].close();
   }
 
   char cmd[4 + sizeof(filename[ps_eFile_Body]) + 4 + sizeof(filename[ps_eFile_Info]) + 1];
   // Concatenate files
-  sprintf(
-      cmd, "cat %s >> %s", filename[ps_eFile_Body], filename[ps_eFile_Info]);
+  sprintf(cmd, "cat %s >> %s", filename[ps_eFile_Body], filename[ps_eFile_Info]);
   system(cmd);
 }
 
 void CnvToPs::print_horizontal_line()
 {
   y -= 3;
-  if (!conf_pass) {
+  if (!conf_pass)
+  {
     fp[cf] << "newpath\n"
            << ps_cLeftMargin - 50 << " " << y << " moveto\n"
            << ps_cPageWidth << " " << y << " lineto\n"
@@ -390,7 +420,7 @@ static int char_cnt;
 
 static void image_pixel(void* userdata, std::ofstream& fp, unsigned char* rgb)
 {
-  unsigned char transp[3] = { 255, 0, 255 };
+  unsigned char transp[3] = {255, 0, 255};
   int grey;
 
   if (*rgb == transp[0] && *(rgb + 1) == transp[1] && *(rgb + 2) == transp[2])
@@ -400,7 +430,8 @@ static void image_pixel(void* userdata, std::ofstream& fp, unsigned char* rgb)
 
   fp.width(2);
   fp << grey;
-  if (++char_cnt >= 40) {
+  if (++char_cnt >= 40)
+  {
     char_cnt = 0;
     fp << '\n';
   }
@@ -420,21 +451,24 @@ int CnvToPs::print_image(const char* filename)
 
   if (strchr(filename, '/') != 0)
     dcli_translate_filename(fname, filename);
-  else {
+  else
+  {
     // Try $pwr_doc/help/
     strcpy(fname, "$pwr_doc/help/");
     strcat(fname, filename);
     dcli_translate_filename(fname, fname);
   }
   sts = cnv_get_image(fname, &image, &pixmap);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Try $pwr_exe
     strcpy(fname, "$pwr_exe/");
     strcat(fname, filename);
     dcli_translate_filename(fname, fname);
 
     sts = cnv_get_image(fname, &image, &pixmap);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       // Try $pwrp_exe
       strcpy(fname, "$pwrp_exe/");
       strcat(fname, filename);
@@ -449,9 +483,11 @@ int CnvToPs::print_image(const char* filename)
   width = cnv_image_width(image);
   height = cnv_image_height(image);
 
-  if (width * scalex > ps_cPageWidth - ps_cLeftMargin) {
+  if (width * scalex > ps_cPageWidth - ps_cLeftMargin)
+  {
     x = ps_cPageWidth - width * scalex;
-    if (x < 50) {
+    if (x < 50)
+    {
       double scale_factor = (ps_cPageWidth - 50) / (width * scalex);
       x = 50;
       scalex = scalex * scale_factor;
@@ -462,30 +498,27 @@ int CnvToPs::print_image(const char* filename)
   if (y - height * scaley + 20 < ps_cBottomMargin)
     print_pagebreak(1);
 
-  if (!conf_pass) {
+  if (!conf_pass)
+  {
     fp[cf] << "save\n"
            << scalex * width << " " << scaley * height << " scale\n"
            << "/oneline " << width << " string def\n"
            << "/drawimage {\n"
-           << " " << width << " " << height << " 8 [" << width << " 0 0 -"
-           << height << " 0 " << height << "]\n"
+           << " " << width << " " << height << " 8 [" << width << " 0 0 -" << height << " 0 " << height
+           << "]\n"
            << " { currentfile oneline readhexstring pop } image\n"
            << "} def\n"
-           << x / scalex / width << " "
-           << (y - height * scaley) / scaley / height << " translate\n"
+           << x / scalex / width << " " << (y - height * scaley) / scaley / height << " translate\n"
            << "drawimage\n";
 
-    fp[cf].flags((fp[cf].flags() & ~std::ios_base::dec) | std::ios_base::hex
-        | std::ios_base::uppercase);
+    fp[cf].flags((fp[cf].flags() & ~std::ios_base::dec) | std::ios_base::hex | std::ios_base::uppercase);
     fp[cf].fill('0');
 
     char_cnt = 0;
     cnv_image_pixel_iter(image, image_pixel, 0, fp[cf]);
 
     fp[cf] << '\n' << "restore\n";
-    fp[cf].flags(
-        ((fp[cf].flags() & ~std::ios_base::hex) & ~std::ios_base::uppercase)
-        | std::ios_base::dec);
+    fp[cf].flags(((fp[cf].flags() & ~std::ios_base::hex) & ~std::ios_base::uppercase) | std::ios_base::dec);
 
     cnv_free_image(image, pixmap);
   }
@@ -507,17 +540,20 @@ void CnvToPs::print_h1(const char* text, int hlevel, char* subject)
   if (cf == ps_eFile_Info)
     return;
 
-  if (ci == ps_eId_Chapter) {
+  if (ci == ps_eId_Chapter)
+  {
     set_pageheader(text);
   }
 
-  if (style[ci].h1.display_number) {
+  if (style[ci].h1.display_number)
+  {
     if (hlevel < 0)
       hlevel = 0;
     if (hlevel > ps_cMaxLevel - 1)
       hlevel = ps_cMaxLevel - 1;
     header_number[hlevel]++;
-    switch (hlevel) {
+    switch (hlevel)
+    {
     case 0:
       sprintf(hnum, "%d", header_number[0]);
       break;
@@ -525,12 +561,10 @@ void CnvToPs::print_h1(const char* text, int hlevel, char* subject)
       sprintf(hnum, "%d.%d", header_number[0], header_number[1]);
       break;
     case 2:
-      sprintf(hnum, "%d.%d.%d", header_number[0], header_number[1],
-          header_number[2]);
+      sprintf(hnum, "%d.%d.%d", header_number[0], header_number[1], header_number[2]);
       break;
     case 3:
-      sprintf(hnum, "%d.%d.%d.%d", header_number[0], header_number[1],
-          header_number[2], header_number[3]);
+      sprintf(hnum, "%d.%d.%d.%d", header_number[0], header_number[1], header_number[2], header_number[3]);
       break;
     default:;
     }
@@ -543,10 +577,12 @@ void CnvToPs::print_h1(const char* text, int hlevel, char* subject)
       x = x0;
 
     print_text(text, style[ci].h1, ps_mPrintMode_KeepY | ps_mPrintMode_FixX);
-  } else
+  }
+  else
     print_text(text, style[ci].h1);
 
-  if (conf_pass && ci != ps_eId_Report) {
+  if (conf_pass && ci != ps_eId_Report)
+  {
     CnvContentElem cnt;
     cnt.page_number = page_number[cf];
     cnt.header_level = hlevel;
@@ -558,20 +594,15 @@ void CnvToPs::print_h1(const char* text, int hlevel, char* subject)
   strcpy(previous_chapter, current_chapter);
 }
 
-void CnvToPs::print_h2(const char* text)
-{
-  print_text(text, style[ci].h2);
-}
+void CnvToPs::print_h2(const char* text) { print_text(text, style[ci].h2); }
 
-void CnvToPs::print_h3(const char* text)
-{
-  print_text(text, style[ci].h3);
-}
+void CnvToPs::print_h3(const char* text) { print_text(text, style[ci].h3); }
 
 void CnvToPs::open()
 {
   y = ps_cPageHeight - ps_cTopMargin;
-  if (!conf_pass) {
+  if (!conf_pass)
+  {
     fp[ps_eFile_Info].open(filename[ps_eFile_Info]);
     fp[ps_eFile_Body].open(filename[ps_eFile_Body]);
   }

@@ -59,7 +59,8 @@
 
 #define EXTEND 1 /* alias for TRUE */
 
-struct commandline {
+struct commandline
+{
   int cflag;
   int hflag;
   int lflag;
@@ -73,8 +74,7 @@ static char* cmdname;
 #ifdef WIN32
 static char CPP[] = "cl";
 static char CPPFLAGS[] = "/C /EP /nologo";
-#elif defined OS_MACOS || defined OS_FREEBSD || defined OS_OPENBSD             \
-    || defined OS_CYGWIN
+#elif defined OS_MACOS || defined OS_FREEBSD || defined OS_OPENBSD || defined OS_CYGWIN
 static char CPP[] = "/usr/bin/cpp";
 static char CPPFLAGS[] = "-C";
 #else
@@ -88,7 +88,7 @@ static char CL_DEFINE[] = "-DPDR_CLNT";
 static char S_DEFINE[] = "-DPDR_SVC";
 
 static char* allv[] = {
-  "rpcgen", "-s", "udp", "-s", "tcp",
+    "rpcgen", "-s", "udp", "-s", "tcp",
 };
 
 static int allc = sizeof(allv) / sizeof(allv[0]);
@@ -97,8 +97,8 @@ static void c_output(char* infile, char* define, int extend, char* outfile);
 
 static void h_output(char* infile, char* define, int extend, char* outfile);
 
-static void s_output(int argc, char* argv[], char* infile, char* define,
-    int extend, char* outfile, int nomain);
+static void s_output(int argc, char* argv[], char* infile, char* define, int extend, char* outfile,
+                     int nomain);
 
 static void l_output(char* infile, char* define, int extend, char* outfile);
 
@@ -110,7 +110,8 @@ int main(int argc, char* argv[])
 {
   struct commandline cmd;
 
-  if (!parseargs(argc, argv, &cmd)) {
+  if (!parseargs(argc, argv, &cmd))
+  {
     f_print(stderr, "usage: %s infile\n", cmdname);
     f_print(stderr, "       %s [-c | -h] [-o outfile] [infile]\n", cmdname);
 #if 0 /* Not supported by PDR */
@@ -123,15 +124,24 @@ int main(int argc, char* argv[])
 
   fin = NULL;
 
-  if (cmd.cflag) {
+  if (cmd.cflag)
+  {
     c_output(cmd.infile, C_DEFINE, !EXTEND, cmd.outfile);
-  } else if (cmd.hflag) {
+  }
+  else if (cmd.hflag)
+  {
     h_output(cmd.infile, H_DEFINE, !EXTEND, cmd.outfile);
-  } else if (cmd.lflag) {
+  }
+  else if (cmd.lflag)
+  {
     l_output(cmd.infile, CL_DEFINE, !EXTEND, cmd.outfile);
-  } else if (cmd.sflag || cmd.mflag) {
+  }
+  else if (cmd.sflag || cmd.mflag)
+  {
     s_output(argc, argv, cmd.infile, S_DEFINE, !EXTEND, cmd.outfile, cmd.mflag);
-  } else {
+  }
+  else
+  {
     c_output(cmd.infile, C_DEFINE, EXTEND, "_pdr.c");
     reinitialize();
     h_output(cmd.infile, H_DEFINE, EXTEND, ".h");
@@ -147,7 +157,8 @@ int main(int argc, char* argv[])
 /*
  * add extension to filename
  */
-static char* extendfile(file, ext) char* file;
+static char* extendfile(file, ext)
+char* file;
 char* ext;
 {
 #ifdef WIN32
@@ -164,7 +175,8 @@ char* ext;
     file = p + 1;
 
   res = alloc(strlen(file) + strlen(ext) + 1);
-  if (res == NULL) {
+  if (res == NULL)
+  {
     abort();
   }
 #ifdef WIN32
@@ -175,7 +187,8 @@ char* ext;
 #else
   p = rindex(file, '.');
 #endif
-  if (p == NULL) {
+  if (p == NULL)
+  {
     p = file + strlen(file);
   }
   (void)strcpy(res, file);
@@ -188,16 +201,19 @@ char* ext;
  */
 static void open_output(char* infile, char* outfile)
 {
-  if (outfile == NULL) {
+  if (outfile == NULL)
+  {
     fout = stdout;
     return;
   }
-  if (infile != NULL && streq(outfile, infile)) {
+  if (infile != NULL && streq(outfile, infile))
+  {
     f_print(stderr, "%s: output would overwrite %s\n", cmdname, infile);
     crash();
   }
   fout = fopen(outfile, "w");
-  if (fout == NULL) {
+  if (fout == NULL)
+  {
     f_print(stderr, "%s: unable to open ", cmdname);
     perror(outfile);
     crash();
@@ -208,8 +224,7 @@ static void open_output(char* infile, char* outfile)
 /*
  * Open input file with given define for C-preprocessor
  */
-static void open_input(
-    char* infile, char* define, char* outfile /* VMS. Use for temporary file */)
+static void open_input(char* infile, char* define, char* outfile /* VMS. Use for temporary file */)
 {
 #ifdef WIN32
   int old;
@@ -220,7 +235,8 @@ static void open_input(
   old = dup(1);
   (void)dup2(pd[1], 1);
 
-  if (_spawnlp(_P_WAIT, CPP, CPP, CPPFLAGS, define, infile, NULL) < 0) {
+  if (_spawnlp(_P_WAIT, CPP, CPP, CPPFLAGS, define, infile, NULL) < 0)
+  {
     f_print(stderr, "%s: unable to open ", cmdname);
     perror(CPP);
     crash();
@@ -230,7 +246,8 @@ static void open_input(
 
   (void)close(pd[1]);
   fin = fdopen(pd[0], "r");
-  if (fin == NULL) {
+  if (fin == NULL)
+  {
     f_print(stderr, "%s: ", cmdname);
     perror(infilename);
     crash();
@@ -240,7 +257,8 @@ static void open_input(
 
   infilename = (infile == NULL) ? "<stdin>" : infile;
   (void)pipe(pd);
-  switch (fork()) {
+  switch (fork())
+  {
   case 0:
     (void)close(1);
     (void)dup2(pd[1], 1);
@@ -254,7 +272,8 @@ static void open_input(
   }
   (void)close(pd[1]);
   fin = fdopen(pd[0], "r");
-  if (fin == NULL) {
+  if (fin == NULL)
+  {
     f_print(stderr, "%s: ", cmdname);
     perror(infilename);
     crash();
@@ -276,15 +295,18 @@ static void c_output(char* infile, char* define, int extend, char* outfile)
   outfilename = extend ? extendfile(infile, outfile) : outfile;
   open_output(infile, outfilename);
   f_print(fout, "#include \"co_pdr.h\"\n");
-  if (infile && (include = extendfile(infile, ".h"))) {
+  if (infile && (include = extendfile(infile, ".h")))
+  {
     f_print(fout, "#include \"%s\"\n", include);
     free(include);
   }
   tell = ftell(fout);
-  while ((def = get_definition())) {
+  while ((def = get_definition()))
+  {
     emit(def);
   }
-  if (extend && tell == ftell(fout)) {
+  if (extend && tell == ftell(fout))
+  {
     (void)unlink(outfilename);
   }
 }
@@ -305,10 +327,12 @@ static void h_output(char* infile, char* define, int extend, char* outfile)
 
   f_print(fout, "#include \"co_pdr.h\"\n");
 
-  while ((def = get_definition())) {
+  while ((def = get_definition()))
+  {
     print_datadef(def);
   }
-  if (extend && tell == ftell(fout)) {
+  if (extend && tell == ftell(fout))
+  {
     (void)unlink(outfilename);
   }
 }
@@ -316,8 +340,8 @@ static void h_output(char* infile, char* define, int extend, char* outfile)
 /*
  * Compile into an RPC service
  */
-static void s_output(int argc, char* argv[], char* infile, char* define,
-    int extend, char* outfile, int nomain)
+static void s_output(int argc, char* argv[], char* infile, char* define, int extend, char* outfile,
+                     int nomain)
 {
   char* include;
   definition* def;
@@ -329,21 +353,27 @@ static void s_output(int argc, char* argv[], char* infile, char* define,
   open_output(infile, outfilename);
   f_print(fout, "#include <stdio.h>\n");
   f_print(fout, "#include <rpc/rpc.h>\n");
-  if (infile && (include = extendfile(infile, ".h"))) {
+  if (infile && (include = extendfile(infile, ".h")))
+  {
     f_print(fout, "#include \"%s\"\n", include);
     free(include);
   }
   foundprogram = 0;
-  while ((def = get_definition())) {
+  while ((def = get_definition()))
+  {
     foundprogram |= (def->def_kind == DEF_PROGRAM);
   }
-  if (extend && !foundprogram) {
+  if (extend && !foundprogram)
+  {
     (void)unlink(outfilename);
     return;
   }
-  if (nomain) {
+  if (nomain)
+  {
     write_programs((char*)NULL);
-  } else {
+  }
+  else
+  {
     write_most();
     do_registers(argc, argv);
     write_rest();
@@ -362,15 +392,18 @@ static void l_output(char* infile, char* define, int extend, char* outfile)
   outfilename = extend ? extendfile(infile, outfile) : outfile;
   open_output(infile, outfilename);
   f_print(fout, "#include <rpc/rpc.h>\n");
-  if (infile && (include = extendfile(infile, ".h"))) {
+  if (infile && (include = extendfile(infile, ".h")))
+  {
     f_print(fout, "#include \"%s\"\n", include);
     free(include);
   }
   foundprogram = 0;
-  while ((def = get_definition())) {
+  while ((def = get_definition()))
+  {
     foundprogram |= (def->def_kind == DEF_PROGRAM);
   }
-  if (extend && !foundprogram) {
+  if (extend && !foundprogram)
+  {
     (void)unlink(outfilename);
     return;
   }
@@ -385,8 +418,10 @@ static void do_registers(int argc, char* argv[])
 {
   int i;
 
-  for (i = 1; i < argc; i++) {
-    if (streq(argv[i], "-s")) {
+  for (i = 1; i < argc; i++)
+  {
+    if (streq(argv[i], "-s"))
+    {
       write_register(argv[i + 1]);
       i++;
     }
@@ -407,7 +442,8 @@ static int parseargs(int argc, char* argv[], struct commandline* cmd)
 
   cmdname = argv[0];
   cmd->infile = cmd->outfile = NULL;
-  if (argc < 2) {
+  if (argc < 2)
+  {
     return (0);
   }
   flag['c'] = 0;
@@ -416,22 +452,30 @@ static int parseargs(int argc, char* argv[], struct commandline* cmd)
   flag['o'] = 0;
   flag['l'] = 0;
   flag['m'] = 0;
-  for (i = 1; i < argc; i++) {
-    if (argv[i][0] != '-') {
-      if (cmd->infile) {
+  for (i = 1; i < argc; i++)
+  {
+    if (argv[i][0] != '-')
+    {
+      if (cmd->infile)
+      {
         return (0);
       }
       cmd->infile = argv[i];
-    } else {
-      for (j = 1; argv[i][j] != 0; j++) {
+    }
+    else
+    {
+      for (j = 1; argv[i][j] != 0; j++)
+      {
         c = argv[i][j];
-        switch (c) {
+        switch (c)
+        {
         case 'c':
         case 'h':
           /* not supported by PDR		case 'l':
            *				case 'm':
            */
-          if (flag[(int)c]) {
+          if (flag[(int)c])
+          {
             return (0);
           }
           flag[(int)c] = 1;
@@ -439,19 +483,26 @@ static int parseargs(int argc, char* argv[], struct commandline* cmd)
 
         /* not supported by PDR         case 's': */
         case 'o':
-          if (argv[i][j - 1] != '-' || argv[i][j + 1] != 0) {
+          if (argv[i][j - 1] != '-' || argv[i][j + 1] != 0)
+          {
             return (0);
           }
           flag[(int)c] = 1;
-          if (++i == argc) {
+          if (++i == argc)
+          {
             return (0);
           }
-          if (c == 's') {
-            if (!streq(argv[i], "udp") && !streq(argv[i], "tcp")) {
+          if (c == 's')
+          {
+            if (!streq(argv[i], "udp") && !streq(argv[i], "tcp"))
+            {
               return (0);
             }
-          } else if (c == 'o') {
-            if (cmd->outfile) {
+          }
+          else if (c == 'o')
+          {
+            if (cmd->outfile)
+            {
               return (0);
             }
             cmd->outfile = argv[i];
@@ -471,11 +522,15 @@ static int parseargs(int argc, char* argv[], struct commandline* cmd)
   cmd->lflag = flag['l'];
   cmd->mflag = flag['m'];
   nflags = cmd->cflag + cmd->hflag + cmd->sflag + cmd->lflag + cmd->mflag;
-  if (nflags == 0) {
-    if (cmd->outfile != NULL || cmd->infile == NULL) {
+  if (nflags == 0)
+  {
+    if (cmd->outfile != NULL || cmd->infile == NULL)
+    {
       return (0);
     }
-  } else if (nflags > 1) {
+  }
+  else if (nflags > 1)
+  {
     return (0);
   }
   return (1);

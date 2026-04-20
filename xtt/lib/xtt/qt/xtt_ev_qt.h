@@ -46,12 +46,12 @@
 
 class EvQtObject;
 
-class EvQt : public Ev {
+class EvQt : public Ev
+{
 public:
-  EvQt(void* ev_parent_ctx, char* eve_name, char* ala_name, char* blk_name,
-      pwr_tObjid ev_user, int display_ala, int display_eve, int display_blk,
-      int display_return, int display_ack, int ev_beep, pwr_tMask ev_pop_mask,
-      int ev_eventname_seg, pwr_tStatus* status);
+  EvQt(void* ev_parent_ctx, char* eve_name, char* ala_name, char* blk_name, pwr_tObjid ev_user,
+       int display_ala, int display_eve, int display_blk, int display_return, int display_ack, int ev_beep,
+       pwr_tMask ev_pop_mask, int ev_eventname_seg, pwr_tStatus* status);
   ~EvQt();
 
   QDialog* parent_wid_eve;
@@ -72,18 +72,17 @@ public:
   void set_transient_ala(void* basewidget);
   void set_transient_blk(void* basewidget);
   void set_title_ala(char* title);
-  EvAla* open_alarmlist_satellite(const char* title, pwr_tStatus* sts,
-      int width, int height, int x, int y, pwr_tObjid view,
-      unsigned int options = 0, void* widget = 0);
-  EvEve* open_eventlist_satellite(const char* title, pwr_tStatus* sts,
-      int width, int height, int x, int y, pwr_tObjid view,
-      unsigned int options = 0, void* widget = 0);
+  EvAla* open_alarmlist_satellite(const char* title, pwr_tStatus* sts, int width, int height, int x, int y,
+                                  pwr_tObjid view, unsigned int options = 0, void* widget = 0);
+  EvEve* open_eventlist_satellite(const char* title, pwr_tStatus* sts, int width, int height, int x, int y,
+                                  pwr_tObjid view, unsigned int options = 0, void* widget = 0);
 
 private:
   EvQtObject* object = NULL;
 };
 
-class EvQtObject : public QObject {
+class EvQtObject : public QObject
+{
   Q_OBJECT
 
 public:

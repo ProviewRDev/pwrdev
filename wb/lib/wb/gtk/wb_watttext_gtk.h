@@ -43,11 +43,11 @@
 
 #include "cow_wow_gtk.h"
 
-class WAttTextGtk : public WAttText {
+class WAttTextGtk : public WAttText
+{
 public:
-  WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
-      ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref, int wa_editmode,
-      pwr_tStatus* status);
+  WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref,
+              int wa_editmode, pwr_tStatus* status);
   ~WAttTextGtk();
   GtkWidget* parent_wid;
   GtkWidget* toplevel;
@@ -76,11 +76,10 @@ public:
   static void activate_ok(GtkWidget* w, gpointer data);
   static void activate_apply(GtkWidget* w, gpointer data);
   static void activate_cancel(GtkWidget* w, gpointer data);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void action_text_changed(GtkTextBuffer* w, gpointer data);
-  static void action_text_inserted(GtkTextBuffer* w, GtkTextIter* arg1,
-      gchar* arg2, gint arg3, gpointer data);
+  static void action_text_inserted(GtkTextBuffer* w, GtkTextIter* arg1, gchar* arg2, gint arg3,
+                                   gpointer data);
 };
 
 #endif

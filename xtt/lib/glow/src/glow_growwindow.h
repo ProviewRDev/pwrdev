@@ -37,6 +37,8 @@
 #ifndef glow_growwindow_h
 #define glow_growwindow_h
 
+#include <iosfwd>
+
 #include "glow_growrect.h"
 
 /*! \file glow_growwindow.h
@@ -55,7 +57,8 @@ class GrowScrollBar;
   object is clicked on, moved etc.
 */
 
-class GrowWindow : public GrowRect {
+class GrowWindow : public GrowRect
+{
 public:
   //! Constuctor
   /*!
@@ -70,10 +73,9 @@ public:
     \param display_lev	Displaylevel when this object is visible.
     \param nodraw	Don't draw the object now.
   */
-  GrowWindow(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0,
-      double w = 0, double h = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int nodraw = 0);
+  GrowWindow(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0, double w = 0, double h = 0,
+             glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
+             glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int nodraw = 0);
 
   //! Destructor
   /*! Remove the object from context, and erase it from the screen.
@@ -85,13 +87,13 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Draw the objects if any part is inside the drawing area.
   /*!
@@ -126,33 +128,30 @@ public:
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowWindow;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowWindow; }
 
-  char file_name[80]; //!< Graph file name.
-  char input_file_name[80]; //!< Filename inserted in attribute editor.
-  GlowTraceData trace; //!< Obsolete
-  void* user_data; //!< User data.
-  GrowCtx* window_ctx; //!< Window grow context.
-  int vertical_scrollbar; //!< Draw vertical scrollbar.
-  int horizontal_scrollbar; //!< Draw horizontal scrollbar.
-  double scrollbar_width; //!< Width of scrollbar objects.
-  GrowScrollBar* v_scrollbar; //!< Vertical scrollbar object.
-  GrowScrollBar* h_scrollbar; //!< Horizontal scrollbar object.
-  double v_value; //!< Value of vertical scrollbar.
-  double h_value; //!< Value of horizontal scrollbar.
-  double wctx_x0; //!< Coordinate for left border of window ctx.
-  double wctx_x1; //!< Coordinate for right border of window ctx.
-  double wctx_y0; //!< Coordinate for low border of window ctx.
-  double wctx_y1; //!< Coordiante for high border of window ctx.
-  glow_eDrawType scrollbar_color; //!< Color of scrollbar bar.
+  char file_name[80];                //!< Graph file name.
+  char input_file_name[80];          //!< Filename inserted in attribute editor.
+  GlowTraceData trace;               //!< Obsolete
+  void* user_data;                   //!< User data.
+  GrowCtx* window_ctx;               //!< Window grow context.
+  int vertical_scrollbar;            //!< Draw vertical scrollbar.
+  int horizontal_scrollbar;          //!< Draw horizontal scrollbar.
+  double scrollbar_width;            //!< Width of scrollbar objects.
+  GrowScrollBar* v_scrollbar;        //!< Vertical scrollbar object.
+  GrowScrollBar* h_scrollbar;        //!< Horizontal scrollbar object.
+  double v_value;                    //!< Value of vertical scrollbar.
+  double h_value;                    //!< Value of horizontal scrollbar.
+  double wctx_x0;                    //!< Coordinate for left border of window ctx.
+  double wctx_x1;                    //!< Coordinate for right border of window ctx.
+  double wctx_y0;                    //!< Coordinate for low border of window ctx.
+  double wctx_y1;                    //!< Coordiante for high border of window ctx.
+  glow_eDrawType scrollbar_color;    //!< Color of scrollbar bar.
   glow_eDrawType scrollbar_bg_color; //!< Color of scrollbar background.
-  double window_scale; //!< Scale of window ctx.
-  double y_low_offs; //!< y low offset.
-  int input_focus; //!< Window has input focus.
-  char owner[256]; //!< Window owner.
+  double window_scale;               //!< Scale of window ctx.
+  double y_low_offs;                 //!< y low offset.
+  int input_focus;                   //!< Window has input focus.
+  char owner[256];                   //!< Window owner.
 
   //! Draw the object.
   /*!
@@ -168,8 +167,8 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();
@@ -182,8 +181,7 @@ public:
     \param colornode	The node that controls the color of the object. Can be
     zero.
   */
-  void draw_brief(GlowWind* w, GlowTransform* t, int highlight, int hot,
-      void* node, void* colornode);
+  void draw_brief(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode);
 
   //! Scan trace
   /*! Calls the trace scan callback for the object.
@@ -218,19 +216,13 @@ public:
   /*!
     \param data User data.
   */
-  void set_user_data(void* data)
-  {
-    user_data = data;
-  }
+  void set_user_data(void* data) { user_data = data; }
 
   //! Get user data.
   /*!
     \param data User data.
   */
-  void get_user_data(void** data)
-  {
-    *data = user_data;
-  }
+  void get_user_data(void** data) { *data = user_data; }
 
   //! Export the object as a javabean.
   /*!
@@ -248,8 +240,8 @@ public:
     used to generate
     java code for the bean.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ostream& fp);
 
   //! Conversion between different versions of Glow
   /*!
@@ -257,8 +249,7 @@ public:
   */
   void convert(glow_eConvert version);
 
-  int event_handler(
-      GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
 
   //! Check if new filename
   int update_attributes();
@@ -270,25 +261,12 @@ public:
   void configure_scrollbars();
 
   void set_transform_from_stored(GlowTransform* t);
-  void set_fill(int fillval)
-  {
-  }
-  void set_fill_color(glow_eDrawType drawtype)
-  {
-  }
-  void set_original_fill_color(glow_eDrawType drawtype)
-  {
-  }
-  void set_rotation(
-      double angle, double x0, double y0, glow_eRotationPoint type)
-  {
-  }
-  void flip(double x0, double y0, glow_eFlipDirection dir)
-  {
-  }
-  void set_transform(GlowTransform* t)
-  {
-  }
+  void set_fill(int fillval) {}
+  void set_fill_color(glow_eDrawType drawtype) {}
+  void set_original_fill_color(glow_eDrawType drawtype) {}
+  void set_rotation(double angle, double x0, double y0, glow_eRotationPoint type) {}
+  void flip(double x0, double y0, glow_eFlipDirection dir) {}
+  void set_transform(GlowTransform* t) {}
   void draw_background();
   void set_shadow(int shadowval)
   {
@@ -297,9 +275,9 @@ public:
     draw();
   }
   void zoom();
-  int get_background_object_limits(GlowTransform* t, glow_eTraceType type,
-      double x, double y, GlowArrayElem** background, double* min, double* max,
-      glow_eDirection* direction);
+  int get_background_object_limits(GlowTransform* t, glow_eTraceType type, double x, double y,
+                                   GlowArrayElem** background, double* min, double* max,
+                                   glow_eDirection* direction);
   void set_input_focus(int focus, glow_eEvent event);
   int set_source(char* source, char* new_owner);
   int export_script(GlowExportScript* es, void* o, void* m);

@@ -75,85 +75,40 @@
 
 static char* growapi_translate(char* transtab, const char* name);
 
-int grow_Save(grow_tCtx ctx, char* filename)
-{
-  return ctx->save(filename, glow_eSaveMode_Edit);
-}
+int grow_Save(grow_tCtx ctx, char* filename) { return ctx->save(filename, glow_eSaveMode_Edit); }
 
-int grow_Open(grow_tCtx ctx, char* filename)
-{
-  return ctx->open(filename, glow_eSaveMode_Edit);
-}
+int grow_Open(grow_tCtx ctx, char* filename) { return ctx->open(filename, glow_eSaveMode_Edit); }
 
-int grow_SaveTrace(grow_tCtx ctx, char* filename)
-{
-  return ctx->save(filename, glow_eSaveMode_Trace);
-}
+int grow_SaveTrace(grow_tCtx ctx, char* filename) { return ctx->save(filename, glow_eSaveMode_Trace); }
 
-int grow_OpenTrace(grow_tCtx ctx, char* filename)
-{
-  return ctx->open(filename, glow_eSaveMode_Trace);
-}
+int grow_OpenTrace(grow_tCtx ctx, char* filename) { return ctx->open(filename, glow_eSaveMode_Trace); }
 
-void grow_DeleteObject(grow_tCtx ctx, grow_tObject object)
-{
-  ctx->delete_object((GlowArrayElem*)object);
-}
+void grow_DeleteObject(grow_tCtx ctx, grow_tObject object) { ctx->delete_object((GlowArrayElem*)object); }
 
-void grow_DeleteAll(grow_tCtx ctx)
-{
-  ctx->delete_all();
-}
+void grow_DeleteAll(grow_tCtx ctx) { ctx->delete_all(); }
 
 int grow_FindSelectedObject(grow_tCtx ctx, grow_tObject object)
 {
   return ctx->select_find((GlowArrayElem*)object);
 }
 
-void grow_ResetHighlightAll(grow_tCtx ctx)
-{
-  ctx->set_highlight(0);
-}
+void grow_ResetHighlightAll(grow_tCtx ctx) { ctx->set_highlight(0); }
 
-void grow_ResetInverseAll(grow_tCtx ctx)
-{
-  ctx->set_inverse(0);
-}
+void grow_ResetInverseAll(grow_tCtx ctx) { ctx->set_inverse(0); }
 
-void grow_ResetSelectInverse(grow_tCtx ctx)
-{
-  ctx->set_select_inverse(0);
-}
+void grow_ResetSelectInverse(grow_tCtx ctx) { ctx->set_select_inverse(0); }
 
-void grow_ResetSelectHighlight(grow_tCtx ctx)
-{
-  ctx->set_select_highlight(0);
-}
+void grow_ResetSelectHighlight(grow_tCtx ctx) { ctx->set_select_highlight(0); }
 
-void grow_SetSelectHighlight(grow_tCtx ctx)
-{
-  ctx->set_select_highlight(1);
-}
+void grow_SetSelectHighlight(grow_tCtx ctx) { ctx->set_select_highlight(1); }
 
-void grow_SetSelectInverse(grow_tCtx ctx)
-{
-  ctx->set_select_inverse(1);
-}
+void grow_SetSelectInverse(grow_tCtx ctx) { ctx->set_select_inverse(1); }
 
-void grow_SelectInsert(grow_tCtx ctx, grow_tObject object)
-{
-  ctx->select_insert((GlowArrayElem*)object);
-}
+void grow_SelectInsert(grow_tCtx ctx, grow_tObject object) { ctx->select_insert((GlowArrayElem*)object); }
 
-void grow_SelectRemove(grow_tCtx ctx, grow_tObject object)
-{
-  ctx->select_remove((GlowArrayElem*)object);
-}
+void grow_SelectRemove(grow_tCtx ctx, grow_tObject object) { ctx->select_remove((GlowArrayElem*)object); }
 
-void grow_SelectClear(grow_tCtx ctx)
-{
-  ctx->select_clear();
-}
+void grow_SelectClear(grow_tCtx ctx) { ctx->select_clear(); }
 
 void grow_GetSelectedNodes(grow_tCtx ctx, grow_tNode** nodes, int* num)
 {
@@ -165,41 +120,32 @@ void grow_GetSelectedCons(grow_tCtx ctx, grow_tCon** cons, int* num)
   ctx->get_selected_cons((GlowArrayElem***)cons, num);
 }
 
-void grow_GetNodeClassList(
-    grow_tCtx ctx, grow_tNodeClass** nodeclasses, int* num)
+void grow_GetNodeClassList(grow_tCtx ctx, grow_tNodeClass** nodeclasses, int* num)
 {
   ctx->get_nodeclasslist((GlowArrayElem***)nodeclasses, num);
 }
 
-void grow_GetNodeGroupList(
-    grow_tCtx ctx, grow_tNodeClass** nodegroups, int* num)
+void grow_GetNodeGroupList(grow_tCtx ctx, grow_tNodeClass** nodegroups, int* num)
 {
   ctx->get_nodegrouplist((GlowArrayElem***)nodegroups, num);
 }
 
-void grow_GetNodeClassObjectList(
-    grow_tObject nodeclass, grow_tObject** objects, int* num)
+void grow_GetNodeClassObjectList(grow_tObject nodeclass, grow_tObject** objects, int* num)
 {
   ((GlowNodeClass*)nodeclass)->get_objectlist((GlowArrayElem***)objects, num);
 }
 
-void grow_SetHighlight(grow_tObject object, int value)
-{
-  ((GlowArrayElem*)object)->set_highlight(value);
-}
+void grow_SetHighlight(grow_tObject object, int value) { ((GlowArrayElem*)object)->set_highlight(value); }
 
 void grow_GetHighlight(grow_tObject object, int* value)
 {
   *value = ((GlowArrayElem*)object)->get_highlight();
 }
 
-void grow_SetInverse(grow_tObject object, int value)
-{
-  ((GlowArrayElem*)object)->set_inverse(value);
-}
+void grow_SetInverse(grow_tObject object, int value) { ((GlowArrayElem*)object)->set_inverse(value); }
 
-void grow_CreateNode(grow_tCtx ctx, char* name, grow_tNodeClass nc, double x,
-    double y, void* user_data, grow_tNode* node)
+void grow_CreateNode(grow_tCtx ctx, char* name, grow_tNodeClass nc, double x, double y, void* user_data,
+                     grow_tNode* node)
 {
   GlowNode* n1;
   n1 = new GlowNode(ctx, name, (GlowNodeClass*)nc, x, y);
@@ -209,8 +155,8 @@ void grow_CreateNode(grow_tCtx ctx, char* name, grow_tNodeClass nc, double x,
   *node = (grow_tNode)n1;
 }
 
-void grow_CreateGrowNode(grow_tCtx ctx, const char* name, grow_tNodeClass nc,
-    double x, double y, void* user_data, grow_tNode* node)
+void grow_CreateGrowNode(grow_tCtx ctx, const char* name, grow_tNodeClass nc, double x, double y,
+                         void* user_data, grow_tNode* node)
 {
   GrowNode* n1;
   n1 = new GrowNode(ctx, name, (GlowNodeClass*)nc, x, y);
@@ -220,8 +166,8 @@ void grow_CreateGrowNode(grow_tCtx ctx, const char* name, grow_tNodeClass nc,
   *node = (grow_tNode)n1;
 }
 
-void grow_CreateGrowSlider(grow_tCtx ctx, const char* name, grow_tNodeClass nc,
-    double x, double y, void* user_data, grow_tNode* node)
+void grow_CreateGrowSlider(grow_tCtx ctx, const char* name, grow_tNodeClass nc, double x, double y,
+                           void* user_data, grow_tNode* node)
 {
   GrowSlider* n1;
   n1 = new GrowSlider(ctx, name, (GlowNodeClass*)nc, x, y);
@@ -231,23 +177,21 @@ void grow_CreateGrowSlider(grow_tCtx ctx, const char* name, grow_tNodeClass nc,
   *node = (grow_tNode)n1;
 }
 
-void grow_CreateCon(grow_tCtx ctx, const char* name, grow_tConClass cc,
-    grow_tNode source, grow_tNode dest, int source_conpoint, int dest_conpoint,
-    void* user_data, grow_tCon* con, int point_num, double* x_vect,
-    double* y_vect, int border, int shadow)
+void grow_CreateCon(grow_tCtx ctx, const char* name, grow_tConClass cc, grow_tNode source, grow_tNode dest,
+                    int source_conpoint, int dest_conpoint, void* user_data, grow_tCon* con, int point_num,
+                    double* x_vect, double* y_vect, int border, int shadow)
 {
   GlowCon* c1;
-  c1 = new GlowCon(ctx, name, (GlowConClass*)cc, (GlowNode*)source,
-      (GlowNode*)dest, source_conpoint, dest_conpoint, 0, point_num, x_vect,
-      y_vect, border, shadow);
+  c1 = new GlowCon(ctx, name, (GlowConClass*)cc, (GlowNode*)source, (GlowNode*)dest, source_conpoint,
+                   dest_conpoint, 0, point_num, x_vect, y_vect, border, shadow);
   c1->set_user_data(user_data);
   ctx->insert(c1);
   ctx->nav_zoom();
   *con = (grow_tCon)c1;
 }
 
-void grow_CreatePasteNode(grow_tCtx ctx, char* name, grow_tNodeClass nc,
-    double x, double y, void* user_data, grow_tNode* node)
+void grow_CreatePasteNode(grow_tCtx ctx, char* name, grow_tNodeClass nc, double x, double y, void* user_data,
+                          grow_tNode* node)
 {
   GlowNode* n1;
 
@@ -267,35 +211,33 @@ void grow_SetObjectInputFocus(grow_tNode node, int focus, glow_eEvent event)
 
 void grow_SetAnnotation(grow_tNode node, int number, const char* text, int size)
 {
-  if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowSlider
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowGroup)
+  if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowSlider ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowGroup)
     ((GrowNode*)node)->set_annotation(number, text, size, 0);
 }
 
-void grow_SetAnnotationInput(
-    grow_tNode node, int number, const char* text, int size)
+void grow_SetAnnotationInput(grow_tNode node, int number, const char* text, int size)
 {
-  if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowSlider
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowGroup)
+  if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowSlider ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowGroup)
     ((GrowNode*)node)->set_annotation_input(number, text, size, 0);
 }
 
-void grow_SetAnnotationBrief(
-    grow_tNode node, int number, const char* text, int size)
+void grow_SetAnnotationBrief(grow_tNode node, int number, const char* text, int size)
 {
-  if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowSlider
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowGroup)
+  if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowSlider ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowGroup)
     ((GrowNode*)node)->set_annotation(number, text, size, 0, 1);
 }
 
 void grow_GetAnnotation(grow_tNode node, int number, char* text, int size)
 {
-  if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowSlider
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowGroup)
+  if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowSlider ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowGroup)
     ((GrowNode*)node)->get_annotation(number, text, size);
 }
 
@@ -317,15 +259,9 @@ void grow_CloseAnnotationInput(grow_tNode node, int number)
     ((GrowNode*)node)->close_annotation_input(number);
 }
 
-void grow_CloseAnnotationInputAll(GrowCtx* ctx)
-{
-  ctx->close_annotation_input_all();
-}
+void grow_CloseAnnotationInputAll(GrowCtx* ctx) { ctx->close_annotation_input_all(); }
 
-void grow_ResetInputFocusAll(GrowCtx* ctx)
-{
-  ctx->reset_input_focus_all();
-}
+void grow_ResetInputFocusAll(GrowCtx* ctx) { ctx->reset_input_focus_all(); }
 
 int grow_AnnotationInputIsOpen(grow_tNode node, int number)
 {
@@ -335,8 +271,7 @@ int grow_AnnotationInputIsOpen(grow_tNode node, int number)
     return 0;
 }
 
-void grow_SetPasteNodeAnnotation(
-    grow_tNode node, int number, char* text, int size)
+void grow_SetPasteNodeAnnotation(grow_tNode node, int number, char* text, int size)
 {
   if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode)
     ((GrowNode*)node)->set_annotation(number, text, size, 1);
@@ -355,161 +290,122 @@ void grow_SetAnnotationTextOffset(grow_tNode node, int num, double x, double y)
     ((GrowNode*)node)->set_annotation_text_offset(num, x, y);
 }
 
-void grow_GetAnnotationTextExtent(
-    grow_tNode node, int num, double* width, double* height)
+void grow_GetAnnotationTextExtent(grow_tNode node, int num, double* width, double* height)
 {
   if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode)
     ((GrowNode*)node)->get_annotation_text_extent(num, width, height);
 }
 
-extern "C" void grow_EnableEvent(GrowCtx* ctx, glow_eEvent event,
-    glow_eEventType event_type,
-    int (*event_cb)(GlowCtx* ctx, glow_tEvent event))
+extern "C" void grow_EnableEvent(GrowCtx* ctx, glow_eEvent event, glow_eEventType event_type,
+                                 int (*event_cb)(GlowCtx* ctx, glow_tEvent event))
 {
   ctx->enable_event(event, event_type, event_cb);
 }
 
-void grow_DisableEvent(GrowCtx* ctx, glow_eEvent event)
+void grow_DisableEvent(GrowCtx* ctx, glow_eEvent event) { ctx->disable_event(event); }
+
+extern "C" void grow_DisableEventAll(GrowCtx* ctx) { ctx->disable_event_all(); }
+
+void grow_Cut(grow_tCtx ctx) { ctx->cut(); }
+
+void grow_Copy(grow_tCtx ctx) { ctx->copy(); }
+
+void grow_Paste(grow_tCtx ctx) { ctx->paste(); }
+
+void grow_PasteClear(grow_tCtx ctx) { ctx->paste_clear(); }
+
+int grow_GetPasteActive(grow_tCtx ctx) { return ctx->get_paste_active(); }
+
+void grow_CreateRect(grow_tCtx ctx, double x, double y, double width, double height, glow_eDrawType draw_type,
+                     int line_width, int fix_line_width, grow_tObject* rect)
 {
-  ctx->disable_event(event);
+  *rect = (grow_tObject) new GlowRect(ctx, x, y, width, height, draw_type, line_width, fix_line_width);
 }
 
-extern "C" void grow_DisableEventAll(GrowCtx* ctx)
+void grow_CreateLine(grow_tCtx ctx, double x1, double y1, double x2, double y2, glow_eDrawType draw_type,
+                     int line_width, int fix_line_width, grow_tObject* line)
 {
-  ctx->disable_event_all();
+  *line = (grow_tObject) new GlowLine(ctx, x1, y1, x2, y2, draw_type, line_width, fix_line_width);
 }
 
-void grow_Cut(grow_tCtx ctx)
+void grow_CreateArc(grow_tCtx ctx, double x1, double y1, double x2, double y2, int angle1, int angle2,
+                    glow_eDrawType draw_type, int line_width, grow_tObject* arc)
 {
-  ctx->cut();
+  *arc = (grow_tObject) new GlowArc(ctx, x1, y1, x2, y2, angle1, angle2, draw_type, line_width);
 }
 
-void grow_Copy(grow_tCtx ctx)
+void grow_CreateText(grow_tCtx ctx, char* text_str, double x, double y, glow_eDrawType draw_type,
+                     int text_size, grow_tObject* text)
 {
-  ctx->copy();
+  *text = (grow_tObject) new GlowText(ctx, text_str, x, y, draw_type, glow_eDrawType_Line, text_size);
 }
 
-void grow_Paste(grow_tCtx ctx)
-{
-  ctx->paste();
-}
-
-void grow_PasteClear(grow_tCtx ctx)
-{
-  ctx->paste_clear();
-}
-
-int grow_GetPasteActive(grow_tCtx ctx)
-{
-  return ctx->get_paste_active();
-}
-
-void grow_CreateRect(grow_tCtx ctx, double x, double y, double width,
-    double height, glow_eDrawType draw_type, int line_width, int fix_line_width,
-    grow_tObject* rect)
-{
-  *rect = (grow_tObject) new GlowRect(
-      ctx, x, y, width, height, draw_type, line_width, fix_line_width);
-}
-
-void grow_CreateLine(grow_tCtx ctx, double x1, double y1, double x2, double y2,
-    glow_eDrawType draw_type, int line_width, int fix_line_width,
-    grow_tObject* line)
-{
-  *line = (grow_tObject) new GlowLine(
-      ctx, x1, y1, x2, y2, draw_type, line_width, fix_line_width);
-}
-
-void grow_CreateArc(grow_tCtx ctx, double x1, double y1, double x2, double y2,
-    int angle1, int angle2, glow_eDrawType draw_type, int line_width,
-    grow_tObject* arc)
-{
-  *arc = (grow_tObject) new GlowArc(
-      ctx, x1, y1, x2, y2, angle1, angle2, draw_type, line_width);
-}
-
-void grow_CreateText(grow_tCtx ctx, char* text_str, double x, double y,
-    glow_eDrawType draw_type, int text_size, grow_tObject* text)
-{
-  *text = (grow_tObject) new GlowText(
-      ctx, text_str, x, y, draw_type, glow_eDrawType_Line, text_size);
-}
-
-void grow_AddRect(grow_tNodeClass nc, const char* name, double x, double y,
-    double width, double height, glow_eDrawType draw_type, int line_width,
-    int fix_line_width, glow_mDisplayLevel display_level, int fill_rect,
-    int border, int shadow, glow_eDrawType fill_draw_type, void* user_data)
+void grow_AddRect(grow_tNodeClass nc, const char* name, double x, double y, double width, double height,
+                  glow_eDrawType draw_type, int line_width, int fix_line_width,
+                  glow_mDisplayLevel display_level, int fill_rect, int border, int shadow,
+                  glow_eDrawType fill_draw_type, void* user_data)
 {
   GrowRect* r1;
-  r1 = new GrowRect(((GlowNodeClass*)nc)->ctx, name, x, y, width, height,
-      draw_type, line_width, fix_line_width, display_level, fill_rect, border,
-      shadow, fill_draw_type);
+  r1 = new GrowRect(((GlowNodeClass*)nc)->ctx, name, x, y, width, height, draw_type, line_width,
+                    fix_line_width, display_level, fill_rect, border, shadow, fill_draw_type);
   r1->set_user_data(user_data);
   ((GlowNodeClass*)nc)->insert(r1);
 }
 
-void grow_AddLine(grow_tNodeClass nc, const char* name, double x1, double y1,
-    double x2, double y2, glow_eDrawType draw_type, int line_width,
-    int fix_line_width, void* user_data)
+void grow_AddLine(grow_tNodeClass nc, const char* name, double x1, double y1, double x2, double y2,
+                  glow_eDrawType draw_type, int line_width, int fix_line_width, void* user_data)
 {
   GrowLine* l1;
-  l1 = new GrowLine(((GlowNodeClass*)nc)->ctx, name, x1, y1, x2, y2, draw_type,
-      line_width, fix_line_width);
+  l1 = new GrowLine(((GlowNodeClass*)nc)->ctx, name, x1, y1, x2, y2, draw_type, line_width, fix_line_width);
   l1->set_user_data(user_data);
   ((GlowNodeClass*)nc)->insert(l1);
 }
 
-void grow_AddPolyLine(grow_tNodeClass nc, const char* name,
-    glow_sPoint* pointarray, int point_cnt, glow_eDrawType draw_type,
-    int line_width, int fix_line_width, int fill, int border, int shadow,
-    glow_eDrawType fill_draw_type, int closed, void* user_data)
+void grow_AddPolyLine(grow_tNodeClass nc, const char* name, glow_sPoint* pointarray, int point_cnt,
+                      glow_eDrawType draw_type, int line_width, int fix_line_width, int fill, int border,
+                      int shadow, glow_eDrawType fill_draw_type, int closed, void* user_data)
 {
   GrowPolyLine* l1;
-  l1 = new GrowPolyLine(((GlowNodeClass*)nc)->ctx, name, pointarray, point_cnt,
-      draw_type, line_width, fix_line_width, fill, border, shadow,
-      fill_draw_type, closed);
+  l1 = new GrowPolyLine(((GlowNodeClass*)nc)->ctx, name, pointarray, point_cnt, draw_type, line_width,
+                        fix_line_width, fill, border, shadow, fill_draw_type, closed);
   l1->set_user_data(user_data);
   ((GlowNodeClass*)nc)->insert(l1);
 }
 
-void grow_AddArc(grow_tNodeClass nc, const char* name, double x1, double y1,
-    double x2, double y2, int angle1, int angle2, glow_eDrawType draw_type,
-    int line_width, int fill_arc, int border, int shadow,
-    glow_eDrawType fill_draw_type, void* user_data)
+void grow_AddArc(grow_tNodeClass nc, const char* name, double x1, double y1, double x2, double y2, int angle1,
+                 int angle2, glow_eDrawType draw_type, int line_width, int fill_arc, int border, int shadow,
+                 glow_eDrawType fill_draw_type, void* user_data)
 {
   GrowArc* a1;
-  a1 = new GrowArc(((GlowNodeClass*)nc)->ctx, name, x1, y1, x2, y2, angle1,
-      angle2, draw_type, line_width, fill_arc, border, shadow, fill_draw_type);
+  a1 = new GrowArc(((GlowNodeClass*)nc)->ctx, name, x1, y1, x2, y2, angle1, angle2, draw_type, line_width,
+                   fill_arc, border, shadow, fill_draw_type);
   a1->set_user_data(user_data);
   ((GlowNodeClass*)nc)->insert(a1);
 }
 
-void grow_AddText(grow_tNodeClass nc, const char* name, const char* text,
-    double x, double y, glow_eDrawType draw_type, glow_eDrawType color,
-    int t_size, glow_eFont t_font, glow_mDisplayLevel display_level,
-    void* user_data)
+void grow_AddText(grow_tNodeClass nc, const char* name, const char* text, double x, double y,
+                  glow_eDrawType draw_type, glow_eDrawType color, int t_size, glow_eFont t_font,
+                  glow_mDisplayLevel display_level, void* user_data)
 {
   GrowText* t1;
-  t1 = new GrowText(((GlowNodeClass*)nc)->ctx, name, text, x, y, draw_type,
-      color, t_size, t_font, display_level);
+  t1 = new GrowText(((GlowNodeClass*)nc)->ctx, name, text, x, y, draw_type, color, t_size, t_font,
+                    display_level);
   t1->set_user_data(user_data);
   ((GlowNodeClass*)nc)->insert(t1);
 }
 
-void grow_AddAnnot(grow_tNodeClass nc, double x, double y, int annot_num,
-    glow_eDrawType d_type, glow_eDrawType color_d_type, int t_size,
-    glow_eAnnotType a_type, int rel_pos, glow_mDisplayLevel display_lev,
-    void* user_data)
+void grow_AddAnnot(grow_tNodeClass nc, double x, double y, int annot_num, glow_eDrawType d_type,
+                   glow_eDrawType color_d_type, int t_size, glow_eAnnotType a_type, int rel_pos,
+                   glow_mDisplayLevel display_lev, void* user_data)
 {
   GrowAnnot* a1;
-  a1 = new GrowAnnot(((GlowNodeClass*)nc)->ctx, x, y, annot_num, d_type,
-      color_d_type, t_size, a_type, rel_pos, display_lev);
+  a1 = new GrowAnnot(((GlowNodeClass*)nc)->ctx, x, y, annot_num, d_type, color_d_type, t_size, a_type,
+                     rel_pos, display_lev);
   a1->set_user_data(user_data);
   ((GlowNodeClass*)nc)->insert(a1);
 }
 
-void grow_CreateNodeClass(grow_tCtx ctx, const char* name,
-    glow_eNodeGroup group, grow_tNodeClass* nodeclass)
+void grow_CreateNodeClass(grow_tCtx ctx, const char* name, glow_eNodeGroup group, grow_tNodeClass* nodeclass)
 {
   *nodeclass = (grow_tNodeClass) new GlowNodeClass(ctx, name, group);
   ctx->nodeclass_insert((GlowArrayElem*)*nodeclass);
@@ -520,14 +416,12 @@ void grow_NodeClassAdd(grow_tNodeClass nc, grow_tObject object)
   ((GlowNodeClass*)nc)->insert((GlowArrayElem*)object);
 }
 
-void grow_CreateConClass(grow_tCtx ctx, char* name, glow_eConType con_type,
-    glow_eCorner corner, glow_eDrawType line_type, int line_width,
-    double arrow_width, double arrow_length, double round_corner_amount,
-    glow_eConGroup group, grow_tConClass* conclass)
+void grow_CreateConClass(grow_tCtx ctx, char* name, glow_eConType con_type, glow_eCorner corner,
+                         glow_eDrawType line_type, int line_width, double arrow_width, double arrow_length,
+                         double round_corner_amount, glow_eConGroup group, grow_tConClass* conclass)
 {
-  *conclass = (grow_tConClass) new GlowConClass(ctx, name, con_type, corner,
-      line_type, line_width, arrow_width, arrow_length, round_corner_amount,
-      group);
+  *conclass = (grow_tConClass) new GlowConClass(ctx, name, con_type, corner, line_type, line_width,
+                                                arrow_width, arrow_length, round_corner_amount, group);
   ctx->conclass_insert((GlowArrayElem*)*conclass);
 }
 
@@ -558,19 +452,14 @@ void grow_SetObjectName(grow_tObject object, char* name)
   ((GlowArrayElem*)object)->set_object_name(name);
 }
 
-glow_eObjectType grow_GetObjectType(grow_tObject object)
-{
-  return ((GlowArrayElem*)object)->type();
-}
+glow_eObjectType grow_GetObjectType(grow_tObject object) { return ((GlowArrayElem*)object)->type(); }
 
-void grow_MeasureNode(
-    grow_tNode node, double* ll_x, double* ll_y, double* ur_x, double* ur_y)
+void grow_MeasureNode(grow_tNode node, double* ll_x, double* ll_y, double* ur_x, double* ur_y)
 {
   ((GlowNode*)node)->measure(ll_x, ll_y, ur_x, ur_y);
 }
 
-void grow_MeasureWindow(
-    grow_tCtx ctx, double* ll_x, double* ll_y, double* ur_x, double* ur_y)
+void grow_MeasureWindow(grow_tCtx ctx, double* ll_x, double* ll_y, double* ur_x, double* ur_y)
 {
   ctx->measure_window(ll_x, ll_y, ur_x, ur_y);
 }
@@ -580,10 +469,7 @@ void grow_Print(grow_tCtx ctx, char* filename, double x0, double x1, int end)
   ctx->print(filename, x0, x1, end);
 }
 
-int grow_ExportImage(grow_tCtx ctx, char* filename)
-{
-  return ctx->export_image(filename);
-}
+int grow_ExportImage(grow_tCtx ctx, char* filename) { return ctx->export_image(filename); }
 
 void grow_GetUserData(grow_tObject object, void** user_data)
 {
@@ -595,20 +481,11 @@ void grow_SetUserData(grow_tObject object, void* user_data)
   ((GlowArrayElem*)object)->set_user_data(user_data);
 }
 
-void grow_GetCtxUserData(grow_tCtx ctx, void** user_data)
-{
-  ((GlowCtx*)ctx)->get_user_data(user_data);
-}
+void grow_GetCtxUserData(grow_tCtx ctx, void** user_data) { ((GlowCtx*)ctx)->get_user_data(user_data); }
 
-void grow_SetCtxUserData(grow_tCtx ctx, void* user_data)
-{
-  ((GlowCtx*)ctx)->set_user_data(user_data);
-}
+void grow_SetCtxUserData(grow_tCtx ctx, void* user_data) { ((GlowCtx*)ctx)->set_user_data(user_data); }
 
-grow_tCtx grow_GetCtx(grow_tObject object)
-{
-  return (grow_tCtx)((GlowArrayElem*)object)->get_ctx();
-}
+grow_tCtx grow_GetCtx(grow_tObject object) { return (grow_tCtx)((GlowArrayElem*)object)->get_ctx(); }
 
 void grow_SetTraceAttr(grow_tObject object, GlowTraceData* trace_data)
 {
@@ -625,60 +502,33 @@ void grow_SetTraceData(grow_tObject object, void* trace_data)
   ((GlowNode*)object)->set_trace_data(trace_data);
 }
 
-extern "C" int grow_TraceInit(grow_tCtx ctx,
-    int (*trace_connect_func)(grow_tObject, GlowTraceData*),
-    int (*trace_disconnect_func)(grow_tObject),
-    int (*trace_scan_func)(grow_tObject, void*),
-    int (*trace_ctrl_func)(int, void*))
+extern "C" int grow_TraceInit(grow_tCtx ctx, int (*trace_connect_func)(grow_tObject, GlowTraceData*),
+                              int (*trace_disconnect_func)(grow_tObject),
+                              int (*trace_scan_func)(grow_tObject, void*), int (*trace_ctrl_func)(int, void*))
 {
-  return ctx->trace_init(trace_connect_func, trace_disconnect_func,
-      trace_scan_func, trace_ctrl_func);
+  return ctx->trace_init(trace_connect_func, trace_disconnect_func, trace_scan_func, trace_ctrl_func);
 }
 
-void grow_TraceClose(grow_tCtx ctx)
-{
-  ctx->trace_close();
-}
+void grow_TraceClose(grow_tCtx ctx) { ctx->trace_close(); }
 
-void grow_TraceScan(grow_tCtx ctx)
-{
-  ctx->trace_scan();
-}
+void grow_TraceScan(grow_tCtx ctx) { ctx->trace_scan(); }
 
 int grow_TraceInitObject(grow_tCtx ctx, grow_tObject object)
-{  
-  return ((GlowCtx *)ctx)->trace_init_object((GlowArrayElem *)object);
+{
+  return ((GlowCtx*)ctx)->trace_init_object((GlowArrayElem*)object);
 }
 
-void grow_RemoveTraceObjects(grow_tCtx ctx)
-{
-  ctx->remove_trace_objects();
-}
+void grow_RemoveTraceObjects(grow_tCtx ctx) { ctx->remove_trace_objects(); }
 
-void grow_Zoom(grow_tCtx ctx, double zoom_factor)
-{
-  ctx->zoom(zoom_factor);
-}
+void grow_Zoom(grow_tCtx ctx, double zoom_factor) { ctx->zoom(zoom_factor); }
 
-void grow_ZoomX(grow_tCtx ctx, double zoom_factor)
-{
-  ctx->zoom_x(zoom_factor);
-}
+void grow_ZoomX(grow_tCtx ctx, double zoom_factor) { ctx->zoom_x(zoom_factor); }
 
-void grow_ZoomY(grow_tCtx ctx, double zoom_factor)
-{
-  ctx->zoom_y(zoom_factor);
-}
+void grow_ZoomY(grow_tCtx ctx, double zoom_factor) { ctx->zoom_y(zoom_factor); }
 
-void grow_ZoomAbsolute(grow_tCtx ctx, double zoom_factor)
-{
-  ctx->zoom_absolute(zoom_factor);
-}
+void grow_ZoomAbsolute(grow_tCtx ctx, double zoom_factor) { ctx->zoom_absolute(zoom_factor); }
 
-void grow_GetZoom(grow_tCtx ctx, double* zoom_factor)
-{
-  *zoom_factor = ctx->mw.zoom_factor_x;
-}
+void grow_GetZoom(grow_tCtx ctx, double* zoom_factor) { *zoom_factor = ctx->mw.zoom_factor_x; }
 
 void grow_Scroll(grow_tCtx ctx, double x, double y)
 {
@@ -686,10 +536,10 @@ void grow_Scroll(grow_tCtx ctx, double x, double y)
   ;
 }
 
-void grow_SetAttributes(
-    grow_tCtx ctx, grow_sAttributes* attr, unsigned long mask)
+void grow_SetAttributes(grow_tCtx ctx, grow_sAttributes* attr, unsigned long mask)
 {
-  if (mask & grow_eAttr_base_zoom_factor) {
+  if (mask & grow_eAttr_base_zoom_factor)
+  {
     ctx->mw.zoom_factor_x *= attr->base_zoom_factor / ctx->mw.base_zoom_factor;
     ctx->mw.zoom_factor_y *= attr->base_zoom_factor / ctx->mw.base_zoom_factor;
     ctx->mw.base_zoom_factor = attr->base_zoom_factor;
@@ -728,7 +578,8 @@ void grow_SetAttributes(
     ctx->default_hot_mode = ctx->hot_mode = attr->default_hot_mode;
   if (mask & grow_eAttr_enable_bg_pixmap)
     ctx->enable_bg_pixmap = attr->enable_bg_pixmap;
-  if (mask & grow_eAttr_hot_mode) {
+  if (mask & grow_eAttr_hot_mode)
+  {
     ctx->default_hot_mode = attr->hot_mode;
     ctx->hot_mode = attr->hot_mode;
   }
@@ -744,8 +595,7 @@ void grow_SetAttributes(
     ctx->dashboard = attr->dashboard;
 }
 
-void grow_GetAttributes(
-    grow_tCtx ctx, grow_sAttributes* attr, unsigned long mask)
+void grow_GetAttributes(grow_tCtx ctx, grow_sAttributes* attr, unsigned long mask)
 {
   if (mask & grow_eAttr_base_zoom_factor)
     attr->base_zoom_factor = ctx->mw.base_zoom_factor;
@@ -789,47 +639,35 @@ void grow_GetAttributes(
     attr->initial_position = (glow_eDirection)ctx->initial_position;
 }
 
-void grow_PositionToPixel(
-    grow_tCtx ctx, double x, double y, int* pix_x, int* pix_y)
+void grow_PositionToPixel(grow_tCtx ctx, double x, double y, int* pix_x, int* pix_y)
 {
   ctx->position_to_pixel(x, y, pix_x, pix_y);
 }
 
-void grow_UnZoom(grow_tCtx ctx)
-{
-  ctx->unzoom();
-}
+void grow_UnZoom(grow_tCtx ctx) { ctx->unzoom(); }
 
-void grow_CenterObject(grow_tCtx ctx, grow_tObject object)
-{
-  ctx->center_object((GlowArrayElem*)object);
-}
+void grow_CenterObject(grow_tCtx ctx, grow_tObject object) { ctx->center_object((GlowArrayElem*)object); }
 
 void grow_GetNodePosition(grow_tNode node, double* x, double* y)
 {
   ((GlowNode*)node)->get_node_position(x, y);
 }
 
-void grow_MeasureAnnotText(grow_tCtx ctx, char* text, glow_eDrawType draw_type,
-    int text_size, glow_eAnnotType annot_type, glow_eFont font, double* width,
-    double* height, int* rows)
+void grow_MeasureAnnotText(grow_tCtx ctx, char* text, glow_eDrawType draw_type, int text_size,
+                           glow_eAnnotType annot_type, glow_eFont font, double* width, double* height,
+                           int* rows)
 {
-  glow_measure_annot_text(
-      ctx, text, draw_type, text_size, annot_type, font, width, height, rows);
+  glow_measure_annot_text(ctx, text, draw_type, text_size, annot_type, font, width, height, rows);
 }
 
-glow_eNodeGroup grow_GetNodeGroup(grow_tNode node)
-{
-  return ((GlowNode*)node)->get_group();
-}
+glow_eNodeGroup grow_GetNodeGroup(grow_tNode node) { return ((GlowNode*)node)->get_group(); }
 
-int grow_GetObjectName(
-    grow_tObject object, char* name, int size, glow_eName ntype)
+int grow_GetObjectName(grow_tObject object, char* name, int size, glow_eName ntype)
 {
   return ((GlowNode*)object)->get_object_name(name, size, ntype);
 }
 
-void grow_GetObjectParent(grow_tObject object, grow_tObject *parent)
+void grow_GetObjectParent(grow_tObject object, grow_tObject* parent)
 {
   *(grow_tObject*)parent = ((GlowArrayElem*)object)->get_parent();
 }
@@ -839,251 +677,213 @@ void grow_GetNodeClassName(grow_tNodeClass nodeclass, char* name, int size)
   ((GlowNodeClass*)nodeclass)->get_object_name(name, size, glow_eName_Object);
 }
 
-void grow_Reconfigure(grow_tCtx ctx)
-{
-  ctx->reconfigure();
-}
+void grow_Reconfigure(grow_tCtx ctx) { ctx->reconfigure(); }
 
-void grow_SetNodraw(grow_tCtx ctx)
-{
-  ctx->set_nodraw();
-}
+void grow_SetNodraw(grow_tCtx ctx) { ctx->set_nodraw(); }
 
-void grow_ResetNodraw(grow_tCtx ctx)
-{
-  ctx->reset_nodraw();
-}
+void grow_ResetNodraw(grow_tCtx ctx) { ctx->reset_nodraw(); }
 
-void grow_SetDeferedRedraw(grow_tCtx ctx)
-{
-  ctx->set_defered_redraw();
-}
+void grow_SetDeferedRedraw(grow_tCtx ctx) { ctx->set_defered_redraw(); }
 
-void grow_RedrawDefered(grow_tCtx ctx)
-{
-  ctx->redraw_defered();
-}
+void grow_RedrawDefered(grow_tCtx ctx) { ctx->redraw_defered(); }
 
-void grow_Redraw(grow_tCtx ctx)
-{
-  ctx->redraw();
-}
+void grow_Redraw(grow_tCtx ctx) { ctx->redraw(); }
 
-void grow_SetInputFocus(grow_tCtx ctx)
-{
-  ctx->gdraw->set_inputfocus(&ctx->mw);
-}
+void grow_SetInputFocus(grow_tCtx ctx) { ctx->gdraw->set_inputfocus(&ctx->mw); }
 
-void grow_SetMode(grow_tCtx ctx, grow_eMode mode)
-{
-  ctx->set_mode(mode);
-}
+void grow_SetMode(grow_tCtx ctx, grow_eMode mode) { ctx->set_mode(mode); }
 
-grow_eMode grow_Mode(grow_tCtx ctx)
-{
-  return ctx->mode();
-}
+grow_eMode grow_Mode(grow_tCtx ctx) { return ctx->mode(); }
 
-void grow_CreateGrowRect(grow_tCtx ctx, const char* name, double x, double y,
-    double width, double height, glow_eDrawType draw_type, int line_width,
-    int fix_line_width, glow_mDisplayLevel display_level, int fill_rect,
-    int border, int shadow, glow_eDrawType fill_draw_type, void* user_data,
-    grow_tObject* rect)
+void grow_CreateGrowRect(grow_tCtx ctx, const char* name, double x, double y, double width, double height,
+                         glow_eDrawType draw_type, int line_width, int fix_line_width,
+                         glow_mDisplayLevel display_level, int fill_rect, int border, int shadow,
+                         glow_eDrawType fill_draw_type, void* user_data, grow_tObject* rect)
 {
   GrowRect* r1;
-  r1 = new GrowRect(ctx, name, x, y, width, height, draw_type, line_width,
-      fix_line_width, display_level, fill_rect, border, shadow, fill_draw_type);
+  r1 = new GrowRect(ctx, name, x, y, width, height, draw_type, line_width, fix_line_width, display_level,
+                    fill_rect, border, shadow, fill_draw_type);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
   *rect = (grow_tObject)r1;
 }
 
-void grow_CreateGrowRectRounded(grow_tCtx ctx, const char* name, double x,
-    double y, double width, double height, glow_eDrawType draw_type,
-    int line_width, int fix_line_width, glow_mDisplayLevel display_level,
-    int fill_rect, int border, int shadow, glow_eDrawType fill_draw_type,
-    void* user_data, grow_tObject* rect)
+void grow_CreateGrowRectRounded(grow_tCtx ctx, const char* name, double x, double y, double width,
+                                double height, glow_eDrawType draw_type, int line_width, int fix_line_width,
+                                glow_mDisplayLevel display_level, int fill_rect, int border, int shadow,
+                                glow_eDrawType fill_draw_type, void* user_data, grow_tObject* rect)
 {
   GrowRectRounded* r1;
-  r1 = new GrowRectRounded(ctx, name, x, y, width, height, draw_type,
-      line_width, fix_line_width, display_level, fill_rect, border, shadow,
-      fill_draw_type);
+  r1 = new GrowRectRounded(ctx, name, x, y, width, height, draw_type, line_width, fix_line_width,
+                           display_level, fill_rect, border, shadow, fill_draw_type);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
   *rect = (grow_tObject)r1;
 }
 
-void grow_CreateGrowBar(grow_tCtx ctx, const char* name, double x, double y,
-    double width, double height, glow_eDrawType draw_type, int line_width,
-    glow_mDisplayLevel display_level, int fill_rect, int border,
-    glow_eDrawType fill_draw_type, void* user_data, grow_tObject* bar)
+void grow_CreateGrowBar(grow_tCtx ctx, const char* name, double x, double y, double width, double height,
+                        glow_eDrawType draw_type, int line_width, glow_mDisplayLevel display_level,
+                        int fill_rect, int border, glow_eDrawType fill_draw_type, void* user_data,
+                        grow_tObject* bar)
 {
   GrowBar* r1;
-  r1 = new GrowBar(ctx, name, x, y, width, height, draw_type, line_width,
-      display_level, fill_rect, border, fill_draw_type);
+  r1 = new GrowBar(ctx, name, x, y, width, height, draw_type, line_width, display_level, fill_rect, border,
+                   fill_draw_type);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
   *bar = (grow_tObject)r1;
 }
 
-void grow_CreateGrowBarArc(grow_tCtx ctx, const char* name, double x1, double y1,
-    double x2, double y2, int ang1, int ang2, double width, glow_eDrawType border_draw_type, 
-    int line_width, int border, glow_eDrawType fill_draw_type, void* user_data, grow_tObject* bar)
+void grow_CreateGrowBarArc(grow_tCtx ctx, const char* name, double x1, double y1, double x2, double y2,
+                           int ang1, int ang2, double width, glow_eDrawType border_draw_type, int line_width,
+                           int border, glow_eDrawType fill_draw_type, void* user_data, grow_tObject* bar)
 {
   GrowBarArc* r1;
   r1 = new GrowBarArc(ctx, name, x1, y1, x2, y2, ang1, ang2, width, border, border_draw_type, line_width,
-		      fill_draw_type, 1);
+                      fill_draw_type, 1);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
   *bar = (grow_tObject)r1;
 }
 
-void grow_CreateGrowTrend(grow_tCtx ctx, const char* name, double x, double y,
-    double width, double height, glow_eDrawType draw_type, int line_width,
-    glow_mDisplayLevel display_level, int fill_rect, int border,
-    glow_eDrawType fill_draw_type, void* user_data, grow_tObject* trend)
+void grow_CreateGrowTrend(grow_tCtx ctx, const char* name, double x, double y, double width, double height,
+                          glow_eDrawType draw_type, int line_width, glow_mDisplayLevel display_level,
+                          int fill_rect, int border, glow_eDrawType fill_draw_type, void* user_data,
+                          grow_tObject* trend)
 {
   GrowTrend* r1;
-  r1 = new GrowTrend(ctx, name, x, y, width, height, draw_type, line_width,
-      display_level, fill_rect, border, fill_draw_type);
+  r1 = new GrowTrend(ctx, name, x, y, width, height, draw_type, line_width, display_level, fill_rect, border,
+                     fill_draw_type);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
   *trend = (grow_tObject)r1;
 }
 
-void grow_CreateGrowXYCurve(grow_tCtx ctx, const char* name, double x, double y,
-    double width, double height, glow_eDrawType draw_type, int line_width,
-    glow_mDisplayLevel display_level, int fill_rect, int border,
-    glow_eDrawType fill_draw_type, void* user_data, grow_tObject* xycurve)
+void grow_CreateGrowXYCurve(grow_tCtx ctx, const char* name, double x, double y, double width, double height,
+                            glow_eDrawType draw_type, int line_width, glow_mDisplayLevel display_level,
+                            int fill_rect, int border, glow_eDrawType fill_draw_type, void* user_data,
+                            grow_tObject* xycurve)
 {
   GrowXYCurve* r1;
-  r1 = new GrowXYCurve(ctx, name, x, y, width, height, draw_type, line_width,
-      display_level, fill_rect, border, fill_draw_type);
+  r1 = new GrowXYCurve(ctx, name, x, y, width, height, draw_type, line_width, display_level, fill_rect,
+                       border, fill_draw_type);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
   *xycurve = (grow_tObject)r1;
 }
 
-void grow_CreateGrowCurve(grow_tCtx ctx, const char* name,
-    glow_sCurveData* data, double x, double y, double width, double height,
-    glow_eDrawType draw_type, int line_width, glow_mDisplayLevel display_level,
-    int fill_rect, int border, glow_eDrawType fill_draw_type, void* user_data,
-    grow_tObject* curve)
+void grow_CreateGrowCurve(grow_tCtx ctx, const char* name, glow_sCurveData* data, double x, double y,
+                          double width, double height, glow_eDrawType draw_type, int line_width,
+                          glow_mDisplayLevel display_level, int fill_rect, int border,
+                          glow_eDrawType fill_draw_type, void* user_data, grow_tObject* curve)
 {
   GrowCurve* r1;
-  r1 = new GrowCurve(ctx, name, data, x, y, width, height, draw_type,
-      line_width, display_level, fill_rect, border, fill_draw_type);
+  r1 = new GrowCurve(ctx, name, data, x, y, width, height, draw_type, line_width, display_level, fill_rect,
+                     border, fill_draw_type);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
   *curve = (grow_tObject)r1;
 }
 
-void grow_CreateGrowWindow(grow_tCtx ctx, const char* name, double x, double y,
-    double width, double height, glow_eDrawType draw_type, int line_width,
-    glow_mDisplayLevel display_level, void* user_data, grow_tObject* window)
+void grow_CreateGrowWindow(grow_tCtx ctx, const char* name, double x, double y, double width, double height,
+                           glow_eDrawType draw_type, int line_width, glow_mDisplayLevel display_level,
+                           void* user_data, grow_tObject* window)
 {
   GrowWindow* r1;
-  r1 = new GrowWindow(
-      ctx, name, x, y, width, height, draw_type, line_width, display_level);
+  r1 = new GrowWindow(ctx, name, x, y, width, height, draw_type, line_width, display_level);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
   *window = (grow_tObject)r1;
 }
 
-void grow_CreateGrowTable(grow_tCtx ctx, const char* name, double x, double y,
-    double width, double height, glow_eDrawType draw_type, int line_width,
-    int fill, glow_eDrawType fillcolor, glow_mDisplayLevel display_level,
-    void* user_data, grow_tObject* window)
+void grow_CreateGrowTable(grow_tCtx ctx, const char* name, double x, double y, double width, double height,
+                          glow_eDrawType draw_type, int line_width, int fill, glow_eDrawType fillcolor,
+                          glow_mDisplayLevel display_level, void* user_data, grow_tObject* window)
 {
   GrowTable* r1;
-  r1 = new GrowTable(ctx, name, x, y, width, height, draw_type, line_width,
-      fill, fillcolor, display_level);
+  r1 = new GrowTable(ctx, name, x, y, width, height, draw_type, line_width, fill, fillcolor, display_level);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
   *window = (grow_tObject)r1;
 }
 
-void grow_CreateGrowFolder(grow_tCtx ctx, const char* name, double x, double y,
-    double width, double height, glow_eDrawType draw_type, int line_width,
-    glow_eDrawType selected_color, glow_eDrawType unselected_color,
-    glow_mDisplayLevel display_level, void* user_data, grow_tObject* window)
+void grow_CreateGrowFolder(grow_tCtx ctx, const char* name, double x, double y, double width, double height,
+                           glow_eDrawType draw_type, int line_width, glow_eDrawType selected_color,
+                           glow_eDrawType unselected_color, glow_mDisplayLevel display_level, void* user_data,
+                           grow_tObject* window)
 {
   GrowFolder* r1;
-  r1 = new GrowFolder(ctx, name, x, y, width, height, draw_type, line_width,
-      selected_color, unselected_color, display_level);
+  r1 = new GrowFolder(ctx, name, x, y, width, height, draw_type, line_width, selected_color, unselected_color,
+                      display_level);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
   *window = (grow_tObject)r1;
 }
 
-void grow_CreateGrowToolbar(grow_tCtx ctx, const char* name,
-    const char* nc_name, char* tools1, char* tools2, int tools1_cnt,
-    int tools2_cnt, double x, double y, void* user_data, grow_tObject* toolbar)
+void grow_CreateGrowToolbar(grow_tCtx ctx, const char* name, const char* nc_name, char* tools1, char* tools2,
+                            int tools1_cnt, int tools2_cnt, double x, double y, void* user_data,
+                            grow_tObject* toolbar)
 {
   GrowToolbar* r1;
-  r1 = new GrowToolbar(
-      ctx, name, nc_name, tools1, tools2, tools1_cnt, tools2_cnt, x, y);
+  r1 = new GrowToolbar(ctx, name, nc_name, tools1, tools2, tools1_cnt, tools2_cnt, x, y);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
   *toolbar = (grow_tObject)r1;
 }
 
-void grow_CreateGrowLine(grow_tCtx ctx, const char* name, double x1, double y1,
-    double x2, double y2, glow_eDrawType draw_type, int line_width,
-    int fix_line_width, void* user_data, grow_tObject* line)
+void grow_CreateGrowLine(grow_tCtx ctx, const char* name, double x1, double y1, double x2, double y2,
+                         glow_eDrawType draw_type, int line_width, int fix_line_width, void* user_data,
+                         grow_tObject* line)
 {
   GrowLine* l1;
-  l1 = new GrowLine(
-      ctx, name, x1, y1, x2, y2, draw_type, line_width, fix_line_width);
+  l1 = new GrowLine(ctx, name, x1, y1, x2, y2, draw_type, line_width, fix_line_width);
   l1->set_user_data(user_data);
   ctx->insert(l1);
   ctx->nav_zoom();
   *line = (grow_tObject)l1;
 }
 
-void grow_CreateGrowPolyLine(grow_tCtx ctx, const char* name,
-    glow_sPoint* pointarray, int point_cnt, glow_eDrawType draw_type,
-    int line_width, int fix_line_width, int fill, int border, int shadow,
-    glow_eDrawType fill_draw_type, int closed, void* user_data,
-    grow_tObject* polyline)
+void grow_CreateGrowPolyLine(grow_tCtx ctx, const char* name, glow_sPoint* pointarray, int point_cnt,
+                             glow_eDrawType draw_type, int line_width, int fix_line_width, int fill,
+                             int border, int shadow, glow_eDrawType fill_draw_type, int closed,
+                             void* user_data, grow_tObject* polyline)
 {
   GrowPolyLine* l1;
-  l1 = new GrowPolyLine(ctx, name, pointarray, point_cnt, draw_type, line_width,
-      fix_line_width, fill, border, shadow, fill_draw_type, closed);
+  l1 = new GrowPolyLine(ctx, name, pointarray, point_cnt, draw_type, line_width, fix_line_width, fill, border,
+                        shadow, fill_draw_type, closed);
   l1->set_user_data(user_data);
   ctx->insert(l1);
   ctx->nav_zoom();
   *polyline = (grow_tObject)l1;
 }
 
-void grow_CreateGrowArc(grow_tCtx ctx, const char* name, double x1, double y1,
-    double x2, double y2, int angle1, int angle2, glow_eDrawType draw_type,
-    int line_width, int fill_arc, int border, int shadow,
-    glow_eDrawType fill_draw_type, void* user_data, grow_tObject* arc)
+void grow_CreateGrowArc(grow_tCtx ctx, const char* name, double x1, double y1, double x2, double y2,
+                        int angle1, int angle2, glow_eDrawType draw_type, int line_width, int fill_arc,
+                        int border, int shadow, glow_eDrawType fill_draw_type, void* user_data,
+                        grow_tObject* arc)
 {
   GrowArc* a1;
-  a1 = new GrowArc(ctx, name, x1, y1, x2, y2, angle1, angle2, draw_type,
-      line_width, fill_arc, border, shadow, fill_draw_type);
+  a1 = new GrowArc(ctx, name, x1, y1, x2, y2, angle1, angle2, draw_type, line_width, fill_arc, border, shadow,
+                   fill_draw_type);
   a1->set_user_data(user_data);
   ctx->insert(a1);
   ctx->nav_zoom();
   *arc = (grow_tObject)a1;
 }
 
-void grow_CreateGrowConPoint(grow_tCtx ctx, const char* name, double x,
-    double y, int cp_num, glow_eDirection d, void* user_data,
-    grow_tObject* conpoint)
+void grow_CreateGrowConPoint(grow_tCtx ctx, const char* name, double x, double y, int cp_num,
+                             glow_eDirection d, void* user_data, grow_tObject* conpoint)
 {
   GrowConPoint* cp1;
   cp1 = new GrowConPoint(ctx, name, x, y, cp_num, d);
@@ -1093,36 +893,34 @@ void grow_CreateGrowConPoint(grow_tCtx ctx, const char* name, double x,
   *conpoint = (grow_tObject)cp1;
 }
 
-void grow_CreateGrowAnnot(grow_tCtx ctx, const char* name, double x, double y,
-    int annot_num, glow_eDrawType d_type, glow_eDrawType color_d_type,
-    int t_size, glow_eAnnotType a_type, int rel_pos,
-    glow_mDisplayLevel display_lev, void* user_data, grow_tObject* annot)
+void grow_CreateGrowAnnot(grow_tCtx ctx, const char* name, double x, double y, int annot_num,
+                          glow_eDrawType d_type, glow_eDrawType color_d_type, int t_size,
+                          glow_eAnnotType a_type, int rel_pos, glow_mDisplayLevel display_lev,
+                          void* user_data, grow_tObject* annot)
 {
   GrowSubAnnot* a1;
-  a1 = new GrowSubAnnot(ctx, name, x, y, annot_num, d_type, color_d_type,
-      t_size, a_type, rel_pos, display_lev);
+  a1 = new GrowSubAnnot(ctx, name, x, y, annot_num, d_type, color_d_type, t_size, a_type, rel_pos,
+                        display_lev);
   a1->set_user_data(user_data);
   ctx->insert(a1);
   ctx->nav_zoom();
   *annot = (grow_tObject)a1;
 }
 
-void grow_CreateGrowText(grow_tCtx ctx, const char* name, const char* text,
-    double x, double y, glow_eDrawType draw_type, glow_eDrawType color,
-    int t_size, glow_eFont t_font, glow_mDisplayLevel display_level,
-    void* user_data, grow_tObject* text_object)
+void grow_CreateGrowText(grow_tCtx ctx, const char* name, const char* text, double x, double y,
+                         glow_eDrawType draw_type, glow_eDrawType color, int t_size, glow_eFont t_font,
+                         glow_mDisplayLevel display_level, void* user_data, grow_tObject* text_object)
 {
   GrowText* t1;
-  t1 = new GrowText(
-      ctx, name, text, x, y, draw_type, color, t_size, t_font, display_level);
+  t1 = new GrowText(ctx, name, text, x, y, draw_type, color, t_size, t_font, display_level);
   t1->set_user_data(user_data);
   ctx->insert(t1);
   ctx->nav_zoom();
   *text_object = (grow_tObject)t1;
 }
 
-void grow_CreateGrowImage(grow_tCtx ctx, const char* name, const char* filename,
-    double x1, double y1, void* user_data, grow_tObject* image)
+void grow_CreateGrowImage(grow_tCtx ctx, const char* name, const char* filename, double x1, double y1,
+                          void* user_data, grow_tObject* image)
 {
   GrowImage* i1;
   i1 = new GrowImage(ctx, name, x1, y1, filename);
@@ -1132,64 +930,58 @@ void grow_CreateGrowImage(grow_tCtx ctx, const char* name, const char* filename,
   *image = (grow_tObject)i1;
 }
 
-void grow_CreateGrowAxis(grow_tCtx ctx, const char* name, double x1, double y1,
-    double x2, double y2, glow_eDrawType draw_type, int line_width,
-    int text_size, glow_eDrawType text_drawtype, void* user_data,
-    grow_tObject* axis)
+void grow_CreateGrowAxis(grow_tCtx ctx, const char* name, double x1, double y1, double x2, double y2,
+                         glow_eDrawType draw_type, int line_width, int text_size,
+                         glow_eDrawType text_drawtype, void* user_data, grow_tObject* axis)
 {
   GrowAxis* l1;
-  l1 = new GrowAxis(ctx, name, x1, y1, x2, y2, draw_type, line_width, text_size,
-      text_drawtype);
+  l1 = new GrowAxis(ctx, name, x1, y1, x2, y2, draw_type, line_width, text_size, text_drawtype);
   l1->set_user_data(user_data);
   ctx->insert(l1);
   ctx->nav_zoom();
   *axis = (grow_tObject)l1;
 }
 
-void grow_CreateGrowAxisArc(grow_tCtx ctx, const char* name, double x1,
-    double y1, double x2, double y2, int ang1, int ang2,
-    glow_eDrawType draw_type, int line_width, int text_size,
-    glow_eDrawType text_drawtype, void* user_data, grow_tObject* axis)
+void grow_CreateGrowAxisArc(grow_tCtx ctx, const char* name, double x1, double y1, double x2, double y2,
+                            int ang1, int ang2, glow_eDrawType draw_type, int line_width, int text_size,
+                            glow_eDrawType text_drawtype, void* user_data, grow_tObject* axis)
 {
   GrowAxisArc* l1;
-  l1 = new GrowAxisArc(ctx, name, x1, y1, x2, y2, ang1, ang2, draw_type,
-      line_width, text_size, text_drawtype);
+  l1 =
+      new GrowAxisArc(ctx, name, x1, y1, x2, y2, ang1, ang2, draw_type, line_width, text_size, text_drawtype);
   l1->set_user_data(user_data);
   ctx->insert(l1);
   ctx->nav_zoom();
   *axis = (grow_tObject)l1;
 }
 
-void grow_CreateGrowPie(grow_tCtx ctx, const char* name, double x1, double y1,
-    double x2, double y2, int angle1, int angle2, glow_eDrawType draw_type,
-    int line_width, int border, int shadow, glow_eDrawType fill_draw_type,
-    void* user_data, grow_tObject* arc)
+void grow_CreateGrowPie(grow_tCtx ctx, const char* name, double x1, double y1, double x2, double y2,
+                        int angle1, int angle2, glow_eDrawType draw_type, int line_width, int border,
+                        int shadow, glow_eDrawType fill_draw_type, void* user_data, grow_tObject* arc)
 {
   GrowPie* a1;
-  a1 = new GrowPie(ctx, name, x1, y1, x2, y2, angle1, angle2, draw_type,
-      line_width, border, shadow, fill_draw_type);
+  a1 = new GrowPie(ctx, name, x1, y1, x2, y2, angle1, angle2, draw_type, line_width, border, shadow,
+                   fill_draw_type);
   a1->set_user_data(user_data);
   ctx->insert(a1);
   ctx->nav_zoom();
   *arc = (grow_tObject)a1;
 }
 
-void grow_CreateGrowBarChart(grow_tCtx ctx, const char* name, double x,
-    double y, double width, double height, glow_eDrawType draw_type,
-    int line_width, int border, int shadow, glow_eDrawType fill_draw_type,
-    void* user_data, grow_tObject* barchart)
+void grow_CreateGrowBarChart(grow_tCtx ctx, const char* name, double x, double y, double width, double height,
+                             glow_eDrawType draw_type, int line_width, int border, int shadow,
+                             glow_eDrawType fill_draw_type, void* user_data, grow_tObject* barchart)
 {
   GrowBarChart* r1;
-  r1 = new GrowBarChart(ctx, name, x, y, width, height, draw_type, line_width,
-      border, shadow, fill_draw_type);
+  r1 =
+      new GrowBarChart(ctx, name, x, y, width, height, draw_type, line_width, border, shadow, fill_draw_type);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
   *barchart = (grow_tObject)r1;
 }
 
-void grow_CreateGrowConGlue(
-    grow_tCtx ctx, const char* name, double x, double y, grow_tObject* conglue)
+void grow_CreateGrowConGlue(grow_tCtx ctx, const char* name, double x, double y, grow_tObject* conglue)
 {
   GrowConGlue* r1;
   r1 = new GrowConGlue(ctx, name, x, y);
@@ -1198,25 +990,24 @@ void grow_CreateGrowConGlue(
   *conglue = (grow_tObject)r1;
 }
 
-void grow_CreateGrowMenu(grow_tCtx ctx, const char* name, glow_sMenuInfo* info,
-    double x, double y, double min_width, glow_eDrawType draw_type,
-    int line_width, int fill_rect, int border, glow_eDrawType fill_draw_type,
-    int text_size, glow_eDrawType text_drawtype, glow_eDrawType text_color,
-    glow_eDrawType disabled_text_color, glow_eFont text_font,
-    grow_tObject parent, grow_tObject* menu)
+void grow_CreateGrowMenu(grow_tCtx ctx, const char* name, glow_sMenuInfo* info, double x, double y,
+                         double min_width, glow_eDrawType draw_type, int line_width, int fill_rect,
+                         int border, glow_eDrawType fill_draw_type, int text_size,
+                         glow_eDrawType text_drawtype, glow_eDrawType text_color,
+                         glow_eDrawType disabled_text_color, glow_eFont text_font, grow_tObject parent,
+                         grow_tObject* menu)
 {
   GrowMenu* r1;
-  r1 = new GrowMenu(ctx, name, info, x, y, min_width, draw_type, line_width,
-      fill_rect, border, fill_draw_type, text_size, text_drawtype, text_color,
-      disabled_text_color, text_font, (GlowArrayElem*)parent);
+  r1 = new GrowMenu(ctx, name, info, x, y, min_width, draw_type, line_width, fill_rect, border,
+                    fill_draw_type, text_size, text_drawtype, text_color, disabled_text_color, text_font,
+                    (GlowArrayElem*)parent);
   ctx->insert(r1);
   ctx->pop(r1);
   r1->draw();
   *menu = (grow_tObject)r1;
 }
 
-void grow_CreateGrowLayer(grow_tCtx ctx, const char* name, void* user_data,
-    grow_tObject* layer)
+void grow_CreateGrowLayer(grow_tCtx ctx, const char* name, void* user_data, grow_tObject* layer)
 {
   GrowLayer* l1;
   l1 = new GrowLayer(ctx, name);
@@ -1226,8 +1017,8 @@ void grow_CreateGrowLayer(grow_tCtx ctx, const char* name, void* user_data,
   *layer = (grow_tObject)l1;
 }
 
-void grow_CreateGrowDashCell(grow_tCtx ctx, const char* name, double x, double y,
-    double width, double height, glow_eDrawType draw_type, void* user_data, grow_tObject* cell)
+void grow_CreateGrowDashCell(grow_tCtx ctx, const char* name, double x, double y, double width, double height,
+                             glow_eDrawType draw_type, void* user_data, grow_tObject* cell)
 {
   GrowDashCell* r1;
   r1 = new GrowDashCell(ctx, name, x, y, width, height, draw_type);
@@ -1237,15 +1028,14 @@ void grow_CreateGrowDashCell(grow_tCtx ctx, const char* name, double x, double y
   *cell = (grow_tObject)r1;
 }
 
-void grow_CreateGrowScriptModule(grow_tCtx ctx, const char* name, double x, double y,
-    double width, double height, glow_eDrawType draw_type, int line_width,
-    glow_mDisplayLevel display_level, int fill_rect,
-    int border, glow_eDrawType fill_draw_type, void* user_data,
-    grow_tObject* module)
+void grow_CreateGrowScriptModule(grow_tCtx ctx, const char* name, double x, double y, double width,
+                                 double height, glow_eDrawType draw_type, int line_width,
+                                 glow_mDisplayLevel display_level, int fill_rect, int border,
+                                 glow_eDrawType fill_draw_type, void* user_data, grow_tObject* module)
 {
   GrowScriptModule* r1;
-  r1 = new GrowScriptModule(ctx, name, x, y, width, height, draw_type, line_width,
-      display_level, fill_rect, border, fill_draw_type);
+  r1 = new GrowScriptModule(ctx, name, x, y, width, height, draw_type, line_width, display_level, fill_rect,
+                            border, fill_draw_type);
   r1->set_user_data(user_data);
   ctx->insert(r1);
   ctx->nav_zoom();
@@ -1272,8 +1062,7 @@ int grow_FindObjectByName(grow_tCtx ctx, const char* name, grow_tObject* object)
   return ctx->find_by_name(name, (GlowArrayElem**)object);
 }
 
-int grow_FindNodeClassByName(
-    grow_tCtx ctx, const char* name, grow_tObject* object)
+int grow_FindNodeClassByName(grow_tCtx ctx, const char* name, grow_tObject* object)
 {
   return ctx->find_nc_by_name(name, (GlowArrayElem**)object);
 }
@@ -1283,30 +1072,15 @@ int grow_FindConClassByName(grow_tCtx ctx, char* name, grow_tObject* object)
   return ctx->find_cc_by_name(name, (GlowArrayElem**)object);
 }
 
-int grow_GetNextConPointNumber(grow_tCtx ctx)
-{
-  return ctx->get_next_conpoint_num();
-}
+int grow_GetNextConPointNumber(grow_tCtx ctx) { return ctx->get_next_conpoint_num(); }
 
-int grow_GetNextObjectNameNumber(grow_tCtx ctx)
-{
-  return ctx->get_next_objectname_num();
-}
+int grow_GetNextObjectNameNumber(grow_tCtx ctx) { return ctx->get_next_objectname_num(); }
 
-int grow_IncrNextObjectNameNumber(grow_tCtx ctx)
-{
-  return ctx->incr_next_objectname_num();
-}
+int grow_IncrNextObjectNameNumber(grow_tCtx ctx) { return ctx->incr_next_objectname_num(); }
 
-void grow_SetNextObjectNameNumber(grow_tCtx ctx, int num)
-{
-  ctx->set_next_objectname_num(num);
-}
+void grow_SetNextObjectNameNumber(grow_tCtx ctx, int num) { ctx->set_next_objectname_num(num); }
 
-int grow_IncrNextLayerNameNumber(grow_tCtx ctx)
-{
-  return ctx->incr_next_layername_num();
-}
+int grow_IncrNextLayerNameNumber(grow_tCtx ctx) { return ctx->incr_next_layername_num(); }
 
 static int grow_name_validation_cb(void* ctx, void* value)
 {
@@ -1319,8 +1093,7 @@ static int grow_name_validation_cb(void* ctx, void* value)
   return gctx->check_object_name((char*)value);
 }
 
-int grow_GetObjectAttrInfo(
-    grow_tObject object, char* transtab, grow_sAttrInfo** info, int* attr_cnt)
+int grow_GetObjectAttrInfo(grow_tObject object, char* transtab, grow_sAttrInfo** info, int* attr_cnt)
 {
   grow_sAttrInfo* attrinfo;
   int i, j;
@@ -1328,8 +1101,10 @@ int grow_GetObjectAttrInfo(
   attrinfo = (grow_sAttrInfo*)calloc(100, sizeof(grow_sAttrInfo));
 
   i = 0;
-  switch (((GrowRect*)object)->type()) {
-  case glow_eObjectType_GrowRect: {
+  switch (((GrowRect*)object)->type())
+  {
+  case glow_eObjectType_GrowRect:
+  {
     GrowRect* op = (GrowRect*)object;
     char* dynamic;
     int dynsize;
@@ -1428,7 +1203,8 @@ int grow_GetObjectAttrInfo(
     attrinfo[i++].info_type = grow_eInfoType_Dynamic;
     break;
   }
-  case glow_eObjectType_GrowRectRounded: {
+  case glow_eObjectType_GrowRectRounded:
+  {
     GrowRectRounded* op = (GrowRectRounded*)object;
     char* dynamic;
     int dynsize;
@@ -1524,7 +1300,8 @@ int grow_GetObjectAttrInfo(
     attrinfo[i++].info_type = grow_eInfoType_Dynamic;
     break;
   }
-  case glow_eObjectType_GrowPolyLine: {
+  case glow_eObjectType_GrowPolyLine:
+  {
     GrowPolyLine* op = (GrowPolyLine*)object;
     char* dynamic;
     int dynsize;
@@ -1648,7 +1425,8 @@ int grow_GetObjectAttrInfo(
     attrinfo[i++].info_type = grow_eInfoType_Dynamic;
     break;
   }
-  case glow_eObjectType_GrowLine: {
+  case glow_eObjectType_GrowLine:
+  {
     GrowLine* op = (GrowLine*)object;
     char* dynamic;
     int dynsize;
@@ -1681,7 +1459,8 @@ int grow_GetObjectAttrInfo(
     attrinfo[i++].info_type = grow_eInfoType_Dynamic;
     break;
   }
-  case glow_eObjectType_GrowArc: {
+  case glow_eObjectType_GrowArc:
+  {
     GrowArc* op = (GrowArc*)object;
     char* dynamic;
     int dynsize;
@@ -1800,7 +1579,8 @@ int grow_GetObjectAttrInfo(
     attrinfo[i++].info_type = grow_eInfoType_Dynamic;
     break;
   }
-  case glow_eObjectType_GrowConPoint: {
+  case glow_eObjectType_GrowConPoint:
+  {
     GrowConPoint* op = (GrowConPoint*)object;
 
     strcpy(attrinfo[i].name, "Name");
@@ -1823,7 +1603,8 @@ int grow_GetObjectAttrInfo(
 
     break;
   }
-  case glow_eObjectType_GrowSubAnnot: {
+  case glow_eObjectType_GrowSubAnnot:
+  {
     GrowSubAnnot* op = (GrowSubAnnot*)object;
 
     strcpy(attrinfo[i].name, "Name");
@@ -1866,7 +1647,8 @@ int grow_GetObjectAttrInfo(
 
     break;
   }
-  case glow_eObjectType_GrowText: {
+  case glow_eObjectType_GrowText:
+  {
     GrowText* op = (GrowText*)object;
     char* dynamic;
     int dynsize;
@@ -1911,7 +1693,8 @@ int grow_GetObjectAttrInfo(
     attrinfo[i++].info_type = grow_eInfoType_Dynamic;
     break;
   }
-  case glow_eObjectType_GrowImage: {
+  case glow_eObjectType_GrowImage:
+  {
     GrowImage* op = (GrowImage*)object;
     char* dynamic;
     int dynsize;
@@ -1948,7 +1731,8 @@ int grow_GetObjectAttrInfo(
     attrinfo[i++].info_type = grow_eInfoType_Dynamic;
     break;
   }
-  case glow_eObjectType_GrowBar: {
+  case glow_eObjectType_GrowBar:
+  {
     GrowBar* op = (GrowBar*)object;
     char* name;
     char* dynamic;
@@ -1962,49 +1746,56 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "MaxValue"))) {
+    if ((name = growapi_translate(transtab, "MaxValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->max_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->max_value);
     }
 
-    if ((name = growapi_translate(transtab, "MinValue"))) {
+    if ((name = growapi_translate(transtab, "MinValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->min_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->min_value);
     }
 
-    if ((name = growapi_translate(transtab, "BarValue"))) {
+    if ((name = growapi_translate(transtab, "BarValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->bar_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->bar_value);
     }
 
-    if ((name = growapi_translate(transtab, "BarColor"))) {
+    if ((name = growapi_translate(transtab, "BarColor")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->bar_drawtype;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->bar_drawtype);
     }
 
-    if ((name = growapi_translate(transtab, "BarBorderColor"))) {
+    if ((name = growapi_translate(transtab, "BarBorderColor")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->bar_bordercolor;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->bar_bordercolor);
     }
 
-    if ((name = growapi_translate(transtab, "BarBorderWidth"))) {
+    if ((name = growapi_translate(transtab, "BarBorderWidth")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->bar_borderwidth;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->bar_borderwidth);
     }
 
-    if ((name = growapi_translate(transtab, "Dynamic"))) {
+    if ((name = growapi_translate(transtab, "Dynamic")))
+    {
       strcpy(attrinfo[i].name, name);
       op->get_dynamic(&dynamic, &dynsize);
       attrinfo[i].value_p = malloc(1024);
@@ -2019,7 +1810,8 @@ int grow_GetObjectAttrInfo(
     }
     break;
   }
-  case glow_eObjectType_GrowBarArc: {
+  case glow_eObjectType_GrowBarArc:
+  {
     GrowBarArc* op = (GrowBarArc*)object;
     char* name;
     char* dynamic;
@@ -2033,77 +1825,88 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "MaxValue"))) {
+    if ((name = growapi_translate(transtab, "MaxValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->max_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->max_value);
     }
 
-    if ((name = growapi_translate(transtab, "MinValue"))) {
+    if ((name = growapi_translate(transtab, "MinValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->min_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->min_value);
     }
 
-    if ((name = growapi_translate(transtab, "Angle1"))) {
+    if ((name = growapi_translate(transtab, "Angle1")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->angle1;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->angle1);
     }
 
-    if ((name = growapi_translate(transtab, "Angle2"))) {
+    if ((name = growapi_translate(transtab, "Angle2")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->angle2;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->angle2);
     }
 
-    if ((name = growapi_translate(transtab, "BarWidth"))) {
+    if ((name = growapi_translate(transtab, "BarWidth")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->bar_width;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->bar_width);
     }
 
-    if ((name = growapi_translate(transtab, "BarDirection"))) {
+    if ((name = growapi_translate(transtab, "BarDirection")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->bar_direction;
       attrinfo[i].type = glow_eType_Boolean;
       attrinfo[i++].size = sizeof(op->bar_direction);
     }
 
-    if ((name = growapi_translate(transtab, "BarValue"))) {
+    if ((name = growapi_translate(transtab, "BarValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->bar_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->bar_value);
     }
 
-    if ((name = growapi_translate(transtab, "BarColor"))) {
+    if ((name = growapi_translate(transtab, "BarColor")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->bar_drawtype;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->bar_drawtype);
     }
 
-    if ((name = growapi_translate(transtab, "BarBorderColor"))) {
+    if ((name = growapi_translate(transtab, "BarBorderColor")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->bar_bordercolor;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->bar_bordercolor);
     }
 
-    if ((name = growapi_translate(transtab, "BarBorderWidth"))) {
+    if ((name = growapi_translate(transtab, "BarBorderWidth")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->bar_borderwidth;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->bar_borderwidth);
     }
 
-    if ((name = growapi_translate(transtab, "Dynamic"))) {
+    if ((name = growapi_translate(transtab, "Dynamic")))
+    {
       strcpy(attrinfo[i].name, name);
       op->get_dynamic(&dynamic, &dynsize);
       attrinfo[i].value_p = malloc(1024);
@@ -2119,7 +1922,8 @@ int grow_GetObjectAttrInfo(
     break;
   }
   case glow_eObjectType_GrowTrend:
-  case glow_eObjectType_GrowXYCurve: {
+  case glow_eObjectType_GrowXYCurve:
+  {
     GrowTrend* op = (GrowTrend*)object;
     char* name;
     char* dynamic;
@@ -2133,112 +1937,128 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "NoOfPoints"))) {
+    if ((name = growapi_translate(transtab, "NoOfPoints")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->no_of_points;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->no_of_points);
     }
 
-    if ((name = growapi_translate(transtab, "ScanTime"))) {
+    if ((name = growapi_translate(transtab, "ScanTime")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->scan_time;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->scan_time);
     }
 
-    if ((name = growapi_translate(transtab, "CurveWidth"))) {
+    if ((name = growapi_translate(transtab, "CurveWidth")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->curve_width;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->curve_width);
     }
 
-    if ((name = growapi_translate(transtab, "FillCurve"))) {
+    if ((name = growapi_translate(transtab, "FillCurve")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->fill_curve;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->fill_curve);
     }
 
-    if ((name = growapi_translate(transtab, "HorizontalLines"))) {
+    if ((name = growapi_translate(transtab, "HorizontalLines")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->horizontal_lines;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->horizontal_lines);
     }
 
-    if ((name = growapi_translate(transtab, "VerticalLines"))) {
+    if ((name = growapi_translate(transtab, "VerticalLines")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->vertical_lines;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->vertical_lines);
     }
 
-    if ((name = growapi_translate(transtab, "MaxValue1"))) {
+    if ((name = growapi_translate(transtab, "MaxValue1")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->y_max_value[0];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->y_max_value[0]);
     }
 
-    if ((name = growapi_translate(transtab, "MinValue1"))) {
+    if ((name = growapi_translate(transtab, "MinValue1")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->y_min_value[0];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->y_min_value[0]);
     }
 
-    if ((name = growapi_translate(transtab, "CurveColor1"))) {
+    if ((name = growapi_translate(transtab, "CurveColor1")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->curve_drawtype[0];
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->curve_drawtype[0]);
     }
 
-    if ((name = growapi_translate(transtab, "CurveFillColor1"))) {
+    if ((name = growapi_translate(transtab, "CurveFillColor1")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->curve_fill_drawtype[0];
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->curve_fill_drawtype[0]);
     }
 
-    if ((name = growapi_translate(transtab, "MaxValue2"))) {
+    if ((name = growapi_translate(transtab, "MaxValue2")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->y_max_value[1];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->y_max_value[1]);
     }
 
-    if ((name = growapi_translate(transtab, "MinValue2"))) {
+    if ((name = growapi_translate(transtab, "MinValue2")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->y_min_value[1];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->y_min_value[1]);
     }
 
-    if ((name = growapi_translate(transtab, "CurveColor2"))) {
+    if ((name = growapi_translate(transtab, "CurveColor2")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->curve_drawtype[1];
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->curve_drawtype[1]);
     }
 
-    if ((name = growapi_translate(transtab, "CurveFillColor2"))) {
+    if ((name = growapi_translate(transtab, "CurveFillColor2")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->curve_fill_drawtype[1];
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->curve_fill_drawtype[1]);
     }
 
-    if ((name = growapi_translate(transtab, "Direction"))) {
+    if ((name = growapi_translate(transtab, "Direction")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->direction;
       attrinfo[i].type = glow_eType_HorizDirection;
       attrinfo[i++].size = sizeof(op->direction);
     }
 
-    if ((name = growapi_translate(transtab, "Dynamic"))) {
+    if ((name = growapi_translate(transtab, "Dynamic")))
+    {
       strcpy(attrinfo[i].name, name);
       op->get_dynamic(&dynamic, &dynsize);
       attrinfo[i].value_p = malloc(1024);
@@ -2253,7 +2073,8 @@ int grow_GetObjectAttrInfo(
     }
     break;
   }
-  case glow_eObjectType_GrowWindow: {
+  case glow_eObjectType_GrowWindow:
+  {
     GrowWindow* op = (GrowWindow*)object;
     char* name;
 
@@ -2265,49 +2086,57 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "FileName"))) {
+    if ((name = growapi_translate(transtab, "FileName")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->input_file_name;
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->input_file_name);
     }
-    if ((name = growapi_translate(transtab, "WindowScale"))) {
+    if ((name = growapi_translate(transtab, "WindowScale")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->window_scale;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->window_scale);
     }
-    if ((name = growapi_translate(transtab, "VerticalScrollbar"))) {
+    if ((name = growapi_translate(transtab, "VerticalScrollbar")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->vertical_scrollbar;
       attrinfo[i].type = glow_eType_Boolean;
       attrinfo[i++].size = sizeof(op->vertical_scrollbar);
     }
-    if ((name = growapi_translate(transtab, "HorizontalScrollbar"))) {
+    if ((name = growapi_translate(transtab, "HorizontalScrollbar")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->horizontal_scrollbar;
       attrinfo[i].type = glow_eType_Boolean;
       attrinfo[i++].size = sizeof(op->horizontal_scrollbar);
     }
-    if ((name = growapi_translate(transtab, "ScrollbarWidth"))) {
+    if ((name = growapi_translate(transtab, "ScrollbarWidth")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->scrollbar_width;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->scrollbar_width);
     }
-    if ((name = growapi_translate(transtab, "ScrollbarColor"))) {
+    if ((name = growapi_translate(transtab, "ScrollbarColor")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->scrollbar_color;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->scrollbar_color);
     }
-    if ((name = growapi_translate(transtab, "ScrollbarBgColor"))) {
+    if ((name = growapi_translate(transtab, "ScrollbarBgColor")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->scrollbar_bg_color;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->scrollbar_bg_color);
     }
-    if ((name = growapi_translate(transtab, "Owner"))) {
+    if ((name = growapi_translate(transtab, "Owner")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->owner;
       attrinfo[i].type = glow_eType_String;
@@ -2316,7 +2145,8 @@ int grow_GetObjectAttrInfo(
 
     break;
   }
-  case glow_eObjectType_GrowTable: {
+  case glow_eObjectType_GrowTable:
+  {
     GrowTable* op = (GrowTable*)object;
     char* name;
 
@@ -2328,13 +2158,15 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "Rows"))) {
+    if ((name = growapi_translate(transtab, "Rows")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->rows;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->rows);
     }
-    if ((name = growapi_translate(transtab, "Columns"))) {
+    if ((name = growapi_translate(transtab, "Columns")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->columns;
       attrinfo[i].type = glow_eType_Int;
@@ -2342,301 +2174,351 @@ int grow_GetObjectAttrInfo(
       attrinfo[i].maxlimit = 12;
       attrinfo[i++].size = sizeof(op->columns);
     }
-    if ((name = growapi_translate(transtab, "HeaderRow"))) {
+    if ((name = growapi_translate(transtab, "HeaderRow")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->header_row;
       attrinfo[i].type = glow_eType_Boolean;
       attrinfo[i++].size = sizeof(op->header_row);
     }
-    if ((name = growapi_translate(transtab, "HeaderColumn"))) {
+    if ((name = growapi_translate(transtab, "HeaderColumn")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->header_column;
       attrinfo[i].type = glow_eType_Boolean;
       attrinfo[i++].size = sizeof(op->header_column);
     }
-    if ((name = growapi_translate(transtab, "HeaderRowHeight"))) {
+    if ((name = growapi_translate(transtab, "HeaderRowHeight")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->header_row_height;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->header_row_height);
     }
-    if ((name = growapi_translate(transtab, "RowHeight"))) {
+    if ((name = growapi_translate(transtab, "RowHeight")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->row_height;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->row_height);
     }
-    if ((name = growapi_translate(transtab, "HeaderTextSize"))) {
+    if ((name = growapi_translate(transtab, "HeaderTextSize")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->header_text_size;
       attrinfo[i].type = glow_eType_TextSize;
       attrinfo[i++].size = sizeof(op->header_text_size);
     }
-    if ((name = growapi_translate(transtab, "HeaderTextBold"))) {
+    if ((name = growapi_translate(transtab, "HeaderTextBold")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->header_text_bold;
       attrinfo[i].type = glow_eType_Boolean;
       attrinfo[i++].size = sizeof(op->header_text_bold);
     }
-    if ((name = growapi_translate(transtab, "HeaderTextColor"))) {
+    if ((name = growapi_translate(transtab, "HeaderTextColor")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->header_text_color;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->header_text_color);
     }
-    if ((name = growapi_translate(transtab, "SelectColor"))) {
+    if ((name = growapi_translate(transtab, "SelectColor")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->select_drawtype;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->select_drawtype);
     }
-    if ((name = growapi_translate(transtab, "Options"))) {
+    if ((name = growapi_translate(transtab, "Options")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->options;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->options);
     }
-    if ((name = growapi_translate(transtab, "VerticalScrollbar"))) {
+    if ((name = growapi_translate(transtab, "VerticalScrollbar")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->vertical_scrollbar;
       attrinfo[i].type = glow_eType_Boolean;
       attrinfo[i++].size = sizeof(op->vertical_scrollbar);
     }
-    if ((name = growapi_translate(transtab, "HorizontalScrollbar"))) {
+    if ((name = growapi_translate(transtab, "HorizontalScrollbar")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->horizontal_scrollbar;
       attrinfo[i].type = glow_eType_Boolean;
       attrinfo[i++].size = sizeof(op->horizontal_scrollbar);
     }
-    if ((name = growapi_translate(transtab, "ScrollbarWidth"))) {
+    if ((name = growapi_translate(transtab, "ScrollbarWidth")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->scrollbar_width;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->scrollbar_width);
     }
-    if ((name = growapi_translate(transtab, "ScrollbarColor"))) {
+    if ((name = growapi_translate(transtab, "ScrollbarColor")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->scrollbar_color;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->scrollbar_color);
     }
-    if ((name = growapi_translate(transtab, "ScrollbarBgColor"))) {
+    if ((name = growapi_translate(transtab, "ScrollbarBgColor")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->scrollbar_bg_color;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->scrollbar_bg_color);
     }
-    if ((name = growapi_translate(transtab, "ColumnWidth1"))) {
+    if ((name = growapi_translate(transtab, "ColumnWidth1")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_width[0];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->column_width[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnAdjustment1"))) {
+    if ((name = growapi_translate(transtab, "ColumnAdjustment1")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_adjustment[0];
       attrinfo[i].type = glow_eType_Adjustment;
       attrinfo[i++].size = sizeof(op->column_adjustment[0]);
     }
-    if ((name = growapi_translate(transtab, "HeaderText1"))) {
+    if ((name = growapi_translate(transtab, "HeaderText1")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->header_text[0];
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->header_text[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnWidth2"))) {
+    if ((name = growapi_translate(transtab, "ColumnWidth2")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_width[1];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->column_width[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnAdjustment2"))) {
+    if ((name = growapi_translate(transtab, "ColumnAdjustment2")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_adjustment[1];
       attrinfo[i].type = glow_eType_Adjustment;
       attrinfo[i++].size = sizeof(op->column_adjustment[0]);
     }
-    if ((name = growapi_translate(transtab, "HeaderText2"))) {
+    if ((name = growapi_translate(transtab, "HeaderText2")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->header_text[1];
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->header_text[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnWidth3"))) {
+    if ((name = growapi_translate(transtab, "ColumnWidth3")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_width[2];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->column_width[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnAdjustment3"))) {
+    if ((name = growapi_translate(transtab, "ColumnAdjustment3")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_adjustment[2];
       attrinfo[i].type = glow_eType_Adjustment;
       attrinfo[i++].size = sizeof(op->column_adjustment[0]);
     }
-    if ((name = growapi_translate(transtab, "HeaderText3"))) {
+    if ((name = growapi_translate(transtab, "HeaderText3")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->header_text[2];
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->header_text[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnWidth4"))) {
+    if ((name = growapi_translate(transtab, "ColumnWidth4")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_width[3];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->column_width[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnAdjustment4"))) {
+    if ((name = growapi_translate(transtab, "ColumnAdjustment4")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_adjustment[3];
       attrinfo[i].type = glow_eType_Adjustment;
       attrinfo[i++].size = sizeof(op->column_adjustment[0]);
     }
-    if ((name = growapi_translate(transtab, "HeaderText4"))) {
+    if ((name = growapi_translate(transtab, "HeaderText4")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->header_text[3];
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->header_text[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnWidth5"))) {
+    if ((name = growapi_translate(transtab, "ColumnWidth5")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_width[4];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->column_width[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnAdjustment5"))) {
+    if ((name = growapi_translate(transtab, "ColumnAdjustment5")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_adjustment[4];
       attrinfo[i].type = glow_eType_Adjustment;
       attrinfo[i++].size = sizeof(op->column_adjustment[0]);
     }
-    if ((name = growapi_translate(transtab, "HeaderText5"))) {
+    if ((name = growapi_translate(transtab, "HeaderText5")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->header_text[4];
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->header_text[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnWidth6"))) {
+    if ((name = growapi_translate(transtab, "ColumnWidth6")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_width[5];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->column_width[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnAdjustment6"))) {
+    if ((name = growapi_translate(transtab, "ColumnAdjustment6")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_adjustment[5];
       attrinfo[i].type = glow_eType_Adjustment;
       attrinfo[i++].size = sizeof(op->column_adjustment[0]);
     }
-    if ((name = growapi_translate(transtab, "HeaderText6"))) {
+    if ((name = growapi_translate(transtab, "HeaderText6")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->header_text[5];
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->header_text[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnWidth7"))) {
+    if ((name = growapi_translate(transtab, "ColumnWidth7")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_width[6];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->column_width[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnAdjustment7"))) {
+    if ((name = growapi_translate(transtab, "ColumnAdjustment7")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_adjustment[6];
       attrinfo[i].type = glow_eType_Adjustment;
       attrinfo[i++].size = sizeof(op->column_adjustment[0]);
     }
-    if ((name = growapi_translate(transtab, "HeaderText7"))) {
+    if ((name = growapi_translate(transtab, "HeaderText7")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->header_text[6];
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->header_text[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnWidth8"))) {
+    if ((name = growapi_translate(transtab, "ColumnWidth8")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_width[7];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->column_width[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnAdjustment8"))) {
+    if ((name = growapi_translate(transtab, "ColumnAdjustment8")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_adjustment[7];
       attrinfo[i].type = glow_eType_Adjustment;
       attrinfo[i++].size = sizeof(op->column_adjustment[0]);
     }
-    if ((name = growapi_translate(transtab, "HeaderText8"))) {
+    if ((name = growapi_translate(transtab, "HeaderText8")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->header_text[7];
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->header_text[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnWidth9"))) {
+    if ((name = growapi_translate(transtab, "ColumnWidth9")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_width[8];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->column_width[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnAdjustment9"))) {
+    if ((name = growapi_translate(transtab, "ColumnAdjustment9")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_adjustment[8];
       attrinfo[i].type = glow_eType_Adjustment;
       attrinfo[i++].size = sizeof(op->column_adjustment[0]);
     }
-    if ((name = growapi_translate(transtab, "HeaderText9"))) {
+    if ((name = growapi_translate(transtab, "HeaderText9")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->header_text[8];
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->header_text[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnWidth10"))) {
+    if ((name = growapi_translate(transtab, "ColumnWidth10")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_width[9];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->column_width[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnAdjustment10"))) {
+    if ((name = growapi_translate(transtab, "ColumnAdjustment10")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_adjustment[9];
       attrinfo[i].type = glow_eType_Adjustment;
       attrinfo[i++].size = sizeof(op->column_adjustment[0]);
     }
-    if ((name = growapi_translate(transtab, "HeaderText10"))) {
+    if ((name = growapi_translate(transtab, "HeaderText10")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->header_text[9];
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->header_text[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnWidth11"))) {
+    if ((name = growapi_translate(transtab, "ColumnWidth11")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_width[10];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->column_width[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnAdjustment11"))) {
+    if ((name = growapi_translate(transtab, "ColumnAdjustment11")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_adjustment[10];
       attrinfo[i].type = glow_eType_Adjustment;
       attrinfo[i++].size = sizeof(op->column_adjustment[0]);
     }
-    if ((name = growapi_translate(transtab, "HeaderText11"))) {
+    if ((name = growapi_translate(transtab, "HeaderText11")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->header_text[10];
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->header_text[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnWidth12"))) {
+    if ((name = growapi_translate(transtab, "ColumnWidth12")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_width[11];
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->column_width[0]);
     }
-    if ((name = growapi_translate(transtab, "ColumnAdjustment12"))) {
+    if ((name = growapi_translate(transtab, "ColumnAdjustment12")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->column_adjustment[11];
       attrinfo[i].type = glow_eType_Adjustment;
       attrinfo[i++].size = sizeof(op->column_adjustment[0]);
     }
-    if ((name = growapi_translate(transtab, "HeaderText12"))) {
+    if ((name = growapi_translate(transtab, "HeaderText12")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = op->header_text[11];
       attrinfo[i].type = glow_eType_String;
@@ -2645,7 +2527,8 @@ int grow_GetObjectAttrInfo(
 
     break;
   }
-  case glow_eObjectType_GrowFolder: {
+  case glow_eObjectType_GrowFolder:
+  {
     GrowFolder* op = (GrowFolder*)object;
     char* name;
 
@@ -2657,70 +2540,81 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "Folders"))) {
+    if ((name = growapi_translate(transtab, "Folders")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->folders;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->folders);
     }
-    if ((name = growapi_translate(transtab, "HeaderHeight"))) {
+    if ((name = growapi_translate(transtab, "HeaderHeight")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->header_height;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->header_height);
     }
-    if ((name = growapi_translate(transtab, "ColorSelected"))) {
+    if ((name = growapi_translate(transtab, "ColorSelected")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->color_selected;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->color_selected);
     }
-    if ((name = growapi_translate(transtab, "ColorUnselected"))) {
+    if ((name = growapi_translate(transtab, "ColorUnselected")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->color_unselected;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->color_unselected);
     }
-    for (int j = 0; j < 12; j++) {
+    for (int j = 0; j < 12; j++)
+    {
       char tname[32];
 
       sprintf(tname, "FileName%d", j + 1);
-      if ((name = growapi_translate(transtab, tname))) {
+      if ((name = growapi_translate(transtab, tname)))
+      {
         strcpy(attrinfo[i].name, name);
         attrinfo[i].value_p = op->folder_file_names[j];
         attrinfo[i].type = glow_eType_String;
         attrinfo[i++].size = sizeof(op->folder_file_names[0]);
       }
       sprintf(tname, "Text%d", j + 1);
-      if ((name = growapi_translate(transtab, tname))) {
+      if ((name = growapi_translate(transtab, tname)))
+      {
         strcpy(attrinfo[i].name, name);
         attrinfo[i].value_p = op->folder_text[j];
         attrinfo[i].type = glow_eType_String;
         attrinfo[i++].size = sizeof(op->folder_text[0]);
       }
       sprintf(tname, "Scale%d", j + 1);
-      if ((name = growapi_translate(transtab, tname))) {
+      if ((name = growapi_translate(transtab, tname)))
+      {
         strcpy(attrinfo[i].name, name);
         attrinfo[i].value_p = &op->folder_scale[j];
         attrinfo[i].type = glow_eType_Double;
         attrinfo[i++].size = sizeof(op->folder_scale[0]);
       }
       sprintf(tname, "VerticalScrollbar%d", j + 1);
-      if ((name = growapi_translate(transtab, tname))) {
+      if ((name = growapi_translate(transtab, tname)))
+      {
         strcpy(attrinfo[i].name, name);
         attrinfo[i].value_p = &op->folder_v_scrollbar[j];
         attrinfo[i].type = glow_eType_Boolean;
         attrinfo[i++].size = sizeof(op->folder_v_scrollbar[0]);
       }
       sprintf(tname, "HorizontalScrollbar%d", j + 1);
-      if ((name = growapi_translate(transtab, tname))) {
+      if ((name = growapi_translate(transtab, tname)))
+      {
         strcpy(attrinfo[i].name, name);
         attrinfo[i].value_p = &op->folder_h_scrollbar[j];
         attrinfo[i].type = glow_eType_Boolean;
         attrinfo[i++].size = sizeof(op->folder_h_scrollbar[0]);
       }
       sprintf(tname, "Owner%d", j + 1);
-      if ((name = growapi_translate(transtab, tname))) {
+      if ((name = growapi_translate(transtab, tname)))
+      {
         strcpy(attrinfo[i].name, name);
         attrinfo[i].value_p = op->folder_owner[j];
         attrinfo[i].type = glow_eType_String;
@@ -2729,7 +2623,8 @@ int grow_GetObjectAttrInfo(
     }
     break;
   }
-  case glow_eObjectType_GrowAxis: {
+  case glow_eObjectType_GrowAxis:
+  {
     GrowAxis* op = (GrowAxis*)object;
     char* name;
     char* dynamic;
@@ -2743,49 +2638,56 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "MaxValue"))) {
+    if ((name = growapi_translate(transtab, "MaxValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->max_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->max_value);
     }
 
-    if ((name = growapi_translate(transtab, "MinValue"))) {
+    if ((name = growapi_translate(transtab, "MinValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->min_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->min_value);
     }
 
-    if ((name = growapi_translate(transtab, "Lines"))) {
+    if ((name = growapi_translate(transtab, "Lines")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->lines;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->lines);
     }
 
-    if ((name = growapi_translate(transtab, "LongQuotient"))) {
+    if ((name = growapi_translate(transtab, "LongQuotient")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->longquotient;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->longquotient);
     }
 
-    if ((name = growapi_translate(transtab, "ValueQuotient"))) {
+    if ((name = growapi_translate(transtab, "ValueQuotient")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->valuequotient;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->valuequotient);
     }
 
-    if ((name = growapi_translate(transtab, "Format"))) {
+    if ((name = growapi_translate(transtab, "Format")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->format;
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->format);
     }
 
-    if ((name = growapi_translate(transtab, "Dynamic"))) {
+    if ((name = growapi_translate(transtab, "Dynamic")))
+    {
       strcpy(attrinfo[i].name, name);
       op->get_dynamic(&dynamic, &dynsize);
       attrinfo[i].value_p = malloc(1024);
@@ -2800,7 +2702,8 @@ int grow_GetObjectAttrInfo(
     }
     break;
   }
-  case glow_eObjectType_GrowAxisArc: {
+  case glow_eObjectType_GrowAxisArc:
+  {
     GrowAxisArc* op = (GrowAxisArc*)object;
     char* name;
     char* dynamic;
@@ -2814,70 +2717,80 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "Angle1"))) {
+    if ((name = growapi_translate(transtab, "Angle1")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->angle1;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->angle1);
     }
 
-    if ((name = growapi_translate(transtab, "Angle2"))) {
+    if ((name = growapi_translate(transtab, "Angle2")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->angle2;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->angle2);
     }
 
-    if ((name = growapi_translate(transtab, "LineLength"))) {
+    if ((name = growapi_translate(transtab, "LineLength")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->linelength;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->linelength);
     }
 
-    if ((name = growapi_translate(transtab, "MaxValue"))) {
+    if ((name = growapi_translate(transtab, "MaxValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->max_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->max_value);
     }
 
-    if ((name = growapi_translate(transtab, "MinValue"))) {
+    if ((name = growapi_translate(transtab, "MinValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->min_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->min_value);
     }
 
-    if ((name = growapi_translate(transtab, "Lines"))) {
+    if ((name = growapi_translate(transtab, "Lines")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->lines;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->lines);
     }
 
-    if ((name = growapi_translate(transtab, "LongQuotient"))) {
+    if ((name = growapi_translate(transtab, "LongQuotient")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->longquotient;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->longquotient);
     }
 
-    if ((name = growapi_translate(transtab, "ValueQuotient"))) {
+    if ((name = growapi_translate(transtab, "ValueQuotient")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->valuequotient;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->valuequotient);
     }
 
-    if ((name = growapi_translate(transtab, "Format"))) {
+    if ((name = growapi_translate(transtab, "Format")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->format;
       attrinfo[i].type = glow_eType_String;
       attrinfo[i++].size = sizeof(op->format);
     }
 
-    if ((name = growapi_translate(transtab, "Dynamic"))) {
+    if ((name = growapi_translate(transtab, "Dynamic")))
+    {
       strcpy(attrinfo[i].name, name);
       op->get_dynamic(&dynamic, &dynsize);
       attrinfo[i].value_p = malloc(1024);
@@ -2892,7 +2805,8 @@ int grow_GetObjectAttrInfo(
     }
     break;
   }
-  case glow_eObjectType_GrowPie: {
+  case glow_eObjectType_GrowPie:
+  {
     GrowPie* op = (GrowPie*)object;
     char* name;
     char* dynamic;
@@ -2906,19 +2820,22 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "Angle1"))) {
+    if ((name = growapi_translate(transtab, "Angle1")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->angle1;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->angle1);
     }
-    if ((name = growapi_translate(transtab, "Angle2"))) {
+    if ((name = growapi_translate(transtab, "Angle2")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->angle2;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->angle2);
     }
-    if ((name = growapi_translate(transtab, "ShadowWidth"))) {
+    if ((name = growapi_translate(transtab, "ShadowWidth")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->shadow_width;
       attrinfo[i].minlimit = 0;
@@ -2926,7 +2843,8 @@ int grow_GetObjectAttrInfo(
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->shadow_width);
     }
-    if ((name = growapi_translate(transtab, "ShadowContrast"))) {
+    if ((name = growapi_translate(transtab, "ShadowContrast")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->shadow_contrast;
       attrinfo[i].type = glow_eType_Int;
@@ -2934,7 +2852,8 @@ int grow_GetObjectAttrInfo(
       attrinfo[i].maxlimit = 3;
       attrinfo[i++].size = sizeof(op->shadow_contrast);
     }
-    if ((name = growapi_translate(transtab, "GradientContrast"))) {
+    if ((name = growapi_translate(transtab, "GradientContrast")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->gradient_contrast;
       attrinfo[i].type = glow_eType_Int;
@@ -2942,19 +2861,22 @@ int grow_GetObjectAttrInfo(
       attrinfo[i].maxlimit = 10;
       attrinfo[i++].size = sizeof(op->gradient_contrast);
     }
-    if ((name = growapi_translate(transtab, "Gradient"))) {
+    if ((name = growapi_translate(transtab, "Gradient")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->gradient;
       attrinfo[i].type = glow_eType_Gradient;
       attrinfo[i++].size = sizeof(op->gradient);
     }
-    if ((name = growapi_translate(transtab, "Relief"))) {
+    if ((name = growapi_translate(transtab, "Relief")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->relief;
       attrinfo[i].type = glow_eType_Relief;
       attrinfo[i++].size = sizeof(op->relief);
     }
-    if ((name = growapi_translate(transtab, "Sectors"))) {
+    if ((name = growapi_translate(transtab, "Sectors")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->sectors;
       attrinfo[i].minlimit = 1;
@@ -2962,30 +2884,35 @@ int grow_GetObjectAttrInfo(
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->sectors);
     }
-    if ((name = growapi_translate(transtab, "MinValue"))) {
+    if ((name = growapi_translate(transtab, "MinValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->min_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->min_value);
     }
-    if ((name = growapi_translate(transtab, "MaxValue"))) {
+    if ((name = growapi_translate(transtab, "MaxValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->max_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->max_value);
     }
-    for (int j = 0; j < 12; j++) {
+    for (int j = 0; j < 12; j++)
+    {
       char tname[32];
 
       sprintf(tname, "SectorColor%d", j + 1);
-      if ((name = growapi_translate(transtab, tname))) {
+      if ((name = growapi_translate(transtab, tname)))
+      {
         strcpy(attrinfo[i].name, name);
         attrinfo[i].value_p = &op->sector_color[j];
         attrinfo[i].type = glow_eType_Color;
         attrinfo[i++].size = sizeof(op->sector_color[0]);
       }
     }
-    if ((name = growapi_translate(transtab, "Dynamic"))) {
+    if ((name = growapi_translate(transtab, "Dynamic")))
+    {
       strcpy(attrinfo[i].name, name);
       op->get_dynamic(&dynamic, &dynsize);
       attrinfo[i].value_p = malloc(1024);
@@ -3000,7 +2927,8 @@ int grow_GetObjectAttrInfo(
     }
     break;
   }
-  case glow_eObjectType_GrowBarChart: {
+  case glow_eObjectType_GrowBarChart:
+  {
     GrowBarChart* op = (GrowBarChart*)object;
     char* name;
     char* dynamic;
@@ -3014,7 +2942,8 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "ShadowWidth"))) {
+    if ((name = growapi_translate(transtab, "ShadowWidth")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->shadow_width;
       attrinfo[i].minlimit = 0;
@@ -3022,7 +2951,8 @@ int grow_GetObjectAttrInfo(
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->shadow_width);
     }
-    if ((name = growapi_translate(transtab, "ShadowContrast"))) {
+    if ((name = growapi_translate(transtab, "ShadowContrast")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->shadow_contrast;
       attrinfo[i].type = glow_eType_Int;
@@ -3030,7 +2960,8 @@ int grow_GetObjectAttrInfo(
       attrinfo[i].maxlimit = 3;
       attrinfo[i++].size = sizeof(op->shadow_contrast);
     }
-    if ((name = growapi_translate(transtab, "GradientContrast"))) {
+    if ((name = growapi_translate(transtab, "GradientContrast")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->gradient_contrast;
       attrinfo[i].type = glow_eType_Int;
@@ -3038,19 +2969,22 @@ int grow_GetObjectAttrInfo(
       attrinfo[i].maxlimit = 10;
       attrinfo[i++].size = sizeof(op->gradient_contrast);
     }
-    if ((name = growapi_translate(transtab, "Gradient"))) {
+    if ((name = growapi_translate(transtab, "Gradient")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->gradient;
       attrinfo[i].type = glow_eType_Gradient;
       attrinfo[i++].size = sizeof(op->gradient);
     }
-    if ((name = growapi_translate(transtab, "Relief"))) {
+    if ((name = growapi_translate(transtab, "Relief")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->relief;
       attrinfo[i].type = glow_eType_Relief;
       attrinfo[i++].size = sizeof(op->relief);
     }
-    if ((name = growapi_translate(transtab, "Bars"))) {
+    if ((name = growapi_translate(transtab, "Bars")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->bars;
       attrinfo[i].minlimit = 1;
@@ -3058,7 +2992,8 @@ int grow_GetObjectAttrInfo(
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->bars);
     }
-    if ((name = growapi_translate(transtab, "BarSegments"))) {
+    if ((name = growapi_translate(transtab, "BarSegments")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->barsegments;
       attrinfo[i].minlimit = 1;
@@ -3066,48 +3001,56 @@ int grow_GetObjectAttrInfo(
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->barsegments);
     }
-    if ((name = growapi_translate(transtab, "MinValue"))) {
+    if ((name = growapi_translate(transtab, "MinValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->min_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->min_value);
     }
-    if ((name = growapi_translate(transtab, "MaxValue"))) {
+    if ((name = growapi_translate(transtab, "MaxValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->max_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->max_value);
     }
-    if ((name = growapi_translate(transtab, "LineColor"))) {
+    if ((name = growapi_translate(transtab, "LineColor")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->line_color;
       attrinfo[i].type = glow_eType_Color;
       attrinfo[i++].size = sizeof(op->line_color);
     }
-    if ((name = growapi_translate(transtab, "HorizontalLines"))) {
+    if ((name = growapi_translate(transtab, "HorizontalLines")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->horizontal_lines;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->horizontal_lines);
     }
-    if ((name = growapi_translate(transtab, "VerticalLines"))) {
+    if ((name = growapi_translate(transtab, "VerticalLines")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->vertical_lines;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->vertical_lines);
     }
-    for (int j = 0; j < 12; j++) {
+    for (int j = 0; j < 12; j++)
+    {
       char tname[32];
 
       sprintf(tname, "BarColor%d", j + 1);
-      if ((name = growapi_translate(transtab, tname))) {
+      if ((name = growapi_translate(transtab, tname)))
+      {
         strcpy(attrinfo[i].name, name);
         attrinfo[i].value_p = &op->bar_color[j];
         attrinfo[i].type = glow_eType_Color;
         attrinfo[i++].size = sizeof(op->bar_color[0]);
       }
     }
-    if ((name = growapi_translate(transtab, "Dynamic"))) {
+    if ((name = growapi_translate(transtab, "Dynamic")))
+    {
       strcpy(attrinfo[i].name, name);
       op->get_dynamic(&dynamic, &dynsize);
       attrinfo[i].value_p = malloc(1024);
@@ -3125,7 +3068,8 @@ int grow_GetObjectAttrInfo(
   case glow_eObjectType_GrowNode:
   case glow_eObjectType_GrowGroup:
   case glow_eObjectType_GrowToolbar:
-  case glow_eObjectType_GrowLayer: {
+  case glow_eObjectType_GrowLayer:
+  {
     GrowNode* op = (GrowNode*)object;
     char* dynamic;
     int dynsize;
@@ -3140,7 +3084,8 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "SubGraph"))) {
+    if ((name = growapi_translate(transtab, "SubGraph")))
+    {
       if (((GrowNode*)object)->type() == glow_eObjectType_GrowGroup)
         strcpy(attrinfo[i].name, "Group");
       else
@@ -3158,18 +3103,20 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].maxlimit = 1;
     attrinfo[i++].size = sizeof(op->transparency);
 
-    for (j = 0; j < 10; j++) {
-      if (op->nc->check_annotation(j)) {
+    for (j = 0; j < 10; j++)
+    {
+      if (op->nc->check_annotation(j))
+      {
         sprintf(annot_name, "A%d", j);
-        if ((name = growapi_translate(transtab, annot_name))) {
+        if ((name = growapi_translate(transtab, annot_name)))
+        {
           int a_size;
           glow_eDrawType a_drawtype, a_color, a_bgcolor;
           double a_scale;
           glow_eFont a_font;
           glow_eAnnotType a_type;
 
-          op->get_annotation_info(j, &a_size, &a_drawtype, &a_color, &a_bgcolor,
-              &a_scale, &a_font, &a_type);
+          op->get_annotation_info(j, &a_size, &a_drawtype, &a_color, &a_bgcolor, &a_scale, &a_font, &a_type);
           strcpy(attrinfo[i].name, name);
           attrinfo[i].value_p = malloc(1024);
           attrinfo[i].type = glow_eType_String;
@@ -3184,7 +3131,8 @@ int grow_GetObjectAttrInfo(
       }
     }
 
-    for (j = 0; j < op->nc->arg_cnt; j++) {
+    for (j = 0; j < op->nc->arg_cnt; j++)
+    {
       strcpy(attrinfo[i].name, op->nc->argname[j]);
       attrinfo[i].value_p = malloc(80);
       attrinfo[i].type = glow_eType_String;
@@ -3195,7 +3143,8 @@ int grow_GetObjectAttrInfo(
       i++;
     }
 
-    if ((name = growapi_translate(transtab, "Dynamic"))) {
+    if ((name = growapi_translate(transtab, "Dynamic")))
+    {
       strcpy(attrinfo[i].name, name);
       op->get_dynamic(&dynamic, &dynsize);
       attrinfo[i].value_p = malloc(1024);
@@ -3210,7 +3159,8 @@ int grow_GetObjectAttrInfo(
     }
     break;
   }
-  case glow_eObjectType_GrowSlider: {
+  case glow_eObjectType_GrowSlider:
+  {
     GrowSlider* op = (GrowSlider*)object;
     char* dynamic;
     int dynsize;
@@ -3225,7 +3175,8 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "SubGraph"))) {
+    if ((name = growapi_translate(transtab, "SubGraph")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->nc->n_name;
       attrinfo[i].type = glow_eType_String;
@@ -3233,45 +3184,53 @@ int grow_GetObjectAttrInfo(
       attrinfo[i++].size = sizeof(op->nc->n_name);
     }
 
-    if ((name = growapi_translate(transtab, "Direction"))) {
+    if ((name = growapi_translate(transtab, "Direction")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->direction;
       attrinfo[i].type = glow_eType_Direction;
       attrinfo[i++].size = sizeof(op->direction);
     }
 
-    if ((name = growapi_translate(transtab, "MaxValue"))) {
+    if ((name = growapi_translate(transtab, "MaxValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->max_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->max_value);
     }
 
-    if ((name = growapi_translate(transtab, "MinValue"))) {
+    if ((name = growapi_translate(transtab, "MinValue")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->min_value;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->min_value);
     }
 
-    if ((name = growapi_translate(transtab, "MaxPos"))) {
+    if ((name = growapi_translate(transtab, "MaxPos")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->max_pos;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->max_pos);
     }
 
-    if ((name = growapi_translate(transtab, "MinPos"))) {
+    if ((name = growapi_translate(transtab, "MinPos")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->min_pos;
       attrinfo[i].type = glow_eType_Double;
       attrinfo[i++].size = sizeof(op->min_pos);
     }
 
-    for (j = 0; j < 10; j++) {
-      if (op->nc->check_annotation(j)) {
+    for (j = 0; j < 10; j++)
+    {
+      if (op->nc->check_annotation(j))
+      {
         sprintf(annot_name, "A%d", j);
-        if ((name = growapi_translate(transtab, annot_name))) {
+        if ((name = growapi_translate(transtab, annot_name)))
+        {
           strcpy(attrinfo[i].name, name);
           attrinfo[i].value_p = malloc(80);
           attrinfo[i].type = glow_eType_String;
@@ -3284,7 +3243,8 @@ int grow_GetObjectAttrInfo(
       }
     }
 
-    for (j = 0; j < op->nc->arg_cnt; j++) {
+    for (j = 0; j < op->nc->arg_cnt; j++)
+    {
       strcpy(attrinfo[i].name, op->nc->argname[j]);
       attrinfo[i].value_p = malloc(80);
       attrinfo[i].type = glow_eType_String;
@@ -3295,7 +3255,8 @@ int grow_GetObjectAttrInfo(
       i++;
     }
 
-    if ((name = growapi_translate(transtab, "Dynamic"))) {
+    if ((name = growapi_translate(transtab, "Dynamic")))
+    {
       strcpy(attrinfo[i].name, name);
       op->get_dynamic(&dynamic, &dynsize);
       attrinfo[i].value_p = malloc(1024);
@@ -3310,7 +3271,8 @@ int grow_GetObjectAttrInfo(
     }
     break;
   }
-  case glow_eObjectType_GrowScriptModule: {
+  case glow_eObjectType_GrowScriptModule:
+  {
     GrowScriptModule* op = (GrowScriptModule*)object;
 
     strcpy(attrinfo[i].name, "Name");
@@ -3321,7 +3283,7 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-     strcpy(attrinfo[i].name, "ModuleIndex");
+    strcpy(attrinfo[i].name, "ModuleIndex");
     attrinfo[i].value_p = &op->module_index;
     attrinfo[i].type = glow_eType_Int;
     attrinfo[i++].size = sizeof(op->module_index);
@@ -3480,7 +3442,8 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].value_p = &op->fill_module;
     attrinfo[i].type = glow_eType_Int;
     attrinfo[i++].size = sizeof(op->fill_module);
-    if (op->module_index == 0) {
+    if (op->module_index == 0)
+    {
       strcpy(attrinfo[i].name, "WindowBorderWidth");
       attrinfo[i].value_p = &op->window_border_width;
       attrinfo[i].type = glow_eType_Float;
@@ -3493,7 +3456,8 @@ int grow_GetObjectAttrInfo(
     }
     break;
   }
-  case glow_eObjectType_NodeClass: {
+  case glow_eObjectType_NodeClass:
+  {
     GlowNodeClass* op = (GlowNodeClass*)object;
 
     strcpy(attrinfo[i].name, "Name");
@@ -3546,7 +3510,8 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].type = glow_eType_Cycle;
     attrinfo[i++].size = sizeof(op->cycle);
 
-    for (j = 0; j < op->arg_cnt; j++) {
+    for (j = 0; j < op->arg_cnt; j++)
+    {
       sprintf(attrinfo[i].name, "Arg%d", j + 1);
       attrinfo[i].value_p = &op->argname[j];
       attrinfo[i].type = glow_eType_String;
@@ -3554,7 +3519,8 @@ int grow_GetObjectAttrInfo(
     }
     break;
   }
-  case glow_eObjectType_GrowDashCell: {
+  case glow_eObjectType_GrowDashCell:
+  {
     GrowDashCell* op = (GrowDashCell*)object;
     char* name;
 
@@ -3566,14 +3532,16 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
 
-    if ((name = growapi_translate(transtab, "CellRows"))) {
+    if ((name = growapi_translate(transtab, "CellRows")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->cell_rows;
       attrinfo[i].type = glow_eType_Int;
       attrinfo[i++].size = sizeof(op->cell_rows);
     }
 
-    if ((name = growapi_translate(transtab, "CellColumns"))) {
+    if ((name = growapi_translate(transtab, "CellColumns")))
+    {
       strcpy(attrinfo[i].name, name);
       attrinfo[i].value_p = &op->cell_columns;
       attrinfo[i].type = glow_eType_Int;
@@ -3589,8 +3557,7 @@ int grow_GetObjectAttrInfo(
   return 1;
 }
 
-int grow_GetSubGraphAttrInfo(
-    grow_tCtx ctx, char* transtab, grow_sAttrInfo** info, int* attr_cnt)
+int grow_GetSubGraphAttrInfo(grow_tCtx ctx, char* transtab, grow_sAttrInfo** info, int* attr_cnt)
 {
   grow_sAttrInfo* attrinfo;
   int i;
@@ -3602,67 +3569,78 @@ int grow_GetSubGraphAttrInfo(
 
   i = 0;
 
-  if ((name = growapi_translate(transtab, "DynType1"))) {
+  if ((name = growapi_translate(transtab, "DynType1")))
+  {
     strcpy(attrinfo[i].name, name);
     attrinfo[i].value_p = &ctx->dyn_type1;
     attrinfo[i].type = glow_eType_DynType1;
     attrinfo[i++].size = sizeof(ctx->dyn_type1);
   }
-  if ((name = growapi_translate(transtab, "DynType2"))) {
+  if ((name = growapi_translate(transtab, "DynType2")))
+  {
     strcpy(attrinfo[i].name, name);
     attrinfo[i].value_p = &ctx->dyn_type2;
     attrinfo[i].type = glow_eType_DynType2;
     attrinfo[i++].size = sizeof(ctx->dyn_type2);
   }
-  if ((name = growapi_translate(transtab, "DynActionType1"))) {
+  if ((name = growapi_translate(transtab, "DynActionType1")))
+  {
     strcpy(attrinfo[i].name, name);
     attrinfo[i].value_p = &ctx->dyn_action_type1;
     attrinfo[i].type = glow_eType_ActionType1;
     attrinfo[i++].size = sizeof(ctx->dyn_action_type1);
   }
-  if ((name = growapi_translate(transtab, "DynColor1"))) {
+  if ((name = growapi_translate(transtab, "DynColor1")))
+  {
     strcpy(attrinfo[i].name, name);
     attrinfo[i].value_p = &ctx->dyn_color[0];
     attrinfo[i].type = glow_eType_TraceColor;
     attrinfo[i++].size = sizeof(ctx->dyn_color[0]);
   }
-  if ((name = growapi_translate(transtab, "DynColor2"))) {
+  if ((name = growapi_translate(transtab, "DynColor2")))
+  {
     strcpy(attrinfo[i].name, name);
     attrinfo[i].value_p = &ctx->dyn_color[1];
     attrinfo[i].type = glow_eType_TraceColor;
     attrinfo[i++].size = sizeof(ctx->dyn_color[0]);
   }
-  if ((name = growapi_translate(transtab, "DynColor3"))) {
+  if ((name = growapi_translate(transtab, "DynColor3")))
+  {
     strcpy(attrinfo[i].name, name);
     attrinfo[i].value_p = &ctx->dyn_color[2];
     attrinfo[i].type = glow_eType_TraceColor;
     attrinfo[i++].size = sizeof(ctx->dyn_color[0]);
   }
-  if ((name = growapi_translate(transtab, "DynColor4"))) {
+  if ((name = growapi_translate(transtab, "DynColor4")))
+  {
     strcpy(attrinfo[i].name, name);
     attrinfo[i].value_p = &ctx->dyn_color[3];
     attrinfo[i].type = glow_eType_TraceColor;
     attrinfo[i++].size = sizeof(ctx->dyn_color[0]);
   }
-  if ((name = growapi_translate(transtab, "DynAttr1"))) {
+  if ((name = growapi_translate(transtab, "DynAttr1")))
+  {
     strcpy(attrinfo[i].name, name);
     attrinfo[i].value_p = &ctx->dyn_attr[0];
     attrinfo[i].type = glow_eType_Int;
     attrinfo[i++].size = sizeof(ctx->dyn_attr[0]);
   }
-  if ((name = growapi_translate(transtab, "DynAttr2"))) {
+  if ((name = growapi_translate(transtab, "DynAttr2")))
+  {
     strcpy(attrinfo[i].name, name);
     attrinfo[i].value_p = &ctx->dyn_attr[1];
     attrinfo[i].type = glow_eType_Int;
     attrinfo[i++].size = sizeof(ctx->dyn_attr[0]);
   }
-  if ((name = growapi_translate(transtab, "DynAttr3"))) {
+  if ((name = growapi_translate(transtab, "DynAttr3")))
+  {
     strcpy(attrinfo[i].name, name);
     attrinfo[i].value_p = &ctx->dyn_attr[2];
     attrinfo[i].type = glow_eType_Int;
     attrinfo[i++].size = sizeof(ctx->dyn_attr[0]);
   }
-  if ((name = growapi_translate(transtab, "DynAttr4"))) {
+  if ((name = growapi_translate(transtab, "DynAttr4")))
+  {
     strcpy(attrinfo[i].name, name);
     attrinfo[i].value_p = &ctx->dyn_attr[3];
     attrinfo[i].type = glow_eType_Int;
@@ -3846,7 +3824,8 @@ int grow_GetGraphAttrInfo(grow_tCtx ctx, grow_sAttrInfo** info, int* attr_cnt)
   attrinfo[i].type = glow_eType_Int;
   attrinfo[i++].size = sizeof(ctx->dashboard);
 
-  if (ctx->dashboard) {
+  if (ctx->dashboard)
+  {
     strcpy(attrinfo[i].name, "DashCellWidth");
     attrinfo[i].value_p = &ctx->dash_cell_width;
     attrinfo[i].type = glow_eType_Double;
@@ -3874,23 +3853,19 @@ int grow_GetGraphAttrInfo(grow_tCtx ctx, grow_sAttrInfo** info, int* attr_cnt)
   return 1;
 }
 
-void grow_FreeSubGraphAttrInfo(grow_sAttrInfo* attrinfo)
-{
-  grow_FreeObjectAttrInfo(attrinfo);
-}
+void grow_FreeSubGraphAttrInfo(grow_sAttrInfo* attrinfo) { grow_FreeObjectAttrInfo(attrinfo); }
 
-void grow_FreeGraphAttrInfo(grow_sAttrInfo* attrinfo)
-{
-  grow_FreeObjectAttrInfo(attrinfo);
-}
+void grow_FreeGraphAttrInfo(grow_sAttrInfo* attrinfo) { grow_FreeObjectAttrInfo(attrinfo); }
 
 void grow_FreeObjectAttrInfo(grow_sAttrInfo* attrinfo)
 {
   grow_sAttrInfo* info_p;
 
   info_p = attrinfo;
-  while (info_p->info_type != grow_eInfoType_End) {
-    switch (info_p->info_type) {
+  while (info_p->info_type != grow_eInfoType_End)
+  {
+    switch (info_p->info_type)
+    {
     case grow_eInfoType_Annot:
       free((char*)info_p->value_p);
       break;
@@ -3911,13 +3886,17 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
 {
   grow_sAttrInfo* info_p;
 
-  switch (((GrowRect*)object)->type()) {
+  switch (((GrowRect*)object)->type())
+  {
   case glow_eObjectType_GrowRect:
     // Set changed dynamic
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Dynamic: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -3926,13 +3905,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowRect*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowRect*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowRect*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowRect*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -3948,9 +3923,12 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
   case glow_eObjectType_GrowRectRounded:
     // Set changed dynamic
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Dynamic: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -3959,13 +3937,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowRectRounded*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowRectRounded*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowRectRounded*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowRectRounded*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -3981,9 +3955,12 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
   case glow_eObjectType_GrowPolyLine:
     // Set changed dynamic
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Dynamic: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -3992,13 +3969,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowPolyLine*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowPolyLine*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowPolyLine*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowPolyLine*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -4013,9 +3986,12 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     break;
   case glow_eObjectType_GrowLine:
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Dynamic: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -4024,13 +4000,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowLine*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowLine*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowLine*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowLine*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -4044,9 +4016,12 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     break;
   case glow_eObjectType_GrowArc:
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Dynamic: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -4055,13 +4030,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowArc*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowArc*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowArc*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowArc*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -4082,8 +4053,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     break;
   case glow_eObjectType_GrowSubAnnot:
     ((GrowSubAnnot*)object)->set_textsize(((GrowSubAnnot*)object)->text_size);
-    sprintf(((GrowSubAnnot*)object)->text.text, "A%d",
-        ((GrowSubAnnot*)object)->number);
+    sprintf(((GrowSubAnnot*)object)->text.text, "A%d", ((GrowSubAnnot*)object)->number);
     ((GrowSubAnnot*)object)->move(0, 0, 0);
     ((GrowSubAnnot*)object)->zoom();
     ((GrowSubAnnot*)object)->nav_zoom();
@@ -4094,13 +4064,16 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
 
     // Set changed dynamic
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
       case grow_eInfoType_DynamicText:
         if (!streq(((GrowText*)object)->text, (char*)info_p->value_p))
           ((GrowText*)object)->set_text((char*)info_p->value_p);
         break;
-      case grow_eInfoType_Dynamic: {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -4109,13 +4082,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowText*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowText*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowText*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowText*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -4131,9 +4100,12 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
   case glow_eObjectType_GrowImage:
     // Set changed dynamic
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Dynamic: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -4142,16 +4114,13 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowImage*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowImage*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowImage*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowImage*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
-      case grow_eInfoType_Image: {
+      case grow_eInfoType_Image:
+      {
         ((GrowImage*)object)->insert_image((char*)info_p->value_p);
         break;
       }
@@ -4168,9 +4137,12 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
   case glow_eObjectType_GrowBar:
     // Set changed dynamic
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Dynamic: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -4179,13 +4151,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowBar*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowBar*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowBar*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowBar*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -4202,9 +4170,12 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
   case glow_eObjectType_GrowXYCurve:
     // Set changed dynamic
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Dynamic: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -4213,13 +4184,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowTrend*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowTrend*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowTrend*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowTrend*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -4245,9 +4212,12 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
   case glow_eObjectType_GrowAxis:
     // Set changed dynamic
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Dynamic: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -4256,13 +4226,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowAxis*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowAxis*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowAxis*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowAxis*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -4279,9 +4245,12 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
   case glow_eObjectType_GrowAxisArc:
     // Set changed dynamic
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Dynamic: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -4290,13 +4259,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowAxisArc*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowAxisArc*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowAxisArc*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowAxisArc*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -4313,9 +4278,12 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
   case glow_eObjectType_GrowPie:
     // Set changed dynamic
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Dynamic: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -4324,13 +4292,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowAxisArc*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowAxisArc*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowAxisArc*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowAxisArc*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -4347,25 +4311,27 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
   case glow_eObjectType_GrowGroup:
     // Set changed annotations
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Annot: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Annot:
+      {
         char annot_value[80];
-        ((GrowNode*)object)
-            ->get_annotation(info_p->number, annot_value, sizeof(annot_value));
+        ((GrowNode*)object)->get_annotation(info_p->number, annot_value, sizeof(annot_value));
         if (!streq(annot_value, (char*)info_p->value_p))
           ((GrowNode*)object)
-              ->set_annotation(info_p->number, (char*)info_p->value_p,
-                  strlen((char*)info_p->value_p), 0);
+              ->set_annotation(info_p->number, (char*)info_p->value_p, strlen((char*)info_p->value_p), 0);
         break;
       }
-      case grow_eInfoType_Arg: {
+      case grow_eInfoType_Arg:
+      {
         ((GrowNode*)object)
-            ->set_argument(info_p->number, (char*)info_p->value_p,
-                strlen((char*)info_p->value_p));
+            ->set_argument(info_p->number, (char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
-      case grow_eInfoType_Dynamic: {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -4374,13 +4340,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowNode*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowNode*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowNode*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowNode*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -4397,25 +4359,27 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
   case glow_eObjectType_GrowSlider:
     // Set changed annotations
     info_p = info;
-    while (info_p->info_type != grow_eInfoType_End) {
-      switch (info_p->info_type) {
-      case grow_eInfoType_Annot: {
+    while (info_p->info_type != grow_eInfoType_End)
+    {
+      switch (info_p->info_type)
+      {
+      case grow_eInfoType_Annot:
+      {
         char annot_value[80];
-        ((GrowSlider*)object)
-            ->get_annotation(info_p->number, annot_value, sizeof(annot_value));
+        ((GrowSlider*)object)->get_annotation(info_p->number, annot_value, sizeof(annot_value));
         if (!streq(annot_value, (char*)info_p->value_p))
           ((GrowSlider*)object)
-              ->set_annotation(info_p->number, (char*)info_p->value_p,
-                  strlen((char*)info_p->value_p), 0);
+              ->set_annotation(info_p->number, (char*)info_p->value_p, strlen((char*)info_p->value_p), 0);
         break;
       }
-      case grow_eInfoType_Arg: {
+      case grow_eInfoType_Arg:
+      {
         ((GrowSlider*)object)
-            ->set_argument(info_p->number, (char*)info_p->value_p,
-                strlen((char*)info_p->value_p));
+            ->set_argument(info_p->number, (char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
-      case grow_eInfoType_Dynamic: {
+      case grow_eInfoType_Dynamic:
+      {
         char* dynamic;
         int dynsize;
 
@@ -4424,13 +4388,9 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
           break;
 
         if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-          ((GrowSlider*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowSlider*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         else if (!dynsize)
-          ((GrowSlider*)object)
-              ->set_dynamic(
-                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+          ((GrowSlider*)object)->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
         break;
       }
       default:;
@@ -4458,9 +4418,12 @@ void grow_UpdateSubGraph(grow_tCtx ctx, grow_sAttrInfo* info)
 
   // Set changed dynamic
   info_p = info;
-  while (info_p->info_type != grow_eInfoType_End) {
-    switch (info_p->info_type) {
-    case grow_eInfoType_Dynamic: {
+  while (info_p->info_type != grow_eInfoType_End)
+  {
+    switch (info_p->info_type)
+    {
+    case grow_eInfoType_Dynamic:
+    {
       char* dynamic;
       int dynsize;
 
@@ -4469,11 +4432,9 @@ void grow_UpdateSubGraph(grow_tCtx ctx, grow_sAttrInfo* info)
         break;
 
       if (dynsize && !streq(dynamic, (char*)info_p->value_p))
-        ctx->set_dynamic(
-            (char*)info_p->value_p, strlen((char*)info_p->value_p));
+        ctx->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
       else if (!dynsize)
-        ctx->set_dynamic(
-            (char*)info_p->value_p, strlen((char*)info_p->value_p));
+        ctx->set_dynamic((char*)info_p->value_p, strlen((char*)info_p->value_p));
       break;
     }
     default:;
@@ -4489,12 +4450,15 @@ void grow_UpdateGraph(grow_tCtx ctx, grow_sAttrInfo* info)
 
   // Set changed dynamic
   info_p = info;
-  while (info_p->info_type != grow_eInfoType_End) {
-    if (strcmp(info_p->name, "AntiAliasing") == 0) {
+  while (info_p->info_type != grow_eInfoType_End)
+  {
+    if (strcmp(info_p->name, "AntiAliasing") == 0)
+    {
       ctx->gdraw->set_anti_aliasing(ctx->anti_aliasing);
     }
 
-    switch (info_p->info_type) {
+    switch (info_p->info_type)
+    {
     default:;
     }
     info_p++;
@@ -4518,41 +4482,22 @@ void grow_New(grow_tCtx ctx)
   ctx->reset_background();
 }
 
-void grow_SetName(grow_tCtx ctx, char* name)
-{
-  ctx->set_name(name);
-}
+void grow_SetName(grow_tCtx ctx, char* name) { ctx->set_name(name); }
 
-void grow_GetName(grow_tCtx ctx, char* name)
-{
-  ctx->get_name(name);
-}
+void grow_GetName(grow_tCtx ctx, char* name) { ctx->get_name(name); }
 
-void grow_PolylineEnd(grow_tCtx ctx)
-{
-  ctx->polyline_end();
-}
+void grow_PolylineEnd(grow_tCtx ctx) { ctx->polyline_end(); }
 
-void grow_AddPolyLinePoints(
-    grow_tObject object, glow_sPoint* point_array, int point_cnt)
+void grow_AddPolyLinePoints(grow_tObject object, glow_sPoint* point_array, int point_cnt)
 {
   ((GrowPolyLine*)object)->add_points(point_array, point_cnt);
 }
 
-void grow_SetObjectFill(grow_tObject object, int fill)
-{
-  ((GlowArrayElem*)object)->set_fill(fill);
-}
+void grow_SetObjectFill(grow_tObject object, int fill) { ((GlowArrayElem*)object)->set_fill(fill); }
 
-void grow_SetObjectBorder(grow_tObject object, int border)
-{
-  ((GlowArrayElem*)object)->set_border(border);
-}
+void grow_SetObjectBorder(grow_tObject object, int border) { ((GlowArrayElem*)object)->set_border(border); }
 
-void grow_SetObjectShadow(grow_tObject object, int shadow)
-{
-  ((GlowArrayElem*)object)->set_shadow(shadow);
-}
+void grow_SetObjectShadow(grow_tObject object, int shadow) { ((GlowArrayElem*)object)->set_shadow(shadow); }
 
 void grow_SetObjectShadowWidth(grow_tObject object, double width)
 {
@@ -4574,10 +4519,7 @@ void grow_SetObjectLinetype(grow_tObject object, glow_eLineType type)
   ((GlowArrayElem*)object)->set_linetype(type);
 }
 
-void grow_ExecDynamic(grow_tCtx ctx)
-{
-  ctx->exec_dynamic();
-}
+void grow_ExecDynamic(grow_tCtx ctx) { ctx->exec_dynamic(); }
 
 void grow_SetObjectPosition(grow_tObject object, double x, double y)
 {
@@ -4587,24 +4529,22 @@ void grow_SetObjectPosition(grow_tObject object, double x, double y)
 void grow_MoveObject(grow_tObject object, double x, double y)
 {
   grow_tCtx ctx = (grow_tCtx)((GlowArrayElem*)object)->get_ctx();
-  ((GlowArrayElem*)object)
-      ->move(x * ctx->mw.zoom_factor_x, y * ctx->mw.zoom_factor_y, 0);
+  ((GlowArrayElem*)object)->move(x * ctx->mw.zoom_factor_x, y * ctx->mw.zoom_factor_y, 0);
 }
 
-void grow_SetObjectScale(grow_tObject object, double scale_x, double scale_y,
-    double x0, double y0, glow_eScaleType type)
+void grow_SetObjectScale(grow_tObject object, double scale_x, double scale_y, double x0, double y0,
+                         glow_eScaleType type)
 {
   ((GlowArrayElem*)object)->set_scale(scale_x, scale_y, x0, y0, type);
 }
 
-void grow_SetObjectScalePos(grow_tObject object, double x, double y,
-    double scale_x, double scale_y, double x0, double y0, glow_eScaleType type)
+void grow_SetObjectScalePos(grow_tObject object, double x, double y, double scale_x, double scale_y,
+                            double x0, double y0, glow_eScaleType type)
 {
   ((GlowArrayElem*)object)->set_scale_pos(x, y, scale_x, scale_y, x0, y0, type);
 }
 
-void grow_SetObjectRotation(grow_tObject object, double angle, double x0,
-    double y0, glow_eRotationPoint type)
+void grow_SetObjectRotation(grow_tObject object, double angle, double x0, double y0, glow_eRotationPoint type)
 {
   ((GlowArrayElem*)object)->set_rotation(angle, x0, y0, type);
 }
@@ -4614,30 +4554,21 @@ void grow_SetObjectFillColor(grow_tObject object, glow_eDrawType drawtype)
   ((GlowArrayElem*)object)->set_fill_color(drawtype);
 }
 
-void grow_ResetObjectFillColor(grow_tObject object)
-{
-  ((GlowArrayElem*)object)->reset_fill_color();
-}
+void grow_ResetObjectFillColor(grow_tObject object) { ((GlowArrayElem*)object)->reset_fill_color(); }
 
 void grow_SetObjectBorderColor(grow_tObject object, glow_eDrawType drawtype)
 {
   ((GlowArrayElem*)object)->set_border_color(drawtype);
 }
 
-void grow_ResetObjectBorderColor(grow_tObject object)
-{
-  ((GlowArrayElem*)object)->reset_border_color();
-}
+void grow_ResetObjectBorderColor(grow_tObject object) { ((GlowArrayElem*)object)->reset_border_color(); }
 
 void grow_SetObjectTextColor(grow_tObject object, glow_eDrawType drawtype)
 {
   ((GlowArrayElem*)object)->set_text_color(drawtype);
 }
 
-void grow_ResetObjectTextColor(grow_tObject object)
-{
-  ((GlowArrayElem*)object)->reset_text_color();
-}
+void grow_ResetObjectTextColor(grow_tObject object) { ((GlowArrayElem*)object)->reset_text_color(); }
 
 void grow_SetSelectOrigBorderColor(grow_tCtx ctx, glow_eDrawType drawtype)
 {
@@ -4684,25 +4615,16 @@ void grow_IncrSelectOrigColIntensity(grow_tCtx ctx, int intensity)
   ctx->incr_select_original_color_intensity(intensity);
 }
 
-void grow_SetSelectOrigColorShift(grow_tCtx ctx, int shift)
-{
-  ctx->set_select_original_color_shift(shift);
-}
+void grow_SetSelectOrigColorShift(grow_tCtx ctx, int shift) { ctx->set_select_original_color_shift(shift); }
 
-void grow_IncrSelectOrigColorShift(grow_tCtx ctx, int shift)
-{
-  ctx->incr_select_original_color_shift(shift);
-}
+void grow_IncrSelectOrigColorShift(grow_tCtx ctx, int shift) { ctx->incr_select_original_color_shift(shift); }
 
 void grow_SetObjectColorTone(grow_tObject object, glow_eDrawTone tone)
 {
   ((GlowArrayElem*)object)->set_color_tone(tone);
 }
 
-void grow_ResetObjectColorTone(grow_tObject object)
-{
-  ((GlowArrayElem*)object)->reset_color_tone();
-}
+void grow_ResetObjectColorTone(grow_tObject object) { ((GlowArrayElem*)object)->reset_color_tone(); }
 
 void grow_SetObjectColorLightness(grow_tObject object, int lightness)
 {
@@ -4734,16 +4656,13 @@ void grow_IncrObjectColorShift(grow_tObject object, int shift)
   ((GlowArrayElem*)object)->incr_color_shift(shift);
 }
 
-void grow_ResetObjectColorShift(grow_tObject object)
-{
-  ((GlowArrayElem*)object)->reset_color_shift();
-}
+void grow_ResetObjectColorShift(grow_tObject object) { ((GlowArrayElem*)object)->reset_color_shift(); }
 
 void grow_SetObjectColorInverse(grow_tObject object, int inverse)
 {
-  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup)
+  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup)
     ((GrowNode*)object)->set_color_inverse(inverse);
 }
 
@@ -4752,36 +4671,20 @@ void grow_SetObjectVisibility(grow_tObject object, glow_eVis visibility)
   ((GlowArrayElem*)object)->set_visibility(visibility);
 }
 
-glow_eVis grow_GetObjectVisibility(grow_tObject object)
-{
-  return ((GlowArrayElem*)object)->get_visibility();
-}
+glow_eVis grow_GetObjectVisibility(grow_tObject object) { return ((GlowArrayElem*)object)->get_visibility(); }
 
-void grow_RotateSelectedObjects(
-    grow_tCtx ctx, double angle, glow_eRotationPoint type)
+void grow_RotateSelectedObjects(grow_tCtx ctx, double angle, glow_eRotationPoint type)
 {
   ctx->rotate_select(angle, type);
 }
 
-void grow_FlipSelectedObjects(grow_tCtx ctx, glow_eFlipDirection dir)
-{
-  ctx->flip_select(dir);
-}
+void grow_FlipSelectedObjects(grow_tCtx ctx, glow_eFlipDirection dir) { ctx->flip_select(dir); }
 
-void grow_SetBackgroundColor(grow_tCtx ctx, glow_eDrawType color)
-{
-  ctx->set_background(color);
-}
+void grow_SetBackgroundColor(grow_tCtx ctx, glow_eDrawType color) { ctx->set_background(color); }
 
-void grow_GetBackgroundColor(grow_tCtx ctx, glow_eDrawType* color)
-{
-  ctx->get_background(color);
-}
+void grow_GetBackgroundColor(grow_tCtx ctx, glow_eDrawType* color) { ctx->get_background(color); }
 
-void grow_SetBackgroundImage(grow_tCtx ctx, char* image)
-{
-  ctx->set_background_image(image);
-}
+void grow_SetBackgroundImage(grow_tCtx ctx, char* image) { ctx->set_background_image(image); }
 
 void grow_GetBackgroundImage(grow_tCtx ctx, char* image, int* tiled)
 {
@@ -4794,23 +4697,13 @@ int grow_GetBackgroundImageSize(grow_tCtx ctx, int* width, int* height)
   return ctx->get_background_image_size(width, height);
 }
 
-void grow_ResetBackgroundColor(grow_tCtx ctx)
-{
-  ctx->reset_background();
-}
+void grow_ResetBackgroundColor(grow_tCtx ctx) { ctx->reset_background(); }
 
-void grow_DisableHighlight(grow_tCtx ctx)
-{
-  ctx->disable_highlight();
-}
+void grow_DisableHighlight(grow_tCtx ctx) { ctx->disable_highlight(); }
 
-void grow_EnableHighlight(grow_tCtx ctx)
-{
-  ctx->enable_highlight();
-}
+void grow_EnableHighlight(grow_tCtx ctx) { ctx->enable_highlight(); }
 
-void grow_RefSubGraphArgNames(
-    grow_tCtx ctx, char** argnames, int** argtypes, int** arg_cnt)
+void grow_RefSubGraphArgNames(grow_tCtx ctx, char** argnames, int** argtypes, int** arg_cnt)
 {
   *argnames = (char*)ctx->argname;
   *argtypes = ctx->argtype;
@@ -4823,8 +4716,7 @@ void grow_GetSubGraphDynamic(grow_tCtx ctx, char** dynamic, int* size)
   *size = ctx->dynamicsize;
 }
 
-void grow_GetObjectArgs(grow_tObject object, char** argnames, int** argtypes,
-    char*** argvalues, int* arg_cnt)
+void grow_GetObjectArgs(grow_tObject object, char** argnames, int** argtypes, char*** argvalues, int* arg_cnt)
 {
   *argnames = (char*)((GrowNode*)object)->nc->argname;
   *argtypes = ((GrowNode*)object)->nc->argtype;
@@ -4832,66 +4724,51 @@ void grow_GetObjectArgs(grow_tObject object, char** argnames, int** argtypes,
   *arg_cnt = ((GrowNode*)object)->nc->arg_cnt;
 }
 
-void grow_PushSelectedObjects(grow_tCtx ctx)
+void grow_PushSelectedObjects(grow_tCtx ctx) { ctx->push_select(); }
+
+void grow_PopSelectedObjects(grow_tCtx ctx) { ctx->pop_select(); }
+
+int grow_OrderObject(grow_tCtx ctx, grow_tObject object, grow_tObject destination, glow_eDest code)
 {
-  ctx->push_select();
+  return ctx->order_object((GlowArrayElem*)object, (GlowArrayElem*)destination, code);
 }
 
-void grow_PopSelectedObjects(grow_tCtx ctx)
-{
-  ctx->pop_select();
-}
-
-int grow_OrderObject(grow_tCtx ctx, grow_tObject object,
-    grow_tObject destination, glow_eDest code)
-{
-  return ctx->order_object(
-      (GlowArrayElem*)object, (GlowArrayElem*)destination, code);
-}
-
-int grow_OrderGroupObject(grow_tObject group, grow_tObject object,
-    grow_tObject destination, glow_eDest code)
+int grow_OrderGroupObject(grow_tObject group, grow_tObject object, grow_tObject destination, glow_eDest code)
 {
   if (((GlowArrayElem*)group)->type() == glow_eObjectType_GrowGroup)
-    return ((GrowGroup*)group)
-        ->order_object(
-            (GlowArrayElem*)object, (GlowArrayElem*)destination, code);
+    return ((GrowGroup*)group)->order_object((GlowArrayElem*)object, (GlowArrayElem*)destination, code);
   return 0;
 }
 
-void grow_SetDefaultLayout(grow_tCtx ctx)
-{
-  ctx->set_default_layout();
-}
+void grow_SetDefaultLayout(grow_tCtx ctx) { ctx->set_default_layout(); }
 
 void grow_SetLayout(grow_tCtx ctx, double x0, double y0, double x1, double y1)
 {
   ctx->set_layout(x0, y0, x1, y1);
 }
 
-void grow_GetLayout(
-    grow_tCtx ctx, double* x0, double* y0, double* x1, double* y1)
+void grow_GetLayout(grow_tCtx ctx, double* x0, double* y0, double* x1, double* y1)
 {
   ctx->get_layout(x0, y0, x1, y1);
 }
 
-void grow_SetPath(grow_tCtx ctx, int path_cnt, const char* path)
-{
-  ctx->set_path(path_cnt, path);
-}
+void grow_SetPath(grow_tCtx ctx, int path_cnt, const char* path) { ctx->set_path(path_cnt, path); }
 
-void grow_GetObjectClassDynType(grow_tObject object, int* dyn_type1,
-    int* dyn_type2, int* dyn_action_type1, int* dyn_action_type2)
+void grow_GetObjectClassDynType(grow_tObject object, int* dyn_type1, int* dyn_type2, int* dyn_action_type1,
+                                int* dyn_action_type2)
 {
-  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup) {
+  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup)
+  {
     GlowNodeClass* base_nc = ((GrowNode*)object)->nc->get_base_nc();
     *dyn_type1 = base_nc->dyn_type1;
     *dyn_type2 = base_nc->dyn_type2;
     *dyn_action_type1 = base_nc->dyn_action_type1;
     *dyn_action_type2 = base_nc->dyn_action_type2;
-  } else {
+  }
+  else
+  {
     *dyn_type1 = 0;
     *dyn_type2 = 0;
     *dyn_action_type1 = 0;
@@ -4905,8 +4782,8 @@ void grow_GetObjectClassCycle(grow_tObject object, glow_eCycle* cycle)
   *cycle = base_nc->cycle;
 }
 
-void grow_GetNodeClassDynType(grow_tNodeClass nodeclass, int* dyn_type1,
-    int* dyn_type2, int* dyn_action_type1, int* dyn_action_type2)
+void grow_GetNodeClassDynType(grow_tNodeClass nodeclass, int* dyn_type1, int* dyn_type2,
+                              int* dyn_action_type1, int* dyn_action_type2)
 {
   GlowNodeClass* base_nc = ((GlowNodeClass*)nodeclass)->get_base_nc();
   *dyn_type1 = base_nc->dyn_type1;
@@ -4921,8 +4798,8 @@ void grow_GetObjectClassUserData(grow_tObject object, void** user_data)
   base_nc->get_user_data(user_data);
 }
 
-void grow_GetSubGraphDynType(grow_tCtx ctx, int* dyn_type1, int* dyn_type2,
-    int* dyn_action_type1, int* dyn_action_type2)
+void grow_GetSubGraphDynType(grow_tCtx ctx, int* dyn_type1, int* dyn_type2, int* dyn_action_type1,
+                             int* dyn_action_type2)
 {
   *dyn_type1 = ctx->dyn_type1;
   *dyn_type2 = ctx->dyn_type2;
@@ -4930,23 +4807,23 @@ void grow_GetSubGraphDynType(grow_tCtx ctx, int* dyn_type1, int* dyn_type2,
   *dyn_action_type2 = ctx->dyn_action_type2;
 }
 
-void grow_GetSubGraphTraceColor(
-    grow_tCtx ctx, glow_eDrawType* color, glow_eDrawType* color2)
+void grow_GetSubGraphTraceColor(grow_tCtx ctx, glow_eDrawType* color, glow_eDrawType* color2)
 {
   *color = ctx->dyn_color[0];
   *color2 = ctx->dyn_color[1];
 }
 
-void grow_GetObjectClassTraceColor(
-    grow_tObject object, glow_eDrawType* color, glow_eDrawType* color2)
+void grow_GetObjectClassTraceColor(grow_tObject object, glow_eDrawType* color, glow_eDrawType* color2)
 {
-  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup) {
+  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup)
+  {
     *color = ((GrowNode*)object)->nc->dyn_color[0];
     *color2 = ((GrowNode*)object)->nc->dyn_color[1];
   }
-  else {
+  else
+  {
     *color = glow_eDrawType_ColorRed;
     *color2 = glow_eDrawType_ColorRed;
   }
@@ -4958,49 +4835,27 @@ void grow_GetObjectClassDynAttr(grow_tObject object, int* attr1, int* attr2)
   *attr2 = ((GrowNode*)object)->nc->dyn_attr[1];
 }
 
-void grow_SetSelectLineWidth(grow_tCtx ctx, int linewidth)
-{
-  ctx->set_select_linewidth(linewidth);
-}
+void grow_SetSelectLineWidth(grow_tCtx ctx, int linewidth) { ctx->set_select_linewidth(linewidth); }
 
-void grow_SetSelectFill(grow_tCtx ctx, int fill)
-{
-  ctx->set_select_fill(fill);
-}
+void grow_SetSelectFill(grow_tCtx ctx, int fill) { ctx->set_select_fill(fill); }
 
-void grow_SetSelectBorder(grow_tCtx ctx, int border)
-{
-  ctx->set_select_border(border);
-}
+void grow_SetSelectBorder(grow_tCtx ctx, int border) { ctx->set_select_border(border); }
 
-void grow_SetSelectShadow(grow_tCtx ctx, int shadow)
-{
-  ctx->set_select_shadow(shadow);
-}
+void grow_SetSelectShadow(grow_tCtx ctx, int shadow) { ctx->set_select_shadow(shadow); }
 
-void grow_SetSelectGradient(grow_tCtx ctx, glow_eGradient gradient)
-{
-  ctx->set_select_gradient(gradient);
-}
+void grow_SetSelectGradient(grow_tCtx ctx, glow_eGradient gradient) { ctx->set_select_gradient(gradient); }
 
-void grow_SetSelectLineType(grow_tCtx ctx, glow_eLineType type)
-{
-  ctx->set_select_linetype(type);
-}
+void grow_SetSelectLineType(grow_tCtx ctx, glow_eLineType type) { ctx->set_select_linetype(type); }
 
-int grow_AnySelectIsCon(grow_tCtx ctx)
-{
-  return ctx->any_select_is_con();
-}
+int grow_AnySelectIsCon(grow_tCtx ctx) { return ctx->any_select_is_con(); }
 
 void grow_ChangeSelectConClass(grow_tCtx ctx, grow_tConClass conclass)
 {
   ctx->change_select_conclass((GlowArrayElem*)conclass);
 }
 
-void grow_GetConAttributes(grow_tCon con, glow_eDrawType* drawtype,
-    int* linewidth, glow_eConType* contype, glow_eCorner* corner,
-    double* round_corner_amount)
+void grow_GetConAttributes(grow_tCon con, glow_eDrawType* drawtype, int* linewidth, glow_eConType* contype,
+                           glow_eCorner* corner, double* round_corner_amount)
 {
   *drawtype = ((GlowCon*)con)->cc->draw_type;
   *linewidth = ((GlowCon*)con)->cc->line_width;
@@ -5019,18 +4874,22 @@ static char* growapi_translate(char* transtab, const char* name)
   static char return_name[32];
   char* name_p;
 
-  if (!transtab) {
+  if (!transtab)
+  {
     strcpy(return_name, name);
     return return_name;
   }
 
   name_p = transtab;
-  while (!streq(name_p, "")) {
-    if (streq(name_p, name)) {
+  while (!streq(name_p, ""))
+  {
+    if (streq(name_p, name))
+    {
       name_p += 32;
       if (streq(name_p, ""))
         return 0;
-      else {
+      else
+      {
         strcpy(return_name, name_p);
         return return_name;
       }
@@ -5042,50 +4901,29 @@ static char* growapi_translate(char* transtab, const char* name)
   return return_name;
 }
 
-int grow_FindObject(grow_tCtx ctx, grow_tObject object)
-{
-  return ctx->find((GlowArrayElem*)object);
-}
+int grow_FindObject(grow_tCtx ctx, grow_tObject object) { return ctx->find((GlowArrayElem*)object); }
 
-void grow_SetObjectText(grow_tObject object, char* text)
-{
-  ((GrowText*)object)->set_text(text);
-}
+void grow_SetObjectText(grow_tObject object, char* text) { ((GrowText*)object)->set_text(text); }
 
 void grow_GetObjectText(grow_tObject object, char* text, int size)
 {
   ((GrowText*)object)->get_text(text, size);
 }
 
-void grow_SetObjectTextSize(grow_tObject object, int size)
-{
-  ((GlowArrayElem*)object)->set_textsize(size);
-}
+void grow_SetObjectTextSize(grow_tObject object, int size) { ((GlowArrayElem*)object)->set_textsize(size); }
 
-void grow_SetObjectTextBold(grow_tObject object, int bold)
-{
-  ((GlowArrayElem*)object)->set_textbold(bold);
-}
+void grow_SetObjectTextBold(grow_tObject object, int bold) { ((GlowArrayElem*)object)->set_textbold(bold); }
 
 void grow_SetObjectTextFont(grow_tObject object, glow_eFont font)
 {
   ((GlowArrayElem*)object)->set_textfont(font);
 }
 
-void grow_SetSelectTextSize(grow_tCtx ctx, int size)
-{
-  ctx->set_select_textsize(size);
-}
+void grow_SetSelectTextSize(grow_tCtx ctx, int size) { ctx->set_select_textsize(size); }
 
-void grow_SetSelectTextBold(grow_tCtx ctx, int bold)
-{
-  ctx->set_select_textbold(bold);
-}
+void grow_SetSelectTextBold(grow_tCtx ctx, int bold) { ctx->set_select_textbold(bold); }
 
-void grow_SetSelectTextFont(grow_tCtx ctx, glow_eFont font)
-{
-  ctx->set_select_textfont(font);
-}
+void grow_SetSelectTextFont(grow_tCtx ctx, glow_eFont font) { ctx->set_select_textfont(font); }
 
 void grow_SetBarValue(grow_tObject object, double value)
 {
@@ -5100,115 +4938,74 @@ void grow_AddTrendValue(grow_tObject object, double value, int idx)
   ((GrowTrend*)object)->add_value(value, idx);
 }
 
-int grow_IsSliderClass(grow_tNodeClass nodeclass)
+int grow_IsSliderClass(grow_tNodeClass nodeclass) { return ((GlowNodeClass*)nodeclass)->is_slider(); }
+
+void grow_SetMoveRestrictions(grow_tCtx ctx, glow_eMoveRestriction restriction, double max_limit,
+                              double min_limit, grow_tObject object)
 {
-  return ((GlowNodeClass*)nodeclass)->is_slider();
+  ctx->set_move_restrictions(restriction, max_limit, min_limit, (GlowArrayElem*)object);
 }
 
-void grow_SetMoveRestrictions(grow_tCtx ctx, glow_eMoveRestriction restriction,
-    double max_limit, double min_limit, grow_tObject object)
+glow_eMoveRestriction grow_GetMoveRestrictions(grow_tCtx ctx) { return ctx->move_restriction; }
+
+void grow_SetScaleEqual(grow_tCtx ctx, int equal) { ctx->set_scale_equal(equal); }
+
+int grow_GetScaleEqual(grow_tCtx ctx) { return ctx->scale_equal; }
+
+void grow_GetSliderInfo(grow_tObject object, glow_eDirection* direction, double* max_value, double* min_value,
+                        double* max_pos, double* min_pos)
 {
-  ctx->set_move_restrictions(
-      restriction, max_limit, min_limit, (GlowArrayElem*)object);
+  ((GrowSlider*)object)->get_info(direction, max_value, min_value, max_pos, min_pos);
 }
 
-glow_eMoveRestriction grow_GetMoveRestrictions(grow_tCtx ctx)
+void grow_GetSliderInfoPixel(grow_tObject object, glow_eDirection* direction, double* max_pos,
+                             double* min_pos, int bg_dyntype)
 {
-  return ctx->move_restriction;
+  ((GrowSlider*)object)->get_info_pixel(direction, max_pos, min_pos, bg_dyntype);
 }
 
-void grow_SetScaleEqual(grow_tCtx ctx, int equal)
-{
-  ctx->set_scale_equal(equal);
-}
-
-int grow_GetScaleEqual(grow_tCtx ctx)
-{
-  return ctx->scale_equal;
-}
-
-void grow_GetSliderInfo(grow_tObject object, glow_eDirection* direction,
-    double* max_value, double* min_value, double* max_pos, double* min_pos)
-{
-  ((GrowSlider*)object)
-      ->get_info(direction, max_value, min_value, max_pos, min_pos);
-}
-
-void grow_GetSliderInfoPixel(grow_tObject object, glow_eDirection* direction,
-    double* max_pos, double* min_pos, int bg_dyntype)
-{
-  ((GrowSlider*)object)
-      ->get_info_pixel(direction, max_pos, min_pos, bg_dyntype);
-}
-
-void grow_GetSliderOrigo(
-    grow_tObject object, glow_eDirection direction, double* pos)
+void grow_GetSliderOrigo(grow_tObject object, glow_eDirection direction, double* pos)
 {
   ((GrowSlider*)object)->get_origo(direction, pos);
 }
 
-void grow_SetSliderInfo(grow_tObject object, glow_eDirection direction,
-    double max_value, double min_value, double max_pos, double min_pos)
+void grow_SetSliderInfo(grow_tObject object, glow_eDirection direction, double max_value, double min_value,
+                        double max_pos, double min_pos)
 {
-  ((GrowSlider*)object)
-      ->set_info(direction, max_value, min_value, max_pos, min_pos);
+  ((GrowSlider*)object)->set_info(direction, max_value, min_value, max_pos, min_pos);
 }
 
-void grow_ObjectToCtx(grow_tObject object, grow_tCtx* ctx)
-{
-  ((GlowArrayElem*)object)->get_ctx((void**)ctx);
-}
+void grow_ObjectToCtx(grow_tObject object, grow_tCtx* ctx) { ((GlowArrayElem*)object)->get_ctx((void**)ctx); }
 
-void grow_InitTransform(grow_tObject object, double a11, double a12, double a13, double a21,
-		       double a22, double a23, double rotation)
+void grow_InitTransform(grow_tObject object, double a11, double a12, double a13, double a21, double a22,
+                        double a23, double rotation)
 {
   ((GlowArrayElem*)object)->init_transform(a11, a12, a13, a21, a22, a23, rotation);
 }
 
-void grow_StoreTransform(grow_tObject object)
-{
-  ((GlowArrayElem*)object)->store_transform();
-}
+void grow_StoreTransform(grow_tObject object) { ((GlowArrayElem*)object)->store_transform(); }
 
-void grow_RevertTransform(grow_tObject object)
-{
-  ((GlowArrayElem*)object)->revert_transform();
-}
+void grow_RevertTransform(grow_tObject object) { ((GlowArrayElem*)object)->revert_transform(); }
 
-void grow_TransformStoreReset(grow_tObject object)
-{
-  ((GlowArrayElem*)object)->transform_store_reset();  
-}
+void grow_TransformStoreReset(grow_tObject object) { ((GlowArrayElem*)object)->transform_store_reset(); }
 
 int grow_TransformIsStored(grow_tObject object)
 {
   return (int)((GlowArrayElem*)object)->transform_is_stored();
 }
 
-void grow_AlignSelect(grow_tCtx ctx, glow_eAlignDirection direction)
-{
-  ctx->align_select(direction);
-}
+void grow_AlignSelect(grow_tCtx ctx, glow_eAlignDirection direction) { ctx->align_select(direction); }
 
 void grow_EquiDistanceSelect(grow_tCtx ctx, glow_eAlignDirection direction)
 {
   ctx->equidistance_select(direction);
 }
 
-int grow_IsSubGraph(grow_tCtx ctx)
-{
-  return ctx->is_subgraph();
-}
+int grow_IsSubGraph(grow_tCtx ctx) { return ctx->is_subgraph(); }
 
-void grow_GetTrendScanTime(grow_tObject object, double* time)
-{
-  ((GrowTrend*)object)->get_scan_time(time);
-}
+void grow_GetTrendScanTime(grow_tObject object, double* time) { ((GrowTrend*)object)->get_scan_time(time); }
 
-void grow_SetTrendScanTime(grow_tObject object, double time)
-{
-  ((GrowTrend*)object)->set_scan_time(time);
-}
+void grow_SetTrendScanTime(grow_tObject object, double time) { ((GrowTrend*)object)->set_scan_time(time); }
 
 void grow_SetTrendNoOfCurves(grow_tObject object, int no_of_curves)
 {
@@ -5225,7 +5022,7 @@ void grow_SetSliderRange(grow_tObject object, double min, double max)
   ((GrowSlider*)object)->set_range(min, max);
 }
 
-void grow_GetBarRange(grow_tObject object, double *min, double *max)
+void grow_GetBarRange(grow_tObject object, double* min, double* max)
 {
   if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowBar)
     ((GrowBar*)object)->get_range(min, max);
@@ -5241,7 +5038,7 @@ void grow_SetBarRange(grow_tObject object, double min, double max)
     ((GrowBarArc*)object)->set_range(min, max);
 }
 
-void grow_GetTrendRangeY(grow_tObject object, int curve, double *min, double *max)
+void grow_GetTrendRangeY(grow_tObject object, int curve, double* min, double* max)
 {
   ((GrowTrend*)object)->get_range_y(curve, min, max);
 }
@@ -5251,121 +5048,75 @@ void grow_SetTrendRangeY(grow_tObject object, int curve, double min, double max)
   ((GrowTrend*)object)->set_range_y(curve, min, max);
 }
 
-void grow_SetTrendXMark1(grow_tObject object, double mark)
-{
-  ((GrowTrend*)object)->set_x_mark1(mark);
-}
+void grow_SetTrendXMark1(grow_tObject object, double mark) { ((GrowTrend*)object)->set_x_mark1(mark); }
 
-void grow_SetTrendXMark2(grow_tObject object, double mark)
-{
-  ((GrowTrend*)object)->set_x_mark2(mark);
-}
+void grow_SetTrendXMark2(grow_tObject object, double mark) { ((GrowTrend*)object)->set_x_mark2(mark); }
 
-void grow_SetTrendYMark1(grow_tObject object, double mark)
-{
-  ((GrowTrend*)object)->set_y_mark1(mark);
-}
+void grow_SetTrendYMark1(grow_tObject object, double mark) { ((GrowTrend*)object)->set_y_mark1(mark); }
 
-void grow_SetTrendYMark2(grow_tObject object, double mark)
-{
-  ((GrowTrend*)object)->set_y_mark2(mark);
-}
+void grow_SetTrendYMark2(grow_tObject object, double mark) { ((GrowTrend*)object)->set_y_mark2(mark); }
 
-void grow_SetXYCurveRangeY(
-    grow_tObject object, int curve, double min, double max)
+void grow_SetXYCurveRangeY(grow_tObject object, int curve, double min, double max)
 {
   ((GrowXYCurve*)object)->set_xy_range_y(curve, min, max);
 }
 
-void grow_SetXYCurveRangeX(
-    grow_tObject object, int curve, double min, double max)
+void grow_SetXYCurveRangeX(grow_tObject object, int curve, double min, double max)
 {
   ((GrowXYCurve*)object)->set_xy_range_x(curve, min, max);
 }
 
-void grow_GetXYCurveRangeY(
-    grow_tObject object, int curve, double *min, double *max)
+void grow_GetXYCurveRangeY(grow_tObject object, int curve, double* min, double* max)
 {
   ((GrowXYCurve*)object)->get_xy_range_y(curve, min, max);
 }
 
-void grow_GetXYCurveRangeX(
-    grow_tObject object, int curve, double *min, double *max)
+void grow_GetXYCurveRangeX(grow_tObject object, int curve, double* min, double* max)
 {
   ((GrowXYCurve*)object)->get_xy_range_x(curve, min, max);
 }
 
-void grow_SetXYCurveXMark1(grow_tObject object, double mark)
-{
-  ((GrowXYCurve*)object)->set_x_mark1(mark);
-}
+void grow_SetXYCurveXMark1(grow_tObject object, double mark) { ((GrowXYCurve*)object)->set_x_mark1(mark); }
 
-void grow_SetXYCurveXMark2(grow_tObject object, double mark)
-{
-  ((GrowXYCurve*)object)->set_x_mark2(mark);
-}
+void grow_SetXYCurveXMark2(grow_tObject object, double mark) { ((GrowXYCurve*)object)->set_x_mark2(mark); }
 
-void grow_SetXYCurveYMark1(grow_tObject object, double mark)
-{
-  ((GrowXYCurve*)object)->set_y_mark1(mark);
-}
+void grow_SetXYCurveYMark1(grow_tObject object, double mark) { ((GrowXYCurve*)object)->set_y_mark1(mark); }
 
-void grow_SetXYCurveYMark2(grow_tObject object, double mark)
-{
-  ((GrowXYCurve*)object)->set_y_mark2(mark);
-}
+void grow_SetXYCurveYMark2(grow_tObject object, double mark) { ((GrowXYCurve*)object)->set_y_mark2(mark); }
 
 void grow_SetXYCurveNoOfCurves(grow_tObject object, int noofcurves)
 {
   ((GrowXYCurve*)object)->set_xy_noofcurves(noofcurves);
 }
 
-int grow_GetXYCurveNoOfPoints(grow_tObject object)
-{
-  return ((GrowXYCurve*)object)->get_xy_noofpoints();
-}
+int grow_GetXYCurveNoOfPoints(grow_tObject object) { return ((GrowXYCurve*)object)->get_xy_noofpoints(); }
 
-void grow_SetTrendFillCurve(grow_tObject object, int fill)
-{
-  ((GrowTrend*)object)->set_fill_curve(fill);
-}
+void grow_SetTrendFillCurve(grow_tObject object, int fill) { ((GrowTrend*)object)->set_fill_curve(fill); }
 
 void grow_SetTrendlines(grow_tObject object, int vert_lines, int horiz_lines)
 {
   ((GrowTrend*)object)->set_lines(vert_lines, horiz_lines);
 }
 
-void grow_SetCurveType(grow_tObject object, glow_eCurveType type)
-{
-  ((GrowCurve*)object)->set_type(type);
-}
+void grow_SetCurveType(grow_tObject object, glow_eCurveType type) { ((GrowCurve*)object)->set_type(type); }
 
-void grow_SetCurveDigitalSplit(grow_tObject object, int set)
-{
-  ((GrowCurve*)object)->set_digital_split(set);
-}
+void grow_SetCurveDigitalSplit(grow_tObject object, int set) { ((GrowCurve*)object)->set_digital_split(set); }
 
 void grow_GetCurveDigitalSplit(grow_tObject object, int* set)
 {
   ((GrowCurve*)object)->get_digital_split(set);
 }
 
-void grow_SetAxisConf(grow_tObject object, double max_val, double min_val,
-    int no_of_lines, int long_quot, int value_quot, double rot,
-    const char* format)
+void grow_SetAxisConf(grow_tObject object, double max_val, double min_val, int no_of_lines, int long_quot,
+                      int value_quot, double rot, const char* format)
 {
   if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowAxis)
-    ((GrowAxis*)object)
-        ->set_conf(
-            max_val, min_val, no_of_lines, long_quot, value_quot, rot, format);
+    ((GrowAxis*)object)->set_conf(max_val, min_val, no_of_lines, long_quot, value_quot, rot, format);
   else if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowAxisArc)
-    ((GrowAxisArc*)object)
-        ->set_conf(
-            max_val, min_val, no_of_lines, long_quot, value_quot, rot, format);
+    ((GrowAxisArc*)object)->set_conf(max_val, min_val, no_of_lines, long_quot, value_quot, rot, format);
 }
 
-void grow_SetAxisRange(
-    grow_tObject object, double minval, double maxval, int keep_settings)
+void grow_SetAxisRange(grow_tObject object, double minval, double maxval, int keep_settings)
 {
   if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowAxis)
     ((GrowAxis*)object)->set_range(minval, maxval, keep_settings);
@@ -5389,76 +5140,53 @@ void grow_GetAxisFormat(grow_tObject object, char* format)
     ((GrowAxisArc*)object)->get_format(format);
 }
 
-void grow_SetModified(grow_tCtx ctx, int modified)
-{
-  ctx->set_modified(modified);
-}
+void grow_SetModified(grow_tCtx ctx, int modified) { ctx->set_modified(modified); }
 
-int grow_GetModified(grow_tCtx ctx)
-{
-  return ctx->get_modified();
-}
+int grow_GetModified(grow_tCtx ctx) { return ctx->get_modified(); }
 
-void grow_MeasureJavaBean(grow_tCtx ctx, double* x_right, double* x_left,
-    double* y_high, double* y_low)
+void grow_MeasureJavaBean(grow_tCtx ctx, double* x_right, double* x_left, double* y_high, double* y_low)
 {
   ctx->measure_javabean(x_right, x_left, y_high, y_low);
 }
 
-void grow_ToPixel(
-    grow_tCtx ctx, double x, double y, double* x_pix, double* y_pix)
+void grow_ToPixel(grow_tCtx ctx, double x, double y, double* x_pix, double* y_pix)
 {
   ctx->to_pixel(x, y, x_pix, y_pix);
 }
 
-void grow_SetJavaFrame(grow_tCtx ctx, double* x_right, double* x_left,
-    double* y_high, double* y_low)
+void grow_SetJavaFrame(grow_tCtx ctx, double* x_right, double* x_left, double* y_high, double* y_low)
 {
   ctx->set_javaframe(x_right, x_left, y_high, y_low);
 }
 
-void grow_MeasureNodeClassJavaBean(grow_tNodeClass nodeclass, double* x_right,
-    double* x_left, double* y_high, double* y_low)
+void grow_MeasureNodeClassJavaBean(grow_tNodeClass nodeclass, double* x_right, double* x_left, double* y_high,
+                                   double* y_low)
 {
   ((GlowNodeClass*)nodeclass)->measure_javabean(x_right, x_left, y_high, y_low);
 }
 
-void grow_ExportJavaBean(grow_tCtx ctx, std::ofstream& fp, int components)
+void grow_ExportJavaBean(grow_tCtx ctx, std::ostream& fp, int components)
 {
   ctx->export_javabean(fp, components);
 }
 
-void grow_ExportNodeClassJavaBean(
-    grow_tCtx ctx, grow_tNodeClass nc, std::ofstream& fp, int components)
+void grow_ExportNodeClassJavaBean(grow_tCtx ctx, grow_tNodeClass nc, std::ostream& fp, int components)
 {
   ctx->export_nodeclass_javabean((GlowArrayElem*)nc, fp, components);
 }
 
-void grow_ExportNcJavaBeanFont(
-    grow_tCtx ctx, grow_tNodeClass nc, std::ofstream& fp, int components)
+void grow_ExportNcJavaBeanFont(grow_tCtx ctx, grow_tNodeClass nc, std::ostream& fp, int components)
 {
   ctx->export_nc_javabean_font((GlowArrayElem*)nc, fp, components);
 }
 
-void grow_SetJavaName(grow_tCtx ctx, const char* name)
-{
-  ctx->set_java_name(name);
-}
+void grow_SetJavaName(grow_tCtx ctx, const char* name) { ctx->set_java_name(name); }
 
-int grow_GetJavaName(grow_tCtx ctx, char* name)
-{
-  return ctx->get_java_name(name);
-}
+int grow_GetJavaName(grow_tCtx ctx, char* name) { return ctx->get_java_name(name); }
 
-int grow_IsJavaApplet(grow_tCtx ctx)
-{
-  return ctx->is_javaapplet;
-}
+int grow_IsJavaApplet(grow_tCtx ctx) { return ctx->is_javaapplet; }
 
-int grow_IsJavaApplication(grow_tCtx ctx)
-{
-  return ctx->is_javaapplication;
-}
+int grow_IsJavaApplication(grow_tCtx ctx) { return ctx->is_javaapplication; }
 
 int grow_GetObjectClassJavaName(grow_tObject object, char* name)
 {
@@ -5470,14 +5198,14 @@ int grow_GetNodeClassJavaName(grow_tNodeClass nodeclass, char* name)
   return ((GlowNodeClass*)nodeclass)->get_java_name(name);
 }
 
-void grow_GetObjectAnnotationNumbers(
-    grow_tObject object, int** numbers, int* cnt)
+void grow_GetObjectAnnotationNumbers(grow_tObject object, int** numbers, int* cnt)
 {
-  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup)
+  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup)
     ((GrowNode*)object)->nc->get_annotation_numbers(numbers, cnt);
-  else {
+  else
+  {
     *cnt = 0;
     *numbers = 0;
   }
@@ -5488,45 +5216,24 @@ void grow_GetSubgraphAnnotNumbers(grow_tCtx ctx, int** numbers, int* cnt)
   ctx->get_annotation_numbers(numbers, cnt);
 }
 
-int grow_IsSlider(grow_tCtx ctx)
-{
-  return ctx->is_slider();
-}
+int grow_IsSlider(grow_tCtx ctx) { return ctx->is_slider(); }
 
-char* grow_ColorToName(glow_eDrawType drawtype)
-{
-  return GlowColor::color_to_name(drawtype);
-}
+char* grow_ColorToName(glow_eDrawType drawtype) { return GlowColor::color_to_name(drawtype); }
 
-char* grow_ColorToneToName(glow_eDrawType drawtype)
-{
-  return GlowColor::colortone_to_name(drawtype);
-}
+char* grow_ColorToneToName(glow_eDrawType drawtype) { return GlowColor::colortone_to_name(drawtype); }
 
 int grow_GetObjectNextNodeClass(grow_tObject object, grow_tNodeClass* next)
 {
   return ((GrowNode*)object)->get_next_nodeclass((GlowNodeClass**)next);
 }
 
-int grow_SetObjectNextNodeClass(grow_tObject object)
-{
-  return ((GrowNode*)object)->set_next_nodeclass();
-}
+int grow_SetObjectNextNodeClass(grow_tObject object) { return ((GrowNode*)object)->set_next_nodeclass(); }
 
-int grow_SetObjectPrevNodeClass(grow_tObject object)
-{
-  return ((GrowNode*)object)->set_previous_nodeclass();
-}
+int grow_SetObjectPrevNodeClass(grow_tObject object) { return ((GrowNode*)object)->set_previous_nodeclass(); }
 
-void grow_SetObjectFirstNodeClass(grow_tObject object)
-{
-  ((GrowNode*)object)->set_root_nodeclass();
-}
+void grow_SetObjectFirstNodeClass(grow_tObject object) { ((GrowNode*)object)->set_root_nodeclass(); }
 
-void grow_SetObjectLastNodeClass(grow_tObject object)
-{
-  ((GrowNode*)object)->set_last_nodeclass();
-}
+void grow_SetObjectLastNodeClass(grow_tObject object) { ((GrowNode*)object)->set_last_nodeclass(); }
 
 int grow_SetObjectNodeClassByIndex(grow_tObject object, int idx)
 {
@@ -5538,58 +5245,30 @@ void grow_GetObjectAnimationCount(grow_tObject object, int* count)
   ((GrowNode*)object)->get_animation_count(count);
 }
 
-void grow_GetScanTime(grow_tCtx ctx, double* scantime, double* fast_scantime,
-    double* animation_scantime)
+void grow_GetScanTime(grow_tCtx ctx, double* scantime, double* fast_scantime, double* animation_scantime)
 {
   *scantime = ctx->scantime;
   *fast_scantime = ctx->fast_scantime;
   *animation_scantime = ctx->animation_scantime;
 }
 
-void grow_SetShowGrid(grow_tCtx ctx, int show)
-{
-  ctx->set_show_grid(show);
-}
+void grow_SetShowGrid(grow_tCtx ctx, int show) { ctx->set_show_grid(show); }
 
-int grow_GetShowGrid(grow_tCtx ctx)
-{
-  return ctx->get_show_grid();
-}
+int grow_GetShowGrid(grow_tCtx ctx) { return ctx->get_show_grid(); }
 
-int grow_IsNextNodeClass(grow_tNodeClass nodeclass)
-{
-  return ((GlowNodeClass*)nodeclass)->is_next();
-}
+int grow_IsNextNodeClass(grow_tNodeClass nodeclass) { return ((GlowNodeClass*)nodeclass)->is_next(); }
 
-int grow_IsLastNodeClass(grow_tNodeClass nodeclass)
-{
-  return ((GlowNodeClass*)nodeclass)->is_last();
-}
+int grow_IsLastNodeClass(grow_tNodeClass nodeclass) { return ((GlowNodeClass*)nodeclass)->is_last(); }
 
-int grow_GetNodeClassPages(grow_tNodeClass nodeclass)
-{
-  return ((GlowNodeClass*)nodeclass)->get_pages();
-}
+int grow_GetNodeClassPages(grow_tNodeClass nodeclass) { return ((GlowNodeClass*)nodeclass)->get_pages(); }
 
-void grow_SetNextSubgraph(grow_tCtx ctx, const char* next)
-{
-  strcpy(ctx->next_subgraph, next);
-}
+void grow_SetNextSubgraph(grow_tCtx ctx, const char* next) { strcpy(ctx->next_subgraph, next); }
 
-void grow_GetNextSubgraph(grow_tCtx ctx, char* next)
-{
-  strcpy(next, ctx->next_subgraph);
-}
+void grow_GetNextSubgraph(grow_tCtx ctx, char* next) { strcpy(next, ctx->next_subgraph); }
 
-void grow_StoreGeometry(grow_tCtx ctx)
-{
-  ctx->store_geometry();
-}
+void grow_StoreGeometry(grow_tCtx ctx) { ctx->store_geometry(); }
 
-void grow_RestoreGeometry(grow_tCtx ctx)
-{
-  ctx->restore_geometry();
-}
+void grow_RestoreGeometry(grow_tCtx ctx) { ctx->restore_geometry(); }
 
 void grow_SetClickSensitivity(grow_tCtx ctx, int value)
 {
@@ -5598,18 +5277,16 @@ void grow_SetClickSensitivity(grow_tCtx ctx, int value)
 
 void grow_MoveNode(grow_tNode node, double x, double y)
 {
-  if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowSlider
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowGroup)
+  if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowSlider ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowGroup)
     ((GrowNode*)node)->move_to(x, y);
 }
 
-void grow_GetTextExtent(grow_tCtx ctx, char* text, int len,
-    glow_eDrawType draw_type, int text_size, glow_eFont font, double* width,
-    double* height, double* descent)
+void grow_GetTextExtent(grow_tCtx ctx, char* text, int len, glow_eDrawType draw_type, int text_size,
+                        glow_eFont font, double* width, double* height, double* descent)
 {
-  ctx->get_text_extent(
-      text, len, draw_type, text_size, font, width, height, descent);
+  ctx->get_text_extent(text, len, draw_type, text_size, font, width, height, descent);
 }
 
 int grow_GetDefaultWindowSize(grow_tCtx ctx, int* width, int* height)
@@ -5622,23 +5299,16 @@ int grow_GroupSelect(grow_tCtx ctx, grow_tObject* group, char* last_group_name)
   return ctx->group_select((GlowArrayElem**)group, last_group_name);
 }
 
-int grow_UngroupSelect(grow_tCtx ctx)
-{
-  return ctx->ungroup_select();
-}
+int grow_UngroupSelect(grow_tCtx ctx) { return ctx->ungroup_select(); }
 
-void grow_UngroupGroup(grow_tCtx ctx, grow_tObject group)
-{
-  ctx->ungroup_group((GrowGroup*)group);
-}
+void grow_UngroupGroup(grow_tCtx ctx, grow_tObject group) { ctx->ungroup_group((GrowGroup*)group); }
 
 void grow_CurveConfigure(grow_tObject object, glow_sCurveData* data)
 {
   ((GrowCurve*)object)->configure_curves(data);
 }
 
-void grow_CurveAddPoints(
-    grow_tObject object, glow_sCurveData* data, unsigned int* no_of_points)
+void grow_CurveAddPoints(grow_tObject object, glow_sCurveData* data, unsigned int* no_of_points)
 {
   ((GrowCurve*)object)->add_points(data, no_of_points);
 }
@@ -5668,52 +5338,40 @@ void grow_SetNodeClassExternAll(grow_tCtx ctx, int ext)
     nc_list[i]->set_extern(ext);
 }
 
-int grow_GetBackgroundObjectLimits(grow_tCtx ctx, glow_eTraceType type,
-    double x, double y, grow_tObject* background, double* min, double* max,
-    glow_eDirection* direction)
+int grow_GetBackgroundObjectLimits(grow_tCtx ctx, glow_eTraceType type, double x, double y,
+                                   grow_tObject* background, double* min, double* max,
+                                   glow_eDirection* direction)
 {
-  return ctx->get_background_object_limits(
-      type, x, y, (GlowArrayElem**)background, min, max, direction);
+  return ctx->get_background_object_limits(type, x, y, (GlowArrayElem**)background, min, max, direction);
 }
 
-int grow_GetTranslate(grow_tCtx ctx)
-{
-  return ctx->translate_on;
-}
+int grow_GetTranslate(grow_tCtx ctx) { return ctx->translate_on; }
 
-glow_eMB3Action grow_GetMB3Action(grow_tCtx ctx)
-{
-  return ctx->mb3_action;
-}
+glow_eMB3Action grow_GetMB3Action(grow_tCtx ctx) { return ctx->mb3_action; }
 
 void grow_GetNodeClassOrigo(grow_tObject object, double* x, double* y)
 {
   ((GrowNode*)object)->get_nodeclass_origo((GlowTransform*)NULL, x, y);
 }
 
-int grow_ImageUpdate(grow_tObject object)
-{
-  return ((GrowImage*)object)->update();
-}
+int grow_ImageUpdate(grow_tObject object) { return ((GrowImage*)object)->update(); }
 
-void grow_RegisterUserDataCallbacks(grow_tCtx ctx,
-    void (*save)(void*, void*, glow_eUserdataCbType),
-    void (*open)(void*, void*, glow_eUserdataCbType),
-    void (*copy)(void*, void*, void**, glow_eUserdataCbType))
+void grow_RegisterUserDataCallbacks(grow_tCtx ctx, void (*save)(void*, void*, glow_eUserdataCbType),
+                                    void (*open)(void*, void*, glow_eUserdataCbType),
+                                    void (*copy)(void*, void*, void**, glow_eUserdataCbType),
+                                    void (*close)(void*, void*, glow_eUserdataCbType))
 {
   ((GrowCtx*)ctx)
-      ->register_userdata_callbacks((glow_tUserDataSaveCb)save,
-          (glow_tUserDataOpenCb)open, (glow_tUserDataCopyCb)copy);
+      ->register_userdata_callbacks((glow_tUserDataSaveCb)save, (glow_tUserDataOpenCb)open,
+                                    (glow_tUserDataCopyCb)copy, (glow_tUserDataCloseCb)close);
 }
 
-void grow_RegisterEventLogCallback(
-    grow_tCtx ctx, void (*log_cb)(void*, void*, unsigned int))
+void grow_RegisterEventLogCallback(grow_tCtx ctx, void (*log_cb)(void*, void*, unsigned int))
 {
   ((GrowCtx*)ctx)->register_eventlog_callback((glow_tEventLogCb)log_cb);
 }
 
-void grow_RegisterScriptExecCallback(
-    grow_tCtx ctx, void (*script_cb)(void*, char*))
+void grow_RegisterScriptExecCallback(grow_tCtx ctx, void (*script_cb)(void*, char*))
 {
   ((GrowCtx*)ctx)->register_scriptexec_callback((glow_tScriptExecCb)script_cb);
 }
@@ -5724,13 +5382,9 @@ void grow_GetVersion(grow_tCtx ctx, int* grow_version, int* graph_version)
   *grow_version = GLOW_VERSION;
 }
 
-void grow_UpdateVersion(grow_tCtx ctx)
-{
-  ctx->version = GLOW_VERSION;
-}
+void grow_UpdateVersion(grow_tCtx ctx) { ctx->version = GLOW_VERSION; }
 
-void grow_SetTipText(
-    grow_tCtx ctx, grow_tObject object, char* text, int x, int y)
+void grow_SetTipText(grow_tCtx ctx, grow_tObject object, char* text, int x, int y)
 {
   ctx->tiptext->draw_text((GlowArrayElem*)object, text, x, y);
 }
@@ -5745,8 +5399,7 @@ void grow_SetObjectLevelColorTone(grow_tObject object, glow_eDrawTone tone)
   ((GrowNode*)object)->set_level_color_tone(tone);
 }
 
-void grow_SetObjectLevelDirection(
-    grow_tObject object, glow_eDirection direction)
+void grow_SetObjectLevelDirection(grow_tObject object, glow_eDirection direction)
 {
   ((GrowNode*)object)->set_level_direction(direction);
 }
@@ -5756,14 +5409,12 @@ void grow_SetObjectFillLevel(grow_tObject object, double level)
   ((GrowNode*)object)->set_fill_level(level);
 }
 
-int grow_GetObjectLimits(
-    grow_tObject object, double* min, double* max, glow_eDirection* direction)
+int grow_GetObjectLimits(grow_tObject object, double* min, double* max, glow_eDirection* direction)
 {
   return ((GrowNode*)object)->get_limits(min, max, direction);
 }
 
-int grow_GetObjectLimitsPixel(
-    grow_tObject object, double* min, double* max, glow_eDirection* direction)
+int grow_GetObjectLimitsPixel(grow_tObject object, double* min, double* max, glow_eDirection* direction)
 {
   return ((GrowNode*)object)->get_limits_pixel(min, max, direction);
 }
@@ -5773,15 +5424,9 @@ void grow_SetTrendInfo(grow_tObject object, glow_sTrendInfo* info)
   ((GrowTrend*)object)->set_trend_info(info);
 }
 
-void grow_SetBarInfo(grow_tObject object, glow_sBarInfo* info)
-{
-  ((GrowBar*)object)->set_bar_info(info);
-}
+void grow_SetBarInfo(grow_tObject object, glow_sBarInfo* info) { ((GrowBar*)object)->set_bar_info(info); }
 
-void grow_GetBarInfo(grow_tObject object, glow_sBarInfo* info)
-{
-  ((GrowBar*)object)->get_bar_info(info);
-}
+void grow_GetBarInfo(grow_tObject object, glow_sBarInfo* info) { ((GrowBar*)object)->get_bar_info(info); }
 
 void grow_SetBarArcInfo(grow_tObject object, glow_sBarInfo* info)
 {
@@ -5839,10 +5484,7 @@ int grow_TableMakeCellVisible(grow_tObject object, int column, int row)
   return ((GrowTable*)object)->make_cell_visible(column, row);
 }
 
-void grow_Convert(grow_tCtx ctx, glow_eConvert version)
-{
-  ((GrowCtx*)ctx)->convert(version);
-}
+void grow_Convert(grow_tCtx ctx, glow_eConvert version) { ((GrowCtx*)ctx)->convert(version); }
 
 int grow_NodeClassIsExtern(grow_tNodeClass nodeclass)
 {
@@ -5850,127 +5492,98 @@ int grow_NodeClassIsExtern(grow_tNodeClass nodeclass)
   return base_nc->nc_extern;
 }
 
-int grow_GetNodeConPoint(
-    grow_tNode node, int num, double* x, double* y, glow_eDirection* dir)
+int grow_GetNodeConPoint(grow_tNode node, int num, double* x, double* y, glow_eDirection* dir)
 {
-  if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowSlider
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowConGlue
-      || ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowGroup)
+  if (((GlowArrayElem*)node)->type() == glow_eObjectType_GrowNode ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowSlider ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowConGlue ||
+      ((GlowArrayElem*)node)->type() == glow_eObjectType_GrowGroup)
     return ((GrowNode*)node)->get_conpoint(num, x, y, dir);
   return 0;
 }
 
-void grow_InputFocusInitEvent(grow_tCtx ctx)
-{
-  ((GrowCtx*)ctx)->inputfocus_init_event();
-}
+void grow_InputFocusInitEvent(grow_tCtx ctx) { ((GrowCtx*)ctx)->inputfocus_init_event(); }
 
-int grow_GetTrendNoOfPoints(grow_tObject object)
-{
-  return ((GrowTrend*)object)->get_no_of_points();
-}
+int grow_GetTrendNoOfPoints(grow_tObject object) { return ((GrowTrend*)object)->get_no_of_points(); }
 
-int grow_GetTrendFillCurve(grow_tObject object)
-{
-  return ((GrowTrend*)object)->get_fill_curve();
-}
+int grow_GetTrendFillCurve(grow_tObject object) { return ((GrowTrend*)object)->get_fill_curve(); }
 
-void grow_SetTrendData(
-    grow_tObject object, double* data[3], int data_curves, int data_points)
+void grow_SetTrendData(grow_tObject object, double* data[3], int data_curves, int data_points)
 {
   ((GrowTrend*)object)->set_data(data, data_curves, data_points);
 }
 
-void grow_SetTrendMarkColor(
-    grow_tObject object, glow_eDrawType mark1_color, glow_eDrawType mark2_color)
+void grow_SetTrendMarkColor(grow_tObject object, glow_eDrawType mark1_color, glow_eDrawType mark2_color)
 {
   ((GrowTrend*)object)->set_mark_color(mark1_color, mark2_color);
 }
-void grow_SetXYCurveCurveColor(grow_tObject object, int curve,
-    glow_eDrawType curve_color, glow_eDrawType fill_color)
+void grow_SetXYCurveCurveColor(grow_tObject object, int curve, glow_eDrawType curve_color,
+                               glow_eDrawType fill_color)
 {
   ((GrowXYCurve*)object)->set_xy_curve_color(curve, curve_color, fill_color);
 }
 
-void grow_SetXYCurveMarkColor(
-    grow_tObject object, glow_eDrawType mark1_color, glow_eDrawType mark2_color)
+void grow_SetXYCurveMarkColor(grow_tObject object, glow_eDrawType mark1_color, glow_eDrawType mark2_color)
 {
   ((GrowXYCurve*)object)->set_mark_color(mark1_color, mark2_color);
 }
 
-void grow_SetXYCurveData(grow_tObject object, double* y_data, double* x_data,
-    int curve_idx, int data_points)
+void grow_SetXYCurveData(grow_tObject object, double* y_data, double* x_data, int curve_idx, int data_points)
 {
   ((GrowXYCurve*)object)->set_xy_data(y_data, x_data, curve_idx, data_points);
 }
 
-void grow_SetPieValues(grow_tObject object, double* values)
-{
-  ((GrowPie*)object)->set_values(values);
-}
+void grow_SetPieValues(grow_tObject object, double* values) { ((GrowPie*)object)->set_values(values); }
 
-void grow_SetPieConf(grow_tObject object, int sector_num, double min_val,
-    double max_val, glow_eDrawType* color)
+void grow_SetPieConf(grow_tObject object, int sector_num, double min_val, double max_val,
+                     glow_eDrawType* color)
 {
   ((GrowPie*)object)->set_conf(sector_num, min_val, max_val, color);
 }
 
-void grow_GetPieConf(
-    grow_tObject object, int* sector_num, double* min_val, double* max_val)
+void grow_GetPieConf(grow_tObject object, int* sector_num, double* min_val, double* max_val)
 {
   ((GrowPie*)object)->get_conf(sector_num, min_val, max_val);
 }
 
-void grow_SetBarChartValues(grow_tObject object, float* values1, float* values2,
-    float* values3, float* values4, float* values5, float* values6,
-    float* values7, float* values8, float* values9, float* values10,
-    float* values11, float* values12)
+void grow_SetBarChartValues(grow_tObject object, float* values1, float* values2, float* values3,
+                            float* values4, float* values5, float* values6, float* values7, float* values8,
+                            float* values9, float* values10, float* values11, float* values12)
 {
   ((GrowBarChart*)object)
-      ->set_values(values1, values2, values3, values4, values5, values6,
-          values7, values8, values9, values10, values11, values12);
+      ->set_values(values1, values2, values3, values4, values5, values6, values7, values8, values9, values10,
+                   values11, values12);
 }
 
-void grow_SetBarChartConf(grow_tObject object, int bar_num, int barsegment_num,
-    double min_val, double max_val, int vert_lines, int horiz_lines,
-    glow_eDrawType line_color, glow_eDrawType* color)
+void grow_SetBarChartConf(grow_tObject object, int bar_num, int barsegment_num, double min_val,
+                          double max_val, int vert_lines, int horiz_lines, glow_eDrawType line_color,
+                          glow_eDrawType* color)
 {
   ((GrowBarChart*)object)
-      ->set_conf(bar_num, barsegment_num, min_val, max_val, vert_lines,
-          horiz_lines, line_color, color);
+      ->set_conf(bar_num, barsegment_num, min_val, max_val, vert_lines, horiz_lines, line_color, color);
 }
 
-void grow_GetBarChartConf(grow_tObject object, int* bar_num,
-    int* barsegment_num, double* min_val, double* max_val)
+void grow_GetBarChartConf(grow_tObject object, int* bar_num, int* barsegment_num, double* min_val,
+                          double* max_val)
 {
   ((GrowBarChart*)object)->get_conf(bar_num, barsegment_num, min_val, max_val);
 }
 
-int grow_GetObjectAnnotInfo(grow_tObject object, int num, int* text_size,
-    glow_eDrawType* text_drawtype, glow_eDrawType* text_color,
-    glow_eDrawType* bg_color, double* scale, glow_eFont* font,
-    glow_eAnnotType* type)
+int grow_GetObjectAnnotInfo(grow_tObject object, int num, int* text_size, glow_eDrawType* text_drawtype,
+                            glow_eDrawType* text_color, glow_eDrawType* bg_color, double* scale,
+                            glow_eFont* font, glow_eAnnotType* type)
 {
   return ((GrowNode*)object)
-      ->get_annotation_info(num, text_size, text_drawtype, text_color, bg_color,
-          scale, font, type);
+      ->get_annotation_info(num, text_size, text_drawtype, text_color, bg_color, scale, font, type);
 }
 
-void grow_GetMenuChar(grow_tObject menu, int* t_size,
-    glow_eDrawType* fill_color, glow_eDrawType* t_drawtype,
-    glow_eDrawType* t_color, glow_eDrawType* t_color_disabled,
-    glow_eFont* t_font)
+void grow_GetMenuChar(grow_tObject menu, int* t_size, glow_eDrawType* fill_color, glow_eDrawType* t_drawtype,
+                      glow_eDrawType* t_color, glow_eDrawType* t_color_disabled, glow_eFont* t_font)
 {
-  ((GrowMenu*)menu)
-      ->get_menu_char(
-          t_size, fill_color, t_drawtype, t_color, t_color_disabled, t_font);
+  ((GrowMenu*)menu)->get_menu_char(t_size, fill_color, t_drawtype, t_color, t_color_disabled, t_font);
 }
 
-void grow_MenuShiftCurrentItem(grow_tObject menu, int shift)
-{
-  ((GrowMenu*)menu)->shift_current_item(shift);
-}
+void grow_MenuShiftCurrentItem(grow_tObject menu, int shift) { ((GrowMenu*)menu)->shift_current_item(shift); }
 
 int grow_MenuGetCurrentItem(grow_tObject menu, int* item)
 {
@@ -5982,10 +5595,7 @@ void grow_SetMenuInputFocus(grow_tObject menu, int focus)
   ((GrowMenu*)menu)->set_input_focus(focus, glow_eEvent_Null);
 }
 
-int grow_GetMenuInputFocus(grow_tObject menu)
-{
-  return ((GrowMenu*)menu)->get_input_focus();
-}
+int grow_GetMenuInputFocus(grow_tObject menu) { return ((GrowMenu*)menu)->get_input_focus(); }
 
 void grow_GetSubmenuPosition(grow_tObject menu, int item, double* x, double* y)
 {
@@ -5997,20 +5607,14 @@ int grow_GetMenuParent(grow_tObject menu, grow_tObject* parent)
   return ((GrowMenu*)menu)->get_parent((GlowArrayElem**)parent);
 }
 
-int grow_SetFolderIndex(grow_tObject folder, int idx)
-{
-  return ((GrowFolder*)folder)->set_folder(idx);
-}
+int grow_SetFolderIndex(grow_tObject folder, int idx) { return ((GrowFolder*)folder)->set_folder(idx); }
 
 int grow_SetWindowSource(grow_tObject window, char* source, char* owner)
 {
   return ((GrowWindow*)window)->set_source(source, owner);
 }
 
-grow_tCtx grow_GetWindowCtx( grow_tObject window)
-{
-  return ((GrowWindow *)window)->window_ctx;
-}
+grow_tCtx grow_GetWindowCtx(grow_tObject window) { return ((GrowWindow*)window)->window_ctx; }
 
 void grow_GetWindowSize(grow_tCtx ctx, int* width, int* height)
 {
@@ -6025,7 +5629,8 @@ int grow_IsJava(char* name, int* is_frame, int* is_applet, char* java_name)
   GrowCtx* ctx = new GrowCtx("tmp");
   ctx->set_nodraw();
   sts = ctx->open(name, glow_eSaveMode_ReadConfigOnly);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     *is_frame = ctx->is_javaapplication;
     *is_applet = ctx->is_javaapplet;
     strcpy(java_name, ctx->java_name);
@@ -6034,37 +5639,26 @@ int grow_IsJava(char* name, int* is_frame, int* is_applet, char* java_name)
   return sts;
 }
 
-void grow_GetOwner(grow_tCtx ctx, char* owner)
-{
-  ((GrowCtx*)ctx)->get_owner(owner);
-}
+void grow_GetOwner(grow_tCtx ctx, char* owner) { ((GrowCtx*)ctx)->get_owner(owner); }
 
-void grow_SetOwner(grow_tCtx ctx, char* owner)
-{
-  ((GrowCtx*)ctx)->set_owner(owner);
-}
+void grow_SetOwner(grow_tCtx ctx, char* owner) { ((GrowCtx*)ctx)->set_owner(owner); }
 
-int grow_GetNodeClassAnnotBackground(
-    grow_tNodeClass nodeclass, glow_eDrawType* background)
+int grow_GetNodeClassAnnotBackground(grow_tNodeClass nodeclass, glow_eDrawType* background)
 {
   return ((GlowNodeClass*)nodeclass)->get_annot_background(0, 0, background);
 }
 
-void grow_SetSelectScale(
-    grow_tCtx ctx, double scale_x, double scale_y, glow_eScaleType type)
+void grow_SetSelectScale(grow_tCtx ctx, double scale_x, double scale_y, glow_eScaleType type)
 {
   ctx->set_select_scale(scale_x, scale_y, type);
 }
 
-int grow_GetNextObjectPosition(
-    grow_tCtx ctx, grow_tObject object, glow_eDirection dir, grow_tObject* next)
+int grow_GetNextObjectPosition(grow_tCtx ctx, grow_tObject object, glow_eDirection dir, grow_tObject* next)
 {
-  return ctx->get_next_object_position(
-      (GlowArrayElem*)object, dir, (GlowArrayElem**)next);
+  return ctx->get_next_object_position((GlowArrayElem*)object, dir, (GlowArrayElem**)next);
 }
 
-int grow_GetPreviousObject(
-    grow_tCtx ctx, grow_tObject object, grow_tObject* prev)
+int grow_GetPreviousObject(grow_tCtx ctx, grow_tObject object, grow_tObject* prev)
 {
   return ctx->get_previous_object((GlowArrayElem*)object, (GlowArrayElem**)prev);
 }
@@ -6079,20 +5673,18 @@ int grow_GetFirstObject(grow_tCtx ctx, grow_tObject* first)
   return ctx->get_first_object((GlowArrayElem**)first);
 }
 
-int grow_GroupGetNextObject(
-    grow_tObject group, grow_tObject object, grow_tObject* next)
+int grow_GroupGetNextObject(grow_tObject group, grow_tObject object, grow_tObject* next)
 {
   if (!(((GlowArrayElem*)group)->type() == glow_eObjectType_GrowGroup ||
-	((GlowArrayElem*)group)->type() == glow_eObjectType_GrowDashCell))
+        ((GlowArrayElem*)group)->type() == glow_eObjectType_GrowDashCell))
     return 0;
-  return ((GrowGroup*)group)
-      ->get_next_object((GlowArrayElem*)object, (GlowArrayElem**)next);
+  return ((GrowGroup*)group)->get_next_object((GlowArrayElem*)object, (GlowArrayElem**)next);
 }
 
 int grow_GroupGetFirstObject(grow_tObject group, grow_tObject* first)
 {
   if (!(((GlowArrayElem*)group)->type() == glow_eObjectType_GrowGroup ||
-	((GlowArrayElem*)group)->type() == glow_eObjectType_GrowDashCell))
+        ((GlowArrayElem*)group)->type() == glow_eObjectType_GrowDashCell))
     return 0;
   return ((GrowGroup*)group)->get_first_object((GlowArrayElem**)first);
 }
@@ -6107,7 +5699,7 @@ int grow_DashInsertObject(grow_tObject group, grow_tObject object)
 int grow_GroupClear(grow_tObject group)
 {
   if (!(((GlowArrayElem*)group)->type() == glow_eObjectType_GrowGroup ||
-	((GlowArrayElem*)group)->type() == glow_eObjectType_GrowDashCell))
+        ((GlowArrayElem*)group)->type() == glow_eObjectType_GrowDashCell))
     return 0;
   return ((GrowGroup*)group)->clear();
 }
@@ -6117,29 +5709,22 @@ int grow_IsVisible(grow_tCtx ctx, grow_tObject object, glow_eVisible type)
   return ctx->is_visible((GlowArrayElem*)object, type);
 }
 
-int grow_ExportFlow(grow_tCtx ctx, char* filename)
-{
-  return ctx->export_flow(filename);
-}
+int grow_ExportFlow(grow_tCtx ctx, char* filename) { return ctx->export_flow(filename); }
 
-int grow_ExportScript(grow_tCtx ctx, char* filename, 
-		      int (*userdata_cb)(void*, grow_tObject, std::ofstream&, char*))
+int grow_ExportScript(grow_tCtx ctx, char* filename,
+                      int (*userdata_cb)(void*, grow_tObject, std::ostream&, char*))
 {
   return ctx->export_script(filename, userdata_cb);
 }
 
-void grow_ObjectSave(
-    grow_tObject object, std::ofstream& fp, glow_eSaveMode mode)
+void grow_ObjectSave(grow_tObject object, std::ostream& fp, glow_eSaveMode mode)
 {
   ((GlowArrayElem*)object)->save(fp, mode);
 }
 
-void grow_ObjectOpen(grow_tObject object, std::ifstream& fp)
-{
-  ((GlowArrayElem*)object)->open(fp);
-}
+void grow_ObjectOpen(grow_tObject object, std::istream& fp) { ((GlowArrayElem*)object)->open(fp); }
 
-void grow_ObjectRead(grow_tCtx ctx, std::ifstream& fp, grow_tObject* object)
+void grow_ObjectRead(grow_tCtx ctx, std::istream& fp, grow_tObject* object)
 {
   ctx->read_object(fp, (GlowArrayElem**)object);
 }
@@ -6149,27 +5734,18 @@ int grow_GetDimension(char* filename, int* width, int* height)
   return GrowCtx::get_dimension(filename, width, height);
 }
 
-void grow_SetTextCoding(grow_tCtx ctx, glow_eTextCoding coding)
-{
-  ctx->set_text_coding(coding);
-}
+void grow_SetTextCoding(grow_tCtx ctx, glow_eTextCoding coding) { ctx->set_text_coding(coding); }
 
-void grow_EventExec(grow_tCtx ctx, void* event, unsigned int size)
-{
-  ctx->gdraw->event_exec(event, size);
-}
+void grow_EventExec(grow_tCtx ctx, void* event, unsigned int size) { ctx->gdraw->event_exec(event, size); }
 
-void grow_EventLogEnable(int enable)
-{
-  GlowCtx::eventlog_enabled = enable;
-}
+void grow_EventLogEnable(int enable) { GlowCtx::eventlog_enabled = enable; }
 
 void grow_GetObjectClass(grow_tObject object, grow_tNodeClass* nodeclass)
 {
-  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowConGlue
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup)
+  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowConGlue ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup)
     *nodeclass = ((GrowNode*)object)->nc->get_base_nc();
   else
     *nodeclass = 0;
@@ -6181,66 +5757,40 @@ int grow_GetObjectRecursiveTrace(grow_tObject object)
   return nodeclass->recursive_trace;
 }
 
-void grow_ToolbarConfigure(grow_tObject object, char* tools1, char* tools2,
-    int tools1_cnt, int tools2_cnt, unsigned int show_mask1,
-    unsigned int show_mask2, unsigned int insensitive_mask1,
-    unsigned int insensitive_mask2)
+void grow_ToolbarConfigure(grow_tObject object, char* tools1, char* tools2, int tools1_cnt, int tools2_cnt,
+                           unsigned int show_mask1, unsigned int show_mask2, unsigned int insensitive_mask1,
+                           unsigned int insensitive_mask2)
 {
   ((GrowToolbar*)object)
-      ->configure(tools1, tools2, tools1_cnt, tools2_cnt, show_mask1,
-          show_mask2, insensitive_mask1, insensitive_mask2);
+      ->configure(tools1, tools2, tools1_cnt, tools2_cnt, show_mask1, show_mask2, insensitive_mask1,
+                  insensitive_mask2);
 }
 
-void grow_ToolbarScale(grow_tObject object)
-{
-  ((GrowToolbar*)object)->scale();
-}
+void grow_ToolbarScale(grow_tObject object) { ((GrowToolbar*)object)->scale(); }
 
-void grow_SetEditSetMode(grow_tCtx ctx, glow_eEditSetMode mode)
-{
-  ctx->set_edit_set_mode(mode);
-}
+void grow_SetEditSetMode(grow_tCtx ctx, glow_eEditSetMode mode) { ctx->set_edit_set_mode(mode); }
 
-int grow_SetCustomColor(
-    grow_tCtx ctx, glow_eDrawType color, double red, double green, double blue)
+int grow_SetCustomColor(grow_tCtx ctx, glow_eDrawType color, double red, double green, double blue)
 {
   return ctx->set_custom_color(color, red, green, blue);
 }
 
-void* grow_GetCustomColors(grow_tCtx ctx)
-{
-  return (void*)ctx->get_custom_colors();
-}
+void* grow_GetCustomColors(grow_tCtx ctx) { return (void*)ctx->get_custom_colors(); }
 
-int grow_CustomColorsIsEmpty(grow_tCtx ctx)
-{
-  return ctx->custom_colors_is_empty();
-}
+int grow_CustomColorsIsEmpty(grow_tCtx ctx) { return ctx->custom_colors_is_empty(); }
 
 int grow_GetColorThemeColors(char* file, double** colors, int* size)
 {
   return GlowCustomColors::get_colortheme_colors(file, colors, size);
 }
 
-int grow_ReadCustomColorFile(grow_tCtx ctx, char* name)
-{
-  return ctx->read_customcolor_file(name);
-}
+int grow_ReadCustomColorFile(grow_tCtx ctx, char* name) { return ctx->read_customcolor_file(name); }
 
-int grow_WriteCustomColorFile(grow_tCtx ctx, char* name)
-{
-  return ctx->write_customcolor_file(name);
-}
+int grow_WriteCustomColorFile(grow_tCtx ctx, char* name) { return ctx->write_customcolor_file(name); }
 
-void grow_SetColorTheme(grow_tCtx ctx)
-{
-  ctx->set_color_theme();
-}
+void grow_SetColorTheme(grow_tCtx ctx) { ctx->set_color_theme(); }
 
-void grow_SetDefaultColorTheme(char* theme)
-{
-  GrowCtx::set_default_color_theme(theme);
-}
+void grow_SetDefaultColorTheme(char* theme) { GrowCtx::set_default_color_theme(theme); }
 
 void grow_SetColorThemeLightness(grow_tCtx ctx, int lightness)
 {
@@ -6252,28 +5802,15 @@ void grow_SetColorThemeIsDefault(grow_tCtx ctx, int isdefault)
   ((GlowCtx*)ctx)->set_colortheme_is_default(isdefault);
 }
 
-void grow_SetCurrentColorTheme(grow_tCtx ctx, int ct)
-{
-  ((GrowCtx*)ctx)->current_color_theme = ct;
-}
+void grow_SetCurrentColorTheme(grow_tCtx ctx, int ct) { ((GrowCtx*)ctx)->current_color_theme = ct; }
 
-int grow_GetCurrentColorTheme(grow_tCtx ctx)
-{
-  return ((GrowCtx*)ctx)->current_color_theme;  
-}
+int grow_GetCurrentColorTheme(grow_tCtx ctx) { return ((GrowCtx*)ctx)->current_color_theme; }
 
-void grow_SetObjectColorThemeLightness(grow_tObject o)
-{
-  ((GlowArrayElem*)o)->set_colortheme_lightness();
-}
+void grow_SetObjectColorThemeLightness(grow_tObject o) { ((GlowArrayElem*)o)->set_colortheme_lightness(); }
 
-void grow_PrintRgbColors(grow_tCtx ctx)
-{
-  GlowColor::print_rgb_colors(((GlowCtx*)ctx)->customcolors);
-}
+void grow_PrintRgbColors(grow_tCtx ctx) { GlowColor::print_rgb_colors(((GlowCtx*)ctx)->customcolors); }
 
-int grow_SetRgbColor(
-    grow_tCtx ctx, glow_eDrawType color, double r, double g, double b)
+int grow_SetRgbColor(grow_tCtx ctx, glow_eDrawType color, double r, double g, double b)
 {
   if (((GlowCtx*)ctx)->customcolors)
     return ((GlowCtx*)ctx)->customcolors->set_color(color, r, g, b);
@@ -6281,8 +5818,7 @@ int grow_SetRgbColor(
     return 0;
 }
 
-int grow_GetRgbColor(
-    grow_tCtx ctx, glow_eDrawType color, double* r, double* g, double* b)
+int grow_GetRgbColor(grow_tCtx ctx, glow_eDrawType color, double* r, double* g, double* b)
 {
   if (((GlowCtx*)ctx)->customcolors)
     return ((GlowCtx*)ctx)->customcolors->get_color(color, r, g, b);
@@ -6290,60 +5826,33 @@ int grow_GetRgbColor(
     return 0;
 }
 
-int grow_GetObjectFill(grow_tObject o)
-{
-  return ((GlowArrayElem*)o)->get_fill();
-}
+int grow_GetObjectFill(grow_tObject o) { return ((GlowArrayElem*)o)->get_fill(); }
 
-int grow_GetObjectBorder(grow_tObject o)
-{
-  return ((GlowArrayElem*)o)->get_border();
-}
+int grow_GetObjectBorder(grow_tObject o) { return ((GlowArrayElem*)o)->get_border(); }
 
-void grow_StoreObjectBorders(grow_tObject o)
-{
-  ((GlowArrayElem*)o)->store_borders();
-}
+void grow_StoreObjectBorders(grow_tObject o) { ((GlowArrayElem*)o)->store_borders(); }
 
-glow_eDrawType grow_GetObjectFillColor(grow_tObject o)
-{
-  return ((GlowArrayElem*)o)->get_fill_color();
-}
+glow_eDrawType grow_GetObjectFillColor(grow_tObject o) { return ((GlowArrayElem*)o)->get_fill_color(); }
 
-glow_eDrawType grow_GetObjectBorderColor(grow_tObject o)
-{
-  return ((GlowArrayElem*)o)->get_border_color();
-}
+glow_eDrawType grow_GetObjectBorderColor(grow_tObject o) { return ((GlowArrayElem*)o)->get_border_color(); }
 
-glow_eDrawType grow_GetObjectTextColor(grow_tObject o)
-{
-  return ((GlowArrayElem*)o)->get_text_color();
-}
+glow_eDrawType grow_GetObjectTextColor(grow_tObject o) { return ((GlowArrayElem*)o)->get_text_color(); }
 
-glow_eGradient grow_GetObjectGradient(grow_tObject o)
-{
-  return ((GlowArrayElem*)o)->get_gradient();
-}
+glow_eGradient grow_GetObjectGradient(grow_tObject o) { return ((GlowArrayElem*)o)->get_gradient(); }
 
 void grow_SetObjectGradient(grow_tObject o, glow_eGradient gradient)
 {
   ((GlowArrayElem*)o)->set_gradient(gradient);
 }
 
-double grow_GetObjectTransparency(grow_tObject o)
-{
-  return ((GlowArrayElem*)o)->get_transparency();
-}
+double grow_GetObjectTransparency(grow_tObject o) { return ((GlowArrayElem*)o)->get_transparency(); }
 
 void grow_SetObjectTransparency(grow_tObject o, double transparency)
 {
   ((GlowArrayElem*)o)->set_transparency(transparency);
 }
 
-int grow_GetObjectShadow(grow_tObject o)
-{
-  return ((GlowArrayElem*)o)->get_shadow();
-}
+int grow_GetObjectShadow(grow_tObject o) { return ((GlowArrayElem*)o)->get_shadow(); }
 
 void grow_SetObjectOriginalFillColor(grow_tObject o, glow_eDrawType color)
 {
@@ -6377,62 +5886,45 @@ void grow_ResetObjectBackgroundColor(grow_tObject object)
 
 int grow_SetObjectClass(grow_tObject object, grow_tNodeClass nodeclass)
 {
-  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowConGlue
-      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup) {
+  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowConGlue ||
+      ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup)
+  {
     ((GrowNode*)object)->nc = (GlowNodeClass*)nodeclass;
     ((GrowNode*)object)->nc_root = (GlowNodeClass*)nodeclass;
     ((GrowNode*)object)->get_node_borders();
-  } else
+  }
+  else
     return 0;
 
   return 1;
 }
 
-int grow_CheckObjectName(grow_tCtx ctx, char* name)
-{
-  return ((GrowCtx*)ctx)->check_object_name(name);
-}
+int grow_CheckObjectName(grow_tCtx ctx, char* name) { return ((GrowCtx*)ctx)->check_object_name(name); }
 
-int grow_KeyPressed(grow_tCtx ctx, int key)
-{
-  return ((GrowCtx*)ctx)->key_pressed(key);
-}
+int grow_KeyPressed(grow_tCtx ctx, int key) { return ((GrowCtx*)ctx)->key_pressed(key); }
 
-void grow_SignalSend(grow_tCtx ctx, char* signalname)
-{
-  ((GrowCtx*)ctx)->signal_send(signalname);
-}
+void grow_SignalSend(grow_tCtx ctx, char* signalname) { ((GrowCtx*)ctx)->signal_send(signalname); }
 
-void grow_DrawObject(grow_tObject object)
-{
-  ((GlowArrayElem*)object)->draw();
-}
+void grow_DrawObject(grow_tObject object) { ((GlowArrayElem*)object)->draw(); }
 
-void grow_NavRedraw(grow_tCtx ctx)
-{
-  ((GrowCtx*)ctx)->nav_zoom();
-}
+void grow_NavRedraw(grow_tCtx ctx) { ((GrowCtx*)ctx)->nav_zoom(); }
 
-int grow_IsDashboard(grow_tCtx ctx)
-{
-  return ((GrowCtx*)ctx)->is_dashboard();
-}
+int grow_IsDashboard(grow_tCtx ctx) { return ((GrowCtx*)ctx)->is_dashboard(); }
 
-void grow_GetDashboardInfo(grow_tCtx ctx, double *cell_width, double *cell_height,
-			   int *columns, int *rows)
+void grow_GetDashboardInfo(grow_tCtx ctx, double* cell_width, double* cell_height, int* columns, int* rows)
 {
   ((GrowCtx*)ctx)->get_dashboard_info(cell_width, cell_height, columns, rows);
 }
 
-int grow_GetDashboardNextFree(grow_tCtx ctx, int start_row, int start_col,
-    int rows, int columns, double *x, double *y)
+int grow_GetDashboardNextFree(grow_tCtx ctx, int start_row, int start_col, int rows, int columns, double* x,
+                              double* y)
 {
   return ((GrowCtx*)ctx)->dash->get_next_free(start_row, start_col, rows, columns, x, y);
 }
 
-void grow_GetDashCellInfo(grow_tObject o, int *rows, int *columns)
+void grow_GetDashCellInfo(grow_tObject o, int* rows, int* columns)
 {
   if (((GlowArrayElem*)o)->type() != glow_eObjectType_GrowDashCell)
     return;
@@ -6447,73 +5939,44 @@ void grow_SetGraphBorders(grow_tCtx ctx, double x0, double y0, double x1, double
   ((GrowCtx*)ctx)->y1 = y1;
 }
 
-void grow_GetBorders(grow_tCtx ctx)
-{
-  ((GrowCtx*)ctx)->get_borders();
-}
+void grow_GetBorders(grow_tCtx ctx) { ((GrowCtx*)ctx)->get_borders(); }
 
 void grow_DisableSubwindowEvents(grow_tCtx ctx, int disable)
 {
   ((GrowCtx*)ctx)->disable_subw_events = disable;
 }
 
-int grow_GetWindowResize(grow_tCtx ctx)
-{
-  return ((GrowCtx*)ctx)->window_resize;
-}
+int grow_GetWindowResize(grow_tCtx ctx) { return ((GrowCtx*)ctx)->window_resize; }
 
-int grow_LayerIsActive(grow_tObject o)
-{
-  return ((GrowLayer*)o)->is_active();
-}
+int grow_LayerIsActive(grow_tObject o) { return ((GrowLayer*)o)->is_active(); }
 
-void grow_LayerSetActive(grow_tObject o, int active)
-{
-  ((GrowLayer*)o)->set_active(active);
-}
+void grow_LayerSetActive(grow_tObject o, int active) { ((GrowLayer*)o)->set_active(active); }
 
-void grow_LayerResetActiveAll(grow_tCtx ctx)
-{
-  ((GrowCtx*)ctx)->layer_reset_active_all();
-}
+void grow_LayerResetActiveAll(grow_tCtx ctx) { ((GrowCtx*)ctx)->layer_reset_active_all(); }
 
 void grow_GetLayerObjectList(grow_tObject layer, grow_tObject** list, int* cnt)
 {
   ((GrowLayer*)layer)->get_objectlist((GlowArrayElem***)list, cnt);
 }
 
-int grow_GetActiveLayer(grow_tCtx ctx, grow_tObject *layer)
+int grow_GetActiveLayer(grow_tCtx ctx, grow_tObject* layer)
 {
   return ((GrowCtx*)ctx)->get_active_layer((GrowLayer**)layer);
 }
 
-int grow_MergeVisibleLayers(grow_tCtx ctx)
-{
-  return ((GrowCtx*)ctx)->merge_visible_layers();
-}
+int grow_MergeVisibleLayers(grow_tCtx ctx) { return ((GrowCtx*)ctx)->merge_visible_layers(); }
 
-int grow_MergeVisibleLayersToBg(grow_tCtx ctx)
-{
-  return ((GrowCtx*)ctx)->merge_visible_layers_to_bg();
-}
+int grow_MergeVisibleLayersToBg(grow_tCtx ctx) { return ((GrowCtx*)ctx)->merge_visible_layers_to_bg(); }
 
-int grow_MergeAllLayers(grow_tCtx ctx)
-{
-  return ((GrowCtx*)ctx)->merge_all_layers();
-}
+int grow_MergeAllLayers(grow_tCtx ctx) { return ((GrowCtx*)ctx)->merge_all_layers(); }
 
-int grow_MoveSelectToLayer(grow_tCtx ctx)
-{
-  return ((GrowCtx*)ctx)->move_select_to_layer();
-}
+int grow_MoveSelectToLayer(grow_tCtx ctx) { return ((GrowCtx*)ctx)->move_select_to_layer(); }
 
-int grow_LayerGetNextObject(grow_tObject layer, grow_tObject object, 
-    grow_tObject* next)
+int grow_LayerGetNextObject(grow_tObject layer, grow_tObject object, grow_tObject* next)
 {
   if (!(((GlowArrayElem*)layer)->type() == glow_eObjectType_GrowLayer))
     return 0;
-  return ((GrowLayer*)layer)->get_next((GlowArrayElem*)object, 
-      (GlowArrayElem**)next);
+  return ((GrowLayer*)layer)->get_next((GlowArrayElem*)object, (GlowArrayElem**)next);
 }
 
 int grow_LayerGetFirstObject(grow_tObject layer, grow_tObject* first)
@@ -6526,9 +5989,10 @@ int grow_LayerGetFirstObject(grow_tObject layer, grow_tObject* first)
 int grow_LayerInsert(grow_tObject layer, grow_tObject o)
 {
   if (layer)
-    return ((GrowLayer *)layer)->insert((GlowArrayElem*)o);
-  else {
-    GrowCtx *ctx;
+    return ((GrowLayer*)layer)->insert((GlowArrayElem*)o);
+  else
+  {
+    GrowCtx* ctx;
     ((GlowArrayElem*)o)->get_ctx((void**)&ctx);
     return ctx->a.insert((GlowArrayElem*)o);
   }
@@ -6537,38 +6001,30 @@ int grow_LayerInsert(grow_tObject layer, grow_tObject o)
 int grow_LayerRemove(grow_tObject layer, grow_tObject o)
 {
   if (layer)
-    return ((GrowLayer *)layer)->remove((GlowArrayElem*)o);
-  else {
-    GrowCtx *ctx;
+    return ((GrowLayer*)layer)->remove((GlowArrayElem*)o);
+  else
+  {
+    GrowCtx* ctx;
     ((GlowArrayElem*)o)->get_ctx((void**)&ctx);
     return ctx->a.remove((GlowArrayElem*)o);
   }
 }
 
-int grow_LayerIsEmpty(grow_tObject layer)
-{
-  return ((GrowLayer*)layer)->is_empty();
-}
+int grow_LayerIsEmpty(grow_tObject layer) { return ((GrowLayer*)layer)->is_empty(); }
 
-int grow_LayerActive(grow_tCtx ctx)
-{
-  return ((GrowCtx*)ctx)->layer_active();
-}
+int grow_LayerActive(grow_tCtx ctx) { return ((GrowCtx*)ctx)->layer_active(); }
 
-void grow_LayerSave(grow_tObject object, int nochildren, std::ofstream& fp, 
-    glow_eSaveMode mode)
+void grow_LayerSave(grow_tObject object, int nochildren, std::ostream& fp, glow_eSaveMode mode)
 {
   ((GrowLayer*)object)->save(nochildren, fp, mode);
 }
 
-grow_tObject grow_GetBackgroundLayer(grow_tCtx ctx)
-{
-  return (grow_tObject)&((GrowCtx*)ctx)->a;  
-}
+grow_tObject grow_GetBackgroundLayer(grow_tCtx ctx) { return (grow_tObject) & ((GrowCtx*)ctx)->a; }
 
 int grow_FindLayerByName(grow_tCtx ctx, const char* name, grow_tObject* object)
 {
-  if (streq(name, "Background")) {
+  if (streq(name, "Background"))
+  {
     *object = grow_GetBackgroundLayer(ctx);
     return 1;
   }

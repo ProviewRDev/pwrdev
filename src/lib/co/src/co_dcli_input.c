@@ -44,11 +44,11 @@
 #include <termios.h>
 #include <unistd.h>
 
-#include "pwr_class.h"
 #include "co_dcli.h"
 #include "co_dcli_input.h"
 #include "co_dcli_msg.h"
 #include "co_string.h"
+#include "pwr_class.h"
 
 /***********************  D E F I N E ' S *******************************/
 
@@ -72,8 +72,7 @@ static unsigned short state_table[3][256];
 
 /*__Local function prototypes_________________________________________*/
 
-static int r_print(dcli_sChannel* chn, char* format, ...)
-{
+static int r_print(dcli_sChannel *chn, char *format, ...) {
   char buff[400];
   int sts;
   va_list ap;
@@ -87,20 +86,19 @@ static int r_print(dcli_sChannel* chn, char* format, ...)
 }
 
 /*************************************************************************
-*
-* Name:		init_state_table()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Initialization of the stat_table used by dcli_get_input.
-*
-**************************************************************************/
+ *
+ * Name:		init_state_table()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Initialization of the stat_table used by dcli_get_input.
+ *
+ **************************************************************************/
 
-static int init_state_table()
-{
+static int init_state_table() {
   static int done = 0;
 
   if (!done) {
@@ -120,33 +118,29 @@ static int init_state_table()
   return DCLI__SUCCESS;
 }
 
-static void store_cursorpos(dcli_sChannel* chn)
-{
-  char char_ins[] = { 27, 55, 0 };
+static void store_cursorpos(dcli_sChannel *chn) {
+  char char_ins[] = {27, 55, 0};
 
   r_print(chn, "%s", char_ins);
 }
 
-static void restore_cursorpos(dcli_sChannel* chn)
-{
-  char char_ins[] = { 27, 56, 0 };
+static void restore_cursorpos(dcli_sChannel *chn) {
+  char char_ins[] = {27, 56, 0};
 
   r_print(chn, "%s", char_ins);
 }
 
-static void eofline_erase(dcli_sChannel* chn)
-{
-  char char_ins[] = { 27, 91, 48, 75, 0 };
+static void eofline_erase(dcli_sChannel *chn) {
+  char char_ins[] = {27, 91, 48, 75, 0};
 
   r_print(chn, "%s", char_ins);
 }
 
-static void cursor_rel(dcli_sChannel* chn, int x, int y)
-{
-  char cursor_f[] = { 27, 91, 0, 0, 67, 0 };
-  char cursor_b[] = { 27, 91, 0, 0, 68, 0 };
-  char cursor_u[] = { 27, 91, 0, 0, 65, 0 };
-  char cursor_d[] = { 27, 91, 0, 0, 66, 0 };
+static void cursor_rel(dcli_sChannel *chn, int x, int y) {
+  char cursor_f[] = {27, 91, 0, 0, 67, 0};
+  char cursor_b[] = {27, 91, 0, 0, 68, 0};
+  char cursor_u[] = {27, 91, 0, 0, 65, 0};
+  char cursor_d[] = {27, 91, 0, 0, 66, 0};
 
   if (y > 0) {
     cursor_f[2] = y / 10 + 48;
@@ -168,28 +162,26 @@ static void cursor_rel(dcli_sChannel* chn, int x, int y)
   }
 }
 
-static void char_delete(dcli_sChannel* chn, int n)
-{
-  char char_del[5] = { 27, 91, 0, 80, 0 };
+static void char_delete(dcli_sChannel *chn, int n) {
+  char char_del[5] = {27, 91, 0, 80, 0};
 
   char_del[2] = n;
   r_print(chn, "%s", char_del);
 }
 
-static void char_insert_nob(dcli_sChannel* chn, int n)
-{
-  char char_ins[] = { 27, 91, 0, 0, 64, 0 };
+static void char_insert_nob(dcli_sChannel *chn, int n) {
+  char char_ins[] = {27, 91, 0, 0, 64, 0};
 
   char_ins[2] = n / 10 + 48;
   char_ins[3] = n - (n / 10) * 10 + 48;
   r_print(chn, "%s", char_ins);
 }
 
-int dcli_get_input(dcli_sChannel* chn, char* input_str,
-    unsigned long* terminator, int maxlen, unsigned long option, int timeout)
-{
+int dcli_get_input(dcli_sChannel *chn, char *input_str,
+                   unsigned long *terminator, int maxlen, unsigned long option,
+                   int timeout) {
   unsigned char c;
-  char* input_ptr;
+  char *input_ptr;
   int i;
   int sts;
   int state;
@@ -198,9 +190,9 @@ int dcli_get_input(dcli_sChannel* chn, char* input_str,
 
   for (i = 0; i < maxlen; i++) {
     if ((option & DCLI_OPT_TIMEOUT) == 0)
-      dcli_qio_readw(chn, (char*)&c, 1);
+      dcli_qio_readw(chn, (char *)&c, 1);
     else {
-      sts = dcli_qio_read(chn, timeout, (char*)&c, 1);
+      sts = dcli_qio_read(chn, timeout, (char *)&c, 1);
       if (!sts) {
         /* Timeout */
         *terminator = DCLI_K_TIMEOUT;
@@ -222,8 +214,8 @@ int dcli_get_input(dcli_sChannel* chn, char* input_str,
         case DCLI_K_RETURN:
         case DCLI_K_CTRLC: {
           *input_ptr = '\0';
-          if (((option & DCLI_OPT_NOECHO) == 0)
-              && ((option & DCLI_OPT_NOSCROLL) == 0))
+          if (((option & DCLI_OPT_NOECHO) == 0) &&
+              ((option & DCLI_OPT_NOSCROLL) == 0))
             r_print(chn, "\n\r");
           return 1;
         }
@@ -233,7 +225,7 @@ int dcli_get_input(dcli_sChannel* chn, char* input_str,
         }
         }
       } else if (state > 0)
-        dcli_qio_readw(chn, (char*)&c, 1);
+        dcli_qio_readw(chn, (char *)&c, 1);
     }
 
     if (c > 31) {
@@ -254,21 +246,20 @@ int dcli_get_input(dcli_sChannel* chn, char* input_str,
 }
 
 /*************************************************************************
-*
-* Name:		dcli_recall_create()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* dcli_sRecall **recall		O	recall buffer.
-*
-* Description:
-*	Create a recall buffer.
-*
-**************************************************************************/
+ *
+ * Name:		dcli_recall_create()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * dcli_sRecall **recall		O	recall buffer.
+ *
+ * Description:
+ *	Create a recall buffer.
+ *
+ **************************************************************************/
 
-int dcli_recall_create(dcli_sRecall** recall)
-{
+int dcli_recall_create(dcli_sRecall **recall) {
   *recall = calloc(1, sizeof(dcli_sRecall));
   if (*recall == 0)
     return DCLI__NOMEMORY;
@@ -276,31 +267,27 @@ int dcli_recall_create(dcli_sRecall** recall)
   return DCLI__SUCCESS;
 }
 
-void dcli_recall_free(dcli_sRecall* recall)
-{
-  free((char*)recall);
-}
+void dcli_recall_free(dcli_sRecall *recall) { free((char *)recall); }
 
 /*************************************************************************
-*
-* Name:		dcli_recall_insert()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* dcli_sRecall 	*recall		I	recall buffer.
-* char		*command	I	string to insert in recall.
-*
-* Description:
-*	Inserts a command in the recall buffer.
-*
-**************************************************************************/
+ *
+ * Name:		dcli_recall_insert()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * dcli_sRecall 	*recall		I	recall buffer.
+ * char		*command	I	string to insert in recall.
+ *
+ * Description:
+ *	Inserts a command in the recall buffer.
+ *
+ **************************************************************************/
 
-static int dcli_recall_insert(dcli_sRecall* recall, char* command)
-{
+static int dcli_recall_insert(dcli_sRecall *recall, char *command) {
   if (*command == 0)
     return DCLI__SUCCESS;
-  if (streq((char*)recall->command[recall->last_command], command))
+  if (streq((char *)recall->command[recall->last_command], command))
     return DCLI__SUCCESS;
 
   recall->last_command++;
@@ -317,23 +304,22 @@ static int dcli_recall_insert(dcli_sRecall* recall, char* command)
 }
 
 /*************************************************************************
-*
-* Name:		dcli_recall_getcommand()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* dcli_sRecall 	*recall		I	recall buffer.
-* int		nr		I	index of returned command.
-* char		*command	O	command.
-*
-* Description:
-*	Returns a command from the recall buffer.
-*
-**************************************************************************/
+ *
+ * Name:		dcli_recall_getcommand()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * dcli_sRecall 	*recall		I	recall buffer.
+ * int		nr		I	index of returned command.
+ * char		*command	O	command.
+ *
+ * Description:
+ *	Returns a command from the recall buffer.
+ *
+ **************************************************************************/
 
-static int dcli_recall_getcommand(dcli_sRecall* recall, int nr, char* command)
-{
+static int dcli_recall_getcommand(dcli_sRecall *recall, int nr, char *command) {
   int index;
 
   if ((nr >= DCLI_RECALL_MAX) || (nr < 0)) {
@@ -347,8 +333,7 @@ static int dcli_recall_getcommand(dcli_sRecall* recall, int nr, char* command)
   return 1;
 }
 
-int dcli_input_init(dcli_sChannel* chn, dcli_sRecall** recall_buf)
-{
+int dcli_input_init(dcli_sChannel *chn, dcli_sRecall **recall_buf) {
   int sts;
 
   init_state_table();
@@ -365,54 +350,52 @@ int dcli_input_init(dcli_sChannel* chn, dcli_sRecall** recall_buf)
   return DCLI__SUCCESS;
 }
 
-int dcli_input_end(dcli_sChannel* chn, dcli_sRecall* recall_buf)
-{
+int dcli_input_end(dcli_sChannel *chn, dcli_sRecall *recall_buf) {
   if (recall_buf)
     dcli_recall_free(recall_buf);
   dcli_qio_reset(chn);
   return DCLI__SUCCESS;
 }
 
-int dcli_get_input_command(dcli_sChannel* chn, const char* prompt, char* cmd,
-    int maxlen, dcli_sRecall* recall_buf)
-{
+int dcli_get_input_command(dcli_sChannel *chn, const char *prompt, char *cmd,
+                           int maxlen, dcli_sRecall *recall_buf) {
   unsigned long option = 0;
   unsigned long terminator;
   int sts;
 
-  sts = dcli_get_input_string(
-      chn, cmd, &terminator, maxlen, recall_buf, option, 0, 0, 0, prompt);
+  sts = dcli_get_input_string(chn, cmd, &terminator, maxlen, recall_buf, option,
+                              0, 0, 0, prompt);
   return sts;
 }
 
 /*************************************************************************
-*
-* Name:		dcli_get_input_string()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*chn		I	channel.
-* char		*out_string	O	input string
-* unsigned long	*out_terminator	O	terminator
-* int		out_maxlen	I	max charachters.
-* unsigned long	recall		I	recall buffer.
-* unsigned long	option		I	option mask.
-* int		timeout		I	timeout time
-* int		(* timeout_func) () I	timeout function
-* unsigned long	timeout_arg	I	timeout function argument
-* char		*prompt		I	prompt string.
-*
-* Description:
-*	Read a input string.
-*
-**************************************************************************/
+ *
+ * Name:		dcli_get_input_string()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*chn		I	channel.
+ * char		*out_string	O	input string
+ * unsigned long	*out_terminator	O	terminator
+ * int		out_maxlen	I	max charachters.
+ * unsigned long	recall		I	recall buffer.
+ * unsigned long	option		I	option mask.
+ * int		timeout		I	timeout time
+ * int		(* timeout_func) () I	timeout function
+ * unsigned long	timeout_arg	I	timeout function argument
+ * char		*prompt		I	prompt string.
+ *
+ * Description:
+ *	Read a input string.
+ *
+ **************************************************************************/
 
-int dcli_get_input_string(dcli_sChannel* chn, char* out_string,
-    unsigned long* out_terminator, int out_maxlen, dcli_sRecall* recall,
-    unsigned long option, int timeout, int (*timeout_func)(), void* timeout_arg,
-    const char* prompt)
-{
+int dcli_get_input_string(dcli_sChannel *chn, char *out_string,
+                          unsigned long *out_terminator, int out_maxlen,
+                          dcli_sRecall *recall, unsigned long option,
+                          int timeout, int (*timeout_func)(), void *timeout_arg,
+                          const char *prompt) {
   char input_str[400];
   char out_str[400];
   char dum_str[400];
@@ -442,8 +425,8 @@ int dcli_get_input_string(dcli_sChannel* chn, char* out_string,
       break;
     if ((terminator == DCLI_K_ARROW_UP) && ((option & DCLI_OPT_NORECALL) != 0))
       break;
-    if ((terminator == DCLI_K_ARROW_DOWN)
-        && ((option & DCLI_OPT_NORECALL) != 0))
+    if ((terminator == DCLI_K_ARROW_DOWN) &&
+        ((option & DCLI_OPT_NORECALL) != 0))
       break;
     if ((terminator == DCLI_K_TIMEOUT) && ((option & DCLI_OPT_NOEDIT) != 0)) {
       if (timeout_func != NULL)
@@ -455,10 +438,10 @@ int dcli_get_input_string(dcli_sChannel* chn, char* out_string,
     if ((option & DCLI_OPT_NOEDIT) == 0) {
       switch (terminator) {
       case DCLI_K_TIMEOUT:
-        strcpy(dum_str, (char*)&out_str[index]);
-        strcpy((char*)&out_str[index], input_str);
+        strcpy(dum_str, (char *)&out_str[index]);
+        strcpy((char *)&out_str[index], input_str);
         index += strlen(input_str);
-        strcpy((char*)&out_str[index], dum_str);
+        strcpy((char *)&out_str[index], dum_str);
         if (timeout_func != NULL) {
           store_cursorpos(chn);
           (timeout_func)(timeout_arg);
@@ -466,7 +449,7 @@ int dcli_get_input_string(dcli_sChannel* chn, char* out_string,
         }
         break;
       case DCLI_K_ARROW_LEFT:
-        strcpy(dum_str, (char*)&out_str[index]);
+        strcpy(dum_str, (char *)&out_str[index]);
         strcpy(&out_str[index], input_str);
         index += strlen(input_str);
         strcpy(&out_str[index], dum_str);
@@ -476,17 +459,17 @@ int dcli_get_input_string(dcli_sChannel* chn, char* out_string,
         }
         break;
       case DCLI_K_ARROW_RIGHT:
-        strcpy(dum_str, (char*)&out_str[index]);
-        strncpy((char*)&out_str[index], input_str, strlen(input_str));
+        strcpy(dum_str, (char *)&out_str[index]);
+        strncpy((char *)&out_str[index], input_str, strlen(input_str));
         index += strlen(input_str);
-        strcpy((char*)&out_str[index], dum_str);
+        strcpy((char *)&out_str[index], dum_str);
         if (index < (int)strlen(out_str)) {
           index++;
           cursor_rel(chn, 0, 1);
         }
         break;
       case DCLI_K_BACKSPACE:
-        strcpy(dum_str, (char*)&out_str[index]);
+        strcpy(dum_str, (char *)&out_str[index]);
         strncpy(&out_str[index], input_str, strlen(input_str));
         index += strlen(input_str);
         strcpy(&out_str[index], dum_str);
@@ -496,7 +479,7 @@ int dcli_get_input_string(dcli_sChannel* chn, char* out_string,
         }
         break;
       case DCLI_K_DELETE:
-        strcpy(dum_str, (char*)&out_str[index]);
+        strcpy(dum_str, (char *)&out_str[index]);
         strncpy(&out_str[index], input_str, strlen(input_str));
         index += strlen(input_str);
         strcpy(&out_str[index], dum_str);
@@ -541,7 +524,7 @@ int dcli_get_input_string(dcli_sChannel* chn, char* out_string,
       }
     }
   }
-  strcpy(dum_str, (char*)&out_str[index]);
+  strcpy(dum_str, (char *)&out_str[index]);
   strncpy(&out_str[index], input_str, strlen(input_str));
   index += strlen(input_str);
   strcpy(&out_str[index], dum_str);
@@ -556,19 +539,18 @@ int dcli_get_input_string(dcli_sChannel* chn, char* out_string,
 }
 
 /************************************************************************
-*
-* Name:	dcli_qio_assign(char *s, dcli_sChannel *chn)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* char		*s		     I	    String
-* int		*chn		 O	    Kanal
-*
-* Description:	Gör en assign av s till kanalnummer chn
-*************************************************************************/
-int dcli_qio_assign(char* s, dcli_sChannel* chn)
-{
+ *
+ * Name:	dcli_qio_assign(char *s, dcli_sChannel *chn)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * char		*s		     I	    String
+ * int		*chn		 O	    Kanal
+ *
+ * Description:	Gör en assign av s till kanalnummer chn
+ *************************************************************************/
+int dcli_qio_assign(char *s, dcli_sChannel *chn) {
   int chan = -1;
   int sts;
 
@@ -587,24 +569,23 @@ int dcli_qio_assign(char* s, dcli_sChannel* chn)
 }
 
 /************************************************************************
-*
-* Name:	dcli_qio_set_attr( dcli_sChannel *chn, int tmo)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* char		*s		     I	    String
-* int		*chn		 O	    Kanal
-*
-* Description:	Set attributes to a tty
-*************************************************************************/
-int dcli_qio_set_attr(dcli_sChannel* chn, int tmo)
-{
+ *
+ * Name:	dcli_qio_set_attr( dcli_sChannel *chn, int tmo)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * char		*s		     I	    String
+ * int		*chn		 O	    Kanal
+ *
+ * Description:	Set attributes to a tty
+ *************************************************************************/
+int dcli_qio_set_attr(dcli_sChannel *chn, int tmo) {
   int chan;
   int sts;
   struct termios t;
 
-  chan = *(int*)chn;
+  chan = *(int *)chn;
 
   sts = tcgetattr(chan, &t);
   if (sts != 0)
@@ -622,24 +603,23 @@ int dcli_qio_set_attr(dcli_sChannel* chn, int tmo)
 }
 
 /************************************************************************
-*
-* Name:	dcli_qio_reset(char *s, dcli_sChannel *chn)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* char		*s		     I	    String
-* int		*chn		 O	    Kanal
-*
-* Description:	Reset the channel before exit
-*************************************************************************/
-int dcli_qio_reset(dcli_sChannel* chn)
-{
+ *
+ * Name:	dcli_qio_reset(char *s, dcli_sChannel *chn)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * char		*s		     I	    String
+ * int		*chn		 O	    Kanal
+ *
+ * Description:	Reset the channel before exit
+ *************************************************************************/
+int dcli_qio_reset(dcli_sChannel *chn) {
   int chan;
   int sts;
   struct termios t;
 
-  chan = *(int*)chn;
+  chan = *(int *)chn;
 
   sts = tcgetattr(chan, &t);
   if (sts != 0)
@@ -657,20 +637,19 @@ int dcli_qio_reset(dcli_sChannel* chn)
 }
 
 /************************************************************************
-*
-* Name:	dcli_qio_readw( dcli_sChannel chn, char *buf, int len)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* int		chn         I       Kanal
-* char		*buf         O      Läst buffer
-* int		len         I       Antal tecken som får läsas
-*
-* Description:	Läser med qiow från chn till buf
-*************************************************************************/
-int dcli_qio_readw(dcli_sChannel* chn, char* buf, int len)
-{
+ *
+ * Name:	dcli_qio_readw( dcli_sChannel chn, char *buf, int len)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * int		chn         I       Kanal
+ * char		*buf         O      Läst buffer
+ * int		len         I       Antal tecken som får läsas
+ *
+ * Description:	Läser med qiow från chn till buf
+ *************************************************************************/
+int dcli_qio_readw(dcli_sChannel *chn, char *buf, int len) {
   int n = 0;
 
   while (n == 0)
@@ -679,24 +658,23 @@ int dcli_qio_readw(dcli_sChannel* chn, char* buf, int len)
 }
 
 /************************************************************************
-*
-* Name:	dcli_qio_read( dcli_sChannel chn, int tmo, char *buf, int len)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* int		chn         I       Kanal
-* int		tmo         I       Timout-tid
-* char		*buf         O      Läst buffer
-* int		len         I       Antal tecken som får läsas
-*
-* Description:	Läser med qio från chn till buf med timout-tid tmo (ms)
-*************************************************************************/
-int dcli_qio_read(dcli_sChannel* chn, int tmo, char* buf, int len)
-{
+ *
+ * Name:	dcli_qio_read( dcli_sChannel chn, int tmo, char *buf, int len)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * int		chn         I       Kanal
+ * int		tmo         I       Timout-tid
+ * char		*buf         O      Läst buffer
+ * int		len         I       Antal tecken som får läsas
+ *
+ * Description:	Läser med qio från chn till buf med timout-tid tmo (ms)
+ *************************************************************************/
+int dcli_qio_read(dcli_sChannel *chn, int tmo, char *buf, int len) {
   int n;
 
-  n = read(*(int*)chn, buf, len);
+  n = read(*(int *)chn, buf, len);
   if (n == 0)
     /* Timeout */
     return 0;
@@ -704,46 +682,44 @@ int dcli_qio_read(dcli_sChannel* chn, int tmo, char* buf, int len)
 }
 
 /************************************************************************
-*
-* Name:	dcli_qio_writew(dcli_sChannel *chn, char *buf, int len)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* int		chn         I       Kanal
-* char		*buf        I       Buffer
-* int		len         I       Antal tecken som ska skrivas
-*
-* Description:	Skriver med qiow från buf till chn
-*************************************************************************/
-int dcli_qio_writew(dcli_sChannel* chn, char* buf, int len)
-{
-  if (*(int*)chn == STDIN_FILENO)
+ *
+ * Name:	dcli_qio_writew(dcli_sChannel *chn, char *buf, int len)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * int		chn         I       Kanal
+ * char		*buf        I       Buffer
+ * int		len         I       Antal tecken som ska skrivas
+ *
+ * Description:	Skriver med qiow från buf till chn
+ *************************************************************************/
+int dcli_qio_writew(dcli_sChannel *chn, char *buf, int len) {
+  if (*(int *)chn == STDIN_FILENO)
     write(STDOUT_FILENO, buf, len);
   else
-    write(*(int*)chn, buf, len);
+    write(*(int *)chn, buf, len);
   return 1;
 }
 
 /************************************************************************
-*
-* Name:	dcli_qio_write(dcli_sChannel *chn, int tmo, char *buf, int len)
-*
-* Type:	int
-*
-* TYPE		PARAMETER	IOGF	DESCRIPTION
-* int		chn         I       Kanal
-* int		tmo         I       Timout-tid
-* char		*buf         O      Läst buffer
-* int		len         I       Antal tecken som får läsas
-*
-* Description:	Skriver med qio från buf till chn med timout-tid tmo (ms)
-*************************************************************************/
-int dcli_qio_write(dcli_sChannel* chn, int tmo, char* buf, int len)
-{
-  if (*(int*)chn == STDIN_FILENO)
+ *
+ * Name:	dcli_qio_write(dcli_sChannel *chn, int tmo, char *buf, int len)
+ *
+ * Type:	int
+ *
+ * TYPE		PARAMETER	IOGF	DESCRIPTION
+ * int		chn         I       Kanal
+ * int		tmo         I       Timout-tid
+ * char		*buf         O      Läst buffer
+ * int		len         I       Antal tecken som får läsas
+ *
+ * Description:	Skriver med qio från buf till chn med timout-tid tmo (ms)
+ *************************************************************************/
+int dcli_qio_write(dcli_sChannel *chn, int tmo, char *buf, int len) {
+  if (*(int *)chn == STDIN_FILENO)
     write(STDOUT_FILENO, buf, len);
   else
-    write(*(int*)chn, buf, len);
+    write(*(int *)chn, buf, len);
   return 1;
 }

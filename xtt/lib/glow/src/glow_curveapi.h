@@ -40,23 +40,24 @@
 #include "glow_curvectx.h"
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #ifndef __cplusplus
-typedef void* CurveCtx;
+  typedef void* CurveCtx;
 #ifndef glow_api_h
-typedef void* GlowCtx;
+  typedef void* GlowCtx;
 #endif
 #endif
 
-typedef CurveCtx* curve_tCtx;
+  typedef CurveCtx* curve_tCtx;
 
-void curve_Zoom(CurveCtx* ctx, double factor);
-void curve_Unzoom(CurveCtx* ctx);
-void curve_GetZoom(CurveCtx* ctx, double* factor_x, double* factor_y);
-void curve_GetPreferedZoomY(CurveCtx* ctx, int height, double* factor_y);
-void curve_Scroll(CurveCtx* ctx, double value);
+  void curve_Zoom(CurveCtx* ctx, double factor);
+  void curve_Unzoom(CurveCtx* ctx);
+  void curve_GetZoom(CurveCtx* ctx, double* factor_x, double* factor_y);
+  void curve_GetPreferedZoomY(CurveCtx* ctx, int height, double* factor_y);
+  void curve_Scroll(CurveCtx* ctx, double value);
 
 #if defined __cplusplus
 }

@@ -45,18 +45,18 @@
 
 #include "glow_curveapi.h"
 
-#include "xtt_xnav.h"
 #include "xtt_sevhist.h"
+#include "xtt_xnav.h"
 
-XttSevHist::XttSevHist(void* parent_ctx, const char* name, pwr_tOid* xn_oidv,
-    pwr_tOName* xn_anamev, pwr_tOName* xn_onamev, bool* xn_sevhistobjectv,
-    sevcli_tCtx xn_scctx, int xn_color_theme, time_ePeriod xn_time_range, int* sts)
+XttSevHist::XttSevHist(void *parent_ctx, const char *name, pwr_tOid *xn_oidv,
+                       pwr_tOName *xn_anamev, pwr_tOName *xn_onamev,
+                       bool *xn_sevhistobjectv, sevcli_tCtx xn_scctx,
+                       int xn_color_theme, time_ePeriod xn_time_range, int *sts)
     : xnav(parent_ctx), gcd(0), curve(0), rows(0), vsize(0), timerid(0),
       close_cb(0), help_cb(0), get_select_cb(0), first_scan(1), scctx(xn_scctx),
       wow(0), time_low_old(0), time_high_old(0), initial_period(time_ePeriod_),
       color_theme(xn_color_theme), otree(0), time_range(xn_time_range),
-      from(pwr_cNTime), to(pwr_cNTime)
-{
+      from(pwr_cNTime), to(pwr_cNTime) {
   if (xn_oidv == 0 || xn_oidv[0].vid == 0) {
     oid_cnt = 0;
     gcd = new GeCurveData(curve_eDataType_DsTrend);
@@ -73,8 +73,8 @@ XttSevHist::XttSevHist(void* parent_ctx, const char* name, pwr_tOid* xn_oidv,
   memcpy(oidv, xn_oidv, oid_cnt * sizeof(oidv[0]));
   memcpy(anamev, xn_anamev, oid_cnt * sizeof(anamev[0]));
   memcpy(onamev, xn_onamev, oid_cnt * sizeof(onamev[0]));
-  memcpy(
-      sevhistobjectv, xn_sevhistobjectv, oid_cnt * sizeof(sevhistobjectv[0]));
+  memcpy(sevhistobjectv, xn_sevhistobjectv,
+         oid_cnt * sizeof(sevhistobjectv[0]));
 
   if (time_range == time_ePeriod_)
     time_range = time_ePeriod_LastHour;
@@ -117,36 +117,32 @@ XttSevHist::XttSevHist(void* parent_ctx, const char* name, pwr_tOid* xn_oidv,
   str_StrncpyCutOff(title, name, sizeof(title), 1);
 }
 
-XttSevHist::XttSevHist(void* parent_ctx, const char* name, char* filename,
-    int xn_color_theme, int* sts)
+XttSevHist::XttSevHist(void *parent_ctx, const char *name, char *filename,
+                       int xn_color_theme, int *sts)
     : xnav(parent_ctx), gcd(0), curve(0), rows(0), vsize(0), timerid(0),
       close_cb(0), help_cb(0), get_select_cb(0), first_scan(1), scctx(0),
       wow(0), time_low_old(0), time_high_old(0), initial_period(time_ePeriod_),
       color_theme(xn_color_theme), time_range(time_ePeriod_), from(pwr_cNTime),
-      to(pwr_cNTime)
-{
+      to(pwr_cNTime) {
   strncpy(title, filename, sizeof(title));
 
   *sts = read_export(filename);
 }
 
-XttSevHist::~XttSevHist()
-{
-}
+XttSevHist::~XttSevHist() {}
 
-int XttSevHist::get_data(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
-{
+int XttSevHist::get_data(pwr_tStatus *sts, pwr_tTime from, pwr_tTime to) {
   if (sevhistobjectv[0]) {
     return get_objectdata(sts, from, to);
   }
-  pwr_tTime* tbuf;
-  void* vbuf;
+  pwr_tTime *tbuf;
+  void *vbuf;
   pwr_tDeltaTime trange;
 
   if (curve)
     curve->set_clock_cursor();
   sevcli_get_itemdata(sts, scctx, oidv[0], anamev[0], from, to, 1000, &tbuf,
-      &vbuf, &rows, &vtype, &vsize);
+                      &vbuf, &rows, &vtype, &vsize);
   if (curve)
     curve->reset_cursor();
   if (EVEN(*sts))
@@ -160,7 +156,7 @@ int XttSevHist::get_data(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
   // Create data for time axis
   gcd = new GeCurveData(curve_eDataType_DsTrend);
 
-  gcd->x_data[0] = (double*)calloc(1, 8 * rows);
+  gcd->x_data[0] = (double *)calloc(1, 8 * rows);
   for (int i = 0; i < rows; i++)
     gcd->x_data[0][i] = (double)tbuf[i].tv_sec + (double)1e-9 * tbuf[i].tv_nsec;
 
@@ -172,42 +168,42 @@ int XttSevHist::get_data(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
   if (!streq(onamev[0], ""))
     strcat(gcd->y_name[0], ".");
   strcat(gcd->y_name[0], anamev[0]);
-  gcd->y_data[0] = (double*)calloc(1, 8 * rows);
+  gcd->y_data[0] = (double *)calloc(1, 8 * rows);
 
   for (int i = 0; i < rows; i++) {
     switch (vtype) {
     case pwr_eType_Int64:
-      gcd->y_data[0][i] = ((pwr_tInt32*)vbuf)[i];
+      gcd->y_data[0][i] = ((pwr_tInt32 *)vbuf)[i];
       break;
     case pwr_eType_Int32:
-      gcd->y_data[0][i] = ((pwr_tInt32*)vbuf)[i];
+      gcd->y_data[0][i] = ((pwr_tInt32 *)vbuf)[i];
       break;
     case pwr_eType_Int16:
-      gcd->y_data[0][i] = ((pwr_tInt32*)vbuf)[i];
+      gcd->y_data[0][i] = ((pwr_tInt32 *)vbuf)[i];
       break;
     case pwr_eType_Int8:
-      gcd->y_data[0][i] = ((pwr_tInt32*)vbuf)[i];
+      gcd->y_data[0][i] = ((pwr_tInt32 *)vbuf)[i];
       break;
     case pwr_eType_UInt64:
-      gcd->y_data[0][i] = ((pwr_tUInt32*)vbuf)[i];
+      gcd->y_data[0][i] = ((pwr_tUInt32 *)vbuf)[i];
       break;
     case pwr_eType_UInt32:
-      gcd->y_data[0][i] = ((pwr_tUInt32*)vbuf)[i];
+      gcd->y_data[0][i] = ((pwr_tUInt32 *)vbuf)[i];
       break;
     case pwr_eType_UInt16:
-      gcd->y_data[0][i] = ((pwr_tUInt32*)vbuf)[i];
+      gcd->y_data[0][i] = ((pwr_tUInt32 *)vbuf)[i];
       break;
     case pwr_eType_UInt8:
-      gcd->y_data[0][i] = ((pwr_tUInt32*)vbuf)[i];
+      gcd->y_data[0][i] = ((pwr_tUInt32 *)vbuf)[i];
       break;
     case pwr_eType_Float32:
-      gcd->y_data[0][i] = ((pwr_tFloat32*)vbuf)[i];
+      gcd->y_data[0][i] = ((pwr_tFloat32 *)vbuf)[i];
       break;
     case pwr_eType_Float64:
-      gcd->y_data[0][i] = ((pwr_tFloat64*)vbuf)[i];
+      gcd->y_data[0][i] = ((pwr_tFloat64 *)vbuf)[i];
       break;
     case pwr_eType_Boolean:
-      gcd->y_data[0][i] = ((pwr_tBoolean*)vbuf)[i];
+      gcd->y_data[0][i] = ((pwr_tBoolean *)vbuf)[i];
       break;
     default:
       *sts = SEV__CURVETYPE;
@@ -247,11 +243,10 @@ int XttSevHist::get_data(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
   return 1;
 }
 
-int XttSevHist::get_objectdata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
-{
-  pwr_tTime* tbuf;
-  void* vbuf;
-  sevcli_sHistAttr* histattrbuf;
+int XttSevHist::get_objectdata(pwr_tStatus *sts, pwr_tTime from, pwr_tTime to) {
+  pwr_tTime *tbuf;
+  void *vbuf;
+  sevcli_sHistAttr *histattrbuf;
   int numAttributes;
 
   pwr_tDeltaTime trange;
@@ -259,7 +254,7 @@ int XttSevHist::get_objectdata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
   if (curve)
     curve->set_clock_cursor();
   sevcli_get_objectitemdata(sts, scctx, oidv[0], anamev[0], from, to, 1000,
-      &tbuf, &vbuf, &rows, &histattrbuf, &numAttributes);
+                            &tbuf, &vbuf, &rows, &histattrbuf, &numAttributes);
   if (curve)
     curve->reset_cursor();
   if (EVEN(*sts))
@@ -273,7 +268,7 @@ int XttSevHist::get_objectdata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
   // Create data for time axis
   gcd = new GeCurveData(curve_eDataType_DsTrend);
 
-  gcd->x_data[0] = (double*)calloc(1, 8 * rows);
+  gcd->x_data[0] = (double *)calloc(1, 8 * rows);
   for (int i = 0; i < rows; i++)
     gcd->x_data[0][i] = (double)tbuf[i].tv_sec + (double)1e-9 * tbuf[i].tv_nsec;
 
@@ -286,7 +281,7 @@ int XttSevHist::get_objectdata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
   for (int i = 0; i < numAttributes; i++) {
     linesize += histattrbuf[i].size;
   }
-  void* dataptr = vbuf;
+  void *dataptr = vbuf;
   int tmp = 0;
   gcd->cols = 0;
   for (int i = 0; i < numAttributes; i++) {
@@ -319,47 +314,47 @@ int XttSevHist::get_objectdata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
     if (!streq(onamev[0], ""))
       strcat(gcd->y_name[gcd->cols - 1], ".");
     strcat(gcd->y_name[gcd->cols - 1], histattrbuf[i].aname);
-    gcd->y_data[gcd->cols - 1] = (double*)calloc(1, 8 * rows);
+    gcd->y_data[gcd->cols - 1] = (double *)calloc(1, 8 * rows);
     gcd->y_axis_type[gcd->cols - 1] = curve_eAxis_y;
 
-    dataptr = (char*)vbuf + tmp;
+    dataptr = (char *)vbuf + tmp;
     // tmp += histattrbuf[i].size;
     for (int j = 0; j < rows; j++) {
       // dataptr = (char *)dataptr + linesize*j;
-      dataptr = ((char*)vbuf) + j * linesize + tmp;
+      dataptr = ((char *)vbuf) + j * linesize + tmp;
       switch (histattrbuf[i].type) {
       case pwr_eType_Int64:
-        gcd->y_data[gcd->cols - 1][j] = *(pwr_tInt64*)dataptr;
+        gcd->y_data[gcd->cols - 1][j] = *(pwr_tInt64 *)dataptr;
         break;
       case pwr_eType_Int32:
-        gcd->y_data[gcd->cols - 1][j] = *(pwr_tInt32*)dataptr;
+        gcd->y_data[gcd->cols - 1][j] = *(pwr_tInt32 *)dataptr;
         break;
       case pwr_eType_Int16:
-        gcd->y_data[gcd->cols - 1][j] = *(pwr_tInt16*)dataptr;
+        gcd->y_data[gcd->cols - 1][j] = *(pwr_tInt16 *)dataptr;
         break;
       case pwr_eType_Int8:
-        gcd->y_data[gcd->cols - 1][j] = *(pwr_tInt8*)dataptr;
+        gcd->y_data[gcd->cols - 1][j] = *(pwr_tInt8 *)dataptr;
         break;
       case pwr_eType_UInt64:
-        gcd->y_data[gcd->cols - 1][j] = *(pwr_tUInt64*)dataptr;
+        gcd->y_data[gcd->cols - 1][j] = *(pwr_tUInt64 *)dataptr;
         break;
       case pwr_eType_UInt32:
-        gcd->y_data[gcd->cols - 1][j] = *(pwr_tUInt32*)dataptr;
+        gcd->y_data[gcd->cols - 1][j] = *(pwr_tUInt32 *)dataptr;
         break;
       case pwr_eType_UInt16:
-        gcd->y_data[gcd->cols - 1][j] = *(pwr_tUInt16*)dataptr;
+        gcd->y_data[gcd->cols - 1][j] = *(pwr_tUInt16 *)dataptr;
         break;
       case pwr_eType_UInt8:
-        gcd->y_data[gcd->cols - 1][j] = *(pwr_tUInt8*)dataptr;
+        gcd->y_data[gcd->cols - 1][j] = *(pwr_tUInt8 *)dataptr;
         break;
       case pwr_eType_Float32:
-        gcd->y_data[gcd->cols - 1][j] = *(pwr_tFloat32*)dataptr;
+        gcd->y_data[gcd->cols - 1][j] = *(pwr_tFloat32 *)dataptr;
         break;
       case pwr_eType_Float64:
-        gcd->y_data[gcd->cols - 1][j] = *(pwr_tFloat64*)dataptr;
+        gcd->y_data[gcd->cols - 1][j] = *(pwr_tFloat64 *)dataptr;
         break;
       case pwr_eType_Boolean:
-        gcd->y_data[gcd->cols - 1][j] = *(pwr_tBoolean*)dataptr;
+        gcd->y_data[gcd->cols - 1][j] = *(pwr_tBoolean *)dataptr;
         break;
       default:
         *sts = SEV__CURVETYPE;
@@ -399,10 +394,9 @@ int XttSevHist::get_objectdata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
   return 1;
 }
 
-int XttSevHist::get_multidata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
-{
-  pwr_tTime* tbuf;
-  void* vbuf;
+int XttSevHist::get_multidata(pwr_tStatus *sts, pwr_tTime from, pwr_tTime to) {
+  pwr_tTime *tbuf;
+  void *vbuf;
   pwr_tDeltaTime trange;
   int curve_cnt = 0;
   int data_found;
@@ -421,7 +415,7 @@ int XttSevHist::get_multidata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
       if (curve)
         curve->set_clock_cursor();
       sevcli_get_itemdata(sts, scctx, oidv[k], anamev[k], from, to, 1000, &tbuf,
-          &vbuf, &rows, &vtype, &vsize);
+                          &vbuf, &rows, &vtype, &vsize);
       if (curve)
         curve->reset_cursor();
       if (EVEN(*sts) && *sts != SEV__NOPOINTS)
@@ -429,7 +423,7 @@ int XttSevHist::get_multidata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
 
       if (rows == 0 || *sts == SEV__NOPOINTS) {
         rows = 0;
-        gcd->x_data[curve_cnt] = (double*)calloc(1, 8 * rows);
+        gcd->x_data[curve_cnt] = (double *)calloc(1, 8 * rows);
 
         gcd->x_axis_type[curve_cnt] = curve_eAxis_x;
         strcpy(gcd->x_format[curve_cnt], "%10t");
@@ -441,7 +435,7 @@ int XttSevHist::get_multidata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
         if (!streq(onamev[k], ""))
           strcat(gcd->y_name[curve_cnt], ".");
         strcat(gcd->y_name[curve_cnt], anamev[k]);
-        gcd->y_data[curve_cnt] = (double*)calloc(1, 8 * rows);
+        gcd->y_data[curve_cnt] = (double *)calloc(1, 8 * rows);
 
         gcd->y_axis_type[curve_cnt] = curve_eAxis_y;
 
@@ -450,10 +444,10 @@ int XttSevHist::get_multidata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
         continue;
       }
 
-      gcd->x_data[curve_cnt] = (double*)calloc(1, 8 * rows);
+      gcd->x_data[curve_cnt] = (double *)calloc(1, 8 * rows);
       for (int i = 0; i < rows; i++)
-        gcd->x_data[curve_cnt][i]
-            = (double)tbuf[i].tv_sec + (double)1e-9 * tbuf[i].tv_nsec;
+        gcd->x_data[curve_cnt][i] =
+            (double)tbuf[i].tv_sec + (double)1e-9 * tbuf[i].tv_nsec;
 
       gcd->x_axis_type[curve_cnt] = curve_eAxis_x;
       strcpy(gcd->x_format[curve_cnt], "%10t");
@@ -462,42 +456,42 @@ int XttSevHist::get_multidata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
       if (!streq(onamev[k], ""))
         strcat(gcd->y_name[curve_cnt], ".");
       strcat(gcd->y_name[curve_cnt], anamev[k]);
-      gcd->y_data[curve_cnt] = (double*)calloc(1, 8 * rows);
+      gcd->y_data[curve_cnt] = (double *)calloc(1, 8 * rows);
 
       for (int i = 0; i < rows; i++) {
         switch (vtype) {
         case pwr_eType_Int64:
-          gcd->y_data[curve_cnt][i] = ((pwr_tInt32*)vbuf)[i];
+          gcd->y_data[curve_cnt][i] = ((pwr_tInt32 *)vbuf)[i];
           break;
         case pwr_eType_Int32:
-          gcd->y_data[curve_cnt][i] = ((pwr_tInt32*)vbuf)[i];
+          gcd->y_data[curve_cnt][i] = ((pwr_tInt32 *)vbuf)[i];
           break;
         case pwr_eType_Int16:
-          gcd->y_data[curve_cnt][i] = ((pwr_tInt32*)vbuf)[i];
+          gcd->y_data[curve_cnt][i] = ((pwr_tInt32 *)vbuf)[i];
           break;
         case pwr_eType_Int8:
-          gcd->y_data[curve_cnt][i] = ((pwr_tInt32*)vbuf)[i];
+          gcd->y_data[curve_cnt][i] = ((pwr_tInt32 *)vbuf)[i];
           break;
         case pwr_eType_UInt64:
-          gcd->y_data[curve_cnt][i] = ((pwr_tUInt32*)vbuf)[i];
+          gcd->y_data[curve_cnt][i] = ((pwr_tUInt32 *)vbuf)[i];
           break;
         case pwr_eType_UInt32:
-          gcd->y_data[curve_cnt][i] = ((pwr_tUInt32*)vbuf)[i];
+          gcd->y_data[curve_cnt][i] = ((pwr_tUInt32 *)vbuf)[i];
           break;
         case pwr_eType_UInt16:
-          gcd->y_data[curve_cnt][i] = ((pwr_tUInt32*)vbuf)[i];
+          gcd->y_data[curve_cnt][i] = ((pwr_tUInt32 *)vbuf)[i];
           break;
         case pwr_eType_UInt8:
-          gcd->y_data[curve_cnt][i] = ((pwr_tUInt32*)vbuf)[i];
+          gcd->y_data[curve_cnt][i] = ((pwr_tUInt32 *)vbuf)[i];
           break;
         case pwr_eType_Float32:
-          gcd->y_data[curve_cnt][i] = ((pwr_tFloat32*)vbuf)[i];
+          gcd->y_data[curve_cnt][i] = ((pwr_tFloat32 *)vbuf)[i];
           break;
         case pwr_eType_Float64:
-          gcd->y_data[curve_cnt][i] = ((pwr_tFloat64*)vbuf)[i];
+          gcd->y_data[curve_cnt][i] = ((pwr_tFloat64 *)vbuf)[i];
           break;
         case pwr_eType_Boolean:
-          gcd->y_data[curve_cnt][i] = ((pwr_tBoolean*)vbuf)[i];
+          gcd->y_data[curve_cnt][i] = ((pwr_tBoolean *)vbuf)[i];
           break;
         default:
           *sts = SEV__CURVETYPE;
@@ -513,21 +507,22 @@ int XttSevHist::get_multidata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
       curve_cnt++;
     } else {
       // SevHistObject object
-      sevcli_sHistAttr* histattrbuf;
+      sevcli_sHistAttr *histattrbuf;
       int numAttributes;
 
       sevcli_get_objectitemdata(sts, scctx, oidv[k], anamev[k], from, to, 1000,
-          &tbuf, &vbuf, &rows, &histattrbuf, &numAttributes);
+                                &tbuf, &vbuf, &rows, &histattrbuf,
+                                &numAttributes);
       if (EVEN(*sts))
         return 0;
 
       if (rows == 0)
         continue;
 
-      gcd->x_data[curve_cnt] = (double*)calloc(1, 8 * rows);
+      gcd->x_data[curve_cnt] = (double *)calloc(1, 8 * rows);
       for (int i = 0; i < rows; i++)
-        gcd->x_data[curve_cnt][i]
-            = (double)tbuf[i].tv_sec + (double)1e-9 * tbuf[i].tv_nsec;
+        gcd->x_data[curve_cnt][i] =
+            (double)tbuf[i].tv_sec + (double)1e-9 * tbuf[i].tv_nsec;
 
       strcpy(gcd->x_name, "Time");
       gcd->x_axis_type[curve_cnt] = curve_eAxis_x;
@@ -538,13 +533,13 @@ int XttSevHist::get_multidata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
       for (int i = 0; i < numAttributes; i++) {
         linesize += histattrbuf[i].size;
       }
-      void* dataptr = vbuf;
+      void *dataptr = vbuf;
       int tmp = 0;
       for (int i = 0; i < numAttributes; i++) {
-        gcd->x_data[curve_cnt] = (double*)calloc(1, 8 * rows);
+        gcd->x_data[curve_cnt] = (double *)calloc(1, 8 * rows);
         for (int j = 0; j < rows; j++)
-          gcd->x_data[curve_cnt][j]
-              = (double)tbuf[j].tv_sec + (double)1e-9 * tbuf[j].tv_nsec;
+          gcd->x_data[curve_cnt][j] =
+              (double)tbuf[j].tv_sec + (double)1e-9 * tbuf[j].tv_nsec;
 
         strcpy(gcd->x_name, "Time");
         gcd->x_axis_type[curve_cnt] = curve_eAxis_x;
@@ -577,45 +572,45 @@ int XttSevHist::get_multidata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
         if (!streq(onamev[k], ""))
           strcat(gcd->y_name[curve_cnt], ".");
         strcat(gcd->y_name[curve_cnt], histattrbuf[i].aname);
-        gcd->y_data[curve_cnt] = (double*)calloc(1, 8 * rows);
+        gcd->y_data[curve_cnt] = (double *)calloc(1, 8 * rows);
         gcd->y_axis_type[curve_cnt] = curve_eAxis_y;
 
-        dataptr = (char*)vbuf + tmp;
+        dataptr = (char *)vbuf + tmp;
         for (int j = 0; j < rows; j++) {
-          dataptr = ((char*)vbuf) + j * linesize + tmp;
+          dataptr = ((char *)vbuf) + j * linesize + tmp;
           switch (histattrbuf[i].type) {
           case pwr_eType_Int64:
-            gcd->y_data[curve_cnt][j] = *(pwr_tInt64*)dataptr;
+            gcd->y_data[curve_cnt][j] = *(pwr_tInt64 *)dataptr;
             break;
           case pwr_eType_Int32:
-            gcd->y_data[curve_cnt][j] = *(pwr_tInt32*)dataptr;
+            gcd->y_data[curve_cnt][j] = *(pwr_tInt32 *)dataptr;
             break;
           case pwr_eType_Int16:
-            gcd->y_data[curve_cnt][j] = *(pwr_tInt16*)dataptr;
+            gcd->y_data[curve_cnt][j] = *(pwr_tInt16 *)dataptr;
             break;
           case pwr_eType_Int8:
-            gcd->y_data[curve_cnt][j] = *(pwr_tInt8*)dataptr;
+            gcd->y_data[curve_cnt][j] = *(pwr_tInt8 *)dataptr;
             break;
           case pwr_eType_UInt64:
-            gcd->y_data[curve_cnt][j] = *(pwr_tUInt64*)dataptr;
+            gcd->y_data[curve_cnt][j] = *(pwr_tUInt64 *)dataptr;
             break;
           case pwr_eType_UInt32:
-            gcd->y_data[curve_cnt][j] = *(pwr_tUInt32*)dataptr;
+            gcd->y_data[curve_cnt][j] = *(pwr_tUInt32 *)dataptr;
             break;
           case pwr_eType_UInt16:
-            gcd->y_data[curve_cnt][j] = *(pwr_tUInt16*)dataptr;
+            gcd->y_data[curve_cnt][j] = *(pwr_tUInt16 *)dataptr;
             break;
           case pwr_eType_UInt8:
-            gcd->y_data[curve_cnt][j] = *(pwr_tUInt8*)dataptr;
+            gcd->y_data[curve_cnt][j] = *(pwr_tUInt8 *)dataptr;
             break;
           case pwr_eType_Float32:
-            gcd->y_data[curve_cnt][j] = *(pwr_tFloat32*)dataptr;
+            gcd->y_data[curve_cnt][j] = *(pwr_tFloat32 *)dataptr;
             break;
           case pwr_eType_Float64:
-            gcd->y_data[curve_cnt][j] = *(pwr_tFloat64*)dataptr;
+            gcd->y_data[curve_cnt][j] = *(pwr_tFloat64 *)dataptr;
             break;
           case pwr_eType_Boolean:
-            gcd->y_data[curve_cnt][j] = *(pwr_tBoolean*)dataptr;
+            gcd->y_data[curve_cnt][j] = *(pwr_tBoolean *)dataptr;
             break;
           default:
             *sts = SEV__CURVETYPE;
@@ -675,15 +670,14 @@ int XttSevHist::get_multidata(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
   return 1;
 }
 
-void XttSevHist::curve_add(
-    pwr_tOid oid, pwr_tOName aname, pwr_tOName oname, bool sevhistobject)
-{
+void XttSevHist::curve_add(pwr_tOid oid, pwr_tOName aname, pwr_tOName oname,
+                           bool sevhistobject) {
   if (oid_cnt == XTT_SEVHIST_MAX)
     return;
 
   for (int i = 0; i < oid_cnt; i++) {
     if (str_NoCaseStrcmp(aname, anamev[i]) == 0 &&
-	str_NoCaseStrcmp(oname, onamev[i]) == 0) {
+        str_NoCaseStrcmp(oname, onamev[i]) == 0) {
       wow->DisplayError("Add", "Attribute is already displayed");
       return;
     }
@@ -694,7 +688,7 @@ void XttSevHist::curve_add(
 
     for (int i = 1; i < gcd->cols; i++) {
       gcd->rows[i] = gcd->rows[0];
-      gcd->x_data[i] = (double*)calloc(1, 8 * gcd->rows[i]);
+      gcd->x_data[i] = (double *)calloc(1, 8 * gcd->rows[i]);
       memcpy(gcd->x_data[i], gcd->x_data[0], 8 * gcd->rows[i]);
 
       gcd->x_axis_type[i] = curve_eAxis_x;
@@ -712,7 +706,7 @@ void XttSevHist::curve_add(
   int curve_cnt = gcd->cols;
   rows = 0;
 
-  gcd->x_data[curve_cnt] = (double*)calloc(1, 8 * rows);
+  gcd->x_data[curve_cnt] = (double *)calloc(1, 8 * rows);
 
   gcd->x_axis_type[curve_cnt] = curve_eAxis_x;
   strcpy(gcd->x_format[curve_cnt], "%10t");
@@ -721,7 +715,7 @@ void XttSevHist::curve_add(
   if (!streq(oname, ""))
     strcat(gcd->y_name[curve_cnt], ".");
   strcat(gcd->y_name[curve_cnt], aname);
-  gcd->y_data[curve_cnt] = (double*)calloc(1, 8 * rows);
+  gcd->y_data[curve_cnt] = (double *)calloc(1, 8 * rows);
 
   gcd->cols++;
 
@@ -729,24 +723,19 @@ void XttSevHist::curve_add(
   curve->config_names();
 }
 
-void XttSevHist::pop()
-{
-  curve->pop();
-}
+void XttSevHist::pop() { curve->pop(); }
 
-void XttSevHist::setup()
-{
+void XttSevHist::setup() {
   if (!curve)
     return;
-  curve->setup(curve_mEnable_Timebox | curve_mEnable_Export
-      | curve_mEnable_ExportTime | curve_mEnable_CurveType
-      | curve_mEnable_CurveTypeSquare | curve_mEnable_FillCurve
-      | curve_mEnable_DigitalSplit);
+  curve->setup(curve_mEnable_Timebox | curve_mEnable_Export |
+               curve_mEnable_ExportTime | curve_mEnable_CurveType |
+               curve_mEnable_CurveTypeSquare | curve_mEnable_FillCurve |
+               curve_mEnable_DigitalSplit);
 }
 
-void XttSevHist::sevhist_close_cb(void* ctx)
-{
-  XttSevHist* sevhist = (XttSevHist*)ctx;
+void XttSevHist::sevhist_close_cb(void *ctx) {
+  XttSevHist *sevhist = (XttSevHist *)ctx;
 
   if (sevhist->close_cb)
     (sevhist->close_cb)(sevhist->xnav, sevhist);
@@ -754,9 +743,8 @@ void XttSevHist::sevhist_close_cb(void* ctx)
     delete sevhist;
 }
 
-void XttSevHist::sevhist_decrease_period_cb(void* ctx)
-{
-  XttSevHist* sevhist = (XttSevHist*)ctx;
+void XttSevHist::sevhist_decrease_period_cb(void *ctx) {
+  XttSevHist *sevhist = (XttSevHist *)ctx;
   time_ePeriod period;
   pwr_tStatus sts;
   int changed;
@@ -768,9 +756,8 @@ void XttSevHist::sevhist_decrease_period_cb(void* ctx)
     sevhist->curve->set_period(period, 0);
 }
 
-void XttSevHist::sevhist_increase_period_cb(void* ctx)
-{
-  XttSevHist* sevhist = (XttSevHist*)ctx;
+void XttSevHist::sevhist_increase_period_cb(void *ctx) {
+  XttSevHist *sevhist = (XttSevHist *)ctx;
   time_ePeriod period;
   pwr_tStatus sts;
   int changed;
@@ -782,15 +769,14 @@ void XttSevHist::sevhist_increase_period_cb(void* ctx)
     sevhist->curve->set_period(period, 0);
 }
 
-void XttSevHist::sevhist_reload_cb(void* ctx)
-{
-  XttSevHist* sevhist = (XttSevHist*)ctx;
+void XttSevHist::sevhist_reload_cb(void *ctx) {
+  XttSevHist *sevhist = (XttSevHist *)ctx;
   pwr_tTime t_low, t_high;
   pwr_tStatus sts;
 
   sevhist->curve->get_period(&sevhist->time_range);
 
-  switch(sevhist->time_range) {
+  switch (sevhist->time_range) {
   case time_ePeriod_LastMinute:
   case time_ePeriod_Last10Minutes:
   case time_ePeriod_LastHour:
@@ -831,9 +817,8 @@ void XttSevHist::sevhist_reload_cb(void* ctx)
   sevhist->curve->set_center_from_window(1);
 }
 
-void XttSevHist::sevhist_prev_period_cb(void* ctx)
-{
-  XttSevHist* sevhist = (XttSevHist*)ctx;
+void XttSevHist::sevhist_prev_period_cb(void *ctx) {
+  XttSevHist *sevhist = (XttSevHist *)ctx;
   pwr_tTime from, to, prev_from, prev_to;
   pwr_tStatus sts;
   time_ePeriod period;
@@ -894,9 +879,8 @@ void XttSevHist::sevhist_prev_period_cb(void* ctx)
     sevhist->curve->set_period(period, 1);
 }
 
-void XttSevHist::sevhist_next_period_cb(void* ctx)
-{
-  XttSevHist* sevhist = (XttSevHist*)ctx;
+void XttSevHist::sevhist_next_period_cb(void *ctx) {
+  XttSevHist *sevhist = (XttSevHist *)ctx;
   pwr_tTime from, to, prev_from, prev_to;
   pwr_tStatus sts;
   time_ePeriod period;
@@ -919,16 +903,15 @@ void XttSevHist::sevhist_next_period_cb(void* ctx)
   sevhist->curve->set_times(&from, &to);
 }
 
-void XttSevHist::sevhist_add_cb(void* ctx)
-{
-  XttSevHist* sevhist = (XttSevHist*)ctx;
+void XttSevHist::sevhist_add_cb(void *ctx) {
+  XttSevHist *sevhist = (XttSevHist *)ctx;
   if (!sevhist->get_select_cb) {
     if (sevhist->otree)
       sevhist->otree->pop();
     else {
-      pwr_tAttrRef* list;
+      pwr_tAttrRef *list;
       int listcnt;
-      pwr_tCid cid[2] = { pwr_cClass_SevHist, pwr_cClass_SevHistObject };
+      pwr_tCid cid[2] = {pwr_cClass_SevHist, pwr_cClass_SevHistObject};
       int options = 0;
       pwr_tStatus sts;
 
@@ -945,11 +928,11 @@ void XttSevHist::sevhist_add_cb(void* ctx)
         options |= tree_mOptions_LayoutList;
       options |= tree_mOptions_AlphaOrder;
 
-      sevhist->otree = sevhist->tree_new(
-          "Add attribute", list, listcnt, options, sevhist_otree_action_cb);
+      sevhist->otree = sevhist->tree_new("Add attribute", list, listcnt,
+                                         options, sevhist_otree_action_cb);
       sevhist->otree->close_cb = sevhist_otree_close_cb;
 
-      free((char*)list);
+      free((char *)list);
     }
   } else {
     pwr_tOid oid;
@@ -967,14 +950,13 @@ void XttSevHist::sevhist_add_cb(void* ctx)
   }
 }
 
-pwr_tStatus XttSevHist::sevhist_otree_action_cb(void* ctx, pwr_tAttrRef* aref)
-{
-  XttSevHist* sevhist = (XttSevHist*)ctx;
+pwr_tStatus XttSevHist::sevhist_otree_action_cb(void *ctx, pwr_tAttrRef *aref) {
+  XttSevHist *sevhist = (XttSevHist *)ctx;
   pwr_tStatus sts;
   pwr_tAttrRef aaref;
   pwr_tAName oname;
   pwr_tAName aname;
-  char* s;
+  char *s;
   pwr_tCid cid;
 
   sts = gdh_GetAttrRefTid(aref, &cid);
@@ -999,16 +981,15 @@ pwr_tStatus XttSevHist::sevhist_otree_action_cb(void* ctx, pwr_tAttrRef* aref)
     strncpy(aname, s + 1, sizeof(aname));
   }
 
-  sevhist->curve_add(
-      aaref.Objid, aname, oname, cid == pwr_cClass_SevHistObject);
+  sevhist->curve_add(aaref.Objid, aname, oname,
+                     cid == pwr_cClass_SevHistObject);
   if (EVEN(sts))
     printf("SevHist add failure\n");
   return sts;
 }
 
-void XttSevHist::sevhist_otree_close_cb(void* ctx)
-{
-  XttSevHist* sevhist = (XttSevHist*)ctx;
+void XttSevHist::sevhist_otree_close_cb(void *ctx) {
+  XttSevHist *sevhist = (XttSevHist *)ctx;
 
   if (sevhist->otree) {
     delete sevhist->otree;
@@ -1016,35 +997,33 @@ void XttSevHist::sevhist_otree_close_cb(void* ctx)
   }
 }
 
-void XttSevHist::sevhist_remove_cb(void* ctx)
-{
+void XttSevHist::sevhist_remove_cb(void *ctx) {
   // To do
 }
 
-int XttSevHist::sevhist_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to,
-    int rows, int idx, char* filename)
-{
-  XttSevHist* sevhist = (XttSevHist*)ctx;
+int XttSevHist::sevhist_export_cb(void *ctx, pwr_tTime *from, pwr_tTime *to,
+                                  int rows, int idx, char *filename) {
+  XttSevHist *sevhist = (XttSevHist *)ctx;
   pwr_tFileName fname;
-  pwr_tTime* tbuf;
-  void* vbuf;
+  pwr_tTime *tbuf;
+  void *vbuf;
   pwr_eType vtype;
   unsigned int vsize;
   pwr_tStatus sts;
   int rrows;
   char timestr[40];
-  FILE* fp;
+  FILE *fp;
   pwr_tOName oname;
 
   // Replace $date with date
   strncpy(fname, filename, sizeof(fname));
-  char* s1 = strstr(fname, "$date");
+  char *s1 = strstr(fname, "$date");
   if (s1) {
     char timstr[40];
     pwr_tFileName str;
 
-    sts = time_AtoAscii(
-        0, time_eFormat_FileDateAndTime, timstr, sizeof(timstr));
+    sts =
+        time_AtoAscii(0, time_eFormat_FileDateAndTime, timstr, sizeof(timstr));
 
     strncpy(str, s1 + strlen("$date"), sizeof(str));
     *s1 = 0;
@@ -1061,8 +1040,8 @@ int XttSevHist::sevhist_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to,
       return SEV__EXPORTFILE;
 
     for (int j = 0; j < sevhist->oid_cnt; j++) {
-      sts = gdh_ObjidToName(
-          sevhist->oidv[j], oname, sizeof(oname), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(sevhist->oidv[j], oname, sizeof(oname),
+                            cdh_mName_volumeStrict);
       if (EVEN(sts))
         continue;
 
@@ -1070,8 +1049,8 @@ int XttSevHist::sevhist_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to,
 
       sevhist->curve->set_clock_cursor();
       sevcli_get_itemdata(&sts, sevhist->scctx, sevhist->oidv[j],
-          sevhist->anamev[j], *from, *to, rows, &tbuf, &vbuf, &rrows, &vtype,
-          &vsize);
+                          sevhist->anamev[j], *from, *to, rows, &tbuf, &vbuf,
+                          &rrows, &vtype, &vsize);
       sevhist->curve->reset_cursor();
       if (EVEN(sts)) {
         free(tbuf);
@@ -1086,30 +1065,30 @@ int XttSevHist::sevhist_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to,
       fprintf(fp, "# Rows %d\n", rrows);
 
       for (int i = 0; i < rrows; i++) {
-        time_AtoAscii(
-            &tbuf[i], time_eFormat_DateAndTime, timestr, sizeof(timestr));
+        time_AtoAscii(&tbuf[i], time_eFormat_DateAndTime, timestr,
+                      sizeof(timestr));
         fprintf(fp, "%s, ", timestr);
         switch (vtype) {
         case pwr_eType_Int32:
         case pwr_eType_Int64:
         case pwr_eType_Int16:
         case pwr_eType_Int8:
-          fprintf(fp, "%d", ((pwr_tInt32*)vbuf)[i]);
+          fprintf(fp, "%d", ((pwr_tInt32 *)vbuf)[i]);
           break;
         case pwr_eType_UInt64:
         case pwr_eType_UInt32:
         case pwr_eType_UInt16:
         case pwr_eType_UInt8:
-          fprintf(fp, "%u", ((pwr_tUInt32*)vbuf)[i]);
+          fprintf(fp, "%u", ((pwr_tUInt32 *)vbuf)[i]);
           break;
         case pwr_eType_Float32:
-          fprintf(fp, "%g", ((pwr_tFloat32*)vbuf)[i]);
+          fprintf(fp, "%g", ((pwr_tFloat32 *)vbuf)[i]);
           break;
         case pwr_eType_Float64:
-          fprintf(fp, "%g", ((pwr_tFloat64*)vbuf)[i]);
+          fprintf(fp, "%g", ((pwr_tFloat64 *)vbuf)[i]);
           break;
         case pwr_eType_Boolean:
-          fprintf(fp, "%d", ((pwr_tBoolean*)vbuf)[i]);
+          fprintf(fp, "%d", ((pwr_tBoolean *)vbuf)[i]);
           break;
         default:
           sts = SEV__CURVETYPE;
@@ -1123,8 +1102,8 @@ int XttSevHist::sevhist_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to,
   } else {
     sevhist->curve->set_clock_cursor();
     sevcli_get_itemdata(&sts, sevhist->scctx, sevhist->oidv[idx],
-        sevhist->anamev[idx], *from, *to, rows, &tbuf, &vbuf, &rrows, &vtype,
-        &vsize);
+                        sevhist->anamev[idx], *from, *to, rows, &tbuf, &vbuf,
+                        &rrows, &vtype, &vsize);
     sevhist->curve->reset_cursor();
     if (EVEN(sts)) {
       free(tbuf);
@@ -1146,30 +1125,30 @@ int XttSevHist::sevhist_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to,
     }
 
     for (int i = 0; i < rrows; i++) {
-      time_AtoAscii(
-          &tbuf[i], time_eFormat_DateAndTime, timestr, sizeof(timestr));
+      time_AtoAscii(&tbuf[i], time_eFormat_DateAndTime, timestr,
+                    sizeof(timestr));
       fprintf(fp, "%s, ", timestr);
       switch (vtype) {
       case pwr_eType_Int32:
       case pwr_eType_Int64:
       case pwr_eType_Int16:
       case pwr_eType_Int8:
-        fprintf(fp, "%d", ((pwr_tInt32*)vbuf)[i]);
+        fprintf(fp, "%d", ((pwr_tInt32 *)vbuf)[i]);
         break;
       case pwr_eType_UInt64:
       case pwr_eType_UInt32:
       case pwr_eType_UInt16:
       case pwr_eType_UInt8:
-        fprintf(fp, "%u", ((pwr_tUInt32*)vbuf)[i]);
+        fprintf(fp, "%u", ((pwr_tUInt32 *)vbuf)[i]);
         break;
       case pwr_eType_Float32:
-        fprintf(fp, "%g", ((pwr_tFloat32*)vbuf)[i]);
+        fprintf(fp, "%g", ((pwr_tFloat32 *)vbuf)[i]);
         break;
       case pwr_eType_Float64:
-        fprintf(fp, "%g", ((pwr_tFloat64*)vbuf)[i]);
+        fprintf(fp, "%g", ((pwr_tFloat64 *)vbuf)[i]);
         break;
       case pwr_eType_Boolean:
-        fprintf(fp, "%d", ((pwr_tBoolean*)vbuf)[i]);
+        fprintf(fp, "%d", ((pwr_tBoolean *)vbuf)[i]);
         break;
       default:
         sts = SEV__CURVETYPE;
@@ -1188,17 +1167,16 @@ int XttSevHist::sevhist_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to,
   return SEV__SUCCESS;
 }
 
-int XttSevHist::read_export(char* filename)
-{
+int XttSevHist::read_export(char *filename) {
   pwr_tFileName fname;
-  FILE* fp;
+  FILE *fp;
   char line[200];
   int idx = -1;
   int rowcnt = 0;
   int rows;
   char timstr[40];
   double y;
-  char* s;
+  char *s;
   pwr_tStatus sts;
   pwr_tTime t;
 
@@ -1240,8 +1218,8 @@ int XttSevHist::read_export(char* filename)
 
         sscanf(&line[7], "%d", &rows);
         gcd->rows[idx] = rows;
-        gcd->x_data[idx] = (double*)calloc(1, 8 * rows);
-        gcd->y_data[idx] = (double*)calloc(1, 8 * rows);
+        gcd->x_data[idx] = (double *)calloc(1, 8 * rows);
+        gcd->y_data[idx] = (double *)calloc(1, 8 * rows);
       }
     } else {
       if (idx < 0)
@@ -1281,17 +1259,15 @@ int XttSevHist::read_export(char* filename)
   return 1;
 }
 
-void XttSevHist::sevhist_help_cb(void* ctx)
-{
-  XttSevHist* sevhist = (XttSevHist*)ctx;
+void XttSevHist::sevhist_help_cb(void *ctx) {
+  XttSevHist *sevhist = (XttSevHist *)ctx;
 
   if (sevhist->help_cb)
     (sevhist->help_cb)(sevhist->xnav, "opg_history");
 }
 
-void XttSevHist::sevhist_scan(void* data)
-{
-  XttSevHist* sevhist = (XttSevHist*)data;
+void XttSevHist::sevhist_scan(void *data) {
+  XttSevHist *sevhist = (XttSevHist *)data;
 
   if (sevhist->timerid)
     sevhist->timerid->add(1000, sevhist_scan, sevhist);

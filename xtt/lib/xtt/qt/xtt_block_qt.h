@@ -46,10 +46,10 @@
 
 class BlockQtWidget;
 
-class BlockQt : public Block {
+class BlockQt : public Block
+{
 public:
-  BlockQt(void* b_parent_ctx, pwr_sAttrRef* b_oar, char* name,
-      unsigned int priv, pwr_tStatus* status);
+  BlockQt(void* b_parent_ctx, pwr_sAttrRef* b_oar, char* name, unsigned int priv, pwr_tStatus* status);
   ~BlockQt();
   int execute();
   void update();
@@ -67,7 +67,8 @@ private:
   BlockQtWidget* toplevel;
 };
 
-class BlockQtWidget : public QWidget {
+class BlockQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

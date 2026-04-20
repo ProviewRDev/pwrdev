@@ -39,14 +39,13 @@
 
 #include "wb_foe.h"
 
-int gsx_check_connection(WFoe* foe, vldh_t_node sourceobject,
-    unsigned long sourcepoint, vldh_t_node destobject, unsigned long destpoint,
-    pwr_tClassId* conclass, pwr_tClassId user_conclass);
+int gsx_check_connection(WFoe* foe, vldh_t_node sourceobject, unsigned long sourcepoint,
+                         vldh_t_node destobject, unsigned long destpoint, pwr_tClassId* conclass,
+                         pwr_tClassId user_conclass);
 
-int gsx_check_subwindow(vldh_t_node object, unsigned long* subwindow_nr,
-    foe_eFuncAccess* function_access);
+int gsx_check_subwindow(vldh_t_node object, unsigned long* subwindow_nr, foe_eFuncAccess* function_access);
 
-int gsx_auto_create(WFoe* foe, double x, double y, vldh_t_node source,
-    unsigned long sourcepoint, vldh_t_node* dest, unsigned long* destpoint);
+int gsx_auto_create(WFoe* foe, double x, double y, vldh_t_node source, unsigned long sourcepoint,
+                    vldh_t_node* dest, unsigned long* destpoint);
 
 #endif

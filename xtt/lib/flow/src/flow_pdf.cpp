@@ -49,7 +49,8 @@ FlowPdf::FlowPdf(char* filename, void* flow_ctx, int page_border, int* sts)
 
 FlowPdf::~FlowPdf()
 {
-  if (topdf) {
+  if (topdf)
+  {
     topdf->close();
     delete topdf;
   }
@@ -83,52 +84,49 @@ int FlowPdf::print_page(double ll_x, double ll_y, double ur_x, double ur_y)
   return 1;
 }
 
-int FlowPdf::rect(double x, double y, double width, double height,
-    flow_eDrawType type, double idx, int highlight)
+int FlowPdf::rect(double x, double y, double width, double height, flow_eDrawType type, double idx,
+                  int highlight)
 {
   topdf->draw_rect(idx, x - offset_x, offset_y - y - height, width, height);
   return 1;
 }
 
-int FlowPdf::filled_rect(double x, double y, double width, double height,
-    flow_eDrawType type, double idx)
+int FlowPdf::filled_rect(double x, double y, double width, double height, flow_eDrawType type, double idx)
 {
   return 1;
 }
 
-int FlowPdf::triangle(double x, double y, double width, double height,
-    flow_eDrawType type, double idx, int highlight)
+int FlowPdf::triangle(double x, double y, double width, double height, flow_eDrawType type, double idx,
+                      int highlight)
 {
   topdf->draw_triangle(idx, x - offset_x, offset_y - y - height, width, height);
   return 1;
 }
 
-int FlowPdf::filled_triangle(double x, double y, double width, double height,
-    flow_eDrawType type, double idx)
+int FlowPdf::filled_triangle(double x, double y, double width, double height, flow_eDrawType type, double idx)
 {
-  topdf->draw_filled_triangle(
-      type, x - offset_x, offset_y - y - height, width, height);
+  topdf->draw_filled_triangle(type, x - offset_x, offset_y - y - height, width, height);
   return 1;
 }
 
-int FlowPdf::arc(double x, double y, double width, double height, int angle1,
-    int angle2, flow_eDrawType type, double idx, int highlight)
+int FlowPdf::arc(double x, double y, double width, double height, int angle1, int angle2, flow_eDrawType type,
+                 double idx, int highlight)
 {
-  topdf->draw_arc(
-      idx, x - offset_x, offset_y - y - height, width, height, angle1, angle2);
+  topdf->draw_arc(idx, x - offset_x, offset_y - y - height, width, height, angle1, angle2);
   return 1;
 }
 
-int FlowPdf::text(double x, double y, char* text, int len, flow_eDrawType type,
-    double size, int line)
+int FlowPdf::text(double x, double y, char* text, int len, flow_eDrawType type, double size, int line)
 {
   char t[500];
 
   // Replace ( with \( and ) with \)
   char* t1 = text;
   char* t2 = t;
-  for (int i = 0; *t1; t1++, i++) {
-    if (*t1 == ')' || *t1 == '(') {
+  for (int i = 0; *t1; t1++, i++)
+  {
+    if (*t1 == ')' || *t1 == '(')
+    {
       *t2 = '\\';
       t2++;
     }
@@ -148,35 +146,23 @@ int FlowPdf::text(double x, double y, char* text, int len, flow_eDrawType type,
   return 1;
 }
 
-int FlowPdf::pixmap(
-    double x, double y, flow_sPixmapDataElem* data, flow_eDrawType type)
+int FlowPdf::pixmap(double x, double y, flow_sPixmapDataElem* data, flow_eDrawType type) { return 1; }
+
+int FlowPdf::line(double x1, double y1, double x2, double y2, flow_eDrawType type, double idx, int hightlight)
 {
+  topdf->draw_line(idx, x1 - offset_x, offset_y - y1, x2 - offset_x, offset_y - y2,
+                   type == flow_eDrawType_LineDashed, type == flow_eDrawType_LineGray);
   return 1;
 }
 
-int FlowPdf::line(double x1, double y1, double x2, double y2,
-    flow_eDrawType type, double idx, int hightlight)
+int FlowPdf::arrow(double x1, double y1, double x2, double y2, double x3, double y3, flow_eDrawType type,
+                   double idx)
 {
-  topdf->draw_line(idx, x1 - offset_x, offset_y - y1, x2 - offset_x,
-      offset_y - y2, type == flow_eDrawType_LineDashed,
-      type == flow_eDrawType_LineGray);
+  topdf->draw_arrow(x1 - offset_x, offset_y - y1, x2 - offset_x, offset_y - y2, x3 - offset_x, offset_y - y3,
+                    type == flow_eDrawType_LineGray);
   return 1;
 }
 
-int FlowPdf::arrow(double x1, double y1, double x2, double y2, double x3,
-    double y3, flow_eDrawType type, double idx)
-{
-  topdf->draw_arrow(x1 - offset_x, offset_y - y1, x2 - offset_x, offset_y - y2,
-      x3 - offset_x, offset_y - y3, type == flow_eDrawType_LineGray);
-  return 1;
-}
+void FlowPdf::move(double x, double y) { fprintf(file, "%f %f moveto", x, y); }
 
-void FlowPdf::move(double x, double y)
-{
-  fprintf(file, "%f %f moveto", x, y);
-}
-
-void FlowPdf::setlinewidth(double idx)
-{
-  fprintf(file, "%f setlinewidth\n", idx);
-}
+void FlowPdf::setlinewidth(double idx) { fprintf(file, "%f setlinewidth\n", idx); }

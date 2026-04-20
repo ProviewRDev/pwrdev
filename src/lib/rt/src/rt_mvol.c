@@ -45,19 +45,15 @@
 #include "rt_vol.h"
 #include "rt_cmvolc.h"
 
-static pwr_tBoolean decodeAttribute(
-    pwr_tStatus* sts, gdb_sObject* op, co_eBO bo);
+static pwr_tBoolean decodeAttribute(pwr_tStatus* sts, gdb_sObject* op, co_eBO bo);
 
-static pwr_tBoolean decodeClassDef(
-    pwr_tStatus* sts, gdb_sObject* op, co_eBO bo);
+static pwr_tBoolean decodeClassDef(pwr_tStatus* sts, gdb_sObject* op, co_eBO bo);
 
-static pwr_tBoolean decodeObjBodyDef(
-    pwr_tStatus* sts, gdb_sObject* op, co_eBO bo);
+static pwr_tBoolean decodeObjBodyDef(pwr_tStatus* sts, gdb_sObject* op, co_eBO bo);
 
 /* Decode an Attribute object.  */
 
-static pwr_tBoolean decodeAttribute(
-    pwr_tStatus* sts, gdb_sObject* op, co_eBO bo)
+static pwr_tBoolean decodeAttribute(pwr_tStatus* sts, gdb_sObject* op, co_eBO bo)
 {
   pwr_sParam* p;
   pwr_uParDef* up;
@@ -78,7 +74,8 @@ static pwr_tBoolean decodeAttribute(
 
   up = (pwr_uParDef*)p;
 
-  switch (op->g.cid) {
+  switch (op->g.cid)
+  {
   case pwr_eClass_Param:
     ENDIAN_SWAP_INTP(&p->TypeRef);
     break;
@@ -134,8 +131,7 @@ static pwr_tBoolean decodeClassDef(pwr_tStatus* sts, gdb_sObject* op, co_eBO bo)
 
 /* Decode an ObjBodyDef object.  */
 
-static pwr_tBoolean decodeObjBodyDef(
-    pwr_tStatus* sts, gdb_sObject* op, co_eBO bo)
+static pwr_tBoolean decodeObjBodyDef(pwr_tStatus* sts, gdb_sObject* op, co_eBO bo)
 {
   pwr_sObjBodyDef* p;
 
@@ -161,8 +157,8 @@ static pwr_tBoolean decodeObjBodyDef(
    Return the attribute definition, and optionally
    fill in 'arp' if not null.  */
 
-mvol_sAttribute* mvol_AnameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
-    pwr_tClassId cid, cdh_sParseName* pn, gdb_sObject* op)
+mvol_sAttribute* mvol_AnameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap, pwr_tClassId cid,
+                                       cdh_sParseName* pn, gdb_sObject* op)
 {
   cdh_uObjid coid;
   gdb_sClass* acp;
@@ -180,20 +176,26 @@ mvol_sAttribute* mvol_AnameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
 
   /* If it's not native object then we try to fetch class from remote node */
 
-  if (ap->cp == NULL) {
+  if (ap->cp == NULL)
+  {
     if (op == NULL)
       pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
-    if (!(op->l.flags.m & gdb_mLo_native)) {
+    if (!(op->l.flags.m & gdb_mLo_native))
+    {
       cmvolc_GetNonExistingClass(sts, op, cid);
       ap->cp = hash_Search(sts, gdbroot->cid_ht, &cid);
-      if (ap->cp == NULL) {
+      if (ap->cp == NULL)
+      {
         pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
-      } else {
-        /* Refresh pointer, pool has been released during fetch */
-        op = vol_OidToObject(
-            sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
       }
-    } else {
+      else
+      {
+        /* Refresh pointer, pool has been released during fetch */
+        op = vol_OidToObject(sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
+      }
+    }
+    else
+    {
       pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
     }
   }
@@ -202,22 +204,28 @@ mvol_sAttribute* mvol_AnameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
   if (ap->bop == NULL)
     pwr_Return(NULL, sts, GDH__ATTRIBUTE);
 
-  if (pn == NULL || !pn->flags.b.attribute) {
+  if (pn == NULL || !pn->flags.b.attribute)
+  {
     /* Use the whole body.  */
 
     ap->aop = NULL;
     ap->adef = NULL;
     ap->idx = UINT_MAX;
-  } else {
+  }
+  else
+  {
     acp = ap->cp;
     abop = ap->bop;
     acp = ap->cp;
-    for (i = 0; i < pn->nAttribute; i++) {
+    for (i = 0; i < pn->nAttribute; i++)
+    {
       pn->attribute[i].poid = abop->g.oid;
       ap->aop = hash_Search(sts, gdbroot->family_ht, &pn->attribute[i]);
-      while (ap->aop == NULL) {
+      while (ap->aop == NULL)
+      {
         /* Try superclass */
-        if (acp->attr[0].flags.m & PWR_MASK_SUPERCLASS) {
+        if (acp->attr[0].flags.m & PWR_MASK_SUPERCLASS)
+        {
           tid = acp->attr[0].tid;
           acp = hash_Search(sts, gdbroot->cid_ht, &acp->attr[0].tid);
           //	  if ( acp == NULL) pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
@@ -225,21 +233,27 @@ mvol_sAttribute* mvol_AnameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
           /* If it's not native object then we try to fetch class from remote
            * node */
 
-          if (acp == NULL) {
+          if (acp == NULL)
+          {
             if (op == NULL)
               pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
-            if (!(op->l.flags.m & gdb_mLo_native)) {
+            if (!(op->l.flags.m & gdb_mLo_native))
+            {
               cmvolc_GetNonExistingClass(sts, op, tid);
               acp = hash_Search(sts, gdbroot->cid_ht, &tid);
-              if (acp == NULL) {
+              if (acp == NULL)
+              {
                 pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
-              } else {
+              }
+              else
+              {
                 /* Refresh pointers, pool has been released during fetch */
-                op = vol_OidToObject(
-                    sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
+                op = vol_OidToObject(sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
                 ap->cp = hash_Search(sts, gdbroot->cid_ht, &cid);
               }
-            } else {
+            }
+            else
+            {
               pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
             }
           }
@@ -250,16 +264,17 @@ mvol_sAttribute* mvol_AnameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
 
           pn->attribute[i].poid = abop->g.oid;
           ap->aop = hash_Search(sts, gdbroot->family_ht, &pn->attribute[i]);
-        } else
+        }
+        else
           pwr_Return(NULL, sts, GDH__ATTRIBUTE);
       }
       ap->adef = pool_Address(NULL, gdbroot->rtdb, ap->aop->u.n.body);
       offset += ap->adef->Info.Offset;
 
-      if (i != pn->nAttribute - 1) {
+      if (i != pn->nAttribute - 1)
+      {
         if (pn->hasIndex[i])
-          offset
-              += pn->index[i] * (ap->adef->Info.Size / ap->adef->Info.Elements);
+          offset += pn->index[i] * (ap->adef->Info.Size / ap->adef->Info.Elements);
         if (!(ap->adef->Info.Flags & PWR_MASK_CLASS))
           pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
 
@@ -270,24 +285,30 @@ mvol_sAttribute* mvol_AnameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
         /* If it's not native object then we try to fetch class from remote node
          */
 
-        if (acp == NULL) {
+        if (acp == NULL)
+        {
           if (op == NULL)
             pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
 
-          if (!(op->l.flags.m & gdb_mLo_native)) {
+          if (!(op->l.flags.m & gdb_mLo_native))
+          {
             cmvolc_GetNonExistingClass(sts, op, tid);
             acp = hash_Search(sts, gdbroot->cid_ht, &tid);
-            if (acp == NULL) {
+            if (acp == NULL)
+            {
               pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
-            } else {
+            }
+            else
+            {
               /* Refresh pointers, pool has been released during fetch */
-              op = vol_OidToObject(
-                  sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
+              op = vol_OidToObject(sts, oid, gdb_mLo_global, vol_mTrans_all, cvol_eHint_none);
               ap->cp = hash_Search(sts, gdbroot->cid_ht, &cid);
               ap->aop = hash_Search(sts, gdbroot->family_ht, &pn->attribute[i]);
               ap->adef = pool_Address(NULL, gdbroot->rtdb, ap->aop->u.n.body);
             }
-          } else {
+          }
+          else
+          {
             pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
           }
         }
@@ -309,21 +330,21 @@ mvol_sAttribute* mvol_AnameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
   ap->bdef = pool_Address(NULL, gdbroot->rtdb, ap->cp->bbr);
   ap->flags.m = 0;
 
-  if (ap->adef != NULL) {
+  if (ap->adef != NULL)
+  {
     coid.pwr = ap->aop->g.oid;
     ap->aix = coid.t.aix;
     ap->size = ap->adef->Info.Size;
     ap->offs = offset;
     ap->tid = ap->adef->Info.Type;
     ap->elem = ap->adef->Info.Elements;
-    ap->flags.b.Indirect = ((ap->adef->Info.Flags & PWR_MASK_POINTER) != 0)
-        && ((ap->adef->Info.Flags & PWR_MASK_PRIVATE) == 0);
+    ap->flags.b.Indirect =
+        ((ap->adef->Info.Flags & PWR_MASK_POINTER) != 0) && ((ap->adef->Info.Flags & PWR_MASK_PRIVATE) == 0);
     ap->flags.b.CastAttr = ((ap->adef->Info.Flags & PWR_MASK_CASTATTR) != 0);
-    ap->flags.b.DisableAttr
-        = ((ap->adef->Info.Flags & PWR_MASK_DISABLEATTR) != 0);
-    if (ap->idx != UINT_MAX) {
-      if (ap->idx > ap->adef->Info.Elements - 1
-          && !(ap->adef->Info.Flags & PWR_MASK_DYNAMIC))
+    ap->flags.b.DisableAttr = ((ap->adef->Info.Flags & PWR_MASK_DISABLEATTR) != 0);
+    if (ap->idx != UINT_MAX)
+    {
+      if (ap->idx > ap->adef->Info.Elements - 1 && !(ap->adef->Info.Flags & PWR_MASK_DYNAMIC))
         pwr_Return(NULL, sts, GDH__SUBSCRIPT);
       ap->size /= ap->elem;
       if (ap->flags.b.Indirect)
@@ -333,9 +354,10 @@ mvol_sAttribute* mvol_AnameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
       ap->elem = 1;
     }
     ap->flags.b.ObjectAttr = (cdh_tidIsCid(ap->tid) != 0);
-    ap->flags.b.Array
-        = (ap->idx == UINT_MAX && ap->adef->Info.Flags & PWR_MASK_ARRAY);
-  } else {
+    ap->flags.b.Array = (ap->idx == UINT_MAX && ap->adef->Info.Flags & PWR_MASK_ARRAY);
+  }
+  else
+  {
     ap->aix = UINT_MAX;
     ap->size = ap->cp->size;
     ap->offs = 0;
@@ -350,8 +372,8 @@ mvol_sAttribute* mvol_AnameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
 /* Translate an attribute reference to the internal
    attribute format.  */
 
-mvol_sAttribute* mvol_ArefToAttribute(
-    pwr_tStatus* sts, mvol_sAttribute* ap, pwr_sAttrRef* arp, pwr_tClassId cid)
+mvol_sAttribute* mvol_ArefToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap, pwr_sAttrRef* arp,
+                                      pwr_tClassId cid)
 {
   pwr_sParam* param;
   gdb_sClass *cp, *acp;
@@ -364,11 +386,13 @@ mvol_sAttribute* mvol_ArefToAttribute(
   int parsize;
 
   cp = hash_Search(sts, gdbroot->cid_ht, &cid);
-  if (cp == NULL) {
+  if (cp == NULL)
+  {
     pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
   }
 
-  if (arp->Flags.b.Object) {
+  if (arp->Flags.b.Object)
+  {
     ap->cp = cp;
     ap->cop = pool_Address(NULL, gdbroot->pool, cp->cor);
     ap->cdef = pool_Address(NULL, gdbroot->rtdb, cp->cbr);
@@ -386,70 +410,71 @@ mvol_sAttribute* mvol_ArefToAttribute(
   }
 
   acp = cp;
-  for (acp = cp;; acp = hash_Search(sts, gdbroot->cid_ht, &acp->attr[i].tid)) {
+  for (acp = cp;; acp = hash_Search(sts, gdbroot->cid_ht, &acp->attr[i].tid))
+  {
     if (acp == NULL)
       pwr_Return(NULL, sts, GDH__NOSUCHCLASS);
-    for (i = 0; i < acp->acount; i++) {
-      if (arp->Offset <= (offset + acp->attr[i].moffset)
-          || acp->attr[i].flags.b.dynamic)
+    for (i = 0; i < acp->acount; i++)
+    {
+      if (arp->Offset <= (offset + acp->attr[i].moffset) || acp->attr[i].flags.b.dynamic)
         break;
     }
     if (i == acp->acount)
       pwr_Return(NULL, sts, GDH__ATTRIBUTE);
     offset += acp->attr[i].offs;
-    if (idx != UINT_MAX) {
+    if (idx != UINT_MAX)
+    {
       sprintf(idxstr, "[%d]", idx);
       strcat(ap->name, idxstr);
     }
-    if ((acp != cp) && (!noDot)
-        && (!(acp->attr[i].flags.m & PWR_MASK_SUPERCLASS) || (i != 0)
-               || (acp->attr[i].size == arp->Size)))
+    if ((acp != cp) && (!noDot) &&
+        (!(acp->attr[i].flags.m & PWR_MASK_SUPERCLASS) || (i != 0) || (acp->attr[i].size == arp->Size)))
       strcat(ap->name, ".");
     ap->aop = pool_Address(NULL, gdbroot->pool, acp->attr[i].aor);
 
     /* Skip name if it is a attribute of type superclass and not entire
      * attribute */
 
-    if (!(acp->attr[i].flags.m & PWR_MASK_SUPERCLASS) || (i != 0)
-        || (acp->attr[i].size == arp->Size)) {
+    if (!(acp->attr[i].flags.m & PWR_MASK_SUPERCLASS) || (i != 0) || (acp->attr[i].size == arp->Size))
+    {
       strcat(ap->name, ap->aop->g.f.name.orig);
       noDot = FALSE;
     }
 
-    if (!acp->attr[i].flags.b.isclass) {
-      if (acp->attr[i].elem > 1 || acp->attr[i].flags.b.dynamic) {
+    if (!acp->attr[i].flags.b.isclass)
+    {
+      if (acp->attr[i].elem > 1 || acp->attr[i].flags.b.dynamic)
+      {
         if (acp->attr[i].flags.b.pointer)
           idx = (arp->Offset - offset) / sizeof(pwr_tUInt64);
         else
-          idx = (arp->Offset - offset)
-              / (acp->attr[i].size / acp->attr[i].elem);
+          idx = (arp->Offset - offset) / (acp->attr[i].size / acp->attr[i].elem);
       }
       break;
     }
-    if (arp->Size == 0 && arp->Flags.b.ObjectAttr && offset == arp->Offset
-        && acp->attr[i].flags.b.isclass)
+    if (arp->Size == 0 && arp->Flags.b.ObjectAttr && offset == arp->Offset && acp->attr[i].flags.b.isclass)
       break;
-    if (acp->attr[i].size == arp->Size
-        && !(acp->attr[i].flags.b.isclass && !arp->Flags.b.ObjectAttr))
+    if (acp->attr[i].size == arp->Size && !(acp->attr[i].flags.b.isclass && !arp->Flags.b.ObjectAttr))
       break;
-    if (acp->attr[i].flags.b.array) {
-      for (j = 0; j < acp->attr[i].elem; j++) {
+    if (acp->attr[i].flags.b.array)
+    {
+      for (j = 0; j < acp->attr[i].elem; j++)
+      {
         if (arp->Offset < (offset + acp->attr[i].size / acp->attr[i].elem))
           break;
         offset += acp->attr[i].size / acp->attr[i].elem;
       }
       idx = j;
-      if (acp->attr[i].size / acp->attr[i].elem == arp->Size) {
+      if (acp->attr[i].size / acp->attr[i].elem == arp->Size)
+      {
         /* Check that attribute reference is on a even boundary */
-        if (arp->Offset > offset
-            && ((arp->Offset - offset)
-                   % (acp->attr[i].size / acp->attr[i].elem))
-                != 0)
+        if (arp->Offset > offset && ((arp->Offset - offset) % (acp->attr[i].size / acp->attr[i].elem)) != 0)
           pwr_Return(NULL, sts, GDH__ATTRIBUTE);
         offset -= idx * (acp->attr[i].size / acp->attr[i].elem);
         break;
       }
-    } else
+    }
+    else
       idx = UINT_MAX;
   }
 
@@ -469,16 +494,20 @@ mvol_sAttribute* mvol_ArefToAttribute(
   else
     parsize = param->Info.Size / param->Info.Elements;
 
-  if ((arp->Size > parsize && arp->Flags.b.Object) || arp->Size == 0) {
+  if ((arp->Size > parsize && arp->Flags.b.Object) || arp->Size == 0)
+  {
     /* If this is the first attribute, then match whole object
        otherwise say the attribute is ok!  */
 
-    if (param->Info.ParamIndex == 0 && acp == cp /* && offset == 0 */) {
+    if (param->Info.ParamIndex == 0 && acp == cp /* && offset == 0 */)
+    {
       ap->aop = NULL;
       ap->adef = NULL;
       strcpy(ap->name, "");
     }
-  } else if ((param->Info.Elements > 1 && arp->Size < param->Info.Size) || acp->attr[i].flags.b.dynamic) {
+  }
+  else if ((param->Info.Elements > 1 && arp->Size < param->Info.Size) || acp->attr[i].flags.b.dynamic)
+  {
     /* Calculate index.  */
 
     ap->idx = idx;
@@ -490,7 +519,8 @@ mvol_sAttribute* mvol_ArefToAttribute(
   ap->bop = pool_Address(NULL, gdbroot->pool, cp->bor);
   ap->bdef = pool_Address(NULL, gdbroot->rtdb, cp->bbr);
 
-  if (ap->aop != NULL) {
+  if (ap->aop != NULL)
+  {
     coid.pwr = ap->aop->g.oid;
     ap->aix = coid.t.aix;
     ap->size = param->Info.Size;
@@ -498,7 +528,8 @@ mvol_sAttribute* mvol_ArefToAttribute(
     ap->tid = param->Info.Type;
     ap->elem = param->Info.Elements;
 
-    if (ap->idx != UINT_MAX) {
+    if (ap->idx != UINT_MAX)
+    {
       ap->size /= ap->elem;
       if (param->Info.Flags & PWR_MASK_POINTER)
         ap->offs += sizeof(pwr_tUInt64) * ap->idx;
@@ -506,7 +537,9 @@ mvol_sAttribute* mvol_ArefToAttribute(
         ap->offs += ap->size * ap->idx;
       ap->elem = 1;
     }
-  } else {
+  }
+  else
+  {
     ap->aix = UINT_MAX;
     ap->size = arp->Size == 0 ? cp->size : MIN(arp->Size, cp->size);
     ap->offs = 0;
@@ -519,8 +552,7 @@ mvol_sAttribute* mvol_ArefToAttribute(
   pwr_Return(ap, sts, GDH__SUCCESS);
 }
 
-pwr_sAttrRef* mvol_AttributeToAref(
-    pwr_tStatus* sts, mvol_sAttribute* ap, pwr_sAttrRef* arp)
+pwr_sAttrRef* mvol_AttributeToAref(pwr_tStatus* sts, mvol_sAttribute* ap, pwr_sAttrRef* arp)
 {
   if (ap->op != NULL)
     arp->Objid = ap->op->g.oid;
@@ -538,27 +570,28 @@ pwr_sAttrRef* mvol_AttributeToAref(
   pwr_Return(arp, sts, GDH__SUCCESS);
 }
 
-gdb_sObject* mvol_ClassList(
-    pwr_tStatus* sts, pwr_tClassId cid, pwr_tObjid oid, mvol_eList list)
+gdb_sObject* mvol_ClassList(pwr_tStatus* sts, pwr_tClassId cid, pwr_tObjid oid, mvol_eList list)
 {
   gdb_sClass* cp;
   gdb_sObject* op = NULL;
   pool_sQlink* ol;
 
-  if (cdh_ObjidIsNotNull(oid)) {
-    op = vol_OidToObject(
-        sts, oid, gdb_mLo_native, vol_mTrans_none, cvol_eHint_none);
+  if (cdh_ObjidIsNotNull(oid))
+  {
+    op = vol_OidToObject(sts, oid, gdb_mLo_native, vol_mTrans_none, cvol_eHint_none);
     if (op == NULL)
       return NULL;
     cid = op->g.cid;
-  } else if (cid == pwr_cNClassId)
+  }
+  else if (cid == pwr_cNClassId)
     pwr_Return(NULL, sts, GDH__WEIRD);
 
   cp = (gdb_sClass*)hash_Search(sts, gdbroot->cid_ht, &cid);
   if (cp == NULL)
     pwr_Return(NULL, sts, GDH__BADOBJTYPE);
 
-  switch (list) {
+  switch (list)
+  {
   case mvol_eList_first:
     ol = pool_Qsucc(NULL, gdbroot->pool, &cp->cid_lh);
     break;
@@ -593,13 +626,15 @@ gdb_sClass* mvol_LinkClass(pwr_tStatus* sts, gdb_sClass* cp, pwr_tBitMask ilink)
   int count;
   int i;
 
-  if (cp->cor == pool_cNRef) {
+  if (cp->cor == pool_cNRef)
+  {
     pwr_Return(NULL, sts, MVOL__SUCCESS);
   }
 
   cop = pool_Address(NULL, gdbroot->pool, cp->cor);
 
-  if (cp->bor == pool_cNRef) {
+  if (cp->bor == pool_cNRef)
+  {
     pwr_Return(NULL, sts, MVOL__SUCCESS);
   }
 
@@ -614,9 +649,9 @@ gdb_sClass* mvol_LinkClass(pwr_tStatus* sts, gdb_sClass* cp, pwr_tBitMask ilink)
 
   cp = gdb_ReAddClass(sts, cp, cp->acount);
 
-  for (count = 0, ol = pool_Qsucc(sts, gdbroot->pool, &bop->u.n.sib_lh);
-       ol != &bop->u.n.sib_lh;
-       count++, ol = pool_Qsucc(sts, gdbroot->pool, ol)) {
+  for (count = 0, ol = pool_Qsucc(sts, gdbroot->pool, &bop->u.n.sib_lh); ol != &bop->u.n.sib_lh;
+       count++, ol = pool_Qsucc(sts, gdbroot->pool, ol))
+  {
     aop = pool_Qitem(ol, gdb_sObject, u.n.sib_ll);
     abp = pool_Address(NULL, gdbroot->rtdb, aop->u.n.body);
     i = abp->Info.ParamIndex;
@@ -628,20 +663,18 @@ gdb_sClass* mvol_LinkClass(pwr_tStatus* sts, gdb_sClass* cp, pwr_tBitMask ilink)
     cp->attr[i].offs = abp->Info.Offset;
     cp->attr[i].size = abp->Info.Size;
     cp->attr[i].elem = abp->Info.Elements;
-    if (abp->Info.Flags & PWR_MASK_POINTER
-        && !(abp->Info.Flags & PWR_MASK_PRIVATE))
-      cp->attr[i].moffset
-          = abp->Info.Offset + sizeof(pwr_tUInt64) * abp->Info.Elements - 1;
+    if (abp->Info.Flags & PWR_MASK_POINTER && !(abp->Info.Flags & PWR_MASK_PRIVATE))
+      cp->attr[i].moffset = abp->Info.Offset + sizeof(pwr_tUInt64) * abp->Info.Elements - 1;
     else
       cp->attr[i].moffset = abp->Info.Offset + abp->Info.Size - 1;
     cp->attr[i].tid = abp->TypeRef;
     coid.pwr = aop->g.oid;
     cp->attr[i].aix = coid.t.aix;
     pwr_Assert(i == count);
-    if (count > 0) {
+    if (count > 0)
+    {
       if (cp->attr[i - 1].moffset >= cp->attr[i].moffset)
-        printf("---   Class: %s, Attribute: %s\n", cop->g.f.name.orig,
-            aop->g.f.name.orig);
+        printf("---   Class: %s, Attribute: %s\n", cop->g.f.name.orig, aop->g.f.name.orig);
       pwr_Assert(cp->attr[i - 1].moffset < cp->attr[i].moffset);
     }
   }
@@ -658,8 +691,10 @@ gdb_sClass* mvol_LinkSubClassToAttribute(pwr_tStatus* sts, gdb_sClass* cp)
   if (!cp->hasSc)
     pwr_Return(cp, sts, MVOL__SUCCESS);
 
-  for (i = 0; i < cp->acount; i++) {
-    if (cp->attr[i].flags.b.isclass) {
+  for (i = 0; i < cp->acount; i++)
+  {
+    if (cp->attr[i].flags.b.isclass)
+    {
       subcp = hash_Search(sts, gdbroot->cid_ht, &cp->attr[i].tid);
       if (subcp == NULL)
         errh_Bugcheck(0, "No sub class");
@@ -670,8 +705,7 @@ gdb_sClass* mvol_LinkSubClassToAttribute(pwr_tStatus* sts, gdb_sClass* cp)
   pwr_Return(cp, sts, MVOL__SUCCESS);
 }
 
-gdb_sClass* mvol_LinkObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask ilink)
+gdb_sClass* mvol_LinkObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask ilink)
 {
   gdb_sClass* cp;
   gdb_sClass* scp;
@@ -680,27 +714,32 @@ gdb_sClass* mvol_LinkObject(
   pwr_Assert(vp->l.flags.b.isNative);
 
   /* Alias clients should be inserted in Alias class list.  */
-  if (op->g.flags.b.isAliasClient) {
+  if (op->g.flags.b.isAliasClient)
+  {
     cid = pwr_eClass_Alias;
-  } else {
+  }
+  else
+  {
     cid = op->g.cid;
   }
 
   cp = gdb_AddClass(sts, cid, gdb_mAdd__);
-  if (cp == NULL) {
+  if (cp == NULL)
+  {
     errh_Bugcheck(*sts, "add class");
   }
 
-  if (cdh_isClassVolumeClass(vp->g.cid)
-      && streq(op->g.f.name.norm, "TEMPLATE"))
+  if (cdh_isClassVolumeClass(vp->g.cid) && streq(op->g.f.name.norm, "TEMPLATE"))
     return cp; /* We don't want the 'Template' object.  */
 
   pwr_Assert(!op->u.n.flags.b.inCidList);
   pool_QinsertPred(sts, gdbroot->pool, &op->u.n.cid_ll, &cp->cid_lh);
   op->u.n.flags.b.inCidList = 1;
 
-  if (cdh_isClassVolumeClass(vp->g.cid)) {
-    switch (cid) {
+  if (cdh_isClassVolumeClass(vp->g.cid))
+  {
+    switch (cid)
+    {
     case pwr_eClass_ClassDef:
       /* Link the class definition object to the class.  */
       scp = gdb_AddClass(sts, cdh_ClassObjidToId(op->g.oid), gdb_mAdd__);
@@ -749,13 +788,13 @@ gdb_sClass* mvol_LinkObject(
   return cp;
 }
 
-gdb_sClass* mvol_LinkScObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sScObject* scp)
+gdb_sClass* mvol_LinkScObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sScObject* scp)
 {
   gdb_sClass* cp;
 
   cp = gdb_AddClass(sts, scp->cid, gdb_mAdd__);
-  if (cp == NULL) {
+  if (cp == NULL)
+  {
     errh_Bugcheck(*sts, "mvol_LinkScObject add class");
   }
 
@@ -779,8 +818,8 @@ gdb_sClass* mvol_NameToClass(pwr_tStatus* sts, const char* name)
   pn = cdh_ParseName(sts, &ParseName, pwr_cNObjid, name, 0);
   if (pn == NULL)
     return NULL;
-  if ((pn->nObject != 1) || pn->flags.b.parent || pn->flags.b.attribute
-      || pn->flags.b.index) {
+  if ((pn->nObject != 1) || pn->flags.b.parent || pn->flags.b.attribute || pn->flags.b.index)
+  {
     pwr_Return(NULL, sts, GDH__BADOBJTYPE);
   }
 
@@ -789,7 +828,8 @@ gdb_sClass* mvol_NameToClass(pwr_tStatus* sts, const char* name)
     pwr_Return(NULL, sts, GDH__BADOBJTYPE);
 
   for (ol = pool_Qsucc(NULL, gdbroot->pool, &cp->cid_lh); ol != &cp->cid_lh;
-       ol = pool_Qsucc(NULL, gdbroot->pool, ol)) {
+       ol = pool_Qsucc(NULL, gdbroot->pool, ol))
+  {
     op = pool_Qitem(ol, gdb_sObject, u.n.cid_ll);
     pn->object[0].poid = op->g.oid;
     op = hash_Search(sts, gdbroot->family_ht, &pn->object[0]);
@@ -799,17 +839,19 @@ gdb_sClass* mvol_NameToClass(pwr_tStatus* sts, const char* name)
       break;
   }
 
-  if (op != NULL && op->g.cid == pwr_eClass_ClassDef) {
+  if (op != NULL && op->g.cid == pwr_eClass_ClassDef)
+  {
     cid = cdh_ClassObjidToId(op->g.oid);
     return hash_Search(sts, gdbroot->cid_ht, &cid);
-  } else {
+  }
+  else
+  {
     pwr_Return(NULL, sts, GDH__BADOBJTYPE);
   }
 }
 
-static void insertCattObject(
-   pwr_tStatus* sts, pwr_tCid cid, gdb_sAttribute* ap, int offset,
-   gdb_sAttribute* pap)
+static void insertCattObject(pwr_tStatus* sts, pwr_tCid cid, gdb_sAttribute* ap, int offset,
+                             gdb_sAttribute* pap)
 {
   gdb_sClassAttrKey key;
   gdb_sClassAttr* item;
@@ -827,29 +869,35 @@ static void insertCattObject(
   key.hostCid = cid;
   key.idx = 0;
   item0 = ptree_Find(sts, gdbroot->catt_tt, &key);
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     itemr = ptree_Insert(sts, gdbroot->catt_tt, &key);
     item0 = (gdb_sClassAttr*)pool_Address(sts, gdbroot->pool, itemr);
   }
   if (item0->numIdx == 0)
     item = item0;
-  else {
+  else
+  {
     key.idx = item0->numIdx;
     item = ptree_Find(sts, gdbroot->catt_tt, &key);
     if (EVEN(*sts))
       pwr_ReturnVoid(sts, GDH__WEIRD);
-  }    
+  }
 
-  if (!ap->flags.b.array) {
-    if (item->numOffset < gdb_cCattOffsetSize) {
+  if (!ap->flags.b.array)
+  {
+    if (item->numOffset < gdb_cCattOffsetSize)
+    {
 
       /* Insert in found item */
       item->offset[item->numOffset] = offset + ap->offs;
       item->flags[item->numOffset++] = ap->flags;
       if (ap->flags.b.superclass && pap)
-	/* Inherit disable flag */
-	ap->flags.b.disableattr = pap->flags.b.disableattr;
-    } else {
+        /* Inherit disable flag */
+        ap->flags.b.disableattr = pap->flags.b.disableattr;
+    }
+    else
+    {
       /* Insert a new item */
       key.idx++;
       item0->numIdx = key.idx;
@@ -862,42 +910,47 @@ static void insertCattObject(
       item->flags[item->numOffset++] = ap->flags;
     }
     /* Look for class attributes in this class */
-    for (i = 0; i < cp->acount; i++) {
-      if (cp->attr[i].flags.b.isclass && cdh_tidIsCid(cp->attr[i].tid)
-          && !cp->attr[i].flags.b.pointer) {
+    for (i = 0; i < cp->acount; i++)
+    {
+      if (cp->attr[i].flags.b.isclass && cdh_tidIsCid(cp->attr[i].tid) && !cp->attr[i].flags.b.pointer)
+      {
         insertCattObject(sts, cid, &cp->attr[i], offset + ap->offs, ap);
         if (EVEN(*sts))
           return;
       }
     }
-  } else {
+  }
+  else
+  {
     /* Insert all offsets in the array */
-    for (j = 0; j < ap->elem; j++) {
-      if (item->numOffset < gdb_cCattOffsetSize) {
+    for (j = 0; j < ap->elem; j++)
+    {
+      if (item->numOffset < gdb_cCattOffsetSize)
+      {
         /* Insert in current item */
-        item->offset[item->numOffset]
-            = offset + ap->offs + j * (ap->size / ap->elem);
+        item->offset[item->numOffset] = offset + ap->offs + j * (ap->size / ap->elem);
         item->flags[item->numOffset++] = ap->flags;
-      } else {
+      }
+      else
+      {
         /* Insert a new item */
         pool_tRef itemr;
-	key.idx++;
-	item0->numIdx = key.idx;
+        key.idx++;
+        item0->numIdx = key.idx;
         itemr = ptree_Insert(sts, gdbroot->catt_tt, &key);
         item = (gdb_sClassAttr*)pool_Address(sts, gdbroot->pool, itemr);
         if (item == NULL)
           return;
-        item->offset[item->numOffset]
-            = offset + ap->offs + j * (ap->size / ap->elem);
+        item->offset[item->numOffset] = offset + ap->offs + j * (ap->size / ap->elem);
         item->flags[item->numOffset++] = ap->flags;
       }
 
       /* Look for class attributes in this class */
-      for (i = 0; i < cp->acount; i++) {
-        if (cp->attr[i].flags.b.isclass && cdh_tidIsCid(cp->attr[i].tid)
-            && !cp->attr[i].flags.b.pointer) {
-          insertCattObject(sts, cid, &cp->attr[i],
-	    offset + ap->offs + j * (ap->size / ap->elem), 0);
+      for (i = 0; i < cp->acount; i++)
+      {
+        if (cp->attr[i].flags.b.isclass && cdh_tidIsCid(cp->attr[i].tid) && !cp->attr[i].flags.b.pointer)
+        {
+          insertCattObject(sts, cid, &cp->attr[i], offset + ap->offs + j * (ap->size / ap->elem), 0);
           if (EVEN(*sts))
             return;
         }
@@ -939,16 +992,18 @@ void mvol_BuildCatt(pwr_tStatus* sts)
 
   /* Loop through all $ClassDef objects */
   op = mvol_ClassList(sts, pwr_eClass_ClassDef, pwr_cNObjid, mvol_eList_first);
-  while (op) {
+  while (op)
+  {
     cid = cdh_ClassObjidToId(op->g.oid);
 
     cp = hash_Search(sts, gdbroot->cid_ht, &cid);
     if (cp == NULL)
       return;
 
-    for (i = 0; i < cp->acount; i++) {
-      if (cp->attr[i].flags.b.isclass && cdh_tidIsCid(cp->attr[i].tid)
-          && !cp->attr[i].flags.b.pointer) {
+    for (i = 0; i < cp->acount; i++)
+    {
+      if (cp->attr[i].flags.b.isclass && cdh_tidIsCid(cp->attr[i].tid) && !cp->attr[i].flags.b.pointer)
+      {
         insertCattObject(sts, cid, &cp->attr[i], 0, 0);
         if (EVEN(*sts))
           return;
@@ -959,8 +1014,8 @@ void mvol_BuildCatt(pwr_tStatus* sts)
   }
 }
 
-void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid,
-    pwr_sAttrRef* iarp, pwr_sAttrRef* oarp, mvol_eList list)
+void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid, pwr_sAttrRef* iarp, pwr_sAttrRef* oarp,
+                           mvol_eList list)
 {
   gdb_sClass* cp;
   gdb_sClass* cap = NULL;
@@ -976,48 +1031,53 @@ void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid,
 
   first_flags.m = 0;
 
-  if (iarp != NULL && cdh_ObjidIsNotNull(iarp->Objid)) {
-    op = vol_OidToObject(
-        sts, iarp->Objid, gdb_mLo_native, vol_mTrans_none, cvol_eHint_none);
+  if (iarp != NULL && cdh_ObjidIsNotNull(iarp->Objid))
+  {
+    op = vol_OidToObject(sts, iarp->Objid, gdb_mLo_native, vol_mTrans_none, cvol_eHint_none);
     if (op == NULL)
       return;
-  } else if (cid == pwr_cNClassId)
+  }
+  else if (cid == pwr_cNClassId)
     pwr_ReturnVoid(sts, GDH__WEIRD);
 
   cp = (gdb_sClass*)hash_Search(sts, gdbroot->cid_ht, &cid);
   if (cp == NULL)
     pwr_ReturnVoid(sts, GDH__BADOBJTYPE);
 
-  switch (list) {
+  switch (list)
+  {
   case mvol_eList_first:
     /* Find object in class list */
     ol = pool_Qsucc(NULL, gdbroot->pool, &cp->cid_lh);
-    if (ol != NULL && ol != &cp->cid_lh) {
+    if (ol != NULL && ol != &cp->cid_lh)
+    {
       fop = pool_Qitem(ol, gdb_sObject, u.n.cid_ll);
       *oarp = pwr_cNAttrRef;
       oarp->Objid = fop->g.oid;
       oarp->Flags.b.Object = 1;
       oarp->Size = cp->size;
       pwr_ReturnVoid(sts, MVOL__SUCCESS);
-    } else {
+    }
+    else
+    {
       /* Find attribute object */
       key.subCid = cid;
       key.hostCid = 0;
       key.idx = 0;
-      for (item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &key);
-           item != NULL && item->key.subCid == cid;
-           item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &item->key)) {
+      for (item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &key); item != NULL && item->key.subCid == cid;
+           item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &item->key))
+      {
         if (cap != NULL && item->key.hostCid == cap->cid)
           /* Same class with other index */
           continue;
 
-        cap = (gdb_sClass*)hash_Search(
-            sts, gdbroot->cid_ht, &item->key.hostCid);
+        cap = (gdb_sClass*)hash_Search(sts, gdbroot->cid_ht, &item->key.hostCid);
         if (cap == NULL)
           return;
 
         ol = pool_Qsucc(NULL, gdbroot->pool, &cap->cid_lh);
-        if (ol != NULL && ol != &cap->cid_lh) {
+        if (ol != NULL && ol != &cap->cid_lh)
+        {
           fop = pool_Qitem(ol, gdb_sObject, u.n.cid_ll);
           *oarp = pwr_cNAttrRef;
           oarp->Objid = fop->g.oid;
@@ -1026,8 +1086,8 @@ void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid,
           oarp->Size = cp->size;
           oarp->Body = cid;
 
-          if (item->flags[0].m & PWR_MASK_DISABLEATTR
-              && vol_ArefDisabled(sts, oarp)) {
+          if (item->flags[0].m & PWR_MASK_DISABLEATTR && vol_ArefDisabled(sts, oarp))
+          {
             aref = *oarp;
             mvol_ClassListAttrRef(sts, cid, &aref, oarp, mvol_eList_next);
             return;
@@ -1039,35 +1099,39 @@ void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid,
     }
 
   case mvol_eList_next:
-    if (op->g.cid == cid) {
+    if (op->g.cid == cid)
+    {
       /* Find next object in class list */
       ol = pool_Qsucc(NULL, gdbroot->pool, &op->u.n.cid_ll);
-      if (ol != NULL && ol != &cp->cid_lh) {
+      if (ol != NULL && ol != &cp->cid_lh)
+      {
         fop = pool_Qitem(ol, gdb_sObject, u.n.cid_ll);
         *oarp = pwr_cNAttrRef;
         oarp->Objid = fop->g.oid;
         oarp->Flags.b.Object = 1;
         oarp->Size = cp->size;
         pwr_ReturnVoid(sts, MVOL__SUCCESS);
-      } else {
+      }
+      else
+      {
         /* Find first attribute object */
         key.subCid = cid;
         key.hostCid = 0;
         key.idx = 0;
-        for (item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &key);
-             item != NULL && item->key.subCid == cid;
-             item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &item->key)) {
+        for (item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &key); item != NULL && item->key.subCid == cid;
+             item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &item->key))
+        {
           if (cap != NULL && item->key.hostCid == cap->cid)
             /* Same class with other index */
             continue;
 
-          cap = (gdb_sClass*)hash_Search(
-              sts, gdbroot->cid_ht, &item->key.hostCid);
+          cap = (gdb_sClass*)hash_Search(sts, gdbroot->cid_ht, &item->key.hostCid);
           if (cap == NULL)
             return;
 
           ol = pool_Qsucc(NULL, gdbroot->pool, &cap->cid_lh);
-          if (ol != NULL && ol != &cap->cid_lh) {
+          if (ol != NULL && ol != &cap->cid_lh)
+          {
             fop = pool_Qitem(ol, gdb_sObject, u.n.cid_ll);
             *oarp = pwr_cNAttrRef;
             oarp->Objid = fop->g.oid;
@@ -1075,8 +1139,8 @@ void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid,
             oarp->Offset = item->offset[0];
             oarp->Size = cp->size;
             oarp->Body = cid;
-            if (item->flags[0].m & PWR_MASK_DISABLEATTR
-                && vol_ArefDisabled(sts, oarp)) {
+            if (item->flags[0].m & PWR_MASK_DISABLEATTR && vol_ArefDisabled(sts, oarp))
+            {
               aref = *oarp;
               mvol_ClassListAttrRef(sts, cid, &aref, oarp, list);
               return;
@@ -1092,24 +1156,28 @@ void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid,
     key.subCid = cid;
     key.hostCid = op->g.cid;
     key.idx = 0;
-    for (item = ptree_Find(sts, gdbroot->catt_tt, &key); item != NULL
-         && item->key.subCid == cid && item->key.hostCid == op->g.cid;
-         item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &item->key)) {
+    for (item = ptree_Find(sts, gdbroot->catt_tt, &key);
+         item != NULL && item->key.subCid == cid && item->key.hostCid == op->g.cid;
+         item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &item->key))
+    {
       /* Find next offset */
-      for (i = 0; i < item->numOffset; i++) {
-        if (i == 0 && item->key.idx == 0) {
+      for (i = 0; i < item->numOffset; i++)
+      {
+        if (i == 0 && item->key.idx == 0)
+        {
           first_offset = item->offset[0];
           first_flags = item->flags[0];
         }
-        if (item->offset[i] > iarp->Offset) {
+        if (item->offset[i] > iarp->Offset)
+        {
           *oarp = pwr_cNAttrRef;
           oarp->Objid = op->g.oid;
           oarp->Flags.b.ObjectAttr = 1;
           oarp->Offset = item->offset[i];
           oarp->Size = cp->size;
           oarp->Body = cid;
-          if (item->flags[i].m & PWR_MASK_DISABLEATTR
-              && vol_ArefDisabled(sts, oarp)) {
+          if (item->flags[i].m & PWR_MASK_DISABLEATTR && vol_ArefDisabled(sts, oarp))
+          {
             aref = *oarp;
             mvol_ClassListAttrRef(sts, cid, &aref, oarp, list);
             return;
@@ -1120,13 +1188,15 @@ void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid,
     }
 
     /* Find first attribute in next object */
-    if (cap == NULL) {
+    if (cap == NULL)
+    {
       cap = (gdb_sClass*)hash_Search(sts, gdbroot->cid_ht, &op->g.cid);
       if (cap == NULL)
         pwr_ReturnVoid(sts, GDH__WEIRD);
     }
     ol = pool_Qsucc(NULL, gdbroot->pool, &op->u.n.cid_ll);
-    if (ol != NULL && ol != &cap->cid_lh) {
+    if (ol != NULL && ol != &cap->cid_lh)
+    {
       fop = pool_Qitem(ol, gdb_sObject, u.n.cid_ll);
       *oarp = pwr_cNAttrRef;
       oarp->Objid = fop->g.oid;
@@ -1134,7 +1204,8 @@ void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid,
       oarp->Offset = first_offset;
       oarp->Size = cp->size;
       oarp->Body = cid;
-      if (first_flags.m & PWR_MASK_DISABLEATTR && vol_ArefDisabled(sts, oarp)) {
+      if (first_flags.m & PWR_MASK_DISABLEATTR && vol_ArefDisabled(sts, oarp))
+      {
         aref = *oarp;
         mvol_ClassListAttrRef(sts, cid, &aref, oarp, list);
         return;
@@ -1146,9 +1217,9 @@ void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid,
     key.subCid = cid;
     key.hostCid = op->g.cid;
     key.idx = 0;
-    for (item = ptree_Find(sts, gdbroot->catt_tt, &key);
-         item != NULL && item->key.subCid == cid;
-         item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &item->key)) {
+    for (item = ptree_Find(sts, gdbroot->catt_tt, &key); item != NULL && item->key.subCid == cid;
+         item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &item->key))
+    {
       if (item->key.hostCid == key.hostCid)
         continue;
 
@@ -1157,7 +1228,8 @@ void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid,
         pwr_ReturnVoid(sts, GDH__WEIRD);
 
       ol = pool_Qsucc(NULL, gdbroot->pool, &cap->cid_lh);
-      if (ol != NULL && ol != &cap->cid_lh) {
+      if (ol != NULL && ol != &cap->cid_lh)
+      {
         fop = pool_Qitem(ol, gdb_sObject, u.n.cid_ll);
         *oarp = pwr_cNAttrRef;
         oarp->Objid = fop->g.oid;
@@ -1165,8 +1237,8 @@ void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid,
         oarp->Offset = item->offset[0];
         oarp->Size = cp->size;
         oarp->Body = cid;
-        if (item->flags[0].m & PWR_MASK_DISABLEATTR
-            && vol_ArefDisabled(sts, oarp)) {
+        if (item->flags[0].m & PWR_MASK_DISABLEATTR && vol_ArefDisabled(sts, oarp))
+        {
           aref = *oarp;
           mvol_ClassListAttrRef(sts, cid, &aref, oarp, list);
           return;
@@ -1199,22 +1271,25 @@ void mvol_ClassListAttrRef(pwr_tStatus* sts, pwr_tClassId cid,
     key.subCid = cid;
     key.hostCid = op->g.cid;
     key.idx = 0;
-    for (item = ptree_Find(sts, gdbroot->catt_tt, &key); item != NULL
-         && item->key.subCid == cid && item->key.hostCid == op->g.cid;
-         item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &item->key)) {
+    for (item = ptree_Find(sts, gdbroot->catt_tt, &key);
+         item != NULL && item->key.subCid == cid && item->key.hostCid == op->g.cid;
+         item = ptree_FindSuccessor(sts, gdbroot->catt_tt, &item->key))
+    {
       /* Find next offset */
-      for (i = 0; i < item->numOffset; i++) {
+      for (i = 0; i < item->numOffset; i++)
+      {
         if (i == 0 && item->key.idx == 0)
           first_offset = item->offset[0];
-        if (item->offset[i] > iarp->Offset) {
+        if (item->offset[i] > iarp->Offset)
+        {
           *oarp = pwr_cNAttrRef;
           oarp->Objid = op->g.oid;
           oarp->Flags.b.ObjectAttr = 1;
           oarp->Offset = item->offset[i];
           oarp->Size = cp->size;
           oarp->Body = cid;
-          if (item->flags[i].m & PWR_MASK_DISABLEATTR
-              && vol_ArefDisabled(sts, oarp)) {
+          if (item->flags[i].m & PWR_MASK_DISABLEATTR && vol_ArefDisabled(sts, oarp))
+          {
             aref = *oarp;
             mvol_ClassListAttrRef(sts, cid, &aref, oarp, list);
             return;

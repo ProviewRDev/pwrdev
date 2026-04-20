@@ -45,8 +45,7 @@
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 32)
 long pb_ioctl(struct file* file, unsigned int cmd, unsigned long arg);
 #else
-int pb_ioctl(struct inode* inode, struct file* file, unsigned int cmd,
-             unsigned long arg);
+int pb_ioctl(struct inode* inode, struct file* file, unsigned int cmd, unsigned long arg);
 #endif
 #endif
 

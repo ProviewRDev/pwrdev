@@ -46,35 +46,29 @@
 #include "glow_grownode.h"
 #include "glow_exportscript.h"
 
-//#if defined IMLIB
-static int rgb_tone(
-    unsigned char* x0, unsigned char* y0, unsigned char* z0, int tone);
-static int rgb_shift(
-    unsigned char* x0, unsigned char* y0, unsigned char* z0, int shift);
-//#endif
+// #if defined IMLIB
+static int rgb_tone(unsigned char* x0, unsigned char* y0, unsigned char* z0, int tone);
+static int rgb_shift(unsigned char* x0, unsigned char* y0, unsigned char* z0, int shift);
+// #endif
 
-extern "C" {
+extern "C"
+{
 #include "co_dcli.h"
 }
 
-GrowImage::GrowImage(GrowCtx* glow_ctx, const char* name, double x, double y,
-    const char* imagefile, glow_mDisplayLevel display_lev)
-  : GlowArrayElem(glow_ctx), ll(glow_ctx, x, y), ur(glow_ctx, x + 1, y + 1), 
-      hot(0), pzero(glow_ctx),
-      stored_pos(glow_ctx), highlight(0), inverse(0), user_data(NULL),
-      dynamic(0), dynamicsize(0), image_data(0), image(0), original_image(0),
-      pixmap(0), nav_pixmap(0), clip_mask(0), nav_clip_mask(0),
-      display_level(display_lev), color_tone(glow_eDrawTone_No),
-      color_lightness(0), color_intensity(0), color_shift(0), color_inverse(0),
-      current_color_tone(glow_eDrawTone_No), current_color_lightness(0),
-      current_color_intensity(0), current_color_shift(0),
-      current_color_inverse(0), current_direction(0),
+GrowImage::GrowImage(GrowCtx* glow_ctx, const char* name, double x, double y, const char* imagefile,
+                     glow_mDisplayLevel display_lev)
+    : GlowArrayElem(glow_ctx), ll(glow_ctx, x, y), ur(glow_ctx, x + 1, y + 1), hot(0), pzero(glow_ctx),
+      stored_pos(glow_ctx), highlight(0), inverse(0), user_data(NULL), dynamic(0), dynamicsize(0),
+      image_data(0), image(0), original_image(0), pixmap(0), nav_pixmap(0), clip_mask(0), nav_clip_mask(0),
+      display_level(display_lev), color_tone(glow_eDrawTone_No), color_lightness(0), color_intensity(0),
+      color_shift(0), color_inverse(0), current_color_tone(glow_eDrawTone_No), current_color_lightness(0),
+      current_color_intensity(0), current_color_shift(0), current_color_inverse(0), current_direction(0),
       current_nav_color_tone(glow_eDrawTone_No), current_nav_color_lightness(0),
-      current_nav_color_intensity(0), current_nav_color_shift(0),
-      current_nav_color_inverse(0), current_nav_direction(0),
-      flip_vertical(false), flip_horizontal(false),
-      current_flip_vertical(false), current_flip_horizontal(false), rotation(0),
-      current_rotation(0), fixposition(0), original_width(0), original_height(0)
+      current_nav_color_intensity(0), current_nav_color_shift(0), current_nav_color_inverse(0),
+      current_nav_direction(0), flip_vertical(false), flip_horizontal(false), current_flip_vertical(false),
+      current_flip_horizontal(false), rotation(0), current_rotation(0), fixposition(0), original_width(0),
+      original_height(0)
 {
   strcpy(n_name, name);
   strcpy(image_filename, "");
@@ -86,7 +80,8 @@ GrowImage::GrowImage(GrowCtx* glow_ctx, const char* name, double x, double y,
 
   pzero.nav_zoom();
 
-  if (ctx->grid_on) {
+  if (ctx->grid_on)
+  {
     double x_grid, y_grid;
 
     ctx->find_grid(ll.x, ll.y, &x_grid, &y_grid);
@@ -96,7 +91,7 @@ GrowImage::GrowImage(GrowCtx* glow_ctx, const char* name, double x, double y,
       ur.posit(ll.x + 1, ll.y + 1);
     else
       ur.posit(ll.x + double(current_width) / ctx->mw.zoom_factor_x,
-          ll.y + double(current_height) / ctx->mw.zoom_factor_y);
+               ll.y + double(current_height) / ctx->mw.zoom_factor_y);
   }
   get_node_borders();
   draw();
@@ -104,7 +99,7 @@ GrowImage::GrowImage(GrowCtx* glow_ctx, const char* name, double x, double y,
 
 void GrowImage::copy_from(const GrowImage& im)
 {
-  memcpy((void *)this, (void *)&im, sizeof(im));
+  memcpy((void*)this, (void*)&im, sizeof(im));
   image = 0;
   original_image = 0;
   pixmap = 0;
@@ -119,19 +114,20 @@ GrowImage::~GrowImage()
 {
   ctx->object_deleted(this);
 
-  if (!ctx->nodraw) {
+  if (!ctx->nodraw)
+  {
     draw();
     if (hot)
       ctx->gdraw->set_cursor(&ctx->mw, glow_eDrawCursor_Normal);
   }
-  //#if defined IMLIB
+  // #if defined IMLIB
   if (original_image)
     ctx->gdraw->image_free(original_image);
   if (image)
     ctx->gdraw->image_free(image);
   if (pixmap)
     ctx->gdraw->pixmap_free(pixmap);
-  //#endif
+  // #endif
 }
 
 int GrowImage::insert_image(const char* imagefile)
@@ -146,25 +142,30 @@ int GrowImage::insert_image(const char* imagefile)
     strcpy(image_filename, imagefile);
 
   // Find file
-  if (str_StartsWith(image_filename, "jpwr/")) {
+  if (str_StartsWith(image_filename, "jpwr/"))
+  {
     if ((s = strchr(&image_filename[5], '/')))
       strcpy(imagename, s + 1);
     else
       strcpy(imagename, image_filename);
-  } else
+  }
+  else
     strcpy(imagename, image_filename);
 
   strcpy(filename, imagename);
   if (check_file(filename))
     found = 1;
 
-  if (!found) {
+  if (!found)
+  {
     // Add some search path
-    for (int i = 0; i < ((GrowCtx*)ctx)->path_cnt; i++) {
+    for (int i = 0; i < ((GrowCtx*)ctx)->path_cnt; i++)
+    {
       strcpy(filename, ((GrowCtx*)ctx)->path[i]);
       strcat(filename, imagename);
       dcli_translate_filename(filename, filename);
-      if (check_file(filename)) {
+      if (check_file(filename))
+      {
         found = 1;
         break;
       }
@@ -183,12 +184,10 @@ int GrowImage::insert_image(const char* imagefile)
   if (!original_image)
     return 0;
 
-  current_width = int(ctx->mw.zoom_factor_x / ctx->mw.base_zoom_factor
-          * ctx->gdraw->image_get_width(image)
-      + 0.5);
-  current_height = int(ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor
-          * ctx->gdraw->image_get_height(image)
-      + 0.5);
+  current_width =
+      int(ctx->mw.zoom_factor_x / ctx->mw.base_zoom_factor * ctx->gdraw->image_get_width(image) + 0.5);
+  current_height =
+      int(ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * ctx->gdraw->image_get_height(image) + 0.5);
   current_color_tone = color_tone;
   current_color_lightness = color_lightness;
   current_color_intensity = color_intensity;
@@ -198,23 +197,24 @@ int GrowImage::insert_image(const char* imagefile)
   original_height = ctx->gdraw->image_get_height(original_image);
 
   ur.posit(ll.x + double(current_width) / ctx->mw.zoom_factor_x,
-      ll.y + double(current_height) / ctx->mw.zoom_factor_y);
+           ll.y + double(current_height) / ctx->mw.zoom_factor_y);
   get_node_borders();
 
   int w, h;
-  if (ABS(rotation) % 180 == 90) {
+  if (ABS(rotation) % 180 == 90)
+  {
     w = current_height;
     h = current_width;
-  } else {
+  }
+  else
+  {
     w = current_width;
     h = current_height;
   }
   ctx->gdraw->image_render(w, h, &original_image, &image, &pixmap, &clip_mask);
-  ctx->gdraw->image_scale(
-      w, h, original_image, &image, &image_data, &pixmap, &clip_mask);
-  if (current_color_tone != glow_eDrawTone_No || current_color_lightness != 0
-      || current_color_intensity != 0 || current_color_shift != 0
-      || current_color_inverse != 0)
+  ctx->gdraw->image_scale(w, h, original_image, &image, &image_data, &pixmap, &clip_mask);
+  if (current_color_tone != glow_eDrawTone_No || current_color_lightness != 0 ||
+      current_color_intensity != 0 || current_color_shift != 0 || current_color_inverse != 0)
     set_image_color(image, 0);
   if (ABS(rotation) % 360 != 0)
     ctx->gdraw->image_rotate(&image, rotation, 0);
@@ -245,10 +245,9 @@ int GrowImage::update()
   date = info.st_ctime;
 
   set_image_color(image, NULL);
-  ctx->gdraw->image_scale(current_width, current_height, original_image, &image,
-      &image_data, &pixmap, &clip_mask);
-  ctx->gdraw->image_render(current_width, current_height, original_image,
-      &image, &pixmap, &clip_mask);
+  ctx->gdraw->image_scale(current_width, current_height, original_image, &image, &image_data, &pixmap,
+                          &clip_mask);
+  ctx->gdraw->image_render(current_width, current_height, original_image, &image, &pixmap, &clip_mask);
 
   draw();
   return 1;
@@ -277,20 +276,22 @@ void GrowImage::move(double delta_x, double delta_y, int grid)
   if (fixposition)
     return;
   ctx->set_defered_redraw();
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  if (grid) {
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  if (grid)
+  {
     double x_grid, y_grid;
 
     /* Move to closest grid point */
-    ctx->find_grid(x_left + delta_x / ctx->mw.zoom_factor_x,
-        y_low + delta_y / ctx->mw.zoom_factor_y, &x_grid, &y_grid);
+    ctx->find_grid(x_left + delta_x / ctx->mw.zoom_factor_x, y_low + delta_y / ctx->mw.zoom_factor_y, &x_grid,
+                   &y_grid);
     trf.move(x_grid - x_left, y_grid - y_low);
     get_node_borders();
-  } else {
+  }
+  else
+  {
     double dx, dy;
 
     dx = delta_x / ctx->mw.zoom_factor_x;
@@ -309,15 +310,18 @@ void GrowImage::move_noerase(int delta_x, int delta_y, int grid)
 {
   if (fixposition)
     return;
-  if (grid) {
+  if (grid)
+  {
     double x_grid, y_grid;
 
     /* Move to closest grid point */
     ctx->find_grid(x_left + double(delta_x) / ctx->mw.zoom_factor_x,
-        y_low + double(delta_y) / ctx->mw.zoom_factor_y, &x_grid, &y_grid);
+                   y_low + double(delta_y) / ctx->mw.zoom_factor_y, &x_grid, &y_grid);
     trf.move(x_grid - x_left, y_grid - y_low);
     get_node_borders();
-  } else {
+  }
+  else
+  {
     double dx, dy;
 
     dx = double(delta_x) / ctx->mw.zoom_factor_x;
@@ -328,16 +332,14 @@ void GrowImage::move_noerase(int delta_x, int delta_y, int grid)
     y_high += dy;
     y_low += dy;
   }
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
 int GrowImage::local_event_handler(glow_eEvent event, double x, double y)
@@ -349,15 +351,16 @@ int GrowImage::local_event_handler(glow_eEvent event, double x, double y)
   ll_y = MIN(ll.y, ur.y);
   ur_y = MAX(ll.y, ur.y);
 
-  if (ll_x <= x && x <= ur_x && ll_y <= y && y <= ur_y) {
+  if (ll_x <= x && x <= ur_x && ll_y <= y && y <= ur_y)
+  {
     //    std::cout << "Event handler: Hit in image\n";
     return 1;
-  } else
+  }
+  else
     return 0;
 }
 
-int GrowImage::event_handler(
-    GlowWind* w, glow_eEvent event, double fx, double fy)
+int GrowImage::event_handler(GlowWind* w, glow_eEvent event, double fx, double fy)
 {
   double x, y;
 
@@ -365,8 +368,7 @@ int GrowImage::event_handler(
   return local_event_handler(event, x, y);
 }
 
-int GrowImage::event_handler(
-    GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
+int GrowImage::event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
 {
   int sts;
 
@@ -376,44 +378,51 @@ int GrowImage::event_handler(
   trf.reverse(fx, fy, &rx, &ry);
 
   sts = 0;
-  if (event == ctx->event_move_node) {
+  if (event == ctx->event_move_node)
+  {
     sts = local_event_handler(event, rx, ry);
-    if (sts) {
+    if (sts)
+    {
       /* Register node for potential movement */
       ctx->move_insert(this);
     }
     return sts;
   }
-  switch (event) {
-  case glow_eEvent_CursorMotion: {
+  switch (event)
+  {
+  case glow_eEvent_CursorMotion:
+  {
     int redraw = 0;
 
     if (ctx->hot_mode == glow_eHotMode_TraceAction)
       sts = 0;
     else if (ctx->hot_found)
       sts = 0;
-    else {
+    else
+    {
       sts = local_event_handler(event, rx, ry);
       if (sts)
         ctx->hot_found = 1;
     }
-    if (sts && !hot
-        && !(ctx->node_movement_active || ctx->node_movement_paste_active)) {
+    if (sts && !hot && !(ctx->node_movement_active || ctx->node_movement_paste_active))
+    {
       ctx->gdraw->set_cursor(w, glow_eDrawCursor_CrossHair);
       hot = 1;
       redraw = 1;
     }
-    if (!sts && hot) {
+    if (!sts && hot)
+    {
       if (!ctx->hot_found)
         ctx->gdraw->set_cursor(w, glow_eDrawCursor_Normal);
       redraw = 1;
       hot = 0;
     }
-    if (redraw) {
+    if (redraw)
+    {
       ctx->draw(w, x_left * w->zoom_factor_x - w->offset_x - DRAW_MP,
-          y_low * w->zoom_factor_y - w->offset_y - DRAW_MP,
-          x_right * w->zoom_factor_x - w->offset_x + DRAW_MP,
-          y_high * w->zoom_factor_y - w->offset_y + DRAW_MP);
+                y_low * w->zoom_factor_y - w->offset_y - DRAW_MP,
+                x_right * w->zoom_factor_x - w->offset_x + DRAW_MP,
+                y_high * w->zoom_factor_y - w->offset_y + DRAW_MP);
       //          ((GlowImage *)this)->draw( (void *)&pzero, highlight, hot,
       //          NULL);
     }
@@ -427,23 +436,24 @@ int GrowImage::event_handler(
   return sts;
 }
 
-void GrowImage::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowImage::save(std::ostream& fp, glow_eSaveMode mode)
 {
   char* s;
 
   fp << int(glow_eSave_GrowImage) << '\n';
   fp << int(glow_eSave_GrowImage_n_name) << FSPACE << n_name << '\n';
-  fp << int(glow_eSave_GrowImage_image_filename) << FSPACE << image_filename
-     << '\n';
+  fp << int(glow_eSave_GrowImage_image_filename) << FSPACE << image_filename << '\n';
   fp << int(glow_eSave_GrowImage_x_right) << FSPACE << x_right << '\n';
   fp << int(glow_eSave_GrowImage_x_left) << FSPACE << x_left << '\n';
   fp << int(glow_eSave_GrowImage_y_high) << FSPACE << y_high << '\n';
   fp << int(glow_eSave_GrowImage_y_low) << FSPACE << y_low << '\n';
   fp << int(glow_eSave_GrowImage_dynamicsize) << FSPACE << dynamicsize << '\n';
   fp << int(glow_eSave_GrowImage_dynamic) << '\n';
-  if (dynamic) {
+  if (dynamic)
+  {
     fp << "\"";
-    for (s = dynamic; *s; s++) {
+    for (s = dynamic; *s; s++)
+    {
       if (*s == '"')
         fp << "\\";
       fp << *s;
@@ -452,24 +462,20 @@ void GrowImage::save(std::ofstream& fp, glow_eSaveMode mode)
   }
   fp << int(glow_eSave_GrowImage_trf) << '\n';
   trf.save(fp, mode);
-  fp << int(glow_eSave_GrowImage_display_level) << FSPACE << int(display_level)
-     << '\n';
+  fp << int(glow_eSave_GrowImage_display_level) << FSPACE << int(display_level) << '\n';
   fp << int(glow_eSave_GrowImage_ll) << '\n';
   ll.save(fp, mode);
   fp << int(glow_eSave_GrowImage_ur) << '\n';
   ur.save(fp, mode);
-  fp << int(glow_eSave_GrowImage_color_tone) << FSPACE << int(color_tone)
-     << '\n';
-  fp << int(glow_eSave_GrowImage_color_lightness) << FSPACE << color_lightness
-     << '\n';
-  fp << int(glow_eSave_GrowImage_color_intensity) << FSPACE << color_intensity
-     << '\n';
+  fp << int(glow_eSave_GrowImage_color_tone) << FSPACE << int(color_tone) << '\n';
+  fp << int(glow_eSave_GrowImage_color_lightness) << FSPACE << color_lightness << '\n';
+  fp << int(glow_eSave_GrowImage_color_intensity) << FSPACE << color_intensity << '\n';
   fp << int(glow_eSave_GrowImage_color_shift) << FSPACE << color_shift << '\n';
   fp << int(glow_eSave_GrowImage_fixposition) << FSPACE << fixposition << '\n';
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowImage::open(std::ifstream& fp)
+void GrowImage::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -478,15 +484,18 @@ void GrowImage::open(std::ifstream& fp)
   int j;
   char c;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowImage: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowImage:
       break;
     case glow_eSave_GrowImage_n_name:
@@ -514,14 +523,18 @@ void GrowImage::open(std::ifstream& fp)
       break;
     case glow_eSave_GrowImage_dynamic:
       fp.getline(dummy, sizeof(dummy));
-      if (dynamicsize) {
+      if (dynamicsize)
+      {
         dynamic = (char*)calloc(1, dynamicsize);
         fp.get();
-        for (j = 0; j < dynamicsize; j++) {
-          if ((c = fp.get()) == '"') {
+        for (j = 0; j < dynamicsize; j++)
+        {
+          if ((c = fp.get()) == '"')
+          {
             if (dynamic[j - 1] == '\\')
               j--;
-            else {
+            else
+            {
               dynamic[j] = 0;
               break;
             }
@@ -579,23 +592,25 @@ void GrowImage::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
 {
   int tmp;
 
-  if (ll_x > ur_x) {
+  if (ll_x > ur_x)
+  {
     /* Shift */
     tmp = ll_x;
     ll_x = ur_x;
     ur_x = tmp;
   }
-  if (ll_y > ur_y) {
+  if (ll_y > ur_y)
+  {
     /* Shift */
     tmp = ll_y;
     ll_y = ur_y;
     ur_y = tmp;
   }
 
-  if (x_right * w->zoom_factor_x - w->offset_x + 1 >= ll_x
-      && x_left * w->zoom_factor_x - w->offset_x <= ur_x
-      && y_high * w->zoom_factor_y - w->offset_y + 1 >= ll_y
-      && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
+  if (x_right * w->zoom_factor_x - w->offset_x + 1 >= ll_x &&
+      x_left * w->zoom_factor_x - w->offset_x <= ur_x &&
+      y_high * w->zoom_factor_y - w->offset_y + 1 >= ll_y && y_low * w->zoom_factor_y - w->offset_y <= ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
   }
 }
@@ -608,21 +623,23 @@ void GrowImage::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
   int obj_ur_y = int(y_high * w->zoom_factor_y) - w->offset_y;
   int obj_ll_y = int(y_low * w->zoom_factor_y) - w->offset_y;
 
-  if (*ll_x > *ur_x) {
+  if (*ll_x > *ur_x)
+  {
     /* Shift */
     tmp = *ll_x;
     *ll_x = *ur_x;
     *ur_x = tmp;
   }
-  if (*ll_y > *ur_y) {
+  if (*ll_y > *ur_y)
+  {
     /* Shift */
     tmp = *ll_y;
     *ll_y = *ur_y;
     *ur_y = tmp;
   }
 
-  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
-      && obj_ll_y <= *ur_y) {
+  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y && obj_ll_y <= *ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
 
     // Increase the redraw area
@@ -643,16 +660,19 @@ void GrowImage::set_highlight(int on)
   draw();
 }
 
-void GrowImage::select_region_insert(double ll_x, double ll_y, double ur_x,
-    double ur_y, glow_eSelectPolicy select_policy)
+void GrowImage::select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
+                                     glow_eSelectPolicy select_policy)
 {
   if (!in_active_layer())
     return;
 
-  if (select_policy == glow_eSelectPolicy_Surround) {
+  if (select_policy == glow_eSelectPolicy_Surround)
+  {
     if (x_left > ll_x && x_right < ur_x && y_high < ur_y && y_low > ll_y)
       ctx->select_insert(this);
-  } else {
+  }
+  else
+  {
     if (x_right > ll_x && x_left < ur_x && y_low < ur_y && y_high > ll_y)
       ctx->select_insert(this);
   }
@@ -660,10 +680,13 @@ void GrowImage::select_region_insert(double ll_x, double ll_y, double ur_x,
 
 void GrowImage::set_dynamic(char* code, int size)
 {
-  if (!dynamic) {
+  if (!dynamic)
+  {
     dynamic = (char*)calloc(1, size + 1);
     dynamicsize = size + 1;
-  } else if (dynamicsize < size + 1) {
+  }
+  else if (dynamicsize < size + 1)
+  {
     free(dynamic);
     dynamic = (char*)calloc(1, size + 1);
     dynamicsize = size + 1;
@@ -689,25 +712,23 @@ void GrowImage::set_position(double x, double y)
   old_y_high = y_high;
   trf.posit(x, y);
   get_node_borders();
-  ctx->draw(&ctx->mw,
-      old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->mw, old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
   draw();
 }
 
-void GrowImage::set_scale(
-    double scale_x, double scale_y, double x0, double y0, glow_eScaleType type)
+void GrowImage::set_scale(double scale_x, double scale_y, double x0, double y0, glow_eScaleType type)
 {
   double old_x_left, old_x_right, old_y_low, old_y_high;
 
-  if (trf.s_a11 && trf.s_a22
-      && fabs(scale_x - trf.a11 / trf.s_a11) < FLT_EPSILON
-      && fabs(scale_y - trf.a22 / trf.s_a22) < FLT_EPSILON)
+  if (trf.s_a11 && trf.s_a22 && fabs(scale_x - trf.a11 / trf.s_a11) < FLT_EPSILON &&
+      fabs(scale_y - trf.a22 / trf.s_a22) < FLT_EPSILON)
     return;
 
-  switch (type) {
+  switch (type)
+  {
   case glow_eScaleType_LowerLeft:
     x0 = x_left;
     y0 = y_low;
@@ -740,7 +761,8 @@ void GrowImage::set_scale(
   trf.scale_from_stored(scale_x, scale_y, x0, y0);
   get_node_borders();
 
-  switch (type) {
+  switch (type)
+  {
   case glow_eScaleType_LowerLeft:
     x_left = old_x_left;
     y_low = old_y_low;
@@ -765,23 +787,22 @@ void GrowImage::set_scale(
     break;
   default:;
   }
-  ctx->draw(&ctx->mw,
-      old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->mw, old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
   draw();
 }
 
-void GrowImage::set_rotation(
-    double angle, double x0, double y0, glow_eRotationPoint type)
+void GrowImage::set_rotation(double angle, double x0, double y0, glow_eRotationPoint type)
 {
   double old_x_left, old_x_right, old_y_low, old_y_high;
 
   if (fabs(angle - trf.rotation + trf.s_rotation) < FLT_EPSILON)
     return;
 
-  switch (type) {
+  switch (type)
+  {
   case glow_eRotationPoint_LowerLeft:
     x0 = x_left;
     y0 = y_low;
@@ -811,20 +832,20 @@ void GrowImage::set_rotation(
   old_y_high = y_high;
   trf.rotate_from_stored(angle, x0, y0);
   get_node_borders();
-  ctx->draw(&ctx->mw,
-      old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->mw, old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
   draw();
 }
 
-void GrowImage::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode, void *transpnode)
+void GrowImage::draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+                     void* transpnode)
 {
   if (!(display_level & ctx->display_level))
     return;
-  if (w == &ctx->navw) {
+  if (w == &ctx->navw)
+  {
     if (ctx->no_nav)
       return;
     hot = 0;
@@ -832,12 +853,15 @@ void GrowImage::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
   double x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
 
-  if (!t) {
+  if (!t)
+  {
     x1 = (trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = (trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
     x2 = (trf.x(ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
     y2 = (trf.y(ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  } else {
+  }
+  else
+  {
     x1 = (trf.x(t, ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = (trf.y(t, ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
     x2 = (trf.x(t, ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
@@ -861,11 +885,14 @@ void GrowImage::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
   rotation = int((rot + 45) / 90) * 90;
 
-  if (w == &ctx->navw) {
-    ctx->gdraw->fill_rect(
-        w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineGray);
-  } else {
-    if (pixmap || image) {
+  if (w == &ctx->navw)
+  {
+    ctx->gdraw->fill_rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineGray);
+  }
+  else
+  {
+    if (pixmap || image)
+    {
       int sts = 0;
       int sts_rotate = 0;
       int sts_color = 0;
@@ -875,74 +902,81 @@ void GrowImage::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       int flip_vert, flip_horiz;
       glow_tImImage om = original_image;
 
-      if (colornode) {
-        flip_vert = ((((GrowNode*)node)->flip_vertical && !flip_vertical)
-            || (!((GrowNode*)node)->flip_vertical && flip_vertical));
-        flip_horiz = ((((GrowNode*)node)->flip_horizontal && !flip_horizontal)
-            || (!((GrowNode*)node)->flip_horizontal && flip_horizontal));
-      } else {
+      if (colornode)
+      {
+        flip_vert = ((((GrowNode*)node)->flip_vertical && !flip_vertical) ||
+                     (!((GrowNode*)node)->flip_vertical && flip_vertical));
+        flip_horiz = ((((GrowNode*)node)->flip_horizontal && !flip_horizontal) ||
+                      (!((GrowNode*)node)->flip_horizontal && flip_horizontal));
+      }
+      else
+      {
         flip_vert = flip_vertical;
         flip_horiz = flip_horizontal;
       }
 
-      if (int(ur_x - ll_x + 0.5) != current_width
-          || int(ur_y - ll_y + 0.5) != current_height) {
+      if (int(ur_x - ll_x + 0.5) != current_width || int(ur_y - ll_y + 0.5) != current_height)
+      {
         sts_scale = 1;
         sts = 1;
       }
 
-      if (rotation != current_rotation) {
+      if (rotation != current_rotation)
+      {
         current_rotation = rotation;
         sts_rotate = 1;
         sts = 1;
       }
 
-      if ((colornode
-              && !(current_color_tone == ((GrowNode*)node)->color_tone
-                     && current_color_lightness
-                         == ((GrowNode*)node)->color_lightness
-                     && current_color_intensity
-                         == ((GrowNode*)node)->color_intensity
-                     && current_color_shift == ((GrowNode*)node)->color_shift
-                     && current_color_inverse
-                         == ((GrowNode*)node)->color_inverse))
-          || (!colornode
-                 && !(current_color_tone == color_tone
-                        && current_color_lightness == color_lightness
-                        && current_color_intensity == color_intensity
-                        && current_color_shift == color_shift
-                        && current_color_inverse == color_inverse))) {
+      if ((colornode && !(current_color_tone == ((GrowNode*)node)->color_tone &&
+                          current_color_lightness == ((GrowNode*)node)->color_lightness &&
+                          current_color_intensity == ((GrowNode*)node)->color_intensity &&
+                          current_color_shift == ((GrowNode*)node)->color_shift &&
+                          current_color_inverse == ((GrowNode*)node)->color_inverse)) ||
+          (!colornode && !(current_color_tone == color_tone && current_color_lightness == color_lightness &&
+                           current_color_intensity == color_intensity && current_color_shift == color_shift &&
+                           current_color_inverse == color_inverse)))
+      {
         sts_color = 1;
         sts = 1;
       }
 
-      if (flip_vert != current_flip_vertical) {
+      if (flip_vert != current_flip_vertical)
+      {
         current_flip_vertical = flip_vert;
         sts_flip_vert = 1;
         sts = 1;
       }
-      if (flip_horiz != current_flip_horizontal) {
+      if (flip_horiz != current_flip_horizontal)
+      {
         current_flip_horizontal = flip_horiz;
         sts_flip_horiz = 1;
         sts = 1;
       }
 
-      if (sts) {
+      if (sts)
+      {
         int w, h;
-        if (ABS(rotation) % 180 == 90) {
+        if (ABS(rotation) % 180 == 90)
+        {
           w = int(ur_y - ll_y + 0.5);
           h = int(ur_x - ll_x + 0.5);
-        } else {
+        }
+        else
+        {
           w = int(ur_x - ll_x + 0.5);
           h = int(ur_y - ll_y + 0.5);
         }
-        if (colornode) {
+        if (colornode)
+        {
           current_color_tone = ((GrowNode*)colornode)->color_tone;
           current_color_lightness = ((GrowNode*)colornode)->color_lightness;
           current_color_intensity = ((GrowNode*)colornode)->color_intensity;
           current_color_shift = ((GrowNode*)colornode)->color_shift;
           current_color_inverse = ((GrowNode*)colornode)->color_inverse;
-        } else {
+        }
+        else
+        {
           current_color_tone = color_tone;
           current_color_lightness = color_lightness;
           current_color_intensity = color_intensity;
@@ -950,21 +984,20 @@ void GrowImage::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
           current_color_inverse = color_inverse;
         }
 
-        ctx->gdraw->image_render(
-            w, h, &original_image, &image, &pixmap, &clip_mask);
-        if (w != original_width || h != original_height) {
-          int sts2 = ctx->gdraw->image_scale(
-              w, h, om, &image, &image_data, &pixmap, &clip_mask);
-          if (sts2 == 0) {
+        ctx->gdraw->image_render(w, h, &original_image, &image, &pixmap, &clip_mask);
+        if (w != original_width || h != original_height)
+        {
+          int sts2 = ctx->gdraw->image_scale(w, h, om, &image, &image_data, &pixmap, &clip_mask);
+          if (sts2 == 0)
+          {
             ctx->gdraw->image_copy(om, &image);
-            ctx->gdraw->image_scale(
-                w, h, om, &image, &image_data, &pixmap, &clip_mask);
+            ctx->gdraw->image_scale(w, h, om, &image, &image_data, &pixmap, &clip_mask);
           }
-        } else
+        }
+        else
           ctx->gdraw->image_copy(om, &image);
-        if (current_color_tone != glow_eDrawTone_No
-            || current_color_lightness != 0 || current_color_intensity != 0
-            || current_color_shift != 0 || current_color_inverse != 0)
+        if (current_color_tone != glow_eDrawTone_No || current_color_lightness != 0 ||
+            current_color_intensity != 0 || current_color_shift != 0 || current_color_inverse != 0)
           set_image_color(image, colornode);
         if (ABS(rotation) % 360 != 0)
           ctx->gdraw->image_rotate(&image, rotation, 0);
@@ -977,45 +1010,44 @@ void GrowImage::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         current_height = ctx->gdraw->image_get_height(image);
       }
 
-      ctx->gdraw->image_d(
-          w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, image, pixmap, clip_mask);
-    } else
-      ctx->gdraw->fill_rect(
-          w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineGray);
-    if (highlight) {
-      ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x - 1, ur_y - ll_y - 1,
-          glow_eDrawType_LineRed, 0, 0);
-    } else if (hot /*  && !((GrowCtx *)ctx)->enable_bg_pixmap */)
-      ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x - 1, ur_y - ll_y - 1,
-          glow_eDrawType_LineGray, 0, 0);
+      ctx->gdraw->image_d(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, image, pixmap, clip_mask);
+    }
+    else
+      ctx->gdraw->fill_rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineGray);
+    if (highlight)
+    {
+      ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x - 1, ur_y - ll_y - 1, glow_eDrawType_LineRed, 0, 0);
+    }
+    else if (hot /*  && !((GrowCtx *)ctx)->enable_bg_pixmap */)
+      ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x - 1, ur_y - ll_y - 1, glow_eDrawType_LineGray, 0, 0);
   }
 }
 
 void GrowImage::draw()
 {
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
-void GrowImage::get_borders(GlowTransform* t, double* x_right, double* x_left,
-    double* y_high, double* y_low)
+void GrowImage::get_borders(GlowTransform* t, double* x_right, double* x_left, double* y_high, double* y_low)
 {
   double ll_x, ur_x, ll_y, ur_y, x1, x2, y1, y2;
 
-  if (t) {
+  if (t)
+  {
     x1 = trf.x(t, ll.x, ll.y);
     x2 = trf.x(t, ur.x, ur.y);
     y1 = trf.y(t, ll.x, ll.y);
     y2 = trf.y(t, ur.x, ur.y);
-  } else {
+  }
+  else
+  {
     x1 = trf.x(ll.x, ll.y);
     x2 = trf.x(ur.x, ur.y);
     y1 = trf.y(ll.x, ll.y);
@@ -1047,14 +1079,15 @@ void GrowImage::set_transform(GlowTransform* t)
 
 void GrowImage::align(double x, double y, glow_eAlignDirection direction)
 {
-  double dx, dy;
+  double dx = 0, dy = 0;
 
   if (fixposition)
     return;
 
   ctx->set_defered_redraw();
   draw();
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eAlignDirection_CenterVert:
     dx = x - (x_right + x_left) / 2;
     dy = 0;
@@ -1094,9 +1127,8 @@ void GrowImage::align(double x, double y, glow_eAlignDirection direction)
   ctx->redraw_defered();
 }
 
-void GrowImage::export_javabean(GlowTransform* t, void* node,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, int in_nc,
-    std::ofstream& fp)
+void GrowImage::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
+                                int node_cnt, int in_nc, std::ostream& fp)
 {
   if (!(display_level & ctx->display_level))
     return;
@@ -1104,13 +1136,16 @@ void GrowImage::export_javabean(GlowTransform* t, void* node,
   double rot;
   int transparent = 0;
 
-  if (!t) {
+  if (!t)
+  {
     x1 = trf.x(ll.x, ll.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = trf.y(ll.x, ll.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = trf.x(ur.x, ur.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y2 = trf.y(ur.x, ur.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     rot = trf.rot();
-  } else {
+  }
+  else
+  {
     x1 = trf.x(t, ll.x, ll.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = trf.y(t, ll.x, ll.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = trf.x(t, ur.x, ur.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
@@ -1125,9 +1160,8 @@ void GrowImage::export_javabean(GlowTransform* t, void* node,
   if (clip_mask)
     transparent = 1;
 
-  ctx->export_jbean->image(ll_x, ll_y, ur_x, ur_y, image_filename, transparent,
-      color_tone, color_lightness, color_intensity, color_shift, rot, pass,
-      shape_cnt, node_cnt, in_nc, fp);
+  ctx->export_jbean->image(ll_x, ll_y, ur_x, ur_y, image_filename, transparent, color_tone, color_lightness,
+                           color_intensity, color_shift, rot, pass, shape_cnt, node_cnt, in_nc, fp);
 }
 
 int GrowImage::set_image_color(glow_tImImage om, void* n)
@@ -1135,14 +1169,17 @@ int GrowImage::set_image_color(glow_tImImage om, void* n)
   GrowNode* node = (GrowNode*)n;
   int inverse;
 
-  if (node) {
+  if (node)
+  {
     inverse = c_color_inverse != node->color_inverse;
     c_color_lightness = node->color_lightness;
     c_color_tone = node->color_tone;
     c_color_inverse = node->color_inverse;
     c_color_shift = node->color_shift;
     c_color_intensity = node->color_intensity;
-  } else {
+  }
+  else
+  {
     inverse = c_color_inverse != color_inverse;
     c_color_lightness = color_lightness;
     c_color_tone = color_tone;
@@ -1161,8 +1198,9 @@ int GrowImage::set_image_color(glow_tImImage om, void* n)
   else
     factor_light = 1 + 0.1 * c_color_lightness;
 
-  if (!(c_color_tone == glow_eDrawTone_No || c_color_tone >= glow_eDrawTone__)
-      || c_color_shift || c_color_intensity || c_color_lightness || inverse) {
+  if (!(c_color_tone == glow_eDrawTone_No || c_color_tone >= glow_eDrawTone__) || c_color_shift ||
+      c_color_intensity || c_color_lightness || inverse)
+  {
     ctx->gdraw->image_pixel_iter(0, &image, pixel_cb, this);
   }
 
@@ -1175,16 +1213,19 @@ void GrowImage::pixel_cb(void* data, unsigned char* rgb)
   int m;
   int value;
 
-  if (!(o->c_color_tone == glow_eDrawTone_No
-          || o->c_color_tone >= glow_eDrawTone__)) {
+  if (!(o->c_color_tone == glow_eDrawTone_No || o->c_color_tone >= glow_eDrawTone__))
+  {
     rgb_tone(rgb, rgb + 1, rgb + 2, o->c_color_tone);
   }
-  if (o->c_color_shift) {
+  if (o->c_color_shift)
+  {
     rgb_shift(rgb, rgb + 1, rgb + 2, o->c_color_shift);
   }
 
-  for (int i = 0; i < 3; i++) {
-    if (o->c_color_intensity) {
+  for (int i = 0; i < 3; i++)
+  {
+    if (o->c_color_intensity)
+    {
       value = int(o->factor_intens * *rgb) - o->c_color_intensity * 25;
       if (value > 255)
         *rgb = 255;
@@ -1194,14 +1235,18 @@ void GrowImage::pixel_cb(void* data, unsigned char* rgb)
         *rgb = value;
     }
 
-    if (o->c_color_lightness) {
-      if (o->c_color_lightness > 0) {
+    if (o->c_color_lightness)
+    {
+      if (o->c_color_lightness > 0)
+      {
         value = int(o->factor_light * *rgb) + o->c_color_lightness * 25;
         if (value < 0)
           *rgb = 0;
         else
           *rgb = value;
-      } else {
+      }
+      else
+      {
         value = int(o->factor_light * *rgb);
         if (value > 255)
           *rgb = 255;
@@ -1210,9 +1255,11 @@ void GrowImage::pixel_cb(void* data, unsigned char* rgb)
       }
     }
 
-    if (o->c_color_inverse) {
+    if (o->c_color_inverse)
+    {
       //        *rgb = 255 - *rgb;
-      if (i % 3 == 0) {
+      if (i % 3 == 0)
+      {
         m = ((int)(*rgb) + *(rgb + 1) + *(rgb + 2)) / 3;
         value = 255 - m + ((int)*rgb - m);
         if (value < 0)
@@ -1238,9 +1285,8 @@ void GrowImage::pixel_cb(void* data, unsigned char* rgb)
   }
 }
 
-//#if defined IMLIB
-static int rgb_tone(
-    unsigned char* x0, unsigned char* y0, unsigned char* z0, int tone)
+// #if defined IMLIB
+static int rgb_tone(unsigned char* x0, unsigned char* y0, unsigned char* z0, int tone)
 {
   int a1, b2;
   int tmp, m;
@@ -1263,7 +1309,8 @@ static int rgb_tone(
   if (b2 < 0)
     b2 = 0;
 
-  switch (tone) {
+  switch (tone)
+  {
   case glow_eDrawTone_Gray:
     *x0 = m;
     *y0 = m;
@@ -1325,11 +1372,10 @@ static int rgb_tone(
   }
   return 1;
 }
-//#endif
+// #endif
 
-//#if defined IMLIB
-static int rgb_shift(
-    unsigned char* x0, unsigned char* y0, unsigned char* z0, int shift)
+// #if defined IMLIB
+static int rgb_shift(unsigned char* x0, unsigned char* y0, unsigned char* z0, int shift)
 {
   unsigned char x, y, z;
   int d;
@@ -1344,293 +1390,347 @@ static int rgb_shift(
   y = *y0;
   z = *z0;
 
-  for (;;) {
+  for (;;)
+  {
     if (x == y && y == z)
       break;
-    if (x > y && y >= z && x > z) {
+    if (x > y && y >= z && x > z)
+    {
       d = x - z;
       step = 6 * d / 10 * shift;
       //      printf("Section 1, d: %d, step: %d, lap: %d\n", d, step, 6 * d);
 
-      if (step <= z + d - y) {
+      if (step <= z + d - y)
+      {
         y += step;
         break;
       }
       step -= z + d - y;
       y = z + d;
-      if (step <= d) {
+      if (step <= d)
+      {
         x -= step;
         break;
       }
       x -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         z += step;
         break;
       }
       z += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         y -= step;
         break;
       }
       y -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         x += step;
         break;
       }
       x += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         z -= step;
         break;
       }
       z -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         y += step;
         break;
       }
       y += d;
       printf("Error, shift larger than one lap\n");
       break;
-    } else if (x > z && y >= x && y > z) {
+    }
+    else if (x > z && y >= x && y > z)
+    {
       d = y - z;
       step = 6 * d / 10 * shift;
       //      printf("Section 2, d: %d, step: %d\n", d, step);
 
-      if (step <= x - z) {
+      if (step <= x - z)
+      {
         x -= step;
         break;
       }
       step -= x - z;
       x = z;
-      if (step <= d) {
+      if (step <= d)
+      {
         z += step;
         break;
       }
       z += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         y -= step;
         break;
       }
       y -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         x += step;
         break;
       }
       x += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         z -= step;
         break;
       }
       z -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         y += step;
         break;
       }
       y += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         x -= step;
         break;
       }
       x -= d;
       printf("Error, shift larger than one lap\n");
       break;
-    } else if (y > z && z >= x && y > x) {
+    }
+    else if (y > z && z >= x && y > x)
+    {
       d = y - x;
       step = 6 * d / 10 * shift;
       //      printf("Section 3, d: %d, step: %d\n", d, step);
 
-      if (step <= x + d - z) {
+      if (step <= x + d - z)
+      {
         z += step;
         break;
       }
       step -= x + d - z;
       z = x + d;
-      if (step <= d) {
+      if (step <= d)
+      {
         y -= step;
         break;
       }
       y -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         x += step;
         break;
       }
       x += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         z -= step;
         break;
       }
       z -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         y += step;
         break;
       }
       y += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         x -= step;
         break;
       }
       x -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         z += step;
         break;
       }
       z += d;
       printf("Error, shift larger than one lap\n");
       break;
-    } else if (z >= y && y > x && z >= y) {
+    }
+    else if (z >= y && y > x && z >= y)
+    {
       d = z - x;
       step = 6 * d / 10 * shift;
       //      printf("Section 4, d: %d, step: %d\n", d, step);
 
-      if (step <= y - x) {
+      if (step <= y - x)
+      {
         y -= step;
         break;
       }
       step -= y - x;
       y = x;
-      if (step <= d) {
+      if (step <= d)
+      {
         x += step;
         break;
       }
       x += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         z -= step;
         break;
       }
       z -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         y += step;
         break;
       }
       y += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         x -= step;
         break;
       }
       x -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         z += step;
         break;
       }
       z += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         y -= step;
         break;
       }
       y -= d;
       printf("Error, shift larger than one lap\n");
       break;
-    } else if (z > x && x >= y && z > y) {
+    }
+    else if (z > x && x >= y && z > y)
+    {
       d = z - y;
       step = 6 * d / 10 * shift;
       //      printf("Section 5, d: %d, step: %d\n", d, step);
 
-      if (step <= y + d - x) {
+      if (step <= y + d - x)
+      {
         x += step;
         break;
       }
       step -= y + d - x;
       x = y + d;
-      if (step <= d) {
+      if (step <= d)
+      {
         z -= step;
         break;
       }
       z -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         y += step;
         break;
       }
       y += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         x -= step;
         break;
       }
       x -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         z += step;
         break;
       }
       z += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         y -= step;
         break;
       }
       y -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         x += step;
         break;
       }
       x += d;
       printf("Error, shift larger than one lap\n");
       break;
-    } else /* if ( x >= z && z > y && x > y) */ {
+    }
+    else /* if ( x >= z && z > y && x > y) */
+    {
       d = x - y;
       step = 6 * d / 8 * shift;
       //      printf("Section 6, d: %d, step: %d\n", d, step);
       if (d < 0)
         printf("d: %d ( %d, %d, %d)\n", d, x, y, z);
 
-      if (step <= z - y) {
+      if (step <= z - y)
+      {
         z -= step;
         break;
       }
       step -= z - y;
       z = y;
-      if (step <= d) {
+      if (step <= d)
+      {
         y += step;
         break;
       }
       y += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         x -= step;
         break;
       }
       x -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         z += step;
         break;
       }
       z += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         y -= step;
         break;
       }
       y -= d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         x += step;
         break;
       }
       x += d;
       step -= d;
-      if (step <= d) {
+      if (step <= d)
+      {
         z -= step;
         break;
       }
@@ -1644,10 +1744,10 @@ static int rgb_shift(
   *z0 = z;
   return 1;
 }
-//#endif
+// #endif
 
-int grow_image_to_pixmap(GrowCtx* ctx, char* imagefile, int width, int height,
-    glow_tPixmap* pixmap, glow_tImImage* image, int* w, int* h)
+int grow_image_to_pixmap(GrowCtx* ctx, char* imagefile, int width, int height, glow_tPixmap* pixmap,
+                         glow_tImImage* image, int* w, int* h)
 {
   int found = 0;
   char imagename[80];
@@ -1655,25 +1755,30 @@ int grow_image_to_pixmap(GrowCtx* ctx, char* imagefile, int width, int height,
   char* s;
 
   // Find file
-  if (str_StartsWith(imagefile, "jpwr/")) {
+  if (str_StartsWith(imagefile, "jpwr/"))
+  {
     if ((s = strchr(&imagefile[5], '/')))
       strcpy(imagename, s + 1);
     else
       strcpy(imagename, imagefile);
-  } else
+  }
+  else
     strcpy(imagename, imagefile);
 
   strcpy(filename, imagename);
   if (check_file(filename))
     found = 1;
 
-  if (!found) {
+  if (!found)
+  {
     // Add some search path
-    for (int i = 0; i < ((GrowCtx*)ctx)->path_cnt; i++) {
+    for (int i = 0; i < ((GrowCtx*)ctx)->path_cnt; i++)
+    {
       strcpy(filename, ((GrowCtx*)ctx)->path[i]);
       strcat(filename, imagename);
       dcli_translate_filename(filename, filename);
-      if (check_file(filename)) {
+      if (check_file(filename))
+      {
         found = 1;
         break;
       }
@@ -1686,10 +1791,13 @@ int grow_image_to_pixmap(GrowCtx* ctx, char* imagefile, int width, int height,
   if (!*image)
     return 0;
 
-  if (width == 0 || height == 0) {
+  if (width == 0 || height == 0)
+  {
     width = ctx->gdraw->image_get_width(*image);
     height = ctx->gdraw->image_get_height(*image);
-  } else {
+  }
+  else
+  {
     ctx->gdraw->image_scale(width, height, 0, image, 0, pixmap, 0);
   }
   ctx->gdraw->image_render(width, height, 0, image, pixmap, 0);
@@ -1701,7 +1809,8 @@ int grow_image_to_pixmap(GrowCtx* ctx, char* imagefile, int width, int height,
 
 void GrowImage::flip(double x0, double y0, glow_eFlipDirection dir)
 {
-  switch (dir) {
+  switch (dir)
+  {
   case glow_eFlipDirection_Horizontal:
     trf.store();
     set_scale(1, -1, x0, y0, glow_eScaleType_FixPoint);
@@ -1715,7 +1824,4 @@ void GrowImage::flip(double x0, double y0, glow_eFlipDirection dir)
   }
 }
 
-int GrowImage::export_script(GlowExportScript* es, void* o, void* m)
-{
-  return es->image(this, o, m);
-}
+int GrowImage::export_script(GlowExportScript* es, void* o, void* m) { return es->image(this, o, m); }

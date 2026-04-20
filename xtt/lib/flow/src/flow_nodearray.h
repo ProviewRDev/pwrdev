@@ -41,7 +41,8 @@
 
 typedef void* flow_tAddress;
 
-typedef enum {
+typedef enum
+{
   flow_eElemTypeRectangle,
   flow_eElemTypeCircle,
   flow_eElemTypeLine,
@@ -50,15 +51,13 @@ typedef enum {
   flow_eElemTypeConnection
 } flow_eElemType;
 
-class FlowArray {
+class FlowArray
+{
 public:
   FlowArray(int allocate = 10, int incr = 10);
   FlowArrayElem* operator[](int idx);
   friend std::ostream& operator<<(std::ostream& o, const FlowArray a);
-  int size()
-  {
-    return a_size;
-  }
+  int size() { return a_size; }
   void insert(FlowArrayElem* element);
   void zoom();
   friend class FlowNodeClass;

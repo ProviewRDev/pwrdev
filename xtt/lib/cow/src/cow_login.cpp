@@ -55,12 +55,15 @@ void CoLogin::activate_ok()
 
   message("");
   sts = get_values();
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     if (bc_success)
       (bc_success)(parent_ctx);
     delete this;
     return;
-  } else {
+  }
+  else
+  {
     message((char*)"User not authorized");
     printf("User not authorized\n");
     strcpy((char*)&password, "");
@@ -78,11 +81,9 @@ void CoLogin::activate_cancel()
 //
 // Constructor
 //
-CoLogin::CoLogin(void* wl_parent_ctx, const char* wl_name,
-    const char* wl_groupname, void (*wl_bc_success)(void*),
-    void (*wl_bc_cancel)(void*), pwr_tStatus* status)
-    : parent_ctx(wl_parent_ctx), bc_success(wl_bc_success),
-      bc_cancel(wl_bc_cancel)
+CoLogin::CoLogin(void* wl_parent_ctx, const char* wl_name, const char* wl_groupname,
+                 void (*wl_bc_success)(void*), void (*wl_bc_cancel)(void*), pwr_tStatus* status)
+    : parent_ctx(wl_parent_ctx), bc_success(wl_bc_success), bc_cancel(wl_bc_cancel)
 {
   strcpy(name, wl_name);
   strcpy(groupname, wl_groupname);
@@ -92,15 +93,12 @@ CoLogin::CoLogin(void* wl_parent_ctx, const char* wl_name,
 //
 // Destructor
 //
-CoLogin::~CoLogin()
-{
-}
+CoLogin::~CoLogin() {}
 
 //
 //	Check username and password and insert login infomation.
 //
-pwr_tStatus CoLogin::user_check(
-    const char* groupname, const char* username, const char* password)
+pwr_tStatus CoLogin::user_check(const char* groupname, const char* username, const char* password)
 {
   pwr_tStatus sts;
   unsigned int priv;
@@ -120,9 +118,8 @@ pwr_tStatus CoLogin::user_check(
 //
 //	Inserts login info in global priv struct.
 //
-pwr_tStatus CoLogin::insert_login_info(const char* groupname,
-    const char* password, const char* username, unsigned long priv,
-    unsigned long attr)
+pwr_tStatus CoLogin::insert_login_info(const char* groupname, const char* password, const char* username,
+                                       unsigned long priv, unsigned long attr)
 {
   strcpy(m_username, username);
   strcpy(m_ucpassword, password);
@@ -133,8 +130,8 @@ pwr_tStatus CoLogin::insert_login_info(const char* groupname,
   return LOGIN__SUCCESS;
 }
 
-pwr_tStatus CoLogin::get_login_info(char* groupname, char* password,
-    char* username, unsigned long* priv, unsigned long* attr)
+pwr_tStatus CoLogin::get_login_info(char* groupname, char* password, char* username, unsigned long* priv,
+                                    unsigned long* attr)
 {
   if (username)
     strcpy(username, m_username);

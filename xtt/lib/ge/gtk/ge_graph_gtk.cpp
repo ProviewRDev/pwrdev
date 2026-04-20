@@ -45,24 +45,24 @@
 #include "ge_graph_gtk.h"
 #include "ge_msg.h"
 
-GraphGtk::GraphGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-    const char* xn_name, GtkWidget** w, pwr_tStatus* status,
-    const char* xn_default_path, graph_eMode graph_mode, int scrollbar,
-    int xn_gdh_init_done, const char* xn_object_name, int xn_use_default_access,
-    unsigned int xn_default_access, unsigned int xn_options, int xn_color_theme,
-    int xn_dashboard, void (*xn_keyboard_cb)(void*, int, int))
-    : Graph(xn_parent_ctx, xn_name, xn_default_path, graph_mode,
-          xn_gdh_init_done, xn_object_name, xn_use_default_access,
-	  xn_default_access, xn_options, xn_color_theme, xn_dashboard, xn_keyboard_cb),
+GraphGtk::GraphGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name, GtkWidget** w,
+                   pwr_tStatus* status, const char* xn_default_path, graph_eMode graph_mode, int scrollbar,
+                   int xn_gdh_init_done, const char* xn_object_name, int xn_use_default_access,
+                   unsigned int xn_default_access, unsigned int xn_options, int xn_color_theme,
+                   int xn_dashboard, void (*xn_keyboard_cb)(void*, int, int))
+    : Graph(xn_parent_ctx, xn_name, xn_default_path, graph_mode, xn_gdh_init_done, xn_object_name,
+            xn_use_default_access, xn_default_access, xn_options, xn_color_theme, xn_dashboard,
+            xn_keyboard_cb),
       parent_wid(xn_parent_wid)
 {
   default_access = xn_default_access;
-  if (scrollbar) {
-    form_widget = scrolledgrowwidgetgtk_new(
-        graph_init_grow_base_cb, this, &grow_widget);
-  } else {
-    grow_widget = form_widget
-        = growwidgetgtk_new(graph_init_grow_base_cb, this);
+  if (scrollbar)
+  {
+    form_widget = scrolledgrowwidgetgtk_new(graph_init_grow_base_cb, this, &grow_widget);
+  }
+  else
+  {
+    grow_widget = form_widget = growwidgetgtk_new(graph_init_grow_base_cb, this);
     // gtk_menu_shell_append( GTK_MENU_SHELL(parent_wid), grow_widget);
   }
 
@@ -85,7 +85,8 @@ GraphGtk::~GraphGtk()
     close_trace(0);
 
   sts = attr_list.get_first((void**)&attrctx);
-  while (sts) {
+  while (sts)
+  {
     delete attrctx;
     attr_list.remove((void*)attrctx);
     sts = attr_list.get_first((void**)&attrctx);
@@ -93,8 +94,10 @@ GraphGtk::~GraphGtk()
 
   localdb_free();
 
-  for (int i = 0; i < grow_cnt; i++) {
-    if (grow_stack[i] != grow) {
+  for (int i = 0; i < grow_cnt; i++)
+  {
+    if (grow_stack[i] != grow)
+    {
       grow_SetCtxUserData(grow_stack[i]->ctx, 0);
       delete grow_stack[i];
     }
@@ -116,10 +119,7 @@ static gboolean graphgdk_trace_scan(void* data)
   return FALSE;
 }
 
-void GraphGtk::trace_timer_add(int time)
-{
-  trace_timerid = g_timeout_add(time, graphgdk_trace_scan, this);
-}
+void GraphGtk::trace_timer_add(int time) { trace_timerid = g_timeout_add(time, graphgdk_trace_scan, this); }
 
 int GraphGtk::create_navigator(GtkWidget* parent)
 {
@@ -127,11 +127,9 @@ int GraphGtk::create_navigator(GtkWidget* parent)
   return 1;
 }
 
-Attr* GraphGtk::attr_new(void* parent_ctx, attr_eType type, void* object,
-    attr_sItem* itemlist, int item_cnt)
+Attr* GraphGtk::attr_new(void* parent_ctx, attr_eType type, void* object, attr_sItem* itemlist, int item_cnt)
 {
-  AttrGtk* attr
-      = new AttrGtk(parent_wid, parent_ctx, type, object, itemlist, item_cnt, 0);
+  AttrGtk* attr = new AttrGtk(parent_wid, parent_ctx, type, object, itemlist, item_cnt, 0);
   return attr;
 }
 

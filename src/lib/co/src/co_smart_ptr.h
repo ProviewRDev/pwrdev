@@ -42,99 +42,91 @@
 #include <stddef.h>
 
 // std::unique_ptr for single objects -> free memory with 'delete'
-template<typename T>
-class unique_ptr {
+template <typename T> class unique_ptr
+{
 public:
-    unique_ptr(T* p) : value(p) {
-    }
-    unique_ptr(unique_ptr&& x) : value(x.release()) {
-    }
+  unique_ptr(T* p) : value(p) {}
+  unique_ptr(unique_ptr&& x) : value(x.release()) {}
 
-    unique_ptr& operator=(unique_ptr&& x) {
-        reset(x.release());
-        return *this;
-    }
+  unique_ptr& operator=(unique_ptr&& x)
+  {
+    reset(x.release());
+    return *this;
+  }
 
-    ~unique_ptr() {
-        reset();
-    }
+  ~unique_ptr() { reset(); }
 
-    void reset(T* p = NULL) {
-        if (p != value) {
-            delete value;
-            value = p;
-        }
+  void reset(T* p = NULL)
+  {
+    if (p != value)
+    {
+      delete value;
+      value = p;
     }
+  }
 
-    T* release() {
-        T* const tmp = value;
-        value = NULL;
-        return tmp;
-    }
+  T* release()
+  {
+    T* const tmp = value;
+    value = NULL;
+    return tmp;
+  }
 
-    T& operator*() const {
-        return *value;
-    }
+  T& operator*() const { return *value; }
 
-    T* operator->() const {
-        return value;
-    }
+  T* operator->() const { return value; }
 
-    T* get() const {
-        return value;
-    }
+  T* get() const { return value; }
+
 protected:
-    T* value;
+  T* value;
 
-    unique_ptr(const unique_ptr&);
-    unique_ptr& operator=(const unique_ptr&);
-    unique_ptr& operator=(T* p);
+  unique_ptr(const unique_ptr&);
+  unique_ptr& operator=(const unique_ptr&);
+  unique_ptr& operator=(T* p);
 };
 
 // std::unique_ptr for arrays -> free memory with 'delete[]'
-template<typename T>
-class unique_ptr<T[]> {
+template <typename T> class unique_ptr<T[]>
+{
 public:
-    unique_ptr(T* p) : value(p) {
-    }
-    unique_ptr(unique_ptr&& x) : value(x.release()) {
-    }
+  unique_ptr(T* p) : value(p) {}
+  unique_ptr(unique_ptr&& x) : value(x.release()) {}
 
-    unique_ptr& operator=(unique_ptr&& x) {
-        reset(x.release());
-        return *this;
-    }
+  unique_ptr& operator=(unique_ptr&& x)
+  {
+    reset(x.release());
+    return *this;
+  }
 
-    ~unique_ptr() {
-        reset();
-    }
+  ~unique_ptr() { reset(); }
 
-    void reset(T* p = NULL) {
-        if (p != value) {
-            delete[] value;
-            value = p;
-        }
+  void reset(T* p = NULL)
+  {
+    if (p != value)
+    {
+      delete[] value;
+      value = p;
     }
+  }
 
-    T* release() {
-        T* const tmp = value;
-        value = NULL;
-        return tmp;
-    }
+  T* release()
+  {
+    T* const tmp = value;
+    value = NULL;
+    return tmp;
+  }
 
-    T& operator[](int i) const {
-        return value[i];
-    }
+  T& operator[](int i) const { return value[i]; }
 
-    T* get() const {
-        return value;
-    }
+  T* get() const { return value; }
+
 protected:
-    T* value;
+  T* value;
 
-    unique_ptr(const unique_ptr&);
-    unique_ptr& operator=(const unique_ptr&);
-    unique_ptr& operator=(T* p);
+  unique_ptr(const unique_ptr&);
+  unique_ptr& operator=(const unique_ptr&);
+  unique_ptr& operator=(T* p);
 };
 
 #endif

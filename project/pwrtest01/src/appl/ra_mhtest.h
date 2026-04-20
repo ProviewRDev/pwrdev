@@ -8,8 +8,9 @@
 #define SUP_ISIZE 1
 #define SUP_CYCLES 10
 
-typedef struct {
-  pwr_tBoolean *dp;
+typedef struct
+{
+  pwr_tBoolean* dp;
   pwr_tOid oid;
   int active;
   int eactive;
@@ -20,14 +21,15 @@ typedef struct {
   int check;
 } sSup;
 
-class ra_mhtest {
-  static ra_mhtest *m_mh;
+class ra_mhtest
+{
+  static ra_mhtest* m_mh;
   pwr_tStatus m_sts;
-  tst_log *m_log;
+  tst_log* m_log;
   pwr_tOid m_user;
   int m_clean;
   int m_checkstatus;
-  sSup m_sup[SUP_ASIZE+SUP_ISIZE][32];
+  sSup m_sup[SUP_ASIZE + SUP_ISIZE][32];
   int m_errcnt;
 
   static pwr_tStatus mh_ack_bc(mh_sAck* MsgP);
@@ -43,13 +45,12 @@ class ra_mhtest {
   unsigned int rand();
   void clean();
   void receive();
-  sSup *find_sup(mh_sEventId *id);
+  sSup* find_sup(mh_sEventId* id);
 
- public:
+public:
   ra_mhtest();
   ~ra_mhtest();
-  tst_log *log() {return m_log;}
-
+  tst_log* log() { return m_log; }
 
   void OutunitConnect();
   void OutunitTest();

@@ -37,9 +37,14 @@
 #ifndef wb_vext_h
 #define wb_vext_h
 
-typedef enum { procom_eType_Ipc, procom_eType_Local } procom_eType;
+typedef enum
+{
+  procom_eType_Ipc,
+  procom_eType_Local
+} procom_eType;
 
-typedef enum {
+typedef enum
+{
   vext_eMsgType_Status,
   vext_eMsgType_Object,
   vext_eMsgType_ObjectOid,
@@ -58,36 +63,42 @@ typedef enum {
 
 // Question message types
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
 } vext_sQMsgAny;
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
   pwr_tOix Oix;
 } vext_sQMsgOid;
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
   pwr_tOix Oix;
 } vext_sQMsgDeleteObject;
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
   pwr_tOix Oix;
 } vext_sQMsgDeleteFamily;
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
   char Name[120];
 } vext_sQMsgObjectName;
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
   pwr_tOix DestOix;
@@ -96,7 +107,8 @@ typedef struct {
   char Name[120];
 } vext_sQMsgCreateObject;
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
   pwr_tOix Oix;
@@ -104,7 +116,8 @@ typedef struct {
   int DestType;
 } vext_sQMsgMoveObject;
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
   pwr_tOix Oix;
@@ -113,14 +126,16 @@ typedef struct {
   char Name[120];
 } vext_sQMsgCopyObject;
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
   pwr_tOix Oix;
   char Name[120];
 } vext_sQMsgRenameObject;
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
   pwr_tOix Oix;
@@ -129,7 +144,8 @@ typedef struct {
   char Buffer[512];
 } vext_sQMsgWriteAttr;
 
-typedef union {
+typedef union
+{
   vext_sQMsgAny Any;
   vext_sQMsgOid Oid;
   vext_sQMsgObjectName ObjectName;
@@ -144,13 +160,15 @@ typedef union {
 
 // Answer message types
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
   pwr_tStatus Status;
 } vext_sAMsgAny;
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
   pwr_tStatus Status;
@@ -165,7 +183,8 @@ typedef struct {
   char longname[120];
 } vext_sAMsgObject;
 
-typedef struct {
+typedef struct
+{
   unsigned long message_type;
   vext_eMsgType Type;
   pwr_tStatus Status;
@@ -174,7 +193,8 @@ typedef struct {
   char body[500];
 } vext_sAMsgObjectBody;
 
-typedef union {
+typedef union
+{
   vext_sAMsgAny Any;
   vext_sAMsgObject Object;
   vext_sAMsgObjectBody ObjectBody;

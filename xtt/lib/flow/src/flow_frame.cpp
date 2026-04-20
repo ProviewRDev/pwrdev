@@ -55,10 +55,12 @@ void FlowFrame::draw(void* pos, int highlight, int dimmed, int hot, void* node)
 {
   double ur_x, ur_y;
   int idx;
-  if (fix_line_width) {
+  if (fix_line_width)
+  {
     idx = line_width;
     idx += hot;
-    if (idx < 0) {
+    if (idx < 0)
+    {
       erase(pos, 1, node);
       return;
     }
@@ -74,23 +76,25 @@ void FlowFrame::draw(void* pos, int highlight, int dimmed, int hot, void* node)
   idx += hot;
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  ctx->fdraw->rect(ctx, ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-      ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y,
+  ctx->fdraw->rect(
+      ctx, ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x, ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y,
       int(ur_x * ctx->zoom_factor - ll.z_x - ((FlowPoint*)pos)->z_x - 1),
-      int(ur_y * ctx->zoom_factor - ll.z_y - ((FlowPoint*)pos)->z_y - 1),
-      draw_type, idx, highlight, 0);
+      int(ur_y * ctx->zoom_factor - ll.z_y - ((FlowPoint*)pos)->z_y - 1), draw_type, idx, highlight, 0);
 }
 
 void FlowFrame::erase(void* pos, int hot, void* node)
 {
   double ur_x, ur_y;
   int idx;
-  if (fix_line_width) {
+  if (fix_line_width)
+  {
     idx = line_width;
     idx += hot;
     if (idx < 0)
       return;
-  } else {
+  }
+  else
+  {
     idx = int(ctx->zoom_factor / ctx->base_zoom_factor * line_width - 1);
     idx += hot;
   }
@@ -104,13 +108,13 @@ void FlowFrame::erase(void* pos, int hot, void* node)
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
 
   ctx->fdraw->rect_erase(ctx, ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-      ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y,
-      int(ur_x * ctx->zoom_factor - ll.z_x - ((FlowPoint*)pos)->z_x - 1),
-      int(ur_y * ctx->zoom_factor - ll.z_y - ((FlowPoint*)pos)->z_y - 1), idx);
+                         ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y,
+                         int(ur_x * ctx->zoom_factor - ll.z_x - ((FlowPoint*)pos)->z_x - 1),
+                         int(ur_y * ctx->zoom_factor - ll.z_y - ((FlowPoint*)pos)->z_y - 1), idx);
 }
 
-void FlowFrame::get_borders(double pos_x, double pos_y, double* x_right,
-    double* x_left, double* y_high, double* y_low, void* node)
+void FlowFrame::get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                            double* y_low, void* node)
 {
   double ur_x;
   if (ctx->type() == flow_eCtxType_Brow && ((BrowCtx*)ctx)->frame_x_right > 0)
@@ -128,24 +132,26 @@ void FlowFrame::get_borders(double pos_x, double pos_y, double* x_right,
     *y_high = pos_y + ur.y;
 }
 
-int FlowFrame::event_handler(
-    void* pos, flow_eEvent event, int x, int y, void* node)
+int FlowFrame::event_handler(void* pos, flow_eEvent event, int x, int y, void* node)
 {
   FlowPoint* p;
 
   p = (FlowPoint*)pos;
-  if (ctx->type() == flow_eCtxType_Brow) {
-    if (ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x <= x
-        && ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y <= y
-        && y <= ur.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y)
+  if (ctx->type() == flow_eCtxType_Brow)
+  {
+    if (ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x <= x &&
+        ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y <= y &&
+        y <= ur.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y)
       return 1;
     else
       return 0;
-  } else {
-    if (ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x <= x
-        && x <= ur.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x
-        && ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y <= y
-        && y <= ur.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y)
+  }
+  else
+  {
+    if (ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x <= x &&
+        x <= ur.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x &&
+        ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y <= y &&
+        y <= ur.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y)
       //    std::cout << "Event handler: Hit in rect\n";
       return 1;
     else

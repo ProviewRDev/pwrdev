@@ -44,7 +44,8 @@
 
 #include "pwr_baseclasses.h"
 
-class VideoMgmCell {
+class VideoMgmCell
+{
 public:
   VideoMgmCell()
   {
@@ -60,15 +61,15 @@ public:
   char cameraid[80];
 };
 
-class VideoMgmPanel {
+class VideoMgmPanel
+{
 public:
   VideoMgmPanel() : width(0), height(0)
   {
     strcpy(id, "");
     strcpy(name, "");
   }
-  VideoMgmPanel(const VideoMgmPanel& x)
-      : width(x.width), height(x.height), cell(x.cell)
+  VideoMgmPanel(const VideoMgmPanel& x) : width(x.width), height(x.height), cell(x.cell)
   {
     strncpy(id, x.id, sizeof(id));
     strncpy(name, x.name, sizeof(name));
@@ -80,7 +81,8 @@ public:
   std::vector<VideoMgmCell> cell;
 };
 
-class VideoMgmCamera {
+class VideoMgmCamera
+{
 public:
   VideoMgmCamera()
   {
@@ -105,7 +107,8 @@ public:
   char password[80];
 };
 
-class XttVideoMgm {
+class XttVideoMgm
+{
 public:
   int m_camera_cnt;
   float m_scantime;
@@ -136,7 +139,8 @@ public:
   virtual int delete_panel(char* name);
 };
 
-class XttVideoMgmAimetis : public XttVideoMgm {
+class XttVideoMgmAimetis : public XttVideoMgm
+{
 public:
   char m_fix;
   char m_auth_token[80];
@@ -163,27 +167,23 @@ public:
   int delete_panel(char* name);
 };
 
-class Json {
+class Json
+{
 public:
-  static int get_attribute_value(
-      std::ifstream& fp, const char* attribute, char* value, int size);
+  static int get_attribute_value(std::ifstream& fp, const char* attribute, char* value, int size);
 };
 
-class VideoMgmServer {
+class VideoMgmServer
+{
 public:
   float m_scantime;
   std::vector<XttVideoMgm*> m_mgmvect;
 
-  VideoMgmServer() : m_scantime(0.5)
-  {
-  }
+  VideoMgmServer() : m_scantime(0.5) {}
   void open();
   void scan();
   void close();
-  float scantime()
-  {
-    return m_scantime;
-  }
+  float scantime() { return m_scantime; }
 };
 
 #endif

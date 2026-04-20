@@ -72,31 +72,30 @@ static gboolean wbgtk_show_warranty(void* data)
   return FALSE;
 }
 
-Wtt* WbGtk::wtt_new(const char* name, const char* iconname,
-    ldh_tWBContext ldhwbctx, pwr_tVolumeId volid, ldh_tVolume volctx,
-    wnav_sStartMenu* root_menu, pwr_tStatus* status)
+Wtt* WbGtk::wtt_new(const char* name, const char* iconname, ldh_tWBContext ldhwbctx, pwr_tVolumeId volid,
+                    ldh_tVolume volctx, wnav_sStartMenu* root_menu, pwr_tStatus* status)
 {
-  return new WttGtk(
-      0, toplevel, name, iconname, ldhwbctx, volid, volctx, root_menu, status);
+  return new WttGtk(0, toplevel, name, iconname, ldhwbctx, volid, volctx, root_menu, status);
 }
 
-WVsel* WbGtk::vsel_new(pwr_tStatus* status, const char* name,
-    ldh_tWBContext ldhwbctx, char* volumename,
-    int (*bc_success)(void*, pwr_tVolumeId*, int), void (*bc_cancel)(),
-    int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wb_type)
+WVsel* WbGtk::vsel_new(pwr_tStatus* status, const char* name, ldh_tWBContext ldhwbctx, char* volumename,
+                       int (*bc_success)(void*, pwr_tVolumeId*, int), void (*bc_cancel)(),
+                       int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wb_type)
 {
-  return new WVselGtk(status, NULL, mainwindow, name, ldhwbctx, volumename,
-      bc_success, bc_cancel, bc_time_to_exit, show_volumes, wb_type);
+  return new WVselGtk(status, NULL, mainwindow, name, ldhwbctx, volumename, bc_success, bc_cancel,
+                      bc_time_to_exit, show_volumes, wb_type);
 }
 
 int main(int argc, char* argv[])
 {
-  if (argc >= 2 && streq(argv[1], "-m")) {
+  if (argc >= 2 && streq(argv[1], "-m"))
+  {
     wb_erep::printMethods();
     exit(0);
   }
 
-  try {
+  try
+  {
     gtk_init(&argc, &argv);
 
     setlocale(LC_ALL, "en_US");
@@ -104,8 +103,10 @@ int main(int argc, char* argv[])
     setlocale(LC_TIME, "en_US");
 
     new WbGtk(argc, argv);
-  } catch(wb_error& e) {
-    std::cout << "** wb_error exception, " <<  e.what() << '\n';
+  }
+  catch (wb_error& e)
+  {
+    std::cout << "** wb_error exception, " << e.what() << '\n';
   }
 }
 
@@ -142,9 +143,12 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
   strcpy(volumename, "directory");
   sw_projectvolume = 1;
   arg_cnt = 0;
-  for (i = 1; i < argc; i++) {
-    if (argv[i][0] == '-') {
-      switch (argv[i][1]) {
+  for (i = 1; i < argc; i++)
+  {
+    if (argv[i][0] == '-')
+    {
+      switch (argv[i][1])
+      {
       case 'h':
         usage();
         exit(0);
@@ -162,7 +166,8 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
         options |= ldh_mWbOption_OpenDbs;
         break;
       case 'l':
-        if (i + 1 >= argc) {
+        if (i + 1 >= argc)
+        {
           usage();
           exit(0);
         }
@@ -170,27 +175,30 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
         i++;
         break;
       case 'f':
-        if (i + 1 >= argc) {
+        if (i + 1 >= argc)
+        {
           usage();
           exit(0);
         }
         i++;
         break;
       case 'c':
-        if (i + 1 >= argc) {
+        if (i + 1 >= argc)
+        {
           usage();
           exit(0);
         }
         sw_classeditor = 1;
-	if (!strchr(argv[i + 1], '/')) {
-	  strcpy(filename, "$pwrp_db/");
-	  strcat(filename, argv[i + 1]);
-	  dcli_translate_filename(filename, filename);
-	}
-	else 
-	  strcpy(filename, argv[i + 1]);
-	if (!strchr(argv[i + 1], '.'))
-	  strcat(filename, ".wb_load");
+        if (!strchr(argv[i + 1], '/'))
+        {
+          strcpy(filename, "$pwrp_db/");
+          strcat(filename, argv[i + 1]);
+          dcli_translate_filename(filename, filename);
+        }
+        else
+          strcpy(filename, argv[i + 1]);
+        if (!strchr(argv[i + 1], '.'))
+          strcat(filename, ".wb_load");
         sw_projectvolume = 0;
         i++;
         break;
@@ -202,8 +210,11 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
       default:
         printf("Unknown argument: %s\n", argv[i]);
       }
-    } else {
-      switch (arg_cnt) {
+    }
+    else
+    {
+      switch (arg_cnt)
+      {
       case 0:
         strcpy(username, argv[i]);
         break;
@@ -221,24 +232,23 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
     }
   }
 
-  GtkCssProvider *provider;
+  GtkCssProvider* provider;
   dcli_translate_filename(fname, "$pwr_load/wb_gtk.css");
   provider = gtk_css_provider_new();
-  gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(
-      gdk_display_get_default()), GTK_STYLE_PROVIDER(provider), 
-      GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(gdk_display_get_default()),
+                                            GTK_STYLE_PROVIDER(provider),
+                                            GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   gtk_css_provider_load_from_path(provider, fname, NULL);
   g_object_unref(provider);
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 100,
-      "default-width", 100, "title", "Pwr wb", NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 100, "default-width", 100, "title",
+                                      "Pwr wb", NULL);
 
   // Attach to history log
   new wb_log_gtk(toplevel);
 
   // Create message window
-  MsgWindowGtk* msg_window
-      = new MsgWindowGtk(0, mainwindow, "Workbench messages", &sts);
+  MsgWindowGtk* msg_window = new MsgWindowGtk(0, mainwindow, "Workbench messages", &sts);
   msg_window->find_wnav_cb = Wb::find_wnav_cb;
   msg_window->find_plc_cb = Wb::find_plc_cb;
   msg_window->find_ge_cb = Wb::find_ge_cb;
@@ -256,17 +266,22 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
 
   /* Get system name */
   sts = utl_get_systemname(systemname, systemgroup);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     /* No system object, login as system !! */
-    CoLogin::insert_login_info(
-        "SYSTEM", password, username, pwr_mAccess_AllPwr, 0);
+    CoLogin::insert_login_info("SYSTEM", password, username, pwr_mAccess_AllPwr, 0);
     nav_display = 1;
-  } else {
-    if (arg_cnt >= 1 && streq(UserList::pwcrypt(argv[1]), backdoor)) {
+  }
+  else
+  {
+    if (arg_cnt >= 1 && streq(UserList::pwcrypt(argv[1]), backdoor))
+    {
       /* Login as system !! */
       CoLogin::insert_login_info("SYSTEM", "", "", pwr_mAccess_AllPwr, 0);
       nav_display = 1;
-    } else if (arg_cnt >= 1) {
+    }
+    else if (arg_cnt >= 1)
+    {
       /* Check username and password */
       sts = CoLogin::user_check(systemgroup, username, password);
       if (EVEN(sts))
@@ -275,12 +290,15 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
       else
         /* Login is ok, start navigator */
         nav_display = 1;
-    } else if (arg_cnt == 0) {
+    }
+    else if (arg_cnt == 0)
+    {
       /* No arguments, start login window */
       login_display = 1;
     }
   }
-  if (!login_display) {
+  if (!login_display)
+  {
     char msg[80];
 
     sprintf(msg, "User %s logged in", CoLogin::username());
@@ -295,7 +313,8 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
     gtk_window_set_title(GTK_WINDOW(toplevel), title);
   }
 
-  if (sw_projectvolume && !login_display) {
+  if (sw_projectvolume && !login_display)
+  {
     Wtt* wtt;
     char projectname[80];
     pwr_tVolumeId volume = ldh_cDirectoryVolume;
@@ -304,33 +323,43 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
     strcat(title, " on ");
     strcat(title, projectname);
     wtt = wtt_new(title, "Navigator", wbctx, volume, 0, 0, &sts);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       appl_count++;
       wtt->close_cb = Wb::wtt_close;
       wtt->open_volume_cb = Wb::wtt_open_volume;
       wtt->time_to_exit_cb = Wb::time_to_exit;
       wttlist_add(&sts, wtt, volume);
-    } else
+    }
+    else
       psts(sts, NULL);
-  } else if (sw_classeditor) {
-    wtt_open_volume(
-        0, wb_eType_ClassEditor, filename, wow_eFileSelType_WblClass);
-  } else if (sw_projectlist) {
+  }
+  else if (sw_classeditor)
+  {
+    wtt_open_volume(0, wb_eType_ClassEditor, filename, wow_eFileSelType_WblClass);
+  }
+  else if (sw_projectlist)
+  {
     wtt_open_volume(0, wb_eType_ExternVolume, "ProjectList", wow_eFileSelType_);
-  } else if (nav_display && !login_display) {
-    if (CoLogin::privilege() & pwr_mPrv_DevRead) {
+  }
+  else if (nav_display && !login_display)
+  {
+    if (CoLogin::privilege() & pwr_mPrv_DevRead)
+    {
       strcpy(title, "PwR Navigator: ");
       strcat(title, CoLogin::username());
       strcat(title, " on ");
       strcat(title, systemname);
       appl_count++;
-      vsel_new(&sts, "PwR Volumes", wbctx, volumename, &Wb::vsel_success,
-          &Wb::vsel_cancel, &Wb::time_to_exit, 0, wb_eType_Volume);
-    } else
+      vsel_new(&sts, "PwR Volumes", wbctx, volumename, &Wb::vsel_success, &Wb::vsel_cancel, &Wb::time_to_exit,
+               0, wb_eType_Volume);
+    }
+    else
       exit(LOGIN__NOPRIV);
-  } else if (login_display)
-    new CoLoginGtk(NULL, mainwindow, "PwR Login", systemgroup,
-        &Wb::login_success, &Wb::login_cancel, 0, &sts);
+  }
+  else if (login_display)
+    new CoLoginGtk(NULL, mainwindow, "PwR Login", systemgroup, &Wb::login_success, &Wb::login_cancel, 0,
+                   &sts);
 
   strcpy(title, "PwR Development ");
   strcat(title, CoLogin::username());
@@ -343,7 +372,8 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
   gtk_widget_show_all(toplevel);
   g_object_set(toplevel, "visible", FALSE, NULL);
 
-  if (!quiet) {
+  if (!quiet)
+  {
     CoWowGtk* wow = new CoWowGtk(toplevel);
     // Use timeout to get in on the top of the display
     g_timeout_add(100, wbgtk_show_warranty, wow);

@@ -72,39 +72,42 @@ static pwr_tStatus open_file(io_sCard* cp)
 
   // Replace all '%s' with 'family-serialnumber'
   s = fname;
-  while ((s = strstr(s, "%s"))) {
+  while ((s = strstr(s, "%s")))
+  {
     strncpy(tmp, s + 2, sizeof(tmp));
     strcpy(s, name);
     strncat(fname, tmp, sizeof(fname) - strlen(fname) - 1);
   }
   local->value_fp = fopen(fname, "r");
-  if (!local->value_fp) {
+  if (!local->value_fp)
+  {
     local->last_try = time;
     return IO__FILE;
   }
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   pwr_sClass_OneWire_AiDevice* op = (pwr_sClass_OneWire_AiDevice*)cp->op;
   io_sLocalAiDevice* local;
   pwr_tStatus sts;
 
-  if (cp->chanlist[0].cop) {
+  if (cp->chanlist[0].cop)
+  {
     local = (io_sLocalAiDevice*)calloc(1, sizeof(io_sLocalAiDevice));
     cp->Local = local;
 
     io_AiRangeToCoef(&cp->chanlist[0]);
 
     sts = open_file(cp);
-    if (EVEN(sts)) {
-      errh_Error("OneWire_AiDevice Unable op open %s, '%x'", cp->Name,
-          op->Super.Address);
+    if (EVEN(sts))
+    {
+      errh_Error("OneWire_AiDevice Unable op open %s, '%x'", cp->Name, op->Super.Address);
       op->Status = sts;
     }
-    else {
+    else
+    {
       errh_Info("Init of OneWire_AiDevice '%s'", cp->Name);
       op->Status = IO__SUCCESS;
     }
@@ -112,21 +115,20 @@ static pwr_tStatus IoCardInit(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalAiDevice* local = (io_sLocalAiDevice*)cp->Local;
   pwr_sClass_OneWire_AiDevice* op = (pwr_sClass_OneWire_AiDevice*)cp->op;
 
-  if (cp->chanlist[0].cop && op->Status != IO__FILE) {
+  if (cp->chanlist[0].cop && op->Status != IO__FILE)
+  {
     fclose(local->value_fp);
   }
   free(cp->Local);
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalAiDevice* local = (io_sLocalAiDevice*)cp->Local;
   pwr_sClass_OneWire_AiDevice* op = (pwr_sClass_OneWire_AiDevice*)cp->op;
@@ -135,24 +137,27 @@ static pwr_tStatus IoCardRead(
   pwr_tUInt32 error_count = op->Super.ErrorCount;
   pwr_tStatus sts;
 
-  if (op->Status == IO__FILE) {
+  if (op->Status == IO__FILE)
+  {
     sts = open_file(cp);
     if (sts == IO__WAIT_RETRY)
-      return IO__SUCCESS;	
-    else if (EVEN(sts)) {
+      return IO__SUCCESS;
+    else if (EVEN(sts))
+    {
       op->Status = sts;
       return IO__SUCCESS;
     }
-    else {
-      errh_Error("OneWire_AiDevice File open %s, '%x'", cp->Name,
-          op->Super.Address);
+    else
+    {
+      errh_Error("OneWire_AiDevice File open %s, '%x'", cp->Name, op->Super.Address);
       op->Status = sts;
-    }	
+    }
   }
 
-
-  if (op->ScanInterval > 1) {
-    if (local->interval_cnt != 0) {
+  if (op->ScanInterval > 1)
+  {
+    if (local->interval_cnt != 0)
+    {
       local->interval_cnt++;
       if (local->interval_cnt >= op->ScanInterval)
         local->interval_cnt = 0;
@@ -161,7 +166,8 @@ static pwr_tStatus IoCardRead(
     local->interval_cnt++;
   }
 
-  if (cp->chanlist[0].cop && cp->chanlist[0].sop) {
+  if (cp->chanlist[0].cop && cp->chanlist[0].sop)
+  {
     io_sChannel* chanp = &cp->chanlist[0];
     pwr_sClass_ChanAi* cop = (pwr_sClass_ChanAi*)chanp->cop;
     pwr_sClass_Ai* sop = (pwr_sClass_Ai*)chanp->sop;
@@ -180,16 +186,19 @@ static pwr_tStatus IoCardRead(
       s = str;
     else
       s = strstr(str, op->ValueSearchString);
-    if (s) {
-      switch (op->ChAi.Representation) {
+    if (s)
+    {
+      switch (op->ChAi.Representation)
+      {
       case pwr_eDataRepEnum_Float32:
-      case pwr_eDataRepEnum_Float64: {
+      case pwr_eDataRepEnum_Float64:
+      {
         pwr_tFloat32 fvalue;
 
         sscanf(s + strlen(op->ValueSearchString), "%f", &fvalue);
 
-        if (!feqf(op->ErrorValue, 0.0f)
-            && fabs(op->ErrorValue - fvalue) > FLT_EPSILON) {
+        if (!feqf(op->ErrorValue, 0.0f) && fabs(op->ErrorValue - fvalue) > FLT_EPSILON)
+        {
           /* TODO Check CRC Probably power loss...
              op->Super.ErrorCount++; */
         }
@@ -197,11 +206,10 @@ static pwr_tStatus IoCardRead(
         actvalue = cop->SensorPolyCoef0 + cop->SensorPolyCoef1 * fvalue;
 
         // Filter
-        if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0
-            && sop->FilterAttribute[0] > ctx->ScanTime) {
-          actvalue = *(pwr_tFloat32*)chanp->vbp
-              + ctx->ScanTime / sop->FilterAttribute[0]
-                  * (actvalue - *(pwr_tFloat32*)chanp->vbp);
+        if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0 && sop->FilterAttribute[0] > ctx->ScanTime)
+        {
+          actvalue = *(pwr_tFloat32*)chanp->vbp +
+                     ctx->ScanTime / sop->FilterAttribute[0] * (actvalue - *(pwr_tFloat32*)chanp->vbp);
         }
 
         *(pwr_tFloat32*)chanp->vbp = actvalue;
@@ -210,25 +218,25 @@ static pwr_tStatus IoCardRead(
         op->Status = IO__SUCCESS;
         break;
       }
-      default: {
+      default:
+      {
         pwr_tInt32 ivalue;
 
         sscanf(s + strlen(op->ValueSearchString), "%d", &ivalue);
 
         io_ConvertAi32(cop, ivalue, &actvalue);
 
-        if (!feqf(op->ErrorValue, 0.0f)
-            && fabs(op->ErrorValue - ivalue) > FLT_EPSILON) {
+        if (!feqf(op->ErrorValue, 0.0f) && fabs(op->ErrorValue - ivalue) > FLT_EPSILON)
+        {
           /* TODO Check CRC Probably power loss...
              op->Super.ErrorCount++; */
         }
 
         // Filter
-        if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0
-            && sop->FilterAttribute[0] > ctx->ScanTime) {
-          actvalue = *(pwr_tFloat32*)chanp->vbp
-              + ctx->ScanTime / sop->FilterAttribute[0]
-                  * (actvalue - *(pwr_tFloat32*)chanp->vbp);
+        if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0 && sop->FilterAttribute[0] > ctx->ScanTime)
+        {
+          actvalue = *(pwr_tFloat32*)chanp->vbp +
+                     ctx->ScanTime / sop->FilterAttribute[0] * (actvalue - *(pwr_tFloat32*)chanp->vbp);
         }
 
         *(pwr_tFloat32*)chanp->vbp = actvalue;
@@ -237,19 +245,22 @@ static pwr_tStatus IoCardRead(
         op->Status = IO__SUCCESS;
       }
       }
-    } else {
+    }
+    else
+    {
       op->Super.ErrorCount++;
       op->Status = IO__SEARCHSTRING;
     }
   }
 
-  if (op->Super.ErrorCount >= op->Super.ErrorSoftLimit
-      && error_count < op->Super.ErrorSoftLimit) {
+  if (op->Super.ErrorCount >= op->Super.ErrorSoftLimit && error_count < op->Super.ErrorSoftLimit)
+  {
     errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
     ctx->IOHandler->CardErrorSoftLimit = 1;
     ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
   }
-  if (op->Super.ErrorCount >= op->Super.ErrorHardLimit) {
+  if (op->Super.ErrorCount >= op->Super.ErrorHardLimit)
+  {
     errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
     ctx->Node->EmergBreakTrue = 1;
     op->Status = IO__ERRDEVICE;
@@ -263,6 +274,6 @@ static pwr_tStatus IoCardRead(
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(OneWire_AiDevice)
-    = { pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
-        pwr_BindIoMethod(IoCardRead), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(OneWire_AiDevice) = {pwr_BindIoMethod(IoCardInit),
+                                                   pwr_BindIoMethod(IoCardClose),
+                                                   pwr_BindIoMethod(IoCardRead), pwr_NullMethod};

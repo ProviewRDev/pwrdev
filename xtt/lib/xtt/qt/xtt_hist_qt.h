@@ -49,10 +49,10 @@
 
 class HistQtWidget;
 
-class HistQt : public Hist {
+class HistQt : public Hist
+{
 public:
-  HistQt(void* hist_parent_ctx, char* hist_name, pwr_tAttrRef* arp,
-      pwr_tStatus* status);
+  HistQt(void* hist_parent_ctx, char* hist_name, pwr_tAttrRef* arp, pwr_tStatus* status);
   ~HistQt();
 
   QWidget* form_hist;
@@ -85,8 +85,7 @@ public:
   QWidget* search_vbox;
 
   void set_num_of_events(int nrOfEvents);
-  void set_search_string(
-      const char* s1, const char* s2, const char* s3, const char* s4);
+  void set_search_string(const char* s1, const char* s2, const char* s3, const char* s4);
   void SetListTime(pwr_tTime StartTime, pwr_tTime StopTime, int Sensitive);
   void insert_eventname(const char* name);
 
@@ -94,7 +93,8 @@ private:
   HistQtWidget* toplevel;
 };
 
-class HistQtWidget : public QWidget {
+class HistQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:
@@ -133,10 +133,13 @@ private:
 // Dummy for other platforms then OS_LINUX
 #include "xtt_hist.h"
 
-class HistQt : public Hist {
+class HistQt : public Hist
+{
 public:
-  HistQt(void* hist_parent_ctx, char* hist_name, pwr_tAttrRef* arp,
-      pwr_tStatus* status) : Hist(hist_parent_ctx, hist_name, arp, status) {}
+  HistQt(void* hist_parent_ctx, char* hist_name, pwr_tAttrRef* arp, pwr_tStatus* status)
+      : Hist(hist_parent_ctx, hist_name, arp, status)
+  {
+  }
 };
 
 #endif

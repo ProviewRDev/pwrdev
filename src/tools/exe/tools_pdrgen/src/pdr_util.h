@@ -58,7 +58,8 @@
 #define s_print (void)sprintf
 #define f_print (void)fprintf
 
-struct list {
+struct list
+{
   char* val;
   struct list* next;
 };
@@ -95,7 +96,7 @@ char* stringfix(char* type);
 void pvname();
 void ptype();
 int isvectordef(char* type, relation rel);
-#define streq(a,b) (strcmp((a),(b)) == 0)
+#define streq(a, b) (strcmp((a), (b)) == 0)
 void error();
 void expected1();
 void expected2();

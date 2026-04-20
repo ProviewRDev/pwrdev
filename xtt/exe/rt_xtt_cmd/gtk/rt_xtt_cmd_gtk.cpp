@@ -62,8 +62,8 @@ XttCmdGtk::XttCmdGtk(GtkWidget* w)
   pwr_tStatus sts;
   pwr_tOName opplace = "";
 
-  xnav = new XNavGtk(this, (GtkWidget*)w, "Plant", &brow_widget,
-      (xnav_sStartMenu*)root_menu, opplace, 0, &sts);
+  xnav =
+      new XNavGtk(this, (GtkWidget*)w, "Plant", &brow_widget, (xnav_sStartMenu*)root_menu, opplace, 0, &sts);
 
   xnav->message_cb = &message_cb;
   xnav->close_cb = XttCmd::close_cb;
@@ -94,9 +94,12 @@ int main(int argc, char* argv[])
   // Open directory volume as default
 
   str[0] = 0;
-  for (i = 1; i < argc; i++) {
-    if (argv[i][0] == '-') {
-      switch (argv[i][1]) {
+  for (i = 1; i < argc; i++)
+  {
+    if (argv[i][0] == '-')
+    {
+      switch (argv[i][1])
+      {
       case 'h':
         XttCmd::usage();
         exit(0);
@@ -115,7 +118,9 @@ int main(int argc, char* argv[])
       default:
         std::cout << "Unknown argument: " << argv[i] << "\n";
       }
-    } else {
+    }
+    else
+    {
       if (str[0] != 0)
         strcat(str, " ");
       strcat(str, argv[i]);
@@ -123,7 +128,8 @@ int main(int argc, char* argv[])
   }
 
   sts = gdh_Init("rt_xtt_cmd");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("Unable to connect to database\n");
     exit(0);
   }
@@ -136,8 +142,8 @@ int main(int argc, char* argv[])
   strcpy(title, "Xtt Cmd");
 
   // Gtk
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      window_height, "default-width", window_width, "title", title, NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height, "default-width",
+                                      window_width, "title", title, NULL);
   cmd = new XttCmdGtk(toplevel);
 
   gtk_container_add(GTK_CONTAINER(toplevel), cmd->brow_widget);
@@ -155,7 +161,8 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of \n\
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the \n\
 GNU General Public License for more details.\n\n";
 
-  if (str[0] != 0) {
+  if (str[0] != 0)
+  {
     str_trim(str, str);
     sts = cmd->xnav->command(str);
     if (ODD(sts))
@@ -168,7 +175,8 @@ GNU General Public License for more details.\n\n";
 
   // Init input
 
-  while (1) {
+  while (1)
+  {
     unsigned long terminator;
     unsigned long option = DCLI_OPT_TIMEOUT;
 
@@ -176,8 +184,8 @@ GNU General Public License for more details.\n\n";
 
     /* get input */
     dcli_qio_set_attr(&cmd->chn, 1);
-    sts = dcli_get_input_string(&cmd->chn, str, &terminator, sizeof(str),
-        cmd->recall_buf, option, 1, timeout_func, 0, "xttc> ");
+    sts = dcli_get_input_string(&cmd->chn, str, &terminator, sizeof(str), cmd->recall_buf, option, 1,
+                                timeout_func, 0, "xttc> ");
     dcli_qio_reset(&cmd->chn);
 
     //    sts = scanf( "%s", str);

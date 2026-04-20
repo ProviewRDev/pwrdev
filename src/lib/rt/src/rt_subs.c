@@ -80,9 +80,9 @@ void subs_DeleteServer(sub_sServer* sp)
 
   /* Decrement subcounter for referenced object */
 
-  op = vol_OidToObject(
-      &sts, sp->aref.Objid, gdb_mLo_owned, vol_mTrans_alias, cvol_eHint_none);
-  if (op != NULL) {
+  op = vol_OidToObject(&sts, sp->aref.Objid, gdb_mLo_owned, vol_mTrans_alias, cvol_eHint_none);
+  if (op != NULL)
+  {
     op->u.n.subcount--;
   }
 
@@ -98,16 +98,16 @@ void subs_UnlinkObject(gdb_sObject* op)
 
   gdb_AssumeLocked;
 
-  for (sl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->subs_lh);
-       sl != &gdbroot->db->subs_lh;) {
+  for (sl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->subs_lh); sl != &gdbroot->db->subs_lh;)
+  {
     sp = pool_Qitem(sl, sub_sServer, subs_ll);
-    if (cdh_ObjidIsEqual(sp->aref.Objid, op->g.oid)) {
+    if (cdh_ObjidIsEqual(sp->aref.Objid, op->g.oid))
+    {
       sp->data = pool_cNRef;
       sp->sts = GDH__NOSUCHOBJ;
 
-      if (op->u.n.subcount
-          > 0) /* Subscriptions on invalid offset will allocate buffer without
-                  increasing count */
+      if (op->u.n.subcount > 0) /* Subscriptions on invalid offset will allocate buffer without
+                                   increasing count */
         op->u.n.subcount--;
     }
   }

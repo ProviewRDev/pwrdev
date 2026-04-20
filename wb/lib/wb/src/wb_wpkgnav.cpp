@@ -46,42 +46,28 @@
 #include "wb_wpkgnav.h"
 #include "wb_wnav_item.h"
 
-void WPkgNav::message(char sev, const char* text)
-{
-  (message_cb)(parent_ctx, sev, text);
-}
+void WPkgNav::message(char sev, const char* text) { (message_cb)(parent_ctx, sev, text); }
 //
 //  Get current zoom factor
 //
-void WPkgNav::get_zoom(double* zoom_factor)
-{
-  brow_GetZoom(brow->ctx, zoom_factor);
-}
+void WPkgNav::get_zoom(double* zoom_factor) { brow_GetZoom(brow->ctx, zoom_factor); }
 
 //
 //  Zoom
 //
-void WPkgNav::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void WPkgNav::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void WPkgNav::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void WPkgNav::unzoom() { brow_UnZoom(brow->ctx); }
 
 //
 // Create the navigator widget
 //
-WPkgNav::WPkgNav(void* wa_parent_ctx, const char* wa_name,
-    wb_eUtility wa_utility, pwr_tStatus* status)
-    : parent_ctx(wa_parent_ctx), message_cb(0), set_clock_cursor_cb(0),
-      reset_cursor_cb(0), utility(wa_utility), displayed(0),
-      display_mode(wpkg_mDisplayMode__)
+WPkgNav::WPkgNav(void* wa_parent_ctx, const char* wa_name, wb_eUtility wa_utility, pwr_tStatus* status)
+    : parent_ctx(wa_parent_ctx), message_cb(0), set_clock_cursor_cb(0), reset_cursor_cb(0),
+      utility(wa_utility), displayed(0), display_mode(wpkg_mDisplayMode__)
 {
   strcpy(name, wa_name);
   *status = 1;
@@ -90,9 +76,7 @@ WPkgNav::WPkgNav(void* wa_parent_ctx, const char* wa_name,
 //
 //  Delete a nav context
 //
-WPkgNav::~WPkgNav()
-{
-}
+WPkgNav::~WPkgNav() {}
 
 //
 // Callbacks from brow
@@ -102,7 +86,8 @@ int WPkgNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   WPkgNav* wpkgnav;
   WItemPkg* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
@@ -110,21 +95,27 @@ int WPkgNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
 
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&wpkgnav);
   wpkgnav->message(' ', "");
-  switch (event->event) {
-  case flow_eEvent_Key_Up: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(wpkgnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLast(wpkgnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
+    }
+    else
+    {
       sts = brow_GetPrevious(wpkgnav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         if (node_count)
           free(node_list);
         return 1;
@@ -139,20 +130,25 @@ int WPkgNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(wpkgnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirst(wpkgnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
+    }
+    else
+    {
       sts = brow_GetNext(wpkgnav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         if (node_count)
           free(node_list);
         return 1;
@@ -170,15 +166,18 @@ int WPkgNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   case flow_eEvent_SelectClear:
     brow_ResetSelectInverse(wpkgnav->brow->ctx);
     break;
-  case flow_eEvent_MB1Click: {
+  case flow_eEvent_MB1Click:
+  {
     // Select
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -190,9 +189,12 @@ int WPkgNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(wpkgnav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(wpkgnav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(wpkgnav->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(wpkgnav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(wpkgnav->brow->ctx, event->object.object);
@@ -203,7 +205,8 @@ int WPkgNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
@@ -216,10 +219,12 @@ int WPkgNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (brow_IsOpen(node_list[0]))
       // Close this node
       object = node_list[0];
-    else {
+    else
+    {
       // Close parent
       sts = brow_GetParent(wpkgnav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(node_list);
         return 1;
       }
@@ -234,7 +239,8 @@ int WPkgNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     int node_count;
     int sts;
@@ -252,25 +258,30 @@ int WPkgNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_MB1DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
       (wpkgnav->set_clock_cursor_cb)(wpkgnav->parent_ctx);
-      item->open_children(wpkgnav->brow, event->object.x, event->object.y,
-          wpkgnav->display_mode);
+      item->open_children(wpkgnav->brow, event->object.x, event->object.y, wpkgnav->display_mode);
       (wpkgnav->reset_cursor_cb)(wpkgnav->parent_ctx);
       break;
     default:;
     }
     break;
-  case flow_eEvent_MB1ClickShift: {
+  case flow_eEvent_MB1ClickShift:
+  {
     // Add elect
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
-      if (brow_FindSelectedObject(wpkgnav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(wpkgnav->brow->ctx, event->object.object))
+      {
         brow_SetInverse(event->object.object, 0);
         brow_SelectRemove(wpkgnav->brow->ctx, event->object.object);
-      } else {
+      }
+      else
+      {
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(wpkgnav->brow->ctx, event->object.object);
       }
@@ -287,23 +298,28 @@ int WPkgNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     // Add select region
     brow_SetSelectInverse(wpkgnav->brow->ctx);
     break;
-  case flow_eEvent_Key_PageDown: {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(wpkgnav->brow->ctx, 0.8);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(wpkgnav->brow->ctx, -0.8);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(wpkgnav->brow->ctx, 0.1);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(wpkgnav->brow->ctx, -0.1);
     break;
   }
-  case flow_eEvent_Map: {
+  case flow_eEvent_Map:
+  {
     wpkgnav->displayed = 1;
     break;
   }
@@ -325,18 +341,20 @@ int WPkgNav::root_objects()
   dcli_translate_filename(fname, pwr_cNameDistribute);
   std::ifstream is(fname);
 
-  while (is.getline(line, sizeof(line))) {
+  while (is.getline(line, sizeof(line)))
+  {
     line_cnt++;
     str_trim(line, line);
     if (line[0] == '#' || line[0] == '!')
       continue;
 
-    num = dcli_parse(line, " 	", "", (char*)line_item,
-        sizeof(line_item) / sizeof(line_item[0]), sizeof(line_item[0]), 0);
+    num = dcli_parse(line, " 	", "", (char*)line_item, sizeof(line_item) / sizeof(line_item[0]),
+                     sizeof(line_item[0]), 0);
     if (!num)
       continue;
 
-    if (streq(cdh_Low(line_item[0]), "node")) {
+    if (streq(cdh_Low(line_item[0]), "node"))
+    {
       pwr_mOpSys opsys;
       int bus;
       int dstatus;
@@ -356,9 +374,9 @@ int WPkgNav::root_objects()
       if (sts != 1)
         throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
-      new WItemPkgNode(
-          brow, line_item[1], line_item[1], bus, opsys, 0, flow_eDest_IntoLast);
-    } else
+      new WItemPkgNode(brow, line_item[1], line_item[1], bus, opsys, 0, flow_eDest_IntoLast);
+    }
+    else
       continue;
   }
 
@@ -371,38 +389,22 @@ int WPkgNav::root_objects()
 
 void WPkgNav::enable_events()
 {
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB1Press, flow_eEventType_RegionSelect, brow_cb);
-  brow_EnableEvent(brow->ctx, flow_eEvent_MB1PressShift,
-      flow_eEventType_RegionAddSelect, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB1ClickShift, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Map, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1Press, flow_eEventType_RegionSelect, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1PressShift, flow_eEventType_RegionAddSelect, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1ClickShift, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Map, flow_eEventType_CallBack, brow_cb);
 }
 
 //
@@ -427,14 +429,12 @@ int WPkgNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   return 1;
 }
 
-void WPkgNav::redraw()
-{
-  brow_Redraw(brow->ctx, 0);
-}
+void WPkgNav::redraw() { brow_Redraw(brow->ctx, 0); }
 
 void WPkgNav::refresh_node(WItemPkg* item)
 {
-  if (brow_IsOpen(item->node)) {
+  if (brow_IsOpen(item->node))
+  {
     item->close(brow, 0, 0);
     item->open_children(brow, 0, 0, display_mode);
   }
@@ -469,12 +469,14 @@ int WPkgNav::get_select(WItemPkg*** items, int* item_cnt)
   WItemPkg *item, **itemlist;
 
   brow_GetSelectedNodes(brow->ctx, &node_list, &node_count);
-  if (node_count == 0) {
+  if (node_count == 0)
+  {
     *items = 0;
     return PKG__NOSELECT;
   }
   itemlist = (WItemPkg**)calloc(node_count, sizeof(WItemPkg*));
-  for (int i = 0; i < node_count; i++) {
+  for (int i = 0; i < node_count; i++)
+  {
     brow_GetUserData(node_list[i], (void**)&item);
     itemlist[i] = item;
   }
@@ -483,25 +485,18 @@ int WPkgNav::get_select(WItemPkg*** items, int* item_cnt)
   return PKG__SUCCESS;
 }
 
-WItemPkg::WItemPkg() : node(0)
-{
-}
+WItemPkg::WItemPkg() : node(0) {}
 
-int WItemPkg::open_children(
-    WNavBrow* brow, double x, double y, int display_mode)
-{
-  return 1;
-}
+int WItemPkg::open_children(WNavBrow* brow, double x, double y, int display_mode) { return 1; }
 
-WItemPkg::~WItemPkg()
-{
-}
+WItemPkg::~WItemPkg() {}
 
 int WItemPkg::close(WNavBrow* brow, double x, double y)
 {
   double node_x, node_y;
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_GetNodePosition(node, &node_x, &node_y);
     brow_SetNodraw(brow->ctx);
@@ -515,20 +510,18 @@ int WItemPkg::close(WNavBrow* brow, double x, double y)
   return 1;
 }
 
-WItemPkgNode::WItemPkgNode(WNavBrow* brow, char* item_name, char* item_nodename,
-    int item_bus, pwr_mOpSys item_opsys, brow_tNode dest, flow_eDest dest_code)
+WItemPkgNode::WItemPkgNode(WNavBrow* brow, char* item_name, char* item_nodename, int item_bus,
+                           pwr_mOpSys item_opsys, brow_tNode dest, flow_eDest dest_code)
     : bus(item_bus), opsys(item_opsys)
 {
   strcpy(nodename, item_nodename);
 
-  brow_CreateNode(
-      brow->ctx, name, brow->nc_object, dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, name, brow->nc_object, dest, dest_code, (void*)this, 1, &node);
   brow_SetAnnotPixmap(node, 0, brow->pixmap_map);
   brow_SetAnnotation(node, 0, nodename, strlen(nodename));
 }
 
-int WItemPkgNode::open_children(
-    WNavBrow* brow, double x, double y, int display_mode)
+int WItemPkgNode::open_children(WNavBrow* brow, double x, double y, int display_mode)
 {
   pwr_tTime time;
   int pkg_cnt = 0;
@@ -540,7 +533,8 @@ int WItemPkgNode::open_children(
   char dev[80], dir[80], file[80], type[80];
   int version;
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     close(brow, 0, 0);
     return 1;
   }
@@ -549,25 +543,26 @@ int WItemPkgNode::open_children(
   sts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_INIT);
 
   brow_SetNodraw(brow->ctx);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     dcli_file_time(found_file, &time);
     dcli_parse_filename(found_file, dev, dir, file, type, &version);
     strcat(file, type);
 
     sts = brow_GetChild(brow->ctx, node, &child);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       brow_GetUserData(child, (void**)&item);
-      if (item->time.tv_sec < time.tv_sec) {
-        new WItemPkgPackage(
-            brow, file, file, time, nodename, bus, child, flow_eDest_Before);
+      if (item->time.tv_sec < time.tv_sec)
+      {
+        new WItemPkgPackage(brow, file, file, time, nodename, bus, child, flow_eDest_Before);
         inserted = 1;
         break;
       }
       sts = brow_GetNextSibling(brow->ctx, child, &child);
     }
     if (!inserted)
-      new WItemPkgPackage(
-          brow, file, file, time, nodename, bus, node, flow_eDest_IntoLast);
+      new WItemPkgPackage(brow, file, file, time, nodename, bus, node, flow_eDest_IntoLast);
 
     pkg_cnt++;
 
@@ -575,7 +570,8 @@ int WItemPkgNode::open_children(
   }
   dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_END);
 
-  if (pkg_cnt) {
+  if (pkg_cnt)
+  {
     brow_SetOpen(node, wnav_mOpen_Children);
     brow_SetAnnotPixmap(node, 0, brow->pixmap_openmap);
   }
@@ -584,9 +580,8 @@ int WItemPkgNode::open_children(
   return 1;
 }
 
-WItemPkgPackage::WItemPkgPackage(WNavBrow* brow, char* item_name,
-    char* item_packagename, pwr_tTime item_time, char* item_nodename,
-    int item_bus, brow_tNode dest, flow_eDest dest_code)
+WItemPkgPackage::WItemPkgPackage(WNavBrow* brow, char* item_name, char* item_packagename, pwr_tTime item_time,
+                                 char* item_nodename, int item_bus, brow_tNode dest, flow_eDest dest_code)
     : time(item_time), bus(item_bus)
 {
   char timestr[32];
@@ -595,24 +590,22 @@ WItemPkgPackage::WItemPkgPackage(WNavBrow* brow, char* item_name,
   strcpy(nodename, item_nodename);
 
   time_AtoAscii(&time, time_eFormat_DateAndTime, timestr, sizeof(timestr));
-  brow_CreateNode(
-      brow->ctx, name, brow->nc_object, dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, name, brow->nc_object, dest, dest_code, (void*)this, 1, &node);
   brow_SetAnnotPixmap(node, 0, brow->pixmap_map);
   brow_SetAnnotation(node, 0, packagename, strlen(packagename));
   brow_SetAnnotation(node, 1, timestr, strlen(timestr));
 }
 
-int WItemPkgPackage::open_children(
-    WNavBrow* brow, double x, double y, int display_mode)
+int WItemPkgPackage::open_children(WNavBrow* brow, double x, double y, int display_mode)
 {
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     close(brow, 0, 0);
     return 1;
   }
 
   brow_SetNodraw(brow->ctx);
-  new WItemPkgInfoHier(
-      brow, "Info", packagename, nodename, bus, node, flow_eDest_IntoLast);
+  new WItemPkgInfoHier(brow, "Info", packagename, nodename, bus, node, flow_eDest_IntoLast);
   new WItemPkgFileHier(brow, "Files", packagename, node, flow_eDest_IntoLast);
   brow_ResetNodraw(brow->ctx);
   brow_Redraw(brow->ctx, 0);
@@ -620,22 +613,19 @@ int WItemPkgPackage::open_children(
   return 1;
 }
 
-WItemPkgInfoHier::WItemPkgInfoHier(WNavBrow* brow, const char* item_name,
-    char* item_packagename, char* item_nodename, int item_bus, brow_tNode dest,
-    flow_eDest dest_code)
+WItemPkgInfoHier::WItemPkgInfoHier(WNavBrow* brow, const char* item_name, char* item_packagename,
+                                   char* item_nodename, int item_bus, brow_tNode dest, flow_eDest dest_code)
     : bus(item_bus)
 {
   strcpy(packagename, item_packagename);
   strcpy(nodename, item_nodename);
 
-  brow_CreateNode(
-      brow->ctx, name, brow->nc_object, dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, name, brow->nc_object, dest, dest_code, (void*)this, 1, &node);
   brow_SetAnnotPixmap(node, 0, brow->pixmap_map);
   brow_SetAnnotation(node, 0, item_name, strlen(item_name));
 }
 
-int WItemPkgInfoHier::open_children(
-    WNavBrow* brow, double x, double y, int display_mode)
+int WItemPkgInfoHier::open_children(WNavBrow* brow, double x, double y, int display_mode)
 {
   pwr_tFileName bootfile;
   pwr_tFileName bfile;
@@ -652,35 +642,33 @@ int WItemPkgInfoHier::open_children(
   char cmd[420];
   pwr_tStatus sts;
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     close(brow, 0, 0);
     return 1;
   }
 
   sprintf(bootfile, pwr_cNameBoot, "pkg_build/", nodename, bus);
-  sprintf(
-      cmd, "cd $pwrp_tmp; tar -xzf $pwrp_load/%s %s", packagename, bootfile);
+  sprintf(cmd, "cd $pwrp_tmp; tar -xzf $pwrp_load/%s %s", packagename, bootfile);
   system(cmd);
   strcpy(bfile, "$pwrp_tmp/");
   strcat(bfile, bootfile);
 
-  sts = lfu_ReadBootFile(bfile, &date, systemname, systemgroup, &vollist,
-      &volnamelist, &volcount, &plclist, &plccount);
+  sts = lfu_ReadBootFile(bfile, &date, systemname, systemgroup, &vollist, &volnamelist, &volcount, &plclist,
+                         &plccount);
   if (EVEN(sts))
     return sts;
 
   sprintf(cmd, "cd $pwrp_tmp; rm %s; rmdir pkg_build", bootfile);
   system(cmd);
 
-  sts = time_AtoAscii(
-      &date, time_eFormat_DateAndTime, version, sizeof(version));
+  sts = time_AtoAscii(&date, time_eFormat_DateAndTime, version, sizeof(version));
   brow_SetNodraw(brow->ctx);
   new WItemPkgInfo(brow, "NodeName", nodename, node, flow_eDest_IntoLast);
   sprintf(bus_str, "%d", bus);
   new WItemPkgInfo(brow, "QComBusId", bus_str, node, flow_eDest_IntoLast);
   if (volcount > 0)
-    new WItemPkgInfo(
-        brow, "RootVolume", volnamelist[0], node, flow_eDest_IntoLast);
+    new WItemPkgInfo(brow, "RootVolume", volnamelist[0], node, flow_eDest_IntoLast);
   new WItemPkgInfo(brow, "Version", version, node, flow_eDest_IntoLast);
   brow_ResetNodraw(brow->ctx);
   brow_Redraw(brow->ctx, 0);
@@ -688,36 +676,31 @@ int WItemPkgInfoHier::open_children(
   return 1;
 }
 
-WItemPkgInfo::WItemPkgInfo(WNavBrow* brow, const char* item_name,
-    char* item_value, brow_tNode dest, flow_eDest dest_code)
+WItemPkgInfo::WItemPkgInfo(WNavBrow* brow, const char* item_name, char* item_value, brow_tNode dest,
+                           flow_eDest dest_code)
 {
   strcpy(name, item_name);
   strcpy(value, item_value);
 
-  brow_CreateNode(
-      brow->ctx, name, brow->nc_object, dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, name, brow->nc_object, dest, dest_code, (void*)this, 1, &node);
   brow_SetAnnotPixmap(node, 0, brow->pixmap_leaf);
   brow_SetAnnotation(node, 0, item_name, strlen(item_name));
   brow_SetAnnotation(node, 1, item_value, strlen(item_value));
 }
 
-WItemPkgInfo::~WItemPkgInfo()
-{
-}
+WItemPkgInfo::~WItemPkgInfo() {}
 
-WItemPkgFileHier::WItemPkgFileHier(WNavBrow* brow, const char* item_name,
-    char* item_packagename, brow_tNode dest, flow_eDest dest_code)
+WItemPkgFileHier::WItemPkgFileHier(WNavBrow* brow, const char* item_name, char* item_packagename,
+                                   brow_tNode dest, flow_eDest dest_code)
 {
   strcpy(packagename, item_packagename);
 
-  brow_CreateNode(
-      brow->ctx, name, brow->nc_object, dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, name, brow->nc_object, dest, dest_code, (void*)this, 1, &node);
   brow_SetAnnotPixmap(node, 0, brow->pixmap_map);
   brow_SetAnnotation(node, 0, item_name, strlen(item_name));
 }
 
-int WItemPkgFileHier::open_children(
-    WNavBrow* brow, double x, double y, int display_mode)
+int WItemPkgFileHier::open_children(WNavBrow* brow, double x, double y, int display_mode)
 {
   char cmd[350];
   char tmpfile[200];
@@ -737,7 +720,8 @@ int WItemPkgFileHier::open_children(
   int next_pkg_was_open = 0;
   int next_files_was_open = 0;
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     close(brow, 0, 0);
     return 1;
   }
@@ -751,18 +735,22 @@ int WItemPkgFileHier::open_children(
 
   brow_SetNodraw(brow->ctx);
 
-  if (display_mode & wpkg_mDisplayMode_FileDiff) {
+  if (display_mode & wpkg_mDisplayMode_FileDiff)
+  {
     // Display only file with newer date compared to previous package
     sts = brow_GetParent(brow->ctx, node, &parent);
     if (ODD(sts))
       sts = brow_GetNextSibling(brow->ctx, parent, &next_pkg);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       brow_GetUserData(next_pkg, (void**)&next_pkg_item);
-      if (brow_IsOpen(next_pkg)) {
+      if (brow_IsOpen(next_pkg))
+      {
         sts = brow_GetChild(brow->ctx, next_pkg, &next_files);
         if (ODD(sts))
           sts = brow_GetNextSibling(brow->ctx, next_files, &next_files);
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           brow_GetUserData(next_files, (void**)&next_files_item);
           if (brow_IsOpen(next_files))
             next_files_was_open = 1;
@@ -775,40 +763,48 @@ int WItemPkgFileHier::open_children(
       sts = brow_GetChild(brow->ctx, next_pkg, &next_files);
       if (ODD(sts))
         sts = brow_GetNextSibling(brow->ctx, next_files, &next_files);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         brow_GetUserData(next_files, (void**)&next_files_item);
-        if (brow_IsOpen(next_files)) {
+        if (brow_IsOpen(next_files))
+        {
           next_files_item->close(brow, 0, 0);
         }
         next_files_item->open_children(brow, 0, 0, wpkg_mDisplayMode__);
-      } else
+      }
+      else
         // No next sibling, display all files
         display_mode &= ~wpkg_mDisplayMode_FileDiff;
-    } else
+    }
+    else
       // No next sibling, display all files
       display_mode &= ~wpkg_mDisplayMode_FileDiff;
   }
 
-  while (is.getline(line, sizeof(line))) {
+  while (is.getline(line, sizeof(line)))
+  {
     str_trim(line, line);
     if (line[0] == '-')
       continue;
 
-    num = dcli_parse(line, " 	", "", (char*)line_item,
-        sizeof(line_item) / sizeof(line_item[0]), sizeof(line_item[0]), 0);
+    num = dcli_parse(line, " 	", "", (char*)line_item, sizeof(line_item) / sizeof(line_item[0]),
+                     sizeof(line_item[0]), 0);
     if (num != 3)
       continue;
 
     sprintf(timestr, "%s %s", line_item[0], line_item[1]);
     time_AsciiToA(timestr, &time);
 
-    if (display_mode & wpkg_mDisplayMode_FileDiff) {
+    if (display_mode & wpkg_mDisplayMode_FileDiff)
+    {
       // Check if this file is changed
       int keep = 1;
       sts = brow_GetChild(brow->ctx, next_files, &child);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         brow_GetUserData(child, (void**)&item);
-        if (streq(item->filename, line_item[2])) {
+        if (streq(item->filename, line_item[2]))
+        {
           if (item->time.tv_sec == time.tv_sec)
             keep = 0;
           break;
@@ -818,43 +814,49 @@ int WItemPkgFileHier::open_children(
       if (!keep)
         continue;
     }
-    if (display_mode & wpkg_mDisplayMode_FileOrderTime) {
+    if (display_mode & wpkg_mDisplayMode_FileOrderTime)
+    {
       // Order in time
       sts = brow_GetChild(brow->ctx, node, &child);
       inserted = 0;
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         brow_GetUserData(child, (void**)&item);
-        if (item->time.tv_sec < time.tv_sec) {
-          new WItemPkgFile(brow, "File", line_item[2], time, display_mode,
-              child, flow_eDest_Before);
+        if (item->time.tv_sec < time.tv_sec)
+        {
+          new WItemPkgFile(brow, "File", line_item[2], time, display_mode, child, flow_eDest_Before);
           inserted = 1;
           break;
         }
         sts = brow_GetNextSibling(brow->ctx, child, &child);
       }
       if (!inserted)
-        new WItemPkgFile(brow, "File", line_item[2], time, display_mode, node,
-            flow_eDest_IntoLast);
+        new WItemPkgFile(brow, "File", line_item[2], time, display_mode, node, flow_eDest_IntoLast);
 
       file_cnt++;
-    } else {
-      new WItemPkgFile(brow, "File", line_item[2], time, display_mode, node,
-          flow_eDest_IntoLast);
+    }
+    else
+    {
+      new WItemPkgFile(brow, "File", line_item[2], time, display_mode, node, flow_eDest_IntoLast);
       file_cnt++;
     }
   }
 
   is.close();
 
-  if (display_mode & wpkg_mDisplayMode_FileDiff && next_pkg_item) {
+  if (display_mode & wpkg_mDisplayMode_FileDiff && next_pkg_item)
+  {
     next_pkg_item->close(brow, 0, 0);
-    if (next_pkg_was_open) {
+    if (next_pkg_was_open)
+    {
       next_pkg_item->open_children(brow, 0, 0, display_mode);
-      if (next_files_was_open) {
+      if (next_files_was_open)
+      {
         sts = brow_GetChild(brow->ctx, next_pkg, &next_files);
         if (ODD(sts))
           sts = brow_GetNextSibling(brow->ctx, next_files, &next_files);
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           brow_GetUserData(next_files, (void**)&next_files_item);
           next_files_item->open_children(brow, 0, 0, display_mode);
         }
@@ -862,7 +864,8 @@ int WItemPkgFileHier::open_children(
     }
   }
 
-  if (file_cnt) {
+  if (file_cnt)
+  {
     brow_SetOpen(node, wnav_mOpen_Children);
     brow_SetAnnotPixmap(node, 0, brow->pixmap_openmap);
   }
@@ -871,9 +874,8 @@ int WItemPkgFileHier::open_children(
   return 1;
 }
 
-WItemPkgFile::WItemPkgFile(WNavBrow* brow, const char* item_name,
-    char* item_filename, pwr_tTime item_time, int dmode, brow_tNode dest,
-    flow_eDest dest_code)
+WItemPkgFile::WItemPkgFile(WNavBrow* brow, const char* item_name, char* item_filename, pwr_tTime item_time,
+                           int dmode, brow_tNode dest, flow_eDest dest_code)
     : time(item_time)
 {
   char timestr[32];
@@ -881,13 +883,13 @@ WItemPkgFile::WItemPkgFile(WNavBrow* brow, const char* item_name,
   strcpy(filename, item_filename);
 
   time_AtoAscii(&time, time_eFormat_DateAndTime, timestr, sizeof(timestr));
-  brow_CreateNode(
-      brow->ctx, name, brow->nc_table, dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(brow->ctx, name, brow->nc_table, dest, dest_code, (void*)this, 1, &node);
   brow_SetAnnotPixmap(node, 0, brow->pixmap_leaf);
 
   if (dmode & wpkg_mDisplayMode_FilePath)
     brow_SetAnnotation(node, 0, filename, strlen(filename));
-  else {
+  else
+  {
     char* s;
     if ((s = strrchr(filename, '/')))
       brow_SetAnnotation(node, 0, s + 1, strlen(s + 1));
@@ -897,6 +899,4 @@ WItemPkgFile::WItemPkgFile(WNavBrow* brow, const char* item_name,
   brow_SetAnnotation(node, 3, timestr, strlen(timestr));
 }
 
-WItemPkgFile::~WItemPkgFile()
-{
-}
+WItemPkgFile::~WItemPkgFile() {}

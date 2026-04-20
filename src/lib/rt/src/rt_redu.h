@@ -40,7 +40,8 @@
 /* rt_redu.h -- Redundancy */
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "pwr_baseclasses.h"
@@ -59,106 +60,111 @@ extern "C" {
 #define redu_cQixPrio9 ((1 << 31) | 13)
 #define redu_cQixPrio10 ((1 << 31) | 14)
 
-typedef enum {
-  redu_eMsgType_Table,
-  redu_eMsgType_Cyclic,
-  redu_eMsgType_TableRequest,
-  redu_eMsgType_TableVersionRequest,
-  redu_eMsgType_TableVersion
-} redu_eMsgType;
+  typedef enum
+  {
+    redu_eMsgType_Table,
+    redu_eMsgType_Cyclic,
+    redu_eMsgType_TableRequest,
+    redu_eMsgType_TableVersionRequest,
+    redu_eMsgType_TableVersion
+  } redu_eMsgType;
 
-typedef enum {
-  redu_ePrio_0 = 0,
-  redu_ePrio_1 = 1,
-  redu_ePrio_2 = 2,
-  redu_ePrio_3 = 3,
-  redu_ePrio_4 = 4,
-  redu_ePrio_5 = 5,
-  redu_ePrio_6 = 6,
-  redu_ePrio_7 = 7,
-  redu_ePrio_8 = 8,
-  redu_ePrio_9 = 9,
-  redu_ePrio_10 = 10,
-  redu_ePrio__ = 11,
-} redu_ePrio;
+  typedef enum
+  {
+    redu_ePrio_0 = 0,
+    redu_ePrio_1 = 1,
+    redu_ePrio_2 = 2,
+    redu_ePrio_3 = 3,
+    redu_ePrio_4 = 4,
+    redu_ePrio_5 = 5,
+    redu_ePrio_6 = 6,
+    redu_ePrio_7 = 7,
+    redu_ePrio_8 = 8,
+    redu_ePrio_9 = 9,
+    redu_ePrio_10 = 10,
+    redu_ePrio__ = 11,
+  } redu_ePrio;
 
-typedef struct sTable {
-  pwr_tAttrRef aref;
-  int offset;
-  int size;
-  void* p;
-  struct sTable* next;
-} redu_sTable;
+  typedef struct sTable
+  {
+    pwr_tAttrRef aref;
+    int offset;
+    int size;
+    void* p;
+    struct sTable* next;
+  } redu_sTable;
 
-typedef struct {
-  pwr_sClass_RedcomPacket* packetp;
-  pwr_sNode* nodep;
-  qcom_sQid send_qid;
-  qcom_sQid rcv_qid;
-  int prio;
-  int msgid_table;
-  int msgid_cyclic;
-  int current_offset;
-  int attr_cnt;
-  redu_sTable* t;
-  redu_sTable* t_last;
-  float msg_time;
-  int table_sent;
-  int table_created;
-  pwr_tTime table_version;
-} redu_sCtx, *redu_tCtx;
+  typedef struct
+  {
+    pwr_sClass_RedcomPacket* packetp;
+    pwr_sNode* nodep;
+    qcom_sQid send_qid;
+    qcom_sQid rcv_qid;
+    int prio;
+    int msgid_table;
+    int msgid_cyclic;
+    int current_offset;
+    int attr_cnt;
+    redu_sTable* t;
+    redu_sTable* t_last;
+    float msg_time;
+    int table_sent;
+    int table_created;
+    pwr_tTime table_version;
+  } redu_sCtx, *redu_tCtx;
 
-typedef struct {
-  pwr_tUInt32 type;
-} redu_sHeader;
+  typedef struct
+  {
+    pwr_tUInt32 type;
+  } redu_sHeader;
 
-typedef struct {
-  redu_sHeader h;
-  pwr_tUInt32 size;
-  pwr_tTime version;
-} redu_sMsgHeader;
+  typedef struct
+  {
+    redu_sHeader h;
+    pwr_tUInt32 size;
+    pwr_tTime version;
+  } redu_sMsgHeader;
 
-typedef struct {
-  redu_sHeader h;
-  pwr_tUInt32 size;
-  pwr_tUInt32 attributes;
-  pwr_tTime version;
-} redu_sTableMsgHeader;
+  typedef struct
+  {
+    redu_sHeader h;
+    pwr_tUInt32 size;
+    pwr_tUInt32 attributes;
+    pwr_tTime version;
+  } redu_sTableMsgHeader;
 
-typedef struct {
-  pwr_tAttrRef aref;
-  pwr_tUInt32 size;
-} redu_sTableMsgElement;
+  typedef struct
+  {
+    pwr_tAttrRef aref;
+    pwr_tUInt32 size;
+  } redu_sTableMsgElement;
 
-typedef struct {
-  redu_sHeader h;
-  pwr_tTime version;
-} redu_sMsgTableVersion;
+  typedef struct
+  {
+    redu_sHeader h;
+    pwr_tTime version;
+  } redu_sMsgTableVersion;
 
-pwr_tStatus redu_create_table(redu_tCtx ctx);
-void redu_free(redu_tCtx ctx);
-void redu_free_table(redu_tCtx ctx);
-pwr_tStatus redu_create_message(redu_tCtx ctx, void** msg);
-pwr_tStatus redu_unpack_message(redu_tCtx ctx, void* msg);
-pwr_tStatus redu_receive_table(redu_tCtx ctx, void* table_msg);
-pwr_tStatus redu_send_table(redu_tCtx ctx, void** table_msg);
-pwr_tStatus redu_send_table_request(redu_tCtx ctx);
-pwr_tStatus redu_send_table_version(redu_tCtx ctx);
-pwr_tStatus redu_send_table_version_request(redu_tCtx ctx);
-pwr_tStatus redu_init(
-    redu_tCtx* ctx, pwr_sNode* nodep, pwr_sClass_RedcomPacket* packetp);
-pwr_tStatus redu_send(redu_tCtx ctx, void* msg, int size, unsigned int msg_id);
-pwr_tStatus redu_receive(
-    redu_tCtx ctx, unsigned int timeout, int* size, void** msg);
-void redu_print(redu_tCtx ctx);
-pwr_tStatus redu_get_initial_state(char* nodename, int busid, int* state);
-pwr_tStatus redu_set_state(pwr_eRedundancyState state);
+  pwr_tStatus redu_create_table(redu_tCtx ctx);
+  void redu_free(redu_tCtx ctx);
+  void redu_free_table(redu_tCtx ctx);
+  pwr_tStatus redu_create_message(redu_tCtx ctx, void** msg);
+  pwr_tStatus redu_unpack_message(redu_tCtx ctx, void* msg);
+  pwr_tStatus redu_receive_table(redu_tCtx ctx, void* table_msg);
+  pwr_tStatus redu_send_table(redu_tCtx ctx, void** table_msg);
+  pwr_tStatus redu_send_table_request(redu_tCtx ctx);
+  pwr_tStatus redu_send_table_version(redu_tCtx ctx);
+  pwr_tStatus redu_send_table_version_request(redu_tCtx ctx);
+  pwr_tStatus redu_init(redu_tCtx* ctx, pwr_sNode* nodep, pwr_sClass_RedcomPacket* packetp);
+  pwr_tStatus redu_send(redu_tCtx ctx, void* msg, int size, unsigned int msg_id);
+  pwr_tStatus redu_receive(redu_tCtx ctx, unsigned int timeout, int* size, void** msg);
+  void redu_print(redu_tCtx ctx);
+  pwr_tStatus redu_get_initial_state(char* nodename, int busid, int* state);
+  pwr_tStatus redu_set_state(pwr_eRedundancyState state);
 
-pwr_tStatus redu_appl_init(redu_tCtx* ctx, pwr_sClass_RedcomPacket* packetp);
-pwr_tStatus redu_appl_send(
-    redu_tCtx ctx, void* msg, int size, pwr_tTime version, unsigned int msg_id);
-pwr_tStatus redu_appl_receive(
-    redu_tCtx ctx, unsigned int timeout, void** msg, int* size);
+  pwr_tStatus redu_appl_init(redu_tCtx* ctx, pwr_sClass_RedcomPacket* packetp);
+  pwr_tStatus redu_appl_send(redu_tCtx ctx, void* msg, int size, pwr_tTime version, unsigned int msg_id);
+  pwr_tStatus redu_appl_receive(redu_tCtx ctx, unsigned int timeout, void** msg, int* size);
 
 #if defined __cplusplus
 }

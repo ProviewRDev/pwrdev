@@ -41,13 +41,13 @@
 
 #include "xtt_trend.h"
 
-class XttTrendQt : public XttTrend {
+class XttTrendQt : public XttTrend
+{
 public:
-  XttTrendQt(void* xn_parent_ctx, char* xn_name, QWidget** w,
-      pwr_sAttrRef* objid, pwr_sAttrRef* plotgroup, int width, int height,
-      unsigned int options, int x_color_theme, void* basewidget, int* sts);
-  XttOTree* tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt,
-      unsigned int layout, pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*));
+  XttTrendQt(void* xn_parent_ctx, char* xn_name, QWidget** w, pwr_sAttrRef* objid, pwr_sAttrRef* plotgroup,
+             int width, int height, unsigned int options, int x_color_theme, void* basewidget, int* sts);
+  XttOTree* tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt, unsigned int layout,
+                     pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*));
   ~XttTrendQt();
 };
 

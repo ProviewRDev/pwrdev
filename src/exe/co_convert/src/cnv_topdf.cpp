@@ -41,7 +41,8 @@
 
 #include <iomanip>
 
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 #include "co_dcli.h"
 }
@@ -57,13 +58,13 @@ void CnvPdfObj::print_begin()
 {
   offset = topdf->fp[topdf->cf].tellp();
 
-  switch (type) {
+  switch (type)
+  {
   case pdf_eObjType_Catalog:
     topdf->fp[topdf->cf] << number << " 0 obj\n"
                          << "  << /Type /Catalog\n"
                          << "     /Outlines 2 0 R\n"
-                         << "     /Pages " << number + topdf->v_outline.size()
-                         << " 0 R\n";
+                         << "     /Pages " << number + topdf->v_outline.size() << " 0 R\n";
 
     if (topdf->use_outlines)
       topdf->fp[topdf->cf] << "     /PageMode /UseOutlines\n";
@@ -88,8 +89,7 @@ void CnvPdfObj::print_begin()
                          << "  << /Type /Pages\n"
                          << "     /Kids [\n";
     for (int i = 1; i < (int)topdf->v_pages.size(); i++)
-      topdf->fp[topdf->cf] << "              "
-                           << topdf->v_outline.size() + topdf->v_pages[i].number
+      topdf->fp[topdf->cf] << "              " << topdf->v_outline.size() + topdf->v_pages[i].number
                            << " 0 R\n";
 
     topdf->fp[topdf->cf] << "           ]\n"
@@ -101,34 +101,30 @@ void CnvPdfObj::print_begin()
   case pdf_eObjType_Page:
     topdf->fp[topdf->cf] << number + topdf->v_outline.size() << " 0 obj\n"
                          << "  << /Type /Page\n"
-                         << "     /Parent " << topdf->v_outline.size() + 1
-                         << " 0 R\n"
-                         << "     /Mediabox [0 0 " << ps_cPageWidth << " "
-                         << ps_cPageHeight << "]\n"
-                         << "     /Contents "
-                         << number - 1 + topdf->v_outline.size()
-            + topdf->v_pages.size()
+                         << "     /Parent " << topdf->v_outline.size() + 1 << " 0 R\n"
+                         << "     /Mediabox [0 0 " << ps_cPageWidth << " " << ps_cPageHeight << "]\n"
+                         << "     /Contents " << number - 1 + topdf->v_outline.size() + topdf->v_pages.size()
                          << " 0 R\n";
-    if (resource == -1) {
+    if (resource == -1)
+    {
       topdf->fp[topdf->cf] << "     /Resources << /Procset "
-                           << topdf->v_outline.size() + topdf->v_pages.size()
-              + topdf->v_content.size() + 1
+                           << topdf->v_outline.size() + topdf->v_pages.size() + topdf->v_content.size() + 1
                            << " 0 R\n"
                            << "                   /Font <<\n";
       for (int i = 1; i < (int)topdf->v_font.size(); i++)
-        topdf->fp[topdf->cf]
-            << "                         /F" << topdf->v_font[i].number - 1
-            << " "
-            << topdf->v_font[i].number + topdf->v_outline.size()
-                + topdf->v_pages.size() + topdf->v_content.size()
-            << " 0 R\n";
+        topdf->fp[topdf->cf] << "                         /F" << topdf->v_font[i].number - 1 << " "
+                             << topdf->v_font[i].number + topdf->v_outline.size() + topdf->v_pages.size() +
+                                    topdf->v_content.size()
+                             << " 0 R\n";
 
       topdf->fp[topdf->cf] << "                          >>\n"
                            << "                >>\n";
-    } else {
+    }
+    else
+    {
       topdf->fp[topdf->cf] << "     /Resources "
-                           << topdf->v_outline.size() + topdf->v_pages.size()
-              + topdf->v_content.size() + +topdf->v_font.size() + resource + 1
+                           << topdf->v_outline.size() + topdf->v_pages.size() + topdf->v_content.size() +
+                                  +topdf->v_font.size() + resource + 1
                            << " 0 R\n";
     }
     topdf->fp[topdf->cf] << "  >>\n"
@@ -136,25 +132,21 @@ void CnvPdfObj::print_begin()
     break;
 
   case pdf_eObjType_Content:
-    topdf->fp[topdf->cf] << number + topdf->v_outline.size()
-            + topdf->v_pages.size()
-                         << " 0 obj\n"
+    topdf->fp[topdf->cf] << number + topdf->v_outline.size() + topdf->v_pages.size() << " 0 obj\n"
                          << "  << /Length " << length << " >>\n"
                          << "stream\n";
     start = (int)topdf->fp[topdf->cf].tellp();
     break;
 
   case pdf_eObjType_Process:
-    topdf->fp[topdf->cf] << number + topdf->v_outline.size()
-            + topdf->v_pages.size() + topdf->v_content.size()
+    topdf->fp[topdf->cf] << number + topdf->v_outline.size() + topdf->v_pages.size() + topdf->v_content.size()
                          << " 0 obj\n"
                          << "  [/PDF /Text]\n"
                          << "endobj\n\n";
     break;
 
   case pdf_eObjType_Font:
-    topdf->fp[topdf->cf] << number + topdf->v_outline.size()
-            + topdf->v_pages.size() + topdf->v_content.size()
+    topdf->fp[topdf->cf] << number + topdf->v_outline.size() + topdf->v_pages.size() + topdf->v_content.size()
                          << " 0 obj\n"
                          << "  << /Type /Font\n"
                          << "     /Subtype /Type1\n"
@@ -179,8 +171,7 @@ void CnvPdfObj::print_begin()
       topdf->fp[topdf->cf] << "     /Last " << last + 1 << " 0 R\n";
     if (count)
       topdf->fp[topdf->cf] << "     /Count " << count << '\n';
-    topdf->fp[topdf->cf] << "     /Dest [" << dest
-                         << " 0 R /XYZ null 700 null]\n"
+    topdf->fp[topdf->cf] << "     /Dest [" << dest << " 0 R /XYZ null 700 null]\n"
                          << "  >>\n"
                          << "endobj\n\n";
     break;
@@ -190,27 +181,25 @@ void CnvPdfObj::print_begin()
     break;
 
   case pdf_eObjType_Resource:
-    topdf->fp[topdf->cf] << number + topdf->v_outline.size()
-            + topdf->v_pages.size() + topdf->v_content.size()
-            + topdf->v_font.size()
+    topdf->fp[topdf->cf] << number + topdf->v_outline.size() + topdf->v_pages.size() +
+                                topdf->v_content.size() + topdf->v_font.size()
                          << " 0 obj\n"
                          << "  << /ProcSet [/PDF /Text /ImageB]\n"
                          << "     /XObject <<\n";
 
-    for (int i = 0; i < xobject_cnt; i++) {
+    for (int i = 0; i < xobject_cnt; i++)
+    {
       topdf->fp[topdf->cf] << "                  /Im" << xobject[i] + 1 << " "
-                           << xobject[i] + 1 + topdf->v_outline.size()
-              + topdf->v_pages.size() + topdf->v_content.size()
-              + topdf->v_font.size() + topdf->v_resource.size()
+                           << xobject[i] + 1 + topdf->v_outline.size() + topdf->v_pages.size() +
+                                  topdf->v_content.size() + topdf->v_font.size() + topdf->v_resource.size()
                            << " 0 R\n";
     }
     topdf->fp[topdf->cf] << "              >>\n"
                          << "     /Font <<\n";
     for (int i = 1; i < (int)topdf->v_font.size(); i++)
-      topdf->fp[topdf->cf] << "               /F" << topdf->v_font[i].number - 1
-                           << " "
-                           << topdf->v_font[i].number + topdf->v_outline.size()
-              + topdf->v_pages.size() + topdf->v_content.size()
+      topdf->fp[topdf->cf] << "               /F" << topdf->v_font[i].number - 1 << " "
+                           << topdf->v_font[i].number + topdf->v_outline.size() + topdf->v_pages.size() +
+                                  topdf->v_content.size()
                            << " 0 R\n";
 
     topdf->fp[topdf->cf] << "           >>\n"
@@ -222,7 +211,8 @@ void CnvPdfObj::print_begin()
 
 void CnvPdfObj::print_end()
 {
-  switch (type) {
+  switch (type)
+  {
   case pdf_eObjType_Content:
     length = (int)topdf->fp[topdf->cf].tellp() - start;
     topdf->fp[topdf->cf] << "endstream\n"
@@ -245,28 +235,32 @@ int CnvPdfObj::print_image()
 
   if (strchr(text, '/') != 0)
     dcli_translate_filename(fname, text);
-  else {
+  else
+  {
     // Try $pwr_doc/help/
     strcpy(fname, "$pwr_doc/help/");
     strcat(fname, text);
     dcli_translate_filename(fname, fname);
   }
   sts = cnv_get_image(fname, &image, &pixmap);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Try $pwr_exe
     strcpy(fname, "$pwr_exe/");
     strcat(fname, text);
     dcli_translate_filename(fname, fname);
 
     sts = cnv_get_image(fname, &image, &pixmap);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       // Try $pwrp_exe
       strcpy(fname, "$pwrp_exe/");
       strcat(fname, text);
       dcli_translate_filename(fname, fname);
 
       sts = cnv_get_image(fname, &image, &pixmap);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         return 0;
       }
     }
@@ -280,13 +274,12 @@ int CnvPdfObj::print_image()
 
   std::ifstream fimgcnt(fname);
   len = 1;
-  while (fimgcnt.get(c)) 
+  while (fimgcnt.get(c))
     len++;
   fimgcnt.close();
 
-  topdf->fp[topdf->cf] << number + topdf->v_outline.size()
-          + topdf->v_pages.size() + topdf->v_content.size()
-          + topdf->v_font.size() + topdf->v_resource.size()
+  topdf->fp[topdf->cf] << number + topdf->v_outline.size() + topdf->v_pages.size() + topdf->v_content.size() +
+                              topdf->v_font.size() + topdf->v_resource.size()
                        << " 0 obj\n"
                        << "  << /Type /XObject\n"
                        << "     /Subtype /Image\n"
@@ -322,42 +315,57 @@ void CnvToPdf::print_text(const char* text, CnvStyle& style, int mode)
 
   cnv_text(str, text);
 
-  if (style.sidebreak && mode & ps_mPrintMode_Pos) {
-    if (page_number[cf] == 0) {
+  if (style.sidebreak && mode & ps_mPrintMode_Pos)
+  {
+    if (page_number[cf] == 0)
+    {
       // First header, no pagebreak
       page_number[cf] = 1;
-    } else {
+    }
+    else
+    {
       print_pagebreak(0);
     }
-  } else if (style.pagebreak && mode & ps_mPrintMode_Pos) {
+  }
+  else if (style.pagebreak && mode & ps_mPrintMode_Pos)
+  {
     print_pagebreak(0);
   }
 
-  if (mode & ps_mPrintMode_Pos || mode & ps_mPrintMode_Start) {
+  if (mode & ps_mPrintMode_Pos || mode & ps_mPrintMode_Start)
+  {
     y -= style.top_offset;
 
-    if (y - style.bottom_offset < ps_cBottomMargin) {
+    if (y - style.bottom_offset < ps_cBottomMargin)
+    {
       print_pagebreak(0);
     }
-  } else
+  }
+  else
     y += style.bottom_offset;
 
-  if (!(mode & ps_mPrintMode_FixX)) {
-    if (style.alignment == cnv_eAlignment_Center) {
-      x = ps_cLeftMargin / 2 + (ps_cPageWidth - ps_cLeftMargin / 2) / 2
-          - 0.50 * strlen(text) * style.font_size / 2;
+  if (!(mode & ps_mPrintMode_FixX))
+  {
+    if (style.alignment == cnv_eAlignment_Center)
+    {
+      x = ps_cLeftMargin / 2 + (ps_cPageWidth - ps_cLeftMargin / 2) / 2 -
+          0.50 * strlen(text) * style.font_size / 2;
       if (x < ps_cLeftMargin / 2)
         x = ps_cLeftMargin / 2;
-    } else
+    }
+    else
       x = ps_cLeftMargin + style.indentation;
   }
 
   int pmode = mode & 31;
 
-  if (!streq(text, "")) {
-    switch (pmode) {
+  if (!streq(text, ""))
+  {
+    switch (pmode)
+    {
     case ps_mPrintMode_Pos:
-    case ps_mPrintMode_KeepY: {
+    case ps_mPrintMode_KeepY:
+    {
       // Full path with beginning and end
       fp[cf] << "  BT\n"
              << "    " << fontname(style) << " " << style.font_size << " Tf\n"
@@ -366,7 +374,8 @@ void CnvToPdf::print_text(const char* text, CnvStyle& style, int mode)
              << "  ET" << '\n';
       break;
     }
-    case ps_mPrintMode_Start: {
+    case ps_mPrintMode_Start:
+    {
       // Start new path
       fp[cf] << "  BT\n"
              << "    " << fontname(style) << " " << style.font_size << " Tf\n"
@@ -374,14 +383,16 @@ void CnvToPdf::print_text(const char* text, CnvStyle& style, int mode)
              << "    (" << str << ") Tj\n";
       break;
     }
-    case ps_mPrintMode_Continue: {
+    case ps_mPrintMode_Continue:
+    {
       // Continue current path
       fp[cf] << "    " << fontname(style) << " " << style.font_size << " Tf\n"
              << "    " << x << " " << y << " Td\n"
              << "    (" << str << ") Tj\n";
       break;
     }
-    case ps_mPrintMode_End: {
+    case ps_mPrintMode_End:
+    {
       // Continue and close current path
       fp[cf] << "    " << fontname(style) << " " << style.font_size << " Tf\n"
              << "    (" << str << ") Tj\n"
@@ -390,15 +401,20 @@ void CnvToPdf::print_text(const char* text, CnvStyle& style, int mode)
     }
     default:;
     }
-  } else {
-    switch (pmode) {
-    case ps_mPrintMode_Start: {
+  }
+  else
+  {
+    switch (pmode)
+    {
+    case ps_mPrintMode_Start:
+    {
       // Start new path
       fp[cf] << "  BT\n"
              << "    " << x << " " << y << " Td\n";
       break;
     }
-    case ps_mPrintMode_End: {
+    case ps_mPrintMode_End:
+    {
       // Continue and close current path
       fp[cf] << "  ET" << '\n';
       break;
@@ -415,39 +431,34 @@ void CnvToPdf::draw_rect(double lw, double x, double y, double w, double h)
          << "  " << x << " " << y << " " << w << " " << h << " re S\n";
 }
 
-void CnvToPdf::draw_arc(
-    double lw, double x, double y, double w, double h, int angle1, int angle2)
+void CnvToPdf::draw_arc(double lw, double x, double y, double w, double h, int angle1, int angle2)
 {
   fp[cf] << "  " << lw << " w\n";
-  if ((angle1 == 0 && angle2 >= 90) || (angle1 == 90 && angle2 >= 360)
-      || (angle1 == 180 && angle2 >= 270) || (angle1 == 270 && angle2 >= 180))
+  if ((angle1 == 0 && angle2 >= 90) || (angle1 == 90 && angle2 >= 360) || (angle1 == 180 && angle2 >= 270) ||
+      (angle1 == 270 && angle2 >= 180))
     fp[cf] << "  " << x + w << " " << y + h / 2 << " m"
-           << "  " << x + w << " " << y + h << " " << x + w << " " << y + h
-           << " " << x + w / 2 << " " << y + h << " "
+           << "  " << x + w << " " << y + h << " " << x + w << " " << y + h << " " << x + w / 2 << " "
+           << y + h << " "
            << " c\n";
-  if ((angle1 == 0 && angle2 >= 180) || (angle1 == 90 && angle2 >= 90)
-      || (angle1 == 180 && angle2 >= 360) || (angle1 == 270 && angle2 >= 270))
+  if ((angle1 == 0 && angle2 >= 180) || (angle1 == 90 && angle2 >= 90) || (angle1 == 180 && angle2 >= 360) ||
+      (angle1 == 270 && angle2 >= 270))
     fp[cf] << "  " << x + w / 2 << " " << y + h << " m"
-           << "  " << x << " " << y + h << " " << x << " " << y + h << " " << x
-           << " " << y + h / 2 << " "
+           << "  " << x << " " << y + h << " " << x << " " << y + h << " " << x << " " << y + h / 2 << " "
            << " c\n";
-  if ((angle1 == 0 && angle2 >= 270) || (angle1 == 90 && angle2 >= 180)
-      || (angle1 == 180 && angle2 >= 90) || (angle1 == 270 && angle2 >= 360))
+  if ((angle1 == 0 && angle2 >= 270) || (angle1 == 90 && angle2 >= 180) || (angle1 == 180 && angle2 >= 90) ||
+      (angle1 == 270 && angle2 >= 360))
     fp[cf] << "  " << x << " " << y + h / 2 << " m"
-           << "  " << x << " " << y << " " << x << " " << y << " " << x + w / 2
-           << " " << y << " "
+           << "  " << x << " " << y << " " << x << " " << y << " " << x + w / 2 << " " << y << " "
            << " c\n";
-  if ((angle1 == 0 && angle2 >= 360) || (angle1 == 90 && angle2 >= 270)
-      || (angle1 == 180 && angle2 >= 180) || (angle1 == 270 && angle2 >= 90))
+  if ((angle1 == 0 && angle2 >= 360) || (angle1 == 90 && angle2 >= 270) || (angle1 == 180 && angle2 >= 180) ||
+      (angle1 == 270 && angle2 >= 90))
     fp[cf] << "  " << x + w / 2 << " " << y << " m"
-           << "  " << x + w << " " << y << " " << x + w << " " << y << " "
-           << x + w << " " << y + h / 2 << " "
+           << "  " << x + w << " " << y << " " << x + w << " " << y << " " << x + w << " " << y + h / 2 << " "
            << " c\n";
   fp[cf] << "  S\n";
 }
 
-void CnvToPdf::draw_line(
-    double lw, double x1, double y1, double x2, double y2, int dashed, int gray)
+void CnvToPdf::draw_line(double lw, double x1, double y1, double x2, double y2, int dashed, int gray)
 {
   fp[cf] << "  " << lw << " w\n";
   if (dashed)
@@ -461,8 +472,7 @@ void CnvToPdf::draw_line(
   if (gray)
     fp[cf] << "  0 G\n";
 }
-void CnvToPdf::draw_arrow(
-    double x1, double y1, double x2, double y2, double x3, double y3, int gray)
+void CnvToPdf::draw_arrow(double x1, double y1, double x2, double y2, double x3, double y3, int gray)
 {
   if (gray)
     fp[cf] << " 0.7 G\n"
@@ -497,24 +507,24 @@ void CnvToPdf::print_pagebreak(int last)
 {
   if (page_number[cf] == 0)
     page_number[cf] = 1;
-  if (page_number[cf] != 1 || last) {
+  if (page_number[cf] != 1 || last)
+  {
     double page_x;
 
     page_x = ps_cPageNumX;
 
-    if (!(prev_ci == ps_eId_TitlePage || prev_ci == ps_eId_InfoPage)) {
+    if (!(prev_ci == ps_eId_TitlePage || prev_ci == ps_eId_InfoPage))
+    {
       prev_ci = ci;
 
       fp[cf] << "  1 w\n"
              << "  " << 10 << " " << ps_cPageHeight - 20 << " m\n"
-             << "  " << ps_cPageWidth + 65 << " " << ps_cPageHeight - 20
-             << " l\n"
+             << "  " << ps_cPageWidth + 65 << " " << ps_cPageHeight - 20 << " l\n"
              << "  S\n"
              << "  BT\n"
              << "    /F1 10 Tf\n"
-             << "    "
-             << ps_cPageWidth / 2 - 10 * 0.5 * strlen(previous_chapter) << " "
-             << ps_cPageNumY << " Td\n"
+             << "    " << ps_cPageWidth / 2 - 10 * 0.5 * strlen(previous_chapter) << " " << ps_cPageNumY
+             << " Td\n"
              << "    (" << previous_chapter << ") Tj\n"
              << "  ET\n"
              << "  BT\n"
@@ -524,7 +534,8 @@ void CnvToPdf::print_pagebreak(int last)
              << "  ET\n";
     }
 
-    if (page_number[cf] > 1 && v_content.size() > 0) {
+    if (page_number[cf] > 1 && v_content.size() > 0)
+    {
       v_content[page_number[cf] - 2].print_end();
     }
   }
@@ -532,7 +543,8 @@ void CnvToPdf::print_pagebreak(int last)
   if (last)
     return;
 
-  if (conf_pass) {
+  if (conf_pass)
+  {
     CnvPdfObj o1 = CnvPdfObj(this, pdf_eObjType_Page, v_pages.size() + 1);
     v_pages.push_back(o1);
 
@@ -552,10 +564,10 @@ void CnvToPdf::print_content()
 {
   int size = content.tab.size();
   int level = 0;
-  int prev[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  int prev[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   int current = v_outline.size();
   int root = 1;
-  int parent[4] = { 0, 0, 0, 0 };
+  int parent[4] = {0, 0, 0, 0};
   int offset = current;
 
   if (!current)
@@ -566,7 +578,8 @@ void CnvToPdf::print_content()
   v_outline[root].count = size;
   parent[level] = root;
 
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < size; i++)
+  {
     level = content.tab[i].header_level;
     if (level < 0)
       level = 0;
@@ -574,17 +587,21 @@ void CnvToPdf::print_content()
     CnvPdfObj o1 = CnvPdfObj(this, pdf_eObjType_OutlineO, current + 1);
     strcpy(o1.text, content.tab[i].text);
     o1.parent = parent[level];
-    if (parent[level] != root) {
+    if (parent[level] != root)
+    {
       v_outline[parent[level]].last = current;
       v_outline[parent[level]].count++;
     }
-    if (i != size - 1) {
-      if (content.tab[i + 1].header_level > content.tab[i].header_level) {
+    if (i != size - 1)
+    {
+      if (content.tab[i + 1].header_level > content.tab[i].header_level)
+      {
         parent[level + 1] = current;
         o1.first = current + 1;
       }
     }
-    if (prev[level]) {
+    if (prev[level])
+    {
       o1.prev = prev[level];
       v_outline[o1.prev].next = current;
     }
@@ -594,11 +611,13 @@ void CnvToPdf::print_content()
     v_outline.push_back(o1);
     current++;
 
-    if (i != size - 1) {
+    if (i != size - 1)
+    {
       int next_level = content.tab[i + 1].header_level;
       if (next_level < 0)
         next_level = 0;
-      if (level > next_level) {
+      if (level > next_level)
+      {
         for (int j = next_level + 1; j <= level; j++)
           prev[j] = 0;
       }
@@ -606,9 +625,7 @@ void CnvToPdf::print_content()
   }
 }
 
-CnvToPdf::~CnvToPdf()
-{
-}
+CnvToPdf::~CnvToPdf() {}
 
 void CnvToPdf::close()
 {
@@ -616,17 +633,20 @@ void CnvToPdf::close()
   print_pagebreak(1);
   // print_content();
 
-  for (int i = 0; i < (int)v_font.size(); i++) {
+  for (int i = 0; i < (int)v_font.size(); i++)
+  {
     v_font[i].print_begin();
     v_font[i].print_end();
   }
 
-  for (int i = 0; i < (int)v_resource.size(); i++) {
+  for (int i = 0; i < (int)v_resource.size(); i++)
+  {
     v_resource[i].print_begin();
     v_resource[i].print_end();
   }
 
-  for (int i = 0; i < (int)v_image.size(); i++) {
+  for (int i = 0; i < (int)v_image.size(); i++)
+  {
     v_image[i].print_begin();
     v_image[i].print_end();
   }
@@ -635,37 +655,43 @@ void CnvToPdf::close()
   fp[cf] << '\n'
          << "xref\n"
          << "0 "
-         << v_outline.size() + v_pages.size() + v_content.size() + v_font.size()
-          + v_resource.size() + v_image.size() + 1
+         << v_outline.size() + v_pages.size() + v_content.size() + v_font.size() + v_resource.size() +
+                v_image.size() + 1
          << '\n'
          << "0000000000 65535 f \n";
 
-  for (int i = 0; i < (int)v_outline.size(); i++) {
+  for (int i = 0; i < (int)v_outline.size(); i++)
+  {
     fp[cf].fill('0');
     fp[cf].width(10);
     fp[cf] << v_outline[i].offset << " 00000 n \n";
   }
-  for (int i = 0; i < (int)v_pages.size(); i++) {
+  for (int i = 0; i < (int)v_pages.size(); i++)
+  {
     fp[cf].fill('0');
     fp[cf].width(10);
     fp[cf] << v_pages[i].offset << " 00000 n \n";
   }
-  for (int i = 0; i < (int)v_content.size(); i++) {
+  for (int i = 0; i < (int)v_content.size(); i++)
+  {
     fp[cf].fill('0');
     fp[cf].width(10);
     fp[cf] << v_content[i].offset << " 00000 n \n";
   }
-  for (int i = 0; i < (int)v_font.size(); i++) {
+  for (int i = 0; i < (int)v_font.size(); i++)
+  {
     fp[cf].fill('0');
     fp[cf].width(10);
     fp[cf] << v_font[i].offset - start_offset << " 00000 n \n";
   }
-  for (int i = 0; i < (int)v_resource.size(); i++) {
+  for (int i = 0; i < (int)v_resource.size(); i++)
+  {
     fp[cf].fill('0');
     fp[cf].width(10);
     fp[cf] << v_resource[i].offset - start_offset << " 00000 n \n";
   }
-  for (int i = 0; i < (int)v_image.size(); i++) {
+  for (int i = 0; i < (int)v_image.size(); i++)
+  {
     fp[cf].fill('0');
     fp[cf].width(10);
     fp[cf] << v_image[i].offset - start_offset << " 00000 n \n";
@@ -673,9 +699,7 @@ void CnvToPdf::close()
 
   fp[cf] << '\n'
          << "trailer\n"
-         << "  << /Size "
-         << v_outline.size() + v_pages.size() + v_content.size() + v_font.size()
-         << '\n'
+         << "  << /Size " << v_outline.size() + v_pages.size() + v_content.size() + v_font.size() << '\n'
          << "     /Root 1 0 R\n"
          << "  >>\n"
          << "startxref\n"
@@ -687,7 +711,7 @@ void CnvToPdf::close()
 
 static void image_pixel(void* userdata, std::ofstream& fp, unsigned char* rgb)
 {
-  unsigned char transp[3] = { 255, 0, 255 };
+  unsigned char transp[3] = {255, 0, 255};
   int grey;
 
   if (*rgb == transp[0] && *(rgb + 1) == transp[1] && *(rgb + 2) == transp[2])
@@ -727,14 +751,16 @@ int CnvToPdf::print_image_inline(const char* filename)
   dcli_translate_filename(fname, fname);
 
   sts = cnv_get_image(fname, &image, &pixmap);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Try $pwr_exe
     strcpy(fname, "$pwr_exe/");
     strcat(fname, filename);
     dcli_translate_filename(fname, fname);
 
     sts = cnv_get_image(fname, &image, &pixmap);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       // Try $pwrp_exe
       strcpy(fname, "$pwrp_exe/");
       strcat(fname, filename);
@@ -749,9 +775,11 @@ int CnvToPdf::print_image_inline(const char* filename)
   width = cnv_image_width(image);
   height = cnv_image_height(image);
 
-  if (width * scalex > ps_cPageWidth - ps_cLeftMargin) {
+  if (width * scalex > ps_cPageWidth - ps_cLeftMargin)
+  {
     x = ps_cPageWidth - width * scalex;
-    if (x < 50) {
+    if (x < 50)
+    {
       double scale_factor = (ps_cPageWidth - 50) / (width * scalex);
       x = 50;
       scalex = scalex * scale_factor;
@@ -763,8 +791,7 @@ int CnvToPdf::print_image_inline(const char* filename)
     print_pagebreak(0);
 
   fp[cf] << "  q\n"
-         << scalex * width << " 0 0 " << scaley * height << " " << x << " "
-         << y - scaley * height << " cm\n"
+         << scalex * width << " 0 0 " << scaley * height << " " << x << " " << y - scaley * height << " cm\n"
          << "  BI\n"
          << "    /W " << width << '\n'
          << "    /H " << height << '\n'
@@ -777,9 +804,7 @@ int CnvToPdf::print_image_inline(const char* filename)
   fp[cf] << '\n'
          << "EI\n"
          << "  Q\n";
-  fp[cf].flags(
-      ((fp[cf].flags() & ~std::ios_base::hex) & ~std::ios_base::uppercase)
-      | std::ios_base::dec);
+  fp[cf].flags(((fp[cf].flags() & ~std::ios_base::hex) & ~std::ios_base::uppercase) | std::ios_base::dec);
 
   cnv_free_image(image, pixmap);
   y -= height * scaley;
@@ -802,29 +827,33 @@ int CnvToPdf::print_image(const char* filename)
 
   if (strchr(filename, '/') != 0)
     dcli_translate_filename(fname, filename);
-  else {
+  else
+  {
     // Try $pwr_doc/help/
     strcpy(fname, "$pwr_doc/help/");
     strcat(fname, filename);
     dcli_translate_filename(fname, fname);
   }
   sts = cnv_get_image(fname, &image, &pixmap);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Try $pwr_exe
     strcpy(fname, "$pwr_exe/");
     strcat(fname, filename);
     dcli_translate_filename(fname, fname);
 
     sts = cnv_get_image(fname, &image, &pixmap);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       // Try $pwrp_exe
       strcpy(fname, "$pwrp_exe/");
       strcat(fname, filename);
       dcli_translate_filename(fname, fname);
 
       sts = cnv_get_image(fname, &image, &pixmap);
-      if (EVEN(sts)) {
-	printf("** Missing image %s\n", fname);
+      if (EVEN(sts))
+      {
+        printf("** Missing image %s\n", fname);
         return 0;
       }
     }
@@ -833,9 +862,11 @@ int CnvToPdf::print_image(const char* filename)
   width = cnv_image_width(image);
   height = cnv_image_height(image);
 
-  if (width * scalex > ps_cPageWidth - ps_cLeftMargin) {
+  if (width * scalex > ps_cPageWidth - ps_cLeftMargin)
+  {
     x = ps_cPageWidth - width * scalex;
-    if (x < 50) {
+    if (x < 50)
+    {
       double scale_factor = (ps_cPageWidth - 50) / (width * scalex);
       x = 50;
       scalex = scalex * scale_factor;
@@ -847,22 +878,21 @@ int CnvToPdf::print_image(const char* filename)
     print_pagebreak(0);
 
   fp[cf] << "  q\n"
-         << "  " << scalex * width << " 0 0 " << scaley * height << " " << x
-         << " " << y - scaley * height << " cm\n"
+         << "  " << scalex * width << " 0 0 " << scaley * height << " " << x << " " << y - scaley * height
+         << " cm\n"
          << "  /Im" << im_cnt << " Do\n"
          << "  Q\n";
 
-  if (conf_pass) {
-    if (v_pages[v_pages.size() - 1].resource == -1) {
+  if (conf_pass)
+  {
+    if (v_pages[v_pages.size() - 1].resource == -1)
+    {
       v_pages[v_pages.size() - 1].resource = v_resource.size();
 
-      CnvPdfObj o1
-          = CnvPdfObj(this, pdf_eObjType_Resource, v_resource.size() + 1);
+      CnvPdfObj o1 = CnvPdfObj(this, pdf_eObjType_Resource, v_resource.size() + 1);
       v_resource.push_back(o1);
     }
-    v_resource[v_resource.size() - 1]
-        .xobject[v_resource[v_resource.size() - 1].xobject_cnt]
-        = v_image.size();
+    v_resource[v_resource.size() - 1].xobject[v_resource[v_resource.size() - 1].xobject_cnt] = v_image.size();
     v_resource[v_resource.size() - 1].xobject_cnt++;
 
     CnvPdfObj o2 = CnvPdfObj(this, pdf_eObjType_Image, v_image.size() + 1);
@@ -881,18 +911,22 @@ void CnvToPdf::open()
   y = ps_cPageHeight - ps_cTopMargin;
   im_cnt = 0;
 
-  if (conf_pass) {
+  if (conf_pass)
+  {
     fp[ps_eFile_Body].open(filename[ps_eFile_Body]);
     fp[ps_eFile_Body] << setiosflags(std::ios::fixed) << std::setprecision(6);
     start_offset = fp[ps_eFile_Body].tellp();
-  } else {
+  }
+  else
+  {
     print_content();
 
     conf_pass = true;
     page_number[cf] = v_content.size() + 1;
     print_pagebreak(1);
     conf_pass = false;
-    for (int i = 0; i < (int)v_image.size(); i++) {
+    for (int i = 0; i < (int)v_image.size(); i++)
+    {
       v_image[i].print_begin();
       v_image[i].print_end();
     }
@@ -907,7 +941,8 @@ void CnvToPdf::open()
   cf = ps_eFile_Body;
   page_number[cf] = 0;
 
-  if (conf_pass) {
+  if (conf_pass)
+  {
     CnvPdfObj o1 = CnvPdfObj(this, pdf_eObjType_Catalog, v_outline.size() + 1);
     v_outline.push_back(o1);
 
@@ -947,11 +982,13 @@ void CnvToPdf::open()
 
   fp[cf] << pdf_cHead << '\n';
 
-  for (int i = 0; i < (int)v_outline.size(); i++) {
+  for (int i = 0; i < (int)v_outline.size(); i++)
+  {
     v_outline[i].print_begin();
     v_outline[i].print_end();
   }
-  for (int i = 0; i < (int)v_pages.size(); i++) {
+  for (int i = 0; i < (int)v_pages.size(); i++)
+  {
     v_pages[i].print_begin();
     v_pages[i].print_end();
   }

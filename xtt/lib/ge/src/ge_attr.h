@@ -52,12 +52,11 @@ class AttrNav;
 
 //! Attribute editor.
 /*! Displays grow attributes and dynamic attributes for an object or graph. */
-class Attr {
+class Attr
+{
 public:
-  Attr(void* a_parent_ctx, attr_eType a_type, void* a_object,
-      attr_sItem* itemlist, int item_cnt, 
-      void (*a_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, 
-      grow_tObject*, int));
+  Attr(void* a_parent_ctx, attr_eType a_type, void* a_object, attr_sItem* itemlist, int item_cnt,
+       void (*a_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, grow_tObject*, int));
   void* parent_ctx;
   attr_eType type;
   int embedded;
@@ -74,11 +73,9 @@ public:
   int (*recall_cb)(void*, void*, int, GeDyn**);
   int (*set_data_cb)(void*, void*, GeDyn*);
   int (*get_plant_select_cb)(void*, char*, int);
-  int (*get_current_colors_cb)(
-      void*, glow_eDrawType*, glow_eDrawType*, glow_eDrawType*);
+  int (*get_current_colors_cb)(void*, glow_eDrawType*, glow_eDrawType*, glow_eDrawType*);
   int (*get_current_color_tone_cb)(void*, glow_eDrawType*);
-  void (*get_object_list_cb)(
-      void*, unsigned int type, grow_tObject**, int*, grow_tObject*, int);
+  void (*get_object_list_cb)(void*, unsigned int type, grow_tObject**, int*, grow_tObject*, int);
   void (*open_value_input_cb)(void*, int, int, char*);
   int (*set_inputfocus_cb)(void*, void*);
   int (*traverse_inputfocus_cb)(void*, void*);
@@ -86,45 +83,24 @@ public:
   int recall_idx;
   GeDyn* original_data;
 
-  virtual void message(char severity, const char* message)
-  {
-  }
-  virtual void message_popup(char severity, const char* msg)
-  {
-    message(severity, msg);
-  }
-  virtual void set_prompt(const char* prompt)
-  {
-  }
-  virtual void change_value()
-  {
-  }
-  virtual int reconfigure_attr()
-  {
-    return 1;
-  }
+  virtual void message(char severity, const char* message) {}
+  virtual void message_popup(char severity, const char* msg) { message(severity, msg); }
+  virtual void set_prompt(const char* prompt) {}
+  virtual void change_value() {}
+  virtual int reconfigure_attr() { return 1; }
   virtual void store();
   virtual void recall_next();
   virtual void recall_prev();
   void refresh_objects(unsigned int type);
-  void set_graph(Graph* g)
-  {
-    attrnav->graph = g;
-  }
+  void set_graph(Graph* g) { attrnav->graph = g; }
   void set_inputfocus(int focus)
   {
     if (focus)
       attrnav->set_inputfocus();
   }
   int set_attr_value(char* value_str);
-  void filter(int type, char* pattern)
-  {
-    attrnav->filter(type, pattern);
-  }
-  void find_object(char* object)
-  {
-    attrnav->find_object(object);
-  }
+  void filter(int type, char* pattern) { attrnav->filter(type, pattern); }
+  void find_object(char* object) { attrnav->find_object(object); }
   void clear()
   {
     if (!attrnav->brow)
@@ -132,22 +108,18 @@ public:
     attrnav->clear();
   }
   static int get_plant_select_c(void* attr_ctx, char* value, int size);
-  static int get_current_colors_c(void* attr_ctx, glow_eDrawType* fill_color,
-      glow_eDrawType* border_color, glow_eDrawType* text_color);
-  static int get_current_color_tone_c(
-      void* attr_ctx, glow_eDrawType* tone_color);
-  static int get_subgraph_info_c(
-      void* attr_ctx, char* name, attr_sItem** itemlist, int* item_cnt);
-  static int get_dyn_info_c(
-      void* attr_ctx, GeDyn* dyn, attr_sItem** itemlist, int* item_cnt);
+  static int get_current_colors_c(void* attr_ctx, glow_eDrawType* fill_color, glow_eDrawType* border_color,
+                                  glow_eDrawType* text_color);
+  static int get_current_color_tone_c(void* attr_ctx, glow_eDrawType* tone_color);
+  static int get_subgraph_info_c(void* attr_ctx, char* name, attr_sItem** itemlist, int* item_cnt);
+  static int get_dyn_info_c(void* attr_ctx, GeDyn* dyn, attr_sItem** itemlist, int* item_cnt);
   static void change_value_c(void* attr);
   static int reconfigure_attr_c(void* attr);
-  static void get_object_list_c(void* attr_ctx, unsigned int type,
-      grow_tObject** list, int* list_cnt, grow_tObject* parent, int parent_cnt);
+  static void get_object_list_c(void* attr_ctx, unsigned int type, grow_tObject** list, int* list_cnt,
+                                grow_tObject* parent, int parent_cnt);
   static int set_inputfocus_c(void* attr_ctx);
   static int traverse_inputfocus_c(void* attr_ctx);
-  static void message(
-      void* attr, int popup, char severity, const char* message);
+  static void message(void* attr, int popup, char severity, const char* message);
   virtual ~Attr();
 };
 

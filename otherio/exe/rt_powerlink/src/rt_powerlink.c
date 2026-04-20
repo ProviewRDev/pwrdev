@@ -89,12 +89,15 @@ int main(int argc, char** argv)
   qcom_sQid qini;
   qcom_sQid qid = qcom_cNQid;
 
-  if (argc > 1) {
-    if (streq(argv[1], "-m")) {
+  if (argc > 1)
+  {
+    if (streq(argv[1], "-m"))
+    {
       io_methods_print();
       exit(0);
     }
-    if (streq(argv[1], "-h")) {
+    if (streq(argv[1], "-h"))
+    {
       usage();
       exit(0);
     }
@@ -104,41 +107,47 @@ int main(int argc, char** argv)
   errh_Init("pwr_powerlink", errh_eAnix_powerlink);
   errh_SetStatus(PWR__SRVSTARTUP);
 
-  if (!qcom_Init(&sts, 0, "pwr_powerlink")) {
+  if (!qcom_Init(&sts, 0, "pwr_powerlink"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     exit(sts);
   }
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, &qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, &qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     exit(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, &qid, &qini)) {
+  if (!qcom_Bind(&sts, &qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     exit(-1);
   }
 
   // Make connection to realtime database
   sts = gdh_Init("rt_powerlink");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("rt_powerlink aborted, gdh_Init failed\n%m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   sts = gdh_GetClassList(pwr_cClass_Epl_CNServer, &oid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     system("rt_powerlink_cn &");
     exit(0);
   }
 
   // Get Powerlink handler object
   sts = io_get_plhandler_object(&plhp, &oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_SetStatus(0);
     errh_Info("rt_powerlink terminated, no EplHandler object found");
     exit(sts);
@@ -147,7 +156,8 @@ int main(int argc, char** argv)
   // Create context and call init functions of all agent,
   // rack and cardobjects
   sts = io_init(io_mProcess_Powerlink, pwr_cNObjid, &io_ctx, 1, ctime);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_SetStatus(PWR__SRVTERM);
     errh_Fatal("rt_powerlink aborted, io_init() failed\n%m", sts);
     exit(sts);
@@ -161,26 +171,34 @@ int main(int argc, char** argv)
 
   // Call IoAgentRead() IoAgentWrite() IoCardRead() IoCardWrite()
   // IoModuleRead() IoModuleWrite() forever
-  for (;;) {
+  for (;;)
+  {
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &qid, &get, tmo);
-    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+    {
       sts = io_read(io_ctx);
       sts = io_write(io_ctx);
 
       aproc_TimeStamp(plhp->CycleTime, 5.0);
-
-    } else {
+    }
+    else
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop) {
+      if (new_event.b.oldPlcStop)
+      {
         // TODO
-      } else if (new_event.b.swapDone) {
+      }
+      else if (new_event.b.swapDone)
+      {
         // TODO
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         // io_close(io_ctx);
         exit(0);
       }

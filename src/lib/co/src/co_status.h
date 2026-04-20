@@ -41,7 +41,8 @@
 
 #include "pwr.h"
 
-class co_status {
+class co_status
+{
 protected:
   pwr_tStatus m_sts;
 

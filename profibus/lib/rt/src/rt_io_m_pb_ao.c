@@ -52,8 +52,7 @@
 /*----------------------------------------------------------------------------*\
    Init method for the Pb module Ao
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                              io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   pwr_sClass_Pb_Ao* op;
@@ -90,8 +89,7 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 /*----------------------------------------------------------------------------*\
    Write method for the Pb module Ao
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                               io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   pwr_sClass_Pb_Ao* op;
@@ -233,8 +231,7 @@ static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                               io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   local = cp->Local;
@@ -248,6 +245,5 @@ static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Pb_Ao) = {
-    pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardWrite),
-    pwr_BindIoMethod(IoCardClose), pwr_NullMethod};
+pwr_dExport pwr_BindIoMethods(Pb_Ao) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardWrite),
+                                        pwr_BindIoMethod(IoCardClose), pwr_NullMethod};

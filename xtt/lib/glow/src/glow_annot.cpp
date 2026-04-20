@@ -43,16 +43,14 @@
 #include "glow_draw.h"
 #include "glow_browctx.h"
 
-void GlowAnnot::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowAnnot::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_Annot) << '\n';
   fp << int(glow_eSave_Annot_number) << FSPACE << number << '\n';
   fp << int(glow_eSave_Annot_draw_type) << FSPACE << int(draw_type) << '\n';
-  fp << int(glow_eSave_Annot_color_drawtype) << FSPACE << int(color_drawtype)
-     << '\n';
+  fp << int(glow_eSave_Annot_color_drawtype) << FSPACE << int(color_drawtype) << '\n';
   fp << int(glow_eSave_Annot_text_size) << FSPACE << text_size << '\n';
-  fp << int(glow_eSave_Annot_display_level) << FSPACE << int(display_level)
-     << '\n';
+  fp << int(glow_eSave_Annot_display_level) << FSPACE << int(display_level) << '\n';
   fp << int(glow_eSave_Annot_p) << '\n';
   p.save(fp, mode);
   fp << int(glow_eSave_Annot_annot_type) << FSPACE << int(annot_type) << '\n';
@@ -61,22 +59,25 @@ void GlowAnnot::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowAnnot::open(std::ifstream& fp)
+void GlowAnnot::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GlowAnnot: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_Annot:
       break;
     case glow_eSave_Annot_number:
@@ -123,47 +124,50 @@ void GlowAnnot::open(std::ifstream& fp)
   }
 }
 
-void glow_measure_annot_text(GrowCtx* ctx, char* text, glow_eDrawType draw_type,
-    int text_size, glow_eAnnotType annot_type, glow_eFont font, double* width,
-    double* height, int* rows)
+void glow_measure_annot_text(GrowCtx* ctx, char* text, glow_eDrawType draw_type, int text_size,
+                             glow_eAnnotType annot_type, glow_eFont font, double* width, double* height,
+                             int* rows)
 {
-  int z_width, z_height, z_descent;
+  int z_width = 0, z_height = 0, z_descent;
 
-  switch (annot_type) {
+  switch (annot_type)
+  {
   case glow_eAnnotType_OneLine:
-    ctx->gdraw->get_text_extent(text, strlen(text), draw_type, text_size, font,
-        &z_width, &z_height, &z_descent,
-        ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (8 + 2 * text_size),
-        0);
+    ctx->gdraw->get_text_extent(text, strlen(text), draw_type, text_size, font, &z_width, &z_height,
+                                &z_descent,
+                                ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (8 + 2 * text_size), 0);
     *rows = 1;
     break;
-  case glow_eAnnotType_MultiLine: {
+  case glow_eAnnotType_MultiLine:
+  {
     int l_width, l_height = 0, l_descent;
     int len = 0;
     int line_cnt = 0;
     char* line = text;
     char* s;
     z_width = 0;
-    for (s = text; *s; s++) {
-      if (*s == 10) {
-        if (len) {
-          ctx->gdraw->get_text_extent(line, len, draw_type, text_size, font,
-              &l_width, &l_height, &l_descent, ctx->mw.zoom_factor_y
-                  / ctx->mw.base_zoom_factor * (8 + 2 * text_size),
-              0);
+    for (s = text; *s; s++)
+    {
+      if (*s == 10)
+      {
+        if (len)
+        {
+          ctx->gdraw->get_text_extent(line, len, draw_type, text_size, font, &l_width, &l_height, &l_descent,
+                                      ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (8 + 2 * text_size),
+                                      0);
           z_width = MAX(z_width, l_width);
         }
         len = 0;
         line = s + 1;
         line_cnt++;
-      } else
+      }
+      else
         len++;
     }
-    if (len) {
-      ctx->gdraw->get_text_extent(line, len, draw_type, text_size, font,
-          &l_width, &l_height, &l_descent, ctx->mw.zoom_factor_y
-              / ctx->mw.base_zoom_factor * (8 + 2 * text_size),
-          0);
+    if (len)
+    {
+      ctx->gdraw->get_text_extent(line, len, draw_type, text_size, font, &l_width, &l_height, &l_descent,
+                                  ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (8 + 2 * text_size), 0);
       z_width = MAX(z_width, l_width);
       line_cnt++;
     }

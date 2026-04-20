@@ -43,10 +43,11 @@
 
 #include "cow_rtmon.h"
 
-class RtMonGtk : public RtMon {
+class RtMonGtk : public RtMon
+{
 public:
-  RtMonGtk(void* rtmon_parent_ctx, GtkWidget* rtmon_parent_wid,
-      const char* rtmon_name, const char* rtmon_display, pwr_tStatus* status);
+  RtMonGtk(void* rtmon_parent_ctx, GtkWidget* rtmon_parent_wid, const char* rtmon_name,
+           const char* rtmon_display, pwr_tStatus* status);
   ~RtMonGtk();
 
   GtkWidget* parent_wid;
@@ -75,11 +76,9 @@ public:
   void reset_cursor();
   void free_cursor();
   void create_input_dialog();
-  void open_input_dialog(
-      char* text, char* title, char* init_text, void (*ok_cb)(RtMon*, char*));
+  void open_input_dialog(char* text, char* title, char* init_text, void (*ok_cb)(RtMon*, char*));
 
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_start(GtkWidget* w, gpointer data);
   static void activate_restart(GtkWidget* w, gpointer data);

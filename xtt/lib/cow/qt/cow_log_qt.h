@@ -43,14 +43,12 @@
 
 #include <QWidget>
 
-class CoLogQt : public CoLog {
+class CoLogQt : public CoLog
+{
 public:
   CoLogQt(QWidget* parent, const char* filename);
 
-  ~CoLogQt()
-  {
-    delete m_wow;
-  }
+  ~CoLogQt() { delete m_wow; }
 };
 
 #endif

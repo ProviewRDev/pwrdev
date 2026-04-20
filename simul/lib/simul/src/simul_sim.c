@@ -51,13 +51,13 @@ void Sim_SignalGeneratorFo_init(pwr_sClass_Sim_SignalGeneratorFo* o)
   pwr_tDlid dlid;
   pwr_tStatus sts;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
   if (EVEN(sts))
     o->PlcConnectP = 0;
-  else {
-    if ( o->BiasP != &o->Bias)
-      ((pwr_sClass_Sim_SignalGenerator *)o->PlcConnectP)->BiasConnected = 1;
+  else
+  {
+    if (o->BiasP != &o->Bias)
+      ((pwr_sClass_Sim_SignalGenerator*)o->PlcConnectP)->BiasConnected = 1;
   }
 }
 
@@ -69,102 +69,105 @@ void Sim_SignalGeneratorFo_exec(plc_sThread* tp, pwr_sClass_Sim_SignalGeneratorF
 
   pwr_tFloat32 value = co->Bias;
 
-
-  if ( co->BiasConnected)
+  if (co->BiasConnected)
     o->Bias = co->Bias = *o->BiasP;
- 
-  switch ( co->Type) {
+
+  switch (co->Type)
+  {
   case pwr_eSim_SignalGeneratorType_Straight:
     break;
   case pwr_eSim_SignalGeneratorType_Sine:
-    if ( co->Period < FLT_MIN)
+    if (co->Period < FLT_MIN)
       break;
     co->Accum += *o->ScanTime;
-    if ( co->Accum > M_PI * 1000)
+    if (co->Accum > M_PI * 1000)
       co->Accum -= M_PI * 1000;
 
     value += co->Amplitude * sinf(co->Accum / co->Period * M_PI * 2);
     break;
   case pwr_eSim_SignalGeneratorType_HalfSine:
-    if ( co->Period < FLT_MIN)
+    if (co->Period < FLT_MIN)
       break;
 
     co->Accum += *o->ScanTime;
-    if ( co->Accum > M_PI * 1000)
+    if (co->Accum > M_PI * 1000)
       co->Accum -= M_PI * 1000;
 
-    value += co->Amplitude * fabs(sinf(co->Accum / co->Period  * M_PI * 2));
+    value += co->Amplitude * fabs(sinf(co->Accum / co->Period * M_PI * 2));
     break;
   case pwr_eSim_SignalGeneratorType_Square:
-    if ( co->Period < FLT_MIN)
+    if (co->Period < FLT_MIN)
       break;
 
     co->Accum += *o->ScanTime;
-    if ( co->Accum / co->Period > (int)(1000.0f / co->Period))
+    if (co->Accum / co->Period > (int)(1000.0f / co->Period))
       co->Accum -= co->Period * (int)(1000.0f / co->Period);
-    
-    if ( co->Accum / co->Period - (int)(co->Accum / co->Period) <= 
-	 co->PulseWidth/100)
+
+    if (co->Accum / co->Period - (int)(co->Accum / co->Period) <= co->PulseWidth / 100)
       value += co->Amplitude;
     break;
   case pwr_eSim_SignalGeneratorType_SawTooth:
-    if ( co->Period < FLT_MIN)
+    if (co->Period < FLT_MIN)
       break;
 
     co->Accum += *o->ScanTime;
-    if ( co->Accum / co->Period > (int)(1000.0f / co->Period))
+    if (co->Accum / co->Period > (int)(1000.0f / co->Period))
       co->Accum -= co->Period * (int)(1000.0f / co->Period);
-    
+
     value += co->Amplitude * (co->Accum / co->Period - (int)(co->Accum / co->Period));
-    if ( value > co->Bias + co->Amplitude)
+    if (value > co->Bias + co->Amplitude)
       value -= co->Amplitude;
     break;
-  case pwr_eSim_SignalGeneratorType_Triangular: {
-    if ( co->Period < FLT_MIN)
+  case pwr_eSim_SignalGeneratorType_Triangular:
+  {
+    if (co->Period < FLT_MIN)
       break;
 
     co->Accum += *o->ScanTime;
-    if ( co->Accum / co->Period > (int)(1000.0f / co->Period))
+    if (co->Accum / co->Period > (int)(1000.0f / co->Period))
       co->Accum -= co->Period * (int)(1000.0f / co->Period);
-    
+
     float p = co->Accum / co->Period - (int)(co->Accum / co->Period);
-    if ( p <= co->PulseWidth/100)
-      value += co->Amplitude * p / (co->PulseWidth/100);
+    if (p <= co->PulseWidth / 100)
+      value += co->Amplitude * p / (co->PulseWidth / 100);
     else
-      value += co->Amplitude * (1 - p) / (1 - (co->PulseWidth/100));
+      value += co->Amplitude * (1 - p) / (1 - (co->PulseWidth / 100));
 
     break;
   }
-  case pwr_eSim_SignalGeneratorType_StepPyramid: {
-    if ( co->Period < FLT_MIN)
+  case pwr_eSim_SignalGeneratorType_StepPyramid:
+  {
+    if (co->Period < FLT_MIN)
       break;
 
     co->Accum += *o->ScanTime;
-    if ( co->Accum / co->Period > (int)(1000.0f / co->Period))
+    if (co->Accum / co->Period > (int)(1000.0f / co->Period))
       co->Accum -= co->Period * (int)(1000.0f / co->Period);
-    
+
     float p = co->Accum / co->Period - (int)(co->Accum / co->Period);
-    int steps = (int)(1.0f / (co->PulseWidth/100));
+    int steps = (int)(1.0f / (co->PulseWidth / 100));
     if (ODD(steps))
       steps -= 1;
     int current = (int)(p * steps);
-    int height = steps/2;
-    if ( current <= steps/2 - 1)
+    int height = steps / 2;
+    if (current <= steps / 2 - 1)
       value += co->Amplitude / height * (current + 1);
-    else  if (current < steps - 1)
+    else if (current < steps - 1)
       value += co->Amplitude / height * (steps - current - 1);
 
     break;
   }
   }
 
-  if ( co->FilterTime > 0.001f) {
-    float a = 1.f - 1.f / ( 1.f + tp->f_scan_time / co->FilterTime);
+  if (co->FilterTime > 0.001f)
+  {
+    float a = 1.f - 1.f / (1.f + tp->f_scan_time / co->FilterTime);
     value = a * value + (1.f - a) * o->ActualValue;
   }
 
-  if ( co->Noise > 0.01f) {
-    value += (float)rand() / RAND_MAX * co->Noise * 2 - co->Noise;    
+  if (co->Noise > 0.01f)
+  {
+    value += (float)rand() / RAND_MAX * co->Noise * 2 - co->Noise;
   }
 
   if (co->RampUp != 0.0f && value - o->ActualValue > co->RampUp * tp->f_scan_time)
@@ -187,8 +190,7 @@ void Sim_CylinderTankFo_init(pwr_sClass_Sim_CylinderTankFo* o)
   pwr_tDlid dlid;
   pwr_tStatus sts;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
   if (EVEN(sts))
     o->PlcConnectP = 0;
 }
@@ -204,9 +206,9 @@ void Sim_CylinderTankFo_exec(plc_sThread* tp, pwr_sClass_Sim_CylinderTankFo* o)
 
   float area = co->Radius * co->Radius * M_PI;
   o->Level += (*o->InFlowP - *o->OutFlowP) * *o->ScanTime / area;
-  if ( o->Level > co->MaxLevel)
+  if (o->Level > co->MaxLevel)
     o->Level = co->MaxLevel;
-  if ( o->Level < co->MinLevel)
+  if (o->Level < co->MinLevel)
     o->Level = co->MinLevel;
   o->Volume = o->Level * area;
   co->Level = o->Level;
@@ -226,8 +228,7 @@ void Sim_FurnaceFo_init(pwr_sClass_Sim_FurnaceFo* o)
   pwr_tDlid dlid;
   pwr_tStatus sts;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
   if (EVEN(sts))
     o->PlcConnectP = 0;
 }
@@ -240,10 +241,12 @@ void Sim_FurnaceFo_exec(plc_sThread* tp, pwr_sClass_Sim_FurnaceFo* o)
 
   o->Power = *o->PowerP;
 
-  o->Temperature += (*o->PowerP / co->ThermalCapacity - (o->Temperature - co->EnvTemperature) / co->ThermalResistance) * (*o->ScanTime);
-  if ( o->Temperature > co->MaxTemperature)
+  o->Temperature +=
+      (*o->PowerP / co->ThermalCapacity - (o->Temperature - co->EnvTemperature) / co->ThermalResistance) *
+      (*o->ScanTime);
+  if (o->Temperature > co->MaxTemperature)
     o->Temperature = co->MaxTemperature;
-  if ( o->Temperature < co->MinTemperature)
+  if (o->Temperature < co->MinTemperature)
     o->Temperature = co->MinTemperature;
   co->Temperature = o->Temperature;
   co->Power = *o->PowerP;

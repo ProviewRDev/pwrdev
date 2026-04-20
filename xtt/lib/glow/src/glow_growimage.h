@@ -37,6 +37,8 @@
 #ifndef glow_growimage_h
 #define glow_growimage_h
 
+#include <iosfwd>
+
 #include "glow_growctx.h"
 #include "glow_draw.h"
 
@@ -53,7 +55,8 @@ class GlowExportScript;
   The class contains functions to draw the image, to change the colors, and to
   detect and handle events.
 */
-class GrowImage : public GlowArrayElem {
+class GrowImage : public GlowArrayElem
+{
 public:
   //! Constuctor
   /*!
@@ -64,12 +67,11 @@ public:
     \param imagefile	Image filename.
     \param display_lev	Displaylevel when this object is visible.
   */
-  GrowImage(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0,
-      const char* imagefile = 0,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1);
+  GrowImage(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0, const char* imagefile = 0,
+            glow_mDisplayLevel display_lev = glow_mDisplayLevel_1);
 
   //! Noargs constructor
-  GrowImage(){}
+  GrowImage() {}
 
   //! Make this object a copy of another image object.
   /*!
@@ -92,8 +94,7 @@ public:
     as
     current callback object.
   */
-  int event_handler(
-      GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
 
   //! Detects if the object is hit by an event in transformed coordinates
   /*!
@@ -136,8 +137,7 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(GlowTransform* t, double* x1_right, double* x1_left,
-      double* y1_high, double* y1_low);
+  void get_borders(GlowTransform* t, double* x1_right, double* x1_left, double* y1_high, double* y1_low);
 
   //! Calculate the border for a set of objects, without transformation.
   /*!
@@ -149,8 +149,7 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(
-      double* x1_right, double* x1_left, double* y1_high, double* y1_low)
+  void get_borders(double* x1_right, double* x1_left, double* y1_high, double* y1_low)
   {
     get_borders((GlowTransform*)NULL, x1_right, x1_left, y1_high, y1_low);
   }
@@ -170,13 +169,13 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Draw the objects if any part is inside the drawing area.
   /*!
@@ -227,13 +226,10 @@ public:
   /*!
     \return Return 1 if object is highlighted, else 0.
   */
-  int get_highlight()
-  {
-    return highlight;
-  }
+  int get_highlight() { return highlight; }
 
   //! Not used.
-  void set_hot(int on){}
+  void set_hot(int on) {}
 
   //! Insert object in select list, if it is inside the selection area.
   /*!
@@ -244,16 +240,13 @@ public:
     \param select_policy Current select policy.
   */
   void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
-      glow_eSelectPolicy select_policy);
+                            glow_eSelectPolicy select_policy);
 
   //! Get the object type
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowImage;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowImage; }
 
   //! Measure the extent of the object.
   /*!
@@ -280,48 +273,47 @@ public:
 
   int update();
 
-  GlowPoint ll; //!< Lower left point of image.
-  GlowPoint ur; //!< Upper right point of image.
-  double x_right; //!< Right border of object.
-  double x_left; //!< Left border of object.
-  double y_high; //!< High border of object.
-  double y_low; //!< Low border of object.
-  int hot; //!< Object is hot, i.e. the cursor is currently on the object.
-  GlowPoint pzero; //!< Not used.
+  GlowPoint ll;         //!< Lower left point of image.
+  GlowPoint ur;         //!< Upper right point of image.
+  double x_right;       //!< Right border of object.
+  double x_left;        //!< Left border of object.
+  double y_high;        //!< High border of object.
+  double y_low;         //!< Low border of object.
+  int hot;              //!< Object is hot, i.e. the cursor is currently on the object.
+  GlowPoint pzero;      //!< Not used.
   GlowPoint stored_pos; //!< Not used.
-  int highlight; //!< Object is highlighted, i.e. painted with red color.
-  int inverse; //!< Not implemented.
-  void* user_data; //!< User data.
+  int highlight;        //!< Object is highlighted, i.e. painted with red color.
+  int inverse;          //!< Not implemented.
+  void* user_data;      //!< User data.
   char image_filename[120];
-  char* dynamic; //!< Dynamic code.
-  int dynamicsize; //!< Size of dynamic code.
-  GlowTransform trf; //!< Transformation matrix of object.
-  glow_tImData imlib; //!< Pointer to imlib
-  glow_tImData image_data; //!< Information about an svg image.
-  glow_tImImage image; //!< The rendered and scaled image.
+  char* dynamic;                //!< Dynamic code.
+  int dynamicsize;              //!< Size of dynamic code.
+  GlowTransform trf;            //!< Transformation matrix of object.
+  glow_tImData imlib;           //!< Pointer to imlib
+  glow_tImData image_data;      //!< Information about an svg image.
+  glow_tImImage image;          //!< The rendered and scaled image.
   glow_tImImage original_image; //!< The original image.
-  glow_tPixmap pixmap; //!< Pixmap of the image.
-  glow_tPixmap nav_pixmap; //!< Pixmap of the image in navigation window.
-  glow_tPixmap clip_mask; //!< Clip mask if transparent GIF image.
-  glow_tPixmap nav_clip_mask; //!< Clip mask in navigation window i transparent
+  glow_tPixmap pixmap;          //!< Pixmap of the image.
+  glow_tPixmap nav_pixmap;      //!< Pixmap of the image in navigation window.
+  glow_tPixmap clip_mask;       //!< Clip mask if transparent GIF image.
+  glow_tPixmap nav_clip_mask;   //!< Clip mask in navigation window i transparent
   //! GIF image.
-  glow_mDisplayLevel
-      display_level; //!< Display level when this object is visible.
-  int current_width; //!< Current width of the image.
-  int current_height; //!< Current height of the image.
-  int current_nav_width; //!< Current widht of the image in navigation window.
-  int current_nav_height; //!< Current height of the image in navigation window.
-  glow_eDrawTone color_tone; //!< Color tone of the object.
-  int color_lightness; //!< Color lightness of the object.
-  int color_intensity; //!< Color intensity of the object.
-  int color_shift; //!< Color shift of the object.
-  int color_inverse; //!< Color inverse of the object.
-  glow_eDrawTone current_color_tone; //!< Current color tone of the image.
-  int current_color_lightness; //!< Current color lightness of the image.
-  int current_color_intensity; //!< Current color intensity of the image.
-  int current_color_shift; //!< Current color shift of the image.
-  int current_color_inverse; //!< Current color inverse of the image.
-  int current_direction; //! Current direction of the image.
+  glow_mDisplayLevel display_level;      //!< Display level when this object is visible.
+  int current_width;                     //!< Current width of the image.
+  int current_height;                    //!< Current height of the image.
+  int current_nav_width;                 //!< Current widht of the image in navigation window.
+  int current_nav_height;                //!< Current height of the image in navigation window.
+  glow_eDrawTone color_tone;             //!< Color tone of the object.
+  int color_lightness;                   //!< Color lightness of the object.
+  int color_intensity;                   //!< Color intensity of the object.
+  int color_shift;                       //!< Color shift of the object.
+  int color_inverse;                     //!< Color inverse of the object.
+  glow_eDrawTone current_color_tone;     //!< Current color tone of the image.
+  int current_color_lightness;           //!< Current color lightness of the image.
+  int current_color_intensity;           //!< Current color intensity of the image.
+  int current_color_shift;               //!< Current color shift of the image.
+  int current_color_inverse;             //!< Current color inverse of the image.
+  int current_direction;                 //! Current direction of the image.
   glow_eDrawTone current_nav_color_tone; //!< Current color tone of the image in
   //! the navitation window.
   int current_nav_color_lightness; //!< Current color lightness of the image in
@@ -334,12 +326,12 @@ public:
   //! navitation window.
   int current_nav_direction; //!< Current direction of the image in the
   //! navitation window.
-  char last_group[32]; //!< The last group the object was a member of.
-  int date; //!< Date of the image file.
-  char filename[256]; //!< Name of the image file with full path.
-  bool flip_vertical; //!< The object is flipped vertically.
-  bool flip_horizontal; //!< The object is flipped horizontally.
-  bool current_flip_vertical; //!< Current vertical flip.
+  char last_group[32];          //!< The last group the object was a member of.
+  int date;                     //!< Date of the image file.
+  char filename[256];           //!< Name of the image file with full path.
+  bool flip_vertical;           //!< The object is flipped vertically.
+  bool flip_horizontal;         //!< The object is flipped horizontally.
+  bool current_flip_vertical;   //!< Current vertical flip.
   bool current_flip_horizontal; //!< Current horizontal flip.
   int rotation;
   int current_rotation;
@@ -379,19 +371,13 @@ public:
   /*!
     \param data User data.
   */
-  void set_user_data(void* data)
-  {
-    user_data = data;
-  }
+  void set_user_data(void* data) { user_data = data; }
 
   //! Get user data.
   /*!
     \param data User data.
   */
-  void get_user_data(void** data)
-  {
-    *data = user_data;
-  }
+  void get_user_data(void** data) { *data = user_data; }
 
   //! Set dynamic code
   /*!
@@ -415,10 +401,7 @@ public:
   /*!
     \return The context.
   */
-  void* get_ctx()
-  {
-    return this->ctx;
-  }
+  void* get_ctx() { return this->ctx; }
 
   //! Execute the dynamic code.
   void exec_dynamic();
@@ -439,8 +422,7 @@ public:
     \param y0		y coordinate of scale point.
     \param type		Type of scaling.
   */
-  void set_scale(double scale_x, double scale_y, double x0, double y0,
-      glow_eScaleType type);
+  void set_scale(double scale_x, double scale_y, double x0, double y0, glow_eScaleType type);
 
   //! Rotate the object. The rotation is made form the last stored transform.
   /*!
@@ -449,8 +431,7 @@ public:
     \param y0		y coordinate of rotation point.
     \param type		Type of rotation point.
   */
-  void set_rotation(
-      double angle, double x0, double y0, glow_eRotationPoint type);
+  void set_rotation(double angle, double x0, double y0, glow_eRotationPoint type);
 
   //! Mirror the object around a horizontal or vertical mirror line.
   /*!
@@ -474,8 +455,8 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();
@@ -484,10 +465,7 @@ public:
   /*!
     \param tone 	Color tone.
   */
-  void set_original_color_tone(glow_eDrawTone tone)
-  {
-    set_color_tone(tone);
-  }
+  void set_original_color_tone(glow_eDrawTone tone) { set_color_tone(tone); }
 
   //! Set the color tone
   /*!
@@ -506,10 +484,7 @@ public:
   /*!
     \param lightness 	Color lightness.
   */
-  void set_original_color_lightness(int lightness)
-  {
-    set_color_lightness(lightness);
-  }
+  void set_original_color_lightness(int lightness) { set_color_lightness(lightness); }
 
   //! Increment the original color lightness.
   /*!
@@ -541,10 +516,7 @@ public:
   /*!
     \param intensity 	Color intensity.
   */
-  void set_original_color_intensity(int intensity)
-  {
-    set_color_intensity(intensity);
-  }
+  void set_original_color_intensity(int intensity) { set_color_intensity(intensity); }
 
   //! Increment the original color intensity.
   /*!
@@ -576,19 +548,13 @@ public:
   /*!
     \param shift 	Color shift.
   */
-  void set_original_color_shift(int shift)
-  {
-    set_color_shift(shift);
-  }
+  void set_original_color_shift(int shift) { set_color_shift(shift); }
 
   //! Increment the original color shift.
   /*!
     \param shift 	Increment of color shift.
   */
-  void incr_original_color_shift(int shift)
-  {
-    incr_color_shift(shift);
-  }
+  void incr_original_color_shift(int shift) { incr_color_shift(shift); }
 
   //! Increment the color shift.
   /*!
@@ -648,24 +614,15 @@ public:
     The transorm is multiplied with the stored transform, to give to new
     transform for the object.
   */
-  void set_transform_from_stored(GlowTransform* t)
-  {
-    trf.set_from_stored(t), get_node_borders();
-  }
+  void set_transform_from_stored(GlowTransform* t) { trf.set_from_stored(t), get_node_borders(); }
 
   //! Store the current transform
   /*! The stored transform can be used as starting point for future scaling or
    * rotations.
    */
-  void store_transform()
-  {
-    trf.store();
-  }
+  void store_transform() { trf.store(); }
 
-  void get_ctx(void** c)
-  {
-    *c = (void*)ctx;
-  } //!< Should be replace by get_ctx() !!
+  void get_ctx(void** c) { *c = (void*)ctx; } //!< Should be replace by get_ctx() !!
 
   int export_script(GlowExportScript* es, void* o, void* m);
 
@@ -685,8 +642,8 @@ public:
     used to generate
     java code for the shape.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ostream& fp);
 
   //! Register the name of the last group
   /*!
@@ -696,19 +653,13 @@ public:
     The last group is used to recover data for a group that is desolved, when
     the members are regrouped.
   */
-  void set_last_group(char* name)
-  {
-    strcpy(last_group, name);
-  }
+  void set_last_group(char* name) { strcpy(last_group, name); }
 
   //! Return the name of the last group the object was a member of
   /*!
     \return The name of the last group the object was a member of.
   */
-  char* get_last_group()
-  {
-    return last_group;
-  }
+  char* get_last_group() { return last_group; }
 
   static void pixel_cb(void* data, unsigned char* rgb);
 
@@ -733,8 +684,8 @@ public:
   If they are zero, the size from the image file is kept, and returned in w and
   h.
 */
-int grow_image_to_pixmap(GrowCtx* ctx, char* imagefile, int width, int height,
-    glow_tPixmap* pixmap, glow_tImImage* image, int* w, int* h);
+int grow_image_to_pixmap(GrowCtx* ctx, char* imagefile, int width, int height, glow_tPixmap* pixmap,
+                         glow_tImImage* image, int* w, int* h);
 
 /*@}*/
 #endif

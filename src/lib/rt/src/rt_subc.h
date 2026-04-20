@@ -47,10 +47,10 @@ void subc_CancelList(pool_sQlink* lh);
 
 void subc_CancelUser(pid_t subscriber);
 
-sub_sClient* subc_Create(char* name, /* Input or NULL */
-    pwr_sAttrRef* arp, /* Input or NULL */
-    pool_sQlink* lh /* List header. */
-    );
+sub_sClient* subc_Create(char* name,        /* Input or NULL */
+                         pwr_sAttrRef* arp, /* Input or NULL */
+                         pool_sQlink* lh    /* List header. */
+);
 
 void subc_RemoveFromMessage(sub_sClient* cp);
 

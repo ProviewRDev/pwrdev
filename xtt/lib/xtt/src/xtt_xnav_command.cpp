@@ -848,7 +848,7 @@ static int xnav_set_func(void* client_data, void* client_flag)
 
       if (focus_p)
       {
-        sprintf(focus, "%s.%s", name_str, focus_p);
+        snprintf(focus, sizeof(focus), "%s.%s", name_str, focus_p);
         gectx->set_object_focus(focus, inputempty);
       }
       if (cont && sts == GLOW__SUBTERMINATED)
@@ -866,7 +866,7 @@ static int xnav_set_func(void* client_data, void* client_flag)
 
       if (focus_p)
       {
-        sprintf(focus, "%s.%s", name_str, focus_p);
+        snprintf(focus, sizeof(focus), "%s.%s", name_str, focus_p);
         gectx->set_object_focus(focus, inputempty);
       }
       return sts;
@@ -10405,7 +10405,7 @@ static int xnav_setsubwindow_func(void* filectx, ccm_sArg* arg_list, int arg_cou
 {
   XNav* xnav;
   XttGe* gectx;
-  int sts;
+  int sts = 0;
   ccm_sArg *arg_p2, *arg_p3, *arg_p4, *arg_p5;
   XttMultiView* mvctx;
   pwr_tOName graph_str;
@@ -12436,6 +12436,7 @@ void XNav::open_keyboard(void* owner, keyboard_eKeymap keymap, int type)
   {
   case graph_eKeyboard_StandardShifted:
     shifted = 1;
+  /* fall through */
   case graph_eKeyboard_Standard:
     keyboard_type = keyboard_eType_Standard;
     break;
@@ -12444,6 +12445,7 @@ void XNav::open_keyboard(void* owner, keyboard_eKeymap keymap, int type)
     break;
   case graph_eKeyboard_AlphabeticShifted:
     shifted = 1;
+  /* fall through */
   case graph_eKeyboard_Alphabetic:
     keyboard_type = keyboard_eType_Alphabetic;
     break;

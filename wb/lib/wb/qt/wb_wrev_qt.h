@@ -47,12 +47,13 @@
 
 class WRevQt;
 
-class WRevInputDialog : public QDialog {
+class WRevInputDialog : public QDialog
+{
   Q_OBJECT
 
 public:
-  WRevInputDialog(WRevQt* parent_ctx, QWidget* parent, const char* text1,
-      const char* text2, const char* init_text1, const char* init_text2);
+  WRevInputDialog(WRevQt* parent_ctx, QWidget* parent, const char* text1, const char* text2,
+                  const char* init_text1, const char* init_text2);
 
 protected:
   void closeEvent(QCloseEvent* event);
@@ -69,7 +70,8 @@ public slots:
 
 class WRevQtWidget;
 
-class WRevQt : public WRev {
+class WRevQt : public WRev
+{
 public:
   WRevQt(void* wa_parent_ctx, ldh_tSession wb_ldhses);
   ~WRevQt();
@@ -85,15 +87,15 @@ public:
   void set_clock_cursor();
   void reset_cursor();
   void flush();
-  void open_input_dialog(const char* text1, const char* text2,
-      const char* title, const char* init_text1, const char* init_text2,
-      void (*ok_cb)(WRev*, char*, char*));
+  void open_input_dialog(const char* text1, const char* text2, const char* title, const char* init_text1,
+                         const char* init_text2, void (*ok_cb)(WRev*, char*, char*));
 
 private:
   WRevQtWidget* toplevel;
 };
 
-class WRevQtWidget : public QWidget {
+class WRevQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

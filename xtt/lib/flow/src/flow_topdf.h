@@ -45,20 +45,21 @@
 
 #include "flow.h"
 
-typedef enum { cnv_eAlignment_Left, cnv_eAlignment_Center } cnv_eAlignment;
+typedef enum
+{
+  cnv_eAlignment_Left,
+  cnv_eAlignment_Center
+} cnv_eAlignment;
 
-class CnvStyle {
+class CnvStyle
+{
 public:
-  CnvStyle()
-  {
-  }
-  CnvStyle(std::string s_font, int s_font_size, int s_indentation,
-      int s_top_offset, int s_bottom_offset, int s_alignment, int s_pagebreak,
-      int s_sidebreak, int s_display_number)
-      : font(s_font), font_size(s_font_size), indentation(s_indentation),
-        top_offset(s_top_offset), bottom_offset(s_bottom_offset),
-        alignment(s_alignment), pagebreak(s_pagebreak), sidebreak(s_sidebreak),
-        display_number(s_display_number)
+  CnvStyle() {}
+  CnvStyle(std::string s_font, int s_font_size, int s_indentation, int s_top_offset, int s_bottom_offset,
+           int s_alignment, int s_pagebreak, int s_sidebreak, int s_display_number)
+      : font(s_font), font_size(s_font_size), indentation(s_indentation), top_offset(s_top_offset),
+        bottom_offset(s_bottom_offset), alignment(s_alignment), pagebreak(s_pagebreak),
+        sidebreak(s_sidebreak), display_number(s_display_number)
   {
   }
   std::string font;
@@ -72,26 +73,19 @@ public:
   int display_number;
 };
 
-class CnvIdStyle {
+class CnvIdStyle
+{
 public:
   CnvIdStyle()
   {
-    h1 = CnvStyle("Helvetica-Bold-ISOLatin1", 14, 0, 30, 25,
-        cnv_eAlignment_Left, 0, 0, 1);
-    h2 = CnvStyle("Helvetica-Bold-ISOLatin1", 12, 0, 25, 20,
-        cnv_eAlignment_Left, 0, 0, 1);
-    h3 = CnvStyle("Helvetica-Bold-ISOLatin1", 10, 0, 15, 10,
-        cnv_eAlignment_Left, 0, 0, 1);
-    text = CnvStyle(
-        "Helvetica-ISOLatin1", 10, 0, 11, 2, cnv_eAlignment_Left, 0, 0, 0);
-    boldtext = CnvStyle(
-        "Helvetica-Bold-ISOLatin1", 10, 0, 11, 2, cnv_eAlignment_Left, 0, 0, 0);
-    link = CnvStyle("Helvetica-Oblique-ISOLatin1", 8, 0, 11, 2,
-        cnv_eAlignment_Left, 0, 0, 0);
-    image = CnvStyle("Helvetica-Oblique-ISOLatin1", 10, 0, 10, 0,
-        cnv_eAlignment_Left, 0, 0, 0);
-    code = CnvStyle(
-        "Courier-ISOLatin1", 10, 0, 11, 2, cnv_eAlignment_Left, 0, 0, 0);
+    h1 = CnvStyle("Helvetica-Bold-ISOLatin1", 14, 0, 30, 25, cnv_eAlignment_Left, 0, 0, 1);
+    h2 = CnvStyle("Helvetica-Bold-ISOLatin1", 12, 0, 25, 20, cnv_eAlignment_Left, 0, 0, 1);
+    h3 = CnvStyle("Helvetica-Bold-ISOLatin1", 10, 0, 15, 10, cnv_eAlignment_Left, 0, 0, 1);
+    text = CnvStyle("Helvetica-ISOLatin1", 10, 0, 11, 2, cnv_eAlignment_Left, 0, 0, 0);
+    boldtext = CnvStyle("Helvetica-Bold-ISOLatin1", 10, 0, 11, 2, cnv_eAlignment_Left, 0, 0, 0);
+    link = CnvStyle("Helvetica-Oblique-ISOLatin1", 8, 0, 11, 2, cnv_eAlignment_Left, 0, 0, 0);
+    image = CnvStyle("Helvetica-Oblique-ISOLatin1", 10, 0, 10, 0, cnv_eAlignment_Left, 0, 0, 0);
+    code = CnvStyle("Courier-ISOLatin1", 10, 0, 11, 2, cnv_eAlignment_Left, 0, 0, 0);
   }
   CnvStyle h1;
   CnvStyle h2;
@@ -103,7 +97,8 @@ public:
   CnvStyle code;
 };
 
-class CnvContentElem {
+class CnvContentElem
+{
 public:
   CnvContentElem();
 
@@ -114,11 +109,10 @@ public:
   char text[80];
 };
 
-class CnvContent {
+class CnvContent
+{
 public:
-  CnvContent()
-  {
-  }
+  CnvContent() {}
   std::vector<CnvContentElem> tab;
   void add(CnvContentElem& elem);
   int find_link(char* subject, char* text, int* page);
@@ -135,7 +129,8 @@ public:
 #define pdf_cCellSize 110
 #define pdf_cTmpFile "/tmp/ptmp.ps"
 
-typedef enum {
+typedef enum
+{
   pdf_mPrintMode_Pos = 1 << 0,
   pdf_mPrintMode_Start = 1 << 1,
   pdf_mPrintMode_Continue = 1 << 2,
@@ -144,9 +139,14 @@ typedef enum {
   pdf_mPrintMode_FixX = 1 << 5
 } pdf_mPrintMode;
 
-typedef enum { pdf_eFile_Body, pdf_eFile__ } pdf_eFile;
+typedef enum
+{
+  pdf_eFile_Body,
+  pdf_eFile__
+} pdf_eFile;
 
-typedef enum {
+typedef enum
+{
   pdf_eId_TitlePage,
   pdf_eId_InfoPage,
   pdf_eId_Content,
@@ -159,7 +159,8 @@ typedef enum {
   pdf_eId__
 } pdf_eId;
 
-typedef enum {
+typedef enum
+{
   pdf_eObjType_Catalog,
   pdf_eObjType_Page,
   pdf_eObjType_Pages,
@@ -174,7 +175,8 @@ typedef enum {
 
 class CnvToPdf;
 
-class CnvPdfObj {
+class CnvPdfObj
+{
 public:
   CnvPdfObj(CnvToPdf* otopdf, pdf_eObjType otype, int onumber);
 
@@ -202,7 +204,8 @@ public:
   int xobject[40];
 };
 
-class CnvToPdf {
+class CnvToPdf
+{
 public:
   CnvToPdf();
   ~CnvToPdf();
@@ -211,15 +214,11 @@ public:
   void print_text(char* text, CnvStyle& style, int mode = pdf_mPrintMode_Pos);
   void draw_rect(double lw, double x, double y, double w, double h);
   void draw_triangle(double lw, double x, double y, double w, double h);
-  void draw_filled_triangle(
-      flow_eDrawType color, double x, double y, double w, double h);
-  void draw_arc(double lw, double x, double y, double w, double h, int angle1,
-      int angle2);
-  void draw_line(double lw, double x1, double y1, double x2, double y2,
-      int dashed, int gray);
+  void draw_filled_triangle(flow_eDrawType color, double x, double y, double w, double h);
+  void draw_arc(double lw, double x, double y, double w, double h, int angle1, int angle2);
+  void draw_line(double lw, double x1, double y1, double x2, double y2, int dashed, int gray);
   void draw_text(double x, double y, char* text, int bold, double size);
-  void draw_arrow(double x1, double y1, double x2, double y2, double x3,
-      double y3, int gray);
+  void draw_arrow(double x1, double y1, double x2, double y2, double x3, double y3, int gray);
   void print_pagebreak(int print_num);
   void print_content();
   void print_h1(char* text, int hlevel, char* subject);
@@ -232,7 +231,8 @@ public:
   void set_confpass(bool conf)
   {
     conf_pass = conf;
-    if (!conf) {
+    if (!conf)
+    {
       // Reset
       for (int i = 0; i < pdf_cMaxLevel; i++)
         header_number[i] = 0;
@@ -247,20 +247,14 @@ public:
     prev_ci = ci;
     ci = val;
   }
-  void set_cf(int val)
-  {
-    cf = val;
-  }
+  void set_cf(int val) { cf = val; }
   void set_filename(int idx, char* name);
   void open();
   void incr_headerlevel();
   void decr_headerlevel();
   void reset_headernumbers(int level);
   void set_pageheader(char* text);
-  void set_useoutlines(int u)
-  {
-    use_outlines = u;
-  }
+  void set_useoutlines(int u) { use_outlines = u; }
   char* fontname(CnvStyle& style);
 
   std::vector<CnvPdfObj> v_pages;

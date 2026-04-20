@@ -43,29 +43,23 @@
 
 class CnvReadWbl;
 
-class cnv_mentry {
-  public:
-  cnv_mentry()
-  {
-  }
-  bool operator<(const cnv_mentry& x)
-  {
-    return (strcmp(name, x.name) < 0);
-  }
+class cnv_mentry
+{
+public:
+  cnv_mentry() {}
+  bool operator<(const cnv_mentry& x) { return (strcmp(name, x.name) < 0); }
   char name[32];
   pwr_tFileName file;
 };
 
-class CnvWblToHtml : public CnvWblTo {
-  public:
+class CnvWblToHtml : public CnvWblTo
+{
+public:
   CnvWblToHtml(CnvCtx* cnv_ctx)
-      : ctx(cnv_ctx), html_class_open(0), html_index_open(0), js_all_first(0),
-        cdp_created(false)
+      : ctx(cnv_ctx), html_class_open(0), html_index_open(0), js_all_first(0), cdp_created(false)
   {
   }
-  virtual ~CnvWblToHtml()
-  {
-  }
+  virtual ~CnvWblToHtml() {}
 
   CnvCtx* ctx;
   std::ofstream fp_html_clf;
@@ -96,20 +90,10 @@ class CnvWblToHtml : public CnvWblTo {
   int typedef_exec();
   int typedef_close();
   int bit_exec();
-  Cnv_eWblToType type()
-  {
-    return Cnv_eWblToType_Html;
-  }
-  int class_open()
-  {
-    return fp_html_clf.is_open();
-  }
-  int index_open()
-  {
-    return fp_html_index.is_open();
-  }
-  void create_cdp_file(const char* volume_name, const char* class_name,
-      const char* attr_typeref);
+  Cnv_eWblToType type() { return Cnv_eWblToType_Html; }
+  int class_open() { return fp_html_clf.is_open(); }
+  int index_open() { return fp_html_index.is_open(); }
+  void create_cdp_file(const char* volume_name, const char* class_name, const char* attr_typeref);
   void print_all_menu();
 };
 

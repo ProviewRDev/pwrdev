@@ -34,30 +34,27 @@
  * General Public License plus this exception.
  */
 
-#include <time.h>
-#include <stdio.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <math.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
 #include <signal.h>
 #include <stdarg.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <time.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <termios.h>
+#include <time.h>
+#include <unistd.h>
 #if defined OS_LINUX
 #include <termio.h>
 #endif
 #if defined OS_LINUX || defined OS_MACOS
 #include <sgtty.h>
 #endif
-#include <sys/ioctl.h>
 #include "remote_utils.h"
+#include <sys/ioctl.h>
 
 /************************************************************************
 **************************************************************************
@@ -73,9 +70,8 @@
 **************************************************************************
 **************************************************************************/
 
-int RemUtils_InitSerialDev(
-    char* device, int speed, int databits, int stopbits, int parity)
-{
+int RemUtils_InitSerialDev(char *device, int speed, int databits, int stopbits,
+                           int parity) {
 #define SER_NONE 0
 #define SER_ODD 1
 #define SER_EVEN 2
@@ -110,7 +106,7 @@ int RemUtils_InitSerialDev(
   if (parity == 2)
     l_parity = SER_EVEN;
 
-/* hastighetsval */
+  /* hastighetsval */
 
 #if defined OS_LINUX
   tty_attributes.c_cflag &= ~CBAUD; // maska bort all hastighet
@@ -169,8 +165,8 @@ int RemUtils_InitSerialDev(
 
   if (parity == SER_ODD || parity == SER_EVEN) {
     tty_attributes.c_cflag |= PARENB; // slå på paritet
-    tty_attributes.c_iflag
-        |= IGNPAR; // vi vill bara skicka paritet inte kolla inkommande
+    tty_attributes.c_iflag |=
+        IGNPAR; // vi vill bara skicka paritet inte kolla inkommande
     if (parity == SER_EVEN)
       tty_attributes.c_cflag &= ~PARODD; // even om inte odd
     if (parity == SER_ODD)
@@ -218,8 +214,7 @@ int RemUtils_InitSerialDev(
 **************************************************************************
 **************************************************************************/
 
-char RemUtils_ConvertR50ToAscii(int i)
-{
+char RemUtils_ConvertR50ToAscii(int i) {
   char asc;
 
   if (i == 0) {
@@ -265,8 +260,7 @@ char RemUtils_ConvertR50ToAscii(int i)
 **************************************************************************
 **************************************************************************/
 
-int RemUtils_R50ToAscii(unsigned short R50[], char asc[])
-{
+int RemUtils_R50ToAscii(unsigned short R50[], char asc[]) {
   int i, j, k, index, ascindex = 0;
   unsigned short radix[2];
 
@@ -299,8 +293,7 @@ int RemUtils_R50ToAscii(unsigned short R50[], char asc[])
 **************************************************************************
 **************************************************************************/
 
-int RemUtils_AsciiToR50(char asc[], short R50[])
-{
+int RemUtils_AsciiToR50(char asc[], short R50[]) {
   int i;
   short dig_vec[6];
 

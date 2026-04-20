@@ -50,11 +50,10 @@ class XNav;
 class XttTrend;
 class XttStream;
 
-class MVRecall {
+class MVRecall
+{
 public:
-  MVRecall() : current_idx(-1), first_idx(0), last_idx(0)
-  {
-  }
+  MVRecall() : current_idx(-1), first_idx(0), last_idx(0) {}
   pwr_tFileName buff[MV_RECALL_SIZE];
   pwr_tAName object[MV_RECALL_SIZE];
   int current_idx;
@@ -66,7 +65,8 @@ public:
   int get_next();
 };
 
-class XttMultiView : XttUtility {
+class XttMultiView : XttUtility
+{
 public:
   void* parent_ctx;
   pwr_tAttrRef aref;
@@ -78,10 +78,8 @@ public:
   void (*help_cb)(void*, const char* key);
   void (*display_in_xnav_cb)(void*, pwr_sAttrRef*);
   int (*is_authorized_cb)(void*, unsigned int);
-  void (*popup_menu_cb)(
-      void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
-  int (*call_method_cb)(void*, const char*, const char*, pwr_sAttrRef,
-      unsigned long, unsigned long, char*);
+  void (*popup_menu_cb)(void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  int (*call_method_cb)(void*, const char*, const char*, pwr_sAttrRef, unsigned long, unsigned long, char*);
   int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**);
   int (*sound_cb)(void*, pwr_tAttrRef*);
   void (*eventlog_cb)(void*, void*, int, void*, unsigned int);
@@ -94,44 +92,26 @@ public:
   ApplList appl;
   MVRecall recall_buffer[MV_SIZE];
 
-  XttMultiView(void* parent_ctx, const char* name, pwr_tAttrRef* aref,
-      int width, int height, int x, int y, unsigned int options,
-      int color_theme, int (*xg_command_cb)(void*, char*, char*, char*, void*),
-      int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-      int (*xg_is_authorized_cb)(void*, unsigned int),
-      void (*xg_keyboard_cb)(void*, void*, int, int));
+  XttMultiView(void* parent_ctx, const char* name, pwr_tAttrRef* aref, int width, int height, int x, int y,
+               unsigned int options, int color_theme, int (*xg_command_cb)(void*, char*, char*, char*, void*),
+               int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+               int (*xg_is_authorized_cb)(void*, unsigned int),
+               void (*xg_keyboard_cb)(void*, void*, int, int));
   virtual ~XttMultiView();
 
-  virtual void pop()
-  {
-  }
-  virtual void set_size(int width, int height)
-  {
-  }
-  virtual void* get_widget()
+  virtual void pop() {}
+  virtual void set_size(int width, int height) {}
+  virtual void* get_widget() { return 0; }
+  virtual int set_subwindow_source(const char* name, char* source, char* object, double* borders,
+                                   int insert = 1, int cont = 0)
   {
     return 0;
   }
-  virtual int set_subwindow_source(const char* name, char* source, char* object,
-      double* borders, int insert = 1, int cont = 0)
-  {
-    return 0;
-  }
-  virtual int key_pressed(int key)
-  {
-    return 0;
-  }
-  virtual void close_input_all()
-  {
-  }
-  virtual void signal_send(char* signalname)
-  {
-  }
+  virtual int key_pressed(int key) { return 0; }
+  virtual void close_input_all() {}
+  virtual void signal_send(char* signalname) {}
 
-  xtt_eUtility get_type()
-  {
-    return xtt_eUtility_MultiView;
-  }
+  xtt_eUtility get_type() { return xtt_eUtility_MultiView; }
   void message(char severity, const char* msg);
   int set_object_focus(const char* name, int empty);
   int set_folder_index(const char* name, int idx);
@@ -144,31 +124,25 @@ public:
   XNav* get_xnav();
 
   static void multiview_ge_close_cb(void* parent_ctx, void* client_data);
-  static int multiview_ge_command_cb(void* multiview_ctx, char* command, 
-      char* script, char* scriptargs, void* caller);
+  static int multiview_ge_command_cb(void* multiview_ctx, char* command, char* script, char* scriptargs,
+                                     void* caller);
   static int multiview_ge_sound_cb(void* multiview_ctx, pwr_tAttrRef* aref);
-  static void multiview_ge_display_in_xnav_cb(
-      void* multiview_ctx, pwr_sAttrRef* arp);
-  static void multiview_ge_popup_menu_cb(void* multiview_ctx,
-      pwr_sAttrRef attrref, unsigned long item_type, unsigned long utility,
-      char* arg, int x, int y);
-  static int multiview_ge_call_method_cb(void* multiview_ctx,
-      const char* method, const char* filter, pwr_sAttrRef attrref,
-      unsigned long item_type, unsigned long utility, char* arg);
-  static int multiview_ge_is_authorized_cb(
-      void* multiview_ctx, unsigned int access);
-  static int multiview_ge_get_current_objects_cb(
-      void* multiview_ctx, pwr_sAttrRef** alist, int** is_alist);
-  static void multiview_ge_eventlog_cb(void* multiview_ctx, void* gectx,
-      int category, void* value, unsigned int size);
-  static void multiview_keyboard_cb(
-      void* multiview_ctx, void* ge_ctx, int action, int type);
+  static void multiview_ge_display_in_xnav_cb(void* multiview_ctx, pwr_sAttrRef* arp);
+  static void multiview_ge_popup_menu_cb(void* multiview_ctx, pwr_sAttrRef attrref, unsigned long item_type,
+                                         unsigned long utility, char* arg, int x, int y);
+  static int multiview_ge_call_method_cb(void* multiview_ctx, const char* method, const char* filter,
+                                         pwr_sAttrRef attrref, unsigned long item_type, unsigned long utility,
+                                         char* arg);
+  static int multiview_ge_is_authorized_cb(void* multiview_ctx, unsigned int access);
+  static int multiview_ge_get_current_objects_cb(void* multiview_ctx, pwr_sAttrRef** alist, int** is_alist);
+  static void multiview_ge_eventlog_cb(void* multiview_ctx, void* gectx, int category, void* value,
+                                       unsigned int size);
+  static void multiview_keyboard_cb(void* multiview_ctx, void* ge_ctx, int action, int type);
   static void multiview_ge_help_cb(void* multiview_ctx, const char* key);
   static void multiview_trend_close_cb(void* ctx, XttTrend* trend);
   static void multiview_trend_command_cb(void* ctx, const char* cmd);
   static void multiview_trend_help_cb(void* ctx, const char* key);
-  static int multiview_sevhist_get_select_cb(
-      void* ctx, pwr_tOid* oid, char* aname, char* oname);
+  static int multiview_sevhist_get_select_cb(void* ctx, pwr_tOid* oid, char* aname, char* oname);
   static void multiview_strm_close_cb(void* ctx, XttStream* strm);
   static void message_cb(void* ctx, char severity, const char* msg);
   static void eventlog_enable(int enable);

@@ -36,11 +36,6 @@
 
 #include "xtt_utility.h"
 
-XttUtility::~XttUtility()
-{
-}
+XttUtility::~XttUtility() {}
 
-xtt_eUtility XttUtility::get_type()
-{
-  return xtt_eUtility_;
-}
+xtt_eUtility XttUtility::get_type() { return xtt_eUtility_; }

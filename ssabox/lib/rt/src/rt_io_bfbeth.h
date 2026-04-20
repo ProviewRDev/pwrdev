@@ -1,8 +1,14 @@
+#ifndef rt_io_bfbeth_h
+#define rt_io_bfbeth_h
+
+#include "rt_io_m_ssab_locals.h"
+
 void bfbeth_set_read_req(io_sRackLocal* r, pwr_tUInt16 address);
 
-void bfbeth_set_write_req(
-    io_sRackLocal* r, pwr_tUInt16 address, pwr_tUInt16 data);
+void bfbeth_set_write_req(io_sRackLocal* r, pwr_tUInt16 address, pwr_tUInt16 data);
 
 pwr_tUInt16 bfbeth_get_data(io_sRackLocal* r, pwr_tUInt16 address, int* sts);
 
 void bfbeth_get_write_status(io_sRackLocal* r, pwr_tUInt16 address, int* sts);
+
+#endif

@@ -48,10 +48,10 @@
 
 class SubPaletteQtObject;
 
-class SubPaletteQt : public SubPalette {
+class SubPaletteQt : public SubPalette
+{
 public:
-  SubPaletteQt(void* xn_parent_ctx, const char* xn_name, QWidget** w,
-      pwr_tStatus* status);
+  SubPaletteQt(void* xn_parent_ctx, const char* xn_name, QWidget** w, pwr_tStatus* status);
   ~SubPaletteQt();
 
   SubPaletteQtObject* object;
@@ -63,7 +63,8 @@ public:
   void create_popup_menu(char* filename, int x, int y);
 };
 
-class SubPaletteQtObject : public QObject {
+class SubPaletteQtObject : public QObject
+{
   Q_OBJECT
 
 public:

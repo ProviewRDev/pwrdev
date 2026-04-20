@@ -71,7 +71,8 @@
 
 \*----------------------------------------------------------------------------*/
 
-typedef struct {
+typedef struct
+{
   unsigned int Address;
   int Qbus_fp;
   unsigned int bfb_item;
@@ -81,8 +82,7 @@ typedef struct {
   unsigned int ErrScanCnt;
 } io_sLocal;
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   pwr_tStatus sts;
   pwr_sClass_Co_PI24BO* op;
@@ -106,7 +106,8 @@ static pwr_tStatus IoCardInit(
   errh_Info("Init of co card '%s'", cp->Name);
 
   /* Configure card */
-  for (i = 0; i < op->MaxNoOfCounters; i++) {
+  for (i = 0; i < op->MaxNoOfCounters; i++)
+  {
     if (!cp->chanlist[i].cop)
       continue;
 
@@ -129,35 +130,40 @@ static pwr_tStatus IoCardInit(
     if (op->LoadWrReg[i] == 1)
       wr_data[1] |= (1 << 15);
 
-    if (r_local->Qbus_fp != 0 && r_local->s == 0) {
+    if (r_local->Qbus_fp != 0 && r_local->s == 0)
+    {
       /* Write to local Q-bus */
       wb.Address = local->Address + 4 * i;
       wb.Data = wr_data[0];
       sts = write(local->Qbus_fp, &wb, sizeof(wb));
-      if (sts != -1) {
+      if (sts != -1)
+      {
         wb.Address += 2;
         wb.Data = wr_data[1];
         sts = write(local->Qbus_fp, &wb, sizeof(wb));
       }
-    } else {
+    }
+    else
+    {
       /* Ethernet I/O, Request a write to current address */
-      bfbeth_set_write_req(
-          r_local, (pwr_tUInt16)(local->Address + 4 * i), wr_data[0]);
-      bfbeth_set_write_req(
-          r_local, (pwr_tUInt16)(local->Address + 4 * i + 2), wr_data[1]);
+      bfbeth_set_write_req(r_local, (pwr_tUInt16)(local->Address + 4 * i), wr_data[0]);
+      bfbeth_set_write_req(r_local, (pwr_tUInt16)(local->Address + 4 * i + 2), wr_data[1]);
       sts = 1;
     }
 
-    if (sts == -1) {
-      errh_Error(
-          "IO init, Fatal write error, card '%s', IO i stopped", cp->Name);
+    if (sts == -1)
+    {
+      errh_Error("IO init, Fatal write error, card '%s', IO i stopped", cp->Name);
       return IO__ERRDEVICE;
     }
 
-    if (op->LoadWrReg[i] == 1) {
+    if (op->LoadWrReg[i] == 1)
+    {
       *(pwr_tUInt32*)cp->chanlist[i].vbp = op->SyncRawValue[i];
       *(pwr_tUInt32*)cp->chanlist[i].abs_vbp = op->SyncRawValue[i];
-    } else {
+    }
+    else
+    {
       *(pwr_tUInt32*)cp->chanlist[i].vbp = 0;
     }
     /* Data is written to device */
@@ -174,8 +180,7 @@ static pwr_tStatus IoCardInit(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local;
 
@@ -190,8 +195,7 @@ static pwr_tStatus IoCardClose(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local;
   pwr_tUInt16 wr_data[2];
@@ -211,14 +215,17 @@ static pwr_tStatus IoCardRead(
   local = (io_sLocal*)cp->Local;
   op = (pwr_sClass_Co_PI24BO*)cp->op;
 
-  for (i = 0; i < op->MaxNoOfCounters; i++) {
+  for (i = 0; i < op->MaxNoOfCounters; i++)
+  {
     if (!cp->chanlist[i].cop)
       continue;
 
-    if (op->ConvMask & (1 << i)) {
+    if (op->ConvMask & (1 << i))
+    {
       /* Conversion is on */
 
-      if (op->COWrFlag[i]) {
+      if (op->COWrFlag[i])
+      {
         /* New configuration of card */
 
         wr_data_p = (pwr_tUInt32*)&wr_data;
@@ -240,28 +247,30 @@ static pwr_tStatus IoCardRead(
         if (op->LoadWrReg[i] == 1)
           wr_data[1] |= (1 << 15);
 
-        if (r_local->Qbus_fp != 0 && r_local->s == 0) {
+        if (r_local->Qbus_fp != 0 && r_local->s == 0)
+        {
           /* Write to local Q-bus */
           wb.Address = local->Address + 4 * i;
           wb.Data = wr_data[0];
           sts = write(local->Qbus_fp, &wb, sizeof(wb));
-          if (sts != -1) {
+          if (sts != -1)
+          {
             wb.Address += 2;
             wb.Data = wr_data[1];
             sts = write(local->Qbus_fp, &wb, sizeof(wb));
           }
-        } else {
+        }
+        else
+        {
           /* Ethernet I/O, Request a write to current address */
-          bfbeth_set_write_req(
-              r_local, (pwr_tUInt16)(local->Address + 4 * i), wr_data[0]);
-          bfbeth_set_write_req(
-              r_local, (pwr_tUInt16)(local->Address + 4 * i + 2), wr_data[1]);
+          bfbeth_set_write_req(r_local, (pwr_tUInt16)(local->Address + 4 * i), wr_data[0]);
+          bfbeth_set_write_req(r_local, (pwr_tUInt16)(local->Address + 4 * i + 2), wr_data[1]);
           sts = 1;
         }
 
-        if (sts == -1) {
-          errh_Error(
-              "IO init, Fatal write error, card '%s', IO i stopped", cp->Name);
+        if (sts == -1)
+        {
+          errh_Error("IO init, Fatal write error, card '%s', IO i stopped", cp->Name);
         }
         op->COWrFlag[i] = 0;
       }
@@ -273,14 +282,18 @@ static pwr_tStatus IoCardRead(
 
       re_data_p = (pwr_tUInt32*)&re_data;
 
-      if (r_local->Qbus_fp != 0 && r_local->s == 0) {
+      if (r_local->Qbus_fp != 0 && r_local->s == 0)
+      {
         /* Read from local Q-bus */
-        if (numofword == 1) {
+        if (numofword == 1)
+        {
           rb.Address = local->Address + 4 * i;
           sts1 = read(local->Qbus_fp, &rb, sizeof(rb));
           re_data[0] = (unsigned short)rb.Data;
           sts2 = 0;
-        } else if (numofword == 2) {
+        }
+        else if (numofword == 2)
+        {
           /* Read second word, then first word, and the second word again */
           int j;
           pwr_tUInt16 val;
@@ -289,7 +302,8 @@ static pwr_tStatus IoCardRead(
           sts2 = read(local->Qbus_fp, &rb, sizeof(rb));
           val = (unsigned short)rb.Data;
 
-          for (j = 0; j < 5; j++) {
+          for (j = 0; j < 5; j++)
+          {
             rb.Address -= 2;
             sts1 = read(local->Qbus_fp, &rb, sizeof(rb));
             re_data[0] = (unsigned short)rb.Data;
@@ -307,35 +321,37 @@ static pwr_tStatus IoCardRead(
           if (val != re_data[1] || val == 0x0100)
             continue;
         }
-      } else {
+      }
+      else
+      {
         /* Ethernet I/O, Get data from current address */
 
-        re_data[0] = bfbeth_get_data(
-            r_local, (pwr_tUInt16)(local->Address + 4 * i), &sts1);
+        re_data[0] = bfbeth_get_data(r_local, (pwr_tUInt16)(local->Address + 4 * i), &sts1);
         /* Yes, we want to read this address the next time aswell */
         bfbeth_set_read_req(r_local, (pwr_tUInt16)(local->Address + 4 * i));
 
-        if (numofword == 2) {
-          re_data[1] = bfbeth_get_data(
-              r_local, (pwr_tUInt16)(local->Address + 4 * i + 2), &sts2);
+        if (numofword == 2)
+        {
+          re_data[1] = bfbeth_get_data(r_local, (pwr_tUInt16)(local->Address + 4 * i + 2), &sts2);
           /* Yes, we want to read this address the next time aswell */
-          bfbeth_set_read_req(
-              r_local, (pwr_tUInt16)(local->Address + 4 * i + 2));
+          bfbeth_set_read_req(r_local, (pwr_tUInt16)(local->Address + 4 * i + 2));
         }
       }
 
-      if (sts1 == -1 || sts2 == -1) {
+      if (sts1 == -1 || sts2 == -1)
+      {
         /* Increase error count and check error limits */
         op->ErrorCount++;
 
-        if (op->ErrorCount == op->ErrorSoftLimit) {
+        if (op->ErrorCount == op->ErrorSoftLimit)
+        {
           errh_Error("IO Error soft limit reached on card '%s'", cp->Name);
           ctx->IOHandler->CardErrorSoftLimit = 1;
           ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
         }
-        if (op->ErrorCount >= op->ErrorHardLimit) {
-          errh_Error(
-              "IO Error hard limit reached on card '%s', IO stopped", cp->Name);
+        if (op->ErrorCount >= op->ErrorHardLimit)
+        {
+          errh_Error("IO Error hard limit reached on card '%s', IO stopped", cp->Name);
           ctx->Node->EmergBreakTrue = 1;
           ctx->IOHandler->CardErrorHardLimit = 1;
           ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
@@ -359,7 +375,8 @@ static pwr_tStatus IoCardRead(
       *(pwr_tUInt32*)cp->chanlist[i].vbp = co16_data;
 
       /* Test if an abs-value should be calculated and stored */
-      if (op->COAbsFlag[i] == TRUE) {
+      if (op->COAbsFlag[i] == TRUE)
+      {
         /* Calculate difference between two readings*/
         diff = co16_data - local->OldValue[i];
         local->OldValue[i] = co16_data; /* Store new value */
@@ -394,7 +411,8 @@ static pwr_tStatus IoCardRead(
 
       /* Test if an abs-value should be calaulated and stored */
 
-      if (op->COAbsFlag[i] == TRUE) {
+      if (op->COAbsFlag[i] == TRUE)
+      {
         /* Calculate difference between two readings */
         diff = co24_data - local->OldValue[i];
         local->OldValue[i] = co24_data; /* Store new value */
@@ -418,7 +436,8 @@ static pwr_tStatus IoCardRead(
 
   /* Fix for qbus errors */
   local->ErrScanCnt++;
-  if (local->ErrScanCnt >= local->ErrReset) {
+  if (local->ErrScanCnt >= local->ErrReset)
+  {
     local->ErrScanCnt = 0;
     if (op->ErrorCount > op->ErrorSoftLimit)
       op->ErrorCount--;
@@ -431,8 +450,8 @@ static pwr_tStatus IoCardRead(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Co_PI24BO) = { pwr_BindIoMethod(IoCardInit),
-  pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Co_PI24BO) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                            pwr_BindIoMethod(IoCardRead), pwr_NullMethod};
 
-pwr_dExport pwr_BindIoMethods(Co_CO4uP) = { pwr_BindIoMethod(IoCardInit),
-  pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Co_CO4uP) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                           pwr_BindIoMethod(IoCardRead), pwr_NullMethod};

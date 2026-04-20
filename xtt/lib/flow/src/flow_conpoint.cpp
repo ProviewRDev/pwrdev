@@ -43,28 +43,17 @@
 #include "flow_draw.h"
 #include "flow_node.h"
 
-FlowConPoint::FlowConPoint(
-    FlowCtx* flow_ctx, double x, double y, int cp_num, flow_eDirection d)
-    : ctx(flow_ctx), number(cp_num), p(flow_ctx, x, y), direction(d),
-      trace_attr_type(flow_eTraceType_Boolean)
+FlowConPoint::FlowConPoint(FlowCtx* flow_ctx, double x, double y, int cp_num, flow_eDirection d)
+    : ctx(flow_ctx), number(cp_num), p(flow_ctx, x, y), direction(d), trace_attr_type(flow_eTraceType_Boolean)
 {
   strcpy(trace_attribute, "");
 }
 
-void FlowConPoint::zoom()
-{
-  p.zoom();
-}
+void FlowConPoint::zoom() { p.zoom(); }
 
-void FlowConPoint::nav_zoom()
-{
-  p.nav_zoom();
-}
+void FlowConPoint::nav_zoom() { p.nav_zoom(); }
 
-void FlowConPoint::print_zoom()
-{
-  p.print_zoom();
-}
+void FlowConPoint::print_zoom() { p.print_zoom(); }
 
 void FlowConPoint::save(std::ofstream& fp, flow_eSaveMode mode)
 {
@@ -73,10 +62,8 @@ void FlowConPoint::save(std::ofstream& fp, flow_eSaveMode mode)
   fp << int(flow_eSave_ConPoint_direction) << FSPACE << int(direction) << '\n';
   fp << int(flow_eSave_ConPoint_p) << '\n';
   p.save(fp, mode);
-  fp << int(flow_eSave_ConPoint_trace_attribute) << FSPACE << trace_attribute
-     << '\n';
-  fp << int(flow_eSave_ConPoint_trace_attr_type) << FSPACE
-     << int(trace_attr_type) << '\n';
+  fp << int(flow_eSave_ConPoint_trace_attribute) << FSPACE << trace_attribute << '\n';
+  fp << int(flow_eSave_ConPoint_trace_attr_type) << FSPACE << int(trace_attr_type) << '\n';
   fp << int(flow_eSave_End) << '\n';
 }
 
@@ -87,9 +74,11 @@ void FlowConPoint::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
+  for (;;)
+  {
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case flow_eSave_ConPoint:
       break;
     case flow_eSave_ConPoint_number:
@@ -122,19 +111,11 @@ void FlowConPoint::open(std::ifstream& fp)
   }
 }
 
-void FlowConPoint::traverse(int x, int y)
-{
-  p.traverse(x, y);
-}
+void FlowConPoint::traverse(int x, int y) { p.traverse(x, y); }
 
-int FlowConPoint::event_handler(
-    void* pos, flow_eEvent event, int x, int y, void* node)
-{
-  return 0;
-}
+int FlowConPoint::event_handler(void* pos, flow_eEvent event, int x, int y, void* node) { return 0; }
 
-void FlowConPoint::conpoint_select(
-    void* pos, int x, int y, double* distance, void** cp)
+void FlowConPoint::conpoint_select(void* pos, int x, int y, double* distance, void** cp)
 {
   int px, py;
   double dist;
@@ -143,16 +124,17 @@ void FlowConPoint::conpoint_select(
   py = ((FlowPoint*)pos)->z_y - ctx->offset_y + p.z_y;
 
   dist = sqrt(1.0 * (x - px) * (x - px) + 1.0 * (y - py) * (y - py));
-  if (dist < *distance) {
+  if (dist < *distance)
+  {
     *distance = dist;
     *cp = (void*)this;
   }
 }
 
-int FlowConPoint::get_conpoint(
-    int num, double* x, double* y, flow_eDirection* dir)
+int FlowConPoint::get_conpoint(int num, double* x, double* y, flow_eDirection* dir)
 {
-  if (number == num) {
+  if (number == num)
+  {
     *x = p.x;
     *y = p.y;
     *dir = direction;
@@ -161,8 +143,8 @@ int FlowConPoint::get_conpoint(
   return 0;
 }
 
-void FlowConPoint::set_trace_attr(const char* object, const char* attribute,
-    flow_eTraceType type, int inverted)
+void FlowConPoint::set_trace_attr(const char* object, const char* attribute, flow_eTraceType type,
+                                  int inverted)
 {
   strncpy(trace_attribute, attribute, sizeof(trace_attribute));
   trace_attr_type = type;
@@ -177,8 +159,7 @@ FlowTraceAttr FlowConPoint::get_trace_attr()
   return attr;
 }
 
-void FlowConPoint::draw(
-    void* pos, int highlight, int dimmed, int hot, void* node)
+void FlowConPoint::draw(void* pos, int highlight, int dimmed, int hot, void* node)
 {
   int line_width = 1;
   int idx = int(ctx->zoom_factor / ctx->base_zoom_factor * line_width - 1) + 2;
@@ -187,9 +168,10 @@ void FlowConPoint::draw(
   int size = (int)(0.025 * ctx->zoom_factor);
   int x, y;
 
-  if (((FlowNode*)node)->sel_conpoint1 == number
-      || ((FlowNode*)node)->sel_conpoint2 == number) {
-    switch (direction) {
+  if (((FlowNode*)node)->sel_conpoint1 == number || ((FlowNode*)node)->sel_conpoint2 == number)
+  {
+    switch (direction)
+    {
     case flow_eDirection_Up:
       x = p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x - size / 2;
       y = p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y - size;
@@ -211,8 +193,7 @@ void FlowConPoint::draw(
       x = p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x - size / 2;
       y = p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y - size / 2;
     }
-    ctx->fdraw->arc(
-        ctx, x, y, size, size, 0, 360, flow_eDrawType_LineRed, idx, 0, 0);
+    ctx->fdraw->arc(ctx, x, y, size, size, 0, 360, flow_eDrawType_LineRed, idx, 0, 0);
   }
 }
 
@@ -225,9 +206,10 @@ void FlowConPoint::erase(void* pos, int hot, void* node)
   int size = (int)(0.025 * ctx->zoom_factor);
   int x, y;
 
-  if (((FlowNode*)node)->sel_conpoint1 == number
-      || ((FlowNode*)node)->sel_conpoint2 == number) {
-    switch (direction) {
+  if (((FlowNode*)node)->sel_conpoint1 == number || ((FlowNode*)node)->sel_conpoint2 == number)
+  {
+    switch (direction)
+    {
     case flow_eDirection_Up:
       x = p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x - size / 2;
       y = p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y - size;

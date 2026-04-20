@@ -41,8 +41,7 @@
 
 #include "pwr_class.h"
 
-pwr_tStatus io_GetIoTypeClasses(
-    io_eType type, pwr_tClassId** classes, int* size);
+pwr_tStatus io_GetIoTypeClasses(io_eType type, pwr_tClassId** classes, int* size);
 
 int io_CheckClassIoType(io_eType type, pwr_tCid cid);
 #endif

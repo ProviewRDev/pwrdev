@@ -46,12 +46,12 @@
 
 class EvAlaQtWidget;
 
-class EvAlaQt : public EvAla {
+class EvAlaQt : public EvAla
+{
 public:
-  EvAlaQt(void* ev_parent_ctx, char* ala_name, pwr_tObjid ev_user,
-      int ev_eventname_seg, int ev_width, int ev_height,  int ev_x, int ev_y,
-      pwr_tObjid ev_view, unsigned int ev_options, void* widget,
-      pwr_tStatus* status);
+  EvAlaQt(void* ev_parent_ctx, char* ala_name, pwr_tObjid ev_user, int ev_eventname_seg, int ev_width,
+          int ev_height, int ev_x, int ev_y, pwr_tObjid ev_view, unsigned int ev_options, void* widget,
+          pwr_tStatus* status);
   ~EvAlaQt();
 
   EvAlaQtWidget* toplevel;
@@ -66,7 +66,8 @@ public:
   QWidget* get_widget();
 };
 
-class EvAlaQtWidget : public QWidget {
+class EvAlaQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

@@ -38,6 +38,6 @@
 #define remote_mq_h
 
 /* remote_mq.h -- Runtime environment - Message Queue
-*/
+ */
 
 #endif

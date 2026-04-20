@@ -59,9 +59,11 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   local = (io_sLocalUSB*)calloc(1, sizeof(io_sLocalUSB));
   rp->Local = local;
 
-  for (i = 0; i < (int)sizeof(local->USB_Handle); i++) {
+  for (i = 0; i < (int)sizeof(local->USB_Handle); i++)
+  {
     status = USBIO_Open(&local->USB_Handle[i]);
-    if (status) {
+    if (status)
+    {
       if (i == 0)
         op->Status = status;
       break;
@@ -69,22 +71,27 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
     /* Check is this card is configured */
     status = USBIO_GetSerialNr(&local->USB_Handle[i], &snum);
-    if (!status) {
+    if (!status)
+    {
       found = 0;
-      for (cp = rp->cardlist; cp; cp = cp->next) {
-        if (((pwr_sClass_MotionControl_USBIO*)cp->op)->Super.Address == snum) {
+      for (cp = rp->cardlist; cp; cp = cp->next)
+      {
+        if (((pwr_sClass_MotionControl_USBIO*)cp->op)->Super.Address == snum)
+        {
           local->snum[i] = snum;
           found = 1;
           break;
         }
       }
-      if (!found) {
+      if (!found)
+      {
         errh_Info("USBIO Serial number %d not configured", snum);
         op->Status = USBIO_Close(&local->USB_Handle[i]);
         i--;
         continue;
       }
-    } else
+    }
+    else
       errh_Error("USBIO Serial number error '%s'", rp->Name);
   }
 
@@ -99,7 +106,8 @@ static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   pwr_sClass_MotionControl_USB* op = (pwr_sClass_MotionControl_USB*)rp->op;
   int i;
 
-  for (i = 0; i < (int)sizeof(local->USB_Handle); i++) {
+  for (i = 0; i < (int)sizeof(local->USB_Handle); i++)
+  {
     if (local->USB_Handle[i])
       USBIO_Close(&local->USB_Handle[i]);
     else
@@ -111,6 +119,5 @@ static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(MotionControl_USB)
-    = { pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackClose),
-        pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(MotionControl_USB) = {pwr_BindIoMethod(IoRackInit),
+                                                    pwr_BindIoMethod(IoRackClose), pwr_NullMethod};

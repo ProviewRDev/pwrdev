@@ -57,43 +57,45 @@
 /*! \addtogroup Time */
 /*@{*/
 
-#define assertAbs(p)                                                           \
-  do {                                                                         \
-    pwr_Assert(p->tv_nsec >= 0 && p->tv_nsec < 1000000000);                    \
+#define assertAbs(p)                                                                                         \
+  do                                                                                                         \
+  {                                                                                                          \
+    pwr_Assert(p->tv_nsec >= 0 && p->tv_nsec < 1000000000);                                                  \
   } while (0)
 #define notATime(p) (p->tv_nsec < 0 || p->tv_nsec >= 1000000000)
 
-#define assertDelta(p)                                                         \
-  do {                                                                         \
-    pwr_Assert((p->tv_sec > 0) ? (p->tv_nsec >= 0 && p->tv_nsec < 1000000000)  \
-                               : TRUE);                                        \
-    pwr_Assert((p->tv_sec < 0) ? (p->tv_nsec <= 0 && p->tv_nsec > -1000000000) \
-                               : TRUE);                                        \
+#define assertDelta(p)                                                                                       \
+  do                                                                                                         \
+  {                                                                                                          \
+    pwr_Assert((p->tv_sec > 0) ? (p->tv_nsec >= 0 && p->tv_nsec < 1000000000) : TRUE);                       \
+    pwr_Assert((p->tv_sec < 0) ? (p->tv_nsec <= 0 && p->tv_nsec > -1000000000) : TRUE);                      \
   } while (0)
-#define notADeltaTime(p)                                                       \
-  (((p->tv_sec > 0) && (p->tv_nsec < 0 || p->tv_nsec >= 1000000000))           \
-      || ((p->tv_sec == 0)                                                     \
-             && (p->tv_nsec <= -1000000000 || p->tv_nsec >= 1000000000))       \
-      || ((p->tv_sec < 0) && (p->tv_nsec > 0 || p->tv_nsec <= -1000000000)))
+#define notADeltaTime(p)                                                                                     \
+  (((p->tv_sec > 0) && (p->tv_nsec < 0 || p->tv_nsec >= 1000000000)) ||                                      \
+   ((p->tv_sec == 0) && (p->tv_nsec <= -1000000000 || p->tv_nsec >= 1000000000)) ||                          \
+   ((p->tv_sec < 0) && (p->tv_nsec > 0 || p->tv_nsec <= -1000000000)))
 
 #define ONEDAY 86400
 
 /* String representations of months.  */
 
-static const char* monStr[] = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL",
-  "AUG", "SEP", "OCT", "NOV", "DEC" };
+static const char* monStr[] = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+                               "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
 #ifdef OS_MACOS
 int clock_gettime(clockid_t clockid, struct timespec* pt)
 {
-  if (clockid == CLOCK_REALTIME) {
+  if (clockid == CLOCK_REALTIME)
+  {
     struct timeval tv;
 
     gettimeofday(&tv, 0);
 
     pt->tv_sec = tv.tv_sec;
     pt->tv_nsec = tv.tv_usec * 1000;
-  } else if (clockid == CLOCK_MONOTONIC) {
+  }
+  else if (clockid == CLOCK_MONOTONIC)
+  {
     // TODO
     struct timeval tv;
 
@@ -101,7 +103,9 @@ int clock_gettime(clockid_t clockid, struct timespec* pt)
 
     pt->tv_sec = tv.tv_sec;
     pt->tv_nsec = tv.tv_usec * 1000;
-  } else {
+  }
+  else
+  {
     errno = EINVAL;
     return -1;
   }
@@ -128,21 +132,24 @@ static pwr_tStatus validateTm(struct tm* tms)
     return TIME__RANGE;
   else if (0 > tms->tm_min || tms->tm_min > 59)
     return TIME__RANGE;
-  else if (0 > tms->tm_sec
-      || tms->tm_sec > 59) /* Should be 61 according to POSIX */
+  else if (0 > tms->tm_sec || tms->tm_sec > 59) /* Should be 61 according to POSIX */
     return TIME__RANGE;
 
   /*
    * validate date
    */
-  switch (tms->tm_mon) {
+  switch (tms->tm_mon)
+  {
   case 1:
     /* check for leap year */
     year = tms->tm_year + 1900;
-    if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+    if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
+    {
       if (tms->tm_mday > 29)
         return TIME__RANGE;
-    } else {
+    }
+    else
+    {
       if (tms->tm_mday > 28)
         return TIME__RANGE;
     }
@@ -178,8 +185,7 @@ int time_IsNull(pwr_tTime* t1)
 {
   assertAbs(t1);
 
-  return (t1->tv_sec == pwr_cNTime.tv_sec)
-      && (t1->tv_nsec == pwr_cNTime.tv_nsec);
+  return (t1->tv_sec == pwr_cNTime.tv_sec) && (t1->tv_nsec == pwr_cNTime.tv_nsec);
 }
 
 //! Add an absolute time and a delta time.
@@ -210,10 +216,13 @@ pwr_tTime* time_Aadd(pwr_tTime* result, pwr_tTime* t, pwr_tDeltaTime* a)
 
   tv_sec += tv_nsec / 1000000000;
   tv_nsec %= 1000000000;
-  if (tv_nsec < 0 && tv_sec > 0) {
+  if (tv_nsec < 0 && tv_sec > 0)
+  {
     tv_sec--;
     tv_nsec += 1000000000;
-  } else if (tv_sec < 0 && tv_nsec > 0) {
+  }
+  else if (tv_sec < 0 && tv_nsec > 0)
+  {
     tv_sec++;
     tv_nsec -= 1000000000;
   }
@@ -246,17 +255,21 @@ pwr_tTime* time_Aadd_NE(pwr_tTime* result, pwr_tTime* t, pwr_tDeltaTime* a)
   if (result == NULL)
     r = t;
 
-  if (notATime(t) || notADeltaTime(a)) {
+  if (notATime(t) || notADeltaTime(a))
+  {
     *r = pwr_cNotATime;
     return r;
   }
 
   tv_sec += tv_nsec / 1000000000;
   tv_nsec %= 1000000000;
-  if (tv_nsec < 0 && tv_sec > 0) {
+  if (tv_nsec < 0 && tv_sec > 0)
+  {
     tv_sec--;
     tv_nsec += 1000000000;
-  } else if (tv_sec < 0 && tv_nsec > 0) {
+  }
+  else if (tv_sec < 0 && tv_nsec > 0)
+  {
     tv_sec++;
     tv_nsec -= 1000000000;
   }
@@ -281,7 +294,7 @@ pwr_tTime* time_Aadd_NE(pwr_tTime* result, pwr_tTime* t, pwr_tDeltaTime* a)
 
 int time_Acomp(pwr_tTime* t1, pwr_tTime* t2)
 {
-  static pwr_tTime null = { 0, 0 };
+  static pwr_tTime null = {0, 0};
 
   if (t2 == NULL)
     t2 = &null;
@@ -289,11 +302,13 @@ int time_Acomp(pwr_tTime* t1, pwr_tTime* t2)
   assertAbs(t1);
   assertAbs(t2);
 
-  if (t1->tv_sec == t2->tv_sec) {
+  if (t1->tv_sec == t2->tv_sec)
+  {
     if (t1->tv_nsec == t2->tv_nsec)
       return 0;
     return ((t1->tv_nsec > t2->tv_nsec) ? 1 : -1);
-  } else
+  }
+  else
     return ((t1->tv_sec > t2->tv_sec) ? 1 : -1);
 }
 
@@ -311,7 +326,7 @@ int time_Acomp(pwr_tTime* t1, pwr_tTime* t2)
 */
 int time_Acomp_NE(pwr_tTime* t1, pwr_tTime* t2)
 {
-  static pwr_tTime null = { 0, 0 };
+  static pwr_tTime null = {0, 0};
 
   if (t2 == NULL)
     t2 = &null;
@@ -319,11 +334,13 @@ int time_Acomp_NE(pwr_tTime* t1, pwr_tTime* t2)
   if (notATime(t1) || notATime(t2))
     return -2;
 
-  if (t1->tv_sec == t2->tv_sec) {
+  if (t1->tv_sec == t2->tv_sec)
+  {
     if (t1->tv_nsec == t2->tv_nsec)
       return 0;
     return ((t1->tv_nsec > t2->tv_nsec) ? 1 : -1);
-  } else
+  }
+  else
     return ((t1->tv_sec > t2->tv_sec) ? 1 : -1);
 }
 
@@ -347,10 +364,13 @@ pwr_tDeltaTime* time_Adiff(pwr_tDeltaTime* r, pwr_tTime* t, pwr_tTime* s)
 
   tv_sec = tv_sec + tv_nsec / 1000000000;
   tv_nsec = tv_nsec % 1000000000;
-  if (tv_nsec < 0 && tv_sec > 0) {
+  if (tv_nsec < 0 && tv_sec > 0)
+  {
     tv_sec--;
     tv_nsec += 1000000000;
-  } else if (tv_sec < 0 && tv_nsec > 0) {
+  }
+  else if (tv_sec < 0 && tv_nsec > 0)
+  {
     tv_sec++;
     tv_nsec -= 1000000000;
   }
@@ -375,17 +395,21 @@ pwr_tDeltaTime* time_Adiff_NE(pwr_tDeltaTime* r, pwr_tTime* t, pwr_tTime* s)
   pwr_tInt64 tv_nsec = t->tv_nsec - s->tv_nsec;
   pwr_tInt64 tv_sec = t->tv_sec - s->tv_sec;
 
-  if (r == NULL || notATime(t) || notATime(s)) {
+  if (r == NULL || notATime(t) || notATime(s))
+  {
     *r = pwr_cNotADeltaTime;
     return r;
   }
 
   tv_sec = tv_sec + tv_nsec / 1000000000;
   tv_nsec = tv_nsec % 1000000000;
-  if (tv_nsec < 0 && tv_sec > 0) {
+  if (tv_nsec < 0 && tv_sec > 0)
+  {
     tv_sec--;
     tv_nsec += 1000000000;
-  } else if (tv_sec < 0 && tv_nsec > 0) {
+  }
+  else if (tv_sec < 0 && tv_nsec > 0)
+  {
     tv_sec++;
     tv_nsec -= 1000000000;
   }
@@ -419,10 +443,13 @@ pwr_tTime* time_Asub(pwr_tTime* result, pwr_tTime* t, pwr_tDeltaTime* s)
 
   tv_sec += tv_nsec / 1000000000;
   tv_nsec %= 1000000000;
-  if (tv_nsec < 0 && tv_sec > 0) {
+  if (tv_nsec < 0 && tv_sec > 0)
+  {
     tv_sec--;
     tv_nsec += 1000000000;
-  } else if (tv_sec < 0 && tv_nsec > 0) {
+  }
+  else if (tv_sec < 0 && tv_nsec > 0)
+  {
     tv_sec++;
     tv_nsec -= 1000000000;
   }
@@ -450,17 +477,21 @@ pwr_tTime* time_Asub_NE(pwr_tTime* result, pwr_tTime* t, pwr_tDeltaTime* s)
   if (r == NULL)
     r = t;
 
-  if (notATime(t) || notADeltaTime(s)) {
+  if (notATime(t) || notADeltaTime(s))
+  {
     *r = pwr_cNotATime;
     return r;
   }
 
   tv_sec += tv_nsec / 1000000000;
   tv_nsec %= 1000000000;
-  if (tv_nsec < 0 && tv_sec > 0) {
+  if (tv_nsec < 0 && tv_sec > 0)
+  {
     tv_sec--;
     tv_nsec += 1000000000;
-  } else if (tv_sec < 0 && tv_nsec > 0) {
+  }
+  else if (tv_sec < 0 && tv_nsec > 0)
+  {
     tv_sec++;
     tv_nsec -= 1000000000;
   }
@@ -489,11 +520,12 @@ pwr_tDeltaTime* time_Dabs(pwr_tDeltaTime* result, pwr_tDeltaTime* t)
 
   if (r == NULL)
     r = t;
-  else {
+  else
+  {
     r->tv_sec = t->tv_sec;
     r->tv_nsec = t->tv_nsec;
   }
-  
+
   if (r->tv_sec < 0)
     r->tv_sec = -r->tv_sec;
   if (r->tv_nsec < 0)
@@ -519,12 +551,14 @@ pwr_tDeltaTime* time_Dabs_NE(pwr_tDeltaTime* result, pwr_tDeltaTime* t)
 
   if (r == NULL)
     r = t;
-  else {
+  else
+  {
     r->tv_sec = t->tv_sec;
     r->tv_nsec = t->tv_nsec;
   }
 
-  if (notADeltaTime(t)) {
+  if (notADeltaTime(t))
+  {
     *r = pwr_cNotADeltaTime;
     return r;
   }
@@ -544,8 +578,7 @@ pwr_tDeltaTime* time_Dabs_NE(pwr_tDeltaTime* result, pwr_tDeltaTime* t)
   cause an exception.
 */
 
-pwr_tDeltaTime* time_Dadd(
-    pwr_tDeltaTime* result, pwr_tDeltaTime* t, pwr_tDeltaTime* a)
+pwr_tDeltaTime* time_Dadd(pwr_tDeltaTime* result, pwr_tDeltaTime* t, pwr_tDeltaTime* a)
 {
   pwr_tDeltaTime* r = result;
   pwr_tInt64 tv_nsec, tv_sec;
@@ -560,10 +593,13 @@ pwr_tDeltaTime* time_Dadd(
   tv_sec = t->tv_sec + a->tv_sec + (tv_nsec / 1000000000);
   tv_nsec = tv_nsec % 1000000000;
 
-  if (tv_nsec < 0 && tv_sec > 0) {
+  if (tv_nsec < 0 && tv_sec > 0)
+  {
     tv_sec--;
     tv_nsec += 1000000000;
-  } else if (tv_sec < 0 && tv_nsec > 0) {
+  }
+  else if (tv_sec < 0 && tv_nsec > 0)
+  {
     tv_sec++;
     tv_nsec -= 1000000000;
   }
@@ -581,8 +617,7 @@ pwr_tDeltaTime* time_Dadd(
   an invalid time, pwr_cNotADeltaTime, is returned.
 */
 
-pwr_tDeltaTime* time_Dadd_NE(
-    pwr_tDeltaTime* result, pwr_tDeltaTime* t, pwr_tDeltaTime* a)
+pwr_tDeltaTime* time_Dadd_NE(pwr_tDeltaTime* result, pwr_tDeltaTime* t, pwr_tDeltaTime* a)
 {
   pwr_tDeltaTime* r = result;
   pwr_tInt64 tv_nsec, tv_sec;
@@ -590,7 +625,8 @@ pwr_tDeltaTime* time_Dadd_NE(
   if (result == NULL)
     r = t;
 
-  if (notADeltaTime(t) || notADeltaTime(a)) {
+  if (notADeltaTime(t) || notADeltaTime(a))
+  {
     *r = pwr_cNotADeltaTime;
     return r;
   }
@@ -599,10 +635,13 @@ pwr_tDeltaTime* time_Dadd_NE(
   tv_sec = t->tv_sec + a->tv_sec + (tv_nsec / 1000000000);
   tv_nsec = tv_nsec % 1000000000;
 
-  if (tv_nsec < 0 && tv_sec > 0) {
+  if (tv_nsec < 0 && tv_sec > 0)
+  {
     tv_sec--;
     tv_nsec += 1000000000;
-  } else if (tv_sec < 0 && tv_nsec > 0) {
+  }
+  else if (tv_sec < 0 && tv_nsec > 0)
+  {
     tv_sec++;
     tv_nsec -= 1000000000;
   }
@@ -628,7 +667,7 @@ pwr_tDeltaTime* time_Dadd_NE(
 
 int time_Dcomp(pwr_tDeltaTime* t1, pwr_tDeltaTime* t2)
 {
-  static pwr_tDeltaTime null = { 0, 0 };
+  static pwr_tDeltaTime null = {0, 0};
 
   if (t2 == NULL)
     t2 = &null;
@@ -636,7 +675,8 @@ int time_Dcomp(pwr_tDeltaTime* t1, pwr_tDeltaTime* t2)
   assertDelta(t1);
   assertDelta(t2);
 
-  if (t1->tv_sec == t2->tv_sec) {
+  if (t1->tv_sec == t2->tv_sec)
+  {
     if (t1->tv_nsec == t2->tv_nsec)
       return 0;
     return ((t1->tv_nsec > t2->tv_nsec) ? 1 : -1);
@@ -659,7 +699,7 @@ int time_Dcomp(pwr_tDeltaTime* t1, pwr_tDeltaTime* t2)
 
 int time_Dcomp_NE(pwr_tDeltaTime* t1, pwr_tDeltaTime* t2)
 {
-  static pwr_tDeltaTime null = { 0, 0 };
+  static pwr_tDeltaTime null = {0, 0};
 
   if (t2 == NULL)
     t2 = &null;
@@ -667,7 +707,8 @@ int time_Dcomp_NE(pwr_tDeltaTime* t1, pwr_tDeltaTime* t2)
   if (notADeltaTime(t1) || notADeltaTime(t2))
     return -2;
 
-  if (t1->tv_sec == t2->tv_sec) {
+  if (t1->tv_sec == t2->tv_sec)
+  {
     if (t1->tv_nsec == t2->tv_nsec)
       return 0;
     return ((t1->tv_nsec > t2->tv_nsec) ? 1 : -1);
@@ -695,7 +736,8 @@ pwr_tDeltaTime* time_Dneg(pwr_tDeltaTime* result, pwr_tDeltaTime* t)
 
   if (r == NULL)
     r = t;
-  else {
+  else
+  {
     r->tv_sec = t->tv_sec;
     r->tv_nsec = t->tv_nsec;
   }
@@ -724,12 +766,14 @@ pwr_tDeltaTime* time_Dneg_NE(pwr_tDeltaTime* result, pwr_tDeltaTime* t)
 
   if (r == NULL)
     r = t;
-  else {
+  else
+  {
     r->tv_sec = t->tv_sec;
     r->tv_nsec = t->tv_nsec;
   }
 
-  if (notADeltaTime(t)) {
+  if (notADeltaTime(t))
+  {
     *r = pwr_cNotADeltaTime;
     return r;
   }
@@ -747,8 +791,7 @@ pwr_tDeltaTime* time_Dneg_NE(pwr_tDeltaTime* result, pwr_tDeltaTime* t)
     cause an exception.
 */
 
-pwr_tDeltaTime* time_Dsub(
-    pwr_tDeltaTime* result, pwr_tDeltaTime* t, pwr_tDeltaTime* s)
+pwr_tDeltaTime* time_Dsub(pwr_tDeltaTime* result, pwr_tDeltaTime* t, pwr_tDeltaTime* s)
 {
   pwr_tInt64 tv_nsec = t->tv_nsec - s->tv_nsec;
   pwr_tInt64 tv_sec = t->tv_sec - s->tv_sec;
@@ -762,10 +805,13 @@ pwr_tDeltaTime* time_Dsub(
 
   tv_sec = tv_sec + tv_nsec / 1000000000;
   tv_nsec = tv_nsec % 1000000000;
-  if (tv_nsec < 0 && tv_sec > 0) {
+  if (tv_nsec < 0 && tv_sec > 0)
+  {
     tv_sec--;
     tv_nsec += 1000000000;
-  } else if (tv_sec < 0 && tv_nsec > 0) {
+  }
+  else if (tv_sec < 0 && tv_nsec > 0)
+  {
     tv_sec++;
     tv_nsec -= 1000000000;
   }
@@ -783,8 +829,7 @@ pwr_tDeltaTime* time_Dsub(
     an invalid time, pwr_cNotADeltaTime, is returned.
 */
 
-pwr_tDeltaTime* time_Dsub_NE(
-    pwr_tDeltaTime* result, pwr_tDeltaTime* t, pwr_tDeltaTime* s)
+pwr_tDeltaTime* time_Dsub_NE(pwr_tDeltaTime* result, pwr_tDeltaTime* t, pwr_tDeltaTime* s)
 {
   pwr_tInt64 tv_nsec = t->tv_nsec - s->tv_nsec;
   pwr_tInt64 tv_sec = t->tv_sec - s->tv_sec;
@@ -793,17 +838,21 @@ pwr_tDeltaTime* time_Dsub_NE(
   if (r == NULL)
     r = t;
 
-  if (notADeltaTime(t) || notADeltaTime(s)) {
+  if (notADeltaTime(t) || notADeltaTime(s))
+  {
     *r = pwr_cNotADeltaTime;
     return r;
   }
 
   tv_sec = tv_sec + tv_nsec / 1000000000;
   tv_nsec = tv_nsec % 1000000000;
-  if (tv_nsec < 0 && tv_sec > 0) {
+  if (tv_nsec < 0 && tv_sec > 0)
+  {
     tv_sec--;
     tv_nsec += 1000000000;
-  } else if (tv_sec < 0 && tv_nsec > 0) {
+  }
+  else if (tv_sec < 0 && tv_nsec > 0)
+  {
     tv_sec++;
     tv_nsec -= 1000000000;
   }
@@ -816,8 +865,7 @@ pwr_tDeltaTime* time_Dsub_NE(
 
 //! Convert a delta time to ascii string.
 
-pwr_tStatus time_DtoAscii(
-    pwr_tDeltaTime* dt, int hundreds, char* buf, int bufsize)
+pwr_tStatus time_DtoAscii(pwr_tDeltaTime* dt, int hundreds, char* buf, int bufsize)
 {
   char tmpStr[32];
   div_t day, hour, min;
@@ -827,13 +875,15 @@ pwr_tStatus time_DtoAscii(
   if (dt == NULL)
     return TIME__IVDTIME;
 
-  if (notADeltaTime(dt)) {
+  if (notADeltaTime(dt))
+  {
     strncpy(buf, "NotADeltaTime", bufsize);
     buf[bufsize - 1] = '\0';
     return TIME__NADT;
   }
 
-  if (dt->tv_sec < 0 || dt->tv_nsec < 0) {    
+  if (dt->tv_sec < 0 || dt->tv_nsec < 0)
+  {
     neg = 1;
 #if defined(HW_X86_64)
     t.tv_sec = labs(dt->tv_sec);
@@ -849,20 +899,26 @@ pwr_tStatus time_DtoAscii(
   hour = div(day.rem, 3600);
   min = div(hour.rem, 60);
 
-  if (day.quot) {
-    if (hundreds) {
+  if (day.quot)
+  {
+    if (hundreds)
+    {
       long int nsec = dt->tv_nsec / 10000000;
-      sprintf(tmpStr, "%s%d %d:%02d:%02d.%02ld", neg?"-":"", day.quot, hour.quot, min.quot,
-          min.rem, nsec);
-    } else
-      sprintf(
-          tmpStr, "%s%d %d:%02d:%02d", neg?"-":"", day.quot, hour.quot, min.quot, min.rem);
-  } else {
-    if (hundreds) {
+      sprintf(tmpStr, "%s%d %d:%02d:%02d.%02ld", neg ? "-" : "", day.quot, hour.quot, min.quot, min.rem,
+              nsec);
+    }
+    else
+      sprintf(tmpStr, "%s%d %d:%02d:%02d", neg ? "-" : "", day.quot, hour.quot, min.quot, min.rem);
+  }
+  else
+  {
+    if (hundreds)
+    {
       long int nsec = dt->tv_nsec / 10000000;
-      sprintf(tmpStr, "%s%d:%02d:%02d.%02ld", neg?"-":"", hour.quot, min.quot, min.rem, nsec);
-    } else
-      sprintf(tmpStr, "%s%d:%02d:%02d", neg?"-":"", hour.quot, min.quot, min.rem);
+      sprintf(tmpStr, "%s%d:%02d:%02d.%02ld", neg ? "-" : "", hour.quot, min.quot, min.rem, nsec);
+    }
+    else
+      sprintf(tmpStr, "%s%d:%02d:%02d", neg ? "-" : "", hour.quot, min.quot, min.rem);
   }
 
   strncpy(buf, tmpStr, bufsize);
@@ -875,8 +931,7 @@ pwr_tStatus time_DtoAscii(
 /*!
    NOTE: Not thread safe.  */
 
-pwr_tStatus time_AtoAscii(
-    pwr_tTime* ts, time_eFormat format, char* buf, int bufsize)
+pwr_tStatus time_AtoAscii(pwr_tTime* ts, time_eFormat format, char* buf, int bufsize)
 {
   struct tm* tmpTm;
   int buflen;
@@ -884,16 +939,19 @@ pwr_tStatus time_AtoAscii(
   pwr_tTime time;
   pwr_tTime* tp;
 
-  if (ts && notATime(ts)) {
+  if (ts && notATime(ts))
+  {
     strncpy(buf, "NotATime", bufsize);
     buf[bufsize - 1] = '\0';
     return TIME__NAT;
   }
 
-  if (ts == NULL) {
+  if (ts == NULL)
+  {
     time_GetTime(&time);
     tp = &time;
-  } else
+  }
+  else
     tp = ts;
 
   time_t sec = tp->tv_sec;
@@ -902,7 +960,8 @@ pwr_tStatus time_AtoAscii(
     return TIME__RANGE;
 
   buflen = strlen(buf);
-  switch (format) {
+  switch (format)
+  {
   case time_eFormat_FileDateAndTime:
   case time_eFormat_FileDate:
   case time_eFormat_TimeAndDate:
@@ -933,15 +992,17 @@ pwr_tStatus time_AsciiToD(const char* tstr, pwr_tDeltaTime* ts)
   int useday = 1;
   int neg = 0;
 
-  if ( streq( tstr, "NotADeltaTime")) {
+  if (streq(tstr, "NotADeltaTime"))
+  {
     *ts = pwr_cNotADeltaTime;
     return TIME__SUCCESS;
   }
-  if (*tstr == '-') {
+  if (*tstr == '-')
+  {
     strncpy(buf, &tstr[1], sizeof(buf) - 1);
     neg = 1;
   }
-  else 
+  else
     strncpy(buf, tstr, sizeof(buf) - 1);
   buf[sizeof(buf) - 1] = '\0';
   sp = buf;
@@ -950,17 +1011,20 @@ pwr_tStatus time_AsciiToD(const char* tstr, pwr_tDeltaTime* ts)
   if (dp == NULL)
     return TIME__RANGE;
 
-  if (*dp == ':') {
+  if (*dp == ':')
+  {
     hour = day;
     day = 0;
     useday = 0;
     if (hour > 23)
       return TIME__RANGE;
-  } else if (*dp != ' ')
+  }
+  else if (*dp != ' ')
     return TIME__RANGE;
   sp = dp + 1;
 
-  if (useday) {
+  if (useday)
+  {
     if (day > 24855)
       return TIME__RANGE;
     hour = strtoul(sp, &dp, 10);
@@ -978,7 +1042,8 @@ pwr_tStatus time_AsciiToD(const char* tstr, pwr_tDeltaTime* ts)
   if ((dp && *dp && *dp != ' ' && *dp != '.') || sec > 59)
     return TIME__RANGE;
 
-  if (dp && *dp == '.') {
+  if (dp && *dp == '.')
+  {
     hun = strtoul(dp + 1, &dp, 10);
     if ((dp && *dp && *dp != ' ') || hun > (10000000 - 1))
       return TIME__RANGE;
@@ -986,7 +1051,8 @@ pwr_tStatus time_AsciiToD(const char* tstr, pwr_tDeltaTime* ts)
 
   ts->tv_sec = day * 24 * 3600 + hour * 3600 + min * 60 + sec;
   ts->tv_nsec = hun * 10000000;
-  if (neg) {
+  if (neg)
+  {
     ts->tv_sec = -ts->tv_sec;
     ts->tv_nsec = -ts->tv_nsec;
   }
@@ -1004,14 +1070,16 @@ pwr_tStatus time_AsciiToA(const char* tstr, pwr_tTime* ts)
   char buf[64];
   pwr_tStatus sts;
 
-  if ( streq( tstr, "NotATime")) {
+  if (streq(tstr, "NotATime"))
+  {
     *ts = pwr_cNotATime;
     return TIME__SUCCESS;
   }
   strncpy(buf, tstr, sizeof(buf) - 1);
   buf[sizeof(buf) - 1] = '\0';
 
-  if ((dotp = strchr(buf, '.'))) {
+  if ((dotp = strchr(buf, '.')))
+  {
     int len;
     char* cp;
 
@@ -1043,8 +1111,7 @@ pwr_tStatus time_AsciiToA(const char* tstr, pwr_tTime* ts)
 
 //! Convert time struct to string.
 
-pwr_tStatus time_TmToAscii(
-    struct tm* tmptr, time_eFormat format, char* buf, int bufsize)
+pwr_tStatus time_TmToAscii(struct tm* tmptr, time_eFormat format, char* buf, int bufsize)
 {
   pwr_tStatus sts;
 
@@ -1052,22 +1119,37 @@ pwr_tStatus time_TmToAscii(
   if (EVEN(sts = validateTm(tmptr)))
     return sts;
 
-  if (format == time_eFormat_DateAndTime) {
+  if (format == time_eFormat_DateAndTime)
+  {
     strftime(buf, bufsize, "%d-xxx-%Y %H:%M:%S", tmptr);
     strncpy(&buf[3], monStr[tmptr->tm_mon], 3);
-  } else if (format == time_eFormat_DateAndTimeLoc) {
+  }
+  else if (format == time_eFormat_DateAndTimeLoc)
+  {
     strftime(buf, bufsize, "%d-%b-%Y %H:%M:%S", tmptr);
-  } else if (format == time_eFormat_FileDateAndTime) {
+  }
+  else if (format == time_eFormat_FileDateAndTime)
+  {
     strftime(buf, bufsize, "%Y%m%d_%H%M%S", tmptr);
-  } else if (format == time_eFormat_FileDate) {
+  }
+  else if (format == time_eFormat_FileDate)
+  {
     strftime(buf, bufsize, "%Y%m%d", tmptr);
-  } else if (format == time_eFormat_ComprDateAndTime) {
+  }
+  else if (format == time_eFormat_ComprDateAndTime)
+  {
     strftime(buf, bufsize, "%y-%m-%d %H:%M:%S", tmptr);
-  } else if (format == time_eFormat_NumDateAndTime) {
+  }
+  else if (format == time_eFormat_NumDateAndTime)
+  {
     strftime(buf, bufsize, "%Y-%m-%d %H:%M:%S", tmptr);
-  } else if (format == time_eFormat_TimeAndDate) {
+  }
+  else if (format == time_eFormat_TimeAndDate)
+  {
     strftime(buf, bufsize, "%H:%M:%S %d/%m/%y", tmptr);
-  } else {
+  }
+  else
+  {
     strftime(buf, bufsize, "%H:%M:%S", tmptr);
   }
 
@@ -1085,19 +1167,22 @@ pwr_tStatus time_AsciiToTm(const char* tstr, struct tm* tmptr)
   pwr_tStatus sts;
   int monstr = 0;
 
-  if (tstr[5] == '-') {
-    sscanf(tstr, "%02d-%02d-%4d %02d:%02d:%02d", &tt.tm_mday, &tt.tm_mon,
-	   &tt.tm_year, &tt.tm_hour, &tt.tm_min, &tt.tm_sec);
+  if (tstr[5] == '-')
+  {
+    sscanf(tstr, "%02d-%02d-%4d %02d:%02d:%02d", &tt.tm_mday, &tt.tm_mon, &tt.tm_year, &tt.tm_hour,
+           &tt.tm_min, &tt.tm_sec);
     tt.tm_mon--;
   }
-  else if (tstr[4] == '-') {
-    sscanf(tstr, "%4d-%02d-%02d %02d:%02d:%02d", &tt.tm_year, &tt.tm_mon,
-	   &tt.tm_mday, &tt.tm_hour, &tt.tm_min, &tt.tm_sec);
+  else if (tstr[4] == '-')
+  {
+    sscanf(tstr, "%4d-%02d-%02d %02d:%02d:%02d", &tt.tm_year, &tt.tm_mon, &tt.tm_mday, &tt.tm_hour,
+           &tt.tm_min, &tt.tm_sec);
     tt.tm_mon--;
   }
-  else {
-    sscanf(tstr, "%02d-%3c-%4d %02d:%02d:%02d", &tt.tm_mday, tmpMonStr,
-	   &tt.tm_year, &tt.tm_hour, &tt.tm_min, &tt.tm_sec);
+  else
+  {
+    sscanf(tstr, "%02d-%3c-%4d %02d:%02d:%02d", &tt.tm_mday, tmpMonStr, &tt.tm_year, &tt.tm_hour, &tt.tm_min,
+           &tt.tm_sec);
     monstr = 1;
   }
 
@@ -1111,15 +1196,18 @@ pwr_tStatus time_AsciiToTm(const char* tstr, struct tm* tmptr)
   tt.tm_isdst = -1;
 
   /* check month */
-  if (monstr) {
+  if (monstr)
+  {
     for (cp = tmpMonStr; *cp; cp++)
       *cp = toupper(*cp);
 
     tt.tm_mon = -1;
-    for (i = 0; i < 12; i++) {
-      if (streq(tmpMonStr, monStr[i])) {
-	tt.tm_mon = i;
-	break;
+    for (i = 0; i < 12; i++)
+    {
+      if (streq(tmpMonStr, monStr[i]))
+      {
+        tt.tm_mon = i;
+        break;
       }
     }
   }
@@ -1134,8 +1222,7 @@ pwr_tStatus time_AsciiToTm(const char* tstr, struct tm* tmptr)
 
 /* Compatibility-function that substitutes co_TimeToAsc.  */
 
-pwr_tStatus time_FormAsciiToA(
-    const char* tstr, short dissolution, short formType, pwr_tTime* ts)
+pwr_tStatus time_FormAsciiToA(const char* tstr, short dissolution, short formType, pwr_tTime* ts)
 {
   struct tm tmpTm;
   int i;
@@ -1153,7 +1240,8 @@ pwr_tStatus time_FormAsciiToA(
     cp++;
 
   /* Get year */
-  for (i = 0; i < 4; i++, cp++) {
+  for (i = 0; i < 4; i++, cp++)
+  {
     if (*cp == '\0' || !isdigit(*cp))
       return TIME__RANGE;
     buf[i] = *cp;
@@ -1165,7 +1253,8 @@ pwr_tStatus time_FormAsciiToA(
   cp++;
 
   /* Get month */
-  for (i = 0; i < 2; i++, cp++) {
+  for (i = 0; i < 2; i++, cp++)
+  {
     if (*cp == '\0' || !isdigit(*cp))
       return TIME__RANGE;
     buf[i] = *cp;
@@ -1179,7 +1268,8 @@ pwr_tStatus time_FormAsciiToA(
   cp++;
 
   /* Get Day */
-  for (i = 0; i < 2; i++, cp++) {
+  for (i = 0; i < 2; i++, cp++)
+  {
     if (*cp == '\0' || !isdigit(*cp))
       return TIME__RANGE;
     buf[i] = *cp;
@@ -1190,10 +1280,14 @@ pwr_tStatus time_FormAsciiToA(
   /* Build a new date string on VMS format, dd-mmm-yyyy ...*/
   sprintf(buf, "%02d-%s-%d%s", day, monStr[month], year, cp);
 
-  if (dissolution == MINUTE) {
+  if (dissolution == MINUTE)
+  {
     strcat(buf, ":00");
-  } else if (dissolution == HUNDRED) {
-    if ((dotp = strchr(buf, '.'))) {
+  }
+  else if (dissolution == HUNDRED)
+  {
+    if ((dotp = strchr(buf, '.')))
+    {
       int len;
       char* cp;
 
@@ -1224,32 +1318,38 @@ pwr_tStatus time_FormAsciiToA(
 
 /* .  */
 
-void time_AtoFormAscii(
-    pwr_tTime* ts, short dissolution, short formType, char buf[], int bufsize)
+void time_AtoFormAscii(pwr_tTime* ts, short dissolution, short formType, char buf[], int bufsize)
 {
   int len;
   struct tm* tmpTm;
   char tmphs[16];
   pwr_tTime time, *tp;
 
-  if (ts == NULL) {
+  if (ts == NULL)
+  {
     time_GetTime(&time);
     tp = &time;
-  } else {
+  }
+  else
+  {
     tp = ts;
   }
 
-  switch (formType) {
+  switch (formType)
+  {
   case GB:
   case SWE:
-  default: {
+  default:
+  {
     time_t sec = tp->tv_sec;
     tmpTm = localtime(&sec);
 
-    switch (dissolution) {
+    switch (dissolution)
+    {
     case HUNDRED:
       len = strftime(buf, bufsize, "%Y-%m-%d %H:%M:%S", tmpTm);
-      if (len != 0 && len + 4 <= bufsize) {
+      if (len != 0 && len + 4 <= bufsize)
+      {
         sprintf(tmphs, ".%02d", (int)(tp->tv_nsec / 10000000));
         strcat(buf, tmphs);
       }
@@ -1298,7 +1398,8 @@ pwr_tDeltaTime* time_FloatToD(pwr_tDeltaTime* dt, pwr_tFloat32 f)
   if (dt != NULL)
     t = dt;
 
-  if (isnan(f)) {
+  if (isnan(f))
+  {
     *t = pwr_cNotADeltaTime;
     return t;
   }
@@ -1321,7 +1422,8 @@ pwr_tDeltaTime* time_Float64ToD(pwr_tDeltaTime* dt, pwr_tFloat64 f)
   if (dt != NULL)
     t = dt;
 
-  if (isnan(f)) {
+  if (isnan(f))
+  {
     *t = pwr_cNotADeltaTime;
     return t;
   }
@@ -1345,7 +1447,8 @@ pwr_tFloat32 time_DToFloat(pwr_tFloat32* f, pwr_tDeltaTime* dt)
   if (f != NULL)
     fp = f;
 
-  if (notADeltaTime(dt)) {
+  if (notADeltaTime(dt))
+  {
     *fp = NAN;
     return *fp;
   }
@@ -1365,7 +1468,8 @@ pwr_tFloat64 time_DToFloat64(pwr_tFloat64* f, pwr_tDeltaTime* dt)
   if (f != NULL)
     fp = f;
 
-  if (notADeltaTime(dt)) {
+  if (notADeltaTime(dt))
+  {
     *fp = NAN;
     return *fp;
   }
@@ -1384,10 +1488,9 @@ time_tClock time_DtoClock(pwr_tStatus* status, pwr_tDeltaTime* tp)
 }
 
 //! Convert clock time to delta time.
-pwr_tDeltaTime* time_ClockToD(
-    pwr_tStatus* status, pwr_tDeltaTime* tp, time_tClock clock)
+pwr_tDeltaTime* time_ClockToD(pwr_tStatus* status, pwr_tDeltaTime* tp, time_tClock clock)
 {
-  pwr_tDeltaTime time;
+  static pwr_tDeltaTime time;
   pwr_dStatus(sts, status, TIME__SUCCESS);
 
   if (tp == NULL)
@@ -1450,8 +1553,7 @@ int time_GetTimeMonotonic(pwr_tTime* ts)
 }
 
 //! Calculate start and end time for month.
-int time_PeriodMonth(
-    pwr_tTime* time, pwr_tTime* from, pwr_tTime* to, int previous)
+int time_PeriodMonth(pwr_tTime* time, pwr_tTime* from, pwr_tTime* to, int previous)
 {
   struct tm* tm;
   int days, month, year;
@@ -1472,16 +1574,21 @@ int time_PeriodMonth(
   t = mktime(tm);
 
   year = tm->tm_year + 1900;
-  if (previous) {
-    if (tm->tm_mon == 0) {
+  if (previous)
+  {
+    if (tm->tm_mon == 0)
+    {
       month = 11;
       year--;
-    } else
+    }
+    else
       month = tm->tm_mon - 1;
-  } else
+  }
+  else
     month = tm->tm_mon;
 
-  switch (month) {
+  switch (month)
+  {
   case 1:
     if ((year % 4 == 0 && year % 100 != 0) || (year + 1900) % 400 == 0)
       days = 29;
@@ -1498,13 +1605,18 @@ int time_PeriodMonth(
     days = 31;
   }
 
-  if (previous) {
-    if (to) {
+  if (previous)
+  {
+    if (to)
+    {
       to->tv_sec = t;
       to->tv_nsec = 0;
     }
-  } else {
-    if (from) {
+  }
+  else
+  {
+    if (from)
+    {
       from->tv_sec = t;
       from->tv_nsec = 0;
     }
@@ -1524,13 +1636,18 @@ int time_PeriodMonth(
 
   t = mktime(tm);
 
-  if (previous) {
-    if (from) {
+  if (previous)
+  {
+    if (from)
+    {
       from->tv_sec = t;
       from->tv_nsec = 0;
     }
-  } else {
-    if (to) {
+  }
+  else
+  {
+    if (to)
+    {
       to->tv_sec = t;
       to->tv_nsec = 0;
     }
@@ -1540,8 +1657,7 @@ int time_PeriodMonth(
 }
 
 //! Calculate start and end time for year.
-static int time_PeriodYear(
-    pwr_tTime* time, pwr_tTime* from, pwr_tTime* to, int previous)
+static int time_PeriodYear(pwr_tTime* time, pwr_tTime* from, pwr_tTime* to, int previous)
 {
   struct tm* tm;
   int days, year;
@@ -1571,13 +1687,18 @@ static int time_PeriodYear(
   else
     days = 366;
 
-  if (previous) {
-    if (to) {
+  if (previous)
+  {
+    if (to)
+    {
       to->tv_sec = t;
       to->tv_nsec = 0;
     }
-  } else {
-    if (from) {
+  }
+  else
+  {
+    if (from)
+    {
       from->tv_sec = t;
       from->tv_nsec = 0;
     }
@@ -1598,13 +1719,18 @@ static int time_PeriodYear(
 
   t = mktime(tm);
 
-  if (previous) {
-    if (from) {
+  if (previous)
+  {
+    if (from)
+    {
       from->tv_sec = t;
       from->tv_nsec = 0;
     }
-  } else {
-    if (to) {
+  }
+  else
+  {
+    if (to)
+    {
       to->tv_sec = t;
       to->tv_nsec = 0;
     }
@@ -1637,11 +1763,13 @@ int time_PeriodPreviousWeek(pwr_tTime* time, pwr_tTime* from, pwr_tTime* to)
   tm->tm_hour = 0;
   t.tv_sec = mktime(tm);
 
-  if (from) {
+  if (from)
+  {
     from->tv_sec = t.tv_sec - days * ONEDAY;
     from->tv_nsec = 0;
   }
-  if (to) {
+  if (to)
+  {
     to->tv_sec = t.tv_sec + (7 - days) * ONEDAY;
     to->tv_nsec = 0;
   }
@@ -1665,8 +1793,7 @@ void time_PreviousDayBreak(pwr_tTime* time, pwr_tTime* daybreak)
   daybreak->tv_nsec = 0;
 }
 
-static void time_PeriodSec(
-    pwr_tTime* from, pwr_tTime* to, pwr_tTime* center, int sec)
+static void time_PeriodSec(pwr_tTime* from, pwr_tTime* to, pwr_tTime* center, int sec)
 {
   pwr_tStatus sts;
   pwr_tTime current;
@@ -1680,50 +1807,56 @@ static void time_PeriodSec(
   from->tv_nsec = to->tv_nsec;
 }
 
-void time_Period(time_ePeriod period, pwr_tTime* from, pwr_tTime* to,
-    pwr_tTime* center, int daybreak)
+void time_Period(time_ePeriod period, pwr_tTime* from, pwr_tTime* to, pwr_tTime* center, int daybreak)
 {
   int sts;
   pwr_tTime current;
 
-  switch (period) {
+  switch (period)
+  {
   case time_ePeriod_OneSecond:
-    if (!center) {
+    if (!center)
+    {
       time_Period(time_ePeriod_LastSecond, from, to, center, daybreak);
       return;
     }
     time_PeriodSec(from, to, center, 1);
     break;
   case time_ePeriod_10Seconds:
-    if (!center) {
+    if (!center)
+    {
       time_Period(time_ePeriod_10Seconds, from, to, center, daybreak);
       return;
     }
     time_PeriodSec(from, to, center, 10);
     break;
   case time_ePeriod_OneMinute:
-    if (!center) {
+    if (!center)
+    {
       time_Period(time_ePeriod_LastMinute, from, to, center, daybreak);
       return;
     }
     time_PeriodSec(from, to, center, 60);
     break;
   case time_ePeriod_10Minutes:
-    if (!center) {
+    if (!center)
+    {
       time_Period(time_ePeriod_Last10Minutes, from, to, center, daybreak);
       return;
     }
     time_PeriodSec(from, to, center, 600);
     break;
   case time_ePeriod_OneHour:
-    if (!center) {
+    if (!center)
+    {
       time_Period(time_ePeriod_LastHour, from, to, center, daybreak);
       return;
     }
     time_PeriodSec(from, to, center, 3600);
     break;
   case time_ePeriod_OneDay:
-    if (!center) {
+    if (!center)
+    {
       sts = time_GetTime(to);
       *from = *to;
       from->tv_sec -= ONEDAY;
@@ -1732,25 +1865,27 @@ void time_Period(time_ePeriod period, pwr_tTime* from, pwr_tTime* to,
     time_PeriodSec(from, to, center, ONEDAY);
     break;
   case time_ePeriod_OneWeek:
-    if (!center) {
+    if (!center)
+    {
       time_Period(time_ePeriod_LastWeek, from, to, center, daybreak);
       return;
     }
     time_PeriodSec(from, to, center, 7 * ONEDAY);
     break;
   case time_ePeriod_OneMonth:
-    if (!center) {
+    if (!center)
+    {
       time_Period(time_ePeriod_LastMonth, from, to, center, daybreak);
       return;
     }
     time_PeriodMonth(center, from, to, 0);
     int middle = from->tv_sec + (to->tv_sec - from->tv_sec) / 2;
     int half = middle - from->tv_sec;
-    if (center->tv_sec >= middle - ONEDAY / 2
-        && center->tv_sec <= middle + ONEDAY / 2)
+    if (center->tv_sec >= middle - ONEDAY / 2 && center->tv_sec <= middle + ONEDAY / 2)
       return;
 
-    if (center->tv_sec < middle) {
+    if (center->tv_sec < middle)
+    {
       // Take period from previous month
       time_PeriodMonth(center, from, to, 1);
       middle = from->tv_sec + (to->tv_sec - from->tv_sec) / 2;
@@ -1760,7 +1895,8 @@ void time_Period(time_ePeriod period, pwr_tTime* from, pwr_tTime* to,
     from->tv_sec = center->tv_sec - half;
 
     sts = time_GetTime(&current);
-    if (time_Acomp(to, &current) == 1) {
+    if (time_Acomp(to, &current) == 1)
+    {
       from->tv_sec = current.tv_sec - (to->tv_sec - from->tv_sec);
       from->tv_nsec = current.tv_sec;
       *to = current;
@@ -1797,7 +1933,8 @@ void time_Period(time_ePeriod period, pwr_tTime* from, pwr_tTime* to,
 
     time_PreviousDayBreak(from, from);
 
-    if (daybreak) {
+    if (daybreak)
+    {
       to->tv_sec += ONEDAY;
       time_PreviousDayBreak(to, to);
     }
@@ -1815,7 +1952,8 @@ void time_Period(time_ePeriod period, pwr_tTime* from, pwr_tTime* to,
     sts = time_PeriodPreviousWeek(&current, 0, from);
 
     *to = current;
-    if (daybreak) {
+    if (daybreak)
+    {
       to->tv_sec += ONEDAY;
       time_PreviousDayBreak(to, to);
     }
@@ -1831,7 +1969,8 @@ void time_Period(time_ePeriod period, pwr_tTime* from, pwr_tTime* to,
     sts = time_PeriodMonth(&current, 0, from, 1);
 
     *to = current;
-    if (daybreak) {
+    if (daybreak)
+    {
       to->tv_sec += ONEDAY;
       time_PreviousDayBreak(to, to);
     }
@@ -1848,17 +1987,20 @@ void time_Period(time_ePeriod period, pwr_tTime* from, pwr_tTime* to,
     sts = time_PeriodYear(&current, 0, from, 1);
 
     *to = current;
-    if (daybreak) {
+    if (daybreak)
+    {
       to->tv_sec += ONEDAY;
       time_PreviousDayBreak(to, to);
     }
     break;
-  default: {
+  default:
+  {
     // time_ePeriod_All:
     struct tm* tm;
 
     sts = time_GetTime(to);
-    if (daybreak) {
+    if (daybreak)
+    {
       to->tv_sec += ONEDAY;
       time_PreviousDayBreak(to, to);
     }
@@ -1879,15 +2021,17 @@ void time_Period(time_ePeriod period, pwr_tTime* from, pwr_tTime* to,
   }
 }
 
-void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from,
-    pwr_tTime* prev_to, pwr_tTime* from, pwr_tTime* to)
+void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from, pwr_tTime* prev_to, pwr_tTime* from,
+                         pwr_tTime* to)
 {
-  switch (period) {
+  switch (period)
+  {
   case time_ePeriod_OneSecond:
   case time_ePeriod_LastSecond:
     *to = *from = *prev_from;
     from->tv_sec -= 1;
-    if (from->tv_sec < 0) {
+    if (from->tv_sec < 0)
+    {
       from->tv_sec = 0;
       to->tv_sec = 1;
     }
@@ -1896,7 +2040,8 @@ void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from,
   case time_ePeriod_Last10Seconds:
     *to = *from = *prev_from;
     from->tv_sec -= 10;
-    if (from->tv_sec < 0) {
+    if (from->tv_sec < 0)
+    {
       from->tv_sec = 0;
       to->tv_sec = 10;
     }
@@ -1905,7 +2050,8 @@ void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from,
   case time_ePeriod_LastMinute:
     *to = *from = *prev_from;
     from->tv_sec -= 60;
-    if (from->tv_sec < 0) {
+    if (from->tv_sec < 0)
+    {
       from->tv_sec = 0;
       to->tv_sec = 60;
     }
@@ -1914,7 +2060,8 @@ void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from,
   case time_ePeriod_Last10Minutes:
     *to = *from = *prev_from;
     from->tv_sec -= 600;
-    if (from->tv_sec < 0) {
+    if (from->tv_sec < 0)
+    {
       from->tv_sec = 0;
       to->tv_sec = 600;
     }
@@ -1923,7 +2070,8 @@ void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from,
   case time_ePeriod_LastHour:
     *to = *from = *prev_from;
     from->tv_sec -= 3600;
-    if (from->tv_sec < 0) {
+    if (from->tv_sec < 0)
+    {
       from->tv_sec = 0;
       to->tv_sec = 3660;
     }
@@ -1933,7 +2081,8 @@ void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from,
   case time_ePeriod_Yesterday:
     *to = *from = *prev_from;
     from->tv_sec -= ONEDAY;
-    if (from->tv_sec < 0) {
+    if (from->tv_sec < 0)
+    {
       from->tv_sec = 0;
       to->tv_sec = ONEDAY;
     }
@@ -1943,7 +2092,8 @@ void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from,
   case time_ePeriod_LastWeek:
     *to = *from = *prev_from;
     from->tv_sec -= ONEDAY * 7;
-    if (from->tv_sec < 0) {
+    if (from->tv_sec < 0)
+    {
       from->tv_sec = 0;
       to->tv_sec = ONEDAY * 7;
     }
@@ -1955,7 +2105,8 @@ void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from,
     from->tv_sec += prev_from->tv_sec - to->tv_sec;
     from->tv_nsec = prev_from->tv_nsec;
     *to = *prev_from;
-    if (from->tv_sec < 0) {
+    if (from->tv_sec < 0)
+    {
       from->tv_sec = 0;
       to->tv_sec = ONEDAY * 30;
     }
@@ -1966,7 +2117,8 @@ void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from,
     from->tv_sec += prev_from->tv_sec - to->tv_sec;
     from->tv_nsec = prev_from->tv_nsec;
     *to = *prev_from;
-    if (from->tv_sec < 0) {
+    if (from->tv_sec < 0)
+    {
       from->tv_sec = 0;
       to->tv_sec = ONEDAY * 365;
     }
@@ -1978,7 +2130,8 @@ void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from,
     // Same lenth of intervall as before
     *to = *from = *prev_from;
     from->tv_sec -= prev_to->tv_sec - prev_from->tv_sec;
-    if (from->tv_sec < 0) {
+    if (from->tv_sec < 0)
+    {
       from->tv_sec = 0;
       to->tv_sec = prev_to->tv_sec - prev_from->tv_sec;
     }
@@ -1987,20 +2140,22 @@ void time_PreviousPeriod(time_ePeriod period, pwr_tTime* prev_from,
   }
 }
 
-void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
-    pwr_tTime* prev_to, pwr_tTime* from, pwr_tTime* to)
+void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from, pwr_tTime* prev_to, pwr_tTime* from,
+                     pwr_tTime* to)
 {
   int sts;
   pwr_tTime current;
 
   sts = time_GetTime(&current);
 
-  switch (period) {
+  switch (period)
+  {
   case time_ePeriod_OneSecond:
   case time_ePeriod_LastSecond:
     *to = *from = *prev_to;
     to->tv_sec += 1;
-    if (time_Acomp(&current, to) != 1) {
+    if (time_Acomp(&current, to) != 1)
+    {
       *to = current;
       from->tv_sec = current.tv_sec - 1;
       from->tv_nsec = current.tv_nsec;
@@ -2010,7 +2165,8 @@ void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
   case time_ePeriod_Last10Seconds:
     *to = *from = *prev_to;
     to->tv_sec += 10;
-    if (time_Acomp(&current, to) != 1) {
+    if (time_Acomp(&current, to) != 1)
+    {
       *to = current;
       from->tv_sec = current.tv_sec - 10;
       from->tv_nsec = current.tv_nsec;
@@ -2020,7 +2176,8 @@ void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
   case time_ePeriod_LastMinute:
     *to = *from = *prev_to;
     to->tv_sec += 60;
-    if (time_Acomp(&current, to) != 1) {
+    if (time_Acomp(&current, to) != 1)
+    {
       *to = current;
       from->tv_sec = current.tv_sec - 60;
       from->tv_nsec = current.tv_nsec;
@@ -2030,7 +2187,8 @@ void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
   case time_ePeriod_Last10Minutes:
     *to = *from = *prev_to;
     to->tv_sec += 600;
-    if (time_Acomp(&current, to) != 1) {
+    if (time_Acomp(&current, to) != 1)
+    {
       *to = current;
       from->tv_sec = current.tv_sec - 600;
       from->tv_nsec = current.tv_nsec;
@@ -2040,7 +2198,8 @@ void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
   case time_ePeriod_LastHour:
     *to = *from = *prev_to;
     to->tv_sec += 3600;
-    if (time_Acomp(&current, to) != 1) {
+    if (time_Acomp(&current, to) != 1)
+    {
       *to = current;
       from->tv_sec = current.tv_sec - 3600;
       from->tv_nsec = current.tv_nsec;
@@ -2051,7 +2210,8 @@ void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
   case time_ePeriod_Yesterday:
     *to = *from = *prev_to;
     to->tv_sec += ONEDAY;
-    if (time_Acomp(&current, to) != 1) {
+    if (time_Acomp(&current, to) != 1)
+    {
       *to = current;
       from->tv_sec = current.tv_sec - ONEDAY;
       from->tv_nsec = current.tv_nsec;
@@ -2062,7 +2222,8 @@ void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
   case time_ePeriod_LastWeek:
     *to = *from = *prev_to;
     to->tv_sec += 7 * ONEDAY;
-    if (time_Acomp(&current, to) != 1) {
+    if (time_Acomp(&current, to) != 1)
+    {
       *to = current;
       from->tv_sec = current.tv_sec - 7 * ONEDAY;
       from->tv_nsec = current.tv_nsec;
@@ -2074,7 +2235,8 @@ void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
     time_PeriodMonth(prev_to, from, to, 0);
     to->tv_sec += prev_to->tv_sec - from->tv_sec;
     *from = *prev_to;
-    if (time_Acomp(&current, to) != 1) {
+    if (time_Acomp(&current, to) != 1)
+    {
       *to = current;
       from->tv_sec = current.tv_sec - 30 * ONEDAY;
       from->tv_nsec = current.tv_nsec;
@@ -2085,7 +2247,8 @@ void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
     time_PeriodYear(prev_to, from, to, 0);
     to->tv_sec += prev_to->tv_sec - from->tv_sec;
     *from = *prev_to;
-    if (time_Acomp(&current, to) != 1) {
+    if (time_Acomp(&current, to) != 1)
+    {
       *to = current;
       from->tv_sec = current.tv_sec - 365 * ONEDAY;
       from->tv_nsec = current.tv_nsec;
@@ -2098,7 +2261,8 @@ void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
     // Same lenth of intervall as before
     *to = *from = *prev_to;
     to->tv_sec += prev_to->tv_sec - prev_from->tv_sec;
-    if (time_Acomp(&current, to) != 1) {
+    if (time_Acomp(&current, to) != 1)
+    {
       *to = current;
       from->tv_sec = current.tv_sec - (prev_to->tv_sec - prev_from->tv_sec);
       from->tv_nsec = current.tv_nsec;
@@ -2111,7 +2275,8 @@ void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
 int time_PeriodZoomIn(time_ePeriod* period)
 {
   int changed = 1;
-  switch (*period) {
+  switch (*period)
+  {
   case time_ePeriod_Last10Seconds:
   case time_ePeriod_10Seconds:
     *period = time_ePeriod_OneSecond;
@@ -2160,7 +2325,8 @@ int time_PeriodZoomOut(time_ePeriod* period)
 {
   int changed = 1;
 
-  switch (*period) {
+  switch (*period)
+  {
   case time_ePeriod_OneSecond:
   case time_ePeriod_LastSecond:
     *period = time_ePeriod_10Seconds;

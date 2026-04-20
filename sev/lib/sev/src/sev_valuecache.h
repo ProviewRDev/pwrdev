@@ -40,25 +40,29 @@
 #include "co_time.h"
 #include "rt_sev_msg.h"
 
-typedef enum {
+typedef enum
+{
   sev_eCvType_Point,
   sev_eCvType_Mean,
 } sev_eCvType;
 
-typedef struct {
+typedef struct
+{
   double val;
   double time;
   double epsilon;
 } sev_sCacheValueDouble;
 
-typedef struct {
+typedef struct
+{
   pwr_tBoolean val;
   pwr_tTime time;
 } sev_sCacheValueBool;
 
 #define VALUECACHE_SIZE 20
 
-class sev_valuecache {
+class sev_valuecache
+{
 public:
   sev_eCvType m_type;
   void* m_userdata;
@@ -71,12 +75,11 @@ public:
   virtual void add(void* value, pwr_tTime* time, void* thread);
   virtual int evaluate(double maxtime, void* thread);
   virtual void write(int index, void* thread);
-  virtual void set_write_cb(
-      void (*write_cb)(void*, int, void*, pwr_tTime*, void*), void* userdata,
-      int idx);
+  virtual void set_write_cb(void (*write_cb)(void*, int, void*, pwr_tTime*, void*), void* userdata, int idx);
 };
 
-class sev_valuecache_double : public sev_valuecache {
+class sev_valuecache_double : public sev_valuecache
+{
   static const int m_size;
   int m_length;
   int m_first;
@@ -94,8 +97,7 @@ class sev_valuecache_double : public sev_valuecache {
   double m_last_k;
 
 public:
-  sev_valuecache_double(
-      sev_eCvType type, double deadband_value, double deadband_time);
+  sev_valuecache_double(sev_eCvType type, double deadband_value, double deadband_time);
   sev_valuecache_double(const sev_valuecache_double& x);
   ~sev_valuecache_double();
   int length();
@@ -115,7 +117,8 @@ public:
   double get_k();
 };
 
-class sev_valuecache_bool : public sev_valuecache {
+class sev_valuecache_bool : public sev_valuecache
+{
   bool m_inited;
   sev_sCacheValueBool m_val;
   sev_sCacheValueBool m_wval;

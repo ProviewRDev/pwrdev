@@ -39,22 +39,21 @@
 
 #include "flow_rect.h"
 
-class FlowFrame : public FlowRect {
+class FlowFrame : public FlowRect
+{
 public:
-  FlowFrame(FlowCtx* flow_ctx, double x = 0, double y = 0, double w = 0,
-      double h = 0, flow_eDrawType d_type = flow_eDrawType_Line, int line_w = 1,
-      int fix_line_w = 0)
-      : FlowRect(flow_ctx, x, y, w, h, d_type, line_w, fix_line_w){}
+  FlowFrame(FlowCtx* flow_ctx, double x = 0, double y = 0, double w = 0, double h = 0,
+            flow_eDrawType d_type = flow_eDrawType_Line, int line_w = 1, int fix_line_w = 0)
+      : FlowRect(flow_ctx, x, y, w, h, d_type, line_w, fix_line_w)
+  {
+  }
   void save(std::ofstream& fp, flow_eSaveMode mode);
   void open(std::ifstream& fp);
   void draw(void* pos, int hightlight, int dimmed, int hot, void* node);
   void erase(void* pos, int hot, void* node);
-  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left,
-      double* y_high, double* y_low, void* node);
-  flow_eObjectType type()
-  {
-    return flow_eObjectType_Frame;
-  }
+  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,
+                   void* node);
+  flow_eObjectType type() { return flow_eObjectType_Frame; }
   int event_handler(void* pos, flow_eEvent event, int x, int y, void* node);
 };
 

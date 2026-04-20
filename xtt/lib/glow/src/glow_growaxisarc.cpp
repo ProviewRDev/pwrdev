@@ -51,7 +51,8 @@
 #define nearbyint rint
 #endif
 
-typedef struct {
+typedef struct
+{
   int lines;
   int longq;
   int vvalq;
@@ -59,16 +60,13 @@ typedef struct {
   char format[10];
 } sRange;
 
-GrowAxisArc::GrowAxisArc(GrowCtx* glow_ctx, const char* name, double x1,
-    double y1, double x2, double y2, int ang1, int ang2,
-    glow_eDrawType border_d_type, int line_w, int t_size,
-    glow_eDrawType t_drawtype, int nodraw)
-    : GrowArc(glow_ctx, name, x1, y1, x2, y2, ang1, ang2, border_d_type, line_w,
-          0, 0, 0, glow_eDrawType_Line, 1),
-      text_size(t_size), text_drawtype(t_drawtype),
-      text_color_drawtype(glow_eDrawType_Line), max_value(100), min_value(0),
-      lines(11), linelength(0.15), longquotient(1), valuequotient(1),
-      increment(0)
+GrowAxisArc::GrowAxisArc(GrowCtx* glow_ctx, const char* name, double x1, double y1, double x2, double y2,
+                         int ang1, int ang2, glow_eDrawType border_d_type, int line_w, int t_size,
+                         glow_eDrawType t_drawtype, int nodraw)
+    : GrowArc(glow_ctx, name, x1, y1, x2, y2, ang1, ang2, border_d_type, line_w, 0, 0, 0, glow_eDrawType_Line,
+              1),
+      text_size(t_size), text_drawtype(t_drawtype), text_color_drawtype(glow_eDrawType_Line), max_value(100),
+      min_value(0), lines(11), linelength(0.15), longquotient(1), valuequotient(1), increment(0)
 {
   strcpy(format, "%3.0f");
 
@@ -77,9 +75,7 @@ GrowAxisArc::GrowAxisArc(GrowCtx* glow_ctx, const char* name, double x1,
     draw();
 }
 
-GrowAxisArc::~GrowAxisArc()
-{
-}
+GrowAxisArc::~GrowAxisArc() {}
 
 void GrowAxisArc::configure()
 {
@@ -92,7 +88,7 @@ void GrowAxisArc::configure()
   increment = (max_value - min_value) / (lines - 1);
 }
 
-void GrowAxisArc::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowAxisArc::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowAxisArc) << '\n';
   fp << int(glow_eSave_GrowAxisArc_max_value) << FSPACE << max_value << '\n';
@@ -101,39 +97,39 @@ void GrowAxisArc::save(std::ofstream& fp, glow_eSaveMode mode)
   GrowArc::save(fp, mode);
   fp << int(glow_eSave_GrowAxisArc_lines) << FSPACE << lines << '\n';
   fp << int(glow_eSave_GrowAxisArc_linelength) << FSPACE << linelength << '\n';
-  fp << int(glow_eSave_GrowAxisArc_longquotient) << FSPACE << longquotient
-     << '\n';
-  fp << int(glow_eSave_GrowAxisArc_valuequotient) << FSPACE << valuequotient
-     << '\n';
+  fp << int(glow_eSave_GrowAxisArc_longquotient) << FSPACE << longquotient << '\n';
+  fp << int(glow_eSave_GrowAxisArc_valuequotient) << FSPACE << valuequotient << '\n';
   fp << int(glow_eSave_GrowAxisArc_format) << FSPACE << format << '\n';
   fp << int(glow_eSave_GrowAxisArc_text_size) << FSPACE << text_size << '\n';
-  fp << int(glow_eSave_GrowAxisArc_text_drawtype) << FSPACE
-     << int(text_drawtype) << '\n';
-  fp << int(glow_eSave_GrowAxisArc_text_color_drawtype) << FSPACE
-     << int(text_color_drawtype) << '\n';
-  if (user_data && ctx->userdata_save_callback) {
+  fp << int(glow_eSave_GrowAxisArc_text_drawtype) << FSPACE << int(text_drawtype) << '\n';
+  fp << int(glow_eSave_GrowAxisArc_text_color_drawtype) << FSPACE << int(text_color_drawtype) << '\n';
+  if (user_data && ctx->userdata_save_callback)
+  {
     fp << int(glow_eSave_GrowAxisArc_userdata_cb) << '\n';
     (ctx->userdata_save_callback)(&fp, this, glow_eUserdataCbType_Node);
   }
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowAxisArc::open(std::ifstream& fp)
+void GrowAxisArc::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowAxisArc: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowAxisArc:
       break;
     case glow_eSave_GrowAxisArc_max_value:
@@ -193,23 +189,24 @@ void GrowAxisArc::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
 {
   int tmp;
 
-  if (ll_x > ur_x) {
+  if (ll_x > ur_x)
+  {
     /* Shift */
     tmp = ll_x;
     ll_x = ur_x;
     ur_x = tmp;
   }
-  if (ll_y > ur_y) {
+  if (ll_y > ur_y)
+  {
     /* Shift */
     tmp = ll_y;
     ll_y = ur_y;
     ur_y = tmp;
   }
 
-  if (x_right * w->zoom_factor_x - w->offset_x >= ll_x
-      && x_left * w->zoom_factor_x - w->offset_x <= ur_x
-      && y_high * w->zoom_factor_y - w->offset_y >= ll_y
-      && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
+  if (x_right * w->zoom_factor_x - w->offset_x >= ll_x && x_left * w->zoom_factor_x - w->offset_x <= ur_x &&
+      y_high * w->zoom_factor_y - w->offset_y >= ll_y && y_low * w->zoom_factor_y - w->offset_y <= ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
   }
 }
@@ -222,21 +219,23 @@ void GrowAxisArc::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
   int obj_ur_y = int(y_high * w->zoom_factor_y) - w->offset_y;
   int obj_ll_y = int(y_low * w->zoom_factor_y) - w->offset_y;
 
-  if (*ll_x > *ur_x) {
+  if (*ll_x > *ur_x)
+  {
     /* Shift */
     tmp = *ll_x;
     *ll_x = *ur_x;
     *ur_x = tmp;
   }
-  if (*ll_y > *ur_y) {
+  if (*ll_y > *ur_y)
+  {
     /* Shift */
     tmp = *ll_y;
     *ll_y = *ur_y;
     *ur_y = tmp;
   }
 
-  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
-      && obj_ll_y <= *ur_y) {
+  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y && obj_ll_y <= *ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
 
     // Increase the redraw area
@@ -257,12 +256,13 @@ void GrowAxisArc::set_highlight(int on)
   draw();
 }
 
-void GrowAxisArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode, void *transpnode)
+void GrowAxisArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+                       void* transpnode)
 {
   if (ctx->nodraw)
     return;
-  if (w == &ctx->navw) {
+  if (w == &ctx->navw)
+  {
     if (ctx->no_nav)
       return;
     hot = 0;
@@ -274,15 +274,12 @@ void GrowAxisArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   int z_height, z_width, z_descent;
   double rotation;
   glow_eDrawType drawtype;
-  int text_idx
-      = int(w->zoom_factor_y / w->base_zoom_factor * (text_size + 4) - 4);
+  int text_idx = int(w->zoom_factor_y / w->base_zoom_factor * (text_size + 4) - 4);
   double tsize = w->zoom_factor_y / w->base_zoom_factor * (8 + 2 * text_size);
   text_idx = MIN(text_idx, DRAW_TYPE_SIZE - 1);
 
   if (node && ((GrowNode*)node)->line_width)
-    idx = int(
-        w->zoom_factor_y / w->base_zoom_factor * ((GrowNode*)node)->line_width
-        - 1);
+    idx = int(w->zoom_factor_y / w->base_zoom_factor * ((GrowNode*)node)->line_width - 1);
   else
     idx = int(w->zoom_factor_y / w->base_zoom_factor * line_width - 1);
   idx += hot;
@@ -291,19 +288,22 @@ void GrowAxisArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y, xt, yt;
 
-  double transp = transparency;  
+  double transp = transparency;
   if (colornode && ((GrowNode*)colornode)->transparency > transparency)
     transp = ((GrowNode*)colornode)->transparency;
   if (transpnode && ((GrowNode*)transpnode)->transparency > transp)
     transp = ((GrowNode*)transpnode)->transparency;
 
-  if (!t) {
+  if (!t)
+  {
     x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
     x2 = int(trf.x(ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
     y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
     rotation = (trf.rot() / 360 - floor(trf.rot() / 360)) * 360;
-  } else {
+  }
+  else
+  {
     x1 = int(trf.x(t, ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = int(trf.y(t, ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
     x2 = int(trf.x(t, ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
@@ -315,12 +315,11 @@ void GrowAxisArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   ur_x = MAX(x1, x2);
   ll_y = MIN(y1, y2);
   ur_y = MAX(y1, y2);
-  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
-      highlight, (GrowNode*)colornode, 0);
+  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight, (GrowNode*)colornode, 0);
 
   // Lines inwards
-  ctx->gdraw->arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-      angle1 - (int)rotation, angle2, drawtype, idx, 0, transp);
+  ctx->gdraw->arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, angle1 - (int)rotation, angle2, drawtype, idx, 0,
+                  transp);
 
   if (lines == 1)
     return;
@@ -329,57 +328,58 @@ void GrowAxisArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     format_text(text, format, min_value + (lines - 2) * increment);
   else
     format_text(text, format, min_value + increment);
-  ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype,
-      MAX(0, text_idx), glow_eFont_Helvetica, &z_width, &z_height, &z_descent,
-      tsize, 0);
+  ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype, MAX(0, text_idx), glow_eFont_Helvetica,
+                              &z_width, &z_height, &z_descent, tsize, 0);
 
   // z_descent=0;
   double line_angle = (double)angle2 / (lines - 1);
-  for (i = 0; i < lines; i++) {
+  for (i = 0; i < lines; i++)
+  {
     double sin1 = sin(((double)angle1 + i * line_angle) / 180 * M_PI);
     double cos1 = cos(((double)angle1 + i * line_angle) / 180 * M_PI);
     y1 = int(((double)ur_y - ll_y) / 2 * (-sin1 + 1) + ll_y);
     x1 = int(((double)ur_x - ll_x) / 2 * (cos1 + 1) + ll_x);
-    if (i % longquotient == 0) {
-      y2 = int(((double)ur_y - ll_y) / 2 * (-sin1 * (1.0 - linelength) + 1)
-               + ll_y);
-      x2 = int(
-          ((double)ur_x - ll_x) / 2 * (cos1 * (1.0 - linelength) + 1) + ll_x);
-    } else {
-      y2 = int(
-          ((double)ur_y - ll_y) / 2 * (-sin1 * (1.0 - linelength / 2) + 1)
-          + ll_y);
-      x2 = int(((double)ur_x - ll_x) / 2 * (cos1 * (1.0 - linelength / 2) + 1)
-          + ll_x);
+    if (i % longquotient == 0)
+    {
+      y2 = int(((double)ur_y - ll_y) / 2 * (-sin1 * (1.0 - linelength) + 1) + ll_y);
+      x2 = int(((double)ur_x - ll_x) / 2 * (cos1 * (1.0 - linelength) + 1) + ll_x);
     }
-    yt = int(((double)ur_y - ll_y) / 2 * (-sin1 * (1.0 - linelength) + 1)
-        + ll_y + sin1 * (z_height - z_descent) / 2);
-    xt = int(((double)ur_x - ll_x) / 2 * (cos1 * (1.0 - linelength) + 1)
-        + ll_x - cos1 * z_width / 2);
+    else
+    {
+      y2 = int(((double)ur_y - ll_y) / 2 * (-sin1 * (1.0 - linelength / 2) + 1) + ll_y);
+      x2 = int(((double)ur_x - ll_x) / 2 * (cos1 * (1.0 - linelength / 2) + 1) + ll_x);
+    }
+    yt = int(((double)ur_y - ll_y) / 2 * (-sin1 * (1.0 - linelength) + 1) + ll_y +
+             sin1 * (z_height - z_descent) / 2);
+    xt = int(((double)ur_x - ll_x) / 2 * (cos1 * (1.0 - linelength) + 1) + ll_x - cos1 * z_width / 2);
 
     ctx->gdraw->line(w, x1, y1, x2, y2, drawtype, idx, 0, transp);
-    if (draw_text) {
-      if (text_idx >= 0 && i % valuequotient == 0
-          && !(angle2 == 360 && ((increment > 0 && i == lines - 1)
-                                    || (increment < 0 && i == 0)))) {
+    if (draw_text)
+    {
+      if (text_idx >= 0 && i % valuequotient == 0 &&
+          !(angle2 == 360 && ((increment > 0 && i == lines - 1) || (increment < 0 && i == 0))))
+      {
         format_text(text, format, min_value + i * increment);
-        ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype,
-            MAX(0, text_idx), glow_eFont_Helvetica, &z_width, &z_height,
-            &z_descent, tsize, 0);
+        ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype, MAX(0, text_idx), glow_eFont_Helvetica,
+                                    &z_width, &z_height, &z_descent, tsize, 0);
 
-        if (i == lines - 1 && angle1 == 0 && angle2 == 180) {
+        if (i == lines - 1 && angle1 == 0 && angle2 == 180)
+        {
           // yt = yt - (z_height-z_descent)/2;
           xt = xt - z_width / 2;
-        } else if (i == 0 && angle1 == 0 && angle2 != 360) {
+        }
+        else if (i == 0 && angle1 == 0 && angle2 != 360)
+        {
           // yt = yt - (z_height-z_descent)/2;
           xt = xt - z_width / 2;
-        } else {
+        }
+        else
+        {
           yt = yt + (z_height - z_descent) / 2;
           xt = xt - z_width / 2;
         }
-        ctx->gdraw->text(w, xt, yt, text, strlen(text), text_drawtype,
-            text_color_drawtype, text_idx, highlight, 0, glow_eFont_Helvetica,
-            tsize, 0, transp);
+        ctx->gdraw->text(w, xt, yt, text, strlen(text), text_drawtype, text_color_drawtype, text_idx,
+                         highlight, 0, glow_eFont_Helvetica, tsize, 0, transp);
       }
     }
   }
@@ -387,25 +387,24 @@ void GrowAxisArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
 void GrowAxisArc::draw()
 {
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
 void GrowAxisArc::align(double x, double y, glow_eAlignDirection direction)
 {
-  double dx, dy;
+  double dx = 0, dy = 0;
 
   ctx->set_defered_redraw();
   draw();
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eAlignDirection_CenterVert:
     dx = x - (x_right + x_left) / 2;
     dy = 0;
@@ -454,8 +453,8 @@ void GrowAxisArc::set_textsize(int size)
 
 void GrowAxisArc::set_textbold(int bold)
 {
-  if ((bold && text_drawtype == glow_eDrawType_TextHelveticaBold)
-      || (!bold && text_drawtype == glow_eDrawType_TextHelvetica))
+  if ((bold && text_drawtype == glow_eDrawType_TextHelveticaBold) ||
+      (!bold && text_drawtype == glow_eDrawType_TextHelvetica))
     return;
 
   if (bold)
@@ -468,56 +467,56 @@ void GrowAxisArc::set_textbold(int bold)
 
 void GrowAxisArc::set_range(double minval, double maxval, int keep_settings)
 {
-  static sRange rdata[2][25] = { { { 26, 5, 5, 10, "%3.1f" }, // 1
-                                     { 21, 5, 5, 10, "%3.1f" }, // 2
-                                     { 31, 5, 10, 10, "%3.1f" }, // 3
-                                     { 41, 5, 10, 20, "%3.1f" }, // 4
-                                     { 26, 5, 5, 10, "%1.0f" }, // 5
-                                     { 31, 5, 10, 10, "%1.0f" }, // 6
-                                     { 36, 5, 10, 10, "%1.0f" }, // 7
-                                     { 17, 2, 4, 4, "%1.0f" }, // 8
-                                     { 19, 2, 4, 4, "%1.0f" }, // 9
-                                     { 21, 2, 4, 8, "%2.0f" }, // 10
-                                     { 23, 2, 4, 8, "%2.0f" }, // 11
-                                     { 13, 4, 4, 4, "%2.0f" }, // 12
-                                     { 14, 4, 4, 4, "%2.0f" }, // 13
-                                     { 15, 4, 4, 4, "%2.0f" }, // 14
-                                     { 16, 5, 5, 5, "%2.0f" }, // 15
-                                     { 17, 5, 5, 5, "%2.0f" }, // 16
-                                     { 18, 5, 5, 5, "%2.0f" }, // 17
-                                     { 19, 5, 5, 5, "%2.0f" }, // 18
-                                     { 20, 5, 5, 5, "%2.0f" }, // 19
-                                     { 21, 5, 5, 5, "%2.0f" }, // 20
-                                     { 22, 5, 5, 5, "%2.0f" }, // 21
-                                     { 23, 5, 5, 5, "%2.0f" }, // 22
-                                     { 24, 5, 5, 5, "%2.0f" }, // 23
-                                     { 25, 5, 5, 5, "%2.0f" }, // 24
-                                     { 26, 5, 5, 10, "%2.0f" } }, // 25
-    { { 101, 5, 10, 20, "%3.1f" }, // 1
-        { 101, 5, 10, 20, "%3.1f" }, // 2
-        { 61, 10, 10, 20, "%3.1f" }, // 3
-        { 81, 10, 10, 20, "%3.1f" }, // 4
-        { 101, 10, 20, 20, "%1.0f" }, // 5
-        { 61, 5, 10, 20, "%1.0f" }, // 6
-        { 71, 5, 10, 20, "%1.0f" }, // 7
-        { 81, 5, 10, 20, "%1.0f" }, // 8
-        { 91, 5, 10, 20, "%1.0f" }, // 9
-        { 101, 5, 10, 20, "%2.0f" }, // 10
-        { 56, 5, 5, 5, "%2.0f" }, // 11
-        { 61, 5, 10, 10, "%2.0f" }, // 12
-        { 66, 5, 10, 20, "%2.0f" }, // 13
-        { 71, 5, 10, 20, "%2.0f" }, // 14
-        { 76, 5, 10, 20, "%2.0f" }, // 15
-        { 81, 5, 10, 20, "%2.0f" }, // 16
-        { 86, 5, 10, 20, "%2.0f" }, // 17
-        { 91, 5, 10, 20, "%2.0f" }, // 18
-        { 96, 5, 10, 20, "%2.0f" }, // 19
-        { 101, 5, 10, 25, "%2.0f" }, // 20
-        { 43, 2, 6, 6, "%2.0f" }, // 21
-        { 45, 2, 4, 8, "%2.0f" }, // 22
-        { 47, 2, 4, 8, "%2.0f" }, // 23
-        { 49, 2, 4, 8, "%2.0f" }, // 24
-        { 26, 5, 5, 5, "%2.0f" } } }; // 25
+  static sRange rdata[2][25] = {{{26, 5, 5, 10, "%3.1f"},    // 1
+                                 {21, 5, 5, 10, "%3.1f"},    // 2
+                                 {31, 5, 10, 10, "%3.1f"},   // 3
+                                 {41, 5, 10, 20, "%3.1f"},   // 4
+                                 {26, 5, 5, 10, "%1.0f"},    // 5
+                                 {31, 5, 10, 10, "%1.0f"},   // 6
+                                 {36, 5, 10, 10, "%1.0f"},   // 7
+                                 {17, 2, 4, 4, "%1.0f"},     // 8
+                                 {19, 2, 4, 4, "%1.0f"},     // 9
+                                 {21, 2, 4, 8, "%2.0f"},     // 10
+                                 {23, 2, 4, 8, "%2.0f"},     // 11
+                                 {13, 4, 4, 4, "%2.0f"},     // 12
+                                 {14, 4, 4, 4, "%2.0f"},     // 13
+                                 {15, 4, 4, 4, "%2.0f"},     // 14
+                                 {16, 5, 5, 5, "%2.0f"},     // 15
+                                 {17, 5, 5, 5, "%2.0f"},     // 16
+                                 {18, 5, 5, 5, "%2.0f"},     // 17
+                                 {19, 5, 5, 5, "%2.0f"},     // 18
+                                 {20, 5, 5, 5, "%2.0f"},     // 19
+                                 {21, 5, 5, 5, "%2.0f"},     // 20
+                                 {22, 5, 5, 5, "%2.0f"},     // 21
+                                 {23, 5, 5, 5, "%2.0f"},     // 22
+                                 {24, 5, 5, 5, "%2.0f"},     // 23
+                                 {25, 5, 5, 5, "%2.0f"},     // 24
+                                 {26, 5, 5, 10, "%2.0f"}},   // 25
+                                {{101, 5, 10, 20, "%3.1f"},  // 1
+                                 {101, 5, 10, 20, "%3.1f"},  // 2
+                                 {61, 10, 10, 20, "%3.1f"},  // 3
+                                 {81, 10, 10, 20, "%3.1f"},  // 4
+                                 {101, 10, 20, 20, "%1.0f"}, // 5
+                                 {61, 5, 10, 20, "%1.0f"},   // 6
+                                 {71, 5, 10, 20, "%1.0f"},   // 7
+                                 {81, 5, 10, 20, "%1.0f"},   // 8
+                                 {91, 5, 10, 20, "%1.0f"},   // 9
+                                 {101, 5, 10, 20, "%2.0f"},  // 10
+                                 {56, 5, 5, 5, "%2.0f"},     // 11
+                                 {61, 5, 10, 10, "%2.0f"},   // 12
+                                 {66, 5, 10, 20, "%2.0f"},   // 13
+                                 {71, 5, 10, 20, "%2.0f"},   // 14
+                                 {76, 5, 10, 20, "%2.0f"},   // 15
+                                 {81, 5, 10, 20, "%2.0f"},   // 16
+                                 {86, 5, 10, 20, "%2.0f"},   // 17
+                                 {91, 5, 10, 20, "%2.0f"},   // 18
+                                 {96, 5, 10, 20, "%2.0f"},   // 19
+                                 {101, 5, 10, 25, "%2.0f"},  // 20
+                                 {43, 2, 6, 6, "%2.0f"},     // 21
+                                 {45, 2, 4, 8, "%2.0f"},     // 22
+                                 {47, 2, 4, 8, "%2.0f"},     // 23
+                                 {49, 2, 4, 8, "%2.0f"},     // 24
+                                 {26, 5, 5, 5, "%2.0f"}}};   // 25
 
   max_value = maxval;
   min_value = minval;
@@ -530,14 +529,12 @@ void GrowAxisArc::set_range(double minval, double maxval, int keep_settings)
   int y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
   double rotation = (trf.rot() / 360 - floor(trf.rot() / 360)) * 360;
 
-  if (!keep_settings) {
+  if (!keep_settings)
+  {
     int len;
     int lix;
     int di;
-    int horizontal = (rotation < 45 || (rotation > 135 && rotation < 225)
-                         || rotation > 315)
-        ? 0
-        : 1;
+    int horizontal = (rotation < 45 || (rotation > 135 && rotation < 225) || rotation > 315) ? 0 : 1;
     if (horizontal)
       len = ABS(x2 - x1);
     else
@@ -556,7 +553,8 @@ void GrowAxisArc::set_range(double minval, double maxval, int keep_settings)
     while (di >= 25)
       di /= 10;
 
-    if (di > 0 && di <= 25) {
+    if (di > 0 && di <= 25)
+    {
       lines = rdata[lix][di - 1].lines;
       longquotient = rdata[lix][di - 1].longq;
       if (horizontal)
@@ -592,25 +590,26 @@ void GrowAxisArc::set_range(double minval, double maxval, int keep_settings)
   draw();
 }
 
-void GrowAxisArc::export_javabean(GlowTransform* t, void* node,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, int in_nc,
-    std::ofstream& fp)
+void GrowAxisArc::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
+                                  int node_cnt, int in_nc, std::ostream& fp)
 {
   double x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
   double rotation;
   int bold;
-  int idx = int(
-      ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (text_size + 4) - 4);
+  int idx = int(ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (text_size + 4) - 4);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
 
   bold = (text_drawtype == glow_eDrawType_TextHelveticaBold);
 
-  if (!t) {
+  if (!t)
+  {
     x1 = trf.x(ll.x, ll.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = trf.y(ll.x, ll.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = trf.x(ur.x, ur.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y2 = trf.y(ur.x, ur.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
-  } else {
+  }
+  else
+  {
     x1 = trf.x(t, ll.x, ll.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = trf.y(t, ll.x, ll.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = trf.x(t, ur.x, ur.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
@@ -628,10 +627,9 @@ void GrowAxisArc::export_javabean(GlowTransform* t, void* node,
     rotation = (trf.rot() / 360 - floor(trf.rot() / 360)) * 360;
 
   ((GrowCtx*)ctx)
-      ->export_jbean->axisarc(ll_x, ll_y, ur_x, ur_y, angle1, angle2, draw_type,
-          text_color_drawtype, min_value, max_value, lines, longquotient,
-          valuequotient, linelength, line_width, rotation, bold, idx, format,
-          pass, shape_cnt, node_cnt, fp);
+      ->export_jbean->axisarc(ll_x, ll_y, ur_x, ur_y, angle1, angle2, draw_type, text_color_drawtype,
+                              min_value, max_value, lines, longquotient, valuequotient, linelength,
+                              line_width, rotation, bold, idx, format, pass, shape_cnt, node_cnt, fp);
 }
 
 int GrowAxisArc::trace_scan()
@@ -658,8 +656,8 @@ void GrowAxisArc::trace_close()
     ctx->trace_disconnect_func((void*)this);
 }
 
-void GrowAxisArc::set_conf(double max_val, double min_val, int no_of_lines,
-    int long_quot, int value_quot, double rot, const char* value_format)
+void GrowAxisArc::set_conf(double max_val, double min_val, int no_of_lines, int long_quot, int value_quot,
+                           double rot, const char* value_format)
 {
   max_value = max_val;
   min_value = min_val;
@@ -696,27 +694,34 @@ void GrowAxisArc::get_axis_info(glow_sAxisInfo* info)
 
 void GrowAxisArc::format_text(char* text, char* fmt, double value)
 {
-  if (streq(fmt, "%1t")) {
+  if (streq(fmt, "%1t"))
+  {
     // Hours, minutes and seconds, value in seconds
     int val = (int)nearbyint(value);
     int hours = val / 3600;
     int minutes = (val - hours * 3600) / 60;
     int seconds = (val - hours * 3600 - minutes * 60);
     sprintf(text, "%d:%02d:%02d", hours, minutes, seconds);
-  } else if (streq(fmt, "%2t")) {
+  }
+  else if (streq(fmt, "%2t"))
+  {
     // Hours and minutes, value in seconds
     int val = (int)nearbyint(value);
     int hours = val / 3600;
     int minutes = (val - hours * 3600) / 60;
     sprintf(text, "%d:%02d", hours, minutes);
-  } else if (streq(fmt, "%3t")) {
+  }
+  else if (streq(fmt, "%3t"))
+  {
     // Days, hours and minues, value in seconds
     int val = (int)nearbyint(value);
     int days = val / (24 * 3600);
     int hours = (val - days * 24 * 3600) / 3600;
     int minutes = (val - days * 24 * 3600 - hours * 3600) / 60;
     sprintf(text, "%d %02d:%02d", days, hours, minutes);
-  } else if (streq(fmt, "%10t")) {
+  }
+  else if (streq(fmt, "%10t"))
+  {
     // Date
     char timstr[40];
     pwr_tTime t;
@@ -726,7 +731,9 @@ void GrowAxisArc::format_text(char* text, char* fmt, double value)
     time_AtoAscii(&t, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
     timstr[19] = 0;
     strcpy(text, timstr);
-  } else if (streq(fmt, "%11t")) {
+  }
+  else if (streq(fmt, "%11t"))
+  {
     // Date, no seconds
     char timstr[40];
     pwr_tTime t;
@@ -736,13 +743,13 @@ void GrowAxisArc::format_text(char* text, char* fmt, double value)
     time_AtoAscii(&t, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
     timstr[16] = 0;
     strcpy(text, timstr);
-  } else {
+  }
+  else
+  {
     if (fabs(value) < FLT_EPSILON)
       value = 0;
     sprintf(text, fmt, value);
   }
 }
 
-void GrowAxisArc::convert(glow_eConvert version)
-{
-}
+void GrowAxisArc::convert(glow_eConvert version) {}

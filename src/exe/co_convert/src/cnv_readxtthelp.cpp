@@ -42,7 +42,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 #include "co_dcli.h"
 }
@@ -50,9 +51,7 @@ extern "C" {
 #include "pwr_names.h"
 #include "cnv_xtthelpto.h"
 
-CnvReadXtthelp::CnvReadXtthelp(
-    char* x_name, char* x_directory, CnvXtthelpTo* to)
-    : xtthelpto(to)
+CnvReadXtthelp::CnvReadXtthelp(char* x_name, char* x_directory, CnvXtthelpTo* to) : xtthelpto(to)
 {
   char* s;
 
@@ -66,15 +65,14 @@ CnvReadXtthelp::CnvReadXtthelp(
   strcpy(directory, x_directory);
 }
 
-void* help_insert_cb(void* ctx, navh_eItemType item_type, const char* text1,
-    const char* text2, const char* text3, const char* link,
-    const char* link_bookmark, const char* file_name, navh_eHelpFile file_type,
-    int help_index, const char* bookmark, int coding)
+void* help_insert_cb(void* ctx, navh_eItemType item_type, const char* text1, const char* text2,
+                     const char* text3, const char* link, const char* link_bookmark, const char* file_name,
+                     navh_eHelpFile file_type, int help_index, const char* bookmark, int coding)
 {
   CnvReadXtthelp* xh = (CnvReadXtthelp*)ctx;
 
-  return xh->xtthelpto->insert(item_type, text1, text2, text3, link,
-      link_bookmark, file_name, file_type, help_index, bookmark, coding);
+  return xh->xtthelpto->insert(item_type, text1, text2, text3, link, link_bookmark, file_name, file_type,
+                               help_index, bookmark, coding);
 }
 
 int CnvReadXtthelp::read_xtthelp()
@@ -82,22 +80,20 @@ int CnvReadXtthelp::read_xtthelp()
   int sts;
   void* bookmark_node;
 
-  if (xtthelpto->confpass()) {
+  if (xtthelpto->confpass())
+  {
     xtthelpto->set_confpass(true);
-    NavHelp* navhelp = new NavHelp(
-        (void*)this, pwr_cNameBaseWttHelp, pwr_cNameProjectXttHelp);
+    NavHelp* navhelp = new NavHelp((void*)this, pwr_cNameBaseWttHelp, pwr_cNameProjectXttHelp);
     navhelp->insert_cb = help_insert_cb;
     navhelp->set_propagate(0); // Don't print include files
 
-    sts = navhelp->help(
-        NULL, "", navh_eHelpFile_Other, filename, &bookmark_node);
+    sts = navhelp->help(NULL, "", navh_eHelpFile_Other, filename, &bookmark_node);
     if (EVEN(sts))
       return sts;
     delete navhelp;
     xtthelpto->set_confpass(false);
   }
-  NavHelp* navhelp
-      = new NavHelp((void*)this, pwr_cNameBaseWttHelp, pwr_cNameProjectXttHelp);
+  NavHelp* navhelp = new NavHelp((void*)this, pwr_cNameBaseWttHelp, pwr_cNameProjectXttHelp);
   navhelp->insert_cb = help_insert_cb;
   navhelp->set_propagate(0); // Don't print include files
   sts = navhelp->help(NULL, "", navh_eHelpFile_Other, filename, &bookmark_node);

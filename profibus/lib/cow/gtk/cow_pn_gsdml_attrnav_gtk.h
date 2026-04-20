@@ -45,9 +45,9 @@
 class GsdmlAttrNavGtk : public GsdmlAttrNav
 {
 public:
-  GsdmlAttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-                  const char* xn_name, pn_gsdml* xn_gsdml, std::shared_ptr<ProfinetRuntimeData> pwr_pn_data, int xn_edit_mode,
-                  GtkWidget** w, pwr_tStatus* status);
+  GsdmlAttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name, pn_gsdml* xn_gsdml,
+                  std::shared_ptr<ProfinetRuntimeData> pwr_pn_data, int xn_edit_mode, GtkWidget** w,
+                  pwr_tStatus* status);
   ~GsdmlAttrNavGtk();
   void set_inputfocus();
   void display_attr_help_text();

@@ -44,8 +44,7 @@
 /**
  * Adds a remote class volume.
  */
-void cvolcm_AddClassVolume(
-    pwr_tStatus* sts, gdb_sNode* np, const net_sGvolume* vp)
+void cvolcm_AddClassVolume(pwr_tStatus* sts, gdb_sNode* np, const net_sGvolume* vp)
 {
   gdb_sCclassVolume *ccvp, *rp;
   gdb_sVolume* cvp;
@@ -65,13 +64,15 @@ void cvolcm_AddClassVolume(
   if (cvp == NULL) /* This volume doesn't exist locally, but we may create it
                       later on */
     ccvp->equalClasses = 0;
-  else {
+  else
+  {
     pwr_tTime t = net_NetTimeToTime(&cvp->g.time);
     ccvp->equalClasses = time_Acomp(&ccvp->time, &t) == 0 ? 1 : 0;
   }
 
   rp = hash_Insert(sts, gdbroot->ccvol_ht, ccvp);
-  if (rp == NULL) { /* This was previously a bugcheck but obviously can occur */
+  if (rp == NULL)
+  { /* This was previously a bugcheck but obviously can occur */
     pool_Free(NULL, gdbroot->pool, ccvp);
     return;
   }
@@ -81,20 +82,18 @@ void cvolcm_AddClassVolume(
 
 /* .  */
 
-gdb_sVolume* cvolcm_ConnectVolume(
-    pwr_tStatus* sts, gdb_sVolume* vp, net_sGvolume* gvp, gdb_sNode* np)
+gdb_sVolume* cvolcm_ConnectVolume(pwr_tStatus* sts, gdb_sVolume* vp, net_sGvolume* gvp, gdb_sNode* np)
 {
   gdb_sTouchQ* tqp;
   gdb_sVolume* ovp;
 
   gdb_AssumeLocked;
 
-  if (vp->g.nid != pwr_cNNodeId && vp->g.nid != np->nid) {
-    errh_Error(
-        "Volume %s (%s) is loaded from another node.\nCurrent: %s, new: %s",
-        vp->g.name.orig, cdh_VolumeIdToString(0, 0, vp->g.vid, 1, 0),
-        cdh_NodeIdToString(NULL, vp->g.nid, 1, 0),
-        cdh_NodeIdToString(NULL, np->nid, 1, 0));
+  if (vp->g.nid != pwr_cNNodeId && vp->g.nid != np->nid)
+  {
+    errh_Error("Volume %s (%s) is loaded from another node.\nCurrent: %s, new: %s", vp->g.name.orig,
+               cdh_VolumeIdToString(0, 0, vp->g.vid, 1, 0), cdh_NodeIdToString(NULL, vp->g.nid, 1, 0),
+               cdh_NodeIdToString(NULL, np->nid, 1, 0));
     return NULL;
   }
 
@@ -107,15 +106,18 @@ gdb_sVolume* cvolcm_ConnectVolume(
   /* Add volume name to hash table.  */
 
   ovp = hash_Search(NULL, gdbroot->vn_ht, &vp->g.name);
-  if (ovp != NULL) {
-    if (ovp != vp) {
-      errh_Warning("Volume name allready exist: %s, vid: %x\n", vp->g.name.orig,
-          vp->g.vid);
+  if (ovp != NULL)
+  {
+    if (ovp != vp)
+    {
+      errh_Warning("Volume name allready exist: %s, vid: %x\n", vp->g.name.orig, vp->g.vid);
       hash_Remove(NULL, gdbroot->vn_ht, ovp);
       ovp = hash_Insert(sts, gdbroot->vn_ht, vp);
       pwr_Assert(ovp == vp);
     }
-  } else {
+  }
+  else
+  {
     ovp = hash_Insert(sts, gdbroot->vn_ht, vp);
     pwr_Assert(ovp == vp);
   }
@@ -205,7 +207,8 @@ void cvolcm_DeleteObject(qcom_sGet* get)
   {
     pop = hash_Search(&sts, gdbroot->oid_ht, &dop->par.oid);
     op = hash_Search(&sts, gdbroot->oid_ht, &dop->notify.oid);
-    if (op != NULL) {
+    if (op != NULL)
+    {
       pwr_Assert(cdh_ObjidIsEqual(op->g.f.poid, dop->par.oid));
       vp = pool_Address(NULL, gdbroot->pool, op->l.vr);
       cvol_FreeObject(&sts, vp, op, vol_mLink_cacheDelete);
@@ -215,7 +218,8 @@ void cvolcm_DeleteObject(qcom_sGet* get)
       break;
 
     pop->g.soid = dop->par.soid;
-    if (cdh_ObjidIsNull(pop->g.soid)) {
+    if (cdh_ObjidIsNull(pop->g.soid))
+    {
       pop->g.flags.b.isParent = 0;
     }
 
@@ -246,7 +250,8 @@ void cvolcm_FlushNode(pwr_tStatus* sts, gdb_sNode* np)
   pwr_Assert(np != gdbroot->my_node && np != gdbroot->no_node);
 
   for (vl = pool_Qsucc(NULL, gdbroot->pool, &np->own_lh); vl != &np->own_lh;
-       vl = pool_Qsucc(NULL, gdbroot->pool, &np->own_lh)) {
+       vl = pool_Qsucc(NULL, gdbroot->pool, &np->own_lh))
+  {
     vp = pool_Qitem(vl, gdb_sVolume, l.own_ll);
     pwr_Assert(vp->l.flags.b.isCached);
     if (vp->l.flags.b.isCached)
@@ -254,7 +259,8 @@ void cvolcm_FlushNode(pwr_tStatus* sts, gdb_sNode* np)
   }
 
   for (vl = pool_Qsucc(NULL, gdbroot->pool, &np->ccvol_lh); vl != &np->ccvol_lh;
-       vl = pool_Qsucc(NULL, gdbroot->pool, &np->ccvol_lh)) {
+       vl = pool_Qsucc(NULL, gdbroot->pool, &np->ccvol_lh))
+  {
     cvp = pool_Qitem(vl, gdb_sCclassVolume, ccvol_ll);
 
     hash_Remove(&lsts, gdbroot->ccvol_ht, cvp);
@@ -282,9 +288,11 @@ void cvolcm_FlushVolume(pwr_tStatus* sts, gdb_sVolume* vp)
   gdb_AssumeLocked;
 
   for (ol = pool_Qsucc(NULL, gdbroot->pool, &vp->l.obj_lh); ol != &vp->l.obj_lh;
-       ol = pool_Qsucc(NULL, gdbroot->pool, &vp->l.obj_lh)) {
+       ol = pool_Qsucc(NULL, gdbroot->pool, &vp->l.obj_lh))
+  {
     op = pool_Qitem(ol, gdb_sObject, l.obj_ll);
-    if (op->l.flags.b.isMountServer) {
+    if (op->l.flags.b.isMountServer)
+    {
       msp = hash_Search(sts, gdbroot->ms_ht, &op->g.oid);
       if (msp == NULL)
         errh_Bugcheck(*sts, "mount server inconsitency");
@@ -328,21 +336,26 @@ void cvolcm_MoveObject(qcom_sGet* get)
   gdb_ScopeLock
   {
     op = hash_Search(&sts, gdbroot->oid_ht, &mop->notify.oid);
-    if (op != NULL) {
+    if (op != NULL)
+    {
       pop = hash_Search(&sts, gdbroot->oid_ht, &mop->npar.oid);
       vp = pool_Address(NULL, gdbroot->pool, op->l.vr);
-      if (pop == NULL) {
+      if (pop == NULL)
+      {
         /* New father is not in the cache => delete object from cache.  */
         cvol_FreeObject(NULL, vp, op, vol_mLink_cacheDelete);
         op = NULL;
-      } else {
+      }
+      else
+      {
         cvol_UnlinkObject(&sts, vp, op, vol_mLink_cacheMove);
         vol_UnlinkObject(&sts, vp, op, vol_mLink_cacheMove);
       }
     }
 
     pop = hash_Search(&sts, gdbroot->oid_ht, &mop->opar.oid);
-    if (pop != NULL) {
+    if (pop != NULL)
+    {
       pop->g.soid = mop->opar.soid;
 
       soid = mop->opar.oid;
@@ -359,7 +372,8 @@ void cvolcm_MoveObject(qcom_sGet* get)
     }
 
     pop = hash_Search(&sts, gdbroot->oid_ht, &mop->npar.oid);
-    if (pop != NULL) {
+    if (pop != NULL)
+    {
       pop->g.soid = mop->npar.soid;
 
       soid = mop->npar.oid;
@@ -374,7 +388,8 @@ void cvolcm_MoveObject(qcom_sGet* get)
         sop->g.sib.blink = mop->nsib.newblink;
     }
 
-    if (op != NULL) {
+    if (op != NULL)
+    {
       vol_LinkObject(&sts, vp, op, vol_mLink_cacheMove);
       cvol_LinkObject(&sts, vp, op, vol_mLink_cacheMove);
     }
@@ -421,7 +436,8 @@ void cvolcm_TrimOld()
 
   gdb_AssumeLocked;
 
-  while (fqp->lc < fqp->lc_min) {
+  while (fqp->lc < fqp->lc_min)
+  {
     ol = pool_Qpred(NULL, gdbroot->pool, &oqp->lh);
     if (ol == &oqp->lh)
       break;
@@ -444,17 +460,19 @@ void cvolcm_ExternVolumeFlush(gdb_sNode* np)
   gdb_AssumeLocked;
 
   for (vl = pool_Qsucc(NULL, gdbroot->pool, &np->own_lh); vl != &np->own_lh;
-       vl = pool_Qsucc(NULL, gdbroot->pool, vl)) {
+       vl = pool_Qsucc(NULL, gdbroot->pool, vl))
+  {
     vp = pool_Qitem(vl, gdb_sVolume, l.own_ll);
     pwr_Assert(vp->l.flags.b.isCached);
-    if (vp->l.flags.b.isCached) {
-      for (ol = pool_Qsucc(NULL, gdbroot->pool, &vp->l.obj_lh);
-           ol != &vp->l.obj_lh;
-           ol = pool_Qsucc(NULL, gdbroot->pool, &vp->l.obj_lh)) {
+    if (vp->l.flags.b.isCached)
+    {
+      for (ol = pool_Qsucc(NULL, gdbroot->pool, &vp->l.obj_lh); ol != &vp->l.obj_lh;
+           ol = pool_Qsucc(NULL, gdbroot->pool, &vp->l.obj_lh))
+      {
         op = pool_Qitem(ol, gdb_sObject, l.obj_ll);
-        if (op->l.flags.b.isMountServer) {
-          msp = (gdb_sMountServer*)hash_Search(
-              &sts, gdbroot->ms_ht, &op->g.oid);
+        if (op->l.flags.b.isMountServer)
+        {
+          msp = (gdb_sMountServer*)hash_Search(&sts, gdbroot->ms_ht, &op->g.oid);
           if (msp == NULL)
             errh_Bugcheck(sts, "mount server inconsitency");
           msp->msor = pool_cNRef;

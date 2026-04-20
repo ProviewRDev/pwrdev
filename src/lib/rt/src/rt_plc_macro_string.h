@@ -48,10 +48,10 @@
   store string value
   @aref stosv StoSv
 */
-#define stosv_exec(obj, in)                                                    \
-  lck_LockStr;                                                                 \
-  strncpy(obj->ActualValue, in, sizeof(obj->ActualValue));                     \
-  obj->ActualValue[sizeof(obj->ActualValue) - 1] = 0;                          \
+#define stosv_exec(obj, in)                                                                                  \
+  lck_LockStr;                                                                                               \
+  strncpy(obj->ActualValue, in, sizeof(obj->ActualValue));                                                   \
+  obj->ActualValue[sizeof(obj->ActualValue) - 1] = 0;                                                        \
   lck_UnlockStr;
 
 /*_*
@@ -59,22 +59,23 @@
   store conditionally into string value
   @aref cstosv CStoSv
 */
-#define cstosv_exec(obj, in, cond)                                             \
-  if (cond) {                                                                  \
-    lck_LockStr;                                                               \
-    strncpy(obj->ActualValue, in, sizeof(obj->ActualValue));                   \
-    obj->ActualValue[sizeof(obj->ActualValue) - 1] = 0;                        \
-    lck_UnlockStr;                                                             \
+#define cstosv_exec(obj, in, cond)                                                                           \
+  if (cond)                                                                                                  \
+  {                                                                                                          \
+    lck_LockStr;                                                                                             \
+    strncpy(obj->ActualValue, in, sizeof(obj->ActualValue));                                                 \
+    obj->ActualValue[sizeof(obj->ActualValue) - 1] = 0;                                                      \
+    lck_UnlockStr;                                                                                           \
   }
 
 /*_*
   STRCAT
   @aref strcat Strcat
 */
-#define Strcat_exec(obj, str1, str2)                                           \
-  strncpy(obj->ActVal, str1, sizeof(obj->ActVal));                             \
-  if (strlen(str1) < sizeof(obj->ActVal))                                      \
-    strncat(obj->ActVal, str2, sizeof(obj->ActVal) - strlen(str1));            \
+#define Strcat_exec(obj, str1, str2)                                                                         \
+  strncpy(obj->ActVal, str1, sizeof(obj->ActVal));                                                           \
+  if (strlen(str1) < sizeof(obj->ActVal))                                                                    \
+    strncat(obj->ActVal, str2, sizeof(obj->ActVal) - strlen(str1));                                          \
   obj->ActVal[sizeof(obj->ActVal) - 1] = 0;
 
 /*_*
@@ -100,10 +101,10 @@
   Store into string attribute
   @aref stosp StoSp
 */
-#define stosp_exec(ut, in, size)                                               \
-  lck_LockStr;                                                                 \
-  strncpy(ut, in, size);                                                       \
-  ut[size - 1] = 0;                                                            \
+#define stosp_exec(ut, in, size)                                                                             \
+  lck_LockStr;                                                                                               \
+  strncpy(ut, in, size);                                                                                     \
+  ut[size - 1] = 0;                                                                                          \
   lck_UnlockStr;
 
 /*_*
@@ -111,12 +112,13 @@
   Store conditionally into string attribute
   @aref cstosp CStoSp
 */
-#define cstosp_exec(ut, in, cond, size)                                        \
-  if (cond) {                                                                  \
-    lck_LockStr;                                                               \
-    strncpy(ut, in, size);                                                     \
-    ut[size - 1] = 0;                                                          \
-    lck_UnlockStr;                                                             \
+#define cstosp_exec(ut, in, cond, size)                                                                      \
+  if (cond)                                                                                                  \
+  {                                                                                                          \
+    lck_LockStr;                                                                                             \
+    strncpy(ut, in, size);                                                                                   \
+    ut[size - 1] = 0;                                                                                        \
+    lck_UnlockStr;                                                                                           \
   }
 
 /*_*
@@ -124,10 +126,10 @@
   Store a number of characters into string attribute
   @aref stonumsp StoNumSp
 */
-#define stonumsp_exec(ut, in, size, num)                                       \
-  lck_LockStr;                                                                 \
-  strncpy(ut, in, num < size ? num : size);                                    \
-  ut[size - 1] = 0;                                                            \
+#define stonumsp_exec(ut, in, size, num)                                                                     \
+  lck_LockStr;                                                                                               \
+  strncpy(ut, in, num < size ? num : size);                                                                  \
+  ut[size - 1] = 0;                                                                                          \
   lck_UnlockStr;
 
 /*_*
@@ -135,12 +137,13 @@
   Store conditionally a number of characters into string attribute
   @aref cstonumsp CStoNumSp
 */
-#define cstonumsp_exec(ut, in, cond, size, num)                                \
-  if (cond) {                                                                  \
-    lck_LockStr;                                                               \
-    strncpy(ut, in, num < size ? num : size);                                  \
-    ut[size - 1] = 0;                                                          \
-    lck_UnlockStr;                                                             \
+#define cstonumsp_exec(ut, in, cond, size, num)                                                              \
+  if (cond)                                                                                                  \
+  {                                                                                                          \
+    lck_LockStr;                                                                                             \
+    strncpy(ut, in, num < size ? num : size);                                                                \
+    ut[size - 1] = 0;                                                                                        \
+    lck_UnlockStr;                                                                                           \
   }
 
 /*_*
@@ -148,21 +151,22 @@
   Get string attribute
   @aref getsp GetSp
 */
-#define GetSp_exec(object, in)                                                 \
-  lck_LockStr;                                                                 \
-  strncpy(object->ActVal, in, sizeof(object->ActVal));                         \
+#define GetSp_exec(object, in)                                                                               \
+  lck_LockStr;                                                                                               \
+  strncpy(object->ActVal, in, sizeof(object->ActVal));                                                       \
   lck_UnlockStr;
 
 /*_*
   SUBSTR
   @aref substr SubStr
 */
-#define SubStr_exec(obj, in)                                                   \
-  if (obj->Start < strlen(in)) {                                               \
-    strncpy(                                                                   \
-        obj->ActVal, &in[obj->Start], MIN(obj->Length, sizeof(obj->ActVal)));  \
-    obj->ActVal[MIN(obj->Length, sizeof(obj->ActVal) - 1)] = 0;                \
-  } else                                                                       \
+#define SubStr_exec(obj, in)                                                                                 \
+  if (obj->Start < strlen(in))                                                                               \
+  {                                                                                                          \
+    strncpy(obj->ActVal, &in[obj->Start], MIN(obj->Length, sizeof(obj->ActVal)));                            \
+    obj->ActVal[MIN(obj->Length, sizeof(obj->ActVal) - 1)] = 0;                                              \
+  }                                                                                                          \
+  else                                                                                                       \
     strcpy(obj->ActVal, "");
 
 /*_*
@@ -170,8 +174,7 @@
   Get string value by reference
   @aref getrefs GetRefS
 */
-#define GetRefS_exec(obj, value)                                               \
-  strncpy(obj->ActVal, value, sizeof(obj->ActVal));
+#define GetRefS_exec(obj, value) strncpy(obj->ActVal, value, sizeof(obj->ActVal));
 
 /*_*
   StoRefS
@@ -185,6 +188,6 @@
   Conditionally store analog value by reference
   @aref cstorefs CStoRefS
 */
-#define CStoRefS_exec(out, in, cond, size)                                     \
-  if (cond)                                                                    \
+#define CStoRefS_exec(out, in, cond, size)                                                                   \
+  if (cond)                                                                                                  \
     strncpy(out, in, size);

@@ -5,7 +5,8 @@
 
 #define USB_MAX_CARDS 50
 
-typedef struct {
+typedef struct
+{
   int USB_Handle[USB_MAX_CARDS];
   unsigned int snum[USB_MAX_CARDS];
 } io_sLocalUSB;

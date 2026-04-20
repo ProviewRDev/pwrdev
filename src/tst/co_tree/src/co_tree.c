@@ -42,7 +42,8 @@
 
 #include "co_tree.h"
 
-typedef struct {
+typedef struct
+{
   tree_sNode node;
   int key;
   int count;
@@ -58,30 +59,35 @@ main()
   char* cp;
   char c;
 
-  tp = tree_CreateTable(sizeof(int), offsetof(sNode, key), sizeof(sNode), 100,
-      tree_eComp_int32, NULL);
+  tp = tree_CreateTable(sizeof(int), offsetof(sNode, key), sizeof(sNode), 100, tree_eComp_int32, NULL);
 
-  for (i = 0; i < 1000; i += 10) {
+  for (i = 0; i < 1000; i += 10)
+  {
     tree_Insert(tp, &i);
   }
 
-  for (;;) {
+  for (;;)
+  {
     printf("Command: ");
     cp = gets(s);
     c = s[0];
-    if (cp == NULL || c == '\0') {
+    if (cp == NULL || c == '\0')
+    {
       printf("\nGoodbye\n");
       return;
     }
-    switch (c) {
+    switch (c)
+    {
     case 'i':
     case 'I':
       printf("Insert, Key: ");
       gets(s);
       key = atoi(s);
-      if (tree_Find(tp, &key) == NULL) {
+      if (tree_Find(tp, &key) == NULL)
+      {
         tree_Insert(tp, &key);
-      } else
+      }
+      else
         printf("\nKey allready exists!\n");
       break;
     case 'd':
@@ -89,9 +95,11 @@ main()
       printf("Delete, Key: ");
       gets(s);
       key = atoi(s);
-      if ((np = tree_Find(tp, &key)) != NULL) {
+      if ((np = tree_Find(tp, &key)) != NULL)
+      {
         tree_Remove(tp, &key);
-      } else
+      }
+      else
         printf("\nKey does not exist!\n");
       break;
     case 'f':
@@ -99,9 +107,11 @@ main()
       printf("Find, Key: ");
       gets(s);
       key = atoi(s);
-      if ((np = tree_Find(tp, &key)) == NULL) {
+      if ((np = tree_Find(tp, &key)) == NULL)
+      {
         printf("\nKey does not exist!\n");
-      } else
+      }
+      else
         printf("\nKey exists! %d\n", np->key);
       break;
     case 's':
@@ -109,9 +119,11 @@ main()
       printf("Find successor, Key: ");
       gets(s);
       key = atoi(s);
-      if ((np = tree_FindSuccessor(tp, &key)) == NULL) {
+      if ((np = tree_FindSuccessor(tp, &key)) == NULL)
+      {
         printf("\nKey does not exist!\n");
-      } else
+      }
+      else
         printf("\nKey exists! %d\n", np->key);
       break;
     case 'p':
@@ -119,9 +131,11 @@ main()
       printf("Find predecessor, Key: ");
       gets(s);
       key = atoi(s);
-      if ((np = tree_FindPredecessor(tp, &key)) == NULL) {
+      if ((np = tree_FindPredecessor(tp, &key)) == NULL)
+      {
         printf("\nKey does not exist!\n");
-      } else
+      }
+      else
         printf("\nKey exists! %d\n", np->key);
       break;
     case 'q':

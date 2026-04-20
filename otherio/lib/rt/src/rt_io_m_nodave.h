@@ -3,7 +3,8 @@
 #ifndef rt_io_m_nodave_h
 #define rt_io_m_nodave_h
 
-typedef struct {
+typedef struct
+{
   _daveOSserialType fds;
   daveInterface* di;
   daveConnection* dc;
@@ -15,7 +16,8 @@ typedef struct {
   unsigned int output_size;
 } io_sRackLocal;
 
-typedef struct {
+typedef struct
+{
   int status;
   int interval_cnt;
   int has_read_method;

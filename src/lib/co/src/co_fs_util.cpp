@@ -39,8 +39,8 @@
 
 void basename(char* _filepath, char** _basename)
 {
-    if ((*_basename = strrchr(_filepath, '/')))
-        (*_basename)++;
-     else
-       *_basename = _filepath;
+  if ((*_basename = strrchr(_filepath, '/')))
+    (*_basename)++;
+  else
+    *_basename = _filepath;
 }

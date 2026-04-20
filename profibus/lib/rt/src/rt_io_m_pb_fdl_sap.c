@@ -59,7 +59,7 @@
 static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 {
   io_sRackLocal* local;
-  char name[196];  
+  char name[196];
 
   gdh_ObjidToName(rp->Objid, (char*)&name, sizeof(name), cdh_mNName);
   errh_Info("PROFIBUS: Init of FDL SAP %s", name);
@@ -75,15 +75,11 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Pb_FDL_SAP) = {pwr_BindIoMethod(IoRackInit),
-                                             pwr_BindIoMethod(IoRackClose),
+pwr_dExport pwr_BindIoMethods(Pb_FDL_SAP) = {pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackClose),
                                              pwr_NullMethod};

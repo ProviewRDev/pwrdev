@@ -48,7 +48,8 @@ class CoWow;
 class CoWowTimer;
 class Op;
 
-typedef enum {
+typedef enum
+{
   op_eSupColor_,
   op_eSupColor_Gray,
   op_eSupColor_Green,
@@ -58,11 +59,12 @@ typedef enum {
   op_eSupColor__
 } op_eSupColor;
 
-class OpSup {
+class OpSup
+{
 public:
   OpSup()
-      : buttonw(0), indw(0), indfiller1w(0), indfiller2w(0), textw(0),
-        textbgw(0), p(0), old_color(op_eSupColor_), flash(0)
+      : buttonw(0), indw(0), indfiller1w(0), indfiller2w(0), textw(0), textbgw(0), p(0),
+        old_color(op_eSupColor_), flash(0)
   {
     strcpy(node_name, "");
     strcpy(object_name, "");
@@ -83,7 +85,8 @@ public:
   int flash;
 };
 
-class Op {
+class Op
+{
 public:
   void* parent_ctx;
   unsigned long balarm_prio;
@@ -108,37 +111,15 @@ public:
   Op(void* op_parent_ctx, char* opplace, pwr_tStatus* status);
   virtual ~Op();
 
-  virtual void map()
-  {
-  }
-  virtual int configure(char* opplace_str)
-  {
-    return 0;
-  }
-  virtual void update_alarm_info()
-  {
-  }
-  virtual void add_close_button()
-  {
-  }
-  virtual int create_menu_item(
-      const char* name, int pixmap, int append, const char* cmd)
-  {
-    return 0;
-  }
-  virtual int delete_menu_item(const char* name)
-  {
-    return 0;
-  }
-  virtual void change_sup_color(void* imagew, op_eSupColor color)
-  {
-  }
-  virtual void set_title(char* user)
-  {
-  }
-  virtual void set_color_theme(int idx)
-  {
-  }
+  virtual void map() {}
+  virtual int configure(char* opplace_str) { return 0; }
+  virtual void update_alarm_info() {}
+  virtual void add_close_button() {}
+  virtual int create_menu_item(const char* name, int pixmap, int append, const char* cmd) { return 0; }
+  virtual int delete_menu_item(const char* name) { return 0; }
+  virtual void change_sup_color(void* imagew, op_eSupColor color) {}
+  virtual void set_title(char* user) {}
+  virtual void set_color_theme(int idx) {}
 
   void set_jop_qid(int qix)
   {

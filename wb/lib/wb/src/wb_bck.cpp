@@ -51,7 +51,8 @@ wb_bck_list::~wb_bck_list()
 {
   bck_sItem* ip;
   bck_sItem* next = m_first;
-  while (next) {
+  while (next)
+  {
     ip = next;
     next = ip->next;
     free(ip->valuep);
@@ -84,10 +85,12 @@ void wb_bck_list::add(bck_sItem* xp, void* value2)
   ip->size = xp->size;
   ip->valuep = malloc(ip->size);
   memcpy(ip->valuep, xp->valuep, ip->size);
-  if (value2) {
+  if (value2)
+  {
     ip->value2p = malloc(ip->size);
     memcpy(ip->value2p, value2, ip->size);
-  } else
+  }
+  else
     ip->value2p = 0;
   ip->hide = 0;
   ip->next = 0;
@@ -111,16 +114,17 @@ pwr_tStatus wb_bck_list::print(char* outfile)
     return LDH__NOSUCHFILE;
 
   bck_sItem* ip = m_first;
-  while (ip) {
+  while (ip)
+  {
     char str[1024];
     pwr_eType atype;
     int printed = 0;
     char* anamep;
     int size;
 
-    sts = ldh_AttrRefToName(
-        m_ldhses, &ip->aref, cdh_mName_volumeStrict, &anamep, &size);
-    if (EVEN(sts)) {
+    sts = ldh_AttrRefToName(m_ldhses, &ip->aref, cdh_mName_volumeStrict, &anamep, &size);
+    if (EVEN(sts))
+    {
       fclose(fout);
       return sts;
     }
@@ -128,18 +132,22 @@ pwr_tStatus wb_bck_list::print(char* outfile)
     fprintf(fout, "%s", anamep);
 
     sts = ldh_GetAttrRefType(m_ldhses, &ip->aref, &atype);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = cdh_AttrValueToString(atype, ip->valuep, str, sizeof(str));
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         fprintf(fout, "\n	%s\n", str);
         printed = 1;
       }
     }
 
-    if (!printed) {
+    if (!printed)
+    {
       // Print as hex code
       unsigned char* p = (unsigned char*)ip->valuep;
-      for (int i = 0; i < (int)ip->size; i++, p++) {
+      for (int i = 0; i < (int)ip->size; i++, p++)
+      {
         if ((i % 16) == 0)
           fprintf(fout, "\n	");
         fprintf(fout, "%02x ", *p);
@@ -168,18 +176,20 @@ pwr_tStatus wb_bck_list::read_db(wb_bck_list* lp)
   m_type = bck_eType_Wb;
 
   bck_sItem* ip = lp->m_first;
-  while (ip) {
-    sts = ldh_AttrRefToName(
-        m_ldhses, &ip->aref, cdh_mName_volumeStrict, &anamep, &size);
+  while (ip)
+  {
+    sts = ldh_AttrRefToName(m_ldhses, &ip->aref, cdh_mName_volumeStrict, &anamep, &size);
     if (EVEN(sts))
       return sts;
 
     sts = ldh_GetAttrRefType(m_ldhses, &ip->aref, &atype);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       // Read value from database
 
       strncpy(aname, anamep, sizeof(aname));
-      if ((s = strrchr(aname, '.')) && streq(s, ".ActualValue")) {
+      if ((s = strrchr(aname, '.')) && streq(s, ".ActualValue"))
+      {
         *s = 0;
 
         sts = ldh_NameToAttrRef(m_ldhses, aname, &aref);
@@ -190,7 +200,8 @@ pwr_tStatus wb_bck_list::read_db(wb_bck_list* lp)
         if (EVEN(sts))
           return sts;
 
-        switch (cid) {
+        switch (cid)
+        {
         case pwr_cClass_Ao:
         case pwr_cClass_Do:
         case pwr_cClass_Io:
@@ -211,7 +222,9 @@ pwr_tStatus wb_bck_list::read_db(wb_bck_list* lp)
           valuep = malloc(ip->size);
           sts = ldh_ReadAttribute(m_ldhses, &ip->aref, valuep, ip->size);
         }
-      } else {
+      }
+      else
+      {
         valuep = malloc(ip->size);
         sts = ldh_ReadAttribute(m_ldhses, &ip->aref, valuep, ip->size);
       }
@@ -238,45 +251,48 @@ pwr_tStatus wb_bck_list::diff(wb_bck_list* lp, char* outfile)
     return LDH__NOSUCHFILE;
 
   if (lp)
-    fprintf(
-        fout, "Backup difference: 1: %s, 2: %s\n", m_filename, lp->m_filename);
+    fprintf(fout, "Backup difference: 1: %s, 2: %s\n", m_filename, lp->m_filename);
   else
     fprintf(fout, "Backup difference: 1: %s, 2: Workbench\n", m_filename);
 
   bck_sItem* ip = m_first;
-  while (ip) {
+  while (ip)
+  {
     char str[1024];
     char str2[1024];
     pwr_eType atype;
     char* anamep;
     int size;
 
-    sts = ldh_AttrRefToName(
-        m_ldhses, &ip->aref, cdh_mName_volumeStrict, &anamep, &size);
-    if (EVEN(sts)) {
+    sts = ldh_AttrRefToName(m_ldhses, &ip->aref, cdh_mName_volumeStrict, &anamep, &size);
+    if (EVEN(sts))
+    {
       fclose(fout);
       return sts;
     }
 
     sts = ldh_GetAttrRefType(m_ldhses, &ip->aref, &atype);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       void* value2p;
 
       bck_sItem* ip2 = lp->find(&ip->aref);
-      if (ip2) {
+      if (ip2)
+      {
         value2p = ip2->valuep;
 
         int is_equal = 0;
-        switch (atype) {
+        switch (atype)
+        {
         case pwr_eType_String:
         case pwr_eType_Text:
-          is_equal
-              = streq((const char*)value2p, (const char*)ip->valuep) ? 1 : 0;
+          is_equal = streq((const char*)value2p, (const char*)ip->valuep) ? 1 : 0;
           break;
         default:
           is_equal = memcmp(value2p, ip->valuep, ip->size) == 0 ? 1 : 0;
         }
-        if (is_equal) {
+        if (is_equal)
+        {
           ip = ip->next;
           continue;
         }
@@ -284,7 +300,8 @@ pwr_tStatus wb_bck_list::diff(wb_bck_list* lp, char* outfile)
         sts = cdh_AttrValueToString(atype, value2p, str2, sizeof(str2));
         if (EVEN(sts))
           strcpy(str2, "-");
-      } else
+      }
+      else
         strcpy(str2, "-");
 
       sts = cdh_AttrValueToString(atype, ip->valuep, str, sizeof(str));
@@ -320,39 +337,43 @@ pwr_tStatus wb_bck_list::diff(wb_bck_list* lp, wb_bck_list* outlp)
     outlp->m_type = bck_eType_FileDiff;
 
   bck_sItem* ip = m_first;
-  while (ip) {
+  while (ip)
+  {
     pwr_eType atype;
     char* anamep;
     int size;
 
-    sts = ldh_AttrRefToName(
-        m_ldhses, &ip->aref, cdh_mName_volumeStrict, &anamep, &size);
+    sts = ldh_AttrRefToName(m_ldhses, &ip->aref, cdh_mName_volumeStrict, &anamep, &size);
     if (EVEN(sts))
       return sts;
 
     sts = ldh_GetAttrRefType(m_ldhses, &ip->aref, &atype);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       void* value2p;
 
       bck_sItem* ip2 = lp->find(&ip->aref);
-      if (ip2) {
+      if (ip2)
+      {
         value2p = ip2->valuep;
 
         int is_equal = 0;
-        switch (atype) {
+        switch (atype)
+        {
         case pwr_eType_String:
         case pwr_eType_Text:
-          is_equal
-              = streq((const char*)value2p, (const char*)ip->valuep) ? 1 : 0;
+          is_equal = streq((const char*)value2p, (const char*)ip->valuep) ? 1 : 0;
           break;
         default:
           is_equal = memcmp(value2p, ip->valuep, ip->size) == 0 ? 1 : 0;
         }
-        if (is_equal) {
+        if (is_equal)
+        {
           ip = ip->next;
           continue;
         }
-      } else
+      }
+      else
         value2p = 0;
 
       outlp->add(ip, value2p);
@@ -367,9 +388,11 @@ pwr_tStatus wb_bck_list::diff(wb_bck_list* lp, wb_bck_list* outlp)
 
 bck_sItem* wb_bck_list::find(pwr_tAttrRef* arp)
 {
-  for (bck_sItem* ip = m_first; ip; ip = ip->next) {
-    if (cdh_ObjidIsEqual(arp->Objid, ip->aref.Objid)
-        && arp->Offset == ip->aref.Offset && arp->Size == ip->aref.Size) {
+  for (bck_sItem* ip = m_first; ip; ip = ip->next)
+  {
+    if (cdh_ObjidIsEqual(arp->Objid, ip->aref.Objid) && arp->Offset == ip->aref.Offset &&
+        arp->Size == ip->aref.Size)
+    {
       return ip;
     }
   }
@@ -402,41 +425,50 @@ pwr_tStatus wb_bck_list::read()
 
   fseek(f, 0, 0);
   fread(&fh, sizeof fh, 1, f);
-  if (fh.version != BCK_FILE_VERSION) {
+  if (fh.version != BCK_FILE_VERSION)
+  {
     printf("This program is built with header version %d\n", BCK_FILE_VERSION);
     fclose(f);
     return LDH__BCKVERSION;
   }
 
-  for (c = 0; c < 2; c++) {
+  for (c = 0; c < 2; c++)
+  {
     fseek(f, fh.curdata[c], 0);
     fread(&ch, sizeof ch, 1, f);
 
     /* Work thru the data segments */
 
-    for (d = 0; d < (int)ch.segments; d++) {
+    for (d = 0; d < (int)ch.segments; d++)
+    {
       csts = fread(&dh, sizeof dh, 1, f);
-      if (csts != 0) {
-        if (dh.namesize > 0) {
+      if (csts != 0)
+      {
+        if (dh.namesize > 0)
+        {
           namep = (char*)malloc(dh.namesize + 1);
           csts = fread(namep, dh.namesize + 1, 1, f);
-        } else
+        }
+        else
           namep = NULL;
         datap = (unsigned char*)malloc(dh.size);
         csts = fread(datap, dh.size, 1, f);
       }
-      if (csts == 0) {
+      if (csts == 0)
+      {
         printf("** Read error\n");
         break;
       }
 
-      if (dh.valid) {
-        sts = ldh_ObjidToName(m_ldhses, dh.objid, cdh_mName_volumeStrict, aname,
-            sizeof(aname), &size);
-        if (EVEN(sts)) {
-          printf("** Error, %s%s not found in this environment",
-              cdh_ObjidToString(dh.objid, 1), aname);
-        } else {
+      if (dh.valid)
+      {
+        sts = ldh_ObjidToName(m_ldhses, dh.objid, cdh_mName_volumeStrict, aname, sizeof(aname), &size);
+        if (EVEN(sts))
+        {
+          printf("** Error, %s%s not found in this environment", cdh_ObjidToString(dh.objid, 1), aname);
+        }
+        else
+        {
           strncat(aname, namep, sizeof(aname) - strlen(aname) - 1);
 
           pwr_tAttrRef aref;
@@ -483,7 +515,8 @@ pwr_tStatus bck_dump(ldh_tSession ldhses, char* filename, char* out)
 
   dcli_translate_filename(fname, out);
   fout = fopen(fname, "w");
-  if (!fout) {
+  if (!fout)
+  {
     fclose(f);
     return LDH__NOSUCHFILE;
   }
@@ -493,43 +526,49 @@ pwr_tStatus bck_dump(ldh_tSession ldhses, char* filename, char* out)
   fseek(f, 0, 0);
   fread(&fh, sizeof fh, 1, f);
   fprintf(fout, "Layout version:       %d\n", fh.version);
-  if (fh.version != BCK_FILE_VERSION) {
+  if (fh.version != BCK_FILE_VERSION)
+  {
     printf("This program is built with header version %d\n", BCK_FILE_VERSION);
     fclose(f);
     fclose(fout);
     return LDH__BCKVERSION;
   }
 
-  time_AtoAscii(
-      &fh.creationtime, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+  time_AtoAscii(&fh.creationtime, time_eFormat_DateAndTime, timstr, sizeof(timstr));
 
   fprintf(fout, "Created:              %s\n", timstr);
 
-  for (c = 0; c < 2; c++) {
+  for (c = 0; c < 2; c++)
+  {
     fseek(f, fh.curdata[c], 0);
     fread(&ch, sizeof ch, 1, f);
 
     /* Work thru the data segments */
 
-    for (d = 0; d < (int)ch.segments; d++) {
+    for (d = 0; d < (int)ch.segments; d++)
+    {
       csts = fread(&dh, sizeof dh, 1, f);
-      if (csts != 0) {
-        if (dh.namesize > 0) {
+      if (csts != 0)
+      {
+        if (dh.namesize > 0)
+        {
           namep = (char*)malloc(dh.namesize + 1);
           csts = fread(namep, dh.namesize + 1, 1, f);
-        } else
+        }
+        else
           namep = NULL;
         datap = (unsigned char*)malloc(dh.size);
         csts = fread(datap, dh.size, 1, f);
       }
-      if (csts == 0) {
+      if (csts == 0)
+      {
         fprintf(fout, "Read error\n");
         break;
       }
 
-      if (dh.valid) {
-        sts = ldh_ObjidToName(ldhses, dh.objid, cdh_mName_volumeStrict, aname,
-            sizeof(aname), &size);
+      if (dh.valid)
+      {
+        sts = ldh_ObjidToName(ldhses, dh.objid, cdh_mName_volumeStrict, aname, sizeof(aname), &size);
         if (EVEN(sts))
           strcpy(aname, cdh_ObjidToString(dh.objid, 1));
         strncat(aname, namep, sizeof(aname) - strlen(aname) - 1);
@@ -541,21 +580,26 @@ pwr_tStatus bck_dump(ldh_tSession ldhses, char* filename, char* out)
         pwr_eType atype;
         int printed = 0;
         sts = ldh_NameToAttrRef(ldhses, aname, &aref);
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           sts = ldh_GetAttrRefType(ldhses, &aref, &atype);
-          if (ODD(sts)) {
+          if (ODD(sts))
+          {
             sts = cdh_AttrValueToString(atype, datap, str, sizeof(str));
-            if (ODD(sts)) {
+            if (ODD(sts))
+            {
               fprintf(fout, "\n	%s\n", str);
               printed = 1;
             }
           }
         }
 
-        if (!printed) {
+        if (!printed)
+        {
           // Print as hex code
           p = datap;
-          for (i = 0; i < (int)dh.size; i++, p++) {
+          for (i = 0; i < (int)dh.size; i++, p++)
+          {
             if ((i % 16) == 0)
               fprintf(fout, "\n	");
             fprintf(fout, "%02x ", *p);

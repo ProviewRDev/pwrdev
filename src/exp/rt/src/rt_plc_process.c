@@ -360,7 +360,7 @@ static pwr_tStatus init_plc(plc_sProcess* pp, char* name)
 
     sts = gdh_GetNextSibling(thread_oid, &thread_oid);
   }
-  for (; i > sizeof(pp->PlcProcess->PlcThreadObjects) / sizeof(pp->PlcProcess->PlcThreadObjects[0]); i++)
+  for (; i < sizeof(pp->PlcProcess->PlcThreadObjects) / sizeof(pp->PlcProcess->PlcThreadObjects[0]); i++)
     pp->PlcProcess->PlcThreadObjects[i] = pwr_cNObjid;
 
   aproc_RegisterObject(pp->oid);
@@ -692,7 +692,7 @@ static void create_thread(plc_sThread* tp, plc_sProctbl* ptp, plc_sProcess* pp)
     return;
   }
 
-  sts = thread_Create(&tp->tid, tp->name, (void* (*)())&plc_thread, tp);
+  sts = thread_Create(&tp->tid, tp->name, (void* (*)()) & plc_thread, tp);
   if (EVEN(sts))
   {
     errh_Error("Creating thread \"%s\", %m", tp->name, sts);

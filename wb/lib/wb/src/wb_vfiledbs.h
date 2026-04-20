@@ -34,5 +34,6 @@
  * General Public License plus this exception.
  */
 
-class wb_vfiledbs : wb_vfile {
+class wb_vfiledbs : wb_vfile
+{
 };

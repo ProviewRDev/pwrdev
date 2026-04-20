@@ -42,7 +42,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 #include "co_ccm.h"
 #include "co_time.h"
@@ -56,42 +57,42 @@ extern "C" {
 
 /*** Local funktions ***************************************************/
 
-static int nav_get_signal_line(
-    FILE* file, char* line, int size, int* spaces, char* text, int* lines);
+static int nav_get_signal_line(FILE* file, char* line, int size, int* spaces, char* text, int* lines);
 static char* nav_VolumeIdToStr(pwr_tVolumeId volumeid);
 
 /*************************************************************************
-*
-* Name:		nav_get_signal_line()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Reads a line i a proview signal or plcmodule list.
-*	Returns the read line (line), number of spaces to the first charachter,
-*	the number of lines read( empty lines are not returned),
-*	and the first word (text).
-*	Returns NAV__EOF if end of file.
-*
-**************************************************************************/
+ *
+ * Name:		nav_get_signal_line()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Reads a line i a proview signal or plcmodule list.
+ *	Returns the read line (line), number of spaces to the first charachter,
+ *	the number of lines read( empty lines are not returned),
+ *	and the first word (text).
+ *	Returns NAV__EOF if end of file.
+ *
+ **************************************************************************/
 
-static int nav_get_signal_line(
-    FILE* file, char* line, int size, int* spaces, char* text, int* lines)
+static int nav_get_signal_line(FILE* file, char* line, int size, int* spaces, char* text, int* lines)
 {
   char* s;
   char* f;
 
   *lines = 0;
-  while (1) {
+  while (1)
+  {
     if (dcli_read_line(line, size, file) == 0)
       return NAV__EOF;
     (*lines)++;
 
     /* Get number of spaces before text */
     *spaces = 0;
-    for (s = line; !((*s == 0) || ((*s != ' ') && (*s != 9))); s++) {
+    for (s = line; !((*s == 0) || ((*s != ' ') && (*s != 9))); s++)
+    {
       (*spaces)++;
       if (*s == 9)
         (*spaces) += 7;
@@ -106,8 +107,10 @@ static int nav_get_signal_line(
     /* Check the text, if no text read next line */
     if (text[0] == 0)
       continue;
-    if (text[0] == '-') {
-      if (*spaces > 30) {
+    if (text[0] == '-')
+    {
+      if (*spaces > 30)
+      {
         /* Next line is a header */
         if (dcli_read_line(line, size, file) == 0)
           return NAV__EOF;
@@ -121,17 +124,17 @@ static int nav_get_signal_line(
 }
 
 /*************************************************************************
-*
-* Name:		nav_crr_signal()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Prints the cross references to a signal.
-*
-**************************************************************************/
+ *
+ * Name:		nav_crr_signal()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Prints the cross references to a signal.
+ *
+ **************************************************************************/
 
 int NavCrr::crr_signal(char* filename, char* signalname)
 {
@@ -157,7 +160,8 @@ int NavCrr::crr_signal(char* filename, char* signalname)
   int single_file = 0;
   pwr_tFileName file_spec;
 
-  if (filename && streq(filename, "*")) {
+  if (filename && streq(filename, "*"))
+  {
     strcpy(file_spec, "$pwrp_load/rtt_crr_*.dat");
     sts = dcli_search_file(file_spec, filestr, DCLI_DIR_SEARCH_INIT);
     if (EVEN(sts))
@@ -174,31 +178,39 @@ int NavCrr::crr_signal(char* filename, char* signalname)
     wildcard = 1;
 
   /* Open file */
-  while (1) {
+  while (1)
+  {
     FILE* file;
 
     /* Open file */
-    if (filename && streq(filename, "*")) {
+    if (filename && streq(filename, "*"))
+    {
       file = fopen(filestr, "r");
-    } else if (filename == NULL) {
+    }
+    else if (filename == NULL)
+    {
       /* Open file, first get the volume id */
-      if (!wildcard) {
+      if (!wildcard)
+      {
         sts = (name_to_objid_cb)(parent_ctx, signalname, &objid);
         if (EVEN(sts))
           return NAV__OBJECTNOTFOUND;
         volid = objid.vid;
-      } else {
+      }
+      else
+      {
         sts = (get_volume_cb)(parent_ctx, &volid, 0);
         if (EVEN(sts))
           return sts;
       }
 
-      sprintf(default_filename, "%srtt_crr_%s.dat", dcli_pwr_dir("pwrp_load"),
-          nav_VolumeIdToStr(volid));
+      sprintf(default_filename, "%srtt_crr_%s.dat", dcli_pwr_dir("pwrp_load"), nav_VolumeIdToStr(volid));
       dcli_get_defaultfilename(default_filename, filestr, NULL);
       file = fopen(filestr, "r");
       single_file = 1;
-    } else {
+    }
+    else
+    {
       dcli_get_defaultfilename(filename, filestr, ".lis");
       file = fopen(filestr, "r");
       single_file = 1;
@@ -208,14 +220,14 @@ int NavCrr::crr_signal(char* filename, char* signalname)
       return NAV__NOFILE;
 
     /* Get the hierarchy */
-    sts = nav_get_signal_line(
-        file, line, sizeof(line), &spaces, object, &lines);
+    sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
     if (EVEN(sts))
       goto finish;
     object_spaces = spaces;
 
     first = 1;
-    while (1) {
+    while (1)
+    {
       if ((s = strchr(object, ':')))
         strcpy(objname, s + 1);
       else
@@ -224,15 +236,16 @@ int NavCrr::crr_signal(char* filename, char* signalname)
       str_ToUpper(objname, objname);
 
       sts = dcli_wildcard(signalname, objname);
-      if (!sts) {
+      if (!sts)
+      {
         /* Hit, print this object */
         signalcount++;
 
-        sts = nav_get_signal_line(
-            file, line, sizeof(line), &spaces, object, &lines);
+        sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
         if (EVEN(sts))
           goto finish;
-        while (spaces > object_spaces) {
+        while (spaces > object_spaces)
+        {
           str_trim(line, line);
 
           if (line[0] == 'W' || line[0] == '>')
@@ -240,29 +253,28 @@ int NavCrr::crr_signal(char* filename, char* signalname)
           else
             write = 0;
 
-          nr = dcli_parse(&line[2], " 	", "", (char*)line_part,
-              sizeof(line_part) / sizeof(line_part[0]), sizeof(line_part[0]),
-              0);
+          nr = dcli_parse(&line[2], " 	", "", (char*)line_part, sizeof(line_part) / sizeof(line_part[0]),
+                          sizeof(line_part[0]), 0);
           if (streq(line_part[nr - 1], "") && nr > 2)
             nr--;
-          (insert_cb)(parent_ctx, parent_node, navc_eItemType_Crossref,
-              line_part[nr - 2], line_part[nr - 1], write);
+          (insert_cb)(parent_ctx, parent_node, navc_eItemType_Crossref, line_part[nr - 2], line_part[nr - 1],
+                      write);
           crossref_count++;
-          sts = nav_get_signal_line(
-              file, line, sizeof(line), &spaces, object, &lines);
+          sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
           if (EVEN(sts))
             goto finish;
         }
         if (!wildcard)
           goto finish;
-      } else {
-        sts = nav_get_signal_line(
-            file, line, sizeof(line), &spaces, object, &lines);
+      }
+      else
+      {
+        sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
         if (EVEN(sts))
           goto finish;
-        while (spaces > object_spaces) {
-          sts = nav_get_signal_line(
-              file, line, sizeof(line), &spaces, object, &lines);
+        while (spaces > object_spaces)
+        {
+          sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
           if (EVEN(sts))
             goto finish;
         }
@@ -275,7 +287,8 @@ int NavCrr::crr_signal(char* filename, char* signalname)
     if (single_file)
       break;
 
-    if (filename && streq(filename, "*")) {
+    if (filename && streq(filename, "*"))
+    {
       sts = dcli_search_file(file_spec, filestr, DCLI_DIR_SEARCH_NEXT);
       if (EVEN(sts))
         break;
@@ -295,17 +308,17 @@ int NavCrr::crr_signal(char* filename, char* signalname)
 }
 
 /*************************************************************************
-*
-* Name:		nav_crr_object()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Prints the cross references to a object that is not a signal.
-*
-**************************************************************************/
+ *
+ * Name:		nav_crr_object()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Prints the cross references to a object that is not a signal.
+ *
+ **************************************************************************/
 
 int NavCrr::crr_object(char* filename, char* objectname)
 {
@@ -331,7 +344,8 @@ int NavCrr::crr_object(char* filename, char* objectname)
   pwr_tFileName file_spec;
   int signalcount = 0;
 
-  if (filename && streq(filename, "*")) {
+  if (filename && streq(filename, "*"))
+  {
     strcpy(file_spec, "$pwrp_load/rtt_crro_*.dat");
     sts = dcli_search_file(file_spec, filestr, DCLI_DIR_SEARCH_INIT);
     if (EVEN(sts))
@@ -347,31 +361,39 @@ int NavCrr::crr_object(char* filename, char* objectname)
   else
     wildcard = 1;
 
-  while (1) {
+  while (1)
+  {
     FILE* file;
 
     /* Open file */
-    if (filename && streq(filename, "*")) {
+    if (filename && streq(filename, "*"))
+    {
       file = fopen(filestr, "r");
-    } else if (filename == NULL) {
+    }
+    else if (filename == NULL)
+    {
       /* Open file, first get the volume id */
-      if (!wildcard) {
+      if (!wildcard)
+      {
         sts = (name_to_objid_cb)(parent_ctx, objectname, &objid);
         if (EVEN(sts))
           return NAV__OBJECTNOTFOUND;
         volid = objid.vid;
-      } else {
+      }
+      else
+      {
         sts = (get_volume_cb)(parent_ctx, &volid, 0);
         if (EVEN(sts))
           return sts;
       }
 
-      sprintf(default_filename, "%srtt_crro_%s.dat", dcli_pwr_dir("pwrp_load"),
-          nav_VolumeIdToStr(volid));
+      sprintf(default_filename, "%srtt_crro_%s.dat", dcli_pwr_dir("pwrp_load"), nav_VolumeIdToStr(volid));
       dcli_get_defaultfilename(default_filename, filestr, NULL);
       file = fopen(filestr, "r");
       single_file = 1;
-    } else {
+    }
+    else
+    {
       dcli_get_defaultfilename(filename, filestr, ".lis");
       file = fopen(filestr, "r");
       single_file = 1;
@@ -381,14 +403,14 @@ int NavCrr::crr_object(char* filename, char* objectname)
       return NAV__NOFILE;
 
     /* Get the object */
-    sts = nav_get_signal_line(
-        file, line, sizeof(line), &spaces, object, &lines);
+    sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
     if (EVEN(sts))
       goto finish;
     object_spaces = spaces;
 
     first = 1;
-    while (1) {
+    while (1)
+    {
       if ((s = strchr(object, ':')))
         strcpy(objname, s + 1);
       else
@@ -397,62 +419,67 @@ int NavCrr::crr_object(char* filename, char* objectname)
       str_ToUpper(objname, objname);
 
       sts = dcli_wildcard(objectname, objname);
-      if (sts) {
+      if (sts)
+      {
         pwr_tAName subname;
         strcpy(subname, objectname);
         strcat(subname, ".*");
 
         sts = dcli_wildcard(subname, objname);
       }
-      if (!sts) {
+      if (!sts)
+      {
         /* Hit, print this object */
         signalcount++;
 
-        sts = nav_get_signal_line(
-            file, line, sizeof(line), &spaces, object, &lines);
+        sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
         if (EVEN(sts))
           goto finish;
-        while (spaces > object_spaces) {
+        while (spaces > object_spaces)
+        {
           str_trim(line, line);
 
-          if (line[0] == 'W') {
+          if (line[0] == 'W')
+          {
             write = 1;
-          } else if (line[0] == '>') {
+          }
+          else if (line[0] == '>')
+          {
             write = 2;
-          } else
+          }
+          else
             write = 0;
 
-          nr = dcli_parse(&line[2], " 	", "", (char*)line_part,
-              sizeof(line_part) / sizeof(line_part[0]), sizeof(line_part[0]),
-              0);
+          nr = dcli_parse(&line[2], " 	", "", (char*)line_part, sizeof(line_part) / sizeof(line_part[0]),
+                          sizeof(line_part[0]), 0);
           if (streq(line_part[nr - 1], "") && nr > 2)
             nr--;
           if (nr > 2 && line_part[nr - 3][0] == '#')
             write = 1;
           else if (nr > 2 && line_part[nr - 3][0] == '&')
             write = 2;
-          (insert_cb)(parent_ctx, parent_node, navc_eItemType_Crossref,
-              line_part[nr - 2], line_part[nr - 1], write);
+          (insert_cb)(parent_ctx, parent_node, navc_eItemType_Crossref, line_part[nr - 2], line_part[nr - 1],
+                      write);
           crossref_count++;
 
-          sts = nav_get_signal_line(
-              file, line, sizeof(line), &spaces, object, &lines);
+          sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
           if (EVEN(sts))
             goto finish;
         }
-      } else {
+      }
+      else
+      {
         if (!wildcard && signalcount)
           goto finish;
 
-        sts = nav_get_signal_line(
-            file, line, sizeof(line), &spaces, object, &lines);
+        sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
         if (EVEN(sts))
           goto finish;
       }
 
-      while (spaces != object_spaces) {
-        sts = nav_get_signal_line(
-            file, line, sizeof(line), &spaces, object, &lines);
+      while (spaces != object_spaces)
+      {
+        sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
         if (EVEN(sts))
           goto finish;
       }
@@ -464,7 +491,8 @@ int NavCrr::crr_object(char* filename, char* objectname)
     if (single_file)
       break;
 
-    if (filename && streq(filename, "*")) {
+    if (filename && streq(filename, "*"))
+    {
       sts = dcli_search_file(file_spec, filestr, DCLI_DIR_SEARCH_NEXT);
       if (EVEN(sts))
         break;
@@ -484,21 +512,20 @@ int NavCrr::crr_object(char* filename, char* objectname)
 }
 
 /*************************************************************************
-*
-* Name:		nav_crr_code()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Prints the cross references to a fuction or string
-*		in arithm objects.
-*
-**************************************************************************/
+ *
+ * Name:		nav_crr_code()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Prints the cross references to a fuction or string
+ *		in arithm objects.
+ *
+ **************************************************************************/
 
-int NavCrr::crr_code(
-    char* filename, char* str, int brief, int func, int case_sensitive)
+int NavCrr::crr_code(char* filename, char* str, int brief, int func, int case_sensitive)
 {
   pwr_tFileName default_filename;
   FILE* file;
@@ -522,22 +549,25 @@ int NavCrr::crr_code(
   int vol_cnt = 0;
   int end_of_file;
 
-  while (1) {
+  while (1)
+  {
     end_of_file = 0;
 
     /* Open file */
-    if (filename == NULL) {
+    if (filename == NULL)
+    {
       sts = (get_volume_cb)(parent_ctx, &volid, prev_volid);
       if (EVEN(sts))
         break;
 
       prev_volid = volid;
 
-      sprintf(default_filename, "%srtt_crrc_%s.dat", dcli_pwr_dir("pwrp_load"),
-          nav_VolumeIdToStr(volid));
+      sprintf(default_filename, "%srtt_crrc_%s.dat", dcli_pwr_dir("pwrp_load"), nav_VolumeIdToStr(volid));
       dcli_get_defaultfilename(default_filename, filestr, NULL);
       file = fopen(filestr, "r");
-    } else {
+    }
+    else
+    {
       if (vol_cnt == 1)
         break;
 
@@ -551,15 +581,17 @@ int NavCrr::crr_code(
 
     /* Case sensitive if any lowercase */
     if (!case_sensitive)
-      for (s = str; *s != 0; s++) {
+      for (s = str; *s != 0; s++)
+      {
         if (*s != '_' && !isupper(*s))
           case_sensitive = 1;
       }
 
-    while (!str_StartsWith(line, " _Obj_ ")) {
-      sts = nav_get_signal_line(
-          file, line, sizeof(line), &spaces, object, &lines);
-      if (EVEN(sts)) {
+    while (!str_StartsWith(line, " _Obj_ "))
+    {
+      sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
+      if (EVEN(sts))
+      {
         fclose(file);
         end_of_file = 1;
         break;
@@ -569,89 +601,103 @@ int NavCrr::crr_code(
       continue;
 
     first = 1;
-    while (1) {
+    while (1)
+    {
       strcpy(objname, &line[7]);
       for (s = objname; !(*s == 32 || *s == 9 || *s == 0); s++)
         ;
       *s = 0;
 
-      sts = nav_get_signal_line(
-          file, line, sizeof(line), &spaces, object, &lines);
+      sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
       objname_written = 0;
-      while (!str_StartsWith(line, " _Obj_ ")) {
+      while (!str_StartsWith(line, " _Obj_ "))
+      {
         if (!case_sensitive)
           str_ToUpper(tst_line, line);
         else
           strcpy(tst_line, line);
 
         hit = 0;
-        if (!func) {
+        if (!func)
+        {
           if (strstr(tst_line, str) != 0)
             hit = 1;
-        } else {
-          if ((s = strstr(tst_line, str)) != 0) {
+        }
+        else
+        {
+          if ((s = strstr(tst_line, str)) != 0)
+          {
             hit = 1;
             /* Check char after */
             tst_char = s + strlen(str);
             if (isalpha(*tst_char) || isdigit(*tst_char) || *tst_char == '_')
               hit = 0;
             /* Check char before */
-            if (s != tst_line) {
+            if (s != tst_line)
+            {
               tst_char = s - 1;
               if (isalpha(*tst_char) || isdigit(*tst_char) || *tst_char == '_')
                 hit = 0;
             }
           }
         }
-        if (hit) {
+        if (hit)
+        {
           /* Hit, print this object */
-          if (signalcount == 0) {
-            if (func) {
+          if (signalcount == 0)
+          {
+            if (func)
+            {
               sprintf(title, "Crossreferens list Function  \"%s\"\n\n", str);
-              (insert_cb)(parent_ctx, parent_node, navc_eItemType_Header, title,
-                  NULL, 0);
-            } else {
+              (insert_cb)(parent_ctx, parent_node, navc_eItemType_Header, title, NULL, 0);
+            }
+            else
+            {
               sprintf(title, "Crossreferens list String    \"%s\"\n\n", str);
-              (insert_cb)(parent_ctx, parent_node, navc_eItemType_Header, title,
-                  NULL, 0);
+              (insert_cb)(parent_ctx, parent_node, navc_eItemType_Header, title, NULL, 0);
             }
           }
           signalcount++;
 
-          if (!objname_written) {
-            (insert_cb)(parent_ctx, parent_node, navc_eItemType_Crossref,
-                objname, (char*)"", 2);
+          if (!objname_written)
+          {
+            (insert_cb)(parent_ctx, parent_node, navc_eItemType_Crossref, objname, (char*)"", 2);
             objname_written = 1;
           }
 
           strcpy(tst_line, "     ");
           strcat(tst_line, line);
-          (insert_cb)(
-              parent_ctx, parent_node, navc_eItemType_Text, tst_line, NULL, 0);
+          (insert_cb)(parent_ctx, parent_node, navc_eItemType_Text, tst_line, NULL, 0);
 
-          if (brief) {
-            while (!str_StartsWith(line, " _Obj_ ")) {
-              sts = nav_get_signal_line(
-                  file, line, sizeof(line), &spaces, object, &lines);
-              if (EVEN(sts)) {
+          if (brief)
+          {
+            while (!str_StartsWith(line, " _Obj_ "))
+            {
+              sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
+              if (EVEN(sts))
+              {
                 end_of_file = 1;
                 break;
               }
             }
             if (end_of_file)
               break;
-          } else {
-            sts = nav_get_signal_line(
-                file, line, sizeof(line), &spaces, object, &lines);
-            if (EVEN(sts)) {
+          }
+          else
+          {
+            sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
+            if (EVEN(sts))
+            {
               end_of_file = 1;
               break;
             }
           }
-        } else {
-          sts = nav_get_signal_line(
-              file, line, sizeof(line), &spaces, object, &lines);
-          if (EVEN(sts)) {
+        }
+        else
+        {
+          sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
+          if (EVEN(sts))
+          {
             end_of_file = 1;
             break;
           }
@@ -666,7 +712,8 @@ int NavCrr::crr_code(
     fclose(file);
   }
 
-  if (signalcount == 0) {
+  if (signalcount == 0)
+  {
     if (func)
       return NAV__STRINGNOTFOUND;
     else
@@ -676,17 +723,17 @@ int NavCrr::crr_code(
 }
 
 /*************************************************************************
-*
-* Name:		get_signals()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Returns all signals under an object.
-*
-**************************************************************************/
+ *
+ * Name:		get_signals()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Returns all signals under an object.
+ *
+ **************************************************************************/
 
 int NavCrr::get_signals(char* filename, char* objectname)
 {
@@ -708,21 +755,24 @@ int NavCrr::get_signals(char* filename, char* objectname)
   str_ToUpper(objectname, objectname);
 
   /* Open file */
-  while (1) {
+  while (1)
+  {
     FILE* file;
 
     /* Open file */
-    if (filename) {
+    if (filename)
+    {
       file = fopen(filestr, "r");
-    } else {
+    }
+    else
+    {
       /* Open file, first get the volume id */
       sts = (name_to_objid_cb)(parent_ctx, objectname, &objid);
       if (EVEN(sts))
         return NAV__OBJECTNOTFOUND;
       volid = objid.vid;
 
-      sprintf(default_filename, "%srtt_crrs_%s.dat", dcli_pwr_dir("pwrp_load"),
-          nav_VolumeIdToStr(volid));
+      sprintf(default_filename, "%srtt_crrs_%s.dat", dcli_pwr_dir("pwrp_load"), nav_VolumeIdToStr(volid));
       dcli_get_defaultfilename(default_filename, filestr, NULL);
       file = fopen(filestr, "r");
     }
@@ -731,14 +781,14 @@ int NavCrr::get_signals(char* filename, char* objectname)
       return NAV__NOFILE;
 
     /* Get the hierarchy */
-    sts = nav_get_signal_line(
-        file, line, sizeof(line), &spaces, object, &lines);
+    sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
     if (EVEN(sts))
       goto finish;
     object_spaces = spaces;
 
     first = 1;
-    while (1) {
+    while (1)
+    {
       if ((s = strchr(object, ':')))
         strcpy(objname, s + 1);
       else
@@ -746,24 +796,23 @@ int NavCrr::get_signals(char* filename, char* objectname)
 
       str_ToUpper(objname, objname);
 
-      if (str_StartsWith(objname, objectname)
-          && (objname[strlen(objectname)] == 0
-                 || objname[strlen(objectname)] == '.'
-                 || objname[strlen(objectname)] == '-')) {
+      if (str_StartsWith(objname, objectname) &&
+          (objname[strlen(objectname)] == 0 || objname[strlen(objectname)] == '.' ||
+           objname[strlen(objectname)] == '-'))
+      {
         /* Hit, print this object */
         signalcount++;
 
-        (insert_cb)(
-            parent_ctx, parent_node, navc_eItemType_Crossref, object, 0, 0);
+        (insert_cb)(parent_ctx, parent_node, navc_eItemType_Crossref, object, 0, 0);
         signalcount++;
 
-        sts = nav_get_signal_line(
-            file, line, sizeof(line), &spaces, object, &lines);
+        sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
         if (EVEN(sts))
           goto finish;
-      } else {
-        sts = nav_get_signal_line(
-            file, line, sizeof(line), &spaces, object, &lines);
+      }
+      else
+      {
+        sts = nav_get_signal_line(file, line, sizeof(line), &spaces, object, &lines);
         if (EVEN(sts))
           goto finish;
       }
@@ -782,19 +831,19 @@ int NavCrr::get_signals(char* filename, char* objectname)
 }
 
 /*************************************************************************
-*
-* Name:		nav_VolumeIdToStr()
-*
-* Type		* char
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Converts an VolumeId to a string.
-*	The returned string is static and must be used befor next call
-*	of the function.
-*
-**************************************************************************/
+ *
+ * Name:		nav_VolumeIdToStr()
+ *
+ * Type		* char
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Converts an VolumeId to a string.
+ *	The returned string is static and must be used befor next call
+ *	of the function.
+ *
+ **************************************************************************/
 
 static char* nav_VolumeIdToStr(pwr_tVolumeId volumeid)
 {
@@ -802,7 +851,6 @@ static char* nav_VolumeIdToStr(pwr_tVolumeId volumeid)
   unsigned char volid[4];
 
   memcpy(&volid, &volumeid, sizeof(volid));
-  sprintf(
-      str, "%3.3u_%3.3u_%3.3u_%3.3u", volid[3], volid[2], volid[1], volid[0]);
+  sprintf(str, "%3.3u_%3.3u_%3.3u_%3.3u", volid[3], volid[2], volid[1], volid[0]);
   return str;
 }

@@ -34,7 +34,8 @@
  * General Public License plus this exception.
  */
 
-extern "C" {
+extern "C"
+{
 #include "co_dcli.h"
 #include "co_cdh.h"
 #include "co_time.h"
@@ -62,29 +63,33 @@ int CnvReadSrc::read_src(char* filename)
 
   html_init(filename);
 
-  while (1) {
+  while (1)
+  {
     sts = CnvCtx::read_line(orig_line, sizeof(orig_line), fp);
     if (!sts)
       linetype = cread_eLine_EOF;
-    else {
+    else
+    {
       str_trim(line, orig_line);
       if (streq(line, ""))
         continue;
 
-      if (!str_StartsWith(line, "/*_*") && !(state & cread_mState_Doc)) {
+      if (!str_StartsWith(line, "/*_*") && !(state & cread_mState_Doc))
+      {
         html_line(orig_line);
         continue;
       }
 
-      nr = dcli_parse(line, " 	=", "", (char*)line_part,
-          sizeof(line_part) / sizeof(line_part[0]), sizeof(line_part[0]), 0);
+      nr = dcli_parse(line, " 	=", "", (char*)line_part, sizeof(line_part) / sizeof(line_part[0]),
+                      sizeof(line_part[0]), 0);
 
       if (streq(low(line_part[0]), "/*_*"))
         linetype = cread_eLine_Doc;
       else if (streq(low(line_part[0]), "*/"))
         linetype = cread_eLine_DocEnd;
 
-      switch (linetype) {
+      switch (linetype)
+      {
       case cread_eLine_Doc:
         state |= cread_mState_Doc;
         strcpy(src_aref, "");
@@ -100,8 +105,10 @@ int CnvReadSrc::read_src(char* filename)
         printf("Error, unknown linetype\n");
       }
     }
-    if (state & cread_mState_Doc) {
-      if (streq(low(line_part[0]), "@aref")) {
+    if (state & cread_mState_Doc)
+    {
+      if (streq(low(line_part[0]), "@aref"))
+      {
         if (nr > 1)
           strcpy(src_aref, line_part[1]);
         if (nr > 2)
@@ -141,7 +148,8 @@ int CnvReadSrc::html_init(char* filename)
   // Open html file
   fp_src_html.open(dir_fname);
 #if defined OS_LINUX
-  if (!fp_src_html.good()) {
+  if (!fp_src_html.good())
+  {
     printf("Unable to open file \"%s\"\n", dir_fname);
     return 0;
   }
@@ -157,7 +165,7 @@ int CnvReadSrc::html_init(char* filename)
               << "<TITLE>\n"
               << filename << '\n'
               << "</TITLE>\n"
-	      << "<link rel=\"stylesheet\" type=\"text/css\" href=\"orm.css\">\n"
+              << "<link rel=\"stylesheet\" type=\"text/css\" href=\"orm.css\">\n"
               << "</HEAD>\n"
               << "<BODY BGCOLOR=\"white\">\n"
               << "<CODE><PRE>\n";
@@ -181,8 +189,10 @@ int CnvReadSrc::html_line(char* line)
   char* s = line;
   char* t = hline;
 
-  for (s = line; *s; s++) {
-    switch (*s) {
+  for (s = line; *s; s++)
+  {
+    switch (*s)
+    {
     case '<':
       strcpy(t, "&#60;");
       t += 5;
@@ -215,8 +225,7 @@ int CnvReadSrc::html_aref()
 {
   fp_src_html << "</pre></code>\n"
               << "<hr>\n"
-              << "<a name=\"" << src_aref << "\"><h3>" << src_aref_text
-              << "</h3></a>\n"
+              << "<a name=\"" << src_aref << "\"><h3>" << src_aref_text << "</h3></a>\n"
               << "<hr><code><pre>\n";
 
   return 1;

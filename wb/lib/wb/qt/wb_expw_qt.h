@@ -45,10 +45,11 @@
 
 class WbExpWQtWidget;
 
-class WbExpWQt : public WbExpW {
+class WbExpWQt : public WbExpW
+{
 public:
-  WbExpWQt(void* l_parent_ctx, ldh_tSession l_ldhses, const char* l_name,
-      int type, int l_editmode, pwr_tStatus* status);
+  WbExpWQt(void* l_parent_ctx, ldh_tSession l_ldhses, const char* l_name, int type, int l_editmode,
+           pwr_tStatus* status);
   ~WbExpWQt();
 
   QWidget* form;
@@ -62,7 +63,8 @@ private:
   WbExpWQtWidget* toplevel;
 };
 
-class WbExpWQtWidget : public QWidget {
+class WbExpWQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

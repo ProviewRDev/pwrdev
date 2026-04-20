@@ -76,9 +76,9 @@ static pwr_tStatus IoRackInitSwap(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   /* Create socket, store in local struct */
 
   local->s = socket(AF_INET, SOCK_DGRAM, 0);
-  if (local->s < 0) {
-    errh_Error(
-        "Error creating socket for IO remote rack %s, %d", rp->Name, local->s);
+  if (local->s < 0)
+  {
+    errh_Error("Error creating socket for IO remote rack %s, %d", rp->Name, local->s);
     op->Status = IO__INITFAIL;
     return IO__ERRINIDEVICE;
   }
@@ -91,11 +91,10 @@ static pwr_tStatus IoRackInitSwap(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
   /* Connect to remote address */
 
-  sts = connect(
-      local->s, (struct sockaddr*)&local->rem_addr, sizeof(local->rem_addr));
-  if (sts != 0) {
-    errh_Error(
-        "Error binding remote socket for IO remote rack %s, %d", rp->Name, sts);
+  sts = connect(local->s, (struct sockaddr*)&local->rem_addr, sizeof(local->rem_addr));
+  if (sts != 0)
+  {
+    errh_Error("Error binding remote socket for IO remote rack %s, %d", rp->Name, sts);
     op->Status = IO__INITFAIL;
     return IO__ERRINIDEVICE;
   }
@@ -109,8 +108,8 @@ static pwr_tStatus IoRackInitSwap(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
   /* Log initialization */
 
-  errh_Info("Init of IO remote rack %s/%s:%d", rp->Name,
-      inet_ntoa(local->rem_addr.sin_addr), ntohs(local->rem_addr.sin_port));
+  errh_Info("Init of IO remote rack %s/%s:%d", rp->Name, inet_ntoa(local->rem_addr.sin_addr),
+            ntohs(local->rem_addr.sin_port));
   op->Status = IO__NORMAL;
   return IO__SUCCESS;
 }
@@ -131,23 +130,23 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   /* Create socket, store in local struct */
 
   local->s = socket(AF_INET, SOCK_DGRAM, 0);
-  if (local->s < 0) {
-    errh_Error(
-        "Error creating socket for IO remote rack %s, %d", rp->Name, local->s);
+  if (local->s < 0)
+  {
+    errh_Error("Error creating socket for IO remote rack %s, %d", rp->Name, local->s);
     op->Status = IO__INITFAIL;
     return IO__ERRINIDEVICE;
   }
 
   /* Bind local port if explicitly numbered ( != 0 ) */
 
-  if (op->LocalPort != 0) {
+  if (op->LocalPort != 0)
+  {
     local->my_addr.sin_family = AF_INET;
     local->my_addr.sin_port = htons(op->LocalPort);
-    sts = bind(
-        local->s, (struct sockaddr*)&local->my_addr, sizeof(local->my_addr));
-    if (sts != 0) {
-      errh_Error("Error binding local socket for IO remote rack %s, %d",
-          rp->Name, sts);
+    sts = bind(local->s, (struct sockaddr*)&local->my_addr, sizeof(local->my_addr));
+    if (sts != 0)
+    {
+      errh_Error("Error binding local socket for IO remote rack %s, %d", rp->Name, sts);
       op->Status = IO__INITFAIL;
       return IO__ERRINIDEVICE;
     }
@@ -161,11 +160,10 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
   /* Connect to remote address */
 
-  sts = connect(
-      local->s, (struct sockaddr*)&local->rem_addr, sizeof(local->rem_addr));
-  if (sts != 0) {
-    errh_Error(
-        "Error binding remote socket for IO remote rack %s, %d", rp->Name, sts);
+  sts = connect(local->s, (struct sockaddr*)&local->rem_addr, sizeof(local->rem_addr));
+  if (sts != 0)
+  {
+    errh_Error("Error binding remote socket for IO remote rack %s, %d", rp->Name, sts);
     op->Status = IO__INITFAIL;
     return IO__ERRINIDEVICE;
   }
@@ -207,16 +205,15 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
   /* Log initialization */
 
-  errh_Info("Init of IO remote rack %s/%s:%d", rp->Name,
-      inet_ntoa(local->rem_addr.sin_addr), ntohs(local->rem_addr.sin_port));
+  errh_Info("Init of IO remote rack %s/%s:%d", rp->Name, inet_ntoa(local->rem_addr.sin_addr),
+            ntohs(local->rem_addr.sin_port));
   op->Status = IO__NORMAL;
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoRackSwap(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_eEvent event
+static pwr_tStatus IoRackSwap(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_eEvent event
 
-    )
+)
 {
   io_sRackLocal* local;
   pwr_sClass_Ssab_RemoteRack* op;
@@ -226,11 +223,13 @@ static pwr_tStatus IoRackSwap(
   struct bfb_buf rbuf;
   int size;
 
-  switch (event) {
+  switch (event)
+  {
   case io_eEvent_IoCommSwapInit:
   case io_eEvent_IoCommSwap:
 
-    if (!rp->Local) {
+    if (!rp->Local)
+    {
       sts = IoRackInitSwap(ctx, ap, rp);
       if (sts != IO__SUCCESS)
         return IO__ERRINIDEVICE;
@@ -249,20 +248,25 @@ static pwr_tStatus IoRackSwap(
     bzero(&local->read_area, sizeof(local->read_area));
 
     sts = 1;
-    while (sts > 0) {
+    while (sts > 0)
+    {
       FD_ZERO(&fds);
       FD_SET(local->s, &fds);
       tv.tv_sec = 0;
       tv.tv_usec = 0;
       sts = select(32, &fds, NULL, NULL, &tv);
-      if (sts > 0) {
+      if (sts > 0)
+      {
         size = recv(local->s, &rbuf, sizeof(rbuf), 0);
         if (size <= 0)
           continue;
-        if (rbuf.service == BFB_SERVICE_READ) {
+        if (rbuf.service == BFB_SERVICE_READ)
+        {
           bzero(&local->read_area, sizeof(local->read_area));
           memcpy(&local->read_area, &rbuf, size);
-        } else if (rbuf.service == BFB_SERVICE_WRITE) {
+        }
+        else if (rbuf.service == BFB_SERVICE_WRITE)
+        {
           bzero(&local->write_area, sizeof(local->write_area));
           memcpy(&local->write_area, &rbuf, size);
         }
@@ -296,7 +300,8 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   int old_comm_error_count;
   int send_link_error = 0;
 
-  if (ctx->read_reset) {
+  if (ctx->read_reset)
+  {
     udp_reset(local->s);
     return IO__SUCCESS;
   }
@@ -313,20 +318,25 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   bzero(&local->write_area, sizeof(local->write_area));
 
   sts = 1;
-  while (sts > 0) {
+  while (sts > 0)
+  {
     FD_ZERO(&fds);
     FD_SET(local->s, &fds);
     tv.tv_sec = 0;
     tv.tv_usec = 0;
     sts = select(32, &fds, NULL, NULL, &tv);
-    if (sts > 0) {
+    if (sts > 0)
+    {
       size = recv(local->s, &rbuf, sizeof(rbuf), 0);
       if (size <= 0)
         continue;
-      if (rbuf.service == BFB_SERVICE_READ) {
+      if (rbuf.service == BFB_SERVICE_READ)
+      {
         bzero(&local->read_area, sizeof(local->read_area));
         memcpy(&local->read_area, &rbuf, size);
-      } else if (rbuf.service == BFB_SERVICE_WRITE) {
+      }
+      else if (rbuf.service == BFB_SERVICE_WRITE)
+      {
         bzero(&local->write_area, sizeof(local->write_area));
         memcpy(&local->write_area, &rbuf, size);
       }
@@ -335,31 +345,34 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     }
   }
 
-  if (rx_packets > 0) {
+  if (rx_packets > 0)
+  {
     local->comm_error_count = 0;
     op->Status = IO__NORMAL;
-  } else {
+  }
+  else
+  {
     old_comm_error_count = local->comm_error_count;
     if (send_link_error && local->comm_error_count < BFB_COMMERR_LINK_FASTTRACK)
       local->comm_error_count = BFB_COMMERR_LINK_FASTTRACK;
     else
       local->comm_error_count++;
 
-    if (old_comm_error_count < BFB_COMMERR_SOFT_LIMIT
-        && local->comm_error_count >= BFB_COMMERR_SOFT_LIMIT) {
+    if (old_comm_error_count < BFB_COMMERR_SOFT_LIMIT && local->comm_error_count >= BFB_COMMERR_SOFT_LIMIT)
+    {
       errh_Error("IO Error soft limit reached on rack '%s'", rp->Name);
       ctx->IOHandler->CardErrorSoftLimit = 1;
       ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(rp->Objid);
     }
-    if (old_comm_error_count < BFB_COMMERR_HARD_LIMIT
-        && local->comm_error_count >= BFB_COMMERR_HARD_LIMIT) {
-      errh_Error("IO Error hard limit reached on rack '%s', stall action %d",
-          rp->Name, op->StallAction);
+    if (old_comm_error_count < BFB_COMMERR_HARD_LIMIT && local->comm_error_count >= BFB_COMMERR_HARD_LIMIT)
+    {
+      errh_Error("IO Error hard limit reached on rack '%s', stall action %d", rp->Name, op->StallAction);
       ctx->IOHandler->CardErrorHardLimit = 1;
       ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(rp->Objid);
     }
 
-    if (local->comm_error_count > BFB_COMMERR_HARD_LIMIT) {
+    if (local->comm_error_count > BFB_COMMERR_HARD_LIMIT)
+    {
       if (op->StallAction == pwr_eSsabStallAction_ResetInputs)
         udp_reset_inputs(local);
       else if (op->StallAction == pwr_eSsabStallAction_EmergencyBreak)
@@ -384,8 +397,7 @@ static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   sts = send(local->s, &local->read_req, local->read_req.length, 0);
   if (sts > 0)
     op->TX_packets++;
-  else if (sts < 0 && udp_is_link_send_error(errno)
-      && local->comm_error_count < BFB_COMMERR_LINK_FASTTRACK)
+  else if (sts < 0 && udp_is_link_send_error(errno) && local->comm_error_count < BFB_COMMERR_LINK_FASTTRACK)
     local->comm_error_count = BFB_COMMERR_LINK_FASTTRACK;
   local->next_read_req_item = 0;
   bzero(&local->read_area, sizeof(local->read_area));
@@ -403,7 +415,8 @@ static void udp_reset(int socket)
   int size;
 
   sts = 1;
-  while (sts > 0) {
+  while (sts > 0)
+  {
     FD_ZERO(&fds);
     FD_SET(socket, &fds);
     tv.tv_sec = 0;
@@ -447,6 +460,6 @@ static void udp_reset_inputs(io_sRackLocal* local)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Ssab_RemoteRack) = { pwr_BindIoMethod(IoRackInit),
-  pwr_BindIoMethod(IoRackSwap), pwr_BindIoMethod(IoRackClose),
-  pwr_BindIoMethod(IoRackRead), pwr_BindIoMethod(IoRackWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Ssab_RemoteRack) = {pwr_BindIoMethod(IoRackInit),  pwr_BindIoMethod(IoRackSwap),
+                                                  pwr_BindIoMethod(IoRackClose), pwr_BindIoMethod(IoRackRead),
+                                                  pwr_BindIoMethod(IoRackWrite), pwr_NullMethod};

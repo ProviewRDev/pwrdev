@@ -51,8 +51,7 @@ static pwr_tStatus OpenProgram(ldh_sMenuCall* ip)
   pwr_tStatus sts;
   void* foe;
 
-  sts = ip->wnav->open_foe(
-      "PlcPgm", ip->Pointed.Objid, &foe, 1, ldh_eAccess_ReadOnly, pwr_cNOid);
+  sts = ip->wnav->open_foe("PlcPgm", ip->Pointed.Objid, &foe, 1, ldh_eAccess_ReadOnly, pwr_cNOid);
   return 1;
 }
 
@@ -78,8 +77,10 @@ static pwr_tStatus Build(ldh_sMenuCall* ip)
 
 static bool CheckChildCid(wb_object& o, pwr_tCid cid)
 {
-  for (wb_object child = o.first(); child; child = child.after()) {
-    if (child.cid() == cid) {
+  for (wb_object child = o.first(); child; child = child.after())
+  {
+    if (child.cid() == cid)
+    {
       return true;
     }
     if (CheckChildCid(child, cid))
@@ -88,11 +89,10 @@ static bool CheckChildCid(wb_object& o, pwr_tCid cid)
   return false;
 }
 
-static pwr_tStatus SyntaxCheck(
-    ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
-    int* ErrorCount, /* accumulated error count */
-    int* WarningCount /* accumulated warning count */
-    )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated warning count */
+)
 {
   wb_session* sp = (wb_session*)Session;
   pwr_tOid thread_oid;
@@ -109,11 +109,9 @@ static pwr_tStatus SyntaxCheck(
 
   wb_object othread = sp->object(thread_oid);
   if (!othread)
-    wsx_error_msg_str(
-        Session, "Bad thread object", Object, 'E', ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Bad thread object", Object, 'E', ErrorCount, WarningCount);
   else if (othread.cid() != pwr_cClass_PlcThread)
-    wsx_error_msg_str(Session, "Bad thread object class", Object, 'E',
-        ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Bad thread object class", Object, 'E', ErrorCount, WarningCount);
 
   // Check WindowPlc object
   bool found = 0;
@@ -121,18 +119,20 @@ static pwr_tStatus SyntaxCheck(
   if (!o)
     return o.sts();
 
-  for (wb_object child = o.first(); child; child = child.after()) {
-    if (child.cid() == pwr_cClass_windowplc) {
+  for (wb_object child = o.first(); child; child = child.after())
+  {
+    if (child.cid() == pwr_cClass_windowplc)
+    {
       found = 1;
       break;
     }
   }
   if (!found)
-    wsx_error_msg_str(Session, "Plc window is not created", Object, 'E',
-        ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Plc window is not created", Object, 'E', ErrorCount, WarningCount);
 
   // Check ResetObject if there is a grafcet sequence present
-  if (CheckChildCid(o, pwr_cClass_initstep)) {
+  if (CheckChildCid(o, pwr_cClass_initstep))
+  {
     a = sp->attribute(Object.Objid, "DevBody", "ResetObject");
     if (!a)
       return a.sts();
@@ -143,19 +143,16 @@ static pwr_tStatus SyntaxCheck(
 
     wb_object oreset = sp->object(reset_oid);
     if (!oreset)
-      wsx_error_msg_str(
-          Session, "Bad reset object", Object, 'E', ErrorCount, WarningCount);
-    else if (!(oreset.cid() == pwr_cClass_Dv || oreset.cid() == pwr_cClass_Di
-                 || oreset.cid() == pwr_cClass_Do))
-      wsx_error_msg_str(Session, "Bad reset object class", Object, 'E',
-          ErrorCount, WarningCount);
+      wsx_error_msg_str(Session, "Bad reset object", Object, 'E', ErrorCount, WarningCount);
+    else if (!(oreset.cid() == pwr_cClass_Dv || oreset.cid() == pwr_cClass_Di ||
+               oreset.cid() == pwr_cClass_Do))
+      wsx_error_msg_str(Session, "Bad reset object class", Object, 'E', ErrorCount, WarningCount);
   }
 
   return PWRB__SUCCESS;
 }
 
-static pwr_tStatus PostCreate(
-    ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
 {
   pwr_tOid oid;
   pwr_tOid toid;
@@ -165,10 +162,11 @@ static pwr_tStatus PostCreate(
   wb_session* sp = (wb_session*)Session;
 
   sts = ldh_GetClassList(Session, pwr_cClass_PlcThread, &oid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     cnt++;
     toid = oid;
-    
+
     wb_attribute a = sp->attribute(toid, "DevBody", "IsDefault");
     if (!a)
       return a.sts();
@@ -182,17 +180,16 @@ static pwr_tStatus PostCreate(
     sts = ldh_GetNextObject(Session, oid, &oid);
   }
 
-  if (cnt > 0) {
-    sts = ldh_SetObjectPar(
-        Session, Object, "RtBody", "ThreadObject", (char*)&toid, sizeof(toid));
+  if (cnt > 0)
+  {
+    sts = ldh_SetObjectPar(Session, Object, "RtBody", "ThreadObject", (char*)&toid, sizeof(toid));
     if (EVEN(sts))
       return sts;
   }
   return PWRB__SUCCESS;
 }
 
-static pwr_tStatus AnteAdopt(
-    ldh_tSesContext Session, pwr_tOid Father, pwr_tCid Class)
+static pwr_tStatus AnteAdopt(ldh_tSesContext Session, pwr_tOid Father, pwr_tCid Class)
 {
   // Only allow plc window objects
   if (Class != pwr_cClass_windowplc)
@@ -205,6 +202,6 @@ static pwr_tStatus AnteAdopt(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(PlcPgm) = { pwr_BindMethod(OpenProgram),
-  pwr_BindMethod(Build), pwr_BindMethod(SyntaxCheck),
-  pwr_BindMethod(PostCreate), pwr_BindMethod(AnteAdopt), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(PlcPgm) = {pwr_BindMethod(OpenProgram), pwr_BindMethod(Build),
+                                       pwr_BindMethod(SyntaxCheck), pwr_BindMethod(PostCreate),
+                                       pwr_BindMethod(AnteAdopt),   pwr_NullMethod};

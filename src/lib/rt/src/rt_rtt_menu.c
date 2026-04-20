@@ -68,7 +68,7 @@
 #include "rt_qcom_msg.h"
 
 #define RTT_HIDE_ELEMENTS 2
-                                                                        
+
 #define IF_NOGDH_RETURN                                                                                      \
   if (!rtt_gdh_started)                                                                                      \
   {                                                                                                          \
@@ -236,18 +236,18 @@ void rtt_usage()
 
 /**
  * @brief Make sure that rtt reset the terminal
- * 
+ *
  */
 static void exit_handler()
-{  
+{
   // Call rtt_exit_now with status code 0 "OK". We have no notion of knowing
   // unless we use GNU extensions and on_exit instead of atexit.
-  rtt_exit_now(1, 0);  
+  rtt_exit_now(1, 0);
 }
 
 /**
  * @brief Signal handler to tell rtt to "exit"
- * 
+ *
  * @param sig Signal caught, ignored
  */
 static void handle_signal(int sig)
@@ -275,7 +275,7 @@ int rtt_initialize(char* username, char* password, char* commandfile, char* main
   int noneth = 0;
   int qcom_only = 0;
 
-  // Add an exit handler to reset rtt and exit 
+  // Add an exit handler to reset rtt and exit
   atexit(exit_handler);
 
   // Set up signal handler
@@ -313,7 +313,7 @@ int rtt_initialize(char* username, char* password, char* commandfile, char* main
 
     if (EVEN(sts))
     {
-      printf("rt_rtt was unable to initialize a full (gdh) connection to ProviewR. Is it running?\n");      
+      printf("rt_rtt was unable to initialize a full (gdh) connection to ProviewR. Is it running?\n");
       exit(EXIT_FAILURE);
     }
 
@@ -336,7 +336,7 @@ int rtt_initialize(char* username, char* password, char* commandfile, char* main
     sts = rtt_qcom_init();
     if (EVEN(sts))
     {
-      printf("rt_rtt was unable to initialize a qcom connection to ProviewR. Is it running?\n");      
+      printf("rt_rtt was unable to initialize a qcom connection to ProviewR. Is it running?\n");
       exit(EXIT_FAILURE);
     }
   }
@@ -2750,7 +2750,7 @@ int rtt_menu_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu** menu_p, cha
   int maxlen = 30;
   unsigned long option;
   rtt_t_menu* menu_ptr;
-  int sts;
+  int sts = 0;
   unsigned long menutype;
   int fastpicture_drawn;
 
@@ -2978,6 +2978,7 @@ int rtt_menu_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu** menu_p, cha
           return sts;
         break;
       }
+    /* fall through */
     case RTT_K_CTRLZ:
       if (ctx->parent_ctx != 0)
       {
@@ -3120,7 +3121,7 @@ int rtt_menu_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu** menu_p, cha
       }
     }
   }
-  
+
   return sts;
   //  return RTT__SUCCESS;
 }
@@ -3419,6 +3420,7 @@ int rtt_menu_upd_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu_upd** men
           return sts;
         break;
       }
+    /* fall through */
     case RTT_K_CTRLZ:
       if (ctx->parent_ctx != 0)
       {
@@ -3904,6 +3906,7 @@ int rtt_menu_edit_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu_upd** me
           return sts;
         break;
       }
+    /* fall through */
     case RTT_K_CTRLZ:
       if (ctx->parent_ctx != 0)
       {
@@ -4410,6 +4413,7 @@ int rtt_menu_sysedit_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu_upd**
           return sts;
         break;
       }
+    /* fall through */
     case RTT_K_CTRLZ:
       if (ctx->parent_ctx != 0)
       {
@@ -5696,6 +5700,7 @@ static int rtt_edit_print_value(rtt_t_menu_upd* menu_ptr, unsigned long init)
       if (EVEN(sts))
         break;
     }
+    /* fall through */
     case pwr_eType_TypeId:
     {
       pwr_tOName hiername;
@@ -5964,7 +5969,7 @@ static int rtt_attribute_elements(menu_ctx parent_ctx, pwr_tObjid objid, void* a
   {
     if (rtt_mode_address)
     {
-      sprintf(parnameindex, "%8lu    ", (unsigned long)(parameter_ptr + rtt_rtdb_offset));
+      snprintf(parnameindex, sizeof(parnameindex), "%8lu    ", (unsigned long)(parameter_ptr + rtt_rtdb_offset));
       strcat(parnameindex, parname);
     }
     else
@@ -5976,7 +5981,7 @@ static int rtt_attribute_elements(menu_ctx parent_ctx, pwr_tObjid objid, void* a
       if (parameter_ptr != 0)
         if (j != 0)
           parameter_ptr += asize / elements;
-      sprintf(nr, "[%d]", j);
+      snprintf(nr, sizeof(nr), "[%d]", j);
       strcat(parnameindex, nr);
       strcat(parameter_name, nr);
     }
@@ -6340,7 +6345,7 @@ int rtt_object_parameters(menu_ctx parent_ctx, pwr_tObjid objid, void* arg1, voi
     {
       if (rtt_mode_address)
       {
-        sprintf(parnameindex, "%8lu    ", (unsigned long)(parameter_ptr + rtt_rtdb_offset));
+        snprintf(parnameindex, sizeof(parnameindex), "%8lu    ", (unsigned long)(parameter_ptr + rtt_rtdb_offset));
         strcat(parnameindex, bd[i].attrName);
       }
       else
@@ -6353,7 +6358,7 @@ int rtt_object_parameters(menu_ctx parent_ctx, pwr_tObjid objid, void* arg1, voi
         if (parameter_ptr != 0)
           if (j != 0)
             parameter_ptr += bd[i].attr->Param.Info.Size / elements;
-        sprintf(nr, "%d", j);
+        snprintf(nr, sizeof(nr), "%d", j);
         strcat(parnameindex, "[");
         strcat(parnameindex, nr);
         strcat(parnameindex, "]");
@@ -6365,7 +6370,7 @@ int rtt_object_parameters(menu_ctx parent_ctx, pwr_tObjid objid, void* arg1, voi
       if (bd[i].attrClass == pwr_eClass_Input && rtt_mode_address)
       {
         /* Add the content of the pointer */
-        sprintf(parnameindex, "%8lu    ", (unsigned long)(parameter_ptr - 4 + rtt_rtdb_offset));
+        snprintf(parnameindex, sizeof(parnameindex), "%8lu    ", (unsigned long)(parameter_ptr - 4 + rtt_rtdb_offset));
         strcat(parnameindex, bd[i].attrName);
         strcat(parnameindex, "P");
 
@@ -7452,7 +7457,7 @@ static int rtt_get_value(menu_ctx ctx, int timeout, int (*timeout_func)(), void*
   char input_str[80];
   int maxlen = 30;
   rtt_t_menu_upd* menu_ptr;
-  int sts;
+  int sts = 0;
 
   option = RTT_OPT_TIMEOUT | RTT_OPT_NOSCROLL;
 
@@ -8431,7 +8436,7 @@ static int rtt_menu_new_update_add(menu_ctx parent_ctx, rtt_t_menu_upd** menulis
   unsigned long elements = 0;
   char* parameter_ptr = NULL;
   SUBID subid = {0, 0};
-  pwr_sParInfo parinfo;
+  pwr_sParInfo parinfo = {0};
   pwr_tOName objname;
   char* s;
   pwr_tOName name_array[2];

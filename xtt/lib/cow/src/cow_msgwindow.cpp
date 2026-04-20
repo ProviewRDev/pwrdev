@@ -50,39 +50,25 @@
 MsgWindow* MsgWindow::default_window = 0;
 int MsgWindow::hide_info = 0;
 
-MsgWindow::MsgWindow(
-    void* msg_parent_ctx, const char* msg_name, pwr_tStatus* status)
-    : parent_ctx(msg_parent_ctx), msgnav(NULL), displayed(0), deferred_map(0),
-      nodraw(0), size(0), max_size(500), find_wnav_cb(0), find_plc_cb(0),
-      find_ge_cb(0), wow(0)
+MsgWindow::MsgWindow(void* msg_parent_ctx, const char* msg_name, pwr_tStatus* status)
+    : parent_ctx(msg_parent_ctx), msgnav(NULL), displayed(0), deferred_map(0), nodraw(0), size(0),
+      max_size(500), find_wnav_cb(0), find_plc_cb(0), find_ge_cb(0), wow(0)
 {
   *status = 1;
   strcpy(name, msg_name);
 }
 
-MsgWindow::~MsgWindow()
-{
-}
+MsgWindow::~MsgWindow() {}
 
-void MsgWindow::map()
-{
-}
+void MsgWindow::map() {}
 
-void MsgWindow::unmap()
-{
-}
+void MsgWindow::unmap() {}
 
-void MsgWindow::print()
-{
-}
+void MsgWindow::print() {}
 
-int MsgWindow::is_mapped()
-{
-  return displayed;
-}
+int MsgWindow::is_mapped() { return displayed; }
 
-void MsgWindow::insert(
-    int severity, const char* text, pwr_tOid oid, msgw_eRow row)
+void MsgWindow::insert(int severity, const char* text, pwr_tOid oid, msgw_eRow row)
 {
   if (size > max_size - 1)
     msgnav->set_nodraw();
@@ -90,21 +76,20 @@ void MsgWindow::insert(
   if (cdh_ObjidIsNull(oid))
     new ItemMsg(msgnav, "", (char*)text, severity, NULL, flow_eDest_Before);
   else if (row == msgw_eRow_Plc)
-    new ItemMsgObjectPlc(
-        msgnav, "", (char*)text, severity, oid, NULL, flow_eDest_Before);
+    new ItemMsgObjectPlc(msgnav, "", (char*)text, severity, oid, NULL, flow_eDest_Before);
   else
-    new ItemMsgObject(
-        msgnav, "", (char*)text, severity, oid, NULL, flow_eDest_Before);
+    new ItemMsgObject(msgnav, "", (char*)text, severity, oid, NULL, flow_eDest_Before);
 
-  if (size > max_size - 1) {
+  if (size > max_size - 1)
+  {
     msgnav->remove_oldest();
     msgnav->reset_nodraw();
-  } else
+  }
+  else
     size++;
 }
 
-void MsgWindow::insert(
-    int severity, const char* text, char* object, void* utility, msgw_eRow row)
+void MsgWindow::insert(int severity, const char* text, char* object, void* utility, msgw_eRow row)
 {
   if (size > max_size - 1)
     msgnav->set_nodraw();
@@ -112,15 +97,16 @@ void MsgWindow::insert(
   if (!object)
     new ItemMsg(msgnav, "", (char*)text, severity, NULL, flow_eDest_Before);
   else if (row == msgw_eRow_Ge)
-    new ItemMsgObjectGe(msgnav, "", (char*)text, severity, object, utility,
-        NULL, flow_eDest_Before);
+    new ItemMsgObjectGe(msgnav, "", (char*)text, severity, object, utility, NULL, flow_eDest_Before);
   else
     new ItemMsg(msgnav, "", (char*)text, severity, NULL, flow_eDest_Before);
 
-  if (size > max_size - 1) {
+  if (size > max_size - 1)
+  {
     msgnav->remove_oldest();
     msgnav->reset_nodraw();
-  } else
+  }
+  else
     size++;
 }
 
@@ -138,85 +124,73 @@ void MsgWindow::reset_nodraw()
     map();
 }
 
-void MsgWindow::msg(
-    int severity, const char* text, msgw_ePop pop, pwr_tOid oid, msgw_eRow row)
+void MsgWindow::msg(int severity, const char* text, msgw_ePop pop, pwr_tOid oid, msgw_eRow row)
 {
   if (severity == 'O')
     severity = 'I';
   insert(severity, text, oid, row);
-  if ((pop == msgw_ePop_Yes
-          || (pop == msgw_ePop_Default
-                 && (severity == 'E' || severity == 'F' || severity == 'W'))))
+  if ((pop == msgw_ePop_Yes ||
+       (pop == msgw_ePop_Default && (severity == 'E' || severity == 'F' || severity == 'W'))))
     map();
 }
 
-void MsgWindow::activate_print()
-{
-  print();
-}
+void MsgWindow::activate_print() { print(); }
 
-void MsgWindow::set_default(MsgWindow* msgw)
-{
-  default_window = msgw;
-}
+void MsgWindow::set_default(MsgWindow* msgw) { default_window = msgw; }
 
-int MsgWindow::has_default()
-{
-  return default_window ? 1 : 0;
-}
+int MsgWindow::has_default() { return default_window ? 1 : 0; }
 
-void MsgWindow::message(
-    int severity, const char* text, msgw_ePop pop, pwr_tOid oid, msgw_eRow row)
+void MsgWindow::message(int severity, const char* text, msgw_ePop pop, pwr_tOid oid, msgw_eRow row)
 {
-  if (default_window) {
+  if (default_window)
+  {
     if (severity == 'O')
       severity = 'I';
     default_window->insert(severity, text, oid, row);
-  } else {
+  }
+  else
+  {
     if ((hide_info && severity == 'I') || severity == 'O')
       return;
-    if (severity == 'E' || severity == 'W' || severity == 'F' || severity == 'I'
-        || severity == 'S')
+    if (severity == 'E' || severity == 'W' || severity == 'F' || severity == 'I' || severity == 'S')
       printf("%c %s\n", severity, text);
     else
       printf("%s\n", text);
   }
-  if (default_window
-      && (pop == msgw_ePop_Yes
-             || (pop == msgw_ePop_Default && (severity == 'E' || severity == 'F'
-                                                 || severity == 'W'))))
+  if (default_window && (pop == msgw_ePop_Yes || (pop == msgw_ePop_Default &&
+                                                  (severity == 'E' || severity == 'F' || severity == 'W'))))
     default_window->map();
 }
 
-void MsgWindow::message(int severity, const char* text, msgw_ePop pop,
-    char* object, void* utility, msgw_eRow row)
+void MsgWindow::message(int severity, const char* text, msgw_ePop pop, char* object, void* utility,
+                        msgw_eRow row)
 {
-  if (default_window) {
+  if (default_window)
+  {
     if (severity == 'O')
       severity = 'I';
     default_window->insert(severity, text, object, utility, row);
-  } else {
+  }
+  else
+  {
     if ((hide_info && severity == 'I') || severity == 'O')
       return;
-    if (severity == 'E' || severity == 'W' || severity == 'F' || severity == 'I'
-        || severity == 'S')
+    if (severity == 'E' || severity == 'W' || severity == 'F' || severity == 'I' || severity == 'S')
       printf("%c %s\n", severity, text);
     else
       printf("%s\n", text);
   }
-  if (default_window
-      && (pop == msgw_ePop_Yes
-             || (pop == msgw_ePop_Default && (severity == 'E' || severity == 'F'
-                                                 || severity == 'W'))))
+  if (default_window && (pop == msgw_ePop_Yes || (pop == msgw_ePop_Default &&
+                                                  (severity == 'E' || severity == 'F' || severity == 'W'))))
     default_window->map();
 }
 
-void MsgWindow::message(const co_error& e, const char* text1, const char* text2,
-    pwr_tOid oid, msgw_eRow row)
+void MsgWindow::message(const co_error& e, const char* text1, const char* text2, pwr_tOid oid, msgw_eRow row)
 {
   pwr_tStatus sts = e.sts();
   int severity;
-  switch (sts & 7) {
+  switch (sts & 7)
+  {
   case 0:
     severity = 'W';
     break;
@@ -238,18 +212,20 @@ void MsgWindow::message(const co_error& e, const char* text1, const char* text2,
   message(severity, e.what().c_str(), text1, text2, oid, row);
 }
 
-void MsgWindow::message(int severity, const char* text1, const char* text2,
-    const char* text3, pwr_tOid oid, msgw_eRow row)
+void MsgWindow::message(int severity, const char* text1, const char* text2, const char* text3, pwr_tOid oid,
+                        msgw_eRow row)
 {
   char text[400];
   strncpy(text, text1, sizeof(text));
   text[sizeof(text) - 1] = 0;
-  if (text2) {
+  if (text2)
+  {
     strncat(text, " ", 400 - strlen(text));
     strncat(text, text2, 400 - strlen(text));
     text[sizeof(text) - 1] = 0;
   }
-  if (text3) {
+  if (text3)
+  {
     strncat(text, " ", 400 - strlen(text));
     strncat(text, text3, 400 - strlen(text));
     text[sizeof(text) - 1] = 0;
@@ -257,18 +233,20 @@ void MsgWindow::message(int severity, const char* text1, const char* text2,
   MsgWindow::message(severity, text, msgw_ePop_Default, oid, row);
 }
 
-void MsgWindow::message(int severity, const char* text1, const char* text2,
-    const char* text3, char* object, void* utility, msgw_eRow row)
+void MsgWindow::message(int severity, const char* text1, const char* text2, const char* text3, char* object,
+                        void* utility, msgw_eRow row)
 {
   char text[400];
   strncpy(text, text1, sizeof(text));
   text[sizeof(text) - 1] = 0;
-  if (text2) {
+  if (text2)
+  {
     strncat(text, " ", 400 - strlen(text));
     strncat(text, text2, 400 - strlen(text));
     text[sizeof(text) - 1] = 0;
   }
-  if (text3) {
+  if (text3)
+  {
     strncat(text, " ", 400 - strlen(text));
     strncat(text, text3, 400 - strlen(text));
     text[sizeof(text) - 1] = 0;
@@ -276,15 +254,9 @@ void MsgWindow::message(int severity, const char* text1, const char* text2,
   MsgWindow::message(severity, text, msgw_ePop_Default, object, utility, row);
 }
 
-bool MsgWindow::has_window()
-{
-  return default_window != 0;
-}
+bool MsgWindow::has_window() { return default_window != 0; }
 
-CoWow* MsgWindow::get_wow()
-{
-  return default_window ? default_window->wow : 0;
-}
+CoWow* MsgWindow::get_wow() { return default_window ? default_window->wow : 0; }
 
 void MsgWindow::map_default()
 {
@@ -304,10 +276,7 @@ void MsgWindow::dreset_nodraw()
     default_window->reset_nodraw();
 }
 
-void MsgWindow::hide_info_messages(int hide)
-{
-  hide_info = hide;
-}
+void MsgWindow::hide_info_messages(int hide) { hide_info = hide; }
 
 void MsgWindow::msgw_find_wnav_cb(void* ctx, pwr_tOid oid)
 {

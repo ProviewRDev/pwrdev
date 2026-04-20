@@ -61,24 +61,18 @@ void pwrs_Node_Exec(void (*handler_event_cb)(int, int))
   errh_eSeverity system_severity;
   errh_eSeverity plc_severity;
   int new_idx = -1;
-  static int supervise[110] = { 
-    0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 
-    1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 
-    1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+  static int supervise[110] = {0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1,
+                               1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
+                               1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                               1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
   static int reboot_done = 0;
   static int old_EmergeBreakTrue = 0;
   static int old_SystemStatus = 1;
   static int init_cnt = 0;
 
-  if (!np) {
+  if (!np)
+  {
     pwr_tOid oid;
     pwr_tStatus sts;
 
@@ -92,8 +86,10 @@ void pwrs_Node_Exec(void (*handler_event_cb)(int, int))
   if (!np)
     return;
 
-  if (np->EmergBreakTrue && !old_EmergeBreakTrue && handler_event_cb) {
-    switch (np->EmergBreakSelect) {
+  if (np->EmergBreakTrue && !old_EmergeBreakTrue && handler_event_cb)
+  {
+    switch (np->EmergBreakSelect)
+    {
     case pwr_eEmergBreakSelectEnum_Reboot:
       (handler_event_cb)(pwr_eSystemEventTypeEnum_EmergBreakReboot, 1);
       break;
@@ -105,8 +101,11 @@ void pwrs_Node_Exec(void (*handler_event_cb)(int, int))
       break;
     default:;
     }
-  } else if (!np->EmergBreakTrue && old_EmergeBreakTrue && handler_event_cb) {
-    switch (np->EmergBreakSelect) {
+  }
+  else if (!np->EmergBreakTrue && old_EmergeBreakTrue && handler_event_cb)
+  {
+    switch (np->EmergBreakSelect)
+    {
     case pwr_eEmergBreakSelectEnum_Reboot:
       (handler_event_cb)(pwr_eSystemEventTypeEnum_EmergBreakReboot, 0);
       break;
@@ -120,13 +119,17 @@ void pwrs_Node_Exec(void (*handler_event_cb)(int, int))
     }
   }
 
-  if (np->EmergBreakTrue) {
-    switch (np->EmergBreakSelect) {
-    case pwr_eEmergBreakSelectEnum_Reboot: {
+  if (np->EmergBreakTrue)
+  {
+    switch (np->EmergBreakSelect)
+    {
+    case pwr_eEmergBreakSelectEnum_Reboot:
+    {
       /* Reboot */
       int sts;
 
-      if (!reboot_done) {
+      if (!reboot_done)
+      {
         errh_Fatal("Emergency break action: reboot");
         sts = system("/sbin/reboot");
         if (sts != 0)
@@ -137,7 +140,8 @@ void pwrs_Node_Exec(void (*handler_event_cb)(int, int))
     }
     default:;
     }
-  } else
+  }
+  else
     reboot_done = 0;
 
   old_EmergeBreakTrue = np->EmergBreakTrue;
@@ -145,11 +149,13 @@ void pwrs_Node_Exec(void (*handler_event_cb)(int, int))
   /* Calculate plc status */
   new_idx = -1;
   plc_severity = errh_Severity(np->ProcStatus[errh_eAnix_plc - 1]);
-  for (i = errh_eAnix_plc1 - 1; i < errh_eAnix_plc1 - 1 + errh_cAnix_PlcSize;
-       i++) {
+  for (i = errh_eAnix_plc1 - 1; i < errh_eAnix_plc1 - 1 + errh_cAnix_PlcSize; i++)
+  {
     severity = errh_Severity(np->ProcStatus[i]);
-    if (np->ProcStatus[i] != 0 && EVEN(np->ProcStatus[i])) {
-      if (severity >= plc_severity) {
+    if (np->ProcStatus[i] != 0 && EVEN(np->ProcStatus[i]))
+    {
+      if (severity >= plc_severity)
+      {
         new_idx = i;
         plc_severity = severity;
       }
@@ -164,21 +170,28 @@ void pwrs_Node_Exec(void (*handler_event_cb)(int, int))
   new_idx = -1;
   system_severity = errh_Severity(np->SystemStatus);
   time_GetTime(&current_time);
-  for (i = 0; i < sizeof(np->ProcStatus) / sizeof(np->ProcStatus[0]); i++) {
-    if (np->ProcStatus[i] != 0 && supervise[i]) {
+  for (i = 0; i < sizeof(np->ProcStatus) / sizeof(np->ProcStatus[0]); i++)
+  {
+    if (np->ProcStatus[i] != 0 && supervise[i])
+    {
       time_Adiff(&diff, &np->ProcTimeStamp[i], &current_time);
 
-      if (time_Dcomp(&diff, 0) < 0) {
+      if (time_Dcomp(&diff, 0) < 0)
+      {
         if (errh_Severity(np->ProcStatus[i]) < errh_Severity(PWR__PTIMEOUT))
           np->ProcStatus[i] = PWR__PTIMEOUT;
-      } else if (np->ProcStatus[i] == PWR__PTIMEOUT) {
+      }
+      else if (np->ProcStatus[i] == PWR__PTIMEOUT)
+      {
         np->ProcStatus[i] = (i < errh_cAnix_SrvSize) ? PWR__SRUN : PWR__ARUN;
       }
     }
 
     severity = errh_Severity(np->ProcStatus[i]);
-    if (np->ProcStatus[i] != 0 && EVEN(np->ProcStatus[i])) {
-      if (severity >= system_severity) {
+    if (np->ProcStatus[i] != 0 && EVEN(np->ProcStatus[i]))
+    {
+      if (severity >= system_severity)
+      {
         new_idx = i;
         system_severity = severity;
       }
@@ -189,27 +202,24 @@ void pwrs_Node_Exec(void (*handler_event_cb)(int, int))
   else if (EVEN(np->SystemStatus))
     np->SystemStatus = PWR__RUNNING;
 
-  if (init_cnt > 30) {
-    if (old_SystemStatus != np->SystemStatus) {
-      if ((errh_SeverityError(np->SystemStatus)
-              || errh_SeverityFatal(np->SystemStatus))
-          && !(errh_SeverityError(old_SystemStatus)
-                 || errh_SeverityFatal(old_SystemStatus)))
+  if (init_cnt > 30)
+  {
+    if (old_SystemStatus != np->SystemStatus)
+    {
+      if ((errh_SeverityError(np->SystemStatus) || errh_SeverityFatal(np->SystemStatus)) &&
+          !(errh_SeverityError(old_SystemStatus) || errh_SeverityFatal(old_SystemStatus)))
         (handler_event_cb)(pwr_eSystemEventTypeEnum_SystemStatusError, 1);
-      else if (!(errh_SeverityError(np->SystemStatus)
-                   || errh_SeverityFatal(np->SystemStatus))
-          && (errh_SeverityError(old_SystemStatus)
-                 || errh_SeverityFatal(old_SystemStatus)))
+      else if (!(errh_SeverityError(np->SystemStatus) || errh_SeverityFatal(np->SystemStatus)) &&
+               (errh_SeverityError(old_SystemStatus) || errh_SeverityFatal(old_SystemStatus)))
         (handler_event_cb)(pwr_eSystemEventTypeEnum_SystemStatusError, 0);
-      if (errh_SeverityWarning(np->SystemStatus)
-          && !errh_SeverityWarning(old_SystemStatus))
+      if (errh_SeverityWarning(np->SystemStatus) && !errh_SeverityWarning(old_SystemStatus))
         (handler_event_cb)(pwr_eSystemEventTypeEnum_SystemStatusWarning, 1);
-      else if (!errh_SeverityWarning(np->SystemStatus)
-          && errh_SeverityWarning(old_SystemStatus))
+      else if (!errh_SeverityWarning(np->SystemStatus) && errh_SeverityWarning(old_SystemStatus))
         (handler_event_cb)(pwr_eSystemEventTypeEnum_SystemStatusWarning, 0);
       old_SystemStatus = np->SystemStatus;
     }
-  } else
+  }
+  else
     init_cnt++;
 }
 
@@ -221,7 +231,8 @@ void pwrs_Node_SupEmon()
   pwr_tDeltaTime diff;
   static float timeout = 3;
 
-  if (!np) {
+  if (!np)
+  {
     pwr_tOid oid;
     pwr_tStatus sts;
 
@@ -235,12 +246,15 @@ void pwrs_Node_SupEmon()
   if (!np)
     return;
 
-  if (np->ProcStatus[i] != 0 && np->ProcStatus[i] != PWR__PTIMEOUT) {
+  if (np->ProcStatus[i] != 0 && np->ProcStatus[i] != PWR__PTIMEOUT)
+  {
     time_GetTime(&current_time);
     time_Adiff(&diff, &current_time, &np->ProcTimeStamp[i]);
 
-    if (time_DToFloat(0, &diff) > timeout) {
-      if (errh_Severity(np->ProcStatus[i]) < errh_Severity(PWR__PTIMEOUT)) {
+    if (time_DToFloat(0, &diff) > timeout)
+    {
+      if (errh_Severity(np->ProcStatus[i]) < errh_Severity(PWR__PTIMEOUT))
+      {
         np->ProcStatus[i] = PWR__PTIMEOUT;
         np->SystemStatus = PWR__PTIMEOUT;
       }
